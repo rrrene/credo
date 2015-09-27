@@ -1,0 +1,10 @@
+{
+  "files": {
+    "include": ["lib/**/*.{ex,exs}"],
+    "exclude": []
+  },
+  "rules": {
+    "Style.MaxLineLength": {"max_length": 100},
+    "Style.TrailingBlankLine": true
+  }
+}
