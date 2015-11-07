@@ -1,11 +1,8 @@
-sudo: false # faster builds
-
+sudo: false
 language: elixir
-
 elixir:
   - 1.0.5
-  - 1.1.0
-
+  - 1.1.1
 otp_release:
   - 17.4
   - 18.0
