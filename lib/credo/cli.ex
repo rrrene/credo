@@ -101,6 +101,7 @@ defmodule Credo.CLI do
     if Keyword.get(switches, :help), do: config = %Config{config | help: true}
     if Keyword.get(switches, :one_line), do: config = %Config{config | one_line: true}
     if Keyword.get(switches, :verbose), do: config = %Config{config | verbose: true}
+    if Keyword.get(switches, :version), do: config = %Config{config | version: true}
     if Keyword.get(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
 
     min_priority = Keyword.get(switches, :min_priority)
