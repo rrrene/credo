@@ -1,10 +1,9 @@
 defmodule Credo.Sources do
-  @always_excluded_dirs ~w(_build/ deps/ tmp/)
+  @default_sources_glob ~w(** *.{ex,exs})
 
   def find(%Credo.Config{files: files}) do
     files.included
-    |> Enum.map(&find/1)
-    |> List.flatten
+    |> Enum.flat_map(&find/1)
     |> exclude(files.excluded)
     |> to_source_files
   end
@@ -13,7 +12,6 @@ defmodule Credo.Sources do
     path
     |> to_glob
     |> Path.wildcard
-    |> Enum.reject( &String.starts_with?(&1, @always_excluded_dirs) )
   end
 
   def exclude(files, patterns \\ []) do
@@ -22,7 +20,7 @@ defmodule Credo.Sources do
 
   defp to_glob(path) do
     if File.dir?(path) do
-      [path, "**", "*.{ex,exs}"]
+      [path | @default_sources_glob]
       |> Path.join
     else
       path

@@ -36,8 +36,21 @@ end
 
     assert "    some_value = parameter1 + parameter2" ==
            Credo.SourceFile.line_at(source_file, 3)
-    assert 17 == Credo.SourceFile.column(source_file, 3, :parameter1)
-    assert 0  == Credo.SourceFile.column(source_file, 1, :defmodule)
+    assert 18 == Credo.SourceFile.column(source_file, 3, :parameter1)
+    assert 1  == Credo.SourceFile.column(source_file, 1, :defmodule)
+  end
+
+  test "it should return line and column correctly with same term in line" do
+    source_file = """
+defmodule CredoSampleModule do
+  def prune_hashes(hashes, parameter2) do
+    some_hashes = hashes + parameter2
+  end
+end
+""" |> to_source_file
+
+    assert 20 == Credo.SourceFile.column(source_file, 2, :hashes)
+    assert 19  == Credo.SourceFile.column(source_file, 3, :hashes)
   end
 
 end

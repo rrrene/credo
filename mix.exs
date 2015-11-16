@@ -4,23 +4,24 @@ defmodule Credo.Mixfile do
   def project do
     [
       app: :credo,
-      version: "0.0.1-dev",
+      version: "0.1.0",
       elixir: "~> 1.0",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps
+      deps: deps,
+      test_coverage: [tool: Coverex.Task]
     ]
   end
 
   def application do
-    [applications: [:logger]]
+    [mod: {Credo, []}, applications: [:bunt, :logger]]
   end
 
   defp deps do
     [
-      {:poison, "~> 1.2"},
-      {:dogma, "~> 0.0.7"}
+      {:bunt, "~> 0.1.4"},
+      {:coverex, "~> 1.4.1", only: :test}
     ]
   end
 end

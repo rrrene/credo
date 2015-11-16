@@ -1,8 +1,14 @@
 defmodule Credo.Issue do
-  defstruct rule:     nil,
+  defstruct check:    nil,
             category: nil,
+            priority: 0,
+            severity: nil,
             message:  nil,
-            trigger:  nil,
-            line:     nil,
-            column:   nil
+            filename: nil,
+            line_no:  nil,
+            column:   nil,
+            trigger:  nil, # optional: the String that triggered the check to fail
+            meta:     [],  # optional: metadata filled in by the check
+            scope:    nil  # optional: the name of the module, macro or
+                           #  function where the issue was found
 end

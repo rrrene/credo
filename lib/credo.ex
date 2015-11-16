@@ -1,28 +1,20 @@
 defmodule Credo do
+  use Application
+
   @version Mix.Project.config[:version]
 
-  def run(dir, formatter) do
-    config = dir |> to_config
-    source_files = config |> Credo.Sources.find
+  def start(_type, _args) do
+    import Supervisor.Spec, warn: false
 
-    Dogma.Formatter.start(source_files, formatter)
-    source_files = Credo.Rule.Runner.run(source_files, config, fn(source_file) ->
-      Dogma.Formatter.script(source_file, formatter)
-    end)
-    Dogma.Formatter.finish(source_files, formatter)
+    children = [
+      worker(Credo.Service.SourceFileWithoutStringAndSigils, []),
+      worker(Credo.Service.SourceFileCodeOnly, []),
+    ]
 
-    source_files_w_issues =
-      Enum.reject(source_files, &Enum.empty?(&1.errors))
-      |> List.flatten
-
-    if Enum.any?(source_files_w_issues) do
-      {:error, source_files_w_issues}
-    else
-      :ok
-    end
+    opts = [strategy: :one_for_one, name: Credo.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 
   def version, do: @version
 
-  defp to_config(dir), do: Credo.Config.read_or_default(dir)
 end

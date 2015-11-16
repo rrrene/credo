@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Credo do
   use Mix.Task
 
-  @shortdoc  "Statically analyse Elixir source files"
+  @shortdoc  "Run code analysis"
   @moduledoc @shortdoc
 
   def run(argv) do

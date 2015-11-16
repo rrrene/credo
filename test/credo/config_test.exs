@@ -1,66 +1,80 @@
 defmodule Credo.ConfigTest do
   use ExUnit.Case
 
-  test "Credo.Config.from_json should work" do
-    json_string = """
-{
-  "files": {
-    "included": ["src/**/*.{ex,exs}"],
-    "excluded": []
-  },
-  "rules": [
-    ["Style.MaxLineLength", {"max_length": 100}],
-    ["Style.TrailingBlankLine"]
-  ]
-}
-    """
-    expected = %Credo.Config{
-      files: %{
-        included: ["src/**/*.{ex,exs}"],
-        excluded: []
-      },
-      rules: [] # TODO: implement rule parsing
-    }
-    assert expected == Credo.Config.from_json(json_string)
+  alias Credo.Config
+
+  @default_config %Config{
+                    files: %{
+                      included: ["lib/", "src/", "web/"],
+                      excluded: []
+                    },
+                    checks: [
+                      {Credo.Check.Consistency.ExceptionNames},
+                      {Credo.Check.Consistency.LineEndings},
+                      {Credo.Check.Consistency.Tabs},
+                    ]
+                  }
+  @example_config %Config{
+                    checks: [
+                      {Credo.Check.Design.AliasUsage},
+                      {Credo.Check.Design.TagFIXME},
+                      {Credo.Check.Design.TagTODO},
+                    ]
+                  }
+  @example_config2 %Config{
+                    files: %{
+                      excluded: ["lib/**/*_test.exs"]
+                    },
+                    checks: [
+                      {Credo.Check.Consistency.ExceptionNames},
+                      {Credo.Check.Consistency.LineEndings},
+                      {Credo.Check.Consistency.Tabs},
+                    ]
+                  }
+
+
+  test "the truth" do
+    expected = %Config{
+                    files: %{
+                      included: ["lib/", "src/", "web/"],
+                      excluded: []
+                    },
+                    checks: [
+                      {Credo.Check.Design.AliasUsage},
+                      {Credo.Check.Design.TagFIXME},
+                      {Credo.Check.Design.TagTODO},
+                    ]
+                  }
+    assert expected == Config.merge(@default_config, @example_config)
   end
 
-  test "Credo.Config.from_json should work with incomplete values" do
-    json_string = """
-{
-  "files": {
-    "excluded": []
-  }
-}
-    """
-    expected = %Credo.Config{
-      files: %{
-        included: ["lib/**/*.{ex,exs}"],
-        excluded: []
-      },
-      rules: Credo.Config.default_rules
-    }
-    assert expected == Credo.Config.from_json(json_string)
+  test "merge works 2" do
+    expected = %Config{
+                    files: %{
+                      included: ["lib/", "src/", "web/"],
+                      excluded: ["lib/**/*_test.exs"]
+                    },
+                    checks: [
+                      {Credo.Check.Consistency.ExceptionNames},
+                      {Credo.Check.Consistency.LineEndings},
+                      {Credo.Check.Consistency.Tabs},
+                    ]
+                  }
+    assert expected == Config.merge(@default_config, @example_config2)
   end
 
-  test "Credo.Config.read_or_default should work" do
-    expected = %Credo.Config{
-      files: %{
-        included: ["lib/**/*.{ex,exs}"],
-        excluded: []
-      },
-      rules: Credo.Config.default_rules
-    }
-    assert expected == Credo.Config.read_or_default(".")
-  end
-
-  test "Credo.Config.read_or_default should work if file is not present" do
-    expected = %Credo.Config{
-      files: %{
-        included: ["lib/**/*.{ex,exs}"],
-        excluded: []
-      },
-      rules: Credo.Config.default_rules
-    }
-    assert expected == Credo.Config.read_or_default("/tmp/")
+  test "merge works with list" do
+    expected = %Config{
+                    files: %{
+                      included: ["lib/", "src/", "web/"],
+                      excluded: ["lib/**/*_test.exs"]
+                    },
+                    checks: [
+                      {Credo.Check.Design.AliasUsage},
+                      {Credo.Check.Design.TagFIXME},
+                      {Credo.Check.Design.TagTODO},
+                    ]
+                  }
+    assert expected == Config.merge([@default_config, @example_config2, @example_config])
   end
 end

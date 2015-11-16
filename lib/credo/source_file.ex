@@ -1,37 +1,51 @@
 defmodule Credo.SourceFile do
-  defstruct path:             nil,
-            source:           nil,
-            lines:            nil,
-            ast:              nil,
-            valid?:           nil,
-            errors:           []
+  defstruct filename: nil,
+            source:   nil,
+            lines:    nil,
+            ast:      nil,
+            valid?:   nil,
+            issues:   []
 
-  def parse(source, path) do
+  def parse(source, filename) do
     %Credo.SourceFile{
-      path:             path,
-      source:           source,
-      lines:            source |> Credo.Code.to_lines,
+      filename: filename,
+      source:   source,
+      lines:    source |> Credo.Code.to_lines,
     } |> with_ast
   end
 
+  @doc """
+  Returns the line at the given +line_no+.
+
+  NOTE: +line_no+ is a 1-based index.
+  """
   def line_at(source_file, line_no) do
-    Enum.find_value(source_file.lines, fn {_line_no, line} ->
-      if _line_no == line_no, do: line
+    Enum.find_value(source_file.lines, fn {line_no2, line} ->
+      if line_no2 == line_no, do: line
     end)
   end
 
+  @doc """
+  Returns the column of the given +trigger+ inside the given line.
+
+  NOTE: Both +line_no+ and the returned index are 1-based.
+  """
   def column(source_file, line_no, trigger) do
     line = line_at(source_file, line_no)
-    {col, _} = Regex.run(~r/#{trigger}/, line, return: :index) |> List.first
-    col
+    case Regex.run(~r/\b#{trigger}\b/, line, return: :index) do
+      nil -> nil
+      result ->
+        {col, _} = result |> List.first
+        col + 1
+    end
   end
 
-  defp with_ast(%Credo.SourceFile{source: source} = source_file) do
-    case Credo.Code.ast(source) do
+  defp with_ast(%Credo.SourceFile{} = source_file) do
+    case Credo.Code.ast(source_file) do
       {:ok, ast} ->
         %Credo.SourceFile{source_file | valid?: true, ast: ast}
       {:error, errors} ->
-        %Credo.SourceFile{source_file | valid?: false, ast: [], errors: errors}
+        %Credo.SourceFile{source_file | valid?: false, ast: [], issues: errors}
     end
   end
 end

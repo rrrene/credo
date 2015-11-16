@@ -1,11 +1,14 @@
 ExUnit.start()
 
+# Exclude all external tests from running
+ExUnit.configure(exclude: [to_be_implemented: true])
+
 defmodule Credo.TestHelper do
   defmacro __using__(_) do
     quote do
       use ExUnit.Case
       import CredoSourceFileCase
-      import CredoRuleCase
+      import CredoCheckCase
     end
   end
 end
@@ -17,36 +20,77 @@ defmodule CredoSourceFileCase do
       _ -> raise "Source could not be parsed!"
     end
   end
+
+  def to_source_files(list, filename \\ "untitled") do
+    list
+    |> Enum.with_index
+    |> Enum.map(fn({source, index}) ->
+      to_source_file(source, "#{filename}.#{index}.ex")
+      end)
+  end
 end
 
-defmodule CredoRuleCase do
+defmodule CredoCheckCase do
   use ExUnit.Case
 
-  def refute_issues(source_file, rule \\ nil, config \\ []) do
-    issues = issues_for(source_file, rule, config)
-    assert [] == issues, "There should be no issues."
-    source_file
+  def refute_issues(source_file, check \\ nil, config \\ []) do
+    issues = issues_for(source_file, check, config)
+    assert [] == issues, "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
+    issues
   end
 
   def assert_issue(source_file, callback) when is_function(callback) do
     assert_issue(source_file, nil, [], callback)
   end
+  def assert_issue(source_file, check, callback) when is_function(callback) do
+    assert_issue(source_file, check, [], callback)
+  end
 
-  def assert_issue(source_file, rule \\ nil, config \\ [], callback \\ nil) do
-    issues = issues_for(source_file, rule, config)
-    assert Enum.count(issues) == 1, "There should be an issue."
+  def assert_issue(source_file, check \\ nil, config \\ [], callback \\ nil) do
+    issues = issues_for(source_file, check, config)
+    refute Enum.count(issues) == 0, "There should be an issue."
+    assert Enum.count(issues) == 1, "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
     if callback, do: callback.(issues |> List.first)
-    source_file
+    issues
   end
 
-  def assert_issues(source_file, rule \\ nil, config \\ [], callback \\ nil) do
-    issues = issues_for(source_file, rule, config)
+  def assert_issues(source_file, callback) when is_function(callback) do
+    assert_issues(source_file, nil, [], callback)
+  end
+  def assert_issues(source_file, check, callback) when is_function(callback) do
+    assert_issues(source_file, check, [], callback)
+  end
+  def assert_issues(source_file, check \\ nil, config \\ [], callback \\ nil) do
+    issues = issues_for(source_file, check, config)
     assert Enum.count(issues) > 0, "There should be issues."
-    assert Enum.count(issues) > 1, "There should be more than one issue."
+    assert Enum.count(issues) > 1, "There should be more than one issue, got: #{to_inspected(issues)}"
     if callback, do: callback.(issues)
-    source_file
+    issues
   end
 
-  defp issues_for(source_file, nil, _), do: source_file.errors
-  defp issues_for(source_file, rule, config), do: rule.test(source_file, config)
+  defp issues_for(source_files, nil, _) when is_list(source_files) do
+    source_files
+    |> Enum.flat_map(&(&1.issues))
+  end
+  defp issues_for(source_files, check, config) when is_list(source_files) do
+    source_files
+    |> check.run(config)
+    |> Enum.flat_map(&(&1.issues))
+  end
+  defp issues_for(source_file, nil, _), do: source_file.issues
+  defp issues_for(source_file, check, config), do: check.run(source_file, config)
+
+
+  def assert_trigger([issue], trigger), do: [assert_trigger(issue, trigger)]
+  def assert_trigger(issue, trigger) do
+    assert trigger == issue.trigger
+    issue
+  end
+
+  def to_inspected(value) do
+    value
+    |> Inspect.Algebra.to_doc(%Inspect.Opts{})
+    |> Inspect.Algebra.format(50)
+    |> Enum.join("")
+  end
 end

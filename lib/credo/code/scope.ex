@@ -1,0 +1,75 @@
+defmodule Credo.Code.Scope do
+  @moduledoc """
+  This module provides helper functions to determine the scope name at a certain
+  point in the analysed code.
+  """
+
+  alias Credo.Code.Block
+  alias Credo.Check.CodeHelper
+
+  @def_ops Application.get_env(:credo, :def_ops)
+
+
+  def mod_name(nil), do: nil
+  def mod_name(scope_name) do
+    names = scope_name |> String.split(".")
+    if names |> List.last |> String.match?(~r/^[a-z]/) do
+      names |> Enum.slice(0..length(names)-2) |> Enum.join(".")
+    else
+      scope_name
+    end
+  end
+
+  @doc """
+  Returns the scope for the given line as a tuple consisting of the call to
+  define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
+  name of the scope.
+
+  Examples:
+
+    {:defmodule, "Foo.Bar"}
+    {:def, "Foo.Bar.baz"}
+  """
+  def name(_ast, [line: 0]), do: nil
+  def name(ast, [line: line]) do
+    result =
+      case find_scope(ast, line, [], nil) do
+        nil -> name(ast, line: line - 1)
+        {op, list} -> {op, Enum.join(list, ".")}
+      end
+    result || {nil, ""}
+  end
+
+  # Returns a List for the scope name
+  defp find_scope({:__block__, _meta, arguments}, line, name_list, last_op) do
+    arguments
+    |> Enum.find_value(&find_scope(&1, line, name_list, last_op))
+  end
+  defp find_scope({:defmodule, meta, [{:__aliases__, _, module_name}, arguments]}, line, name_list, _last_op) do
+    name_list = name_list ++ module_name
+    cond do
+      meta[:line] == line -> {:defmodule, name_list}
+      meta[:line] > line -> nil
+      true -> arguments |> Block.do_block_for! |> find_scope(line, name_list, :defmodule)
+    end
+  end
+  for op <- @def_ops do
+    defp find_scope({unquote(op) = op, meta, arguments} = ast, line, name_list, _last_op) when is_list(arguments) do
+      fun_name = CodeHelper.def_name(ast)
+      name_list = name_list ++ [fun_name]
+      cond do
+        meta[:line] == line -> {op, name_list}
+        meta[:line] > line -> nil
+        true -> arguments |> Block.do_block_for! |> find_scope(line, name_list, op)
+      end
+    end
+  end
+  defp find_scope({_atom, meta, _arguments}, line, name_list, last_op) do
+    if meta[:line] == line do
+      {last_op, name_list}
+    else
+      nil
+    end
+  end
+  defp find_scope(_, _line, _name_list, _last_op), do: nil
+end
