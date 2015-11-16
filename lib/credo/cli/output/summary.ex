@@ -12,7 +12,7 @@ defmodule Credo.CLI.Output.Summary do
     {:readability, "code readability issue", "code readability issues"},
     {:design, "software design suggestion", "software design suggestions"},
   ]
-  @cry_for_help Application.get_env(:credo, :cry_for_help)
+  @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
   def print(_source_files, %Config{one_line: true}, _time_load, _time_run) do
     nil

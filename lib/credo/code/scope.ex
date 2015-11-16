@@ -7,7 +7,7 @@ defmodule Credo.Code.Scope do
   alias Credo.Code.Block
   alias Credo.Check.CodeHelper
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
 
 
   def mod_name(nil), do: nil

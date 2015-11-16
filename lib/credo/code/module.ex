@@ -7,7 +7,7 @@ defmodule Credo.Code.Module do
   alias Credo.Code
   alias Credo.Code.Block
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
 
   @doc "Reads an attribute from a module's `ast`"
   def attribute(ast, attr_name) do

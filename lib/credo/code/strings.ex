@@ -2,7 +2,7 @@ defmodule Credo.Code.Strings do
   @moduledoc """
   This module let's you strip strings from source code.
   """
-  
+
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"\"", "\""}, {"'", "'"}]
   @all_string_sigils @sigil_delimiters |> Enum.flat_map(fn({b, e}) -> [{"~s#{b}", e}, {"~S#{b}", e}] end)

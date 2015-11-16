@@ -12,7 +12,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
       ignore_strings: true
     ]
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
 
   use Credo.Check, base_priority: :low
 

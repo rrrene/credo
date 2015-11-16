@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   """
 
   @explanation [check: @moduledoc]
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
 
   alias Credo.Code.Name
 

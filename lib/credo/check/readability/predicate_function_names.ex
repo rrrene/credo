@@ -28,7 +28,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   """
 
   @explanation [check: @moduledoc]
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
 
   use Credo.Check, base_priority: :high
 

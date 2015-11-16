@@ -13,7 +13,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @explanation [check: @moduledoc]
   @default_params [max_size: 30]
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
 

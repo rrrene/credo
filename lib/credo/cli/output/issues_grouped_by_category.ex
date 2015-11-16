@@ -11,9 +11,21 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   @many_source_files 60
   @indent 8
   @per_category 5
-  @order Application.get_env(:credo, :category_order)
-  @category_colors Application.get_env(:credo, :category_colors)
-  @category_titles Application.get_env(:credo, :category_titles)
+  @order [:design, :readability, :refactor, :warning, :consistency]
+  @category_colors [
+    design: :olive,
+    readability: :blue,
+    refactor: :yellow,
+    warning: :red,
+    consistency: :cyan,
+  ]
+  @category_titles [
+    design: "Software Design",
+    readability: "Code Readability",
+    refactor: "Refactoring opportunities",
+    warning: "Warnings - please take a look",
+    consistency: "Consistency",
+  ]
 
   @doc "Called before the analysis is run."
   def print_before_info(source_files) do

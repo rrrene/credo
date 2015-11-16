@@ -1,7 +1,7 @@
 defmodule Credo.CLI.Command.Help do
   alias Credo.CLI.Output.UI
 
-  @cry_for_help Application.get_env(:credo, :cry_for_help)
+  @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
   def run(_, _) do
     print_banner

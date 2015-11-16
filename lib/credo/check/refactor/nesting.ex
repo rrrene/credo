@@ -23,7 +23,7 @@ defmodule Credo.Check.Refactor.Nesting do
   @explanation [check: @moduledoc]
   @default_params [max_nesting: 2]
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn]
 
   alias Credo.Check.CodeHelper

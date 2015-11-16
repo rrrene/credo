@@ -3,8 +3,8 @@ defmodule Credo.Code.Parameters do
   This module provides helper functions to analyse the parameters taken by a
   function.
   """
-  
-  @def_ops Application.get_env(:credo, :def_ops)
+
+  @def_ops [:def, :defp, :defmacro]
 
   @doc "Returns the parameter count for the given function's AST"
   def count(nil), do: 0

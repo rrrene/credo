@@ -13,11 +13,11 @@ defmodule Credo.CLI.Output do
 
   def check_color(category) when is_binary(category) do
     case category do
-      "consistency" -> :_category_consistency
-      "readability" -> :_category_readability
-      "design" -> :_category_design
-      "refactor" -> :_category_refactor
-      "warning" -> :_category_warning
+      "consistency" -> :cyan
+      "readability" -> :blue
+      "design" -> :olive
+      "refactor" -> :yellow
+      "warning" -> :red
       _ -> :magenta
     end
   end
@@ -62,8 +62,8 @@ defmodule Credo.CLI.Output do
     end
   end
 
-  def foreground_color(:_category_consistency), do: :black
-  def foreground_color(:_category_refactor), do: :black
+  def foreground_color(:cyan), do: :black
+  def foreground_color(:yellow), do: :black
   def foreground_color(_), do: :white
 
   def term_columns(default \\ 80) do

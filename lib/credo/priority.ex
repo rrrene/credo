@@ -4,7 +4,7 @@ defmodule Credo.Priority do
   alias Credo.Code.Scope
   alias Credo.SourceFile
 
-  @def_ops Application.get_env(:credo, :def_ops)
+  @def_ops [:def, :defp, :defmacro]
   @many_functions 5
 
   def scope_priorities(%SourceFile{} = source_file) do

@@ -72,7 +72,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
 
     [
-      UI.edge([outer_color, :faint]), :_code, :faint,
+      UI.edge([outer_color, :faint]), :cyan, :faint,
         String.duplicate(" ", @indent-2), displayed_line
     ]
     |> UI.puts

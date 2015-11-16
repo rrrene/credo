@@ -134,7 +134,7 @@ defmodule Credo.CLI.Output.Explain do
       |> UI.puts
 
       [
-        UI.edge([outer_color, :faint]), :reset, :_code, :bright,
+        UI.edge([outer_color, :faint]), :reset, :cyan, :bright,
           String.duplicate(" ", @indent-2), displayed_line
       ]
       |> UI.puts
@@ -183,7 +183,7 @@ defmodule Credo.CLI.Output.Explain do
     ]
   end
   def format_explanation_text("    " <> line) do
-    [:_explain_code, :faint, "    ", line]
+    [:yellow, :faint, "    ", line]
   end
   def format_explanation_text(line) do
     # TODO: format things in backticks in help texts
