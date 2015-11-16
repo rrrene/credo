@@ -10,7 +10,14 @@ defmodule Credo.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
-      test_coverage: [tool: Coverex.Task]
+      test_coverage: [tool: Coverex.Task],
+      name: "Credo",
+      description: "An opinionated analysis tool for Elixir with a strong focus on teaching",
+      package: [
+        maintainers: ["René Föhring"],
+        licenses: ["MIT"],
+        links: %{"GitHub" => "https://github.com/rrrene/credo"},
+      ]
     ]
   end
 
