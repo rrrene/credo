@@ -36,7 +36,7 @@ To run credo in the current project, **just type**:
 
 This will run the code analysis and suggest places to edit your code.
 
-If you want a **full list instead of suggestions** just type:
+If you want the **list of issues grouped by files** instead of suggestions just type:
 
     $ mix credo list
 
