@@ -7,3 +7,5 @@ otp_release:
   - 17.4
   - 18.0
   - 18.1
+after_script:
+  - mix inch.report
