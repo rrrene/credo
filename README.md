@@ -233,6 +233,16 @@ These checks warn you about things that are potentially dangerous, like a missed
 
 
 
+## Issues
+
+Like any code linter, Credo reports issues. Contrary to many other linters these issues are not created equal. Each issue is assigned a priority, based on a base priority set by the config and a dynamic component based on violation severity and location in the source code.
+
+These priorities hint at the importance of each issue and are displayed in the command-line interface using arrows: ↑ ↗ → ↘ ↓
+
+By default, only issues with a positive priority are part of the report (↑ ↗ →).
+
+
+
 ## Contributing
 
 1. [Fork it!](http://github.com/rrrene/credo/fork)
