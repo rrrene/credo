@@ -95,7 +95,7 @@ defmodule Credo.CLI do
     if Keyword.get(switches, :all) do
       config = %Config{config | all: true}
     end
-    if Keyword.get(switches, :pedantic) do
+    if Keyword.get(switches, :all_priorities) do
       config = %Config{config | all: true, min_priority: -99}
     end
     if Keyword.get(switches, :help), do: config = %Config{config | help: true}

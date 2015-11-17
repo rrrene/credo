@@ -74,16 +74,16 @@ defmodule Credo.CLI.Command.List do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
     List options:
-      -a, --all             Show all issues including low priority ones
+      -a, --all             Show all issues
+      -A, --all-priorities  Show all issues including low priority ones
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
           --one-line        Show a condensed version of the list
-          --pedantic        Include low priority issues
 
-    Other options:
-      -v, --version       Show version
-      -h, --help          Show this help
+    General options:
+      -v, --version         Show version
+      -h, --help            Show this help
     """
     |> UI.puts
   end
