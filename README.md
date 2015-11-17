@@ -52,7 +52,7 @@ You will get output like this:
     ┃       lib/phoenix/router/socket.ex:12:12 (Phoenix.Router.Socket.channel)
     ┃
 
-Now you might want to know more about that particular entry, **just copy the filename+line-no combo into the command**:
+Now you might want to know more about that particular entry, **just copy the filename+line-number combo into the command**:
 
     $ mix credo lib/phoenix/channel.ex:26
 
@@ -149,7 +149,7 @@ $ mix credo -i readability,duplicated
 
 The second example illustrates how the command takes a comma-separated list. All commands matching any of the passed items will be ignored.
 
-You can use partial names to quickly exclude checks. `mix credo -i nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedec**larationBy...**
+You can use partial names to quickly exclude checks. `mix credo -i nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
 
 
 ### Show code snippets in the output
@@ -214,7 +214,7 @@ These checks take a look at your code and ensure a consistent coding style. Usin
 
 ### Readability
 
-Readability checks do not concern themselves with the technical correctness of your code, but easy it is to digest.
+Readability checks do not concern themselves with the technical correctness of your code, but how easy it is to digest.
 
 
 ### Refactoring Opportunities
@@ -224,7 +224,7 @@ The Refactor checks show you opportunities to avoid future problems and technica
 
 ### Software Design
 
-While refactor checks show you possible problems, these checks try to highlight possibilities, like - potentially intended - duplicated code or TODO and FIXME comments.
+While refactor checks show you possible problems, these checks try to highlight possibilities, like - potentially intended - duplicated code or _TODO_ and _FIXME_ comments.
 
 
 ### Warnings
