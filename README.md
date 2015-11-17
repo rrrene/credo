@@ -162,45 +162,62 @@ Use the `--verbose` switch to include the code snippets in question in the outpu
 Use the `--one-line` switch to format the output to represent each issue by a single line.
 
 
+### Show all issues including low priority ones
+
+Use the `--all-priorities` switch to include low priority issues in the output.
+
+
 
 ## Commands
 
 ### suggest (default command)
 
-Usage:
+`suggest` is the default command of Credo. It suggests issues to fix in your code, but it cuts the list to a digestable count. If you want to see the full list, use the `--all`  switch.
 
-    $ mix credo
+Example usage:
 
-or
+    $ mix credo                     # display standard report
+    $ mix credo suggest             # same thing, since it's the default command
+    $ mix credo --all --one-line    # include low priority issues, one issue per line
 
-    $ mix credo suggest
-
-Options:
-
-    $ mix credo suggest --help
+    $ mix credo suggest --help      # more options
 
 
 ### list
 
-Usage:
+`list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.
 
-    $ mix credo list
+Example usage:
 
-Options:
+    $ mix credo list                # show issues grouped by file
+    $ mix credo list --one-line     # show issues grouped by file, one issue per line
+    $ mix credo list --one-line -a  # same thing, include low priority issues
 
-    $ mix credo list --help
+    $ mix credo list --help         # more options
 
 
 ### explain
 
-Usage:
+`explain` allows you to dig deeper into an issue, by showing you details about the issue and the reasoning by it being reported. To be convenient, you can just copy-paste the `filename:line_number:column` string from the report behind the Credo command to check it out.
 
-    $ mix credo explain <FILENAME>:<LINE_NO>[:<COLUMN>]
+*Credits:* This is inspired by how you can snap the info from failed tests behind `mix test`.
 
-Options:
+Example usage:
 
-    none
+    $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
+    $ mix credo explain lib/my_app/server.ex:10:24  # same thing
 
+There are not additional options.
+
+
+
+## Issues
+
+Like any code linter, Credo reports issues. Contrary to many other linters these issues are not created equal. Each issue is assigned a priority, based on a base priority set by the config and a dynamic component based on violation severity and location in the source code.
+
+These priorities hint at the importance of each issue and are displayed in the command-line interface using arrows: ↑ ↗ → ↘ ↓
+
+By default, only issues with a positive priority are part of the report (↑ ↗ →).
 
 
 
@@ -230,16 +247,6 @@ While refactor checks show you possible problems, these checks try to highlight 
 ### Warnings
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to String.downcase without saving the result.
-
-
-
-## Issues
-
-Like any code linter, Credo reports issues. Contrary to many other linters these issues are not created equal. Each issue is assigned a priority, based on a base priority set by the config and a dynamic component based on violation severity and location in the source code.
-
-These priorities hint at the importance of each issue and are displayed in the command-line interface using arrows: ↑ ↗ → ↘ ↓
-
-By default, only issues with a positive priority are part of the report (↑ ↗ →).
 
 
 
