@@ -13,11 +13,16 @@ defmodule Credo.Mixfile do
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
       description: "An opinionated analysis tool for Elixir with a strong focus on teaching",
-      package: [
-        maintainers: ["René Föhring"],
-        licenses: ["MIT"],
-        links: %{"GitHub" => "https://github.com/rrrene/credo"},
-      ]
+      package: package
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", ".credo.exs", "mix.exs", "README.md", "LICENSE"],
+      maintainers: ["René Föhring"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/rrrene/credo"},
     ]
   end
 
