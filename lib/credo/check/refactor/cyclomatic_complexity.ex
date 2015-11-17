@@ -30,6 +30,9 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, max_complexity))
   end
 
+  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
+    {ast, issues}
+  end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_complexity) when is_list(arguments) do
       complexity = ast |> complexity_for |> round

@@ -29,6 +29,9 @@ defmodule Credo.Check.Refactor.ABCSize do
     Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, max_abc_size))
   end
 
+  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
+    {ast, issues}
+  end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_abc_size) when is_list(arguments) do
       abc_size = abc_size_for(ast) |> round
