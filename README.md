@@ -9,6 +9,8 @@ Credo is a static code analysis tool for the Elixir language with a focus on tea
 If you are a Rubyist it is best described as an opinionated mix between [Inch](https://github.com/rrrene/inch) and [Rubocop](https://github.com/bbatsov/rubocop).
 
 
+![Credo](https://raw.github.com/rrrene/credo/master/assets/screenshot.png)
+
 
 ## Installation
 
