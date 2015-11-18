@@ -18,4 +18,10 @@ defmodule Credo.SourcesTest do
     expected = ["lib/credo.ex", "lib/test/credo_test.exs"]
     assert expected == Credo.Sources.exclude(files, ["config/"])
   end
+
+  test "Credo.Sources.exclude with globs" do
+    files = ["lib/credo.ex", "lib/test/credo_test.exs", "config/config.exs"]
+    expected = ["lib/test/credo_test.exs", "config/config.exs"]
+    assert expected == Credo.Sources.exclude(files, ["lib/*.ex"])
+  end
 end
