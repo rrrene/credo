@@ -116,7 +116,7 @@ Take a look at Credo's own `.credo.exs` for an [example configuration](https://g
 
 ### Only run some checks
 
-To ignore selected checks, you can use the `--checks` or the `-c` alias.
+To run only a subset of checks, you can use the `--checks` or the `-c` alias.
 
 ```bash
 # to only run the Readability checks, use:
@@ -125,7 +125,7 @@ $ mix credo -c readability
 
 # to only run Readability checks and Warnings, use:
 
-$ mix credo -i readability,warning
+$ mix credo -c readability,warning
 ```
 
 The second example illustrates how the command takes a comma-separated list. All commands matching **any** of the passed items will be run.
