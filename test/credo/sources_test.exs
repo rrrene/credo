@@ -12,4 +12,10 @@ defmodule Credo.SourcesTest do
     expected = ["credo.ex"]
     assert expected == Credo.Sources.exclude(files, [~r/test/, ~r/\.exs$/])
   end
+
+  test "Credo.Sources.exclude with directories" do
+    files = ["lib/credo.ex", "lib/test/credo_test.exs", "config/config.exs"]
+    expected = ["lib/credo.ex", "lib/test/credo_test.exs"]
+    assert expected == Credo.Sources.exclude(files, ["config/"])
+  end
 end
