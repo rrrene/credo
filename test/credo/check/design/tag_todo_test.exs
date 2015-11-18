@@ -31,6 +31,17 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report an issue at the end of a line w/o space" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    Repo.preload(:comments)# TODO blah blah
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report a couple of issues" do
 """
 defmodule CredoSampleModule do
