@@ -123,7 +123,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
     :use,
     :var!,
   ]
-  @excluded_names [:_]
+  @excluded_names [:_, :sigil_r, :sigil_R]
 
   alias Credo.Code.Module
 
