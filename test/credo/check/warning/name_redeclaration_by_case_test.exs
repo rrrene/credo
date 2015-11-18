@@ -12,6 +12,7 @@ defmodule CredoSampleModule do
     case fun2 do
       x -> x
       %{something: foobar} -> foobar
+      ~r/@/ -> something
     end
   end
 
