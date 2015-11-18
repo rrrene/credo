@@ -32,7 +32,7 @@ defmodule Credo.SourceFile do
   """
   def column(source_file, line_no, trigger) do
     line = line_at(source_file, line_no)
-    regexed = trigger |> Regex.escape
+    regexed = trigger |> to_string |> Regex.escape
     case Regex.run(~r/\b#{regexed}\b/, line, return: :index) do
       nil -> nil
       result ->
