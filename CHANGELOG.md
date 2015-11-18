@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7
+
+- Bugfix to `NameRedeclarationBy\*` checks
+- `Sources.exclude` had a bug when excluding directories
+
 ## 0.1.6
 
 - Rename CLI switch `--pedantic` to `--all-priorities` (alias is `-A`)
