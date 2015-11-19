@@ -92,7 +92,8 @@ defmodule Credo.CLI.Output.Explain do
     ]
     |> UI.puts
 
-    UI.edge(outer_color)
+    outer_color
+    |> UI.edge
     |> UI.puts
 
     [
