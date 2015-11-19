@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.8
+
+- Add `apps/` to default directories
+
 ## 0.1.7
 
 - Bugfix to `NameRedeclarationBy\*` checks
