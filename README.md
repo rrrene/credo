@@ -209,7 +209,15 @@ Example usage:
     $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
     $ mix credo explain lib/my_app/server.ex:10:24  # same thing
 
-There are not additional options.
+There are no additional options.
+
+
+
+### categories
+
+`categories` shows you all issue categories and explains their semantics.
+
+There are no additional options.
 
 
 
