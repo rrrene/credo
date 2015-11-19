@@ -20,7 +20,12 @@ defmodule Credo.Check.Refactor.Nesting do
   different loops and conditions.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      max_nesting: "The maximum number of levels code should be nested."
+    ]
+  ]
   @default_params [max_nesting: 2]
 
   @def_ops [:def, :defp, :defmacro]

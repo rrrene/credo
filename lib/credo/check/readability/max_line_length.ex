@@ -5,7 +5,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
     Can optionally ignore function definitions and (multi-)line strings.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      max_length: "The maximum number of characters a line may consist of.",
+      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+    ]
+  ]
   @default_params [
       max_length: 80,
       ignore_definitions: true,

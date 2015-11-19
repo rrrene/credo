@@ -9,7 +9,12 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   metrics.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      max_complexity: "The maximum cyclomatic complexity a function should have."
+    ]
+  ]
   @default_params [max_complexity: 9]
 
   @def_ops [:def, :defp, :defmacro]

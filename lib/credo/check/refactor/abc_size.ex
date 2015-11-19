@@ -10,9 +10,15 @@ defmodule Credo.Check.Refactor.ABCSize do
   be a useful metric in a declarative language like Elixir.
   """
 
-  @explanation [check: @moduledoc]
-  @default_params [max_size: 30]
-
+  @explanation [
+    check: @moduledoc,
+    params: [
+      max_size: "The maximum ABC size a function should have.",
+    ]
+  ]
+  @default_params [
+    max_size: 30
+  ]
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
