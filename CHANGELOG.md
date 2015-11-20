@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9
+
+- Add missing `-A` alias for `--all-priorities`
+- Improve wording in the CLI a bit
+
 ## 0.1.8
 
 - Add `apps/` to default directories
