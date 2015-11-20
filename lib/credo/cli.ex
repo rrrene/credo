@@ -47,6 +47,7 @@ defmodule Credo.CLI do
     ]
     aliases = [
       a: :all,
+      A: :all_priorities,
       c: :checks,
       C: :config_name,
       i: :ignore_checks,
