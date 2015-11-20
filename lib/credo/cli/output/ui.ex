@@ -10,4 +10,11 @@ defmodule Credo.CLI.Output.UI do
   defdelegate puts(v), to: Bunt
   def puts(v, color), do: Bunt.puts([color, v])
 
+
+  def wrap_at(text, number, acc \\ []) do
+    Regex.compile!("(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{number}})(?:\\r?\\n)?|(?:\\r?\\n|$))")
+    |> Regex.scan(text)
+    |> Enum.map(&List.first/1)
+    |> Enum.map(&String.strip/1)
+  end
 end

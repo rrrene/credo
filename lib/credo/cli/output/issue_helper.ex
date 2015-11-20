@@ -29,14 +29,9 @@ defmodule Credo.CLI.Output.IssueHelper do
     filename_color = :white
     tag_style = if outer_color == inner_color, do: :faint, else: :bright
 
-    [
-      UI.edge(outer_color),
-        outer_color,
-        tag_style,
-        Output.check_tag(check.category), " ", priority |> Output.priority_arrow,
-        :normal, message_color, " ", message,
-    ]
-    |> UI.puts
+    message
+    |> UI.wrap_at(term_width - @indent)
+    |> print_issue_message(check, outer_color, message_color, tag_style, priority)
 
     [
       UI.edge(outer_color, @indent),
@@ -52,6 +47,31 @@ defmodule Credo.CLI.Output.IssueHelper do
       UI.edge([outer_color, :faint])
       |> UI.puts
     end
+  end
+
+  defp print_issue_message([first_line | other_lines], check, outer_color, message_color, tag_style, priority) do
+    [
+      UI.edge(outer_color),
+        outer_color,
+        tag_style,
+        Output.check_tag(check.category), " ", priority |> Output.priority_arrow,
+        :normal, message_color, " ", first_line,
+    ]
+    |> UI.puts
+
+    other_lines
+    |> Enum.each(&print_issue_message(&1, outer_color, message_color))
+  end
+  defp print_issue_message("", _outer_color, _message_color) do
+  end
+  defp print_issue_message(message, outer_color, message_color) do
+    [
+      UI.edge(outer_color),
+        outer_color,
+        String.duplicate(" ", @indent - 3),
+        :normal, message_color, " ", message,
+    ]
+    |> UI.puts
   end
 
   defp print_issue_line(%Issue{line_no: nil}, _source_file, _inner_color, _outer_color, _term_width) do
