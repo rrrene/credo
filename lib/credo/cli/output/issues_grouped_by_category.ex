@@ -107,7 +107,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     if Enum.count(issues) > per_category(config) do
       not_shown = Enum.count(issues) - per_category(config)
 
-      [UI.edge(color), :faint, " ...  (#{not_shown} more, use `--all` to show all)"]
+      [UI.edge(color), :faint, " ...  (#{not_shown} more, use `-a` to show them)"]
       |> UI.puts
     end
   end

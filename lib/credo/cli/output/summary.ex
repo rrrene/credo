@@ -35,7 +35,7 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts
 
     if config.min_priority >= 0 do
-      "Only considering priority objects: ↑ ↗ →  (use `--help` for options)."
+      "Showing issues: ↑ ↗ →  (use `-A` to show all priorities, `--help` for options)."
       |> UI.puts(:faint)
     end
   end
@@ -72,7 +72,6 @@ defmodule Credo.CLI.Output.Summary do
     [bar]
     |> UI.puts
   end
-
 
   defp format_time_spent(time_load, time_run) do
     time_run  = time_run |> div(10000)
