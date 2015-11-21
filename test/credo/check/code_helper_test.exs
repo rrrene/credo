@@ -43,7 +43,7 @@ defmodule CredoSampleModule do
     parameter1 + " this is a string" # this is a comment
   end
 end
-""" |> to_source_file("test1.exs")
+""" |> to_source_file
     assert expected == source_file |> CodeHelper.clean_strings_sigils_and_comments
   end
 
@@ -55,7 +55,7 @@ defmodule CredoSampleModule do
     parameter1 + " this is a string"# this is a comment
   end
 end
-""" |> to_source_file("test2.exs")
+""" |> to_source_file
     assert expected == source_file |> CodeHelper.clean_strings_sigils_and_comments
   end
 

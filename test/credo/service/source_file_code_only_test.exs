@@ -17,7 +17,7 @@ defmodule CredoSampleModule do
     parameter1 + " this is a string" # this is a comment
   end
 end
-""" |> to_source_file("server_test1.exs")
+""" |> to_source_file
 
     SourceFileCodeOnly.put(source_file.filename, expected)
 

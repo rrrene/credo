@@ -16,7 +16,7 @@ defmodule M1 do
     end
   end
 end
-""" |> to_source_file("m1.ex")
+""" |> to_source_file
     s2 = """
 defmodule M2 do
   def myfun(p1, p2) when is_list(p2) do
@@ -27,7 +27,7 @@ defmodule M2 do
     end
   end
 end
-""" |> to_source_file("m2.ex")
+""" |> to_source_file
 
     [s1, s2] = @described_check.run([s1, s2])
     refute Enum.empty?(s1.issues)
