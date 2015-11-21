@@ -5,7 +5,7 @@ defmodule Credo.Code.Scope do
   """
 
   alias Credo.Code.Block
-  alias Credo.Check.CodeHelper
+  alias Credo.Code.Module
 
   @def_ops [:def, :defp, :defmacro]
 
@@ -55,7 +55,7 @@ defmodule Credo.Code.Scope do
   end
   for op <- @def_ops do
     defp find_scope({unquote(op) = op, meta, arguments} = ast, line, name_list, _last_op) when is_list(arguments) do
-      fun_name = CodeHelper.def_name(ast)
+      fun_name = Module.def_name(ast)
       name_list = name_list ++ [fun_name]
       cond do
         meta[:line] == line -> {op, name_list}

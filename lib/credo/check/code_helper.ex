@@ -10,6 +10,7 @@ defmodule Credo.Check.CodeHelper do
   alias Credo.Code.Scope
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
+  alias Credo.Service.SourceFileScopes
   alias Credo.Service.SourceFileCodeOnly
   alias Credo.Service.SourceFileWithoutStringAndSigils
   alias Credo.SourceFile
@@ -30,7 +31,53 @@ defmodule Credo.Check.CodeHelper do
   defdelegate def_name(ast), to: Module
   defdelegate parameter_names(ast), to: Parameters, as: :names
   defdelegate parameter_count(ast), to: Parameters, as: :count
-  defdelegate scope_for(ast, opts), to: Scope, as: :name
+
+  @doc """
+  Returns the scope for the given line as a tuple consisting of the call to
+  define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
+  name of the scope.
+
+  Examples:
+
+    {:defmodule, "Foo.Bar"}
+    {:def, "Foo.Bar.baz"}
+  """
+  def scope_for(source_file, [line: line_no]) do
+    source_file
+    |> scope_list
+    |> Enum.at(line_no-1)
+  end
+
+  @doc """
+  Returns all scopes for the given source_file per line of source code as tuple
+  consisting of the call to define the scope
+  (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the name of the scope.
+
+  Examples:
+
+      [
+        {:defmodule, "Foo.Bar"},
+        {:def, "Foo.Bar.baz"},
+        {:def, "Foo.Bar.baz"},
+        {:def, "Foo.Bar.baz"},
+        {:def, "Foo.Bar.baz"},
+        {:defmodule, "Foo.Bar"}
+      ]
+  """
+  def scope_list(%SourceFile{filename: filename, ast: ast, lines: lines}) do
+    case SourceFileScopes.get(filename) do
+      {:ok, value} ->
+        value
+      :notfound ->
+        result =
+          lines
+          |> Enum.map(fn({line_no, _}) ->
+              Scope.name(ast, line: line_no)
+            end)
+        SourceFileScopes.put(filename, result)
+        result
+    end
+  end
 
   @doc """
   Returns true if the given `child` AST node is part of the larger

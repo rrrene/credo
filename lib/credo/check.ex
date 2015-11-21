@@ -46,7 +46,7 @@ defmodule Credo.Check do
           severity: severity
         }
         if line_no do
-          {_def, scope} = CodeHelper.scope_for(source_file.ast, line: line_no)
+          {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
           issue =
             %Issue{
               issue |

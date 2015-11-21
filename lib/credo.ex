@@ -9,6 +9,7 @@ defmodule Credo do
     children = [
       worker(Credo.Service.SourceFileWithoutStringAndSigils, []),
       worker(Credo.Service.SourceFileCodeOnly, []),
+      worker(Credo.Service.SourceFileScopes, []),
     ]
 
     opts = [strategy: :one_for_one, name: Credo.Supervisor]

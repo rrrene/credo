@@ -3,7 +3,7 @@ defmodule Credo.CLI.Output.Summary do
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.Config
-  alias Credo.Code.Scope
+  alias Credo.Check.CodeHelper
 
   @category_wording [
     {:consistency, "consistency issue", "consistency issues"},
@@ -103,12 +103,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp scope_count(source_files) do
     source_files
-    |> Enum.flat_map(fn(source_file) ->
-        source_file.lines
-        |> Enum.map(fn({line_no, _}) ->
-            Scope.name(source_file.ast, line: line_no)
-          end)
-      end)
+    |> Enum.flat_map(&CodeHelper.scope_list/1)
     |> Enum.uniq
     |> Enum.count
   end
