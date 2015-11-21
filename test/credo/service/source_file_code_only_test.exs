@@ -3,7 +3,7 @@ defmodule Credo.Service.SourceFileCodeOnlyTest do
 
   alias Credo.Service.SourceFileCodeOnly
 
-  test "it should NOT report expected code" do
+  test "it should return the given string" do
     expected = """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do

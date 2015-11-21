@@ -1,6 +1,8 @@
 defmodule Credo.Service.SourceFileCodeOnly do
   use GenServer
 
+  @table_name __MODULE__
+
   def start_link(opts \\ []) do
     {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
@@ -10,29 +12,27 @@ defmodule Credo.Service.SourceFileCodeOnly do
   end
 
   def put(filename, source) do
-    GenServer.cast(__MODULE__, {:put, filename, source})
+    GenServer.call(__MODULE__, {:put, filename, source})
   end
 
   # callbacks
 
   def init(_) do
-    {:ok, HashDict.new}
+    ets = :ets.new(@table_name, [:named_table, read_concurrency: true])
+    {:ok, ets}
   end
 
   def handle_call({:get, filename}, _from, current_state) do
-    if HashDict.has_key?(current_state, filename) do
-      reply = HashDict.fetch(current_state, filename)
-      {:reply, reply, current_state}
-    else
-      {:reply, :notfound, current_state}
+    case :ets.lookup(@table_name, filename) do
+      [{^filename, value}] ->
+        {:reply, {:ok, value}, current_state}
+      [] ->
+        {:reply, :notfound, current_state}
     end
   end
 
-  def handle_cast({:put, filename, source}, current_state) do
-    if HashDict.has_key?(current_state, filename) do
-      {:noreply, current_state}
-    else
-      {:noreply, HashDict.put(current_state, filename, source)}
-    end
+  def handle_call({:put, filename, source}, _from, current_state) do
+    :ets.insert(@table_name, {filename, source})
+    {:reply, source, current_state}
   end
 end
