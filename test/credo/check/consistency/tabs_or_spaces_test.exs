@@ -38,7 +38,7 @@ end
       @with_tabs, @with_spaces, @with_spaces2
     ]
     |> Enum.map(&to_source_file/1)
-    |> assert_issue(@described_check)
+    |> assert_issues(@described_check)
   end
 
 end
