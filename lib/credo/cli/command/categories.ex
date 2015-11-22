@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Categories do
+  use Credo.CLI.Command
+  
   @shortdoc "Show and explain all issue categories"
 
   def run(_dir, _config) do

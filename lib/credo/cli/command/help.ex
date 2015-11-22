@@ -1,8 +1,17 @@
 defmodule Credo.CLI.Command.Help do
-  @shortdoc ""
+  use Credo.CLI.Command
+
+
+  @shortdoc "Show this help message"
+  @ljust 12
+  @starting_order [:suggest, :explain]
+  @ending_order [:help]
+
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
+  alias Credo.CLI
   alias Credo.CLI.Output.UI
+  alias Credo.CLI.Sorter
 
   def run(_, _) do
     print_banner
@@ -22,25 +31,29 @@ defmodule Credo.CLI.Command.Help do
   end
 
   def print_message do
-    """
-    Credo Version #{Credo.version}
-    """
-    |> UI.puts
-    ["Usage: ", :olive, "$ mix credo <command> [options]"]
-    |> UI.puts
-    """
+    UI.puts "Credo Version #{Credo.version}"
+    UI.puts ["Usage: ", :olive, "$ mix credo <command> [options]"]
+    UI.puts "\nCommands:\n"
 
-    Commands:
-      suggest   Suggest code objects to look at next (default)
-      explain   Show code object and explain why it is/might be an issue
-      list      List all code objects with their results
-      help      Show this help message
+    CLI.commands
+    |> Sorter.ensure(@starting_order, @ending_order)
+    |> Enum.each(fn(name) ->
+      module = name |> CLI.command_for
+      name2 = name |> to_string |> String.ljust(@ljust)
+      case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
+        {:shortdoc, [shortdesc]} ->
+          UI.puts "  " <> name2 <> shortdesc
+        _ ->
+          # skip commands without @shortdesc
+      end
+    end)
 
-    Use `--help` on any command to get further information.
-    """
-    |> UI.puts
-    ["For example, `", :olive, "mix credo suggest --help",
-      :reset, "` for help on the default command."]
+    UI.puts "\nUse `--help` on any command to get further information."
+
+    [
+      "For example, `", :olive, "mix credo suggest --help",
+        :reset, "` for help on the default command."
+    ]
     |> UI.puts
   end
 

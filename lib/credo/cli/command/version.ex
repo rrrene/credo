@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Command.Version do
-  @shortdoc "Display the current file version"
-
+  use Credo.CLI.Command
+  
   def run(_, _) do
     Credo.version
     |> IO.puts

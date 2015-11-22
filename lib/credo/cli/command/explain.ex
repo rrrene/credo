@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Explain do
+  use Credo.CLI.Command
+  
   @shortdoc "Show code object and explain why it is/might be an issue"
 
   alias Credo.Check.Runner
