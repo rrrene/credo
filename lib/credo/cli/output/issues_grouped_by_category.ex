@@ -5,6 +5,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.CLI.Output.IssueHelper
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Output.Summary
+  alias Credo.CLI.Sorter
   alias Credo.Config
   alias Credo.Issue
 
@@ -70,7 +71,8 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
       |> Enum.map(&({&1.filename, &1}))
       |> Enum.into(%{})
 
-    (@order ++ (categories -- @order))
+    categories
+    |> Sorter.ensure(@order)
     |> Enum.each(fn(category) ->
         print_issues(category, issue_map[category], source_file_map, config, term_width)
       end)
