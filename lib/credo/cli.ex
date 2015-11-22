@@ -1,4 +1,12 @@
 defmodule Credo.CLI do
+  @moduledoc """
+  Credo.CLI is the entrypoint for both the Mix task and the escript.
+
+  It takes the parameters passed from the command line and translates them into
+  a Command module (see the `Credo.CLI.Command` namespace), the work directory
+  where the Command should run and a `Credo.Config` object.
+  """
+
   alias Credo.Config
   alias Credo.CLI.Filename
 
@@ -12,6 +20,21 @@ defmodule Credo.CLI do
     categories: Credo.CLI.Command.Categories,
     version: Credo.CLI.Command.Version
   }
+  @switches [
+    format: :string,
+    checks: :string,
+    ignore_checks: :string,
+    min_priority: :integer
+  ]
+  @aliases [
+    a: :all,
+    A: :all_priorities,
+    c: :checks,
+    C: :config_name,
+    i: :ignore_checks,
+    h: :help,
+    v: :version,
+  ]
 
   def main(argv) do
     Credo.start nil, nil
@@ -22,12 +45,22 @@ defmodule Credo.CLI do
     end
   end
 
+  @doc "Returns a List with the names of all commands."
   def commands, do: Map.keys(@command_map)
 
+  @doc """
+  Returns the module of a given `command`.
+
+      iex> command_for(:help)
+      Credo.CLI.Command.Help
+  """
   def command_for(nil), do: nil
-  def command_for(command) do
-    if Enum.member?(commands, command |> String.to_atom) do
-      @command_map[command |> String.to_atom]
+  def command_for(command) when is_binary(command) do
+    command_for(command |> String.to_atom)
+  end
+  def command_for(command) when is_atom(command) do
+    if Enum.member?(commands, command) do
+      @command_map[command]
     else
       nil
     end
@@ -39,22 +72,8 @@ defmodule Credo.CLI do
   end
 
   defp parse_options(argv) do
-    switches = [
-      format: :string,
-      checks: :string,
-      ignore_checks: :string,
-      min_priority: :integer
-    ]
-    aliases = [
-      a: :all,
-      A: :all_priorities,
-      c: :checks,
-      C: :config_name,
-      i: :ignore_checks,
-      h: :help,
-      v: :version,
-    ]
-    {switches, files, []} = OptionParser.parse(argv, switches: switches, aliases: aliases)
+    {switches, files, []} =
+      OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
     command_name =
       if files |> List.first |> command_for do

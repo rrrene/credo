@@ -1,7 +1,8 @@
 defmodule Credo.CLI.Command.Help do
-  alias Credo.CLI.Output.UI
-
+  @shortdoc ""
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
+
+  alias Credo.CLI.Output.UI
 
   def run(_, _) do
     print_banner

@@ -30,10 +30,7 @@ defmodule CredoSourceFileCase do
 
   def to_source_files(list) do
     list
-    |> Enum.with_index
-    |> Enum.map(fn({source, index}) ->
-        to_source_file(source)
-      end)
+    |> Enum.map(&to_source_file/1)
   end
 end
 

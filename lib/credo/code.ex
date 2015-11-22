@@ -1,4 +1,14 @@
 defmodule Credo.Code do
+  @moduledoc """
+  Credo.Code contains a lot of utility or helper functions that deal with the
+  analysis if - you guessed it - Code.
+
+  Whenever a function serves a general purpose in this area, e.g. getting the
+  value of a module attribute inside a given module, we want to extract that
+  function and put it here, so others can utilize them without reinventing
+  the wheel.
+  """
+
   alias Credo.SourceFile
 
   defmodule ParserError do
@@ -6,6 +16,11 @@ defmodule Credo.Code do
     use Credo.Check, category: :error
   end
 
+  @doc """
+  Traverses a given SourceFile's AST or a given AST.
+
+  Technically this is just a wrapper around `Macro.prewalk/3`.
+  """
   def traverse(ast_or_source_file, fun, accumulator \\ [])
   def traverse(%SourceFile{ast: source_ast}, fun, accumulator) do
     traverse(source_ast, fun, accumulator)
@@ -15,6 +30,9 @@ defmodule Credo.Code do
     accumulated
   end
 
+  @doc """
+  Takes a SourceFile or String and returns an AST.
+  """
   def ast(%SourceFile{source: source, filename: filename}) do
     ast(source, filename)
   end
@@ -25,6 +43,9 @@ defmodule Credo.Code do
     end
   end
 
+  @doc """
+  Converts a String into a List of tuples of `{line_no, line}`.
+  """
   def to_lines(source) do
     source
     |> String.split("\n")

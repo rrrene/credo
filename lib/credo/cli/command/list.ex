@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.List do
+  @shortdoc "List all code objects grouped by files"
+
   alias Credo.Check.Runner
   alias Credo.Config
   alias Credo.CLI.Filter

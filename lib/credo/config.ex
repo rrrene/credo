@@ -1,4 +1,9 @@
 defmodule Credo.Config do
+  @doc """
+  Every run of Credo is configured via a `Config` object, which is created and
+  manipulated via the `Credo.Config` module.
+  """
+
   defstruct files:        nil,
             checks:       nil,
             min_priority: 0,
@@ -19,6 +24,12 @@ defmodule Credo.Config do
   @default_files_included [@default_glob]
   @default_files_excluded []
 
+  @doc """
+  Returns the checks that should be run for a given `config` object.
+
+  Takes all checks from the `checks:` field of the config, matches those against
+  any patterns to include or exclude certain checks given via the command line.
+  """
   def checks(%__MODULE__{checks: checks, match_checks: match_checks, ignore_checks: ignore_checks}) do
     match_regexes = match_checks |> List.wrap |> to_match_regexes
     ignore_regexes = ignore_checks |> List.wrap |> to_match_regexes
@@ -40,7 +51,7 @@ defmodule Credo.Config do
     |> Enum.any?(&Regex.run(&1, check_name))
   end
 
-  def to_match_regexes(list) do
+  defp to_match_regexes(list) do
     list
     |> Enum.map(fn(match_check) ->
         {:ok, match_pattern} = Regex.compile(match_check, "i")
@@ -73,13 +84,13 @@ defmodule Credo.Config do
     end)
   end
 
-  def from_exs(dir, config_name, exs_string \\ "%{}") do
+  defp from_exs(dir, config_name, exs_string \\ "%{}") do
     exs_string
     |> Credo.ExsLoader.parse
     |> from_data(dir, config_name)
   end
 
-  def from_data(data, dir, config_name) do
+  defp from_data(data, dir, config_name) do
     data =
       data[:configs]
       |> List.wrap
@@ -111,6 +122,22 @@ defmodule Credo.Config do
     end
   end
 
+  @doc """
+  Merges the given Config objects from left to right, meaning that later entries
+  overwrites earlier ones.
+
+      merge(base, other)
+
+  Any options in `other` will overwrite those in `base`.
+
+  The `files:` field is merged, meaning that you can define `included` and/or
+  `excluded` and only override the given one.
+
+  The `checks:` field is overwritten in full, meaning that there is no
+  "blending" of checks from one Config to another. If you are including this
+  field in a Config, it basically means "I want to run these checks and
+  these checks only".
+  """
   def merge(list) when is_list(list) do
     base = list |> List.first
     tail = list |> List.delete_at(0)

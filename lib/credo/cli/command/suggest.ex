@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Suggest do
+  @shortdoc "Suggest code objects to look at next (default)"
+
   alias Credo.Check.Runner
   alias Credo.Config
   alias Credo.CLI.Filter
