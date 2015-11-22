@@ -33,7 +33,7 @@ defmodule Credo.Test.Application do
       worker(Credo.Test.FilenameGenerator, []),
     ]
 
-    opts = [strategy: :one_for_one, name: Credo.TestApplication.Supervisor]
+    opts = [strategy: :one_for_one, name: Credo.Test.Application.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end
