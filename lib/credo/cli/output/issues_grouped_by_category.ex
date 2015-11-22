@@ -1,4 +1,3 @@
-
 defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.CLI.Filter
   alias Credo.CLI.Output
@@ -9,10 +8,8 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.Config
   alias Credo.Issue
 
-  @many_source_files 60
-  @indent 8
-  @per_category 5
-  @order [:design, :readability, :refactor, :warning, :consistency]
+  @category_starting_order [:design, :readability, :refactor]
+  @category_ending_order [:warning, :consistency]
   @category_colors [
     design: :olive,
     readability: :blue,
@@ -27,6 +24,9 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     warning: "Warnings - please take a look",
     consistency: "Consistency",
   ]
+  @many_source_files 60
+  @indent 8
+  @per_category 5
 
   @doc "Called before the analysis is run."
   def print_before_info(source_files) do
@@ -72,7 +72,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
       |> Enum.into(%{})
 
     categories
-    |> Sorter.ensure(@order)
+    |> Sorter.ensure(@category_starting_order, @category_ending_order)
     |> Enum.each(fn(category) ->
         print_issues(category, issue_map[category], source_file_map, config, term_width)
       end)
