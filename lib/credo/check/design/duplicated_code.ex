@@ -119,7 +119,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
       first_node
       |> hashes(%{}, filename)
       |> Map.keys
-      |> List.delete my_hash # don't count self
+      |> List.delete(my_hash) # don't count self
 
     subhashes
   end
