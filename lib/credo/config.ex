@@ -84,7 +84,7 @@ defmodule Credo.Config do
     end)
   end
 
-  defp from_exs(dir, config_name, exs_string \\ "%{}") do
+  defp from_exs(dir, config_name, exs_string) do
     exs_string
     |> Credo.ExsLoader.parse
     |> from_data(dir, config_name)
