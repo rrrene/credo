@@ -1,7 +1,7 @@
-defmodule Credo.Consistency.HelperTest do
+defmodule Credo.Check.Consistency.HelperTest do
   use Credo.TestHelper
 
-  alias Credo.Consistency.Helper
+  alias Credo.Check.Consistency.Helper
 
   test "it should report the correct most picked prop_value" do
     prop_list = [
@@ -12,7 +12,7 @@ defmodule Credo.Consistency.HelperTest do
       {[:prop1], "M5.ex"},
       {[:prop1, :prop2, :prop3], "M6.ex"},
     ]
-    assert :prop1 == Helper.most_picked_prop_value(prop_list)
+    assert {:prop1, 5, 9} == Helper.most_picked_prop_value(prop_list)
   end
 
   test "it should report the correct most picked prop_value if its a keyword list" do
@@ -24,7 +24,7 @@ defmodule Credo.Consistency.HelperTest do
       {[[prefix: "Invalid"]], "M5.ex"},
       {[[prefix: "Invalid"], [suffix: "Error"], [prefix: "Undefined"]], "M6.ex"},
     ]
-    assert [prefix: "Invalid"] == Helper.most_picked_prop_value(prop_list)
+    assert {[prefix: "Invalid"], 5, 9} == Helper.most_picked_prop_value(prop_list)
   end
 
 end
