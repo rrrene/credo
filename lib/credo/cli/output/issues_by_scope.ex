@@ -103,22 +103,23 @@ defmodule Credo.CLI.Output.IssuesByScope do
           String.duplicate(" ", @indent-2), displayed_line
       ]
       |> UI.puts
-    end
-    if issue.column do
-      offset = String.length(line) - String.length(String.strip(line))
-      x = max(issue.column - offset - 1, 0) # column is one-based
-      w =
-        case issue.trigger do
-          nil -> 1
-          atom -> atom |> to_string |> String.length
-        end
 
-      [
-        UI.edge([outer_color, :faint], @indent),
-          inner_color, String.duplicate(" ", x),
-          :faint, String.duplicate("^", w)
-      ]
-      |> UI.puts
+      if issue.column do
+        offset = String.length(line) - String.length(String.strip(line))
+        x = max(issue.column - offset - 1, 0) # column is one-based
+        w =
+          case issue.trigger do
+            nil -> 1
+            atom -> atom |> to_string |> String.length
+          end
+
+        [
+          UI.edge([outer_color, :faint], @indent),
+            inner_color, String.duplicate(" ", x),
+            :faint, String.duplicate("^", w)
+        ]
+        |> UI.puts
+      end
     end
 
     UI.edge([outer_color, :faint], @indent)
