@@ -7,9 +7,9 @@
 * Update version in `mix.exs`
 * Create a commit:
 
-    git commit -m "Bump version to 0.X.Y"
-    git tag -l v0.X.Y
-    mix test && mix hex.publish
-    git push origin master --tags
+      git commit -a -m "Bump version to 0.X.Y"
+      git tag -l v0.X.Y
+      mix test && mix hex.publish
+      git push origin master --tags
 
 * Enjoy!
