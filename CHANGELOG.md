@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10
+
+- Apply many fixes in anticipation of Elixir v1.2 (thx @c-rack)
+- Improve docs
+- Wrap long issue descriptions in `suggest` command
+
 ## 0.1.9
 
 - Add missing `-A` alias for `--all-priorities`
