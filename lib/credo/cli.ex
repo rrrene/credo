@@ -39,10 +39,9 @@ defmodule Credo.CLI do
   def main(argv) do
     Credo.start nil, nil
 
-    case run(argv) do
-      :ok         -> System.halt(0)
-      {:error, _} -> System.halt(1)
-    end
+    run(argv)
+    |> to_exit_status
+    |> System.halt
   end
 
   @doc "Returns a List with the names of all commands."
@@ -68,6 +67,7 @@ defmodule Credo.CLI do
 
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
+
     command_mod.run(dir, config)
   end
 
@@ -146,4 +146,14 @@ defmodule Credo.CLI do
 
     config
   end
+
+  # Converts the return value of a Command.run() call into an exit_status
+  defp to_exit_status(:ok), do: 0
+  defp to_exit_status({:error, issues}) do
+    issues
+    |> Enum.map(&(&1.exit_status))
+    |> Enum.uniq
+    |> Enum.reduce(0, &(&1+&2))
+  end
+
 end

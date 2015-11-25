@@ -28,6 +28,7 @@ defmodule Credo.CLI.Command.Help do
     #|> UI.puts(:faint)
 
     UI.puts
+    :ok
   end
 
   def print_message do

@@ -1,5 +1,12 @@
 defmodule Credo.Check do
   @base_priority_map  %{ignore: -100, low: -10, normal: 1, high: +10, higher: +20}
+  @base_category_exit_status_map %{
+    consistency: 1,
+    design: 2,
+    readability: 4,
+    refactor: 8,
+    warning: 16,
+  }
 
   defmacro __using__(opts) do
     quote do
@@ -11,6 +18,7 @@ defmodule Credo.Check do
       alias Credo.SourceFile
       alias Credo.Check.CodeHelper
       alias Credo.Check.Params
+      alias Credo.CLI.ExitStatus
 
       def base_priority, do: unquote(to_priority(opts[:base_priority]))
       def category, do: unquote(category_body(opts[:category]))
@@ -26,10 +34,14 @@ defmodule Credo.Check do
         source_file = IssueMeta.source_file(issue_meta)
         params = IssueMeta.params(issue_meta)
         priority =
-          if params[:priority] do
-            params[:priority] |> Check.to_priority
-          else
-            base_priority
+          case params[:priority] do
+            nil -> base_priority
+            val -> val |> Check.to_priority
+          end
+        exit_status =
+          case params[:exit_status] do
+            nil -> category |> Check.to_exit_status
+            val -> val |> Check.to_exit_status
           end
 
         line_no = opts[:line_no]
@@ -43,7 +55,8 @@ defmodule Credo.Check do
           trigger: trigger,
           line_no: line_no,
           column: column,
-          severity: severity
+          severity: severity,
+          exit_status: exit_status
         }
         if line_no do
           {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
@@ -89,11 +102,19 @@ defmodule Credo.Check do
   end
   defp category_body(value), do: value
 
+  @doc "Converts a given category to a priority"
   def to_priority(nil), do: 0
   def to_priority(atom) when is_atom(atom) do
     @base_priority_map[atom]
   end
   def to_priority(value), do: value
+
+  @doc "Converts a given category to an exit status"
+  def to_exit_status(nil), do: 0
+  def to_exit_status(atom) when is_atom(atom) do
+    @base_category_exit_status_map[atom]
+  end
+  def to_exit_status(value), do: value
 
   defp run_on_all_body(true), do: true
   defp run_on_all_body(_), do: false
