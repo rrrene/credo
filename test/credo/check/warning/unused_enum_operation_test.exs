@@ -298,6 +298,30 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should report a violation when buried in :if, :when and :fn" do
+"""
+defmodule CredoSampleModule do
+  defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
+    if issue.column do
+      IO.puts "."
+    else
+      case check do
+        true -> false
+        _ ->
+          list =
+            Enum.reduce(arr, fn(w) ->
+              [:this_goes_nowhere, Enum.join(w, ",")]
+            end)
+      end
+    end
+
+    IO.puts "x"
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 
  ##############################################################################
  ##############################################################################
