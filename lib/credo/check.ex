@@ -25,6 +25,8 @@ defmodule Credo.Check do
       def run_on_all?, do: unquote(run_on_all_body(opts[:run_on_all]))
 
       def explanation, do: explanation_for(@explanation, :check)
+      def explanation_for_params, do: explanation_for(@explanation, :params)
+
       defp explanation_for(nil, _), do: nil
       defp explanation_for(kw, key), do: kw[key]
 

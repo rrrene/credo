@@ -173,7 +173,17 @@ defmodule Credo.CLI.Output.Explain do
     (issue.check.explanation || "TODO: Insert explanation")
     |> String.strip
     |> String.split("\n")
-    |> Enum.map(&format_explanation(&1, outer_color))
+    |> Enum.flat_map(&format_explanation(&1, outer_color))
+    |> Enum.slice(0..-2)
+    |> UI.puts
+
+    UI.edge([outer_color, :faint])
+    |> UI.puts
+
+    issue.check.explanation_for_params
+    |> print_params_explanation(outer_color)
+
+    UI.edge([outer_color, :faint])
     |> UI.puts
   end
 
@@ -199,5 +209,28 @@ defmodule Credo.CLI.Output.Explain do
   defp pos_string(nil, nil), do: ""
   defp pos_string(line_no, nil), do: ":#{line_no}"
   defp pos_string(line_no, column), do: ":#{line_no}:#{column}"
+
+  def print_params_explanation(nil, _), do: nil
+  def print_params_explanation(keywords, outer_color) do
+    [
+      UI.edge([outer_color, :faint]), :reset, :color239,
+        String.duplicate(" ", @indent-5), "__ CONFIGURATION OPTIONS"
+    ]
+    |> UI.puts
+
+    UI.edge([outer_color, :faint])
+    |> UI.puts
+
+    keywords
+    |> Enum.each(fn({param, text}) ->
+        [
+          UI.edge([outer_color, :faint]), :reset,
+            String.duplicate(" ", @indent-2),
+            :cyan, "#{param}:" |> String.ljust(20),
+            :reset, text
+        ]
+        |> UI.puts
+      end)
+  end
 
 end
