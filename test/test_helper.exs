@@ -66,7 +66,7 @@ defmodule CredoCheckCase do
   end
   def assert_issues(source_file, check \\ nil, config \\ [], callback \\ nil) do
     issues = issues_for(source_file, check, config)
-    assert Enum.count(issues) > 0, "There should be issues."
+    assert Enum.count(issues) > 0, "There should be issues, got none."
     assert Enum.count(issues) > 1, "There should be more than one issue, got: #{to_inspected(issues)}"
     if callback, do: callback.(issues)
     issues
