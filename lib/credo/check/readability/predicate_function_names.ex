@@ -70,7 +70,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
   defp issue_for(_, line_no, trigger, issue_meta) do
     format_issue issue_meta,
-      message: "Predicate function names should end in a question mark.",
+      message: "Predicate function names should not start with 'is', and should end in a question mark.",
       trigger: trigger,
       line_no: line_no
   end
