@@ -28,6 +28,10 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
     Credo.Code.traverse(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # skip references to functions
+  defp traverse({:&, _, _}, issues, _) do
+    {nil, issues}
+  end
   for {op, constant_result, operand} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [_lhs, unquote(operand)]} = ast, issues, issue_meta) do
       new_issue = issue_for(meta[:line], unquote(op), unquote(constant_result), issue_meta)

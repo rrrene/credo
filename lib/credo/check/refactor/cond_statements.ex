@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.CondStatements do
+defmodule Credo.Check.Refactor.CondStatements do
   @moduledoc """
   Each cond statement should have 3 or more statements including the
   "always true" statement. Otherwise an `if` and `else` construct might be more
@@ -12,7 +12,7 @@ defmodule Credo.Check.Readability.CondStatements do
     end
 
     # should be written as
-    
+
     if x == y do
       0
     else

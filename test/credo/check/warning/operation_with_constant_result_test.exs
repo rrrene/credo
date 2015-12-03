@@ -10,6 +10,7 @@ defmodule CredoSampleModule do
 
   def some_fun do
     x * 2
+    Enum.reject(some_list, &is_nil/1)
   end
 end
 """ |> to_source_file
