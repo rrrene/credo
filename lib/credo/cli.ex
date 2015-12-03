@@ -134,7 +134,7 @@ defmodule Credo.CLI do
     check_pattern = Keyword.get(switches, :checks)
     if check_pattern do
       config =
-        %Config{config | match_checks: check_pattern |> String.split(",")}
+        %Config{config | all: true, match_checks: check_pattern |> String.split(",")}
     end
 
     # exclude/ignore certain checks
