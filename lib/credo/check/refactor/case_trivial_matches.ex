@@ -33,6 +33,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
     cases =
       arguments
       |> CodeHelper.do_block_for!
+      |> List.wrap
       |> Enum.map(&case_statement_for/1)
       |> Enum.sort
 
