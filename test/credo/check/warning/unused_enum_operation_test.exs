@@ -391,7 +391,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should report a violation when buried in :if, :when and :fn" do
+  test "it should report a violation when buried in :if, :when and :fn 2" do
 """
 defmodule CredoSampleModule do
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
@@ -411,7 +411,7 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    |> assert_issue(@described_check)
+    |> assert_issues(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
