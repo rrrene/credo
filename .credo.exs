@@ -3,6 +3,7 @@
 # If you find anything wrong or unclear in this file, please report an
 # issue on GitHub: https://github.com/rrrene/credo/issues
 %{
+  #
   # You can have as many configs as you like in the `configs:` field.
   configs: [
     %{
@@ -26,7 +27,9 @@
       #
       # There are two ways of deactivating a check:
       # 1. deleting the check from this list
-      # 2. putting `false` as second element (to quickly "comment it out").
+      # 2. putting `false` as second element (to quickly "comment it out"):
+      #
+      #      {Credo.Check.Consistency.ExceptionNames, false}
       #
       checks: [
         {Credo.Check.Consistency.ExceptionNames},
@@ -39,12 +42,16 @@
         # For others you can set parameters
         {Credo.Check.Design.DuplicatedCode, mass_threshold: 16, nodes_threshold: 2},
 
+        # You can also customize the exit_status of each check.
+        # If you don't want TODO comments to cause `mix credo` to fail, just
+        # set this value to 0 (zero).
+        {Credo.Check.Design.TagTODO, exit_status: 2},
         {Credo.Check.Design.TagFIXME},
-        {Credo.Check.Design.TagTODO},
 
         {Credo.Check.Readability.FunctionNames},
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
         {Credo.Check.Readability.ModuleAttributeNames},
+        {Credo.Check.Readability.ModuleDoc},
         {Credo.Check.Readability.ModuleNames},
         {Credo.Check.Readability.PredicateFunctionNames},
         {Credo.Check.Readability.TrailingBlankLine},
@@ -52,6 +59,11 @@
         {Credo.Check.Readability.VariableNames},
 
         {Credo.Check.Refactor.ABCSize},
+        {Credo.Check.Refactor.CaseTrivialMatches},
+        {Credo.Check.Refactor.CondStatements},
+        {Credo.Check.Refactor.FunctionArity},
+        {Credo.Check.Refactor.MatchInCondition},
+        {Credo.Check.Refactor.PipeChainStart},
         {Credo.Check.Refactor.CyclomaticComplexity},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
         {Credo.Check.Refactor.NegatedConditionsWithElse},
@@ -65,7 +77,12 @@
         {Credo.Check.Warning.NameRedeclarationByDef},
         {Credo.Check.Warning.NameRedeclarationByFn},
         {Credo.Check.Warning.OperationOnSameValues},
+        {Credo.Check.Warning.UnusedEnumOperation},
+        {Credo.Check.Warning.UnusedKeywordOperation},
+        {Credo.Check.Warning.UnusedListOperation},
         {Credo.Check.Warning.UnusedStringOperation},
+        {Credo.Check.Warning.UnusedTupleOperation},
+        {Credo.Check.Warning.OperationWithConstantResult},
       ]
     }
   ]

@@ -54,7 +54,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
         []
       else
         call
-        |> calls_to_mod_fun([:String], nil)
+        |> calls_to_mod_fun(required_mod_list, restrict_fun_names)
         |> Enum.reject(&valid_call_to_string_mod?(call, &1, last_call_in_def, calls_in_block_above))
       end
     end

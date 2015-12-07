@@ -39,10 +39,9 @@ defmodule Credo.CLI do
   def main(argv) do
     Credo.start nil, nil
 
-    case run(argv) do
-      :ok         -> System.halt(0)
-      {:error, _} -> System.halt(1)
-    end
+    run(argv)
+    |> to_exit_status
+    |> System.halt
   end
 
   @doc "Returns a List with the names of all commands."
@@ -68,6 +67,7 @@ defmodule Credo.CLI do
 
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
+
     command_mod.run(dir, config)
   end
 
@@ -109,36 +109,36 @@ defmodule Credo.CLI do
 
   defp to_config(dir, switches) do
     dir = dir |> Filename.remove_line_no_and_column
-    config_name = Keyword.get(switches, :config_name)
+    config_name = switch(switches, :config_name)
     config = Config.read_or_default(dir, config_name)
 
-    if Keyword.get(switches, :all) do
+    if switch(switches, :all) do
       config = %Config{config | all: true}
     end
-    if Keyword.get(switches, :all_priorities) do
+    if switch(switches, :all_priorities, :strict) do
       config = %Config{config | all: true, min_priority: -99}
     end
-    if Keyword.get(switches, :help), do: config = %Config{config | help: true}
-    if Keyword.get(switches, :one_line), do: config = %Config{config | one_line: true}
-    if Keyword.get(switches, :verbose), do: config = %Config{config | verbose: true}
-    if Keyword.get(switches, :version), do: config = %Config{config | version: true}
-    if Keyword.get(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
+    if switch(switches, :help), do: config = %Config{config | help: true}
+    if switch(switches, :one_line), do: config = %Config{config | one_line: true}
+    if switch(switches, :verbose), do: config = %Config{config | verbose: true}
+    if switch(switches, :version), do: config = %Config{config | version: true}
+    if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
 
-    min_priority = Keyword.get(switches, :min_priority)
+    min_priority = switch(switches, :min_priority)
     if min_priority do
       config =
         %Config{config | min_priority: min_priority}
     end
 
     # only include certain checks
-    check_pattern = Keyword.get(switches, :checks)
+    check_pattern = switch(switches, :checks, :only)
     if check_pattern do
       config =
-        %Config{config | match_checks: check_pattern |> String.split(",")}
+        %Config{config | all: true, match_checks: check_pattern |> String.split(",")}
     end
 
     # exclude/ignore certain checks
-    ignore_pattern = Keyword.get(switches, :ignore_checks)
+    ignore_pattern = switch(switches, :ignore_checks)
     if ignore_pattern do
       config =
         %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
@@ -146,4 +146,19 @@ defmodule Credo.CLI do
 
     config
   end
+
+  def switch(switches, key), do: Keyword.get(switches, key)
+  def switch(switches, key, alias_key) do
+    Keyword.get(switches, key) || Keyword.get(switches, alias_key)
+  end
+
+  # Converts the return value of a Command.run() call into an exit_status
+  defp to_exit_status(:ok), do: 0
+  defp to_exit_status({:error, issues}) do
+    issues
+    |> Enum.map(&(&1.exit_status))
+    |> Enum.uniq
+    |> Enum.reduce(0, &(&1+&2))
+  end
+
 end

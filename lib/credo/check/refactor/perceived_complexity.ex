@@ -1,4 +1,4 @@
-defmodule Credo.Check.Refactor.CyclomaticComplexity do
+defmodule Credo.Check.Refactor.PerceivedComplexity do
   @moduledoc """
   Cyclomatic complexity is a software complexity metric closely correlated with
   coding errors.
@@ -34,7 +34,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     or: 1,
     &&: 1,
     ||: 1,
-    case: 1,
+    case: 0.3,
     cond: 1,
   ]
 

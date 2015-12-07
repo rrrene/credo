@@ -38,6 +38,14 @@ To run credo in the current project, **just type**:
 
 This will run the code analysis and suggest places to edit your code.
 
+**If you want to enforce a style guide** and need a more traditional linting experience, try
+
+    $ mix credo --strict
+
+and continue reading in the Configuration section.
+
+
+
 If you want the **list of issues grouped by files** instead of suggestions just type:
 
     $ mix credo list
@@ -118,7 +126,7 @@ Take a look at Credo's own `.credo.exs` for an [example configuration](https://g
 
 ### Only run some checks
 
-To run only a subset of checks, you can use the `--checks` or the `-c` alias.
+To run only a subset of checks, you can use the `--checks` or the `-c` alias (also aliased as `--only`).
 
 ```bash
 # to only run the Readability checks, use:
@@ -166,7 +174,7 @@ Use the `--one-line` switch to format the output to represent each issue by a si
 
 ### Show all issues including low priority ones
 
-Use the `--all-priorities` switch to include low priority issues in the output.
+Use the `--all-priorities` switch to include low priority issues in the output (aliased as `--strict`).
 
 
 

@@ -1,13 +1,13 @@
-defmodule Credo.Check.Warning.UnusedStringOperationTest do
+defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Warning.UnusedStringOperation
+  @described_check Credo.Check.Warning.UnusedEnumOperation
 
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    String.split(parameter1) + parameter2
+    Enum.join(parameter1) + parameter2
   end
 end
 """ |> to_source_file
@@ -18,7 +18,7 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    String.split(parameter1)
+    Enum.join(parameter1)
     |>  some_where
 
     parameter1
@@ -33,11 +33,11 @@ end
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     parameter1 + parameter2
-    |> String.split(parameter1)
+    |> Enum.join(parameter1)
   end
 end
   """ |> to_source_file
-      |> refute_issues(@described_check)
+  |> refute_issues(@described_check)
   end
 
   test "it should NOT report a violation when inside of pipe" do
@@ -45,7 +45,7 @@ end
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     parameter1 + parameter2
-    |> String.split(parameter1)
+    |> Enum.join(parameter1)
     |> some_func_who_knows_what_it_does
 
     :ok
@@ -59,7 +59,7 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    offset = String.length(line) - String.length(String.strip(line))
+    offset = Enum.count(line)
 
     parameter1 + parameter2 + offset
   end
@@ -72,20 +72,20 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    if String.length(x1) > String.length(String.strip(x2)) do
+    if Enum.count(x1) > Enum.count(x2) do
       cond do
-        String.strip(x3) == "" -> IO.puts("1")
-        String.length(x) == 15 -> IO.puts("2")
-        String.replace(x, "a", "b") == "b" -> IO.puts("2")
+        Enum.count(x3) == "" -> IO.puts("1")
+        Enum.count(x) == 15 -> IO.puts("2")
+        Enum.at(x3, 1) == "b" -> IO.puts("2")
       end
     else
-      case String.length(x3) do
+      case Enum.count(x3) do
         0 -> true
         1 -> false
         _ -> something
       end
     end
-    unless String.strip(x4) == "" do
+    unless Enum.count(x4) == "" do
       IO.puts "empty"
     end
 
@@ -104,8 +104,6 @@ defmodule CredoSampleModule do
       __MODULE__
       |> Module.split
       |> Enum.at(2)
-      |> String.downcase
-      |> String.to_atom
     end
   end
 end
@@ -129,9 +127,9 @@ defmodule CredoSampleModule do
     |> IO.puts
 
     if issue.column do
-      offset = String.length(line) - String.length(String.strip(line))
+      offset = Enum.count(line)
       [
-          String.duplicate(" ", x), :faint, String.duplicate("^", w),
+          Enum.join(x, " "), :faint, Enum.join(w, ","),
       ]
       |> IO.puts
     end
@@ -153,7 +151,7 @@ defmodule CredoSampleModule do
     if issue.column do
       IO.puts "."
     else
-      [:this_actually_might_return, String.duplicate("^", w), :ok] # THIS is not the last_call!
+      [:this_actually_might_return, Enum.join(w, ","), :ok] # THIS is not the last_call!
     end
   end
 end
@@ -169,7 +167,7 @@ defmodule CredoSampleModule do
       if issue.column do
         IO.puts "."
       else
-        [:this_goes_nowhere, String.duplicate("^", w)]
+        [:this_goes_nowhere, Enum.join(w, ",")]
       end
 
     IO.puts "8"
@@ -190,7 +188,7 @@ defmodule CredoSampleModule do
         true -> false
         _ ->
           Enum.reduce(arr, fn(w) ->
-            [:this_might_return, String.duplicate("^", w)]
+            [:this_might_return, Enum.join(w, ",")]
           end)
       end
     end
@@ -207,7 +205,7 @@ defmodule CredoSampleModule do
     for parser <- parsers do
       case Atom.to_string(parser) do
         "Elixir." <> _ -> parser
-        reference      -> String.upcase(reference)
+        reference      -> Enum.at(reference)
       end
     end
   end
@@ -223,7 +221,7 @@ defmodule CredoSampleModule do
     for parser <- parsers do
       case Atom.to_string(parser) do
         "Elixir." <> _ -> parser
-        reference      -> Module.concat(Plug.Parsers, String.upcase(reference))
+        reference      -> Module.concat(Plug.Parsers, Enum.at(reference))
       end
     end
   end
@@ -236,7 +234,7 @@ end
 """
 defmodule CredoSampleModule do
   defp convert_parsers(parsers) do
-    for segment <- String.split(bin, "/"), segment != "", do: segment
+    for segment <- Enum.flat_map(bin, &(&1.blob)), segment != "", do: segment
   end
 end
 """ |> to_source_file
@@ -258,7 +256,7 @@ end
     else
       :ok ->
         {_in, analysis_output} = StringIO.contents(analyse_dest)
-        String.to_char_list(analysis_output)
+        Enum.count(analysis_output)
     after
       StringIO.close(analyse_dest)
     end
@@ -271,7 +269,7 @@ end
 """
   def my_function(url) when is_binary(url) do
     if info.userinfo do
-      destructure [username, password], String.split(info.userinfo, ":")
+      destructure [username, password], Enum.join(info.userinfo, ":")
     end
 
     Enum.reject(opts, fn {_k, v} -> is_nil(v) end)
@@ -283,8 +281,8 @@ end
   test "it should NOT report a violation when in function call 2" do
 """
   defp print_process(pid_atom, count, own) do
-    IO.puts([?", String.duplicate("-", 100)])
-    IO.write format_item(Path.join(path, item), String.ljust(item, width))
+    IO.puts([?", Enum.join(own, "-")])
+    IO.write format_item(Path.join(path, item), Enum.take(item, width))
     print_row(["s", "B", "s", ".3f", "s"], [count, "", own, ""])
   end
 """ |> to_source_file
@@ -294,7 +292,31 @@ end
   test "it should NOT report a violation when in list that is returned" do
 """
 defp indent_line(str, indentation, with \\\\ " ") do
-  [String.duplicate(with, indentation), str]
+  [Enum.join(with, indentation), str]
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should report a violation when buried in :if, :when and :fn" do
+"""
+defmodule CredoSampleModule do
+  defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
+    if issue.column do
+      IO.puts "."
+    else
+      case check do
+        true -> false
+        _ ->
+          list =
+            Enum.reduce(arr, fn(w) ->
+              [:this_goes_nowhere, Enum.join(w, ",")]
+            end)
+      end
+    end
+
+    IO.puts "x"
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -311,7 +333,7 @@ defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     x = parameter1 + parameter2
 
-    String.split(parameter1)
+    Enum.at(parameter1, x)
 
     parameter1
   end
@@ -325,7 +347,7 @@ end
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     parameter1 + parameter2
-    |> String.split(parameter1)
+    |> Enum.at(parameter1)
 
     parameter1
   end
@@ -341,7 +363,7 @@ defmodule CredoSampleModule do
     if issue.column do
       [
         :this_goes_nowhere,
-        String.duplicate("^", w) # THIS is not the last_call!
+        Enum.join(w, ",") # THIS is not the last_call!
       ]
       IO.puts "."
     else
@@ -360,7 +382,7 @@ defmodule CredoSampleModule do
     if issue.column do
       IO.puts "."
     else
-      String.strip(filename)
+      Enum.count(filename)
       IO.puts "x"
     end
   end
@@ -380,7 +402,7 @@ defmodule CredoSampleModule do
         true -> false
         _ ->
           Enum.reduce(arr, fn(w) ->
-            [:this_goes_nowhere, String.duplicate("^", w)]
+            [:this_goes_nowhere, Enum.join(w, ",")]
           end)
       end
     end
@@ -399,7 +421,7 @@ defmodule CredoSampleModule do
     if issue.column do
       IO.puts "."
     else
-      [:this_goes_nowhere, String.duplicate("^", w)] # THIS is not the last_call!
+      [:this_goes_nowhere, Enum.join(w, ",")] # THIS is not the last_call!
     end
 
     IO.puts
@@ -416,14 +438,14 @@ defmodule CredoSampleModule do
     if issue.column do
       IO.puts "."
     else
-      [:this_goes_nowhere, String.duplicate("^", w)] # THIS is not the last_call!
+      [:this_goes_nowhere, Enum.join(w, ",")] # THIS is not the last_call!
       IO.puts " "
     end
   end
 end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(issue) ->
-        assert "String.duplicate" == issue.trigger
+        assert "Enum.join" == issue.trigger
       end)
   end
 
@@ -431,15 +453,15 @@ end
   """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    String.split(parameter1)
+    Enum.reject(parameter1, &is_nil/1)
     parameter1
   end
   def some_function2(parameter1, parameter2) do
-   String.strip(parameter1)
+   Enum.reduce(parameter1, parameter2)
    parameter1
    end
    def some_function3(parameter1, parameter2) do
-     String.strip(parameter1)
+     Enum.reduce(parameter1, parameter2)
      parameter1
    end
 end
@@ -453,15 +475,15 @@ end
 """
 defmodule CredoSampleModule do
   defp something(bin) do
-    for segment <- String.split(bin, "/"), segment != "" do
-      String.upcase(segment)
+    for segment <- Enum.flat_map(segment, &(&1.blob)), segment != "" do
+      Enum.map(segment, &IO.inspect/1)
       segment
     end
   end
 end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(issue) ->
-        assert "String.upcase" == issue.trigger
+        assert "Enum.map" == issue.trigger
       end)
   end
 

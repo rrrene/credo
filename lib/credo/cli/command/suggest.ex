@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Command.Suggest do
   use Credo.CLI.Command
-  
+
   @shortdoc "Suggest code objects to look at next (default)"
 
   alias Credo.Check.Runner
@@ -20,11 +20,21 @@ defmodule Credo.CLI.Command.Suggest do
 
     {time_run, source_files}  = run_checks(source_files, config)
 
+    source_files =
+      source_files
+      |> Filter.important(config)
+
     print_results_and_summary(source_files, config, time_load, time_run)
 
-    # TODO: return :error if there are issues so the CLI can exit with a status
-    #       code other than zero
-    :ok
+    issues =
+      source_files
+      |> Enum.flat_map(&(&1.issues))
+      |> Filter.important(config)
+
+    case issues do
+      [] -> :ok
+      issues -> {:error, issues}
+    end
   end
 
   def load_and_validate_source_files(config) do
@@ -60,7 +70,6 @@ defmodule Credo.CLI.Command.Suggest do
     out = output_mod(config)
 
     source_files
-    |> Filter.important(config)
     |> out.print_after_info(config, time_load, time_run)
   end
 

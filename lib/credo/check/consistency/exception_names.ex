@@ -38,12 +38,25 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   use Credo.Check, run_on_all: true, base_priority: :high
 
   def run(source_files, params \\ []) when is_list(source_files) do
-    source_files
-    |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.add_issues_to_source_files(&check_for_issues/5, params)
+    {property_tuples, most_picked} =
+      source_files
+      |> Helper.run_code_patterns(@code_patterns, params)
+
+    count =
+      property_tuples
+      |> Enum.reduce(0, fn({prop_list, _}, acc) ->
+          acc + Enum.count(prop_list)
+        end)
+
+    if count == 2 do # we just found one prefix and one suffix
+      []
+    else
+      {property_tuples, most_picked}
+      |> Helper.add_issues_to_source_files(&check_for_issues/5, params)
+    end
   end
 
-  defp check_for_issues(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
+  defp check_for_issues(_issue_meta, _actual_prop, nil, _picked_count, _total_count), do: nil
   defp check_for_issues(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
   defp check_for_issues(issue_meta, _actual_prop, expected_prop, _picked_count, _total_count) do
     source_file = IssueMeta.source_file(issue_meta)

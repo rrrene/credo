@@ -39,6 +39,72 @@ end
     assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 21)
   end
 
+  @tag :to_be_implemented
+  test "it should report the correct scope (pedanticly)" do
+    {:ok, ast} = """
+defmodule Credo.Sample do
+  @test_attribute :foo
+
+  def foobar(parameter1, parameter2) do
+    String.split(parameter1) + parameter2
+  end
+
+  defmodule InlineModule do
+    def foobar(v) when is_atom(v) do
+      {:ok} = File.read
+    end
+  end
+end
+
+defmodule OtherModule do
+  defmacro foo do
+    {:ok} = File.read
+  end
+
+  defp bar do
+    :ok
+  end
+end
+""" |> Code.string_to_quoted
+
+    IO.puts ""
+    (1..25)
+    |> Enum.each(fn(line) ->
+      tuple =
+        ast
+        |> Scope.name(line: line)
+        |> to_inspected
+
+      "#{line |> to_string |> String.rjust(2)}: #{tuple}"
+      |> IO.puts
+    end)
+
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 1)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 2)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 3)
+    assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 4)
+    assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 5)
+    assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 6)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 7)
+    assert {:defmodule, "Credo.Sample.InlineModule"} == Scope.name(ast, line: 8)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 9)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 10)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 11)
+    assert {:defmodule, "Credo.Sample.InlineModule"} == Scope.name(ast, line: 12)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 13)
+    assert {nil, ""} == Scope.name(ast, line: 14)
+
+    assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 15)
+    assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 16)
+    assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 17)
+    assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 18)
+    assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 19)
+    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 20)
+    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 21)
+    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 22)
+    assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 23)
+  end
+
   test "it should report the correct scope even outside of modules" do
     {:ok, ast} = """
 defmodule Bar do
