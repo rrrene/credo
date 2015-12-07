@@ -4,7 +4,7 @@ defmodule Credo.Mixfile do
   def project do
     [
       app: :credo,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.0",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env == :prod,
@@ -12,7 +12,7 @@ defmodule Credo.Mixfile do
       deps: deps,
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
-      description: "An opinionated analysis tool for Elixir with a strong focus on teaching",
+      description: "A static code analysis tool for the Elixir language with a focus on code consistency and teaching.",
       package: package
     ]
   end
