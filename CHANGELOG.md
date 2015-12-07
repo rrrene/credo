@@ -49,6 +49,7 @@ So an exit status of 12 tells you that you have only Readability Issues and Refa
 - `mix credo --only <checkname>` will always display a full list of results
   (you no longer need to specify `--all` separately)
 - `mix credo explain <file:line_number>` now also explains the available configuration parameters for the issue/check
+- The ExceptionNames check no longer fails if only a single exception module is found (#22).
 
 ## 0.1.10
 
