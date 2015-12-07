@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Fixes a problem with CaseTrivialMatches crashing
+
 ## 0.2.0
 
 ### Error Status
