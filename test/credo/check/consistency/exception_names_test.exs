@@ -41,6 +41,23 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report correct behaviour (only one exception class)" do
+    [
+"""
+defmodule Credo.SampleError do
+  defexception [:message]
+end
+""",
+"""
+defmodule SomeModule do
+
+end
+"""
+    ]
+    |> Enum.map(&to_source_file/1)
+    |> refute_issues(@described_check)
+  end
+
 
 
   test "it should report a violation for different naming schemes" do
