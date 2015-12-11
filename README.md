@@ -1,6 +1,8 @@
 # Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo)
 
-Credo is a static code analysis tool for the Elixir language with a focus on teaching.
+Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency. 
+
+It implements [its own style guide](https://github.com/rrrene/elixir-style-guide).
 
 ## What can it do?
 
