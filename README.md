@@ -1,4 +1,4 @@
-# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo)
+# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Deps Status](http://hexfaktor.org/images/deps.svg)](https://hexfaktor.org/)
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency. 
 
