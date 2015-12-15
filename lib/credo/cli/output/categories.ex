@@ -25,7 +25,7 @@ defmodule Credo.CLI.Output.Categories do
     """,
     readability: """
     Readability checks do not concern themselves with the technical correctness
-    of your code, but easy it is to digest.
+    of your code, but how easy it is to digest.
     """,
     refactor: """
     The Refactor checks show you opportunities to avoid future problems and
@@ -43,7 +43,6 @@ defmodule Credo.CLI.Output.Categories do
     """,
   ]
 
-  @doc "Called before the analysis is run."
   def print do
     @order
     |> Enum.each(&print_category/1)
