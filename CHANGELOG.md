@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Adds a missing word to the output of the `categories` command (thx @bakkdoor)
+
 ## 0.2.1
 
 - Fixes a problem with CaseTrivialMatches crashing
