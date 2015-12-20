@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
   @moduledoc """
     Checks for the length of lines.
 
-    Can optionally ignore function definitions and (multi-)line strings.
+    Ignores function definitions and (multi-)line strings by default.
   """
 
   @explanation [
@@ -44,12 +44,12 @@ defmodule Credo.Check.Readability.MaxLineLength do
   end
 
   for op <- @def_ops do
-    defp find_definitions({unquote(op), meta, arguments} = ast, defintions) when is_list(arguments) do
-      {ast, [meta[:line] | defintions]}
+    defp find_definitions({unquote(op), meta, arguments} = ast, definitions) when is_list(arguments) do
+      {ast, [meta[:line] | definitions]}
     end
   end
-  defp find_definitions(ast, defintions) do
-    {ast, defintions}
+  defp find_definitions(ast, definitions) do
+    {ast, definitions}
   end
 
   defp refute_issue?(line_no, definitions, ignore_definitions, ignore_strings) do
