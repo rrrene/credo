@@ -5,7 +5,6 @@ defmodule Credo.CLI.Command.List do
 
   alias Credo.Check.Runner
   alias Credo.Config
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output.IssuesByScope
   alias Credo.CLI.Output.IssuesShortList
   alias Credo.CLI.Output.UI
