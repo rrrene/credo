@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Improves docs and UI wording (thx @crack and @jessejanderson)
+
 ## 0.2.2
 
 - Adds a missing word to the output of the `categories` command (thx @bakkdoor)
