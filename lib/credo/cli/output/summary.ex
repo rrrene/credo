@@ -22,6 +22,9 @@ defmodule Credo.CLI.Output.Summary do
       source_files
       |> Enum.map(&(&1.issues))
       |> List.flatten
+
+    shown_issues =
+      issues
       |> Filter.important(config)
 
     UI.puts
@@ -29,13 +32,13 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts
     UI.puts [:faint, format_time_spent(time_load, time_run)]
 
-    UI.puts summary_parts(source_files, issues)
+    UI.puts summary_parts(source_files, shown_issues)
 
     # print_badge(source_files, issues)
     UI.puts
 
     if config.min_priority >= 0 do
-      "Showing issues: ↑ ↗ →  (use `-A` to show all priorities, `--help` for options)."
+      "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
       |> UI.puts(:faint)
     end
   end
@@ -118,7 +121,7 @@ defmodule Credo.CLI.Output.Summary do
         String.replace(last_part, ", ", "")
        end)
 
-    if Enum.empty?(parts), do: parts = "nothing"
+    if Enum.empty?(parts), do: parts = "no issues"
 
     [
       :green,

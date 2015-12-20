@@ -25,6 +25,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     term_width = Output.term_columns
 
     source_files
+    |> Filter.important(config)
     |> Enum.sort_by(&(&1.filename))
     |> Enum.each(&print_issues(&1, config, term_width))
 

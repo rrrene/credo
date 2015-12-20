@@ -20,10 +20,6 @@ defmodule Credo.CLI.Command.Suggest do
 
     {time_run, source_files}  = run_checks(source_files, config)
 
-    source_files =
-      source_files
-      |> Filter.important(config)
-
     print_results_and_summary(source_files, config, time_load, time_run)
 
     issues =

@@ -49,20 +49,18 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   def print_after_info(source_files, config, time_load, time_run) do
     term_width = Output.term_columns
 
-    issues =
-      source_files
-      |> Enum.flat_map(&(&1.issues))
-      |> Filter.important(config)
+    issues = source_files |> Enum.flat_map(&(&1.issues))
+    shown_issues = issues |> Filter.important(config)
 
     categories =
-      issues
+      shown_issues
       |> Enum.map(&(&1.category))
       |> Enum.uniq
 
     issue_map =
       categories
       |> Enum.map(fn(category) ->
-          {category, issues |> Enum.filter(&(&1.category == category))}
+          {category, shown_issues |> Enum.filter(&(&1.category == category))}
         end)
       |> Enum.into(%{})
 
