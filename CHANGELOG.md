@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4
+
+- Remove unused alias to avoid warning during compilation
+
 ## 0.2.3
 
 - Improves docs and UI wording (thx @crack and @jessejanderson)
