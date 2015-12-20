@@ -58,7 +58,6 @@ defmodule Credo.CLI.Command.List do
     output_mod.print_before_info(source_files)
 
     source_files
-    |> Filter.important(config)
     |> output_mod.print_after_info(config, time_load, time_run)
   end
 
