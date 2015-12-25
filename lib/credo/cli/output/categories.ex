@@ -29,7 +29,7 @@ defmodule Credo.CLI.Output.Categories do
     """,
     refactor: """
     The Refactor checks show you opportunities to avoid future problems and
-    technical dept.
+    technical debt.
     """,
     warning: """
     While refactor checks show you possible problems, these checks try to
