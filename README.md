@@ -1,6 +1,6 @@
 # Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Deps Status](http://hexfaktor.org/images/deps.svg)](http://hexfaktor.org/)
 
-Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency. 
+Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
 It implements [its own style guide](https://github.com/rrrene/elixir-style-guide).
 
@@ -256,7 +256,7 @@ Readability checks do not concern themselves with the technical correctness of y
 
 ### Refactoring Opportunities
 
-The Refactor checks show you opportunities to avoid future problems and technical dept.
+The Refactor checks show you opportunities to avoid future problems and technical debt.
 
 
 ### Software Design
