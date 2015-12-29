@@ -1,8 +1,14 @@
 defmodule Credo.CLI.Output do
   alias Credo.CLI.Output.UI
 
+  @category_to_tag %{"consistency" => "C",
+                     "readability" => "R",
+                     "design"      => "D",
+                     "refactor"    => "F",
+                     "warning"     => "W"}
+
   def check_tag(category) when is_binary(category) do
-    "[#{category |> String.at(0) |> String.upcase}]"
+    "[#{Map.fetch!(@category_to_tag, category) |> String.upcase}]"
   end
   def check_tag(category) when is_atom(category) do
     category |> to_string |> check_tag
