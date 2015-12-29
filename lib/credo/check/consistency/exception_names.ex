@@ -49,7 +49,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
         end)
 
     if count == 2 do # we just found one prefix and one suffix
-      []
+      source_files
     else
       {property_tuples, most_picked}
       |> Helper.add_issues_to_source_files(&check_for_issues/5, params)
