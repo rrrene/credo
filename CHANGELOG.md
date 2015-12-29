@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5
+
+- Fix error occuring when a project has exactly one `defexception` module
+- Change the tag for Refactoring Opportunities from "[R]" to "[F]" (thx @rranelli)
+
 ## 0.2.4
 
 - Remove unused alias to avoid warning during compilation
