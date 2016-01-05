@@ -45,7 +45,7 @@ defmodule Credo.CLI.Command.Help do
         {:shortdoc, [shortdesc]} ->
           UI.puts "  " <> name2 <> shortdesc
         _ ->
-          # skip commands without @shortdesc
+          nil # skip commands without @shortdesc
       end
     end)
 
