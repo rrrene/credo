@@ -120,6 +120,7 @@ defmodule Credo.CLI do
     end
     if switch(switches, :help), do: config = %Config{config | help: true}
     if switch(switches, :one_line), do: config = %Config{config | format: "one-line"}
+    if switch(switches, :flycheck), do: config = %Config{config | format: "flycheck"}
     if switch(switches, :verbose), do: config = %Config{config | verbose: true}
     if switch(switches, :version), do: config = %Config{config | version: true}
     if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}

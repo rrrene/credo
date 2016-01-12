@@ -16,7 +16,7 @@ defmodule Credo.CLI.Command.Suggest do
     {time_load, source_files} = load_and_validate_source_files(config)
 
     out = output_mod(config)
-    out.print_before_info(source_files)
+    out.print_before_info(source_files, config)
 
     {time_run, source_files}  = run_checks(source_files, config)
 

@@ -3,16 +3,22 @@ defmodule Credo.CLI.Output do
 
   @category_tag_map %{"refactor" => "F"}
 
-  def check_tag(category) when is_binary(category) do
+  def check_tag(category, in_parens \\ true)
+
+  def check_tag(category, in_parens) when is_binary(category) do
     default_tag = category |> String.at(0) |> String.upcase
     tag = Map.get(@category_tag_map, category, default_tag)
-    "[#{tag}]"
+    if in_parens do
+      "[#{tag}]"
+    else
+      tag
+    end
   end
-  def check_tag(category) when is_atom(category) do
-    category |> to_string |> check_tag
+  def check_tag(category, in_parens) when is_atom(category) do
+    category |> to_string |> check_tag(in_parens)
   end
-  def check_tag(check_mod) do
-    check_mod.category |> to_string |> check_tag
+  def check_tag(check_mod, in_parens) do
+    check_mod.category |> to_string |> check_tag(in_parens)
   end
 
   def check_color(category) when is_binary(category) do

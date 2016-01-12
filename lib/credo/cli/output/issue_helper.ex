@@ -8,6 +8,18 @@ defmodule Credo.CLI.Output.IssueHelper do
   @indent 8
 
   def print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
+                    %Config{format: "flycheck"} = _config, _term_width) do
+    inner_color = Output.check_color(issue)
+    message_color  = inner_color
+    filename_color = :white
+    tag = Output.check_tag(issue, false)
+
+    [
+      filename |> to_string, Filename.pos_suffix(issue.line_no, issue.column), ": ", tag, ": ", message,
+    ]
+    |> UI.puts
+  end
+  def print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
                     %Config{format: "one-line"} = _config, _term_width) do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
