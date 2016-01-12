@@ -55,10 +55,10 @@ defmodule Credo.CLI.Command.Suggest do
     end
   end
 
-  defp output_mod(%Config{one_line: true}) do
+  defp output_mod(%Config{format: "one-line"}) do
     IssuesGroupedByCategory # TODO: offer short list (?)
   end
-  defp output_mod(%Config{one_line: false}) do
+  defp output_mod(%Config{format: _}) do
     IssuesGroupedByCategory
   end
 

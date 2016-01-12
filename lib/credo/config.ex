@@ -4,16 +4,16 @@ defmodule Credo.Config do
   manipulated via the `Credo.Config` module.
   """
 
-  defstruct files:        nil,
-            checks:       nil,
-            min_priority: 0,
-            help:         false,
-            version:      false,
-            verbose:      false,
-            all:          false,
-            one_line:        false, # rename to one-line
+  defstruct files:          nil,
+            checks:         nil,
+            min_priority:   0,
+            help:           false,
+            version:        false,
+            verbose:        false,
+            all:            false,
+            format:         nil,
             match_checks:   nil,
-            ignore_checks:   nil,
+            ignore_checks:  nil,
             crash_on_error: true
 
   @config_filename ".credo.exs"

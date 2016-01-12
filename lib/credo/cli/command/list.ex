@@ -45,10 +45,10 @@ defmodule Credo.CLI.Command.List do
     end
   end
 
-  defp output_mod(%Config{one_line: true}) do
+  defp output_mod(%Config{format: "one-line"}) do
     IssuesShortList
   end
-  defp output_mod(%Config{one_line: false}) do
+  defp output_mod(%Config{format: _}) do
     IssuesByScope
   end
 
