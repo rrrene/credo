@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0-dev
+
+- Add `--format` CLI switch
+- Include experimental Flycheck support via `--format=flycheck`
+- **Deprecate** `--one-line` CLI switch, use `--format=oneline` instead
+
 ## 0.2.5
 
 - Fix error occuring when a project has exactly one `defexception` module
