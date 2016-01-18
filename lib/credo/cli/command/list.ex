@@ -45,7 +45,7 @@ defmodule Credo.CLI.Command.List do
     end
   end
 
-  defp output_mod(%Config{format: "one-line"}) do
+  defp output_mod(%Config{format: "oneline"}) do
     IssuesShortList
   end
   defp output_mod(%Config{format: _}) do
@@ -69,7 +69,7 @@ defmodule Credo.CLI.Command.List do
     Lists objects that Credo thinks can be improved ordered by their priority.
     """
     |> UI.puts
-    ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --one-line"]
+    ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
     |> UI.puts
     """
 
@@ -81,7 +81,7 @@ defmodule Credo.CLI.Command.List do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --one-line        Show a condensed version of the list
+          --format          Display the list in a specific format (oneline,flycheck)
 
     General options:
       -v, --version         Show version

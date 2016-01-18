@@ -88,7 +88,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   defp print_issues(_category, issues, source_file_map, %Config{format: "flycheck"} = config, term_width) do
     print_issues(issues, source_file_map, config, term_width)
   end
-  defp print_issues(_category, issues, source_file_map, %Config{format: "one-line"} = config, term_width) do
+  defp print_issues(_category, issues, source_file_map, %Config{format: "oneline"} = config, term_width) do
     print_issues(issues, source_file_map, config, term_width)
   end
   defp print_issues(category, issues, source_file_map, config, term_width) do

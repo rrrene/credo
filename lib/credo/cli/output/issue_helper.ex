@@ -20,7 +20,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
   end
   def print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
-                    %Config{format: "one-line"} = _config, _term_width) do
+                    %Config{format: "oneline"} = _config, _term_width) do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
     filename_color = :white

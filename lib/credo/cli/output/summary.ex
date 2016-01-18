@@ -17,7 +17,7 @@ defmodule Credo.CLI.Output.Summary do
   def print(_source_files, %Config{format: "flycheck"}, _time_load, _time_run) do
     nil
   end
-  def print(_source_files, %Config{format: "one-line"}, _time_load, _time_run) do
+  def print(_source_files, %Config{format: "oneline"}, _time_load, _time_run) do
     nil
   end
   def print(source_files, config, time_load, time_run) do

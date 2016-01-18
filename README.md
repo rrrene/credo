@@ -171,7 +171,7 @@ Use the `--verbose` switch to include the code snippets in question in the outpu
 
 ### Show compact list
 
-Use the `--one-line` switch to format the output to represent each issue by a single line.
+Use `--format=oneline` to format the output to represent each issue by a single line.
 
 
 ### Show all issues including low priority ones
@@ -188,11 +188,11 @@ Use the `--all-priorities` switch to include low priority issues in the output (
 
 Example usage:
 
-    $ mix credo                     # display standard report
-    $ mix credo suggest             # same thing, since it's the default command
-    $ mix credo --all --one-line    # include low priority issues, one issue per line
+    $ mix credo                         # display standard report
+    $ mix credo suggest                 # same thing, since it's the default command
+    $ mix credo --all --format=oneline  # include low priority issues, one issue per line
 
-    $ mix credo suggest --help      # more options
+    $ mix credo suggest --help          # more options
 
 
 ### list
@@ -201,11 +201,11 @@ Example usage:
 
 Example usage:
 
-    $ mix credo list                # show issues grouped by file
-    $ mix credo list --one-line     # show issues grouped by file, one issue per line
-    $ mix credo list --one-line -a  # same thing, include low priority issues
+    $ mix credo list                      # show issues grouped by file
+    $ mix credo list --format=oneline     # show issues grouped by file, one issue per line
+    $ mix credo list --format=oneline -a  # same thing, include low priority issues
 
-    $ mix credo list --help         # more options
+    $ mix credo list --help               # more options
 
 
 ### explain

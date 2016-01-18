@@ -55,7 +55,7 @@ defmodule Credo.CLI.Command.Suggest do
     end
   end
 
-  defp output_mod(%Config{format: "one-line"}) do
+  defp output_mod(%Config{format: "oneline"}) do
     IssuesGroupedByCategory # TODO: offer short list (?)
   end
   defp output_mod(%Config{format: _}) do
@@ -89,8 +89,7 @@ defmodule Credo.CLI.Command.Suggest do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --one-line        Show a condensed version of the list
-          --verbose         Show a verbose version with code snippets
+          --format          Display the list in a specific format (oneline,flycheck)
 
     General options:
       -v, --version         Show version

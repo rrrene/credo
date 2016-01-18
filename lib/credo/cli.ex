@@ -9,6 +9,7 @@ defmodule Credo.CLI do
 
   alias Credo.Config
   alias Credo.CLI.Filename
+  alias Credo.CLI.Output.UI
 
   @default_dir "."
   @default_command_name "suggest"
@@ -119,8 +120,6 @@ defmodule Credo.CLI do
       config = %Config{config | all: true, min_priority: -99}
     end
     if switch(switches, :help), do: config = %Config{config | help: true}
-    if switch(switches, :one_line), do: config = %Config{config | format: "one-line"}
-    if switch(switches, :flycheck), do: config = %Config{config | format: "flycheck"}
     if switch(switches, :verbose), do: config = %Config{config | verbose: true}
     if switch(switches, :version), do: config = %Config{config | version: true}
     if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
@@ -129,6 +128,12 @@ defmodule Credo.CLI do
     if min_priority do
       config =
         %Config{config | min_priority: min_priority}
+    end
+
+    format = switch(switches, :format)
+    if format do
+      config =
+        %Config{config | format: format}
     end
 
     # only include certain checks
@@ -143,6 +148,13 @@ defmodule Credo.CLI do
     if ignore_pattern do
       config =
         %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
+    end
+
+    # DEPRECATED command line switches:
+
+    if switch(switches, :one_line) do
+      UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
+      config = %Config{config | format: "oneline"}
     end
 
     config
