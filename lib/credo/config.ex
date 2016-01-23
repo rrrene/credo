@@ -4,16 +4,16 @@ defmodule Credo.Config do
   manipulated via the `Credo.Config` module.
   """
 
-  defstruct files:        nil,
-            checks:       nil,
-            min_priority: 0,
-            help:         false,
-            version:      false,
-            verbose:      false,
-            all:          false,
-            one_line:        false, # rename to one-line
+  defstruct files:          nil,
+            checks:         nil,
+            min_priority:   0,
+            help:           false,
+            version:        false,
+            verbose:        false,
+            all:            false,
+            one_line:       false, # rename to one-line
             match_checks:   nil,
-            ignore_checks:   nil,
+            ignore_checks:  nil,
             crash_on_error: true
 
   @config_filename ".credo.exs"
@@ -71,17 +71,34 @@ defmodule Credo.Config do
   end
 
   defp relevant_config_files(dir) do
-    path = dir |> Path.expand |> Path.join("config")
-    count = path |> Path.split |> Enum.count
-    Enum.reduce(0..count-2, [], fn(i, acc) ->
-      new_path =
-        path
-        |> Path.join(String.duplicate("../", i))
-        |> Path.expand
-        |> Path.join(@config_filename)
+    dir
+    |> relevant_directories
+    |> add_config_files
+  end
 
-      [new_path | acc]
-    end)
+  defp relevant_directories(dir) do
+    dir
+    |> Path.expand
+    |> Path.split
+    |> Enum.reverse
+    |> get_dir_paths
+    |> add_config_dirs
+  end
+
+  defp get_dir_paths(dirs), do: do_get_dir_paths(dirs, [])
+
+  defp do_get_dir_paths(dirs, acc) when length(dirs) < 2, do: acc
+  defp do_get_dir_paths([dir | tail], acc) do
+    expanded_path = tail |> Enum.reverse |> Path.join |> Path.join(dir)
+    do_get_dir_paths(tail, [expanded_path | acc])
+  end
+
+  defp add_config_dirs(paths) do
+    Enum.flat_map(paths, fn(path) -> [path, Path.join(path, "config")] end)
+  end
+
+  defp add_config_files(paths) do
+    for path <- paths, do: Path.join(path, @config_filename)
   end
 
   defp from_exs(dir, config_name, exs_string) do
