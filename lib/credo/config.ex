@@ -76,7 +76,7 @@ defmodule Credo.Config do
     |> add_config_files
   end
 
-  defp relevant_directories(dir) do
+  def relevant_directories(dir) do
     dir
     |> Path.expand
     |> Path.split
