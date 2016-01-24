@@ -77,4 +77,14 @@ defmodule Credo.ConfigTest do
                   }
     assert expected == Config.merge([@default_config, @example_config2, @example_config])
   end
+
+  test "loads .credo.exs from ./config subdirs in ascending directories as well" do
+    dirs = Config.relevant_directories(".")
+    config_subdir_count =
+      dirs
+      |> Enum.filter(&(String.ends_with?(&1, "config")))
+      |> Enum.count
+
+    assert config_subdir_count > 1
+  end
 end
