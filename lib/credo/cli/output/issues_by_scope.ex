@@ -36,9 +36,11 @@ defmodule Credo.CLI.Output.IssuesByScope do
   defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width) do
     issues
     |> Filter.important(config)
+    |> Filter.valid_issues(config)
     |> print_issues(filename, source_file, config, term_width)
   end
 
+  @lint false
   defp print_issues(issues, _filename, source_file, _config, term_width) do
     if issues |> Enum.any? do
       first_issue = issues |> List.first

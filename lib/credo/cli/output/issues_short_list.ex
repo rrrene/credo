@@ -28,6 +28,7 @@ defmodule Credo.CLI.Output.IssuesShortList do
   defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width) do
     issues
     |> Filter.important(config)
+    |> Filter.valid_issues(config)
     |> print_issues(filename, source_file, config, term_width)
   end
 

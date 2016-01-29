@@ -14,7 +14,7 @@ defmodule Credo.CLI.Command.List do
   def run(_dir, %Config{help: true}), do: print_help
   def run(_dir, config) do
     {time_load, source_files} = load_and_validate_source_files(config)
-    {time_run, source_files}  = run_checks(source_files, config)
+    {time_run, {source_files, config}}  = run_checks(source_files, config)
 
     print_results_and_summary(source_files, config, time_load, time_run)
 

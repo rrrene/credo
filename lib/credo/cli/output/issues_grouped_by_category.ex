@@ -53,7 +53,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     term_width = Output.term_columns
 
     issues = source_files |> Enum.flat_map(&(&1.issues))
-    shown_issues = issues |> Filter.important(config)
+    shown_issues =
+      issues
+      |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     categories =
       shown_issues

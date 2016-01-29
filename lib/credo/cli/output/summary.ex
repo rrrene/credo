@@ -29,6 +29,7 @@ defmodule Credo.CLI.Output.Summary do
     shown_issues =
       issues
       |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     UI.puts
     UI.puts [:faint, @cry_for_help]

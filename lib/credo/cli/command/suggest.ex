@@ -18,7 +18,7 @@ defmodule Credo.CLI.Command.Suggest do
     out = output_mod(config)
     out.print_before_info(source_files, config)
 
-    {time_run, source_files}  = run_checks(source_files, config)
+    {time_run, {source_files, config}}  = run_checks(source_files, config)
 
     print_results_and_summary(source_files, config, time_load, time_run)
 
@@ -26,6 +26,7 @@ defmodule Credo.CLI.Command.Suggest do
       source_files
       |> Enum.flat_map(&(&1.issues))
       |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     case issues do
       [] -> :ok

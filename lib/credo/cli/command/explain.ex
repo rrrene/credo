@@ -15,7 +15,7 @@ defmodule Credo.CLI.Command.Explain do
   def run(_dir, %Config{help: true}), do: print_help
   def run(file, config) do
     {_, source_files} = load_and_validate_source_files(config)
-    {_, source_files}  = run_checks(source_files, config)
+    {_, {source_files, config}}  = run_checks(source_files, config)
 
     file
     |> String.split(":")
