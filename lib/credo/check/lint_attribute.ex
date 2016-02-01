@@ -6,20 +6,28 @@ defmodule Credo.Check.LintAttribute do
             value: nil
 
   def ignores_issue?(%__MODULE__{value: false} = lint_attribute, issue) do
-    (lint_attribute.scope == issue.scope)
+    lint_attribute.scope == issue.scope
   end
   def ignores_issue?(%__MODULE__{value: check_list} = lint_attribute, issue) when is_list(check_list) do
-    config = check_in_list(issue.check, check_list)
-    if (lint_attribute.scope == issue.scope) do
-      case config do
-        {check, false} ->
-          true
-        _ ->
-          false
-      end
+    if lint_attribute.scope == issue.scope do
+      check_list
+      |> Enum.any?(&check_tuple_ignores_issue?(&1, issue))
+    else
+      false
     end
   end
   def ignores_issue?(lint_attribute, issue) do
+    false
+  end
+
+  defp check_tuple_ignores_issue?({check_or_regex, false}, issue) do
+    if check_or_regex |> Regex.regex? do
+      issue.check |> to_string |> String.match?(check_or_regex)
+    else
+      issue.check == check_or_regex
+    end
+  end
+  defp check_tuple_ignores_issue?(_, _issue) do
     false
   end
 
