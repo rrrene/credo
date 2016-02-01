@@ -322,6 +322,23 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for this" do
+"""
+defmodule CredoSampleModule do
+  def sort_column(col, query) do
+    cols = result_columns(query)
+    if hd(cols) do
+      coercer = fn({name, type}) -> coerce(type, col[Atom.to_string(name)]) end
+      cols |> Enum.map(coercer)
+    else
+      [nil]
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 
  ##############################################################################
  ##############################################################################
