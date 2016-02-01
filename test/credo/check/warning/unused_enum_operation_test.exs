@@ -356,6 +356,57 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for |> in :if when part of a list" do
+"""
+defmodule CredoSampleModule do
+  def sort_column(col, query) do
+    cols = result_columns(query)
+    if hd(cols) do
+      coercer = fn({name, type}) -> coerce(type, col[Atom.to_string(name)]) end
+      [cols |> Enum.map(coercer), 123]
+    else
+      [nil]
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for |> in :if when part of a keyword list" do
+"""
+defmodule CredoSampleModule do
+  def sort_column(col, query) do
+    cols = result_columns(query)
+    if hd(cols) do
+      coercer = fn({name, type}) -> coerce(type, col[Atom.to_string(name)]) end
+      [cols: cols |> Enum.map(coercer), number: 123]
+    else
+      [nil]
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for |> in :if when part of a map" do
+"""
+defmodule CredoSampleModule do
+  def sort_column(col, query) do
+    cols = result_columns(query)
+    if hd(cols) do
+      coercer = fn({name, type}) -> coerce(type, col[Atom.to_string(name)]) end
+      %{cols: cols |> Enum.map(coercer), number: 123}
+    else
+      [nil]
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report a violation for ++ in :if" do
 """
 defmodule CredoSampleModule do
