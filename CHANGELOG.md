@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.6
+
+- Fix false positives for UnusedEnumOperation checks (thx @kbaird)
+
 ## 0.2.5
 
 - Fix error occuring when a project has exactly one `defexception` module
