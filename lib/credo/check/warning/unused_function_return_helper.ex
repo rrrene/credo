@@ -31,7 +31,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
           calls_in_method
           |> Enum.flat_map(&invalid_calls(&1, last_call_in_def, calls_in_method, required_mod_list, restrict_fun_names))
 
-      #IO.puts IO.ANSI.format [:yellow, "unquote(op)"]
+      #IO.puts IO.ANSI.format [:yellow, "OP:", unquote(op) |> to_string]
       #IO.inspect ast |> CodeHelper.do_block_for
       #IO.inspect calls_in_method
       #IO.inspect last_call_in_def
@@ -46,10 +46,14 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
   defp invalid_calls(call, last_call_in_def, calls_in_block_above, required_mod_list, restrict_fun_names) do
     if call |> CodeHelper.do_block? do
+      #IO.inspect "do block"
       call
       |> calls_to_mod_fun(required_mod_list, restrict_fun_names)
+      #|> IO.inspect
       |> Enum.reject(&valid_call_to_string_mod?(call, &1, last_call_in_def, calls_in_block_above))
     else
+      #IO.inspect "no do block"
+      #IO.inspect call
       if call == last_call_in_def do
         []
       else
@@ -121,13 +125,21 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       end
     end
   end
-  defp valid_call_to_string_mod?({:|>, _, arguments}, call_to_string, _last_call_in_def, _calls_in_block_above) do
+  defp valid_call_to_string_mod?({:|>, _, arguments} = ast, call_to_string, last_call_in_def, _calls_in_block_above) do
     #IO.puts IO.ANSI.format [:yellow, ":|>"]
     # We are in a pipe chain that is NOT the last call in the method
     # and that is NOT part of an assignment.
     # This is fine, as long as the call to String is not the last element
     # in the pipe chain.
-    List.last(arguments) != call_to_string
+    if CodeHelper.contains_child?(last_call_in_def, ast) && CodeHelper.contains_child?(ast, call_to_string) do
+      true
+    else
+      List.last(arguments) != call_to_string
+    end
+  end
+  defp valid_call_to_string_mod?({:++, _, _arguments} = ast, call_to_string, last_call_in_def, _calls_in_block_above) do
+    #IO.puts IO.ANSI.format [:yellow, ":++"]
+    CodeHelper.contains_child?(last_call_in_def, ast) && CodeHelper.contains_child?(ast, call_to_string)
   end
   defp valid_call_to_string_mod?({_atom, _meta, arguments} = ast, call_to_string, last_call_in_def, calls_in_block_above) do
     if fn_in_arguments?(ast) do
@@ -156,13 +168,26 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       CodeHelper.contains_child?(arguments, call_to_string)
     end
   end
+  defp valid_call_to_string_mod?(tuple, call_to_string, last_call_in_def, calls_in_block_above) when is_tuple(tuple) do
+    tuple
+    |> Tuple.to_list
+    |> Enum.any?(&valid_call_to_string_mod?(&1, call_to_string, last_call_in_def, calls_in_block_above))
+  end
+  defp valid_call_to_string_mod?(list, call_to_string, last_call_in_def, calls_in_block_above) when is_list(list) do
+    list
+    |> Enum.any?(&valid_call_to_string_mod?(&1, call_to_string, last_call_in_def, calls_in_block_above))
+  end
   defp valid_call_to_string_mod?(_ast, _call_to_string, _last_call_in_def, _calls_in_block_above) do
+    #IO.inspect "fall-thru"
+    #IO.inspect ast
+    #IO.inspect CodeHelper.contains_child?(last_call_in_def, ast) && CodeHelper.contains_child?(ast, call_to_string)
+    #IO.puts ""
     false
   end
 
   defp valid_call_to_string_mod_in_block?({:__block__, _meta, calls_in_this_block}, _ast, call_to_string, last_call_in_def, _calls_in_block_above) do
     #IO.puts IO.ANSI.format [:green, "Block separation (__block__)!"]
-    #IO.inspect block
+    #IO.inspect CodeHelper.contains_child?(last_call_in_def, ast)
     #IO.puts ""
 
     calls_in_this_block
@@ -180,6 +205,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       calls_in_this_block = any_value |> List.wrap
 
       calls_in_this_block
+      #|> IO.inspect
       |> Enum.any?(&valid_call_to_string_mod?(&1, call_to_string, last_call_in_def, calls_in_this_block))
     end
   end
