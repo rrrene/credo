@@ -2,6 +2,32 @@
 
 ## 0.3.0-dev
 
+- Add support for `@lint` attributes for functions
+
+  This lets you exclude functions completely
+
+      @lint false
+      def my_fun do
+      end
+
+  or deactivate specific checks with the same syntax used in the config file:
+
+      @lint {Credo.Check.Design.AliasUsage, false}
+      def my_fun do
+      end
+
+  or use a Regex instead of the check atom to exclude multiple checks at once:
+
+      @lint {~r/Refactor/, false}
+      def my_fun do
+      end
+
+  Finally, you can supply multiple tuples as a list and combine the above:
+
+      @lint [{Credo.Check.Design.AliasUsage, false}, {~r/Refactor/, false}]
+      def my_fun do
+      end
+
 - Add `--format` CLI switch
 - Include experimental Flycheck support via `--format=flycheck`
 - **Deprecate** `--one-line` CLI switch, use `--format=oneline` instead
