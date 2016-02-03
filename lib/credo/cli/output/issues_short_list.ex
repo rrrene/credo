@@ -41,7 +41,7 @@ defmodule Credo.CLI.Output.IssuesShortList do
     outer_color = Output.check_color(issue)
     inner_color = Output.check_color(issue)
     message_color  = inner_color
-    filename_color = :white
+    filename_color = :default_color
 
     [
       inner_color,

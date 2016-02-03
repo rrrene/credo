@@ -69,7 +69,7 @@ defmodule Credo.CLI.Output.Explain do
     outer_color = Output.check_color(issue)
     inner_color = Output.check_color(issue)
     message_color  = inner_color
-    filename_color = :white
+    filename_color = :default_color
     tag_style = if outer_color == inner_color, do: :faint, else: :bright
 
     [
