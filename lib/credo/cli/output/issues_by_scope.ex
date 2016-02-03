@@ -33,6 +33,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> Summary.print(config, time_load, time_run)
   end
 
+  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width) do
     issues
     |> Filter.important(config)

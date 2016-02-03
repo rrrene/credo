@@ -5,6 +5,14 @@ defmodule Credo.Check.LintAttribute do
             scope: nil,
             value: nil
 
+  def from_ast({:@, meta, [{:lint, _, arguments}]}) do
+    %__MODULE__{
+      meta: meta,
+      arguments: arguments,
+      value: value_for(arguments)
+    }
+  end
+
   def ignores_issue?(%__MODULE__{value: false} = lint_attribute, issue) do
     lint_attribute.scope == issue.scope
   end
@@ -40,8 +48,22 @@ defmodule Credo.Check.LintAttribute do
   def value_for([list]) when is_list(list) do
     list |> Enum.map(&value_for/1)
   end
+  def value_for([tuple]) when is_tuple(tuple) do
+    [tuple |> value_for()]
+  end
   def value_for({{:__aliases__, _, mod_list}, params}) do
     {Module.concat(mod_list), params}
   end
-  def value_for(_), do: nil
+  def value_for({{:sigil_r, _, arguments} = sigil, params}) do
+    {result, _binding} = Code.eval_quoted(sigil)
+    {result, params}
+  end
+  def value_for({{:sigil_R, _, arguments} = sigil, params}) do
+    {result, _binding} = Code.eval_quoted(sigil)
+    {result, params}
+  end
+  def value_for(_) do
+    nil
+  end
+
 end

@@ -4,6 +4,44 @@ defmodule Credo.Check.LintAttributeTest do
   alias Credo.Check.LintAttribute
   alias Credo.Issue
 
+  # Asserts that a given `source` produces the `expected` value.
+  defp assert_value(source, expected) do
+    input = source |> Code.string_to_quoted!
+    lint_attribute = LintAttribute.from_ast(input)
+    assert expected == lint_attribute.value, "Expected #{inspect(expected)}, got #{inspect(lint_attribute.value)}"
+  end
+
+
+  test "it should return " do
+    assert_value "@lint false",
+                        false
+  end
+
+  test "it should work for a tuple" do
+    assert_value "@lint {Credo.Check.Design.AliasUsage, false}",
+                        [{Credo.Check.Design.AliasUsage, false}]
+  end
+
+  test "it should work for a Regex" do
+    assert_value "@lint {~r/Refactor/, false}",
+                        [{~r/Refactor/, false}]
+  end
+
+  test "it should work for a Regex ~R" do
+    assert_value "@lint {~R/Refactor/, false}",
+                        [{~R/Refactor/, false}]
+  end
+
+  test "it should work for a list of tuples" do
+    assert_value "@lint [{Credo.Check.Design.AliasUsage, false}]",
+                        [{Credo.Check.Design.AliasUsage, false}]
+  end
+
+  test "it should work for a list of Regexes" do
+    assert_value "@lint [{~r/Refactor/, false}]",
+                        [{~r/Refactor/, false}]
+  end
+
 
   test "it should return true for @lint false with same scope" do
     issue = %Issue{check: Credo.Check.Refactor.ABCSize, scope: "MyScope.fun"}

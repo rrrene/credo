@@ -40,8 +40,8 @@ defmodule Credo.Check.FindLintAttributes do
   def process_calls([head|tail], nil, attribute_list) do
     current_lint_attribute =
       case head do
-        {:@, meta, [{:lint, _, arguments}]} ->
-            %LintAttribute{meta: meta, arguments: arguments, value: LintAttribute.value_for(arguments)}
+        {:@, _, [{:lint, _, _}]} = ast ->
+          LintAttribute.from_ast(ast)
         _ ->
           nil
       end
