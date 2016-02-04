@@ -11,7 +11,7 @@ defmodule Credo.CLI.Output.IssueHelper do
                     %Config{one_line: true} = _config, _term_width) do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
-    filename_color = :white
+    filename_color = :default_color
 
     [
       inner_color,
@@ -26,7 +26,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     outer_color = Output.check_color(issue)
     inner_color = Output.issue_color(issue)
     message_color  = outer_color
-    filename_color = :white
+    filename_color = :default_color
     tag_style = if outer_color == inner_color, do: :faint, else: :bright
 
     message
