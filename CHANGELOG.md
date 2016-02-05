@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0-dev
+## 0.3.0
 
 ### Per-function lint support
 
@@ -31,7 +31,7 @@
       def my_fun do
       end
 
-### New Checks:
+### New Checks
 
 - consistency/space_around_operators
 - consistency/space_in_parentheses
@@ -90,7 +90,7 @@ Default values for the checks are based on their category:
 
 So an exit status of 12 tells you that you have only Readability Issues and Refactoring Opportunities, but e.g. no Warnings.
 
-### New Checks:
+### New Checks
 
 - readability/module_doc
 - refactor/case_trivial_matches
