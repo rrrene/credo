@@ -2,15 +2,18 @@
 
 ## 0.3.0-dev
 
-- Add support for `@lint` attributes for functions
+### Per-function lint support
 
-  This lets you exclude functions completely
+- Adds support for `@lint` attributes used to configure linting for specific
+  functions.
+
+  For now, this lets you exclude functions completely
 
       @lint false
       def my_fun do
       end
 
-  or deactivate specific checks with the same syntax used in the config file:
+  or deactivate specific checks *with the same syntax used in the config file*:
 
       @lint {Credo.Check.Design.AliasUsage, false}
       def my_fun do
@@ -27,6 +30,13 @@
       @lint [{Credo.Check.Design.AliasUsage, false}, {~r/Refactor/, false}]
       def my_fun do
       end
+
+### New Checks:
+
+- consistency/space_around_operators
+- consistency/space_in_parentheses
+
+### Minor Improvements
 
 - Add `--format` CLI switch
 - Include experimental Flycheck support via `--format=flycheck`
