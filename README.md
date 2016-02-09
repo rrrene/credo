@@ -134,10 +134,6 @@ Credo is configured via a file called `.credo.exs`. This file can live in your p
         excluded: []
       },
       checks: [
-        {Credo.Check.Consistency.ExceptionNames},
-        {Credo.Check.Consistency.LineEndings},
-        {Credo.Check.Consistency.SpaceAroundOperators},
-        {Credo.Check.Consistency.SpaceInParentheses},
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority
@@ -156,6 +152,8 @@ Credo is configured via a file called `.credo.exs`. This file can live in your p
         # 1. deleting the check from this list
         # 2. putting `false` as second element (to quickly "comment it out"):
         {Credo.Check.Design.TagFIXME, false},
+
+        # ... several checks omitted for readability ...
       ]
     }
   ]
