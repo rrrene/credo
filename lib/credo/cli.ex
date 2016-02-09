@@ -144,7 +144,7 @@ defmodule Credo.CLI do
     end
 
     # exclude/ignore certain checks
-    ignore_pattern = switch(switches, :ignore_checks)
+    ignore_pattern = switch(switches, :ignore_checks, :ignore)
     if ignore_pattern do
       config =
         %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
