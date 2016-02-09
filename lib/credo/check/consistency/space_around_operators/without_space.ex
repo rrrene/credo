@@ -41,8 +41,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
     end
     if SpaceHelper.no_space_between?(operator, next) && !SpaceHelper.usually_no_space_after?(prev, operator, next) do
       case next do
-        {:eol, _} -> nil
-        _ -> list = list ++ [SpaceHelper.trigger_token(operator)]
+        {:eol, _} ->
+          nil
+        _ ->
+          list = list ++ [SpaceHelper.trigger_token(operator)]
       end
     end
     list

@@ -16,6 +16,7 @@ end
 defmodule Credo.Sample2 do
   defmodule InlineModule do
     def foobar do
+      c = -1
       [3 * 4]
       |> my_func(&Some.Deep.Module.is_something/1)
     end
@@ -41,6 +42,18 @@ defmodule OtherModule3 do
       {line_no, line} ->
         nil
     end
+  end
+end
+"""
+  @with_spaces4 """
+defmodule OtherModule3 do
+  @base_priority_map  %{low: -10, normal: 1, higher: +20}
+
+  def foo(prio) when prio in -999..-1 do
+  end
+
+  for prio < -999..0 do
+    # something
   end
 end
 """
@@ -70,7 +83,7 @@ end
 
   test "it should report the correct result" do
     [
-      @with_spaces, @with_spaces2, @with_spaces3
+      @with_spaces, @with_spaces2, @with_spaces3, @with_spaces4
     ]
     |> to_source_files()
     |> refute_issues(@described_check)

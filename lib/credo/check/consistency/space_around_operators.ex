@@ -7,6 +7,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     Credo.Check.Consistency.SpaceAroundOperators.WithSpace,
     Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace
   ]
+  @default_params [ignore: [:|]]
 
   alias Credo.Check.Consistency.Helper
   alias Credo.Check.PropertyValue
@@ -32,8 +33,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     actual_prop = PropertyValue.get(actual_prop)
 
     line = issue_meta |> IssueMeta.source_file() |> SourceFile.line_at(line_no)
+    params = issue_meta |> IssueMeta.params()
+    ignored_triggers = params |> Params.get(:ignore, @default_params)
 
-    if create_issue?(line, column, trigger) do
+    if !Enum.member?(ignored_triggers, trigger) && create_issue?(line, column, trigger) do
       format_issue issue_meta,
         message: message_for(actual_prop, expected_prop),
         line_no: line_no,
@@ -49,6 +52,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     "There are spaces around operators most of the time, but not here."
   end
 
+  # Don't create issues for `&Mod.fun/4`
   defp create_issue?(line, column, :/) do
     ~r/\&[a-zA-Z0-9\.\_\?\!]+\/\d+/     # pattern to detect &Mod.fun/4
     |> Regex.run(line, return: :index)
@@ -57,5 +61,21 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         start_index < column && end_index > column
       end)
   end
+  # Don't create issues for `c = -1`
+  defp create_issue?(line, column, operator) when operator in [:+, :-] do
+    !number_with_sign?(line, column) && !number_in_range?(line, column)
+  end
   defp create_issue?(_, _, _), do: true
+
+  defp number_with_sign?(line, column) do
+    line
+    |> String.slice(0..column-2) # -2 because we need to substract the operator
+    |> String.match?(~r/[\{\[\(\,\:\=]\s*$/)
+  end
+
+  defp number_in_range?(line, column) do
+    line
+    |> String.slice(column..-1)
+    |> String.match?(~r/^\d+\.\./)
+  end
 end
