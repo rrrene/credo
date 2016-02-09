@@ -15,11 +15,11 @@
 
   or deactivate specific checks *with the same syntax used in the config file*:
 
-      @lint {Credo.Check.Design.AliasUsage, false}
+      @lint {Credo.Check.Design.TagTODO, false}
       def my_fun do
       end
 
-  or use a Regex instead of the check atom to exclude multiple checks at once:
+  or use a Regex instead of the check module to exclude multiple checks at once:
 
       @lint {~r/Refactor/, false}
       def my_fun do
@@ -27,7 +27,7 @@
 
   Finally, you can supply multiple tuples as a list and combine the above:
 
-      @lint [{Credo.Check.Design.AliasUsage, false}, {~r/Refactor/, false}]
+      @lint [{Credo.Check.Design.TagTODO, false}, {~r/Refactor/, false}]
       def my_fun do
       end
 
