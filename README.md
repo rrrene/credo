@@ -119,11 +119,141 @@ Now you might want to know more about that particular entry, **just copy the fil
 ## Configuration
 
 
-### .credo.exs
+### Configuration via .credo.exs
 
 Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine.
 
-Take a look at Credo's own `.credo.exs` for an [example configuration](https://github.com/rrrene/credo/blob/master/.credo.exs).
+```elixir
+# config/.credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      files: %{
+        included: ["lib/", "src/", "web/", "apps/"],
+        excluded: []
+      },
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames},
+        {Credo.Check.Consistency.LineEndings},
+        {Credo.Check.Consistency.SpaceAroundOperators},
+        {Credo.Check.Consistency.SpaceInParentheses},
+        {Credo.Check.Consistency.TabsOrSpaces},
+
+        # For some checks, like AliasUsage, you can only customize the priority
+        # Priority values are: `low, normal, high, higher`
+        {Credo.Check.Design.AliasUsage, priority: :low},
+
+        # For others you can also set parameters
+        {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
+
+        # You can also customize the exit_status of each check.
+        # If you don't want TODO comments to cause `mix credo` to fail, just
+        # set this value to 0 (zero).
+        {Credo.Check.Design.TagTODO, exit_status: 2},
+
+        # There are two ways of deactivating a check:
+        # 1. deleting the check from this list
+        # 2. putting `false` as second element (to quickly "comment it out"):
+        {Credo.Check.Design.TagFIXME, false},
+      ]
+    }
+  ]
+}
+```
+
+Take a look at Credo's own `.credo.exs` for a [complete example configuration](https://github.com/rrrene/credo/blob/master/.credo.exs).
+
+
+### Inline configuration via @lint attributes
+
+`@lint` attributes can be used to configure linting for specific functions.
+
+This lets you exclude functions completely
+
+```elixir
+@lint false
+def my_fun do
+end
+```
+
+or deactivate specific checks *with the same syntax used in the config file*:
+
+```elixir
+@lint {Credo.Check.Design.TagTODO, false}
+def my_fun do
+end
+```
+
+or use a Regex instead of the check module to exclude multiple checks at once:
+
+```elixir
+@lint {~r/Refactor/, false}
+def my_fun do
+end
+```
+
+Finally, you can supply multiple tuples as a list and combine the above:
+
+```elixir
+@lint [{Credo.Check.Design.TagTODO, false}, {~r/Refactor/, false}]
+def my_fun do
+end
+```
+
+
+
+## Commands
+
+### suggest (default command)
+
+`suggest` is the default command of Credo. It suggests issues to fix in your code, but it cuts the list to a digestable count. If you want to see the full list, use the `--all`  switch.
+
+Example usage:
+
+    $ mix credo                         # display standard report
+    $ mix credo suggest                 # same thing, since it's the default command
+    $ mix credo --all --format=oneline  # include low priority issues, one issue per line
+
+    $ mix credo suggest --help          # more options
+
+
+### list
+
+`list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.
+
+Example usage:
+
+    $ mix credo list                      # show issues grouped by file
+    $ mix credo list --format=oneline     # show issues grouped by file, one issue per line
+    $ mix credo list --format=oneline -a  # same thing, include low priority issues
+
+    $ mix credo list --help               # more options
+
+
+### explain
+
+`explain` allows you to dig deeper into an issue, by showing you details about the issue and the reasoning by it being reported. To be convenient, you can just copy-paste the `filename:line_number:column` string from the report behind the Credo command to check it out.
+
+*Credits:* This is inspired by how you can snap the info from failed tests behind `mix test`.
+
+Example usage:
+
+    $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
+    $ mix credo explain lib/my_app/server.ex:10:24  # same thing
+
+There are no additional options.
+
+
+
+### categories
+
+`categories` shows you all issue categories and explains their semantics.
+
+There are no additional options.
+
+
+## Command line options
 
 
 ### Only run some checks
@@ -171,63 +301,12 @@ Use the `--verbose` switch to include the code snippets in question in the outpu
 
 ### Show compact list
 
-Use the `--one-line` switch to format the output to represent each issue by a single line.
+Use `--format=oneline` to format the output to represent each issue by a single line.
 
 
 ### Show all issues including low priority ones
 
 Use the `--all-priorities` switch to include low priority issues in the output (aliased as `--strict`).
-
-
-
-## Commands
-
-### suggest (default command)
-
-`suggest` is the default command of Credo. It suggests issues to fix in your code, but it cuts the list to a digestable count. If you want to see the full list, use the `--all`  switch.
-
-Example usage:
-
-    $ mix credo                     # display standard report
-    $ mix credo suggest             # same thing, since it's the default command
-    $ mix credo --all --one-line    # include low priority issues, one issue per line
-
-    $ mix credo suggest --help      # more options
-
-
-### list
-
-`list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.
-
-Example usage:
-
-    $ mix credo list                # show issues grouped by file
-    $ mix credo list --one-line     # show issues grouped by file, one issue per line
-    $ mix credo list --one-line -a  # same thing, include low priority issues
-
-    $ mix credo list --help         # more options
-
-
-### explain
-
-`explain` allows you to dig deeper into an issue, by showing you details about the issue and the reasoning by it being reported. To be convenient, you can just copy-paste the `filename:line_number:column` string from the report behind the Credo command to check it out.
-
-*Credits:* This is inspired by how you can snap the info from failed tests behind `mix test`.
-
-Example usage:
-
-    $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
-    $ mix credo explain lib/my_app/server.ex:10:24  # same thing
-
-There are no additional options.
-
-
-
-### categories
-
-`categories` shows you all issue categories and explains their semantics.
-
-There are no additional options.
 
 
 

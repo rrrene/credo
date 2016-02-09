@@ -11,10 +11,11 @@ defmodule Credo.Config do
             version:        false,
             verbose:        false,
             all:            false,
-            one_line:       false, # rename to one-line
+            format:         nil,
             match_checks:   nil,
             ignore_checks:  nil,
-            crash_on_error: true
+            crash_on_error: true,
+            lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @config_filename ".credo.exs"
   @default_config_name "default"

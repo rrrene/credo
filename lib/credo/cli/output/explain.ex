@@ -9,7 +9,7 @@ defmodule Credo.CLI.Output.Explain do
   @indent 8
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files) do
+  def print_before_info(source_files, config) do
     UI.puts
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
@@ -31,6 +31,7 @@ defmodule Credo.CLI.Output.Explain do
   defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width, line_no, column) do
     issues
     |> Filter.important(config)
+    |> Filter.valid_issues(config)
     |> Enum.sort_by(&(&1.line_no))
     |> print_issues(filename, source_file, config, term_width, line_no, column)
   end

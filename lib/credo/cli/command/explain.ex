@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Command.Explain do
   use Credo.CLI.Command
-  
+
   @shortdoc "Show code object and explain why it is/might be an issue"
 
   alias Credo.Check.Runner
@@ -15,7 +15,7 @@ defmodule Credo.CLI.Command.Explain do
   def run(_dir, %Config{help: true}), do: print_help
   def run(file, config) do
     {_, source_files} = load_and_validate_source_files(config)
-    {_, source_files}  = run_checks(source_files, config)
+    {_, {source_files, config}}  = run_checks(source_files, config)
 
     file
     |> String.split(":")
@@ -66,7 +66,7 @@ defmodule Credo.CLI.Command.Explain do
 
   def print_result(source_file, config, line_no, column) do
     output_mod = output_mod(config)
-    output_mod.print_before_info([source_file])
+    output_mod.print_before_info([source_file], config)
 
     source_file
     |> output_mod.print_after_info(config, line_no, column)

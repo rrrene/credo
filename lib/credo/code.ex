@@ -50,7 +50,18 @@ defmodule Credo.Code do
     source
     |> String.split("\n")
     |> Enum.with_index
-    |> Enum.map(fn {line, i} -> {i + 1, line} end)
+    |> Enum.map(fn({line, i}) -> {i + 1, line} end)
+  end
+
+  @doc """
+  Converts a String into a List of tokens using the `:elixir_tokenizer`.
+  """
+  def to_tokens(source) do
+    {_, _, _, tokens} =
+      source
+      |> String.to_char_list
+      |> :elixir_tokenizer.tokenize(1, [])
+    tokens
   end
 
   defp issue_for({line_no, error_message, _}, filename) do

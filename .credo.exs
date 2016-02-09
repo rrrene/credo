@@ -34,6 +34,8 @@
       checks: [
         {Credo.Check.Consistency.ExceptionNames},
         {Credo.Check.Consistency.LineEndings},
+        {Credo.Check.Consistency.SpaceAroundOperators},
+        {Credo.Check.Consistency.SpaceInParentheses},
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority

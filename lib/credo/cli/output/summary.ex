@@ -14,7 +14,10 @@ defmodule Credo.CLI.Output.Summary do
   ]
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
-  def print(_source_files, %Config{one_line: true}, _time_load, _time_run) do
+  def print(_source_files, %Config{format: "flycheck"}, _time_load, _time_run) do
+    nil
+  end
+  def print(_source_files, %Config{format: "oneline"}, _time_load, _time_run) do
     nil
   end
   def print(source_files, config, time_load, time_run) do
@@ -26,6 +29,7 @@ defmodule Credo.CLI.Output.Summary do
     shown_issues =
       issues
       |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     UI.puts
     UI.puts [:faint, @cry_for_help]

@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.3.0
+
+### Per-function lint support
+
+- Adds support for `@lint` attributes used to configure linting for specific
+  functions.
+
+  For now, this lets you exclude functions completely
+
+      @lint false
+      def my_fun do
+      end
+
+  or deactivate specific checks *with the same syntax used in the config file*:
+
+      @lint {Credo.Check.Design.TagTODO, false}
+      def my_fun do
+      end
+
+  or use a Regex instead of the check module to exclude multiple checks at once:
+
+      @lint {~r/Refactor/, false}
+      def my_fun do
+      end
+
+  Finally, you can supply multiple tuples as a list and combine the above:
+
+      @lint [{Credo.Check.Design.TagTODO, false}, {~r/Refactor/, false}]
+      def my_fun do
+      end
+
+### New Checks
+
+- consistency/space_around_operators
+- consistency/space_in_parentheses
+
+### Minor Improvements
+
+- Add `--format` CLI switch
+- Include experimental Flycheck support via `--format=flycheck`
+- **Deprecate** `--one-line` CLI switch, use `--format=oneline` instead
+- Fix colors for terminals with light backgrounds (thx @lucasmazza)
+
 ## 0.2.6
 
 - Fix false positives for UnusedEnumOperation checks (thx @kbaird)
@@ -52,7 +95,7 @@ Default values for the checks are based on their category:
 
 So an exit status of 12 tells you that you have only Readability Issues and Refactoring Opportunities, but e.g. no Warnings.
 
-### New Checks:
+### New Checks
 
 - readability/module_doc
 - refactor/case_trivial_matches

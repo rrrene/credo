@@ -4,7 +4,8 @@ defmodule Credo.SourceFile do
             lines:    nil,
             ast:      nil,
             valid?:   nil,
-            issues:   []
+            issues:   [],
+            lint_attributes: []
 
   def parse(source, filename) do
     %Credo.SourceFile{

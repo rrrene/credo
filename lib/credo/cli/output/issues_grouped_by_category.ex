@@ -29,7 +29,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   @per_category 5
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files) do
+  def print_before_info(_source_files, %Config{format: "flycheck"}) do
+    :ok
+  end
+  def print_before_info(source_files, _config) do
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
       1 -> UI.puts "Checking 1 source file ..."
@@ -50,7 +53,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     term_width = Output.term_columns
 
     issues = source_files |> Enum.flat_map(&(&1.issues))
-    shown_issues = issues |> Filter.important(config)
+    shown_issues =
+      issues
+      |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     categories =
       shown_issues
@@ -82,7 +88,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   defp print_issues(_category, nil, _source_file_map, _config, _term_width) do
     nil
   end
-  defp print_issues(_category, issues, source_file_map, %Config{one_line: true} = config, term_width) do
+  defp print_issues(_category, issues, source_file_map, %Config{format: "flycheck"} = config, term_width) do
+    print_issues(issues, source_file_map, config, term_width)
+  end
+  defp print_issues(_category, issues, source_file_map, %Config{format: "oneline"} = config, term_width) do
     print_issues(issues, source_file_map, config, term_width)
   end
   defp print_issues(category, issues, source_file_map, config, term_width) do

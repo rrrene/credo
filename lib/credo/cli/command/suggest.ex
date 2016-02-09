@@ -16,9 +16,9 @@ defmodule Credo.CLI.Command.Suggest do
     {time_load, source_files} = load_and_validate_source_files(config)
 
     out = output_mod(config)
-    out.print_before_info(source_files)
+    out.print_before_info(source_files, config)
 
-    {time_run, source_files}  = run_checks(source_files, config)
+    {time_run, {source_files, config}}  = run_checks(source_files, config)
 
     print_results_and_summary(source_files, config, time_load, time_run)
 
@@ -26,6 +26,7 @@ defmodule Credo.CLI.Command.Suggest do
       source_files
       |> Enum.flat_map(&(&1.issues))
       |> Filter.important(config)
+      |> Filter.valid_issues(config)
 
     case issues do
       [] -> :ok
@@ -55,10 +56,10 @@ defmodule Credo.CLI.Command.Suggest do
     end
   end
 
-  defp output_mod(%Config{one_line: true}) do
+  defp output_mod(%Config{format: "oneline"}) do
     IssuesGroupedByCategory # TODO: offer short list (?)
   end
-  defp output_mod(%Config{one_line: false}) do
+  defp output_mod(%Config{format: _}) do
     IssuesGroupedByCategory
   end
 
@@ -89,8 +90,7 @@ defmodule Credo.CLI.Command.Suggest do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --one-line        Show a condensed version of the list
-          --verbose         Show a verbose version with code snippets
+          --format          Display the list in a specific format (oneline,flycheck)
 
     General options:
       -v, --version         Show version

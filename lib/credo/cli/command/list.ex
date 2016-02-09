@@ -14,7 +14,7 @@ defmodule Credo.CLI.Command.List do
   def run(_dir, %Config{help: true}), do: print_help
   def run(_dir, config) do
     {time_load, source_files} = load_and_validate_source_files(config)
-    {time_run, source_files}  = run_checks(source_files, config)
+    {time_run, {source_files, config}}  = run_checks(source_files, config)
 
     print_results_and_summary(source_files, config, time_load, time_run)
 
@@ -45,16 +45,16 @@ defmodule Credo.CLI.Command.List do
     end
   end
 
-  defp output_mod(%Config{one_line: true}) do
+  defp output_mod(%Config{format: "oneline"}) do
     IssuesShortList
   end
-  defp output_mod(%Config{one_line: false}) do
+  defp output_mod(%Config{format: _}) do
     IssuesByScope
   end
 
   defp print_results_and_summary(source_files, config, time_load, time_run) do
     output_mod = output_mod(config)
-    output_mod.print_before_info(source_files)
+    output_mod.print_before_info(source_files, config)
 
     source_files
     |> output_mod.print_after_info(config, time_load, time_run)
@@ -69,7 +69,7 @@ defmodule Credo.CLI.Command.List do
     Lists objects that Credo thinks can be improved ordered by their priority.
     """
     |> UI.puts
-    ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --one-line"]
+    ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
     |> UI.puts
     """
 
@@ -81,7 +81,7 @@ defmodule Credo.CLI.Command.List do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --one-line        Show a condensed version of the list
+          --format          Display the list in a specific format (oneline,flycheck)
 
     General options:
       -v, --version         Show version
