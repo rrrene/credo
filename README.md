@@ -21,7 +21,7 @@ Add as a dependency in your mix.exs file:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 0.2", only: [:dev, :test]}
+    {:credo, "~> 0.3", only: [:dev, :test]}
   ]
 end
 ```
