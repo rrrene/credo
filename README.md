@@ -28,7 +28,7 @@ end
 
 And run:
 
-    mix deps.get
+    $ mix deps.get
 
 
 
@@ -253,6 +253,7 @@ There are no additional options.
 There are no additional options.
 
 
+
 ## Command line options
 
 
@@ -263,35 +264,35 @@ To run only a subset of checks, you can use the `--checks` or the `-c` alias (al
 ```bash
 # to only run the Readability checks, use:
 
-$ mix credo -c readability
+$ mix credo --only readability
 
 # to only run Readability checks and Warnings, use:
 
-$ mix credo -c readability,warning
+$ mix credo --only readability,warning
 ```
 
 The second example illustrates how the command takes a comma-separated list. All commands matching **any** of the passed items will be run.
 
-You can use partial names to quickly run checks. `mix credo -c todo` will show all `# TODO` comments since `todo` will match Credo.Check.Design.Tag**TODO**. `mix credo -c inspect` will show you all calls to `IO.inspect` since it matches Credo.Check.Warning.Io**Inspect**.
+You can use partial names to quickly run checks. `mix credo --only todo` will show all `# TODO` comments since `todo` will match Credo.Check.Design.Tag**TODO**. `mix credo --only inspect` will show you all calls to `IO.inspect` since it matches Credo.Check.Warning.Io**Inspect**.
 
 
 ### Ignore some checks
 
-To ignore selected checks, you can use the `--ignore-checks` or the `-i` alias.
+To ignore selected checks, you can use the `--ignore-checks` or the `-i` alias (also aliased as `--ignore`).
 
 ```bash
 # to ignore all Readability checks, use:
 
-$ mix credo -i readability
+$ mix credo --ignore readability
 
 # to ignore all Readability checks and the DuplicatedCode check, use:
 
-$ mix credo -i readability,duplicated
+$ mix credo --ignore readability,duplicated
 ```
 
 The second example illustrates how the command takes a comma-separated list. All commands matching any of the passed items will be ignored.
 
-You can use partial names to quickly exclude checks. `mix credo -i nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
+You can use partial names to quickly exclude checks. `mix credo --ignore nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
 
 
 ### Show code snippets in the output

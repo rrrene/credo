@@ -41,6 +41,7 @@
 - Add `--format` CLI switch
 - Include experimental Flycheck support via `--format=flycheck`
 - **Deprecate** `--one-line` CLI switch, use `--format=oneline` instead
+- Add convenience alias `--ignore` for `--ignore-checks`
 - Fix colors for terminals with light backgrounds (thx @lucasmazza)
 
 ## 0.2.6
