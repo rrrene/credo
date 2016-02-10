@@ -41,9 +41,9 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   end
 
   defp message_for(:with_space, :without_space) do
-    "There are no spaces after/before parentheses, but here there are."
+    "There is whitespace around parentheses/brackets and it's not consistent with other code in the project."
   end
   defp message_for(:without_space, :with_space) do
-    "There are spaces after/before parentheses most of the time, but not here."
+    "No whitespace around parentheses/brackets and it's not consistent with other code in the project."
   end
 end
