@@ -11,7 +11,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
   @indent 8
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files, config) do
+  def print_before_info(source_files, _config) do
     UI.puts ""
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"

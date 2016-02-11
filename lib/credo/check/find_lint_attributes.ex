@@ -1,6 +1,7 @@
 defmodule Credo.Check.FindLintAttributes do
   @moduledoc """
   """
+  @explanation nil
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
@@ -9,7 +10,7 @@ defmodule Credo.Check.FindLintAttributes do
   alias Credo.Check.LintAttribute
 
   @doc false
-  def run(source_files, params \\ []) when is_list(source_files) do
+  def run(source_files, _params) when is_list(source_files) do
     source_files
     |> Enum.map(&run_source_file/1)
   end
@@ -20,7 +21,7 @@ defmodule Credo.Check.FindLintAttributes do
     %SourceFile{source_file | lint_attributes: lint_attributes}
   end
 
-  defp traverse({:defmodule, _meta, arguments} = ast, attribute_list, source_file) do
+  defp traverse({:defmodule, _meta, _arguments} = ast, attribute_list, source_file) do
     found_attributes =
       ast
       |> CodeHelper.calls_in_do_block()

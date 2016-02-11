@@ -15,6 +15,13 @@ defmodule Credo.Check.Runner do
     {source_files, config}
   end
 
+  def run(%SourceFile{} = source_file, config) do
+    checks = config |> Config.checks |> Enum.reject(&run_on_all_check?/1)
+
+    issues = run_checks(source_file, checks, config)
+    %SourceFile{source_file | issues: source_file.issues ++ issues}
+  end
+
   defp inject_lint_attributes(config, source_files) do
     lint_attribute_map =
       source_files
@@ -28,14 +35,7 @@ defmodule Credo.Check.Runner do
     %Config{config | lint_attribute_map: lint_attribute_map}
   end
 
-  def run(%SourceFile{} = source_file, config) do
-    checks = config |> Config.checks |> Enum.reject(&run_on_all_check?/1)
-
-    issues = run_checks(source_file, checks, config)
-    %SourceFile{source_file | issues: source_file.issues ++ issues}
-  end
-
-  def run_linter_attribute_reader(source_files, config) do
+  defp run_linter_attribute_reader(source_files, config) do
     checks = [{Credo.Check.FindLintAttributes}]
 
     Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
@@ -43,7 +43,7 @@ defmodule Credo.Check.Runner do
     end)
   end
 
-  def run_checks_that_run_on_all(source_files, config) do
+  defp run_checks_that_run_on_all(source_files, config) do
     checks = config |> Config.checks |> Enum.filter(&run_on_all_check?/1)
 
     Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->

@@ -24,7 +24,7 @@ defmodule Credo.Check.LintAttribute do
       false
     end
   end
-  def ignores_issue?(lint_attribute, issue) do
+  def ignores_issue?(_lint_attribute, _issue) do
     false
   end
 
@@ -39,11 +39,6 @@ defmodule Credo.Check.LintAttribute do
     false
   end
 
-  defp check_in_list(check, check_list) do
-    check_list
-    |> Enum.find(&(&1 |> Tuple.to_list |> Enum.at(0) == check ))
-  end
-
   def value_for([false]), do: false
   def value_for([list]) when is_list(list) do
     list |> Enum.map(&value_for/1)
@@ -54,11 +49,11 @@ defmodule Credo.Check.LintAttribute do
   def value_for({{:__aliases__, _, mod_list}, params}) do
     {Module.concat(mod_list), params}
   end
-  def value_for({{:sigil_r, _, arguments} = sigil, params}) do
+  def value_for({{:sigil_r, _, _} = sigil, params}) do
     {result, _binding} = Code.eval_quoted(sigil)
     {result, params}
   end
-  def value_for({{:sigil_R, _, arguments} = sigil, params}) do
+  def value_for({{:sigil_R, _, _} = sigil, params}) do
     {result, _binding} = Code.eval_quoted(sigil)
     {result, params}
   end
