@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Fix compiler warnings
+- Improve copywriting for consistency checks (thx @vdaniuk)
+
 ## 0.3.0
 
 ### Per-function lint support
