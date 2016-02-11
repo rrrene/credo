@@ -1,5 +1,17 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
   @moduledoc """
+  Don't use spaces after operators like `+`, `-`, `*` and `/`. This is the
+  **preferred** way, although other styles are possible, as long as it is
+  applied consistently.
+
+      # preferred way
+      1 + 2 * 4
+
+      # also okay
+      1+2*4
+
+  While this is not necessarily a concern for the correctness of your code,
+  you should use a consistent style throughout your codebase.
   """
 
   @explanation [check: @moduledoc]

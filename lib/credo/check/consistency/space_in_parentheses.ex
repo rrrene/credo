@@ -1,6 +1,8 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses do
   @moduledoc """
-  Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is the **preferred** way, although other styles are possible, as long as it is applied consistently.
+  Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is
+  the **preferred** way, although other styles are possible, as long as it is
+  applied consistently.
 
       # preferred way
       Helper.format({1, true, 2}, :my_atom)
@@ -41,9 +43,9 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   end
 
   defp message_for(:with_space, :without_space) do
-    "There is whitespace around parentheses/brackets and it's not consistent with other code in the project."
+    "There is no whitespace around parentheses/brackets most of the time, but here there is."
   end
   defp message_for(:without_space, :with_space) do
-    "No whitespace around parentheses/brackets and it's not consistent with other code in the project."
+    "There is whitespace around parentheses/brackets most of the time, but here there is not."
   end
 end
