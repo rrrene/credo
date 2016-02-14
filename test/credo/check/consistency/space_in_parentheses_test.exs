@@ -6,6 +6,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
   @without_spaces """
 defmodule Credo.Sample1 do
   @default_sources_glob ~w(** *.{ex,exs})
+  @username_regex ~r/^[A-z0-9 ]+$/
 
   defmodule InlineModule do
     def foobar do
