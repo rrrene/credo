@@ -12,6 +12,17 @@ defmodule Credo.Sample1 do
   end
 end
 """
+  @without_spaces2 """
+defmodule OtherModule3 do
+  defmacro foo do
+    3+4
+  end
+
+  defp bar do
+    6*7
+  end
+end
+"""
   @with_spaces """
 defmodule Credo.Sample2 do
   defmodule InlineModule do
@@ -81,9 +92,17 @@ defmodule OtherModule3 do
 end
 """
 
-  test "it should report the correct result" do
+  test "it should not report issues if spaces are used everywhere" do
     [
       @with_spaces, @with_spaces2, @with_spaces3, @with_spaces4
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
+
+  test "it should not report issues if spaces are omitted everywhere" do
+    [
+      @without_spaces, @without_spaces2
     ]
     |> to_source_files()
     |> refute_issues(@described_check)
