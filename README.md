@@ -200,7 +200,7 @@ end
 ```
 
 
-## Error Status
+## Exit Status
 
 Credo fails with an exit status != 0 if it shows any issues. This enables shell based pipeline workflows (e.g. on CI systems) which test Credo compliance.
 
