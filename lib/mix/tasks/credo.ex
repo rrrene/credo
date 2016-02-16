@@ -6,6 +6,8 @@ defmodule Mix.Tasks.Credo do
 
   @doc false
   def run(argv) do
-    Credo.CLI.main(argv)
+    Credo.start nil, nil
+
+    Credo.CLI.run(argv)
   end
 end

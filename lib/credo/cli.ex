@@ -66,7 +66,7 @@ defmodule Credo.CLI do
     end
   end
 
-  defp run(argv) do
+  def run(argv) do
     {command_mod, dir, config} = parse_options(argv)
 
     command_mod.run(dir, config)
