@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+- `mix do credo, <something-else>` was broken and never ran `<something-else>`, even if `credo` succeeded (exited with exit status 0). Now it runs `<something-else>` as long as `credo` succeeds.
+
 ## 0.3.1
 
 - Fix compiler warnings
