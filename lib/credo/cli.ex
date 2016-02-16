@@ -37,12 +37,14 @@ defmodule Credo.CLI do
     v: :version,
   ]
 
+  @doc false
   def main(argv) do
     Credo.start nil, nil
 
-    run(argv)
-    |> to_exit_status
-    |> System.halt
+    argv
+    |> run()
+    |> to_exit_status()
+    |> halt_if_failed()
   end
 
   @doc "Returns a List with the names of all commands."
@@ -174,4 +176,6 @@ defmodule Credo.CLI do
     |> Enum.reduce(0, &(&1+&2))
   end
 
+  defp halt_if_failed(0), do: nil
+  defp halt_if_failed(x), do: x |> System.halt
 end
