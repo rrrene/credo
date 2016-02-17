@@ -6,7 +6,8 @@ defmodule Credo.Check.Readability.SpaceAroundOperatorsTest do
   @without_spaces """
 defmodule Credo.Sample1 do
   defmodule InlineModule do
-    @max -1
+    @min -1
+    @max +1
 
     def foobar do
       1+2
@@ -60,6 +61,8 @@ end
 """
   @with_spaces4 """
 defmodule OtherModule3 do
+  @min -1
+  @max 2 + 1
   @base_priority_map  %{low: -10, normal: 1, higher: +20}
 
   def foo(prio) when prio in -999..-1 do

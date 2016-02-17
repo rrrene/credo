@@ -82,7 +82,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp number_with_sign?(line, column) do
     line
     |> String.slice(0..column-2) # -2 because we need to substract the operator
-    |> String.match?(~r/[\{\[\(\,\:\=]\s*$/)
+    |> String.match?(~r/(\@[a-zA-Z0-9\_]+|[\{\[\(\,\:\=])\s*$/)
   end
 
   defp number_in_range?(line, column) do
