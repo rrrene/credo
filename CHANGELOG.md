@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+- Fix false positives for `SpaceAroundOperators` and `SpaceInParentheses`.
+
 ## 0.3.2
 
 - `mix do credo, <something-else>` was broken and never ran `<something-else>`, even if `credo` succeeded (exited with exit status 0). Now it runs `<something-else>` as long as `credo` succeeds.
