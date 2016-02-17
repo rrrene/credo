@@ -1,6 +1,7 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
   use Credo.Check.CodePattern
 
+  alias Credo.Check.CodeHelper
   alias Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper
 
   def property_value, do: :with_space
@@ -11,6 +12,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
 
   defp property_values_for(source, filename) do
     source
+    |> CodeHelper.clean_strings_sigils_and_comments
     |> Credo.Code.to_tokens
     |> check_tokens([])
     |> Enum.uniq
