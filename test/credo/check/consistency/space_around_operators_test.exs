@@ -6,6 +6,8 @@ defmodule Credo.Check.Readability.SpaceAroundOperatorsTest do
   @without_spaces """
 defmodule Credo.Sample1 do
   defmodule InlineModule do
+    @max -1
+
     def foobar do
       1+2
     end
