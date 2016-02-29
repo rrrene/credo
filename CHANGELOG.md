@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.4
+
+- Fix false positives for `SpaceAroundOperators` in binary pattern matches.
+- Fix a bug when supplying a single file via the CLI.
+
 ## 0.3.3
 
 - Fix false positives for `SpaceAroundOperators` and `SpaceInParentheses`.
