@@ -192,9 +192,15 @@ defmodule Credo.Config do
 
   defp add_given_directory_to_files(%__MODULE__{files: files} = config, dir) do
     files = %{
-      included: files[:included] |> Enum.map(&add_directory_to_file(&1, dir)),
-      excluded: files[:excluded] |> Enum.map(&add_directory_to_file(&1, dir))
+      included:
+        files[:included]
+        |> Enum.map(&add_directory_to_file(&1, dir))
+        |> Enum.uniq,
+      excluded: files[:excluded]
+        |> Enum.map(&add_directory_to_file(&1, dir))
+        |> Enum.uniq
     }
+    |> IO.inspect
     %__MODULE__{config | files: files}
   end
 
