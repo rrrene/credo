@@ -22,18 +22,25 @@ defmodule Credo.CLI do
     version: Credo.CLI.Command.Version
   }
   @switches [
-    format: :string,
+    all: :boolean,
+    all_priorities: :boolean,
     checks: :string,
+    crash_on_error: :boolean,
+    format: :string,
+    help: :boolean,
     ignore_checks: :string,
-    min_priority: :integer
+    min_priority: :integer,
+    strict: :boolean,
+    verbose: :boolean,
+    version: :boolean
   ]
   @aliases [
     a: :all,
     A: :all_priorities,
     c: :checks,
     C: :config_name,
-    i: :ignore_checks,
     h: :help,
+    i: :ignore_checks,
     v: :version,
   ]
 
