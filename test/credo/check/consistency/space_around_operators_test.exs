@@ -29,9 +29,23 @@ end
   @with_spaces """
 defmodule Credo.Sample2 do
   defmodule InlineModule do
-    def foobar do
+    def foo do
+      <<_, unquoted::binary-size(size), _>> = quoted
+      <<data::size(len)-binary, _::binary>>
+      <<102::integer-native, rest::binary>>
+      <<102::native-integer, rest::binary>>
+      <<102::unsigned-big-integer, rest::binary>>
+      <<102::unsigned-big-integer-size(8), rest::binary>>
+      <<102::unsigned-big-integer-8, rest::binary>>
+      <<102::8-integer-big-unsigned, rest::binary>>
+      <<102, rest::binary>>
+    end
+
+    def bar do
       c = -1
-      [3 * 4]
+      [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
+      [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
+      [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
       |> my_func(&Some.Deep.Module.is_something/1)
     end
   end
