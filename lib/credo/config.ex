@@ -200,7 +200,6 @@ defmodule Credo.Config do
         |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq
     }
-    |> IO.inspect
     %__MODULE__{config | files: files}
   end
 
