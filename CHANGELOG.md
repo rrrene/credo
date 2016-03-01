@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.5
+
+- Remove superfluous call to `IO.inspect`.
+- Update deps requirements to make HexFaktor happy.
+
 ## 0.3.4
 
 - Fix false positives for `SpaceAroundOperators` in binary pattern matches.
