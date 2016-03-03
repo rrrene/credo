@@ -318,6 +318,38 @@ The second example illustrates how the command takes a comma-separated list. All
 
 You can use partial names to quickly exclude checks. `mix credo --ignore nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
 
+### Parsing source from STDIN
+You can also use Credo to parse source that has been piped directly into it.
+This is especially useful when integrating with external editors. You can use this feature by passing the ```--stdin``` option as follows:
+
+
+```bash
+$ echo 'IO.puts( "hello world");' |  mix credo --format=flycheck --stdin
+# stdin:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
+```
+
+Notice the origin if the source is coming annotated as stdin, you can change this annotation by passing it along after option like so:
+
+```bash
+$ echo 'IO.puts( "hello world");' |  mix credo --format=flycheck --stdin /path/representing/the_current/source.ex
+
+# /path/representing/the_current/source.ex:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
+```
+Do note with the passed option as filename is a stub that is just used to prefix the error and so certain editors can annotate the original file.
+
+### Using Credo as stand alone
+If you do not want or are not allowed to include credo in the current project you can also use it stand alone by installing it as follows :
+
+```bash
+$ git clone git@github.com:rrrene/credo.git
+$ cd credo
+$ mix deps.get
+$ mix archive.build
+$ mix archive.install
+```
+
+You will now be able to invoke credo as usual through mix with ```mix credo```
+This option is especially handy so credo can be used by external editors.
 
 ### Show code snippets in the output
 
@@ -332,7 +364,6 @@ Use `--format=oneline` to format the output to represent each issue by a single 
 ### Show all issues including low priority ones
 
 Use the `--all-priorities` switch to include low priority issues in the output (aliased as `--strict`).
-
 
 
 ## Issues
