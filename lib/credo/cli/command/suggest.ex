@@ -37,7 +37,7 @@ defmodule Credo.CLI.Command.Suggest do
   def load_and_validate_source_files(config) do
     {time_load, {valid_source_files, invalid_source_files}} =
       :timer.tc fn ->
-        source_files = config |> get_source_files
+        source_files = config |> Sources.find
         valid_source_files = Enum.filter(source_files, &(&1.valid?))
         invalid_source_files = Enum.filter(source_files, &(!&1.valid?))
 
@@ -54,14 +54,6 @@ defmodule Credo.CLI.Command.Suggest do
     :timer.tc fn ->
       Runner.run(source_files, config)
     end
-  end
-
-  defp get_source_files(%Config{files: files, stdin: true} = config) do
-    pretent_file = files.included |> Enum.at(0) |> String.replace(~r/\A\.\z/, "stdin")
-    config |> Sources.from_stdin(pretent_file)
-  end
-  defp get_source_files(config) do
-    config |> Sources.find
   end
 
   defp output_mod(%Config{format: "oneline"}) do
