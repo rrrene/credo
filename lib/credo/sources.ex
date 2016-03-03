@@ -14,6 +14,12 @@ defmodule Credo.Sources do
     |> Path.wildcard
   end
 
+  def from_stdin(config, name) do
+    # TODO throw an error if not ok
+    {:ok, source} = read_from_stdin
+    [source |> Credo.SourceFile.parse(name)]
+  end
+
   def exclude(files, patterns \\ []) do
     Enum.reject(files, &matches?(&1, patterns))
   end
@@ -47,5 +53,14 @@ defmodule Credo.Sources do
   end
   defp matches?(file, regex) do
     String.match?(file, regex)
+  end
+
+  defp read_from_stdin(source \\ "") do
+    case IO.read(:stdio, :line) do
+      {:error, reason} -> {:error, reason}
+      :eof             -> {:ok, source}
+      data             -> source = source <> data
+        read_from_stdin(source)
+    end
   end
 end
