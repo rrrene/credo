@@ -15,6 +15,7 @@ defmodule Credo.Config do
             match_checks:   nil,
             ignore_checks:  nil,
             crash_on_error: true,
+            stdin:          false,
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @config_filename ".credo.exs"
