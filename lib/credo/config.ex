@@ -4,18 +4,18 @@ defmodule Credo.Config do
   manipulated via the `Credo.Config` module.
   """
 
-  defstruct files:          nil,
-            checks:         nil,
-            min_priority:   0,
-            help:           false,
-            version:        false,
-            verbose:        false,
-            all:            false,
-            format:         nil,
-            match_checks:   nil,
-            ignore_checks:  nil,
-            crash_on_error: true,
-            stdin:          false,
+  defstruct files:            nil,
+            checks:           nil,
+            min_priority:     0,
+            help:             false,
+            version:          false,
+            verbose:          false,
+            all:              false,
+            format:           nil,
+            match_checks:     nil,
+            ignore_checks:    nil,
+            crash_on_error:   true,
+            read_from_stdin:  false,
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @config_filename ".credo.exs"

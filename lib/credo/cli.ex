@@ -30,10 +30,10 @@ defmodule Credo.CLI do
     help: :boolean,
     ignore_checks: :string,
     min_priority: :integer,
+    read_from_stdin: :boolean,
     strict: :boolean,
     verbose: :boolean,
-    version: :boolean,
-    stdin: :boolean
+    version: :boolean
   ]
   @aliases [
     a: :all,
@@ -42,7 +42,7 @@ defmodule Credo.CLI do
     C: :config_name,
     h: :help,
     i: :ignore_checks,
-    v: :version,
+    v: :version
   ]
 
   @doc false
@@ -97,6 +97,7 @@ defmodule Credo.CLI do
 
     dir = (files |> List.first) || @default_dir
     config = dir |> to_config(switches)
+
     command_name_dir_config(command_name, dir, config)
   end
 
@@ -132,7 +133,7 @@ defmodule Credo.CLI do
     if switch(switches, :verbose), do: config = %Config{config | verbose: true}
     if switch(switches, :version), do: config = %Config{config | version: true}
     if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
-    if switch(switches, :stdin), do: config = %Config{config | stdin: true, files: %{included: [dir], excluded: []}}
+    if switch(switches, :read_from_stdin), do: config = %Config{config | read_from_stdin: true}
 
     min_priority = switch(switches, :min_priority)
     if min_priority do

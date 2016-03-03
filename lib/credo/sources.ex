@@ -1,23 +1,25 @@
 defmodule Credo.Sources do
-  @default_sources_glob ~w(** *.{ex,exs})
+  alias Credo.SourceFile
 
+  @default_sources_glob ~w(** *.{ex,exs})
+  @stdin_filename "stdin"
+
+  def find(%Credo.Config{files: %{excluded: [], included: [filename]}, read_from_stdin: true}) do
+    filename |> source_file_from_stdin() |> List.wrap
+  end
+  def find(%Credo.Config{read_from_stdin: true}) do
+    @stdin_filename |> source_file_from_stdin() |> List.wrap
+  end
   def find(%Credo.Config{files: files}) do
     files.included
     |> Enum.flat_map(&find/1)
     |> exclude(files.excluded)
     |> to_source_files
   end
-
   def find(path) do
     path
     |> to_glob
     |> Path.wildcard
-  end
-
-  def from_stdin(config, name) do
-    # TODO throw an error if not ok
-    {:ok, source} = read_from_stdin
-    [source |> Credo.SourceFile.parse(name)]
   end
 
   def exclude(files, patterns \\ []) do
@@ -40,7 +42,7 @@ defmodule Credo.Sources do
   defp to_source_file(filename) do
     filename
     |> File.read!
-    |> Credo.SourceFile.parse(filename)
+    |> SourceFile.parse(filename)
   end
 
   defp matches?(file, exclude_patterns) when is_list(exclude_patterns) do
@@ -53,6 +55,16 @@ defmodule Credo.Sources do
   end
   defp matches?(file, regex) do
     String.match?(file, regex)
+  end
+
+  defp source_file_from_stdin(filename) do
+    read_from_stdin!
+    |> SourceFile.parse(filename)
+  end
+
+  defp read_from_stdin! do
+    {:ok, source} = read_from_stdin
+    source
   end
 
   defp read_from_stdin(source \\ "") do
