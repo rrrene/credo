@@ -15,11 +15,11 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
     if String.strip(last_line) == "" do
       []
     else
-      [issue_for(line_no, issue_meta)]
+      [issue_for(issue_meta, line_no)]
     end
   end
 
-  def issue_for(line_no, issue_meta) do
+  def issue_for(issue_meta, line_no) do
     format_issue issue_meta,
       message: "There should be a final \\n at the end of each file.",
       line_no: line_no

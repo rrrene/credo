@@ -34,7 +34,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     case Module.attribute(ast, :moduledoc) do
       {:error, _} ->
         mod_name = Module.name(ast)
-        {ast, issues ++ [issue_for(meta[:line], mod_name, issue_meta)]}
+        {ast, issues ++ [issue_for(issue_meta, meta[:line], mod_name)]}
       _ ->
         {ast, issues}
     end
@@ -43,7 +43,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     {ast, issues}
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Modules should have a @moduledoc tag.",
       trigger: trigger,

@@ -40,8 +40,8 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   for {op, operation_name, constant_result} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
       if lhs == rhs do
-        new_issue = issue_for(meta[:line], unquote(op), unquote(operation_name),
-                                    unquote(constant_result), issue_meta)
+        new_issue = issue_for(issue_meta, meta[:line], unquote(op), unquote(operation_name),
+                                    unquote(constant_result))
         {ast, issues ++ [new_issue]}
       else
         {ast, issues}
@@ -53,7 +53,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   end
 
 
-  defp issue_for(line_no, trigger, operation, constant_result, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger, operation, constant_result) do
     format_issue issue_meta,
       message: "#{operation} will always return #{constant_result}.",
       trigger: trigger,

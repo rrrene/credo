@@ -28,10 +28,10 @@ defmodule Credo.Check.Design.TagFIXME do
 
     source
     |> TagHelper.tags(@tag_name)
-    |> Enum.map(&issue_for(&1, issue_meta))
+    |> Enum.map(&issue_for(issue_meta, &1))
   end
 
-  defp issue_for({line_no, _line, trigger}, issue_meta) do
+  defp issue_for(issue_meta, {line_no, _line, trigger}) do
     format_issue issue_meta,
       message: "Found a #{@tag_name} tag in a comment: #{trigger}",
       line_no: line_no,

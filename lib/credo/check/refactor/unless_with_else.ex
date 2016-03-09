@@ -53,11 +53,11 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     nil
   end
   defp issue_for_else_block(_else_block, meta, issue_meta) do
-    issue_for(meta[:line], "unless", issue_meta)
+    issue_for(issue_meta, meta[:line], "unless")
   end
 
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Unless conditions should not have an `else` block.",
       trigger: trigger,

@@ -30,11 +30,11 @@ defmodule Credo.Check.Warning.UnusedTupleOperation do
           |> Macro.to_string
           |> String.split("(")
           |> List.first
-        issues ++ [issue_for(meta[:line], trigger, issue_meta)]
+        issues ++ [issue_for(issue_meta, meta[:line], trigger)]
       end)
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "There should be no unused return values for Tuple functions.",
       trigger: trigger,

@@ -67,7 +67,7 @@ defmodule Credo.Check.Design.AliasUsage do
       last_name = mod_list |> List.last |> to_string
       if !Enum.member?(excluded_namespaces, first_name) && !Enum.member?(excluded_lastnames, last_name) do
         trigger = mod_list |> Enum.join(".")
-        {ast, issues ++ [issue_for(meta[:line], trigger, issue_meta)]}
+        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
       else
         {ast, issues}
       end
@@ -83,7 +83,7 @@ defmodule Credo.Check.Design.AliasUsage do
   def tuple?(_), do: false
 
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Nested modules could be aliased at the top of the invoking module.",
       trigger: trigger,

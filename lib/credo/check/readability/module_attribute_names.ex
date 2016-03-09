@@ -28,7 +28,7 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
   end
 
   defp traverse({:@, _meta, [{name, meta, _arguments}]} = ast, issues, issue_meta) do
-    case issue_for_name(name, meta, issue_meta) do
+    case issue_for_name(issue_meta, name, meta) do
       nil -> {ast, issues}
       val -> {ast, issues ++ [val]}
     end
@@ -37,13 +37,13 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     {ast, issues}
   end
 
-  defp issue_for_name(name, meta, issue_meta) do
+  defp issue_for_name(issue_meta, name, meta) do
     unless name |> to_string |> Name.snake_case? do
-      issue_for(meta[:line], "@#{name}", issue_meta)
+      issue_for(issue_meta, meta[:line], "@#{name}")
     end
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Module attribute names should be written in snake_case.",
       trigger: trigger,

@@ -153,7 +153,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByDef do
           {_name, _meta2, args} -> args
         end
 
-      case issue_for(arguments, issue_meta, def_names, excluded_names) do
+      case find_issue(arguments, issue_meta, def_names, excluded_names) do
         nil -> {ast, issues}
         list when is_list(list) -> {ast, issues ++ list}
         new_issue -> {ast, issues ++ [new_issue]}
@@ -164,32 +164,32 @@ defmodule Credo.Check.Warning.NameRedeclarationByDef do
     {ast, issues}
   end
 
-  def issue_for({:=, _meta2, arguments}, issue_meta, def_names, excluded_names) do
-    issue_for(arguments, issue_meta, def_names, excluded_names)
+  def find_issue({:=, _meta2, arguments}, issue_meta, def_names, excluded_names) do
+    find_issue(arguments, issue_meta, def_names, excluded_names)
   end
 
 
 
 
-  def issue_for({:->, _meta2, [lhs, _rhs]}, issue_meta, def_names, excluded_names) do
-    issue_for(lhs, issue_meta, def_names, excluded_names)
+  def find_issue({:->, _meta2, [lhs, _rhs]}, issue_meta, def_names, excluded_names) do
+    find_issue(lhs, issue_meta, def_names, excluded_names)
   end
-  def issue_for({:%{}, _meta2, keywords}, issue_meta, def_names, excluded_names) do
+  def find_issue({:%{}, _meta2, keywords}, issue_meta, def_names, excluded_names) do
     keywords
     |> Enum.map(fn
       {_lhs, rhs} ->
-        issue_for(rhs, issue_meta, def_names, excluded_names)
+        find_issue(rhs, issue_meta, def_names, excluded_names)
       _ ->
         nil
       end)
   end
-  def issue_for({:{}, _meta2, tuple_list}, issue_meta, def_names, excluded_names) do
-    issue_for(tuple_list, issue_meta, def_names, excluded_names)
+  def find_issue({:{}, _meta2, tuple_list}, issue_meta, def_names, excluded_names) do
+    find_issue(tuple_list, issue_meta, def_names, excluded_names)
   end
-  def issue_for({:%, _meta, [{:__aliases__, _meta1, _mod}, map]}, issue_meta, def_names, excluded_names) do
-    issue_for(map, issue_meta, def_names, excluded_names)
+  def find_issue({:%, _meta, [{:__aliases__, _meta1, _mod}, map]}, issue_meta, def_names, excluded_names) do
+    find_issue(map, issue_meta, def_names, excluded_names)
   end
-  def issue_for({name, meta, _}, issue_meta, def_names, excluded_names) do
+  def find_issue({name, meta, _}, issue_meta, def_names, excluded_names) do
     def_name_with_op =
       def_names
       |> Enum.find(fn({def_name, _op}) -> def_name == name end)
@@ -204,29 +204,29 @@ defmodule Credo.Check.Warning.NameRedeclarationByDef do
             {_, :defmacro} -> "a macro in the same module"
             _ -> "ERROR"
           end
-        create_issue(meta[:line], name, what, issue_meta)
+        issue_for(issue_meta, meta[:line], name, what)
       @kernel_fun_names |> Enum.member?(name) ->
-        create_issue(meta[:line], name, "the `Kernel.#{name}` function", issue_meta)
+        issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` function")
       @kernel_macro_names |> Enum.member?(name) ->
-        create_issue(meta[:line], name, "the `Kernel.#{name}` macro", issue_meta)
+        issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` macro")
       true ->
         nil
     end
   end
-  def issue_for(list, issue_meta, def_names, excluded_names) when is_list(list) do
+  def find_issue(list, issue_meta, def_names, excluded_names) when is_list(list) do
     list
-    |> Enum.map(&issue_for(&1, issue_meta, def_names, excluded_names))
+    |> Enum.map(&find_issue(&1, issue_meta, def_names, excluded_names))
   end
-  def issue_for(tuple, issue_meta, def_names, excluded_names) when is_tuple(tuple) do
+  def find_issue(tuple, issue_meta, def_names, excluded_names) when is_tuple(tuple) do
     tuple
     |> Tuple.to_list
-    |> Enum.map(&issue_for(&1, issue_meta, def_names, excluded_names))
+    |> Enum.map(&find_issue(&1, issue_meta, def_names, excluded_names))
   end
-  def issue_for(_, _, _, _) do
+  def find_issue(_, _, _, _) do
     nil
   end
 
-  defp create_issue(line_no, trigger, what, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger, what) do
     format_issue issue_meta,
       message: "Parameter `#{trigger}` has same name as #{what}.",
       trigger: trigger,

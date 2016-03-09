@@ -61,11 +61,11 @@ defmodule Credo.Check.Readability.VariableNames do
   end
   defp issue_for_name({name, meta, nil}, issue_meta) do
     unless name |> to_string |> Name.snake_case? do
-      issue_for(meta[:line], name, issue_meta)
+      issue_for(issue_meta, meta[:line], name)
     end
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Variable names should be written in snake_case.",
       trigger: trigger,

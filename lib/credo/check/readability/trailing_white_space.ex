@@ -16,14 +16,14 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do
     case Regex.run(~r/\s+$/, line, return: :index) do
       [{column, line_length}] ->
-        issues = [issue_for(line_no, column+1, line_length, issue_meta) | issues]
+        issues = [issue_for(issue_meta, line_no, column+1, line_length) | issues]
       nil -> nil
     end
     traverse_line(tail, issues, issue_meta)
   end
   defp traverse_line([], issues, _issue_meta), do: issues
 
-  def issue_for(line_no, column, line_length, issue_meta) do
+  def issue_for(issue_meta, line_no, column, line_length) do
     format_issue issue_meta,
       message: "There should be no trailing white-space at the end of a line.",
       line_no: line_no,

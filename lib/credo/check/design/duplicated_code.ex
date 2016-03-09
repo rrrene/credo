@@ -53,7 +53,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
           other_nodes = List.delete(nodes, this_node)
 
           issue_meta = IssueMeta.for(source_file, params)
-          new_issue = issue_for(this_node, other_nodes, issue_meta, nodes_threshold)
+          new_issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
 
           issues = source_file.issues ++ List.wrap(new_issue)
           source_file = %SourceFile{source_file | issues: issues}
@@ -219,7 +219,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     {ast, acc}
   end
 
-  defp issue_for(this_node, other_nodes, issue_meta, nodes_threshold) do
+  defp issue_for(issue_meta, this_node, other_nodes, nodes_threshold) do
     if Enum.count(other_nodes) >= nodes_threshold - 1 do
       filenames =
         other_nodes

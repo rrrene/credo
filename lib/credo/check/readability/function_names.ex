@@ -52,11 +52,11 @@ defmodule Credo.Check.Readability.FunctionNames do
     if name |> to_string |> Name.snake_case? do
       issues
     else
-      [issue_for(meta[:line], name, issue_meta) | issues]
+      [issue_for(issue_meta, meta[:line], name) | issues]
     end
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Function/macro names should be written in snake_case.",
       trigger: trigger,

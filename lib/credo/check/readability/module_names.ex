@@ -53,11 +53,11 @@ defmodule Credo.Check.Readability.ModuleNames do
     if name |> to_string |> String.split(".") |> Enum.all?(&Name.pascal_case?/1) do
       issues
     else
-      [issue_for(meta[:line], name, issue_meta) | issues]
+      [issue_for(issue_meta, meta[:line], name) | issues]
     end
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Module names should be written in PascalCase.",
       trigger: trigger,

@@ -40,12 +40,12 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   end
 
   defp issue_for_first_condition({:!, meta, _arguments}, meta, issue_meta) do
-    issue_for(meta[:line], "!", issue_meta)
+    issue_for(issue_meta, meta[:line], "!")
   end
   defp issue_for_first_condition(_, _, _), do: nil
 
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Unless conditions should not have a negated condition.",
       trigger: trigger,

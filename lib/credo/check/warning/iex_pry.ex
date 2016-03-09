@@ -26,10 +26,10 @@ defmodule Credo.Check.Warning.IExPry do
   end
 
   def issues_for_call(meta, issues, issue_meta) do
-    [issue_for(meta[:line], @call_string, issue_meta) | issues]
+    [issue_for(issue_meta, meta[:line], @call_string) | issues]
   end
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "There should be no calls to IEx.pry/1.",
       trigger: trigger,

@@ -60,15 +60,15 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     name = name |> to_string
     cond do
       String.starts_with?(name, "is_") && String.ends_with?(name, "?") ->
-        [issue_for(:predicate_and_question_mark, meta[:line], name, issue_meta) | issues]
+        [issue_for(issue_meta, meta[:line], name, :predicate_and_question_mark) | issues]
       String.starts_with?(name, "is_") ->
-        [issue_for(:only_predicate, meta[:line], name, issue_meta) | issues]
+        [issue_for(issue_meta, meta[:line], name, :only_predicate) | issues]
       true ->
         issues
     end
   end
 
-  defp issue_for(_, line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger, _) do
     format_issue issue_meta,
       message: "Predicate function names should not start with 'is', and should end in a question mark.",
       trigger: trigger,

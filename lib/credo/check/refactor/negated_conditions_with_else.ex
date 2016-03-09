@@ -46,7 +46,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   defp traverse({:if, meta, arguments} = ast, issues, issue_meta) do
     if negated_condition?(arguments) && CodeHelper.else_block?(ast) do
       new_issue =
-        issue_for(meta[:line], "!", issue_meta)
+        issue_for(issue_meta, meta[:line], "!")
 
       {ast, issues ++ [new_issue]}
     else
@@ -68,7 +68,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
 
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "If/else blocks should not have a negated condition in `if`.",
       trigger: trigger,

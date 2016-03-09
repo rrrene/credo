@@ -20,7 +20,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     if valid_chain_start?(lhs) do
       {ast, issues}
     else
-      {ast, issues ++ [issue_for(meta[:line], "TODO", issue_meta)]}
+      {ast, issues ++ [issue_for(issue_meta, meta[:line], "TODO")]}
     end
   end
   defp traverse(ast, issues, _issue_meta) do
@@ -43,7 +43,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   defp valid_chain_start?({{:., _, _}, _, _}), do: false
   defp valid_chain_start?(_), do: true
 
-  defp issue_for(line_no, trigger, issue_meta) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
       message: "Pipe chain should start with a raw value.",
       trigger: trigger,
