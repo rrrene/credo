@@ -43,6 +43,32 @@ defmodule Credo.Check.LintAttributeTest do
   end
 
 
+  test "it should work for a tuple, followed by a custom params list" do
+    assert_value "@lint {Credo.Check.Design.AliasUsage, a: 1, b: 2}",
+                        [{Credo.Check.Design.AliasUsage, a: 1, b: 2}]
+  end
+
+  test "it should work for a Regex, followed by a custom params list" do
+    assert_value "@lint {~r/Refactor/, a: 1, b: 2}",
+                        [{~r/Refactor/, a: 1, b: 2}]
+  end
+
+  test "it should work for a Regex ~R, followed by a custom params list" do
+    assert_value "@lint {~R/Refactor/, a: 1, b: 2}",
+                        [{~R/Refactor/, a: 1, b: 2}]
+  end
+
+  test "it should work for a list of tuples, followed by a custom params list" do
+    assert_value "@lint [{Credo.Check.Design.AliasUsage, a: 1, b: 2}]",
+                        [{Credo.Check.Design.AliasUsage, a: 1, b: 2}]
+  end
+
+  test "it should work for a list of Regexes, followed by a custom params list" do
+    assert_value "@lint [{~r/Refactor/, a: 1, b: 2}]",
+                        [{~r/Refactor/, a: 1, b: 2}]
+  end
+
+
   test "it should return true for @lint false with same scope" do
     issue = %Issue{check: Credo.Check.Refactor.ABCSize, scope: "MyScope.fun"}
     lint_attribute = %LintAttribute{value: false, scope: "MyScope.fun"}
