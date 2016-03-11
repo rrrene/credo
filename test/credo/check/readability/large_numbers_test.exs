@@ -3,6 +3,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 
   @described_check Credo.Check.Readability.LargeNumbers
 
+  @moduletag :to_be_implemented
+
   test "it should NOT report expected code" do
 """
 def numbers do

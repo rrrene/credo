@@ -3,6 +3,8 @@ defmodule Credo.Check.Readability.SemicolonsTest do
 
   @described_check Credo.Check.Readability.Semicolons
 
+  @moduletag :to_be_implemented
+
   test "it should NOT report expected code" do
 """
 def fun_name do

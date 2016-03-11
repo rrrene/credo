@@ -3,6 +3,8 @@ defmodule Credo.Check.Readability.FunctionParenthesesTest do
 
   @described_check Credo.Check.Readability.FunctionParentheses
 
+  @moduletag :to_be_implemented
+
   test "it should NOT report expected code" do
 """
 def fun_name do
