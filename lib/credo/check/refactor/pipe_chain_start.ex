@@ -33,13 +33,21 @@ defmodule Credo.Check.Refactor.PipeChainStart do
       true
     end
   end
+  # function_call()
+  defp valid_chain_start?({atom, _, []}) when is_atom(atom) do
+    true
+  end
+  # sigils
   defp valid_chain_start?({atom, _, arguments}) when is_atom(atom) and is_list(arguments) do
     atom |> to_string |> String.match?(~r/^sigil_[a-zA-Z]$/)
   end
+  # map[:access]
   defp valid_chain_start?({{:., _, [Access, :get]}, _, _}) do
     true
   end
+  # Module.function_call()
   defp valid_chain_start?({{:., _, _}, _, []}), do: true
+  # Module.function_call(with, parameters)
   defp valid_chain_start?({{:., _, _}, _, _}), do: false
   defp valid_chain_start?(_), do: true
 
