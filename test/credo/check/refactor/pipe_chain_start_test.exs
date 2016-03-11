@@ -11,6 +11,8 @@ defmodule CredoSampleModule do
 
     "Fahrenheit 451" |> String.strip
 
+    do_something() |> then_something_else() |> and_last_step()
+
     something
     |> String.downcase
     |> String.strip
