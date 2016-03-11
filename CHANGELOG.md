@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.6
+
+- Fix false positives for `SpaceAroundOperators` and `PipeChainStart`.
+- Add option to read from STDIN for better editor integration
+
 ## 0.3.5
 
 - Remove superfluous call to `IO.inspect`.
