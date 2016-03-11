@@ -322,18 +322,17 @@ You can use partial names to quickly exclude checks. `mix credo --ignore namered
 ### Parsing source from STDIN
 
 You can also use Credo to parse source that has been piped directly into it.
-This is especially useful when integrating with external editors. You can use this feature by passing the ```--read-from-stdin``` option as follows:
-
+This is especially useful when integrating with external editors. You can use this feature by passing the `--read-from-stdin` option as follows:
 
 ```bash
-$ echo 'IO.puts( "hello world");' | mix credo --format=flycheck --read-from-stdin
+$ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin
 # stdin:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
 ```
 
-Notice the origin if the source is coming annotated as stdin, you can change this annotation by passing it along after option like so:
+Notice the origin if the source is coming annotated as `stdin`, you can change this annotation by passing it along after option like so:
 
 ```bash
-$ echo 'IO.puts( "hello world");' | mix credo --format=flycheck --read-from-stdin /path/representing/the_current/source.ex
+$ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin /path/representing/the_current/source.ex
 # /path/representing/the_current/source.ex:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
 ```
 
