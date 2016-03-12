@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.7
+
+- Fix false positive for `SpaceAroundOperators`.
+
 ## 0.3.6
 
 - Fix false positives for `SpaceAroundOperators` and `PipeChainStart`.
