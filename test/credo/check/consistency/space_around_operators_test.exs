@@ -41,6 +41,13 @@ defmodule Credo.Sample2 do
       <<102, rest::binary>>
     end
 
+    defp int(x) do
+      case x |> Integer.parse do
+        :error -> -1
+        {a, _} -> a
+      end
+    end
+
     def bar do
       c = n * -1
       c = n + -1
