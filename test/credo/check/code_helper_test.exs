@@ -34,13 +34,12 @@ defmodule Credo.Check.CodeHelperTest do
     assert :foobar == CodeHelper.def_name(ast)
   end
 
-
   test "it should NOT report expected code" do
     expected = "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \" \n  end\nend\n"
     source_file = """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    parameter1 + " this is a string" # this is a comment
+    parameter1 + " this is a string" # WARNING: NÃO ESTÁ A FUNCIONAR
   end
 end
 """ |> to_source_file
