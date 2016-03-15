@@ -46,12 +46,12 @@ end
     assert expected == source_file |> CodeHelper.clean_strings_sigils_and_comments
   end
 
-  test "it should NOT report expected code without a space between the " do
+  test "it should NOT report expected code 2" do
     expected = "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \"\n  end\nend\n"
     source_file = """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    parameter1 + " this is a string"# this is a comment
+    parameter1 + " this is a string"# tell the most browser´s to open
   end
 end
 """ |> to_source_file
