@@ -1,7 +1,7 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   @explanation ""
   @def_ops [:def, :defp, :defmacro]
-  @block_ops [:if, :unless, :case, :for, :quote, :try, :after, :rescue]
+  @block_ops [:if, :unless, :case, :quote, :try, :after, :rescue]
 
   alias Credo.Check.CodeHelper
 
@@ -81,6 +81,20 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
         |> Enum.reject(&is_nil/1)
         |> Enum.any?(&valid_call_to_string_mod_in_block?(&1, ast, call_to_string, last_call_in_def, calls_in_block_above))
       end
+    end
+  end
+  defp valid_call_to_string_mod?({:for, _meta, arguments} = ast, call_to_string, last_call_in_def, calls_in_block_above) when is_list(arguments) do
+    arguments_without_do_block = arguments |> Enum.slice(0..-2)
+
+    if CodeHelper.contains_child?(arguments_without_do_block, call_to_string) do
+      true
+    else
+      [
+        arguments |> CodeHelper.do_block_for!,
+        arguments |> CodeHelper.else_block_for!,
+      ]
+      |> Enum.reject(&is_nil/1)
+      |> Enum.any?(&valid_call_to_string_mod_in_block?(&1, ast, call_to_string, last_call_in_def, calls_in_block_above))
     end
   end
   defp valid_call_to_string_mod?({:cond, _meta, arguments} = ast, call_to_string, last_call_in_def, calls_in_block_above) do
