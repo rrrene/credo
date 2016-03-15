@@ -234,7 +234,18 @@ end
 """
 defmodule CredoSampleModule do
   defp convert_parsers(parsers) do
-    for segment <- Enum.flat_map(bin, &(&1.blob)), segment != "", do: segment
+    for x <- Enum.flat_map(bin, &(&1.blob)), x != "", do: x
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation when :for 2" do
+"""
+defmodule CredoSampleModule do
+  defp sum(_) do
+    for x <- [1..3, 5..10], sum=Enum.sum(x), do: sum
   end
 end
 """ |> to_source_file
@@ -425,8 +436,12 @@ end
   end
 
 
- ##############################################################################
- ##############################################################################
+
+
+
+
+
+
 
 
   test "it should report a violation" do
@@ -452,6 +467,21 @@ defmodule CredoSampleModule do
     |> Enum.at(parameter1)
 
     parameter1
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation when buried in :for" do
+"""
+defmodule CredoSampleModule do
+  defp print_issue(w) do
+    for x <- [1, 2, 3] do
+      # this goes nowhere!
+      Enum.join(w, ",")
+      x
+    end
   end
 end
 """ |> to_source_file
