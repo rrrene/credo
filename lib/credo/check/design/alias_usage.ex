@@ -71,7 +71,6 @@ defmodule Credo.Check.Design.AliasUsage do
       last_name = mod_list |> List.last |> to_string
       if !Enum.member?(excluded_namespaces, first_name) && !Enum.member?(excluded_lastnames, last_name) do
         trigger = mod_list |> Enum.join(".")
-        IO.inspect fun_atom
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
       else
         {ast, issues}
