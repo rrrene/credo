@@ -34,4 +34,22 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should NOT report violation on multi-use alias" do
+"""
+defmodule Sample.App do
+  alias Sample.App.{One, Two}
+  def foo, do: {One.one, Two.two}
+end
+
+defmodule Sample.App.One do
+  def one, do: "One"
+end
+
+defmodule Sample.App.Two do
+  def two, do: "Two"
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 end
