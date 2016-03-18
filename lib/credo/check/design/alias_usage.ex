@@ -61,12 +61,17 @@ defmodule Credo.Check.Design.AliasUsage do
     Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
   end
 
+  # Ignore multi alias call
+  defp traverse({:., _, [{:__aliases__, meta, mod_list}, :{}]} = ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames) do
+    {ast, issues}
+  end
   defp traverse({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) when is_list(mod_list) and is_atom(fun_atom) do
     if Enum.count(mod_list) > 1 && !Enum.any?(mod_list, &tuple?/1) do
       first_name = mod_list |> List.first |> to_string
       last_name = mod_list |> List.last |> to_string
       if !Enum.member?(excluded_namespaces, first_name) && !Enum.member?(excluded_lastnames, last_name) do
         trigger = mod_list |> Enum.join(".")
+        IO.inspect fun_atom
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
       else
         {ast, issues}
