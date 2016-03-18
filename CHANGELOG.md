@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.8
+
+- Fix false positives for `AliasUsage`.
+
 ## 0.3.7
 
 - Fix false positive for `SpaceAroundOperators`.
