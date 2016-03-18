@@ -34,6 +34,24 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report violation on impossible additional alias when using multi alias" do
+"""
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+
+
+
+
   test "it should NOT report violation on multi-use alias" do
 """
 defmodule Sample.App do
@@ -47,6 +65,35 @@ end
 
 defmodule Sample.App.Two do
   def two, do: "Two"
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report violation on impossible additional alias" do
+"""
+defmodule Test do
+  alias Exzmq.Socket
+  alias Exzmq.Tcp
+
+  def just_an_example do
+    Socket.test1  # Exzmq.Socket.test
+    Tcp.Socket.test2 # Exzmq.Tcp.Socket.test – how can this be further aliased?
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report violation on impossible additional alias when using multi alias" do
+"""
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
+
+  def just_an_example do
+    Socket.test1  # Exzmq.Socket.test
+    Tcp.Socket.test2 # Exzmq.Tcp.Socket.test – how can this be further aliased?
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
