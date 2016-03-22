@@ -34,6 +34,7 @@ end
     |> assert_issue(@described_check)
   end
 
+  @tag needs_elixir: "1.2.0"
   test "it should report violation on impossible additional alias when using multi alias" do
 """
 defmodule Test do
@@ -52,6 +53,7 @@ end
 
 
 
+  @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on multi-use alias" do
 """
 defmodule Sample.App do
@@ -85,6 +87,7 @@ end
     |> refute_issues(@described_check)
   end
 
+  @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on impossible additional alias when using multi alias" do
 """
 defmodule Test do

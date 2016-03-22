@@ -4,8 +4,12 @@ Credo.Test.Application.start([], [])
 
 ExUnit.start()
 
-# Exclude all external tests from running
-ExUnit.configure(exclude: [to_be_implemented: true])
+exclude = [to_be_implemented: true]
+if System.version |> Version.compare("1.2.0") == :lt do
+  exclude = exclude ++ [needs_elixir: "1.2.0"]
+end
+
+ExUnit.configure(exclude: exclude)
 
 defmodule Credo.TestHelper do
   defmacro __using__(_) do
