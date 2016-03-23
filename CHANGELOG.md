@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.9
+
+- Fix a bug in `AliasUsage`.
+
 ## 0.3.8
 
 - Fix false positives for `AliasUsage`.
