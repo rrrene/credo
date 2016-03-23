@@ -49,6 +49,15 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should work with __MODULE__" do
+"""
+defmodule Test do
+  alias __MODULE__.SubModule
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 
 
 
