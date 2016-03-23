@@ -136,11 +136,19 @@ defmodule Credo.Check.Design.AliasUsage do
   def tuple?(t) when is_tuple(t), do: true
   def tuple?(_), do: false
 
+  defp to_module_name(mod_list) when is_list(mod_list) do
+    mod_list
+    |> Enum.map(&to_module_name/1)
+    |> Enum.join(".")
+  end
   defp to_module_name({:__aliases__, _, mod_list}) do
     mod_list |> to_module_name()
   end
-  defp to_module_name(mod_list) when is_list(mod_list) do
-    mod_list |> Enum.join(".")
+  defp to_module_name({name, _, nil}) when is_atom(name) do
+    name |> to_module_name
+  end
+  defp to_module_name(name) when is_binary(name) or is_atom(name) do
+    name
   end
 
 
