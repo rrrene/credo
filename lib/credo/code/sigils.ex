@@ -44,7 +44,7 @@ defmodule Credo.Code.Sigils do
     parse_string_literal(t, acc <> "\"", replacement)
   end
   defp parse_code(<< h::utf8, t::binary >>, acc, replacement) do
-    parse_code(t, acc <> <<h>>, replacement)
+    parse_code(t, acc <> <<h :: utf8>>, replacement)
   end
   defp parse_code(str, acc, replacement) when is_binary(str) do
     {h, t} = str |> String.next_codepoint
