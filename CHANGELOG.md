@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.10
+
+- Fix a bug resulting in `UnicodeConversionError` for code containing UTF-8 comments.
+
 ## 0.3.9
 
 - Fix a bug in `AliasUsage`.
