@@ -51,6 +51,7 @@ defmodule Credo.CLI.Command.List do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of the object being looked at.
     \"\"\"
     |> UI.puts
+    # ↑
   end
 end
 """
@@ -62,6 +63,7 @@ defmodule Credo.CLI.Command.List do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of the object being looked at.
     \"\"\"
     |> UI.puts
+    # ↑
   end
 end
 """
