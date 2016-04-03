@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 0.4.0 (pre)
+
+- Change config behaviour: Checks have to be disabled explicitly in `.credo.exs`
+- Force consistency check settings: you can now force e.g. tabs
+
 ## 0.3.13
 
 - Fix false positives for `NameRedeclarationByDef`.
