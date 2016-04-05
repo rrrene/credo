@@ -41,8 +41,8 @@ end
 defmodule CredoCheckCase do
   use ExUnit.Case
 
-  def refute_issues(source_file, check \\ nil, config \\ []) do
-    issues = issues_for(source_file, check, config)
+  def refute_issues(source_file, check \\ nil, params \\ []) do
+    issues = issues_for(source_file, check, params)
     assert [] == issues, "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
     issues
   end
@@ -54,8 +54,8 @@ defmodule CredoCheckCase do
     assert_issue(source_file, check, [], callback)
   end
 
-  def assert_issue(source_file, check \\ nil, config \\ [], callback \\ nil) do
-    issues = issues_for(source_file, check, config)
+  def assert_issue(source_file, check \\ nil, params \\ [], callback \\ nil) do
+    issues = issues_for(source_file, check, params)
     refute Enum.count(issues) == 0, "There should be one issue, got none."
     assert Enum.count(issues) == 1, "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
     if callback, do: callback.(issues |> List.first)
@@ -68,8 +68,8 @@ defmodule CredoCheckCase do
   def assert_issues(source_file, check, callback) when is_function(callback) do
     assert_issues(source_file, check, [], callback)
   end
-  def assert_issues(source_file, check \\ nil, config \\ [], callback \\ nil) do
-    issues = issues_for(source_file, check, config)
+  def assert_issues(source_file, check \\ nil, params \\ [], callback \\ nil) do
+    issues = issues_for(source_file, check, params)
     assert Enum.count(issues) > 0, "There should be multiple issues, got none."
     assert Enum.count(issues) > 1, "There should be more than one issue, got: #{to_inspected(issues)}"
     if callback, do: callback.(issues)
@@ -80,13 +80,13 @@ defmodule CredoCheckCase do
     source_files
     |> Enum.flat_map(&(&1.issues))
   end
-  defp issues_for(source_files, check, config) when is_list(source_files) do
+  defp issues_for(source_files, check, params) when is_list(source_files) do
     source_files
-    |> check.run(config)
+    |> check.run(params)
     |> Enum.flat_map(&(&1.issues))
   end
   defp issues_for(source_file, nil, _), do: source_file.issues
-  defp issues_for(source_file, check, config), do: check.run(source_file, config)
+  defp issues_for(source_file, check, params), do: check.run(source_file, params)
 
 
   def assert_trigger([issue], trigger), do: [assert_trigger(issue, trigger)]
