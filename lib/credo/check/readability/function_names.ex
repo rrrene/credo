@@ -31,6 +31,10 @@ defmodule Credo.Check.Readability.FunctionNames do
   end
 
   for op <- @def_ops do
+    # catch variables named e.g. `defp`
+    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
+      {ast, issues}
+    end
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
       {ast, issues_for_definition(arguments, issues, issue_meta)}
     end
