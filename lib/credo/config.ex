@@ -152,10 +152,7 @@ defmodule Credo.Config do
   The `files:` field is merged, meaning that you can define `included` and/or
   `excluded` and only override the given one.
 
-  The `checks:` field is overwritten in full, meaning that there is no
-  "blending" of checks from one Config to another. If you are including this
-  field in a Config, it basically means "I want to run these checks and
-  these checks only".
+  The `checks:` field is merged.
   """
   def merge(list) when is_list(list) do
     base = list |> List.first
@@ -174,7 +171,11 @@ defmodule Credo.Config do
     }
   end
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
-    checks_other || checks_base
+    base = normalize_check_tuples(checks_base)
+    |> IO.inspect
+    other = normalize_check_tuples(checks_other)
+    |> IO.inspect
+    Keyword.merge(base, other)
   end
   def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
@@ -182,6 +183,15 @@ defmodule Credo.Config do
       excluded: files_other[:excluded] || files_base[:excluded],
     }
   end
+
+  defp normalize_check_tuples(nil), do: []
+  defp normalize_check_tuples(list) when is_list(list) do
+    list
+    |> Enum.map(&normalize_check_tuple/1)
+  end
+
+  defp normalize_check_tuple({name}), do: {name, []}
+  defp normalize_check_tuple(tuple), do: tuple
 
   defp join_default_files_if_directory(dir) do
     if File.dir?(dir) do

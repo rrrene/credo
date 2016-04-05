@@ -40,9 +40,12 @@ defmodule Credo.ConfigTest do
                       excluded: []
                     },
                     checks: [
-                      {Credo.Check.Design.AliasUsage},
-                      {Credo.Check.Design.TagFIXME},
-                      {Credo.Check.Design.TagTODO},
+                      {Credo.Check.Consistency.ExceptionNames, []},
+                      {Credo.Check.Consistency.LineEndings, []},
+                      {Credo.Check.Consistency.Tabs, []},
+                      {Credo.Check.Design.AliasUsage, []},
+                      {Credo.Check.Design.TagFIXME, []},
+                      {Credo.Check.Design.TagTODO, []},
                     ]
                   }
     assert expected == Config.merge(@default_config, @example_config)
@@ -55,9 +58,9 @@ defmodule Credo.ConfigTest do
                       excluded: ["lib/**/*_test.exs"]
                     },
                     checks: [
-                      {Credo.Check.Consistency.ExceptionNames},
-                      {Credo.Check.Consistency.LineEndings},
-                      {Credo.Check.Consistency.Tabs},
+                      {Credo.Check.Consistency.ExceptionNames, []},
+                      {Credo.Check.Consistency.LineEndings, []},
+                      {Credo.Check.Consistency.Tabs, []},
                     ]
                   }
     assert expected == Config.merge(@default_config, @example_config2)
@@ -70,12 +73,45 @@ defmodule Credo.ConfigTest do
                       excluded: ["lib/**/*_test.exs"]
                     },
                     checks: [
-                      {Credo.Check.Design.AliasUsage},
-                      {Credo.Check.Design.TagFIXME},
-                      {Credo.Check.Design.TagTODO},
+                      {Credo.Check.Consistency.ExceptionNames, []},
+                      {Credo.Check.Consistency.LineEndings, []},
+                      {Credo.Check.Consistency.Tabs, []},
+                      {Credo.Check.Design.AliasUsage, []},
+                      {Credo.Check.Design.TagFIXME, []},
+                      {Credo.Check.Design.TagTODO, []},
                     ]
                   }
     assert expected == Config.merge([@default_config, @example_config2, @example_config])
+  end
+
+  test "merge_checks works" do
+    base =
+      %Config{
+        checks: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []},
+        ]
+      }
+    other =
+      %Config{
+        checks: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Consistency.Tabs, false},
+        ]
+      }
+    expected =
+      [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false},
+      ]
+    assert expected == Config.merge_checks(base, other)
   end
 
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do

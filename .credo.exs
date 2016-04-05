@@ -21,13 +21,10 @@
         excluded: []
       },
       #
-      # The `checks:` field contains all the checks that are run. You can
-      # customize the parameters of any given check by adding a second element
+      # You can customize the parameters of any check by adding a second element
       # to the tuple.
       #
-      # There are two ways of deactivating a check:
-      # 1. deleting the check from this list
-      # 2. putting `false` as second element (to quickly "comment it out"):
+      # To disable a check put `false` as second element:
       #
       #      {Credo.Check.Consistency.ExceptionNames, false}
       #
