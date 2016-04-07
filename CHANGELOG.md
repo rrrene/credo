@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.11
+
+- Fix a bug with checks on function names when declaring a variable with the name `def`, `defp` or `defmacro`.
+
 ## 0.3.10
 
 - Fix a bug resulting in `UnicodeConversionError` for code containing UTF-8 comments.
