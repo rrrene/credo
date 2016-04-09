@@ -36,10 +36,12 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
   defp issue_for(issue_meta, actual_prop, expected_prop, _picked_count, _total_count) do
     line_no = PropertyValue.meta(actual_prop, :line_no)
+    trigger = PropertyValue.meta(actual_prop, :trigger)
     actual_prop = PropertyValue.get(actual_prop)
     format_issue issue_meta,
       message: message_for(actual_prop, expected_prop),
-      line_no: line_no
+      line_no: line_no,
+      trigger: trigger
   end
 
   defp message_for(:with_space, :without_space) do

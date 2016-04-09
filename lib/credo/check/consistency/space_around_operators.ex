@@ -101,7 +101,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
       |> String.match?(~r/\<\</)
     binary_pattern_end_after? =
       line
-      |> String.slice(column..-1) # -2 because we need to substract the operator
+      |> String.slice(column..-1) # -1 because we need to substract the operator
       |> String.match?(~r/\>\>/)
 
     binary_pattern_start_before? && binary_pattern_end_after?
