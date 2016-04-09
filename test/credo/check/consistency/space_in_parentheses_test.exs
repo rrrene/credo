@@ -7,6 +7,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
 defmodule Credo.Sample1 do
   @default_sources_glob ~w(** *.{ex,exs})
   @username_regex ~r/^[A-z0-9 ]+$/
+  @options [foo: 1, bar: 2, ]
 
   defmodule InlineModule do
     def foobar do
