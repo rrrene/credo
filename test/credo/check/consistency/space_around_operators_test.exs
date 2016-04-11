@@ -39,9 +39,20 @@ defmodule Credo.Sample2 do
       <<102::unsigned-big-integer-8, rest::binary>>
       <<102::8-integer-big-unsigned, rest::binary>>
       <<102, rest::binary>>
+      << valsize :: 32-unsigned, rest::binary >>
     end
 
-    defp int(x) do
+    def parse_response(<< _correlation_id :: 32-signed, error_code :: 16-signed, generation_id :: 32-signed,
+                         protocol_len :: 16-signed, _protocol :: size(protocol_len)-binary,
+                         leader_len :: 16-signed, leader :: size(leader_len)-binary,
+                         member_id_len :: 16-signed, member_id :: size(member_id_len)-binary,
+                         members_size :: 32-signed, rest :: binary >>) do
+      members = parse_members(members_size, rest, [])
+      %Response{error_code: KafkaEx.Protocol.error(error_code), generation_id: generation_id,
+                leader_id: leader, member_id: member_id, members: members}
+    end
+
+    defp int(<< value :: size(valsize)-binary >>, x) do
       case x |> Integer.parse do
         :error -> -1
         {a, _} -> a

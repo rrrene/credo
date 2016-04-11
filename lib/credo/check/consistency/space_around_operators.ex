@@ -99,11 +99,29 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
       line
       |> String.slice(0..column-2) # -2 because we need to substract the operator
       |> String.match?(~r/\<\</)
+    double_colon_before? =
+      line
+      |> String.slice(0..column-2) # -2 because we need to substract the operator
+      |> String.match?(~r/\:\:/)
     binary_pattern_end_after? =
       line
       |> String.slice(column..-1) # -1 because we need to substract the operator
       |> String.match?(~r/\>\>/)
+    typed_after? =
+      line
+      |> String.slice(column..-1) # -1 because we need to substract the operator
+      |> String.match?(~r/^\s*(signed|unsigned|binary|size)/)
 
-    binary_pattern_start_before? && binary_pattern_end_after?
+    heuristics_met_count =
+      [
+        binary_pattern_start_before?,
+        binary_pattern_end_after?,
+        double_colon_before?,
+        typed_after?
+      ]
+      |> Enum.filter(&(&1))
+      |> Enum.count
+
+    heuristics_met_count >= 2
   end
 end
