@@ -42,6 +42,14 @@ defmodule Credo.Sample2 do
       << valsize :: 32-unsigned, rest::binary >>
     end
 
+    def error(err_no) do
+      case err_no do
+        -1 -> :unknown_error
+        +2 -> :known_error
+        _  -> @error_map[err_no] || err_no
+      end
+    end
+
     def parse_response(<< _correlation_id :: 32-signed, error_code :: 16-signed, generation_id :: 32-signed,
                          protocol_len :: 16-signed, _protocol :: size(protocol_len)-binary,
                          leader_len :: 16-signed, leader :: size(leader_len)-binary,
