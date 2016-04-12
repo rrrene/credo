@@ -38,11 +38,18 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
     line_no = PropertyValue.meta(actual_prop, :line_no)
     trigger = PropertyValue.meta(actual_prop, :trigger)
     actual_prop = PropertyValue.get(actual_prop)
-    format_issue issue_meta,
-      message: message_for(actual_prop, expected_prop),
-      line_no: line_no,
-      trigger: trigger
+
+    if create_issue?(actual_prop, expected_prop, trigger) do
+      format_issue issue_meta,
+        message: message_for(actual_prop, expected_prop),
+        line_no: line_no,
+        trigger: trigger
+    end
   end
+
+  # Don't create issues for `&Mod.fun/4`
+  defp create_issue?(:with_space, :without_space, ", ]"), do: false
+  defp create_issue?(_actual_prop, _expected_prop, _trigger), do: true
 
   defp message_for(:with_space, :without_space) do
     "There is no whitespace around parentheses/brackets most of the time, but here there is."
