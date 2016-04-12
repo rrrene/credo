@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.12
+
+- Fix false positives for `SpaceInParentheses`.
+- Fix false positive for `SpaceAroundOperators`.
+
 ## 0.3.11
 
 - Fix a bug with checks on function names when declaring a variable with the name `def`, `defp` or `defmacro`.
