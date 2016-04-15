@@ -435,6 +435,22 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for this" do
+"""
+defmodule CredoSampleModule do
+  def testcase(configs) do
+    if Enum.empty?(configs) do
+      {:error, "No config"}
+    else
+      anything
+      {:ok, Enum.flat_map(configs, fn x -> x end)}
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 
 
 
