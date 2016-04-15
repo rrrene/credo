@@ -165,6 +165,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       #IO.puts IO.ANSI.format [:red, "Last"]
       #IO.puts IO.ANSI.format [:cyan, Macro.to_string(call_to_string)]
       #IO.inspect ast
+      #IO.inspect calls_in_block_above
       #IO.puts ""
 
       #result =
@@ -173,13 +174,21 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       #      call_to_string == calls_in_block_above |> List.last
 
       #IO.inspect {:result, CodeHelper.contains_child?(last_call_in_def, ast),
-      #                      CodeHelper.contains_child?(ast, call_to_string),
-      #                      call_to_string == calls_in_block_above |> List.last}
+      #                      CodeHelper.contains_child?(call_to_string, ast),
+      #                      CodeHelper.contains_child?(calls_in_block_above |> List.last, call_to_string),
+      #            }
+
+      in_call_to_string_and_last_call? =
+        CodeHelper.contains_child?(last_call_in_def, ast) &&
+        CodeHelper.contains_child?(call_to_string, ast) &&
+        CodeHelper.contains_child?(calls_in_block_above |> List.last, call_to_string)
+
+      containing_call_to_string? = CodeHelper.contains_child?(arguments, call_to_string)
 
       #IO.inspect CodeHelper.contains_child?(arguments, call_to_string)
       #IO.puts ""
 
-      CodeHelper.contains_child?(arguments, call_to_string)
+      in_call_to_string_and_last_call? || containing_call_to_string?
     end
   end
   defp valid_call_to_string_mod?(tuple, call_to_string, last_call_in_def, calls_in_block_above) when is_tuple(tuple) do
