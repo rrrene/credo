@@ -121,7 +121,8 @@ defmodule Credo.Check.Warning.NameRedeclarationByDef do
     :use,
     :var!,
   ]
-  @excluded_names [:_, :sigil_r, :sigil_R]
+  @excluded_names_regex ~r/^(_|sigil_.)$/
+  @excluded_names [] # TODO: make customizable via params
 
   alias Credo.Code.Module
 
@@ -194,6 +195,8 @@ defmodule Credo.Check.Warning.NameRedeclarationByDef do
       def_names
       |> Enum.find(fn({def_name, _op}) -> def_name == name end)
     cond do
+      name |> to_string |> String.match?(@excluded_names_regex) ->
+        nil
       excluded_names |> Enum.member?(name) ->
         nil
       def_name_with_op ->

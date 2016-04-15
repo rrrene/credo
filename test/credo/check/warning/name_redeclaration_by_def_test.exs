@@ -8,6 +8,10 @@ defmodule Credo.Check.Warning.NameRedeclarationByDefTest do
 defmodule CredoSampleModule do
   use ExUnit.Case
 
+  def foo(~w(a b c)) do
+    IO.puts("a b c")
+  end
+
   def fun1 do
     case fun2 do
       x -> x
