@@ -12,6 +12,10 @@
       # "default" is used.
       name: "default",
       #
+      # If you create your own checks, you must specify the source files for
+      # them here, so they can be loaded by Credo before running the analysis.
+      requires: [],
+      #
       # these are the files included in the analysis
       files: %{
         #

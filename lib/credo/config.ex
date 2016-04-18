@@ -6,6 +6,7 @@ defmodule Credo.Config do
 
   defstruct files:            nil,
             checks:           nil,
+            requires:         nil,
             min_priority:     0,
             help:             false,
             version:          false,
@@ -116,6 +117,7 @@ defmodule Credo.Config do
       |> Enum.find(&(&1[:name] == config_name))
 
     %__MODULE__{
+      requires: data[:requires] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data)
     }
@@ -166,15 +168,14 @@ defmodule Credo.Config do
   end
   def merge(base, other) do
     %__MODULE__{
+      requires: base.requires ++ other.requires,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
     }
   end
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
     base = normalize_check_tuples(checks_base)
-    |> IO.inspect
     other = normalize_check_tuples(checks_other)
-    |> IO.inspect
     Keyword.merge(base, other)
   end
   def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do

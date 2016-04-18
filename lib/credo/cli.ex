@@ -8,6 +8,7 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Config
+  alias Credo.Sources
   alias Credo.CLI.Filename
   alias Credo.CLI.Output.UI
 
@@ -79,7 +80,16 @@ defmodule Credo.CLI do
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
 
+    config |> require_requires()
+
     command_mod.run(dir, config)
+  end
+
+  # Requires the additional files specified in the config.
+  defp require_requires(%Config{requires: requires}) do
+    requires
+    |> Sources.find
+    |> Enum.each(&Code.require_file/1)
   end
 
   defp parse_options(argv) do

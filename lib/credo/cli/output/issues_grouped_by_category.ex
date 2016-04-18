@@ -9,7 +9,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.Issue
 
   @category_starting_order [:design, :readability, :refactor]
-  @category_ending_order [:warning, :consistency]
+  @category_ending_order [:warning, :consistency, :custom, :unknown]
   @category_colors [
     design: :olive,
     readability: :blue,
@@ -95,8 +95,8 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     print_issues(issues, source_file_map, config, term_width)
   end
   defp print_issues(category, issues, source_file_map, config, term_width) do
-    color = @category_colors[category] || "magenta"
-    title = @category_titles[category] || ""
+    color = @category_colors[category] || :magenta
+    title = @category_titles[category] || "Category: #{category}"
 
     UI.puts
 

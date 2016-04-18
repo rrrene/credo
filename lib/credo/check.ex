@@ -21,7 +21,10 @@ defmodule Credo.Check do
       alias Credo.CLI.ExitStatus
 
       def base_priority, do: unquote(to_priority(opts[:base_priority]))
-      def category, do: unquote(category_body(opts[:category]))
+      def category do
+        default = unquote(category_body(opts[:category]))
+        default || :unknown
+      end
       def run_on_all?, do: unquote(run_on_all_body(opts[:run_on_all]))
 
       def explanation, do: explanation_for(@explanation, :check)
@@ -95,9 +98,12 @@ defmodule Credo.Check do
 
   defp category_body(nil) do
     quote do
-      __MODULE__
-      |> Module.split
-      |> Enum.at(2)
+      value =
+        __MODULE__
+        |> Module.split
+        |> Enum.at(2)
+      (value || :unknown)
+      |> to_string
       |> String.downcase
       |> String.to_atom
     end
@@ -115,6 +121,7 @@ defmodule Credo.Check do
   def to_exit_status(nil), do: 0
   def to_exit_status(atom) when is_atom(atom) do
     @base_category_exit_status_map[atom]
+    |> to_exit_status
   end
   def to_exit_status(value), do: value
 
