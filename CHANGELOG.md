@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 0.3.13
+
+- Fix false positives for `NameRedeclarationByDef`.
+- Fix false positives for `UnusedEnumOperation`.
+
 ## 0.3.12
 
 - Fix false positives for `SpaceInParentheses`.
