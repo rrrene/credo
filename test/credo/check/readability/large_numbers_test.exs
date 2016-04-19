@@ -36,6 +36,15 @@ end
 
   test "it should report a violation /3" do
 """
+defp numbers do
+  1024 + 43534.0
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /4" do
+"""
 defmacro numbers do
   1024 + 1_000000
 end
