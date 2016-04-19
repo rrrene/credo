@@ -3,8 +3,26 @@
 
 ## 0.4.0 (pre)
 
-- Change config behaviour: Checks have to be disabled explicitly in `.credo.exs`
-- Force consistency check settings: you can now force e.g. tabs
+### Custom check support
+
+- Adds support for custom checks in your projects.
+
+  TODO: describe how it works.
+
+### BREAKING CHANGE: Checks listed in `.credo.exs`
+
+- prior to `v0.4.0`, `.credo.exs` contained the full list of checks specific to your project
+- starting with `v0.4.0` the check list in `credo.exs` will be merged with the standard check list, with your definitions overwriting the defaults
+- PRO: you can customize individual tasks to your liking and still benefit from additional standard checks with each new release
+- CON: this means checks have to be disabled explicitly in `.credo.exs`
+
+### New Checks
+
+TBA
+
+### Minor Improvements
+
+TBA
 
 ## 0.3.13
 
