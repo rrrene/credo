@@ -49,6 +49,7 @@ end
     |> refute_issues(@described_check)
   end
 
+  @tag :to_be_implemented
   test "it should NOT report for forced, valid props" do
     [
       @with_spaces, @with_spaces2
@@ -67,6 +68,7 @@ end
     |> assert_issues(@described_check)
   end
 
+  @tag :to_be_implemented
   test "it should report for forced, consistent, but invalid props" do
     [
       @with_spaces, @with_spaces2

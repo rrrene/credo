@@ -6,7 +6,7 @@ defmodule Credo.Config do
 
   defstruct files:            nil,
             checks:           nil,
-            requires:         nil,
+            requires:         [],
             min_priority:     0,
             help:             false,
             version:          false,
