@@ -66,6 +66,21 @@ defmodule Credo.ConfigTest do
     assert expected == Config.merge(@default_config, @example_config2)
   end
 
+  test "merge works in the other direction, overwriting files[:excluded]" do
+    expected = %Config{
+                    files: %{
+                      included: ["lib/", "src/", "web/"],
+                      excluded: []
+                    },
+                    checks: [
+                      {Credo.Check.Consistency.ExceptionNames, []},
+                      {Credo.Check.Consistency.LineEndings, []},
+                      {Credo.Check.Consistency.Tabs, []},
+                    ]
+                  }
+    assert expected == Config.merge(@example_config2, @default_config)
+  end
+
   test "merge works with list" do
     expected = %Config{
                     files: %{

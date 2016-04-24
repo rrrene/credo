@@ -22,7 +22,7 @@
         # you can give explicit globs or simply directories
         # in the latter case `**/*.{ex,exs}` will be used
         included: ["lib/", "src/", "web/", "apps/"],
-        excluded: []
+        excluded: [~r"/_build/", ~r"/deps/"]
       },
       #
       # You can customize the parameters of any check by adding a second element

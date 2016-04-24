@@ -35,6 +35,12 @@ defmodule Credo.ExsLoader do
     |> String.split(~r/\s+/)
   end
 
+  # TODO: support regex modifiers
+  defp process_exs({:sigil_r, _, [{:<<>>, _, [regex_as_string]}, []]}) do
+    regex_as_string
+    |> Regex.compile!
+  end
+
   defp process_exs({:%{}, _meta, body}) do
     process_map(body, %{})
   end
