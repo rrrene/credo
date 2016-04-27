@@ -28,21 +28,21 @@ defmodule Credo.CLI.Output.Explain do
   defp print_issues(nil, _config, _term_width, _line_no, _column) do
     nil
   end
+
   defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width, line_no, column) do
     issues
     |> Filter.important(config)
     |> Filter.valid_issues(config)
     |> Enum.sort_by(&(&1.line_no))
+    |> filter_issues(line_no, column)
     |> print_issues(filename, source_file, config, term_width, line_no, column)
   end
 
   defp print_issues([], _filename, _source_file, _config, _term_width, _line_no, _column) do
     nil
   end
-  defp print_issues(issues, _filename, source_file, _config, term_width, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
 
+  defp print_issues(issues, _filename, source_file, _config, term_width, _line_no, _column) do
     first_issue = issues |> List.first
     scope_name = Scope.mod_name(first_issue.scope)
     color = Output.check_color(first_issue)
@@ -61,6 +61,12 @@ defmodule Credo.CLI.Output.Explain do
 
     issues
     |> Enum.each(&print_issue(&1, source_file, term_width))
+  end
+
+  defp filter_issues(issues, line_no, column) do
+    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
+    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
+    issues
   end
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
