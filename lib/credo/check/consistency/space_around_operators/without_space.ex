@@ -12,7 +12,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
 
   defp property_values_for(source, filename) do
     source
-    |> CodeHelper.clean_strings_and_sigils
     |> Credo.Code.to_tokens
     |> check_tokens([])
     |> Enum.uniq
