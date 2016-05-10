@@ -12,7 +12,14 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  test "it should not report exception modules" do
+"""
+defmodule CredoSampleModule do
+  defexception message: "Bad luck"
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
   test "it should report a violation" do
 """

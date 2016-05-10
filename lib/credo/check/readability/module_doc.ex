@@ -31,8 +31,9 @@ defmodule Credo.Check.Readability.ModuleDoc do
   end
 
   defp traverse({:defmodule, meta, _arguments} = ast, issues, issue_meta) do
-    case Module.attribute(ast, :moduledoc) do
-      {:error, _} ->
+    exception? = Module.exception?(ast)
+    case Module.attribute(ast, :moduledoc)  do
+      {:error, _} when not exception? ->
         mod_name = Module.name(ast)
         {ast, issues ++ [issue_for(issue_meta, meta[:line], mod_name)]}
       _ ->
