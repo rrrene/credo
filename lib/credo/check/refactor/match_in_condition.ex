@@ -1,12 +1,29 @@
 defmodule Credo.Check.Refactor.MatchInCondition do
   @moduledoc """
-  Pattern matching should not be used in `if` and `unless`.
+  Pattern matching should only ever be used for simple assignments
+  inside `if` and `unless` clauses.
 
-  Example:
+  While this fine:
 
-      if {:ok, value} = parameter1 do
+      if contents = File.read!("foo.txt") do
         do_something
       end
+
+  the following should be avoided, since it mixes a pattern match with a
+  condition and do/else blocks.
+
+      if {:ok, contents} = File.read("foo.txt") do
+        do_something
+      end
+
+  If you want to match for something and execute another block otherwise,
+  consider using a `case` statement:
+
+      case  = File.read("foo.txt") do
+        {:ok, contents} -> do_something
+        _ -> do_something_else
+      end
+
   """
 
   @explanation [check: @moduledoc]
@@ -33,8 +50,13 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, issues}
   end
 
-  defp issue_for_first_condition({:=, meta, _arguments}, op, meta, source_file) do
-    issue_for(op, meta[:line], "=", source_file)
+  defp issue_for_first_condition({:=, meta, arguments}, op, meta, source_file) do
+    case arguments do
+      [{atom, _, nil}, _right] when is_atom(atom) ->
+        nil
+      _ ->
+        issue_for(op, meta[:line], "=", source_file)
+    end
   end
   defp issue_for_first_condition(_, _, _, _), do: nil
 

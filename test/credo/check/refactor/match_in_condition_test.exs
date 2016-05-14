@@ -7,7 +7,12 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
+    # comparison should not affect this check in any way
     if parameter1 == parameter2 do
+      do_something
+    end
+    # simple wildcard matches/variable assignment should not affect this check
+    if parameter1 = Regex.run(~r/\d+/, parameter2) do
       do_something
     end
   end
