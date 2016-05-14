@@ -215,11 +215,12 @@ defmodule Credo.Config do
     %__MODULE__{config | files: files}
   end
 
-  defp add_directory_to_file(file_or_glob, dir) do
+  defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
     if File.dir?(dir) do
       Path.join(dir, file_or_glob)
     else
       dir
     end
   end
+  defp add_directory_to_file(regex, _), do: regex
 end
