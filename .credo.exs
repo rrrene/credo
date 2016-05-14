@@ -63,7 +63,7 @@
         {Credo.Check.Readability.VariableNames},
 
         {Credo.Check.Refactor.ABCSize},
-        {Credo.Check.Refactor.CaseTrivialMatches},
+        # {Credo.Check.Refactor.CaseTrivialMatches}, # deprecated in 0.4.0
         {Credo.Check.Refactor.CondStatements},
         {Credo.Check.Refactor.FunctionArity},
         {Credo.Check.Refactor.MatchInCondition},
