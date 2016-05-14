@@ -27,6 +27,17 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
+  Returns the snippet at the given +line_no+ between +column1+ and +column2+.
+
+  NOTE: +line_no+ is a 1-based index.
+  """
+  def line_at(source_file, line_no, column1, column2) do
+    source_file
+    |> line_at(line_no)
+    |> String.slice(column1-1, column2-column1)
+  end
+
+  @doc """
   Returns the column of the given +trigger+ inside the given line.
 
   NOTE: Both +line_no+ and the returned index are 1-based.
