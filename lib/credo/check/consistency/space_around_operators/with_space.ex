@@ -1,7 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
   use Credo.Check.CodePattern
 
-  alias Credo.Check.CodeHelper
   alias Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper
 
   def property_value, do: :with_space
