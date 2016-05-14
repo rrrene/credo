@@ -9,6 +9,7 @@ defmodule Credo.Check.Warning.UnusedKeywordOperation do
   """
 
   @explanation [check: @moduledoc]
+  @checked_module :Keyword
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper
 
@@ -20,7 +21,7 @@ defmodule Credo.Check.Warning.UnusedKeywordOperation do
 
     all_unused_calls =
       UnusedFunctionReturnHelper.find_unused_calls(source_file, params,
-                                                                [:Keyword], nil)
+                                                    [@checked_module], nil)
 
     all_unused_calls
     |> Enum.reduce([], fn(invalid_call, issues) ->
