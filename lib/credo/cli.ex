@@ -15,12 +15,14 @@ defmodule Credo.CLI do
   @default_dir "."
   @default_command_name "suggest"
   @command_map %{
-    help: Credo.CLI.Command.Help,
-    list: Credo.CLI.Command.List,
-    suggest: Credo.CLI.Command.Suggest,
-    explain: Credo.CLI.Command.Explain,
-    categories: Credo.CLI.Command.Categories,
-    version: Credo.CLI.Command.Version
+    "categories" => Credo.CLI.Command.Categories,
+    "config.init" => Credo.CLI.Command.ConfigInit,
+    "check.new" => Credo.CLI.Command.CheckNew,
+    "explain" => Credo.CLI.Command.Explain,
+    "help" => Credo.CLI.Command.Help,
+    "list" => Credo.CLI.Command.List,
+    "suggest" => Credo.CLI.Command.Suggest,
+    "version" => Credo.CLI.Command.Version,
   }
   @switches [
     all: :boolean,
@@ -67,9 +69,6 @@ defmodule Credo.CLI do
   """
   def command_for(nil), do: nil
   def command_for(command) when is_binary(command) do
-    command_for(command |> String.to_atom)
-  end
-  def command_for(command) when is_atom(command) do
     if Enum.member?(commands, command) do
       @command_map[command]
     else
@@ -93,39 +92,42 @@ defmodule Credo.CLI do
   end
 
   defp parse_options(argv) do
-    {switches, files, []} =
+    {switches, args, []} =
       OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
     command_name =
-      if files |> List.first |> command_for do
-        command_name = files |> List.first
-        files = files |> List.delete_at(0)
+      if args |> List.first |> command_for() do
+        command_name = args |> List.first
+        args = args |> List.delete_at(0)
         command_name
       else
         nil
       end
 
-    dir = (files |> List.first) || @default_dir
+    dir = (args |> List.first) || @default_dir
     config = dir |> to_config(switches)
 
-    command_name_dir_config(command_name, dir, config)
+    command_name_dir_config(command_name, args, config)
   end
 
-  defp command_name_dir_config(nil, dir, %Config{help: true} = config) do
-    command_name_dir_config("help", dir, config)
+  defp command_name_dir_config(nil, args, %Config{help: true} = config) do
+    command_name_dir_config("help", args, config)
   end
-  defp command_name_dir_config(nil, dir, %Config{version: true} = config) do
-    command_name_dir_config("version", dir, config)
+  defp command_name_dir_config(nil, args, %Config{version: true} = config) do
+    command_name_dir_config("version", args, config)
   end
-  defp command_name_dir_config(nil, dir, config) do
-    if Filename.contains_line_no?(dir) do
-      command_name_dir_config("explain", dir, config)
+  defp command_name_dir_config(nil, [], config) do
+    command_name_dir_config(@default_command_name, [], config)
+  end
+  defp command_name_dir_config(nil, args, config) do
+    if args |> List.first |> Filename.contains_line_no?() do
+      command_name_dir_config("explain", args, config)
     else
-      command_name_dir_config(@default_command_name, dir, config)
+      command_name_dir_config(@default_command_name, args, config)
     end
   end
-  defp command_name_dir_config(command_name, dir, config) do
-    {command_for(command_name), dir, config}
+  defp command_name_dir_config(command_name, args, config) do
+    {command_for(command_name), args, config}
   end
 
   defp to_config(dir, switches) do

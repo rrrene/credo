@@ -19,7 +19,8 @@ defmodule Credo.Mixfile do
 
   defp package do
     [
-      files: ["lib", ".credo.exs", "mix.exs", "README.md", "LICENSE"],
+      files: [".credo.exs", ".template.check.ex", "lib", "mix.exs",
+              "README.md", "LICENSE"],
       maintainers: ["René Föhring"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/rrrene/credo"},
