@@ -65,11 +65,11 @@ defmodule Credo.CLI.Command.Explain do
   end
 
   def print_result(source_file, config, line_no, column) do
-    output_mod = output_mod(config)
-    output_mod.print_before_info([source_file], config)
+    output = output_mod(config)
+    output.print_before_info([source_file], config)
 
     source_file
-    |> output_mod.print_after_info(config, line_no, column)
+    |> output.print_after_info(config, line_no, column)
   end
 
 

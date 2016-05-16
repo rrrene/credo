@@ -5,7 +5,6 @@ defmodule Credo.CLI.Command.ConfigInit do
   @default_config_file File.read!(@config_filename)
 
   def run(args, config) do
-    IO.inspect args
     if File.exists?(@config_filename) do
       IO.puts "File exists: #{@config_filename}, aborted."
     else

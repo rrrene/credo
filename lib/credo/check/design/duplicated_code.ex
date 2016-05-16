@@ -44,8 +44,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
     |> add_issues_to_source_files(source_files, nodes_threshold, params)
   end
 
-  defp add_issues_to_source_files(hashes, source_files, nodes_threshold, params) when is_map(hashes) do
-    Enum.reduce(hashes, source_files, fn({_hash, nodes}, source_files) ->
+  defp add_issues_to_source_files(found_hashes, source_files, nodes_threshold, params) when is_map(found_hashes) do
+    Enum.reduce(found_hashes, source_files, fn({_hash, nodes}, source_files) ->
       filenames = nodes |> Enum.map(&(&1.filename))
       Enum.reduce(source_files, [], fn(source_file, acc) ->
         if Enum.member?(filenames, source_file.filename) do
@@ -72,8 +72,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
     |> add_masses
   end
 
-  def add_masses(hashes) do
-    hashes
+  def add_masses(found_hashes) do
+    found_hashes
     |> Enum.map(&add_mass_to_subnode/1)
     |> Enum.into(%{})
   end
@@ -81,8 +81,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp add_mass_to_subnode({hash, node_items}) do
     node_items =
       node_items
-      |> Enum.map(fn (struct) ->
-          %{struct | mass: mass(struct.node)}
+      |> Enum.map(fn(item) ->
+          %{item | mass: mass(item.node)}
          end)
 
     {hash, node_items}
@@ -94,16 +94,17 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   Returns the resulting map.
   """
-  def prune_hashes(hashes) do
+  def prune_hashes(given_hashes) do
     # remove entries containing a single node
-    hashes =
-      hashes
+    hashes_with_multiple_nodes =
+      given_hashes
       |> Enum.filter(fn {_hash, node_items} -> Enum.count(node_items) > 1 end)
       |> Enum.into(%{})
 
-    hashes_to_prune = Enum.flat_map(hashes, &collect_subhashes/1)
-    hashes = delete_keys hashes_to_prune, hashes
-    hashes
+    hashes_to_prune =
+      Enum.flat_map(hashes_with_multiple_nodes, &collect_subhashes/1)
+
+    delete_keys(hashes_to_prune, hashes_with_multiple_nodes)
   end
 
   defp delete_keys([], acc), do: acc
@@ -225,11 +226,11 @@ defmodule Credo.Check.Design.DuplicatedCode do
         other_nodes
         |> Enum.map(fn(other_node) -> "#{other_node.filename}:#{line_no_for(other_node.node)}" end)
         |> Enum.join(", ")
-      mass = this_node.mass
+      node_mass = this_node.mass
       line_no = line_no_for(this_node.node)
 
       format_issue issue_meta,
-        message: "Duplicate code found in #{filenames} (mass: #{mass}).",
+        message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
         line_no: line_no,
         severity: Severity.compute(1+Enum.count(other_nodes), 1)
     end

@@ -53,11 +53,11 @@ defmodule Credo.CLI.Command.List do
   end
 
   defp print_results_and_summary(source_files, config, time_load, time_run) do
-    output_mod = output_mod(config)
-    output_mod.print_before_info(source_files, config)
+    output = output_mod(config)
+    output.print_before_info(source_files, config)
 
     source_files
-    |> output_mod.print_after_info(config, time_load, time_run)
+    |> output.print_after_info(config, time_load, time_run)
   end
 
 
