@@ -79,6 +79,8 @@ defmodule Credo.CLI do
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
 
+    if config.check_outdated?, do: Credo.Outdated.run()
+
     config |> require_requires()
 
     command_mod.run(dir, config)

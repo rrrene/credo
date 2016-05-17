@@ -16,6 +16,7 @@ defmodule Credo.Config do
             match_checks:     nil,
             ignore_checks:    nil,
             crash_on_error:   true,
+            check_outdated?:  true, # checks if there is a new version of Credo
             read_from_stdin:  false,
             lint_attribute_map: %{} # maps filenames to @lint attributes
 

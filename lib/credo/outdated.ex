@@ -3,7 +3,7 @@ defmodule Credo.Outdated do
     Hex.start
     Hex.Utils.ensure_registry!()
 
-    include_pre_versions? = false
+    include_pre_versions? = false # TODO: include pre versions if running on a pre version
     current = Credo.version
     latest = latest_version(:credo, current, include_pre_versions?)
     outdated? = Hex.Version.compare(current, latest) == :lt
@@ -12,12 +12,12 @@ defmodule Credo.Outdated do
       [
         :orange,
         :bright,
-        "There is a newer version of Credo available: ",
+        "A new Credo version is available (#{latest})",
         :reset,
         :orange,
-        "#{latest} (use `mix deps.update credo` to upgrade)"
+        ", please update with `mix deps.update credo`"
       ]
-      |> Bunt.puts
+      |> warn
     end
   end
 
@@ -45,5 +45,9 @@ defmodule Credo.Outdated do
     end
 
     List.last(versions)
+  end
+
+  defp warn(value) do
+    IO.puts(:stderr, Bunt.format(value))
   end
 end
