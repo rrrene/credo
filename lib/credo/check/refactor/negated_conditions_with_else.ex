@@ -58,10 +58,14 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
 
   defp negated_condition?(arguments) when is_list(arguments) do
-    negated_condition?(arguments |> List.first)
+    arguments |> List.first |> negated_condition?()
   end
   defp negated_condition?({:!, _meta, _arguments}) do
     true
+  end
+  # parentheses around the condition wrap it in a __block__
+  defp negated_condition?({:__block__, _meta, arguments}) do
+    arguments |> negated_condition?()
   end
   defp negated_condition?(_) do
     false
