@@ -5,6 +5,8 @@ defmodule Credo.Check.Refactor.MatchInCondition do
 
   While this fine:
 
+      # okay, simple wildcard assignment:
+
       if contents = File.read!("foo.txt") do
         do_something
       end
@@ -12,14 +14,22 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   the following should be avoided, since it mixes a pattern match with a
   condition and do/else blocks.
 
+      # considered too "complex":
+
       if {:ok, contents} = File.read("foo.txt") do
+        do_something
+      end
+
+      # also considered "complex":
+
+      if allowed? && ( contents = File.read!("foo.txt") ) do
         do_something
       end
 
   If you want to match for something and execute another block otherwise,
   consider using a `case` statement:
 
-      case  = File.read("foo.txt") do
+      case File.read("foo.txt") do
         {:ok, contents} -> do_something
         _ -> do_something_else
       end
@@ -39,30 +49,39 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   end
 
   for op <- @condition_ops do
-    defp traverse({unquote(op), meta, arguments} = ast, issues, source_file) do
-      new_issue =
-        issue_for_first_condition(arguments |> List.first, unquote(op), meta, source_file)
+    defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta) do
+      new_issues =
+        Credo.Code.traverse(ast, &traverse_condition(&1, &2, ast, issue_meta))
 
-      {ast, issues ++ List.wrap(new_issue)}
+      {ast, issues ++ new_issues}
     end
   end
   defp traverse(ast, issues, _source_file) do
     {ast, issues}
   end
 
-  defp issue_for_first_condition({:=, meta, arguments}, op, meta, source_file) do
+  defp traverse_condition({:=, meta, arguments} = ast, issues, {op, _, op_arguments}, issue_meta) do
     case arguments do
       [{atom, _, nil}, _right] when is_atom(atom) ->
-        nil
+        # this means that the current ast is part of the `if/unless`
+        if op_arguments |> Enum.member?(ast) do
+          {ast, issues}
+        else
+          new_issue = issue_for(op, meta[:line], "=", issue_meta)
+          {ast, issues ++ [new_issue]}
+        end
       _ ->
-        issue_for(op, meta[:line], "=", source_file)
+        new_issue = issue_for(op, meta[:line], "=", issue_meta)
+        {ast, issues ++ [new_issue]}
     end
   end
-  defp issue_for_first_condition(_, _, _, _), do: nil
+  defp traverse_condition(ast, issues, op_ast, _issue_meta) do
+    {ast, issues}
+  end
 
 
-  defp issue_for(op, line_no, trigger, source_file) do
-    format_issue source_file,
+  defp issue_for(op, line_no, trigger, issue_meta) do
+    format_issue issue_meta,
       message: "There should be no matches in `#{op}` conditions.",
       trigger: trigger,
       line_no: line_no
