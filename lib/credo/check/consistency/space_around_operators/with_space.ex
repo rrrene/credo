@@ -1,7 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
   use Credo.Check.CodePattern
 
-  alias Credo.Check.CodeHelper
   alias Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper
 
   def property_value, do: :with_space
@@ -23,26 +22,31 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
     |> PropertyValue.for(filename: filename, line_no: line_no, column: column, trigger: trigger)
   end
 
-  defp check_tokens([], acc), do: acc
+  defp check_tokens([], acc), do: List.flatten(acc)
   defp check_tokens([prev | t], acc) do
-    current = t |> List.first
-    next = t |> Enum.at(1)
+    destructure [current, next], t
 
     if SpaceHelper.operator?(current) do
-      acc = acc ++ collect_tokens(prev, current, next)
+      check_tokens(t, [acc, trigger_tokens_before(prev, current, next),
+                            trigger_tokens_after(prev, current, next)])
+    else
+      check_tokens(t, acc)
     end
-
-    check_tokens(t, acc)
   end
 
-  def collect_tokens(prev, operator, next) do
-    list = []
+  defp trigger_tokens_before(prev, operator, _next) do
     if SpaceHelper.space_between?(prev, operator) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
+  end
+
+  defp trigger_tokens_after(_prev, operator, next) do
     if SpaceHelper.space_between?(operator, next) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
-    list
   end
 end

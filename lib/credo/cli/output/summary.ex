@@ -118,21 +118,15 @@ defmodule Credo.CLI.Output.Summary do
   defp summary_parts(source_files, issues) do
     parts =
       @category_wording
-      |> Enum.flat_map(&summary_part(&1, issues))
-
-    parts =
-      parts |> List.update_at(Enum.count(parts) - 1, fn(last_part) ->
-        String.replace(last_part, ", ", "")
-       end)
-
-    if Enum.empty?(parts), do: parts = "no issues"
+      |> Enum.map(&summary_part(&1, issues))
+      |> Enum.intersperse(", ")
 
     [
       :green,
       "#{scope_count(source_files)} mods/funs, ",
       :reset,
       "found ",
-      parts,
+      if(Enum.empty?(parts), do: "no issues", else: parts),
       "."
     ]
   end
@@ -142,9 +136,8 @@ defmodule Credo.CLI.Output.Summary do
 
     case category_count(issues, category) do
       0 -> []
-      1 -> [color, "1 #{singular}, "]
-      x -> [color, "#{x} #{plural}, "]
+      1 -> [color, "1 #{singular}"]
+      x -> [color, "#{x} #{plural}"]
     end
   end
-
 end

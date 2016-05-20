@@ -53,17 +53,10 @@ defmodule Credo.Check.Readability.MaxLineLength do
   end
 
   defp refute_issue?(line_no, definitions, ignore_definitions, ignore_strings) do
-    refute = false
-    if ignore_definitions do
-      refute = refute || Enum.member?(definitions, line_no)
-    end
-    if ignore_strings do
-      refute = refute || false # TODO: implement this check
-    end
-    refute
+    [ignore_definitions and Enum.member?(definitions, line_no),
+     ignore_strings and false] # TODO: implement this check
+    |> Enum.any?
   end
-
-
 
   defp issue_for(line_no, max_length, line, issue_meta) do
     length = String.length(line)

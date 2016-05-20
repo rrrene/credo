@@ -88,13 +88,12 @@ defmodule Credo.CLI do
     {switches, files, []} =
       OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
-    command_name =
+    {command_name, files} =
       if files |> List.first |> command_for do
-        command_name = files |> List.first
-        files = files |> List.delete_at(0)
-        command_name
+        [command_name | files] = files
+        {command_name, files}
       else
-        nil
+        {nil, files}
       end
 
     dir = (files |> List.first) || @default_dir
@@ -121,61 +120,26 @@ defmodule Credo.CLI do
   end
 
   defp to_config(dir, switches) do
-    dir = dir |> Filename.remove_line_no_and_column
-    config_name = switch(switches, :config_name)
-    config = Config.read_or_default(dir, config_name)
-
-    if switch(switches, :all) do
-      config = %Config{config | all: true}
-    end
-    if switch(switches, :all_priorities, :strict) do
-      config = %Config{config | all: true, min_priority: -99}
-    end
-    if switch(switches, :help), do: config = %Config{config | help: true}
-    if switch(switches, :verbose), do: config = %Config{config | verbose: true}
-    if switch(switches, :version), do: config = %Config{config | version: true}
-    if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
-    if switch(switches, :read_from_stdin), do: config = %Config{config | read_from_stdin: true}
-
-    min_priority = switch(switches, :min_priority)
-    if min_priority do
-      config =
-        %Config{config | min_priority: min_priority}
-    end
-
-    format = switch(switches, :format)
-    if format do
-      config =
-        %Config{config | format: format}
-    end
-
-    # only include certain checks
-    check_pattern = switch(switches, :checks, :only)
-    if check_pattern do
-      config =
-        %Config{config | all: true, match_checks: check_pattern |> String.split(",")}
-    end
-
-    # exclude/ignore certain checks
-    ignore_pattern = switch(switches, :ignore_checks, :ignore)
-    if ignore_pattern do
-      config =
-        %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
-    end
-
-    # DEPRECATED command line switches:
-
-    if switch(switches, :one_line) do
-      UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
-      config = %Config{config | format: "oneline"}
-    end
-
-    config
+    dir = Filename.remove_line_no_and_column(dir)
+    config = Config.read_or_default(dir, switches[:config_name])
+    Enum.reduce(switches, config, &apply_config/2)
   end
 
-  def switch(switches, key), do: Keyword.get(switches, key)
-  def switch(switches, key, alias_key) do
-    Keyword.get(switches, key) || Keyword.get(switches, alias_key)
+  @simple_configs ~w(all help verbose version crash_on_error read_from_stdin
+    min_priority format)
+
+  defp apply_config(config, {key, value}) when key in @simple_configs,
+    do: Map.put(config, key, value)
+  defp apply_config(config, {key, true}) when key in [:all_priorities, :strict],
+    do: %Config{config | all: true, min_priority: -99}
+  defp apply_config(config, {checks, patterns}) when checks in [:checks, :only],
+    do: %Config{config | all: true, match_checks: String.split(patterns, ",")}
+  defp apply_config(config, {ignore, patterns}) when ignore in [:ignore_checks, :ignore],
+    do: %Config{config | ignore_checks: String.split(patterns, ",")}
+  # DEPRECATED command line switches:
+  defp apply_config(config, {:one_line, true}) do
+    UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
+    %Config{config | format: "oneline"}
   end
 
   # Converts the return value of a Command.run() call into an exit_status

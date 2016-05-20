@@ -64,10 +64,15 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp filter_issues(issues, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
     issues
+    |> filter_by_if_present(:line, line_no)
+    |> filter_by_if_present(:colum, column)
   end
+
+  defp filter_by_if_present(issues, _field, nil),
+    do: issues
+  defp filter_by_if_present(issues, field, value),
+    do: Enum.filter(issues, &(Map.get(&1, field) == String.to_integer(value)))
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
     pos =

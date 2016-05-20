@@ -47,20 +47,20 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp add_issues_to_source_files(hashes, source_files, nodes_threshold, params) when is_map(hashes) do
     Enum.reduce(hashes, source_files, fn({_hash, nodes}, source_files) ->
       filenames = nodes |> Enum.map(&(&1.filename))
-      Enum.reduce(source_files, [], fn(source_file, acc) ->
-        if Enum.member?(filenames, source_file.filename) do
-          this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
-          other_nodes = List.delete(nodes, this_node)
-
-          issue_meta = IssueMeta.for(source_file, params)
-          new_issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
-
-          issues = source_file.issues ++ List.wrap(new_issue)
-          source_file = %SourceFile{source_file | issues: issues}
-        end
-        acc ++ [source_file]
-      end)
+      source_files
+      |> Enum.filter(&(&1.filename in filenames))
+      |> Enum.map(&%SourceFile{&1 | issues: issues_for_file(&1, nodes, params, nodes_threshold)})
     end)
+  end
+
+  defp issues_for_file(file, nodes, params, threshold) do
+    this_node = Enum.find(nodes, &(&1.filename == file.filename))
+    other_nodes = List.delete(nodes, this_node)
+
+    issue_meta = IssueMeta.for(file, params)
+    new_issue = issue_for(issue_meta, this_node, other_nodes, threshold)
+
+    file.issues ++ List.wrap(new_issue)
   end
 
   defp duplicate_nodes(source_files, mass_threshold) do
