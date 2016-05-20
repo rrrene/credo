@@ -1,4 +1,4 @@
-defmodule CredoCheck do
+defmodule MyFirstCredoCheck do
   @moduledoc """
     Checks all lines for a given Regex.
 
