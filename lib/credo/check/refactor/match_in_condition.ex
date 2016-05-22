@@ -49,7 +49,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   end
 
   for op <- @condition_ops do
-    defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta) do
+    defp traverse({unquote(op), _meta, _arguments} = ast, issues, issue_meta) do
       new_issues =
         Credo.Code.traverse(ast, &traverse_condition(&1, &2, ast, issue_meta))
 
@@ -75,7 +75,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
         {ast, issues ++ [new_issue]}
     end
   end
-  defp traverse_condition(ast, issues, op_ast, _issue_meta) do
+  defp traverse_condition(ast, issues, _op_ast, _issue_meta) do
     {ast, issues}
   end
 

@@ -12,7 +12,7 @@ defmodule Credo.Code do
   alias Credo.SourceFile
 
   defmodule ParserError do
-    @explanation ""
+    @explanation []
     use Credo.Check, category: :error
   end
 
