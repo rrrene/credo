@@ -7,7 +7,8 @@
 
 - Adds support for custom checks in your projects.
 
-  TODO: describe how it works.
+  Using two new mix commands `mix credo.gen.config` and `mix credo.gen.check`
+  you can generate the boilerplate to include custom checks in your projects.
 
 ### BREAKING CHANGE: Checks listed in `.credo.exs`
 
@@ -18,11 +19,16 @@
 
 ### New Checks
 
-TBA
+- readability/large_numbers
+- warning/unused_file_operation
+- warning/unused_path_operation
+- warning/unused_regex_operation
 
 ### Minor Improvements
 
-TBA
+- umbrella apps work out of the box now
+- ModuleDoc now ignores modules declaring exceptions
+- MatchInCondition now allows "simple" wildcard assignments in conditionals
 
 ## 0.3.13
 
