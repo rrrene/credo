@@ -1,4 +1,4 @@
-defmodule <%= @check_name %> do
+defmodule Lib.MyFirstCredoCheck do
   @moduledoc """
     Checks all lines for a given Regex.
 

@@ -16,9 +16,9 @@ defmodule Credo.CLI do
   @default_command_name "suggest"
   @command_map %{
     "categories" => Credo.CLI.Command.Categories,
-    "config.init" => Credo.CLI.Command.ConfigInit,
-    "check.new" => Credo.CLI.Command.CheckNew,
     "explain" => Credo.CLI.Command.Explain,
+    "gen.check" => Credo.CLI.Command.GenCheck,
+    "gen.config" => Credo.CLI.Command.GenConfig,
     "help" => Credo.CLI.Command.Help,
     "list" => Credo.CLI.Command.List,
     "suggest" => Credo.CLI.Command.Suggest,

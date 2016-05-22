@@ -12,10 +12,6 @@
       # "default" is used.
       name: "default",
       #
-      # If you create your own checks, you must specify the source files for
-      # them here, so they can be loaded by Credo before running the analysis.
-      requires: [],
-      #
       # these are the files included in the analysis
       files: %{
         #
@@ -24,6 +20,10 @@
         included: ["lib/", "src/", "web/", "apps/"],
         excluded: [~r"/_build/", ~r"/deps/"]
       },
+      #
+      # If you create your own checks, you must specify the source files for
+      # them here, so they can be loaded by Credo before running the analysis.
+      requires: [],
       #
       # You can customize the parameters of any check by adding a second element
       # to the tuple.
