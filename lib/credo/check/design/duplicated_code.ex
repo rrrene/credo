@@ -41,24 +41,24 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
     source_files
     |> duplicate_nodes(mass_threshold)
-    |> add_issues_to_source_files(source_files, nodes_threshold, params)
+    |> append_issues_via_issue_service(source_files, nodes_threshold, params)
+
+    :ok
   end
 
-  defp add_issues_to_source_files(found_hashes, source_files, nodes_threshold, params) when is_map(found_hashes) do
-    Enum.reduce(found_hashes, source_files, fn({_hash, nodes}, source_files) ->
+  defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params) when is_map(found_hashes) do
+    Enum.each(found_hashes, fn({_hash, nodes}) ->
       filenames = nodes |> Enum.map(&(&1.filename))
-      Enum.reduce(source_files, [], fn(source_file, acc) ->
+      Enum.each(source_files, fn(source_file) ->
         if Enum.member?(filenames, source_file.filename) do
           this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
           other_nodes = List.delete(nodes, this_node)
 
           issue_meta = IssueMeta.for(source_file, params)
-          new_issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
+          issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
 
-          issues = source_file.issues ++ List.wrap(new_issue)
-          source_file = %SourceFile{source_file | issues: issues}
+          Credo.Service.SourceFileIssues.append(source_file, issue)
         end
-        acc ++ [source_file]
       end)
     end)
   end

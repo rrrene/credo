@@ -33,7 +33,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   def run(source_files, params \\ []) when is_list(source_files) do
     source_files
     |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.add_issues_to_source_files(&issue_for/5, params)
+    |> Helper.append_issues_via_issue_service(&issue_for/5, params)
+
+    :ok
   end
 
   defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil

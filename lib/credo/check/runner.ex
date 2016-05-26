@@ -58,9 +58,17 @@ defmodule Credo.Check.Runner do
   defp run_checks_that_run_on_all(source_files, config) do
     checks = config |> Config.checks |> Enum.filter(&run_on_all_check?/1)
 
-    Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
-      run_check(check_tuple, source_files, config)
-    end)
+    checks
+    |> Enum.map(&Task.async(fn ->
+        run_check(&1, source_files, config)
+      end))
+    |> Enum.map(&Task.await(&1, 30_000))
+
+    source_files
+    |> Enum.map(&Task.async(fn ->
+        %SourceFile{&1 | issues: Credo.Service.SourceFileIssues.get(&1)}
+      end))
+    |> Enum.map(&Task.await(&1, 30_000))
   end
 
   defp run_checks(%SourceFile{} = source_file, checks, config) when is_list(checks) do
