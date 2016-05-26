@@ -123,12 +123,6 @@ defmodule Credo.CLI.Output.Explain do
     if issue.line_no do
       {_, line} = Enum.at(source_file.lines, issue.line_no-1)
 
-      displayed_line = String.strip(line)
-      if String.length(displayed_line) > term_width do
-        ellipsis = " ..."
-        displayed_line = String.slice(displayed_line, 0, term_width-@indent-String.length(ellipsis)) <> ellipsis
-      end
-
       UI.edge([outer_color, :faint])
       |> UI.puts
 
@@ -141,11 +135,7 @@ defmodule Credo.CLI.Output.Explain do
       UI.edge([outer_color, :faint])
       |> UI.puts
 
-      [
-        UI.edge([outer_color, :faint]), :reset, :cyan, :bright,
-          String.duplicate(" ", @indent-2), displayed_line
-      ]
-      |> UI.puts
+      print_source_line(source_file, issue.line_no, term_width, outer_color)
 
       if issue.column do
         offset = String.length(line) - String.length(String.strip(line))
@@ -191,6 +181,27 @@ defmodule Credo.CLI.Output.Explain do
     |> print_params_explanation(outer_color)
 
     UI.edge([outer_color, :faint])
+    |> UI.puts
+  end
+
+  defp print_source_line(source_file, line_no, term_width, outer_color) do
+    {_, line} = Enum.at(source_file.lines, line_no-1)
+
+    displayed_line = String.strip(line)
+    if String.length(displayed_line) > term_width do
+      ellipsis = " ..."
+      displayed_line = String.slice(displayed_line, 0, term_width-@indent-String.length(ellipsis)) <> ellipsis
+    end
+
+    line_no_str =
+      "#{line_no} "
+      |> String.rjust(@indent-2)
+
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        :faint, line_no_str, :reset,
+        :cyan, :bright, displayed_line
+    ]
     |> UI.puts
   end
 
