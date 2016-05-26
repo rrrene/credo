@@ -6,11 +6,23 @@ defmodule Credo.Check.Runner do
     config =
       config
       |> inject_lint_attributes(source_files)
-    source_files =
-      source_files
-      |> run_checks_that_run_on_all(config)
-      |> Enum.map(&Task.async(fn -> run(&1, config) end))
-      |> Enum.map(&Task.await(&1, 30_000))
+
+    {time_run_on_all, source_files_after_run_on_all} =
+      :timer.tc fn ->
+        source_files
+        |> run_checks_that_run_on_all(config)
+      end
+
+    #IO.inspect time_run_on_all
+
+    {time_run, source_files} =
+      :timer.tc fn ->
+        source_files_after_run_on_all
+        |> Enum.map(&Task.async(fn -> run(&1, config) end))
+        |> Enum.map(&Task.await(&1, 30_000))
+      end
+
+    #IO.inspect time_run
 
     {source_files, config}
   end
