@@ -3,6 +3,17 @@ defmodule Credo.ConfigTest do
 
   alias Credo.Config
 
+  def assert_sorted_equality(%Config{files: files1, checks: checks1},
+                              %Config{files: files2, checks: checks2}) do
+    assert files1 == files2
+    assert_sorted_equality checks1, checks2
+  end
+  def assert_sorted_equality(checks1, checks2) do
+    config1_sorted = checks1 |> Enum.sort()
+    config2_sorted = checks2 |> Enum.sort()
+    assert config1_sorted == config2_sorted
+  end
+
   @default_config %Config{
                     files: %{
                       included: ["lib/", "src/", "web/"],
@@ -48,7 +59,7 @@ defmodule Credo.ConfigTest do
                       {Credo.Check.Design.TagTODO, []},
                     ]
                   }
-    assert expected == Config.merge(@default_config, @example_config)
+    assert_sorted_equality expected, Config.merge(@default_config, @example_config)
   end
 
   test "merge works 2" do
@@ -63,7 +74,7 @@ defmodule Credo.ConfigTest do
                       {Credo.Check.Consistency.Tabs, []},
                     ]
                   }
-    assert expected == Config.merge(@default_config, @example_config2)
+    assert_sorted_equality expected, Config.merge(@default_config, @example_config2)
   end
 
   test "merge works in the other direction, overwriting files[:excluded]" do
@@ -78,7 +89,7 @@ defmodule Credo.ConfigTest do
                       {Credo.Check.Consistency.Tabs, []},
                     ]
                   }
-    assert expected == Config.merge(@example_config2, @default_config)
+    assert_sorted_equality expected, Config.merge(@example_config2, @default_config)
   end
 
   test "merge works with list" do
@@ -96,7 +107,7 @@ defmodule Credo.ConfigTest do
                       {Credo.Check.Design.TagTODO, []},
                     ]
                   }
-    assert expected == Config.merge([@default_config, @example_config2, @example_config])
+    assert_sorted_equality expected, Config.merge([@default_config, @example_config2, @example_config])
   end
 
   test "merge_checks works" do
@@ -126,7 +137,7 @@ defmodule Credo.ConfigTest do
         {Credo.Check.Design.TagTODO, []},
         {Credo.Check.Consistency.Tabs, false},
       ]
-    assert expected == Config.merge_checks(base, other)
+    assert_sorted_equality expected, Config.merge_checks(base, other)
   end
 
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do
