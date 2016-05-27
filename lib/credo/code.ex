@@ -13,7 +13,7 @@ defmodule Credo.Code do
 
   defmodule ParserError do
     @explanation []
-    use Credo.Check, category: :error
+    use Credo.Check, category: :error, base_priority: :normal
   end
 
   @doc """

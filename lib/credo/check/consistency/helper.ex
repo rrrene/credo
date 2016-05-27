@@ -34,7 +34,6 @@ defmodule Credo.Check.Consistency.Helper do
   """
 
   alias Credo.Check.PropertyValue
-  alias Credo.SourceFile
   alias Credo.IssueMeta
 
   @doc """
@@ -107,7 +106,7 @@ defmodule Credo.Check.Consistency.Helper do
     |> Enum.map(&append_issues_if_necessary(&1, most_picked, new_issue_fun, params))
   end
 
-  defp append_issues_if_necessary({_prop_list, source_file}, nil, _, _) do
+  defp append_issues_if_necessary({_prop_list, _source_file}, nil, _, _) do
     nil
   end
   defp append_issues_if_necessary({prop_list, source_file}, most_picked, new_issue_fun, params) do
