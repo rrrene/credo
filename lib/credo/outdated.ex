@@ -3,12 +3,14 @@ defmodule Credo.Outdated do
     Hex.start
     Hex.Utils.ensure_registry!()
 
-    include_pre_versions? = false # TODO: include pre versions if running on a pre version
+    all_versions =
+      :credo
+      |> Atom.to_string
+      |> Hex.Registry.get_versions
     current = Credo.version
-    latest = latest_version(:credo, current, include_pre_versions?)
-    outdated? = Hex.Version.compare(current, latest) == :lt
 
-    if outdated? do
+    if should_update?(all_versions, current) do
+      latest = latest_version(all_versions, current)
       [
         :orange,
         :bright,
@@ -21,30 +23,32 @@ defmodule Credo.Outdated do
     end
   end
 
-  defp latest_version(package, default, pre?) do
-    {:ok, default} = Hex.Version.parse(default)
-    pre? = pre? || default.pre != []
+  def should_update?(all_versions, current) do
+    latest = latest_version(all_versions, current)
+    Hex.Version.compare(current, latest) == :lt
+  end
 
+  defp latest_version(all_versions, default) do
+    including_pre_versions? = pre_version?(default)
     latest =
-      package
-      |> Atom.to_string
-      |> Hex.Registry.get_versions
-      |> highest_version(pre?)
+      all_versions
+      |> highest_version(including_pre_versions?)
 
     latest || default
   end
 
-  defp highest_version(versions, pre?) do
-    versions = if pre? do
+  defp highest_version(versions, including_pre_versions?) do
+    if including_pre_versions? do
       versions
     else
-      Enum.filter(versions, fn version ->
-        {:ok, version} = Hex.Version.parse(version)
-        version.pre == []
-      end)
+      versions |> Enum.reject(&pre_version?/1)
     end
+    |> List.last
+  end
 
-    List.last(versions)
+  def pre_version?(version) do
+    {:ok, version} = Hex.Version.parse(version)
+    version.pre != []
   end
 
   defp warn(value) do
