@@ -1,6 +1,7 @@
 defmodule Credo.Check.Runner do
   alias Credo.Config
   alias Credo.SourceFile
+  alias Credo.Service.SourceFileIssues
 
   def run(source_files, config) when is_list(source_files) do
     config =
@@ -62,13 +63,10 @@ defmodule Credo.Check.Runner do
     |> Enum.map(&Task.async(fn ->
         run_check(&1, source_files, config)
       end))
-    |> Enum.map(&Task.await(&1, 30_000))
+    |> Enum.each(&Task.await(&1, 30_000))
 
     source_files
-    |> Enum.map(&Task.async(fn ->
-        %SourceFile{&1 | issues: Credo.Service.SourceFileIssues.get(&1)}
-      end))
-    |> Enum.map(&Task.await(&1, 30_000))
+    |> SourceFileIssues.update_in_source_files
   end
 
   defp run_checks(%SourceFile{} = source_file, checks, config) when is_list(checks) do

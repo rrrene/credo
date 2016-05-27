@@ -29,13 +29,13 @@ defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
 
   test "it should report the correct scope" do
     [@unix_line_endings, @unix_line_endings2]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
   test "it should report the correct scope 2" do
     [@unix_line_endings, @windows_line_endings]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issue(@described_check)
   end
 

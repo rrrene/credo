@@ -18,7 +18,7 @@ defmodule SomeOtherError do
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
@@ -37,7 +37,7 @@ defmodule InvalidResponse do
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
@@ -54,7 +54,7 @@ defmodule SomeModule do
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
@@ -75,7 +75,7 @@ defmodule UndefinedResponse do
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issue(@described_check)
   end
 
@@ -98,7 +98,7 @@ defmodule InputValidationException do
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issue(@described_check)
   end
 
@@ -122,7 +122,7 @@ defmodule UndefinedDataFormat do    # <--- does not have the prefix "Invalid"
 end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issue(@described_check)
   end
 
@@ -143,7 +143,7 @@ end
   end
 """
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 

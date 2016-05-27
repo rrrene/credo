@@ -41,6 +41,8 @@ end
 defmodule CredoCheckCase do
   use ExUnit.Case
 
+  alias Credo.Service.SourceFileIssues
+
   def refute_issues(source_file, check \\ nil, params \\ []) do
     issues = issues_for(source_file, check, params)
     assert [] == issues, "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
@@ -81,9 +83,18 @@ defmodule CredoCheckCase do
     |> Enum.flat_map(&(&1.issues))
   end
   defp issues_for(source_files, check, params) when is_list(source_files) do
-    source_files
-    |> check.run(params)
-    |> Enum.flat_map(&(&1.issues))
+    return_value =
+      source_files
+      |> check.run(params)
+
+    if check.run_on_all? do
+      source_files
+      |> SourceFileIssues.update_in_source_files
+      |> Enum.flat_map(&(&1.issues))
+    else
+      return_value
+      |> Enum.flat_map(&(&1.issues))
+    end
   end
   defp issues_for(source_file, nil, _), do: source_file.issues
   defp issues_for(source_file, check, params), do: check.run(source_file, params)

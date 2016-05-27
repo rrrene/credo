@@ -4,6 +4,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   @described_check Credo.Check.Design.DuplicatedCode
 
   alias Credo.Check.Design.DuplicatedCode
+  alias Credo.Service.SourceFileIssues
 
   test "should raise an issue for duplicated code" do
     s1 = """
@@ -29,7 +30,10 @@ defmodule M2 do
 end
 """ |> to_source_file
 
-    [s1, s2] = @described_check.run([s1, s2])
+    source_files = [s1, s2]
+    :ok = @described_check.run(source_files)
+    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
+
     refute Enum.empty?(s1.issues)
     refute Enum.empty?(s2.issues)
   end

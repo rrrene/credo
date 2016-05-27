@@ -37,7 +37,7 @@ end
     [
       @with_tabs
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
@@ -45,7 +45,7 @@ end
     [
       @with_spaces, @with_spaces2
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> refute_issues(@described_check)
   end
 
@@ -54,7 +54,7 @@ end
     [
       @with_spaces, @with_spaces2
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issues(@described_check, force: :spaces)
   end
 
@@ -64,7 +64,7 @@ end
     [
       @with_tabs, @with_spaces, @with_spaces2
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issues(@described_check)
   end
 
@@ -73,7 +73,7 @@ end
     [
       @with_spaces, @with_spaces2
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issues(@described_check, force: :tabs)
   end
 

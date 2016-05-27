@@ -17,6 +17,14 @@ defmodule Credo.Service.SourceFileIssues do
     GenServer.call(__MODULE__, {:get, filename})
   end
 
+  def update_in_source_files(source_files) do
+    source_files
+    |> Enum.map(&Task.async(fn ->
+        %SourceFile{&1 | issues: get(&1)}
+      end))
+    |> Enum.map(&Task.await(&1, 30_000))
+  end
+
   # callbacks
 
   def init(_) do
