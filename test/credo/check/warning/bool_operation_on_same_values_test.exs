@@ -26,11 +26,13 @@ defmodule CredoSampleModule do
     x or x
     x && x
     x || x
+    x &&
+      x # on different lines
   end
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 4 == Enum.count(issues)
+        assert 5 == Enum.count(issues)
       end)
   end
 

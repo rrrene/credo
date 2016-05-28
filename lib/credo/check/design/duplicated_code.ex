@@ -32,6 +32,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   alias Credo.SourceFile
   alias Credo.Issue
+  alias Credo.Check.CodeHelper
 
   use Credo.Check, run_on_all: true, base_priority: :higher
 
@@ -115,7 +116,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp collect_subhashes({_hash, node_items}) do
     %{node: first_node, filename: filename} = Enum.at(node_items, 0)
 
-    my_hash = first_node |> remove_metadata |> to_hash
+    my_hash = first_node |> CodeHelper.remove_metadata |> to_hash
     subhashes =
       first_node
       |> hashes(%{}, filename)
@@ -139,57 +140,13 @@ defmodule Credo.Check.Design.DuplicatedCode do
     if mass(ast) < mass_threshold do
       {ast, acc}
     else
-      hash = ast |> remove_metadata |> to_hash
+      hash = ast |> CodeHelper.remove_metadata |> to_hash
       node_item = %{node: ast, filename: filename, mass: nil}
       node_items = Map.get(acc, hash, [])
       acc = Map.put(acc, hash, node_items ++ [node_item])
       {ast, acc}
     end
   end
-
-  @doc """
-  Returns an AST without its metadata.
-  """
-  def remove_metadata(ast) when is_tuple(ast) do
-    clean_node(ast)
-  end
-  def remove_metadata(ast) do
-    ast
-    |> List.wrap
-    |> Enum.map(&clean_node/1)
-  end
-
-  defp clean_node({atom, _meta, list}) when is_list(list) do
-    {atom, [], Enum.map(list, &clean_node/1)}
-  end
-  defp clean_node([do: tuple]) when is_tuple(tuple) do
-    [do: clean_node(tuple)]
-  end
-  defp clean_node([do: tuple, else: tuple2]) when is_tuple(tuple) do
-    [do: clean_node(tuple), else: clean_node(tuple2)]
-  end
-  defp clean_node({:do, tuple}) when is_tuple(tuple) do
-    {:do, clean_node(tuple)}
-  end
-  defp clean_node({:else, tuple}) when is_tuple(tuple) do
-    {:else, clean_node(tuple)}
-  end
-  defp clean_node({atom, _meta, arguments}) do
-    {atom, [], arguments}
-  end
-  defp clean_node(v) when is_list(v), do: Enum.map(v, &clean_node/1)
-  defp clean_node(tuple) when is_tuple(tuple) do
-    tuple
-    |> Tuple.to_list
-    |> Enum.map(&clean_node/1)
-    |> List.to_tuple
-  end
-  defp clean_node(v) when is_atom(v)
-                      or is_binary(v)
-                      or is_boolean(v)
-                      or is_float(v)
-                      or is_integer(v)
-                      or is_nil(v), do: v
 
   @doc """
   Returns a hash-value for a given +ast+.
@@ -238,8 +195,6 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
 
   # TODO: Put in AST helper
-
-  alias Credo.Check.CodeHelper
 
   def line_no_for({atom, meta, _}) when is_atom(atom) do
     meta[:line]

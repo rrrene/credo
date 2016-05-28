@@ -122,4 +122,48 @@ defmodule Credo.Check.CodeHelper do
     |> Strings.replace_with_spaces
   end
 
+
+  @doc """
+  Returns an AST without its metadata.
+  """
+  def remove_metadata(ast) when is_tuple(ast) do
+    clean_node(ast)
+  end
+  def remove_metadata(ast) do
+    ast
+    |> List.wrap
+    |> Enum.map(&clean_node/1)
+  end
+
+  defp clean_node({atom, _meta, list}) when is_list(list) do
+    {atom, [], Enum.map(list, &clean_node/1)}
+  end
+  defp clean_node([do: tuple]) when is_tuple(tuple) do
+    [do: clean_node(tuple)]
+  end
+  defp clean_node([do: tuple, else: tuple2]) when is_tuple(tuple) do
+    [do: clean_node(tuple), else: clean_node(tuple2)]
+  end
+  defp clean_node({:do, tuple}) when is_tuple(tuple) do
+    {:do, clean_node(tuple)}
+  end
+  defp clean_node({:else, tuple}) when is_tuple(tuple) do
+    {:else, clean_node(tuple)}
+  end
+  defp clean_node({atom, _meta, arguments}) do
+    {atom, [], arguments}
+  end
+  defp clean_node(v) when is_list(v), do: Enum.map(v, &clean_node/1)
+  defp clean_node(tuple) when is_tuple(tuple) do
+    tuple
+    |> Tuple.to_list
+    |> Enum.map(&clean_node/1)
+    |> List.to_tuple
+  end
+  defp clean_node(v) when is_atom(v)
+                      or is_binary(v)
+                      or is_boolean(v)
+                      or is_float(v)
+                      or is_integer(v)
+                      or is_nil(v), do: v
 end
