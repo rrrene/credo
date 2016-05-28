@@ -81,6 +81,7 @@
         {Credo.Check.Warning.NameRedeclarationByDef},
         {Credo.Check.Warning.NameRedeclarationByFn},
         {Credo.Check.Warning.OperationOnSameValues},
+        {Credo.Check.Warning.BoolOperationOnSameValues},
         {Credo.Check.Warning.UnusedEnumOperation},
         {Credo.Check.Warning.UnusedKeywordOperation},
         {Credo.Check.Warning.UnusedListOperation},
