@@ -63,13 +63,21 @@ defmodule Credo.Config do
       end)
   end
 
-  def read_or_default(dir, config_name \\ nil) do
+  @doc """
+  Returns Config struct representing a consolidated Config for all `.credo.exs`
+  files in `relevant_directories/1` merged into the default configuration.
+
+  - `config_name`: name of the configuration to load
+  - `safe`: if +true+, the config files are loaded using static analysis rather
+            than `Code.eval_string/1`
+  """
+  def read_or_default(dir, config_name \\ nil, safe \\ false) do
     dir
     |> relevant_config_files
     |> Enum.filter(&File.exists?/1)
     |> Enum.map(&File.read!/1)
     |> List.insert_at(0, @default_config_file)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1))
+    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
   end
@@ -80,6 +88,10 @@ defmodule Credo.Config do
     |> add_config_files
   end
 
+  @doc """
+  Returns all parent directories of the given `dir` as well as each `./config`
+  sub-directory.
+  """
   def relevant_directories(dir) do
     dir
     |> Path.expand
@@ -105,9 +117,9 @@ defmodule Credo.Config do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, exs_string) do
+  defp from_exs(dir, config_name, exs_string, safe) do
     exs_string
-    |> Credo.ExsLoader.parse
+    |> Credo.ExsLoader.parse(safe)
     |> from_data(dir, config_name)
   end
 
