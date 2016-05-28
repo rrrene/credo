@@ -1,13 +1,16 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValues do
   @moduledoc """
-  Boolean operation on the same values is most probably a logic or a copy-paste error.
+  Boolean operations with identical values on the left and right side are
+  most probably a logical fallacy or a copy-and-paste error.
 
   Examples:
-      # right side of these expressions is useless
+
       x && x
       x || x
       x and x
       x or x
+
+  Each of these cases behaves the same as if you were just writing `x`.
   """
 
   @explanation [check: @moduledoc]
