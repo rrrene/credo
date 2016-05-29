@@ -56,7 +56,7 @@ defmodule Credo.CLI.Output.Summary do
       |> Enum.map(fn({category, _, _}) -> category_count(issues, category) end)
 
     parts = [scopes] ++ parts
-    sum = Enum.reduce(parts, 0, (&(&1+&2)))
+    sum = Enum.sum(parts)
 
     width = 105
 
