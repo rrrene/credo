@@ -204,14 +204,16 @@ end
 
 Credo fails with an exit status != 0 if it shows any issues. This enables shell based pipeline workflows (e.g. on CI systems) which test Credo compliance.
 
-The exit status of each check is customizable and exit statuses of all
-encountered checks are collected, uniqued and summed:
+The exit status of each check is used to construct a bit map of the types of
+issues which were encountered by or-ing them together to produce the final
+result:
 
 ```elixir
+use Bitwise
+
 issues
 |> Enum.map(&(&1.exit_status))
-|> Enum.uniq
-|> Enum.reduce(0, &(&1+&2))
+|> Enum.reduce(0, &(&1 ||| &2))
 ```
 
 This way you can reason about the encountered issues right from the exit status.
