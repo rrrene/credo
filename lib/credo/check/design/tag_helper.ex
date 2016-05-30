@@ -23,7 +23,7 @@ defmodule Credo.Check.Design.TagHelper do
       |> List.wrap
       |> Enum.map(&String.strip/1)
 
-    {index+1, line, tag_list |> List.first}
+    {index + 1, line, tag_list |> List.first}
   end
 
   defp tags?({_line_no, _line, nil}), do: false

@@ -87,12 +87,13 @@ defmodule Credo.CLI.Output.IssueHelper do
     nil
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
-    {_, line} = Enum.at(source_file.lines, issue.line_no-1)
+    {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
 
     displayed_line = String.strip(line)
     if String.length(displayed_line) > term_width do
       ellipsis = " ..."
-      displayed_line = String.slice(displayed_line, 0, term_width-@indent-String.length(ellipsis)) <> ellipsis
+      chars_to_display = term_width - @indent - String.length(ellipsis)
+      displayed_line = String.slice(displayed_line, 0, chars_to_display) <> ellipsis
     end
 
     [outer_color, :faint]
