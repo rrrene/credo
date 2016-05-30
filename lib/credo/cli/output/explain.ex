@@ -128,7 +128,7 @@ defmodule Credo.CLI.Output.Explain do
 
       [
         UI.edge([outer_color, :faint]), :reset, :color239,
-          String.duplicate(" ", @indent-5), "__ CODE IN QUESTION"
+          String.duplicate(" ", @indent - 5), "__ CODE IN QUESTION"
       ]
       |> UI.puts
 
@@ -160,7 +160,7 @@ defmodule Credo.CLI.Output.Explain do
 
     [
       UI.edge([outer_color, :faint]), :reset, :color239,
-        String.duplicate(" ", @indent-5), "__ WHY IT MATTERS"
+        String.duplicate(" ", @indent - 5), "__ WHY IT MATTERS"
     ]
     |> UI.puts
 

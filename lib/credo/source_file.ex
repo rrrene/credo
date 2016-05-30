@@ -34,7 +34,7 @@ defmodule Credo.SourceFile do
   def line_at(source_file, line_no, column1, column2) do
     source_file
     |> line_at(line_no)
-    |> String.slice(column1-1, column2-column1)
+    |> String.slice(column1 - 1, column2 - column1)
   end
 
   @doc """
