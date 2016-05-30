@@ -91,19 +91,13 @@ defmodule Credo.CLI.Output.IssuesByScope do
     if issue.line_no do
       {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
 
-      displayed_line = String.strip(line)
-      if String.length(displayed_line) > term_width do
-        ellipsis = " ..."
-        chars_to_display = term_width - @indent - String.length(ellipsis)
-        displayed_line = String.slice(displayed_line, 0, chars_to_display) <> ellipsis
-      end
-
       UI.edge([outer_color, :faint])
       |> UI.puts
 
       [
         UI.edge([outer_color, :faint]), :cyan, :faint,
-          String.duplicate(" ", @indent - 2), displayed_line
+          String.duplicate(" ", @indent - 2),
+          UI.trim_to_length(line, term_width - @indent)
       ]
       |> UI.puts
 
