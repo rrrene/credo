@@ -14,7 +14,7 @@ defmodule Credo.Code.Scope do
   def mod_name(scope_name) do
     names = scope_name |> String.split(".")
     if names |> List.last |> String.match?(~r/^[a-z]/) do
-      names |> Enum.slice(0..length(names)-2) |> Enum.join(".")
+      names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
     else
       scope_name
     end

@@ -79,7 +79,7 @@ defmodule Credo.Check.Refactor.ABCSize do
                                               initial_acc)
     #IO.inspect [a: a, b: b, c: c]
     #IO.inspect ast
-    :math.sqrt(a*a+b*b+c*c)
+    :math.sqrt(a * a + b * b + c * c)
   end
 
   def get_parameters(arguments) do

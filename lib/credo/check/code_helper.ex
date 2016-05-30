@@ -45,7 +45,7 @@ defmodule Credo.Check.CodeHelper do
   def scope_for(source_file, [line: line_no]) do
     source_file
     |> scope_list
-    |> Enum.at(line_no-1)
+    |> Enum.at(line_no - 1)
   end
 
   @doc """
