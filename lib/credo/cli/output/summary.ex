@@ -56,7 +56,7 @@ defmodule Credo.CLI.Output.Summary do
       |> Enum.map(fn({category, _, _}) -> category_count(issues, category) end)
 
     parts = [scopes] ++ parts
-    sum = Enum.reduce(parts, 0, (&(&1+&2)))
+    sum = Enum.sum(parts)
 
     width = 105
 
@@ -70,7 +70,7 @@ defmodule Credo.CLI.Output.Summary do
             if index == 0 do
               :green
             else
-              {category, _, _} = @category_wording |> Enum.at(index-1)
+              {category, _, _} = @category_wording |> Enum.at(index - 1)
               Output.check_color(category)
             end
           [color, String.duplicate("=", round(quota * width))]
@@ -121,7 +121,7 @@ defmodule Credo.CLI.Output.Summary do
       |> Enum.flat_map(&summary_part(&1, issues))
 
     parts =
-      parts |> List.update_at(Enum.count(parts)-1, fn(last_part) ->
+      parts |> List.update_at(Enum.count(parts) - 1, fn(last_part) ->
         String.replace(last_part, ", ", "")
        end)
 

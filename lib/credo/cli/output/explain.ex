@@ -52,7 +52,7 @@ defmodule Credo.CLI.Output.Explain do
     [
       :bright, "#{color}_background" |> String.to_atom, color, " ",
         Output.foreground_color(color), :normal,
-      " #{scope_name}" |> String.ljust(term_width-1),
+      " #{scope_name}" |> String.ljust(term_width - 1),
     ]
     |> UI.puts
 
@@ -121,7 +121,7 @@ defmodule Credo.CLI.Output.Explain do
     |> UI.puts
 
     if issue.line_no do
-      {_, line} = Enum.at(source_file.lines, issue.line_no-1)
+      {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
 
       UI.edge([outer_color, :faint])
       |> UI.puts
@@ -185,22 +185,16 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp print_source_line(source_file, line_no, term_width, outer_color) do
-    {_, line} = Enum.at(source_file.lines, line_no-1)
-
-    displayed_line = String.strip(line)
-    if String.length(displayed_line) > term_width do
-      ellipsis = " ..."
-      displayed_line = String.slice(displayed_line, 0, term_width-@indent-String.length(ellipsis)) <> ellipsis
-    end
+    {_, line} = Enum.at(source_file.lines, line_no - 1)
 
     line_no_str =
       "#{line_no} "
-      |> String.rjust(@indent-2)
+      |> String.rjust(@indent - 2)
 
     [
       UI.edge([outer_color, :faint]), :reset,
         :faint, line_no_str, :reset,
-        :cyan, :bright, displayed_line
+        :cyan, :bright, UI.trim_to_length(line, term_width - @indent)
     ]
     |> UI.puts
   end

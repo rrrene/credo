@@ -64,7 +64,7 @@ defmodule Credo.Check.Consistency.Helper do
 
           prop_size =
             all_property_values
-            |> Enum.filter(fn(property_value)->
+            |> Enum.filter(fn(property_value) ->
                 PropertyValue.get(property_value) == current_property_value
               end)
             |> Enum.count

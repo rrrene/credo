@@ -68,7 +68,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
   defp issue_for(line_no, max_length, line, issue_meta) do
     line_length = String.length(line)
     column = max_length + 1
-    trigger = String.slice(line, max_length, line_length-max_length)
+    trigger = String.slice(line, max_length, line_length - max_length)
 
     format_issue issue_meta,
       message: "Line is too long (max is #{max_length}, was #{line_length}).",

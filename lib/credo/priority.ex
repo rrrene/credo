@@ -21,7 +21,7 @@ defmodule Credo.Priority do
           case list do
             [] -> nil
             _ ->
-              {_, scope_name} = Scope.name(source_file.ast, line: index+1)
+              {_, scope_name} = Scope.name(source_file.ast, line: index + 1)
               {scope_name, sum(list)}
           end
         end)
@@ -35,7 +35,7 @@ defmodule Credo.Priority do
     |> Enum.map(fn({scope_name, prio}) ->
         names = scope_name |> String.split(".")
         if names |> List.last |> String.match?(~r/^[a-z]/) do
-          mod_name = names |> Enum.slice(0..length(names)-2) |> Enum.join(".")
+          mod_name = names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
           mod_prio = lookup[mod_name]
           {scope_name, prio + mod_prio}
         else
@@ -47,18 +47,18 @@ defmodule Credo.Priority do
 
   defp sum(list, acc \\ 0)
   defp sum([], acc), do: acc
-  defp sum([head|tail], acc), do: sum(tail, acc+head)
+  defp sum([head|tail], acc), do: sum(tail, acc + head)
 
   defp traverse({:defmodule, meta, _} = ast, acc) do
     added_prio = priority_for(ast)
 
-    {ast, List.update_at(acc, meta[:line]-1, &(&1 ++ [added_prio]))}
+    {ast, List.update_at(acc, meta[:line] - 1, &(&1 ++ [added_prio]))}
   end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, acc) when is_list(arguments) do
       added_prio = priority_for(ast)
 
-      {ast, List.update_at(acc, meta[:line]-1, &(&1 ++ [added_prio]))}
+      {ast, List.update_at(acc, meta[:line] - 1, &(&1 ++ [added_prio]))}
     end
   end
   defp traverse(ast, acc) do

@@ -171,7 +171,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   end
 
   defp calc_mass(ast, acc) when is_tuple(ast) do
-    {ast, acc+1}
+    {ast, acc + 1}
   end
   defp calc_mass(ast, acc) do
     {ast, acc}
@@ -189,7 +189,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
       format_issue issue_meta,
         message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
         line_no: line_no,
-        severity: Severity.compute(1+Enum.count(other_nodes), 1)
+        severity: Severity.compute(1 + Enum.count(other_nodes), 1)
     end
   end
 

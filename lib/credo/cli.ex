@@ -7,6 +7,8 @@ defmodule Credo.CLI do
   where the Command should run and a `Credo.Config` object.
   """
 
+  use Bitwise
+
   alias Credo.Config
   alias Credo.Sources
   alias Credo.CLI.Filename
@@ -195,8 +197,7 @@ defmodule Credo.CLI do
   defp to_exit_status({:error, issues}) do
     issues
     |> Enum.map(&(&1.exit_status))
-    |> Enum.uniq
-    |> Enum.reduce(0, &(&1+&2))
+    |> Enum.reduce(0, &(&1 ||| &2))
   end
 
   defp halt_if_failed(0), do: nil
