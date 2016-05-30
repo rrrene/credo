@@ -20,6 +20,7 @@
 ### New Checks
 
 - readability/large_numbers
+- warning/bool_operation_on_same_values
 - warning/unused_file_operation
 - warning/unused_path_operation
 - warning/unused_regex_operation
