@@ -167,7 +167,8 @@ defmodule Credo.CLI do
     check_pattern = switch(switches, :checks, :only)
     if check_pattern do
       config =
-        %Config{config | all: true, match_checks: check_pattern |> String.split(",")}
+        %Config{config | all: true, min_priority: -99,
+                          match_checks: check_pattern |> String.split(",")}
     end
 
     # exclude/ignore certain checks
