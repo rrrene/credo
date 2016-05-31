@@ -8,8 +8,8 @@ defmodule Credo.ExsLoaderTest do
         "dirs": ["lib", "src", "test"],
         "dirs_sigil": ~w(lib src test),
         checks: [
-          {"Style.MaxLineLength", max_length: 100},
-          {"Style.TrailingBlankLine"},
+          {Style.MaxLineLength, max_length: 100},
+          {Style.TrailingBlankLine},
         ]
       }
     """
@@ -19,8 +19,8 @@ defmodule Credo.ExsLoaderTest do
         "dirs": ["lib", "src", "test"],
         "dirs_sigil": ~w(lib src test),
         checks: [
-          {"Style.MaxLineLength", max_length: 100},
-          {"Style.TrailingBlankLine"},
+          {Style.MaxLineLength, max_length: 100},
+          {Style.TrailingBlankLine},
         ]
       }
 
