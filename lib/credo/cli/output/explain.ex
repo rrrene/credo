@@ -64,8 +64,18 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp filter_issues(issues, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
+    issues =
+      if line_no do
+        issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
+      else
+        issues
+      end
+    issues =
+      if column do
+        issues |> Enum.filter(&(&1.column == column |> String.to_integer))
+      else
+        issues
+      end
     issues
   end
 
