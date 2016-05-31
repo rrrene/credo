@@ -37,9 +37,12 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   defp collect_number_tokens([], acc, _), do: acc
   defp collect_number_tokens([head | t], acc, min_number) do
-    if token = number_token(head, min_number) do
-      acc = acc ++ [token]
-    end
+    acc =
+      case number_token(head, min_number) do
+        nil -> acc
+        false -> acc
+        token -> acc ++ [token]
+      end
 
     collect_number_tokens(t, acc, min_number)
   end
@@ -76,11 +79,15 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
     underscored_number = number_with_underscores(number)
 
-    if found_string != underscored_number do
-      new_issue =
-        issue_for(issue_meta, line_no, column1, found_string, underscored_number)
-      acc = acc ++ [new_issue]
-    end
+    new_issue =
+      cond do
+        found_string != underscored_number ->
+          [issue_for(issue_meta, line_no, column1, found_string, underscored_number)]
+        true ->
+          []
+      end
+
+    acc = acc ++ new_issue
 
     find_issues(t, acc, issue_meta)
   end
