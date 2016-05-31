@@ -27,7 +27,7 @@ defmodule Credo.Check.CodeHelper do
   defdelegate all_blocks_for!(ast), to: Block, as: :all_blocks_for!
 
   defdelegate calls_in_do_block(ast), to: Block, as: :calls_in_do_block
-  defdelegate function_count(ast), to: Module
+  defdelegate function_count(ast), to: Module, as: :def_count
   defdelegate def_name(ast), to: Module
   defdelegate parameter_names(ast), to: Parameters, as: :names
   defdelegate parameter_count(ast), to: Parameters, as: :count
