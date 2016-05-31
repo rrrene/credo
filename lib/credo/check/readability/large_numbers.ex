@@ -70,7 +70,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> String.slice(column1-1+underscore_count..-1)
 
     found_string =
-      ~r/([\d_\.]+)/
+      ~r/([0-9\_]*\.[0-9]+|[0-9\_]+)/
       |> Regex.run(temp_string)
       |> List.first
 

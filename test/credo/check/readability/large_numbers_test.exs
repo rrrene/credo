@@ -7,6 +7,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 """
 def numbers do
   1024 + 1_000_000 + 11_000 + 22_000 + 33_000
+  10_000..20_000
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -40,6 +41,33 @@ def numbers do
 end
 """ |> to_source_file
     |> assert_issue(@described_check, only_greater_than: 50000)
+  end
+
+  test "it should report only one violation for ranges /1" do
+"""
+def numbers do
+  10000..20_000
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report only one violation for ranges /2" do
+"""
+def numbers do
+  10_000..20000
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report only two violation for ranges" do
+"""
+def numbers do
+  10000..20000
+end
+""" |> to_source_file
+    |> assert_issues(@described_check)
   end
 
   test "it should report a violation /2" do
