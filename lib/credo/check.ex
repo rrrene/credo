@@ -21,7 +21,10 @@ defmodule Credo.Check do
       alias Credo.CLI.ExitStatus
 
       def base_priority, do: unquote(to_priority(opts[:base_priority]))
-      def category, do: unquote(category_body(opts[:category]))
+      def category do
+        default = unquote(category_body(opts[:category]))
+        default || :unknown
+      end
       def run_on_all?, do: unquote(run_on_all_body(opts[:run_on_all]))
 
       def explanation, do: explanation_for(@explanation, :check)
@@ -50,32 +53,20 @@ defmodule Credo.Check do
         trigger = opts[:trigger]
         column = opts[:column]
         severity = opts[:severity] || Severity.default_value
-        issue = %Issue{
-          priority: priority,
-          filename: source_file.filename,
-          message: opts[:message],
-          trigger: trigger,
-          line_no: line_no,
-          column: column,
-          severity: severity,
-          exit_status: exit_status
-        }
-        if line_no do
-          {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
-          issue =
-            %Issue{
-              issue |
-              priority: issue.priority + priority_for(source_file, scope),
-              scope: scope
-            }
-        end
-        if trigger && line_no && !column do
-          issue =
-            %Issue{
-              issue |
-              column: SourceFile.column(source_file, line_no, trigger)
-            }
-        end
+        issue =
+          %Issue{
+            priority: priority,
+            filename: source_file.filename,
+            message: opts[:message],
+            trigger: trigger,
+            line_no: line_no,
+            column: column,
+            severity: severity,
+            exit_status: exit_status
+          }
+          |> add_line_no_options(line_no, source_file)
+          |> add_custom_column(trigger, line_no, column, source_file)
+
         format_issue(issue)
       end
       def format_issue(issue \\ %Issue{}) do
@@ -84,6 +75,29 @@ defmodule Credo.Check do
           check: __MODULE__,
           category: category
         }
+      end
+
+      defp add_line_no_options(issue, line_no, source_file) do
+        if line_no do
+          {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
+          %Issue{
+            issue |
+            priority: issue.priority + priority_for(source_file, scope),
+            scope: scope
+          }
+        else
+          issue
+        end
+      end
+      defp add_custom_column(issue, trigger, line_no, column, source_file) do
+        if trigger && line_no && !column do
+          %Issue{
+            issue |
+            column: SourceFile.column(source_file, line_no, trigger)
+          }
+        else
+          issue
+        end
       end
 
       defp priority_for(source_file, scope) do
@@ -95,9 +109,12 @@ defmodule Credo.Check do
 
   defp category_body(nil) do
     quote do
-      __MODULE__
-      |> Module.split
-      |> Enum.at(2)
+      value =
+        __MODULE__
+        |> Module.split
+        |> Enum.at(2)
+      (value || :unknown)
+      |> to_string
       |> String.downcase
       |> String.to_atom
     end
@@ -115,6 +132,7 @@ defmodule Credo.Check do
   def to_exit_status(nil), do: 0
   def to_exit_status(atom) when is_atom(atom) do
     @base_category_exit_status_map[atom]
+    |> to_exit_status
   end
   def to_exit_status(value), do: value
 

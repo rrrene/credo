@@ -1,16 +1,29 @@
 defmodule Credo.Check.Runner do
   alias Credo.Config
   alias Credo.SourceFile
+  alias Credo.Service.SourceFileIssues
 
   def run(source_files, config) when is_list(source_files) do
     config =
       config
       |> inject_lint_attributes(source_files)
-    source_files =
-      source_files
-      |> run_checks_that_run_on_all(config)
-      |> Enum.map(&Task.async(fn -> run(&1, config) end))
-      |> Enum.map(&Task.await(&1, 30_000))
+
+    {_time_run_on_all, source_files_after_run_on_all} =
+      :timer.tc fn ->
+        source_files
+        |> run_checks_that_run_on_all(config)
+      end
+
+    #IO.inspect time_run_on_all
+
+    {_time_run, source_files} =
+      :timer.tc fn ->
+        source_files_after_run_on_all
+        |> Enum.map(&Task.async(fn -> run(&1, config) end))
+        |> Enum.map(&Task.await(&1, 600_000))
+      end
+
+    #IO.inspect time_run
 
     {source_files, config}
   end
@@ -46,9 +59,14 @@ defmodule Credo.Check.Runner do
   defp run_checks_that_run_on_all(source_files, config) do
     checks = config |> Config.checks |> Enum.filter(&run_on_all_check?/1)
 
-    Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
-      run_check(check_tuple, source_files, config)
-    end)
+    checks
+    |> Enum.map(&Task.async(fn ->
+        run_check(&1, source_files, config)
+      end))
+    |> Enum.each(&Task.await(&1, 600_000))
+
+    source_files
+    |> SourceFileIssues.update_in_source_files
   end
 
   defp run_checks(%SourceFile{} = source_file, checks, config) when is_list(checks) do

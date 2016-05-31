@@ -18,16 +18,17 @@
         # you can give explicit globs or simply directories
         # in the latter case `**/*.{ex,exs}` will be used
         included: ["lib/", "src/", "web/", "apps/"],
-        excluded: []
+        excluded: [~r"/_build/", ~r"/deps/"]
       },
       #
-      # The `checks:` field contains all the checks that are run. You can
-      # customize the parameters of any given check by adding a second element
+      # If you create your own checks, you must specify the source files for
+      # them here, so they can be loaded by Credo before running the analysis.
+      requires: [],
+      #
+      # You can customize the parameters of any check by adding a second element
       # to the tuple.
       #
-      # There are two ways of deactivating a check:
-      # 1. deleting the check from this list
-      # 2. putting `false` as second element (to quickly "comment it out"):
+      # To disable a check put `false` as second element:
       #
       #      {Credo.Check.Consistency.ExceptionNames, false}
       #
@@ -51,6 +52,7 @@
         {Credo.Check.Design.TagFIXME},
 
         {Credo.Check.Readability.FunctionNames},
+        {Credo.Check.Readability.LargeNumbers},
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
         {Credo.Check.Readability.ModuleAttributeNames},
         {Credo.Check.Readability.ModuleDoc},
@@ -61,7 +63,7 @@
         {Credo.Check.Readability.VariableNames},
 
         {Credo.Check.Refactor.ABCSize},
-        {Credo.Check.Refactor.CaseTrivialMatches},
+        # {Credo.Check.Refactor.CaseTrivialMatches}, # deprecated in 0.4.0
         {Credo.Check.Refactor.CondStatements},
         {Credo.Check.Refactor.FunctionArity},
         {Credo.Check.Refactor.MatchInCondition},
@@ -79,6 +81,7 @@
         {Credo.Check.Warning.NameRedeclarationByDef},
         {Credo.Check.Warning.NameRedeclarationByFn},
         {Credo.Check.Warning.OperationOnSameValues},
+        {Credo.Check.Warning.BoolOperationOnSameValues},
         {Credo.Check.Warning.UnusedEnumOperation},
         {Credo.Check.Warning.UnusedKeywordOperation},
         {Credo.Check.Warning.UnusedListOperation},

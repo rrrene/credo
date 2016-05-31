@@ -17,9 +17,9 @@ defmodule Credo.Code.Module do
     end
   end
 
-  defp find_attribute({:@, _meta, arguments} = ast, tuple, name) do
+  defp find_attribute({:@, _meta, arguments} = ast, tuple, attribute_name) do
     case arguments |> List.first do
-      {^name, _meta, [value]} -> {:ok, value}
+      {^attribute_name, _meta, [value]} -> {:ok, value}
       _ -> {ast, tuple}
     end
   end

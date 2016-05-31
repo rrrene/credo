@@ -6,6 +6,7 @@ defmodule Credo.Config do
 
   defstruct files:            nil,
             checks:           nil,
+            requires:         [],
             min_priority:     0,
             help:             false,
             version:          false,
@@ -15,6 +16,7 @@ defmodule Credo.Config do
             match_checks:     nil,
             ignore_checks:    nil,
             crash_on_error:   true,
+            check_outdated?:  true, # checks if there is a new version of Credo
             read_from_stdin:  false,
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
@@ -61,13 +63,21 @@ defmodule Credo.Config do
       end)
   end
 
-  def read_or_default(dir, config_name \\ nil) do
+  @doc """
+  Returns Config struct representing a consolidated Config for all `.credo.exs`
+  files in `relevant_directories/1` merged into the default configuration.
+
+  - `config_name`: name of the configuration to load
+  - `safe`: if +true+, the config files are loaded using static analysis rather
+            than `Code.eval_string/1`
+  """
+  def read_or_default(dir, config_name \\ nil, safe \\ false) do
     dir
     |> relevant_config_files
     |> Enum.filter(&File.exists?/1)
     |> Enum.map(&File.read!/1)
     |> List.insert_at(0, @default_config_file)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1))
+    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
   end
@@ -78,6 +88,10 @@ defmodule Credo.Config do
     |> add_config_files
   end
 
+  @doc """
+  Returns all parent directories of the given `dir` as well as each `./config`
+  sub-directory.
+  """
   def relevant_directories(dir) do
     dir
     |> Path.expand
@@ -103,9 +117,9 @@ defmodule Credo.Config do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, exs_string) do
+  defp from_exs(dir, config_name, exs_string, safe) do
     exs_string
-    |> Credo.ExsLoader.parse
+    |> Credo.ExsLoader.parse(safe)
     |> from_data(dir, config_name)
   end
 
@@ -116,6 +130,7 @@ defmodule Credo.Config do
       |> Enum.find(&(&1[:name] == config_name))
 
     %__MODULE__{
+      requires: data[:requires] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data)
     }
@@ -152,10 +167,7 @@ defmodule Credo.Config do
   The `files:` field is merged, meaning that you can define `included` and/or
   `excluded` and only override the given one.
 
-  The `checks:` field is overwritten in full, meaning that there is no
-  "blending" of checks from one Config to another. If you are including this
-  field in a Config, it basically means "I want to run these checks and
-  these checks only".
+  The `checks:` field is merged.
   """
   def merge(list) when is_list(list) do
     base = list |> List.first
@@ -169,12 +181,15 @@ defmodule Credo.Config do
   end
   def merge(base, other) do
     %__MODULE__{
+      requires: base.requires ++ other.requires,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
     }
   end
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
-    checks_other || checks_base
+    base = normalize_check_tuples(checks_base)
+    other = normalize_check_tuples(checks_other)
+    Keyword.merge(base, other)
   end
   def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
@@ -182,6 +197,15 @@ defmodule Credo.Config do
       excluded: files_other[:excluded] || files_base[:excluded],
     }
   end
+
+  defp normalize_check_tuples(nil), do: []
+  defp normalize_check_tuples(list) when is_list(list) do
+    list
+    |> Enum.map(&normalize_check_tuple/1)
+  end
+
+  defp normalize_check_tuple({name}), do: {name, []}
+  defp normalize_check_tuple(tuple), do: tuple
 
   defp join_default_files_if_directory(dir) do
     if File.dir?(dir) do
@@ -204,11 +228,12 @@ defmodule Credo.Config do
     %__MODULE__{config | files: files}
   end
 
-  defp add_directory_to_file(file_or_glob, dir) do
+  defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
     if File.dir?(dir) do
       Path.join(dir, file_or_glob)
     else
       dir
     end
   end
+  defp add_directory_to_file(regex, _), do: regex
 end

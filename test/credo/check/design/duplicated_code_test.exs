@@ -4,6 +4,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   @described_check Credo.Check.Design.DuplicatedCode
 
   alias Credo.Check.Design.DuplicatedCode
+  alias Credo.Service.SourceFileIssues
 
   test "should raise an issue for duplicated code" do
     s1 = """
@@ -29,7 +30,10 @@ defmodule M2 do
 end
 """ |> to_source_file
 
-    [s1, s2] = @described_check.run([s1, s2])
+    source_files = [s1, s2]
+    :ok = @described_check.run(source_files)
+    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
+
     refute Enum.empty?(s1.issues)
     refute Enum.empty?(s2.issues)
   end
@@ -134,55 +138,6 @@ end
 """ |> Code.string_to_quoted
 
     DuplicatedCode.hashes(ast)
-  end
-
-
-  test "returns ast without metadata" do
-    ast =
-      {:__block__, [],
- [{:defmodule, [line: 1],
-   [{:__aliases__, [counter: 0, line: 1], [:M1]},
-    [do: {:def, [line: 2],
-      [{:when, [line: 2],
-        [{:myfun, [line: 2], [{:p1, [line: 2], nil}, {:p2, [line: 2], nil}]},
-         {:is_list, [line: 2], [{:p2, [line: 2], nil}]}]},
-       [do: {:if, [line: 3],
-         [{:==, [line: 3], [{:p1, [line: 3], nil}, {:p2, [line: 3], nil}]},
-          [do: {:p1, [line: 4], nil},
-           else: {:+, [line: 6],
-            [{:p2, [line: 6], nil}, {:p1, [line: 6], nil}]}]]}]]}]]},
-  {:defmodule, [line: 11],
-   [{:__aliases__, [counter: 0, line: 11], [:M2]},
-    [do: {:def, [line: 12],
-      [{:myfun2, [line: 12], [{:p1, [line: 12], nil}, {:p2, [line: 12], nil}]},
-       [do: {:if, [line: 13],
-         [{:==, [line: 13], [{:p1, [line: 13], nil}, {:p2, [line: 13], nil}]},
-          [do: {:p1, [line: 14], nil},
-           else: {:+, [line: 16],
-            [{:p2, [line: 16], nil}, {:p1, [line: 16], nil}]}]]}]]}]]}]}
-    expected =
-      {:__block__, [],
-       [{:defmodule, [],
-         [{:__aliases__, [], [:M1]},
-          [do: {:def, [],
-            [{:when, [],
-              [{:myfun, [], [{:p1, [], nil}, {:p2, [], nil}]},
-               {:is_list, [], [{:p2, [], nil}]}]},
-             [do: {:if, [],
-               [{:==, [], [{:p1, [], nil}, {:p2, [], nil}]},
-                [do: {:p1, [], nil},
-                 else: {:+, [],
-                  [{:p2, [], nil}, {:p1, [], nil}]}]]}]]}]]},
-        {:defmodule, [],
-         [{:__aliases__, [], [:M2]},
-          [do: {:def, [],
-            [{:myfun2, [], [{:p1, [], nil}, {:p2, [], nil}]},
-             [do: {:if, [],
-               [{:==, [], [{:p1, [], nil}, {:p2, [], nil}]},
-                [do: {:p1, [], nil},
-                 else: {:+, [],
-                  [{:p2, [], nil}, {:p1, [], nil}]}]]}]]}]]}]}
-    assert expected == DuplicatedCode.remove_metadata(ast)
   end
 
 

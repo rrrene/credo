@@ -22,6 +22,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
   """
 
   @explanation [check: @moduledoc]
+  @checked_module :String
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper
 
@@ -33,7 +34,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
 
     all_unused_calls =
       UnusedFunctionReturnHelper.find_unused_calls(source_file, params,
-                                                                [:String], nil)
+                                                    [@checked_module], nil)
 
     all_unused_calls
     |> Enum.reduce([], fn(invalid_call, issues) ->

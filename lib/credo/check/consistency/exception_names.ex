@@ -48,12 +48,12 @@ defmodule Credo.Check.Consistency.ExceptionNames do
           acc + Enum.count(prop_list)
         end)
 
-    if count == 2 do # we just found one prefix and one suffix
-      source_files
-    else
+    if count > 2 do # we found more than one prefix and one suffix
       {property_tuples, most_picked}
-      |> Helper.add_issues_to_source_files(&check_for_issues/5, params)
+      |> Helper.append_issues_via_issue_service(&check_for_issues/5, params)
     end
+
+    :ok
   end
 
   defp check_for_issues(_issue_meta, _actual_prop, nil, _picked_count, _total_count), do: nil

@@ -16,6 +16,9 @@ defmodule Credo.Sample1 do
       parse_code(t, {:some_tuple, 1})
       parse_code(t, acc <> ~s(\"\"\"))
     end
+    defp count([], acc), do: acc
+    defp count([?( | t], acc), do: count(t, acc + 1)
+    defp count([?) | t], acc), do: count(t, acc - 1)
   end
 end
 """

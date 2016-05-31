@@ -4,6 +4,16 @@ defmodule Credo.Sources do
   @default_sources_glob ~w(** *.{ex,exs})
   @stdin_filename "stdin"
 
+  @doc """
+  Finds sources for a given Config, List or String.
+
+  iex> Sources.find(%Credo.Config{files: %{excluded: [], included: ["*.ex"]}})
+
+  iex> Sources.find(["lib/credo_*.ex", "lib/credo/*.ex"])
+
+  iex> Sources.find("*.ex")
+
+  """
   def find(%Credo.Config{files: %{excluded: [], included: [filename]}, read_from_stdin: true}) do
     filename |> source_file_from_stdin() |> List.wrap
   end
@@ -16,7 +26,11 @@ defmodule Credo.Sources do
     |> exclude(files.excluded)
     |> to_source_files
   end
-  def find(path) do
+  def find(paths) when is_list(paths) do
+    paths
+    |> Enum.flat_map(&find/1)
+  end
+  def find(path) when is_binary(path) do
     path
     |> to_glob
     |> Path.wildcard

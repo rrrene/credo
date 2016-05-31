@@ -7,11 +7,17 @@ defmodule Credo.IssueMeta do
 
   alias Credo.SourceFile
 
-  def for(source_file, params), do: {__MODULE__, source_file, params}
+  def for(current_source_file, check_params) do
+    {__MODULE__, current_source_file, check_params}
+  end
 
-  def source_file({__MODULE__, source_file, _params}), do: source_file
-  def source_file(%SourceFile{} = source_file), do: source_file
+  def source_file({__MODULE__, current_source_file, _params}) do
+    current_source_file
+  end
+  def source_file(%SourceFile{} = current_source_file) do
+    current_source_file
+  end
 
-  def params({__MODULE__, _source_file, params}), do: params
+  def params({__MODULE__, _source_file, check_params}), do: check_params
   def params(%SourceFile{}), do: []
 end

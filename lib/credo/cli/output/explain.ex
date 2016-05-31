@@ -64,10 +64,14 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp filter_issues(issues, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
     issues
+    |> do_filter_issues(line_no, :line_no)
+    |> do_filter_issues(column, :column)
   end
+
+  defp do_filter_issues(issues, nil, _type), do: issues
+  defp do_filter_issues(issues, false, _type), do: issues
+  defp do_filter_issues(issues, value, type), do: issues |> Enum.filter(&(&1[type] == value |> String.to_integer))
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
     pos =
@@ -128,19 +132,14 @@ defmodule Credo.CLI.Output.Explain do
 
       [
         UI.edge([outer_color, :faint]), :reset, :color239,
-          String.duplicate(" ", @indent-5), "__ CODE IN QUESTION"
+          String.duplicate(" ", @indent - 5), "__ CODE IN QUESTION"
       ]
       |> UI.puts
 
       UI.edge([outer_color, :faint])
       |> UI.puts
 
-      [
-        UI.edge([outer_color, :faint]), :reset, :cyan, :bright,
-          String.duplicate(" ", @indent-2),
-          UI.trim_to_length(line, term_width - @indent)
-      ]
-      |> UI.puts
+      print_source_line(source_file, issue.line_no, term_width, outer_color)
 
       if issue.column do
         offset = String.length(line) - String.length(String.strip(line))
@@ -165,7 +164,7 @@ defmodule Credo.CLI.Output.Explain do
 
     [
       UI.edge([outer_color, :faint]), :reset, :color239,
-        String.duplicate(" ", @indent-5), "__ WHY IT MATTERS"
+        String.duplicate(" ", @indent - 5), "__ WHY IT MATTERS"
     ]
     |> UI.puts
 
@@ -186,6 +185,21 @@ defmodule Credo.CLI.Output.Explain do
     |> print_params_explanation(outer_color)
 
     UI.edge([outer_color, :faint])
+    |> UI.puts
+  end
+
+  defp print_source_line(source_file, line_no, term_width, outer_color) do
+    {_, line} = Enum.at(source_file.lines, line_no - 1)
+
+    line_no_str =
+      "#{line_no} "
+      |> String.rjust(@indent - 2)
+
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        :faint, line_no_str, :reset,
+        :cyan, :bright, UI.trim_to_length(line, term_width - @indent)
+    ]
     |> UI.puts
   end
 

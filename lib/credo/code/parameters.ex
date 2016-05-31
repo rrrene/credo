@@ -10,10 +10,10 @@ defmodule Credo.Code.Parameters do
   def count(nil), do: 0
   for op <- @def_ops do
     def count({unquote(op), _, arguments}) when is_list(arguments) do
-      {_atom, _meta, arguments} = arguments |> List.first
-      case arguments do
-        nil -> 0
-        list -> list |> Enum.count
+      case arguments |> List.first do
+        {_atom, _meta, nil} -> 0
+        {_atom, _meta, list} -> list |> Enum.count
+        _ -> 0
       end
     end
   end

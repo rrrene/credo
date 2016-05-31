@@ -7,6 +7,7 @@ defmodule Credo.ExsLoaderTest do
         "cowboy": {:hex, :cowboy, "1.0.2"},
         "dirs": ["lib", "src", "test"],
         "dirs_sigil": ~w(lib src test),
+        "dirs_regex": ~r(lib src test),
         checks: [
           {Style.MaxLineLength, max_length: 100},
           {Style.TrailingBlankLine},
@@ -18,6 +19,7 @@ defmodule Credo.ExsLoaderTest do
         "cowboy": {:hex, :cowboy, "1.0.2"},
         "dirs": ["lib", "src", "test"],
         "dirs_sigil": ~w(lib src test),
+        "dirs_regex": ~r(lib src test),
         checks: [
           {Style.MaxLineLength, max_length: 100},
           {Style.TrailingBlankLine},

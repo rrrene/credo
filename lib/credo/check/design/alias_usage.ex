@@ -82,7 +82,9 @@ defmodule Credo.Check.Design.AliasUsage do
         Enum.member?(excluded_namespaces, first_name) ||
         Enum.member?(excluded_lastnames, last_name)
 
-      if !excluded? do
+      if excluded? do
+        {ast, issues}
+      else
         conflicting_alias =
           aliases
           |> Enum.find(&conflicting_alias?(&1, mod_list))
@@ -93,8 +95,6 @@ defmodule Credo.Check.Design.AliasUsage do
           trigger = mod_list |> Enum.join(".")
           {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
         end
-      else
-        {ast, issues}
       end
     else
       {ast, issues}

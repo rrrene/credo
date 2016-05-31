@@ -4,7 +4,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.WithoutSpace do
   alias Credo.Check.CodeHelper
   alias Credo.Code
 
-  @regex ~r/([\{\[\(]\S|\S[\)\]\}])/
+  @regex ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/
 
   def property_value, do: :without_space
 

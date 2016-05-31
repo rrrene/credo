@@ -44,11 +44,13 @@ defmodule CredoSampleModule do
     x > x   # always false
     y / y   # always 1
     y - y   # always 0
+    y -
+      y # on different lines
   end
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 7 == Enum.count(issues)
+        assert 8 == Enum.count(issues)
       end)
   end
 

@@ -1,6 +1,41 @@
 # Changelog
 
 
+## 0.4.0 (pre)
+
+### Custom check support
+
+- Adds support for custom checks in your projects.
+
+  Using two new mix commands `mix credo.gen.config` and `mix credo.gen.check`
+  you can generate the boilerplate to include custom checks in your projects.
+
+### BREAKING CHANGE: Checks listed in `.credo.exs`
+
+- Prior to `v0.4.0`, `.credo.exs` contained the full list of checks specific to your project
+- Starting with `v0.4.0` the check list in `credo.exs` will be merged with the standard check list, with your definitions overwriting the defaults
+- PRO: you can customize individual tasks to your liking and still benefit from additional standard checks with each new release
+- CON: this means checks have to be disabled explicitly in `.credo.exs`
+
+### New Checks
+
+- readability/large_numbers
+- warning/bool_operation_on_same_values
+- warning/unused_file_operation
+- warning/unused_path_operation
+- warning/unused_regex_operation
+
+### Minor Improvements
+
+- Umbrella apps work out of the box now
+- ModuleDoc now ignores modules declaring exceptions
+- MatchInCondition now allows "simple" wildcard assignments in conditionals
+- Checks analysing all files in the codebase sequentially (consistency checks)
+  are now run in parallel
+- If `--only` is given, all issues are shown (`mix credo --only MaxLineLength`
+  previously yielded no results, since all issues needed `--strict` to actually
+  be displayed)
+
 ## 0.3.13
 
 - Fix false positives for `NameRedeclarationByDef`.

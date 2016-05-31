@@ -9,6 +9,7 @@ defmodule Credo.Check.Warning.UnusedTupleOperation do
   """
 
   @explanation [check: @moduledoc]
+  @checked_module :Tuple
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper
 
@@ -20,7 +21,7 @@ defmodule Credo.Check.Warning.UnusedTupleOperation do
 
     all_unused_calls =
       UnusedFunctionReturnHelper.find_unused_calls(source_file, params,
-                                                                [:Tuple], nil)
+                                                    [@checked_module], nil)
 
     all_unused_calls
     |> Enum.reduce([], fn(invalid_call, issues) ->
