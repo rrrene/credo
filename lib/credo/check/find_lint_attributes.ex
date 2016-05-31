@@ -52,16 +52,12 @@ defmodule Credo.Check.FindLintAttributes do
     case head do
       {:@, meta, [{:lint, _, arguments}]} ->
         # TODO: warn that a new lint attribute was read while one was still active
-        current_lint_attribute =
-          %LintAttribute{meta: meta, arguments: arguments}
+        process_calls(tail, %LintAttribute{meta: meta, arguments: arguments}, attribute_list)
       {op, meta, _} when op in [:def, :defp] ->
-        current_lint_attribute =
-          %LintAttribute{current_lint_attribute | line: meta[:line]}
-        attribute_list = [current_lint_attribute | attribute_list]
-        current_lint_attribute = nil
+        attribute_list = [%LintAttribute{current_lint_attribute | line: meta[:line]} | attribute_list]
+        process_calls(tail, nil, attribute_list)
       _ ->
-        nil
+        process_calls(tail, current_lint_attribute, attribute_list)
     end
-    process_calls(tail, current_lint_attribute, attribute_list)
   end
 end
