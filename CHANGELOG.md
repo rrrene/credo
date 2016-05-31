@@ -12,8 +12,8 @@
 
 ### BREAKING CHANGE: Checks listed in `.credo.exs`
 
-- prior to `v0.4.0`, `.credo.exs` contained the full list of checks specific to your project
-- starting with `v0.4.0` the check list in `credo.exs` will be merged with the standard check list, with your definitions overwriting the defaults
+- Prior to `v0.4.0`, `.credo.exs` contained the full list of checks specific to your project
+- Starting with `v0.4.0` the check list in `credo.exs` will be merged with the standard check list, with your definitions overwriting the defaults
 - PRO: you can customize individual tasks to your liking and still benefit from additional standard checks with each new release
 - CON: this means checks have to be disabled explicitly in `.credo.exs`
 
@@ -27,9 +27,14 @@
 
 ### Minor Improvements
 
-- umbrella apps work out of the box now
+- Umbrella apps work out of the box now
 - ModuleDoc now ignores modules declaring exceptions
 - MatchInCondition now allows "simple" wildcard assignments in conditionals
+- Checks analysing all files in the codebase sequentially (consistency checks)
+  are now run in parallel
+- If `--only` is given, all issues are shown (`mix credo --only MaxLineLength`
+  previously yielded no results, since all issues needed `--strict` to actually
+  be displayed)
 
 ## 0.3.13
 
