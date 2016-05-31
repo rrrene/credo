@@ -64,10 +64,14 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp filter_issues(issues, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
     issues
+    |> do_filter_issues(line_no, :line_no)
+    |> do_filter_issues(column, :column)
   end
+
+  defp do_filter_issues(issues, nil, _type), do: issues
+  defp do_filter_issues(issues, false, _type), do: issues
+  defp do_filter_issues(issues, value, type), do: issues |> Enum.filter(&(&1[type] == value |> String.to_integer))
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
     pos =

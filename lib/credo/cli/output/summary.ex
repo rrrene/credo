@@ -125,7 +125,7 @@ defmodule Credo.CLI.Output.Summary do
         String.replace(last_part, ", ", "")
        end)
 
-    if Enum.empty?(parts), do: parts = "no issues"
+    parts = if Enum.empty?(parts), do: "no issues", else: parts
 
     [
       :green,

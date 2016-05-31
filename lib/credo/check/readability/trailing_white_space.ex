@@ -14,11 +14,12 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   end
 
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do
-    case Regex.run(~r/\s+$/, line, return: :index) do
-      [{column, line_length}] ->
-        issues = [issue_for(issue_meta, line_no, column + 1, line_length) | issues]
-      nil -> nil
-    end
+    issues =
+      case Regex.run(~r/\s+$/, line, return: :index) do
+        [{column, line_length}] ->
+          [issue_for(issue_meta, line_no, column + 1, line_length) | issues]
+        nil -> issues
+      end
     traverse_line(tail, issues, issue_meta)
   end
   defp traverse_line([], issues, _issue_meta), do: issues

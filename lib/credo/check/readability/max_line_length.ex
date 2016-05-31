@@ -53,14 +53,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
   end
 
   defp refute_issue?(line_no, definitions, ignore_definitions, ignore_strings) do
-    refute = false
-    if ignore_definitions do
-      refute = refute || Enum.member?(definitions, line_no)
-    end
-    if ignore_strings do
-      refute = refute || false # TODO: implement this check
-    end
-    refute
+    ignore_definitions? =
+      fn -> if ignore_definitions, do: Enum.member?(definitions, line_no), else: false end
+
+    ignore_strings? = # TODO: implement ignore_strings check
+      fn -> if ignore_strings, do: false, else: false end
+
+    ignore_definitions?.() || ignore_strings?.()
   end
 
 

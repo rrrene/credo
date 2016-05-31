@@ -4,10 +4,12 @@ Credo.Test.Application.start([], [])
 
 ExUnit.start()
 
-exclude = [to_be_implemented: true]
-if System.version |> Version.compare("1.2.0") == :lt do
-  exclude = exclude ++ [needs_elixir: "1.2.0"]
-end
+check_version =
+  cond do
+    System.version |> Version.compare("1.2.0") == :lt -> [needs_elixir: "1.2.0"]
+    true -> []
+  end
+exclude = Keyword.merge([to_be_implemented: true], check_version)
 
 ExUnit.configure(exclude: exclude)
 
