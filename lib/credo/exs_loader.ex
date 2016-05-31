@@ -49,6 +49,14 @@ defmodule Credo.ExsLoader do
     process_tuple(body, {})
   end
 
+  defp process_exs({:__aliases__, _meta, name_list}) do
+    Module.safe_concat(name_list)
+  end
+
+  defp process_exs({{:__aliases__, _meta, name_list}, options}) do
+    {Module.safe_concat(name_list), process_exs(options)}
+  end
+
   defp process_exs({key, value}) when is_atom(key) or is_binary(key) do
     {process_exs(key), process_exs(value)}
   end
