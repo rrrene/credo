@@ -27,26 +27,38 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
     current = t |> List.first
     next = t |> Enum.at(1)
 
-    if SpaceHelper.operator?(current) do
-      acc = acc ++ collect_tokens(prev, current, next)
-    end
+    acc =
+      if SpaceHelper.operator?(current) do
+        acc ++ collect_tokens(prev, current, next)
+      else
+        acc
+      end
 
     check_tokens(t, acc)
   end
 
   def collect_tokens(prev, operator, next) do
-    list = []
+    collect_before(prev, operator, next) ++ collect_after(prev, operator, next)
+  end
+
+  defp collect_before(prev, operator, next) do
     if SpaceHelper.no_space_between?(prev, operator) && !SpaceHelper.usually_no_space_before?(prev, operator, next) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
+  end
+
+  defp collect_after(prev, operator, next) do
     if SpaceHelper.no_space_between?(operator, next) && !SpaceHelper.usually_no_space_after?(prev, operator, next) do
       case next do
         {:eol, _} ->
-          nil
+          []
         _ ->
-          list = list ++ [SpaceHelper.trigger_token(operator)]
+          [SpaceHelper.trigger_token(operator)]
       end
+    else
+      []
     end
-    list
   end
 end
