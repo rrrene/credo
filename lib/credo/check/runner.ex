@@ -6,7 +6,8 @@ defmodule Credo.Check.Runner do
   def run(source_files, config) when is_list(source_files) do
     config =
       config
-      |> inject_lint_attributes(source_files)
+      |> set_lint_attributes(source_files)
+      |> exclude_low_priority_checks(config.min_priority - 9)
 
     {_time_run_on_all, source_files_after_run_on_all} =
       :timer.tc fn ->
@@ -35,7 +36,7 @@ defmodule Credo.Check.Runner do
     %SourceFile{source_file | issues: source_file.issues ++ issues}
   end
 
-  defp inject_lint_attributes(config, source_files) do
+  defp set_lint_attributes(config, source_files) do
     lint_attribute_map =
       source_files
       |> run_linter_attribute_reader(config)
@@ -54,6 +55,17 @@ defmodule Credo.Check.Runner do
     Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
       run_check(check_tuple, source_files, config)
     end)
+  end
+
+  defp exclude_low_priority_checks(config, below_priority) do
+    checks =
+      config.checks
+      |> Enum.reject(fn
+          ({check}) -> check.base_priority < below_priority
+          ({check, _}) -> check.base_priority < below_priority
+        end)
+
+    %Config{config | checks: checks}
   end
 
   defp run_checks_that_run_on_all(source_files, config) do
