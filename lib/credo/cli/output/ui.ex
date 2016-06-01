@@ -1,6 +1,7 @@
 defmodule Credo.CLI.Output.UI do
 
   @edge "┃"
+  @ellipsis "…"
 
   def edge(color, indent \\ 2) when is_integer(indent) do
     [:reset, color, @edge |> String.ljust(indent)]
@@ -31,21 +32,18 @@ defmodule Credo.CLI.Output.UI do
   """
   def trim_to_length(_line, max_length) when max_length <= 0, do: ""
   def trim_to_length(line, max_length) when max_length > 0 do
-    trim_to_length(line, max_length, "…")
+    trim_to_length(line, max_length, @ellipsis)
   end
-
   def trim_to_length(_line, max_length, _ellipsis) when max_length <= 0, do: ""
   def trim_to_length(line, max_length, ellipsis) when max_length > 0 do
-    display_line = String.strip(line)
-
     cond do
-      String.length(display_line) <= max_length -> display_line
+      String.length(line) <= max_length -> line
 
       String.length(ellipsis) >= max_length -> ellipsis
 
       true ->
         chars_to_display = max_length - String.length(ellipsis)
-        String.slice(display_line, 0, chars_to_display) <> ellipsis
+        String.slice(line, 0, chars_to_display) <> ellipsis
     end
   end
 
