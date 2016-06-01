@@ -96,7 +96,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     [
       UI.edge([outer_color, :faint]), :cyan, :faint,
         String.duplicate(" ", @indent-2),
-        UI.trim_to_length(line, term_width - @indent)
+        UI.truncate(line, term_width - @indent)
     ]
     |> UI.puts
 

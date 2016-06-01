@@ -208,7 +208,7 @@ defmodule Credo.CLI.Output.Explain do
     [
       UI.edge([outer_color, :faint]), :reset,
         :faint, line_no_str, :reset,
-        color, UI.trim_to_length(line, term_width - @indent)
+        color, UI.truncate(line, term_width - @indent)
     ]
     |> UI.puts
   end

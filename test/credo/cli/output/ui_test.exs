@@ -27,18 +27,18 @@ These checks take a look at your code and ensure a consistent coding style. Usin
     assert expected == lines
   end
 
-  test "trim_to_length when max_length > ellipsis length and truncation required" do
+  test "truncate when max_length > ellipsis length and truncation required" do
     # Even if the ellipsis is longer than the max lenght we should not
     # truncate the ellipsis so the human reader doesn't have to figure out
     # that the "." they're seeing is part of a truncated "..."
-    assert UI.trim_to_length("hello", 1, "...") == "..."
+    assert UI.truncate("hello", 1, "...") == "..."
   end
 
-  test "trim_to_length with max_length of 0" do
-    assert UI.trim_to_length("hello", 0) == ""
+  test "truncate with max_length of 0" do
+    assert UI.truncate("hello", 0) == ""
   end
 
-  test "trim_to_length with max_length < 0" do
-    assert UI.trim_to_length("hello", -5) == ""
+  test "truncate with max_length < 0" do
+    assert UI.truncate("hello", -5) == ""
   end
 end
