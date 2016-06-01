@@ -49,9 +49,13 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   end
 
   for op <- @condition_ops do
-    defp traverse({unquote(op), _meta, _arguments} = ast, issues, issue_meta) do
+    defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
+      condition_arguments =
+        arguments
+        |> Enum.reject(&Keyword.keyword?/1) # remove do/else blocks
+
       new_issues =
-        Credo.Code.traverse(ast, &traverse_condition(&1, &2, ast, issue_meta))
+        Credo.Code.traverse(condition_arguments, &traverse_condition(&1, &2, unquote(op), condition_arguments, issue_meta))
 
       {ast, issues ++ new_issues}
     end
@@ -60,7 +64,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, issues}
   end
 
-  defp traverse_condition({:=, meta, arguments} = ast, issues, {op, _, op_arguments}, issue_meta) do
+  defp traverse_condition({:=, meta, arguments} = ast, issues, op, op_arguments, issue_meta) do
     case arguments do
       [{atom, _, nil}, _right] when is_atom(atom) ->
         # this means that the current ast is part of the `if/unless`
@@ -75,7 +79,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
         {ast, issues ++ [new_issue]}
     end
   end
-  defp traverse_condition(ast, issues, _op_ast, _issue_meta) do
+  defp traverse_condition(ast, issues, _op, _op_arguments, _issue_meta) do
     {ast, issues}
   end
 

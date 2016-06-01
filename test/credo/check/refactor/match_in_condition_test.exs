@@ -19,6 +19,15 @@ defmodule CredoSampleModule do
     if( parameter1 = foo(bar) ) do
       do_something
     end
+
+    # no match in parens
+    if String.match?(name, ~r/^[a-z]/) do
+      mod_name = names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
+      mod_prio = lookup[mod_name]
+      {scope_name, prio + mod_prio}
+    else
+      {scope_name, prio}
+    end
   end
 end
 """ |> to_source_file
@@ -31,6 +40,25 @@ defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     if {:ok, value} = parameter1 do
       do_something
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation 2" do
+"""
+defmodule CredoSampleModule do
+  def some_function(parameter1, parameter2) do
+    if String.match?(name, ~r/^[a-z]/) do
+      mod_name = names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
+      mod_prio = lookup[mod_name]
+      if {:ok, value} = parameter1 do         # <-- this one should be found
+        do_something
+      end
+    else
+      {scope_name, prio}
     end
   end
 end
