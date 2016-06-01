@@ -59,8 +59,8 @@ defmodule Credo.Sources do
     |> SourceFile.parse(filename)
   end
 
-  defp matches?(file, exclude_patterns) when is_list(exclude_patterns) do
-    exclude_patterns
+  defp matches?(file, patterns) when is_list(patterns) do
+    patterns
     |> Enum.any?(&matches?(file, &1))
   end
   defp matches?(file, string) when is_binary(string) do

@@ -19,6 +19,11 @@ defmodule Credo.Check.Readability.ModuleDoc do
   """
 
   @explanation [check: @moduledoc]
+  @default_params [
+    ignore_names: [
+      ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
+    ]
+  ]
 
   alias Credo.Code.Module
 
@@ -26,22 +31,37 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
+    ignore_names = params |> Params.get(:ignore_names, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta))
+    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, ignore_names))
   end
 
-  defp traverse({:defmodule, meta, _arguments} = ast, issues, issue_meta) do
+  defp traverse({:defmodule, meta, _arguments} = ast, issues, issue_meta, ignore_names) do
     exception? = Module.exception?(ast)
     case Module.attribute(ast, :moduledoc)  do
       {:error, _} when not exception? ->
         mod_name = Module.name(ast)
-        {ast, issues ++ [issue_for(issue_meta, meta[:line], mod_name)]}
+        if mod_name |> matches?(ignore_names) do
+          {ast, issues}
+        else
+          {ast, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}
+        end
       _ ->
         {ast, issues}
     end
   end
-  defp traverse(ast, issues, _issue_meta) do
+  defp traverse(ast, issues, _issue_meta, _ignore_names) do
     {ast, issues}
+  end
+
+  defp matches?(name, patterns) when is_list(patterns) do
+    patterns |> Enum.any?(&matches?(name, &1))
+  end
+  defp matches?(name, string) when is_binary(string) do
+    name |> String.contains?(string)
+  end
+  defp matches?(name, regex) do
+    String.match?(name, regex)
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
