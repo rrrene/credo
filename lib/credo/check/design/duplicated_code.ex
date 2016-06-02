@@ -67,7 +67,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp duplicate_nodes(source_files, mass_threshold) do
     source_files
     |> Enum.reduce(%{}, fn(source_file, acc) ->
-        hashes(source_file.ast, acc, source_file.filename, mass_threshold)
+        calculate_hashes(source_file.ast, acc, source_file.filename, mass_threshold)
       end)
     |> prune_hashes
     |> add_masses
@@ -82,8 +82,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp add_mass_to_subnode({hash, node_items}) do
     node_items =
       node_items
-      |> Enum.map(fn(item) ->
-          %{item | mass: mass(item.node)}
+      |> Enum.map(fn(node_item) ->
+          %{node_item | mass: mass(node_item.node)}
          end)
 
     {hash, node_items}
@@ -119,7 +119,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     my_hash = first_node |> CodeHelper.remove_metadata |> to_hash
     subhashes =
       first_node
-      |> hashes(%{}, filename)
+      |> calculate_hashes(%{}, filename)
       |> Map.keys
       |> List.delete(my_hash) # don't count self
 
@@ -131,7 +131,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   Returns a map with the hashes as keys and the nodes as values.
   """
-  def hashes(ast, existing_hashes \\ %{}, filename \\ "foo.ex", mass_threshold \\ @default_params[:mass_threshold]) when is_map(existing_hashes) do
+  def calculate_hashes(ast, existing_hashes \\ %{}, filename \\ "foo.ex", mass_threshold \\ @default_params[:mass_threshold]) when is_map(existing_hashes) do
     Credo.Code.traverse(ast,
                 &collect_hashes(&1, &2, filename, mass_threshold), existing_hashes)
   end

@@ -65,7 +65,7 @@ defmodule M2 do
 end
 """ |> Code.string_to_quoted
 
-    hashes = DuplicatedCode.hashes(ast)
+    hashes = DuplicatedCode.calculate_hashes(ast)
     pruned = DuplicatedCode.prune_hashes(hashes)
     assert 1 == Enum.count(pruned)
 
@@ -100,8 +100,8 @@ defmodule M2 do
 end
 """ |> Code.string_to_quoted
 
-    hashes = DuplicatedCode.hashes(ast1, %{}, "m1.ex")
-    hashes = DuplicatedCode.hashes(ast2, hashes, "m2.ex")
+    hashes = DuplicatedCode.calculate_hashes(ast1, %{}, "m1.ex")
+    hashes = DuplicatedCode.calculate_hashes(ast2, hashes, "m2.ex")
     pruned = DuplicatedCode.prune_hashes(hashes)
     assert 1 == Enum.count(pruned)
 
@@ -137,7 +137,7 @@ defmodule M2 do
 end
 """ |> Code.string_to_quoted
 
-    DuplicatedCode.hashes(ast)
+    DuplicatedCode.calculate_hashes(ast)
   end
 
 
