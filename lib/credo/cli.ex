@@ -10,18 +10,21 @@ defmodule Credo.CLI do
   use Bitwise
 
   alias Credo.Config
+  alias Credo.Sources
   alias Credo.CLI.Filename
   alias Credo.CLI.Output.UI
 
   @default_dir "."
   @default_command_name "suggest"
   @command_map %{
-    help: Credo.CLI.Command.Help,
-    list: Credo.CLI.Command.List,
-    suggest: Credo.CLI.Command.Suggest,
-    explain: Credo.CLI.Command.Explain,
-    categories: Credo.CLI.Command.Categories,
-    version: Credo.CLI.Command.Version
+    "categories" => Credo.CLI.Command.Categories,
+    "explain" => Credo.CLI.Command.Explain,
+    "gen.check" => Credo.CLI.Command.GenCheck,
+    "gen.config" => Credo.CLI.Command.GenConfig,
+    "help" => Credo.CLI.Command.Help,
+    "list" => Credo.CLI.Command.List,
+    "suggest" => Credo.CLI.Command.Suggest,
+    "version" => Credo.CLI.Command.Version,
   }
   @switches [
     all: :boolean,
@@ -68,9 +71,6 @@ defmodule Credo.CLI do
   """
   def command_for(nil), do: nil
   def command_for(command) when is_binary(command) do
-    command_for(command |> String.to_atom)
-  end
-  def command_for(command) when is_atom(command) do
     if Enum.member?(commands, command) do
       @command_map[command]
     else
@@ -81,102 +81,150 @@ defmodule Credo.CLI do
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
 
+    if config.check_outdated?, do: Credo.Outdated.run()
+
+    config |> require_requires()
+
     command_mod.run(dir, config)
   end
 
+  # Requires the additional files specified in the config.
+  defp require_requires(%Config{requires: requires}) do
+    requires
+    |> Sources.find
+    |> Enum.each(&Code.require_file/1)
+  end
+
   defp parse_options(argv) do
-    {switches, files, []} =
+    {switches_kw, args, []} =
       OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
-    command_name =
-      if files |> List.first |> command_for do
-        command_name = files |> List.first
-        files = files |> List.delete_at(0)
-        command_name
-      else
-        nil
+    {command_name, dir} =
+      case args |> List.first |> command_for() do
+        nil ->
+          {nil, Enum.at(args, 0)}
+        command_name ->
+          {command_name, Enum.at(args, 1)}
       end
 
-    dir = (files |> List.first) || @default_dir
+    dir = dir || @default_dir
+    switches = switches_kw |> Enum.into(%{})
     config = dir |> to_config(switches)
 
-    command_name_dir_config(command_name, dir, config)
+    command_name_dir_config(command_name, args, config)
   end
 
-  defp command_name_dir_config(nil, dir, %Config{help: true} = config) do
-    command_name_dir_config("help", dir, config)
+  defp command_name_dir_config(nil, args, %Config{help: true} = config) do
+    command_name_dir_config("help", args, config)
   end
-  defp command_name_dir_config(nil, dir, %Config{version: true} = config) do
-    command_name_dir_config("version", dir, config)
+  defp command_name_dir_config(nil, args, %Config{version: true} = config) do
+    command_name_dir_config("version", args, config)
   end
-  defp command_name_dir_config(nil, dir, config) do
-    if Filename.contains_line_no?(dir) do
-      command_name_dir_config("explain", dir, config)
+  defp command_name_dir_config(nil, [], config) do
+    command_name_dir_config(@default_command_name, [], config)
+  end
+  defp command_name_dir_config(nil, args, config) do
+    if args |> List.first |> Filename.contains_line_no?() do
+      command_name_dir_config("explain", args, config)
     else
-      command_name_dir_config(@default_command_name, dir, config)
+      command_name_dir_config(@default_command_name, args, config)
     end
   end
-  defp command_name_dir_config(command_name, dir, config) do
-    {command_for(command_name), dir, config}
+  defp command_name_dir_config(command_name, args, config) do
+    {command_for(command_name), args, config}
   end
 
   defp to_config(dir, switches) do
-    dir = dir |> Filename.remove_line_no_and_column
-    config_name = switch(switches, :config_name)
-    config = Config.read_or_default(dir, config_name)
-
-    if switch(switches, :all) do
-      config = %Config{config | all: true}
-    end
-    if switch(switches, :all_priorities, :strict) do
-      config = %Config{config | all: true, min_priority: -99}
-    end
-    if switch(switches, :help), do: config = %Config{config | help: true}
-    if switch(switches, :verbose), do: config = %Config{config | verbose: true}
-    if switch(switches, :version), do: config = %Config{config | version: true}
-    if switch(switches, :crash_on_error), do: config = %Config{config | crash_on_error: true}
-    if switch(switches, :read_from_stdin), do: config = %Config{config | read_from_stdin: true}
-
-    min_priority = switch(switches, :min_priority)
-    if min_priority do
-      config =
-        %Config{config | min_priority: min_priority}
-    end
-
-    format = switch(switches, :format)
-    if format do
-      config =
-        %Config{config | format: format}
-    end
-
-    # only include certain checks
-    check_pattern = switch(switches, :checks, :only)
-    if check_pattern do
-      config =
-        %Config{config | all: true, match_checks: check_pattern |> String.split(",")}
-    end
-
-    # exclude/ignore certain checks
-    ignore_pattern = switch(switches, :ignore_checks, :ignore)
-    if ignore_pattern do
-      config =
-        %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
-    end
-
-    # DEPRECATED command line switches:
-
-    if switch(switches, :one_line) do
-      UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
-      config = %Config{config | format: "oneline"}
-    end
-
-    config
+    dir
+    |> Filename.remove_line_no_and_column
+    |> Config.read_or_default(switches[:config_name])
+    |> set_all(switches)
+    |> set_crash_on_error(switches)
+    |> set_deprecated_switches(switches)
+    |> set_format(switches)
+    |> set_help(switches)
+    |> set_ignore(switches)
+    |> set_min_priority(switches)
+    |> set_only(switches)
+    |> set_read_from_stdin(switches)
+    |> set_strict(switches)
+    |> set_verbose(switches)
+    |> set_version(switches)
   end
 
-  def switch(switches, key), do: Keyword.get(switches, key)
-  def switch(switches, key, alias_key) do
-    Keyword.get(switches, key) || Keyword.get(switches, alias_key)
+  defp set_all(config, %{all: true}) do
+    %Config{config | all: true}
   end
+  defp set_all(config, _), do: config
+
+  defp set_strict(config, %{all_priorities: true}) do
+    set_strict(config, %{strict: true})
+  end
+  defp set_strict(config, %{strict: true}) do
+    %Config{config | all: true, min_priority: -99}
+  end
+  defp set_strict(config, _), do: config
+
+  defp set_help(config, %{help: true}) do
+    %Config{config | help: true}
+  end
+  defp set_help(config, _), do: config
+
+  defp set_verbose(config, %{verbose: true}) do
+    %Config{config | verbose: true}
+  end
+  defp set_verbose(config, _), do: config
+
+  defp set_crash_on_error(config, %{crash_on_error: true}) do
+    %Config{config | crash_on_error: true}
+  end
+  defp set_crash_on_error(config, _), do: config
+
+  defp set_read_from_stdin(config, %{read_from_stdin: true}) do
+    %Config{config | read_from_stdin: true}
+  end
+  defp set_read_from_stdin(config, _), do: config
+
+  defp set_version(config, %{version: true}) do
+    %Config{config | version: true}
+  end
+  defp set_version(config, _), do: config
+
+  defp set_format(config, %{format: format}) do
+    %Config{config | format: format}
+  end
+  defp set_format(config, _), do: config
+
+  defp set_min_priority(config, %{min_priority: min_priority}) do
+    %Config{config | min_priority: min_priority}
+  end
+  defp set_min_priority(config, _), do: config
+
+  # exclude/ignore certain checks
+  defp set_only(config, %{only: only}) do
+    set_only(config, %{checks: only})
+  end
+  defp set_only(config, %{checks: check_pattern}) do
+    %Config{config | all: true, min_priority: -99,
+                      match_checks: check_pattern |> String.split(",")}
+  end
+  defp set_only(config, _), do: config
+
+  # exclude/ignore certain checks
+  defp set_ignore(config, %{ignore: ignore}) do
+    set_ignore(config, %{ignore_checks: ignore})
+  end
+  defp set_ignore(config, %{ignore_checks: ignore_pattern}) do
+    %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
+  end
+  defp set_ignore(config, _), do: config
+
+  # DEPRECATED command line switches
+  defp set_deprecated_switches(config, %{one_line: true}) do
+    UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
+    %Config{config | format: "oneline"}
+  end
+  defp set_deprecated_switches(config, _), do: config
 
   # Converts the return value of a Command.run() call into an exit_status
   defp to_exit_status(:ok), do: 0

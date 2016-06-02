@@ -1,7 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
   use Credo.Check.CodePattern
 
-  alias Credo.Check.CodeHelper
   alias Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper
 
   def property_value, do: :with_space
@@ -28,21 +27,34 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
     current = t |> List.first
     next = t |> Enum.at(1)
 
-    if SpaceHelper.operator?(current) do
-      acc = acc ++ collect_tokens(prev, current, next)
-    end
+    acc =
+      if SpaceHelper.operator?(current) do
+        acc ++ collect_tokens(prev, current, next)
+      else
+        acc
+      end
+
 
     check_tokens(t, acc)
   end
 
   def collect_tokens(prev, operator, next) do
-    list = []
+    collect_before(prev, operator) ++ collect_after(operator, next)
+  end
+
+  defp collect_before(prev, operator) do
     if SpaceHelper.space_between?(prev, operator) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
+  end
+
+  defp collect_after(operator, next) do
     if SpaceHelper.space_between?(operator, next) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
-    list
   end
 end

@@ -33,7 +33,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   def run(source_files, params \\ []) when is_list(source_files) do
     source_files
     |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.add_issues_to_source_files(&issue_for/5, params)
+    |> Helper.append_issues_via_issue_service(&issue_for/5, params)
+
+    :ok
   end
 
   defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
@@ -83,7 +85,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   defp number_with_sign?(line, column) do
     line
-    |> String.slice(0..column-2) # -2 because we need to substract the operator
+    |> String.slice(0..column - 2) # -2 because we need to substract the operator
     |> String.match?(~r/(\s+|\@[a-zA-Z0-9\_]+|[\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
@@ -97,11 +99,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp minus_in_binary_size?(line, column) do
     binary_pattern_start_before? =
       line
-      |> String.slice(0..column-2) # -2 because we need to substract the operator
+      |> String.slice(0..column - 2) # -2 because we need to substract the operator
       |> String.match?(~r/\<\</)
     double_colon_before? =
       line
-      |> String.slice(0..column-2) # -2 because we need to substract the operator
+      |> String.slice(0..column - 2) # -2 because we need to substract the operator
       |> String.match?(~r/\:\:/)
     binary_pattern_end_after? =
       line

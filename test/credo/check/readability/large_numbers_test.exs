@@ -3,12 +3,11 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 
   @described_check Credo.Check.Readability.LargeNumbers
 
-  @moduletag :to_be_implemented
-
   test "it should NOT report expected code" do
 """
 def numbers do
-  1024 + 1_000_000 + 43_534
+  1024 + 1_000_000 + 11_000 + 22_000 + 33_000
+  10_000..20_000
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -22,7 +21,53 @@ def numbers do
   1024 + 1000000 + 43534
 end
 """ |> to_source_file
+    |> assert_issues(@described_check)
+  end
+
+
+  test "it should report a violation, since it is formatted incorrectly" do
+"""
+def numbers do
+  1024 + 10_00_00_0 + 43534
+end
+""" |> to_source_file
+    |> assert_issues(@described_check)
+  end
+
+  test "it should report only one violation" do
+"""
+def numbers do
+  1024 + 1000000 + 43534
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, only_greater_than: 50000)
+  end
+
+  test "it should report only one violation for ranges /1" do
+"""
+def numbers do
+  10000..20_000
+end
+""" |> to_source_file
     |> assert_issue(@described_check)
+  end
+
+  test "it should report only one violation for ranges /2" do
+"""
+def numbers do
+  10_000..20000
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report only two violation for ranges" do
+"""
+def numbers do
+  10000..20000
+end
+""" |> to_source_file
+    |> assert_issues(@described_check)
   end
 
   test "it should report a violation /2" do
@@ -35,6 +80,15 @@ end
   end
 
   test "it should report a violation /3" do
+"""
+defp numbers do
+  1024 + 43534.0
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /4" do
 """
 defmacro numbers do
   1024 + 1_000000

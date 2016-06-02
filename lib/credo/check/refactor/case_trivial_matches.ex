@@ -1,22 +1,8 @@
 defmodule Credo.Check.Refactor.CaseTrivialMatches do
   @moduledoc """
-  A case statement should contain "more" than just `true` and `false`.
+  PLEASE NOTE: This check is deprecated as it might do more harm than good.
 
-  Example:
-
-    case x == y do
-      true -> 0
-      false -> 1
-    end
-
-    # should be written as
-
-    if x == y do
-      0
-    else
-      1
-    end
-
+  Related discussion: https://github.com/rrrene/credo/issues/65
   """
 
   @explanation [check: @moduledoc]

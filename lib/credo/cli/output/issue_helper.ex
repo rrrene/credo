@@ -87,7 +87,8 @@ defmodule Credo.CLI.Output.IssueHelper do
     nil
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
-    {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
+    {_, raw_line} = Enum.at(source_file.lines, issue.line_no - 1)
+    line = raw_line |> String.strip
 
     [outer_color, :faint]
     |> UI.edge
@@ -96,11 +97,11 @@ defmodule Credo.CLI.Output.IssueHelper do
     [
       UI.edge([outer_color, :faint]), :cyan, :faint,
         String.duplicate(" ", @indent-2),
-        UI.trim_to_length(line, term_width - @indent)
+        UI.truncate(line, term_width - @indent)
     ]
     |> UI.puts
 
-    print_issue_trigger_marker(issue, line, inner_color, outer_color)
+    print_issue_trigger_marker(issue, raw_line, inner_color, outer_color)
   end
 
   defp print_issue_trigger_marker(%Issue{column: nil}, _line, _inner_color, _outer_color) do

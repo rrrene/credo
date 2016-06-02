@@ -12,8 +12,8 @@ defmodule Credo.Code do
   alias Credo.SourceFile
 
   defmodule ParserError do
-    @explanation ""
-    use Credo.Check, category: :error
+    @explanation []
+    use Credo.Check, category: :error, base_priority: :normal
   end
 
   @doc """

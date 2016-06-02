@@ -33,12 +33,48 @@ defmodule OtherModule do
 end
 """
 
-  test "it should report the correct scope" do
+  test "it should NOT report for only tabs" do
+    [
+      @with_tabs
+    ]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report for only spaces" do
+    [
+      @with_spaces, @with_spaces2
+    ]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
+
+  @tag :to_be_implemented
+  test "it should NOT report for forced, valid props" do
+    [
+      @with_spaces, @with_spaces2
+    ]
+    |> to_source_files
+    |> assert_issues(@described_check, force: :spaces)
+  end
+
+
+
+  test "it should report for mixed indentation" do
     [
       @with_tabs, @with_spaces, @with_spaces2
     ]
-    |> Enum.map(&to_source_file/1)
+    |> to_source_files
     |> assert_issues(@described_check)
+  end
+
+  @tag :to_be_implemented
+  test "it should report for forced, consistent, but invalid props" do
+    [
+      @with_spaces, @with_spaces2
+    ]
+    |> to_source_files
+    |> assert_issues(@described_check, force: :tabs)
   end
 
 end

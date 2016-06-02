@@ -22,21 +22,28 @@ end
   test "it should report a violation" do
 """
 defmodule Mix.Tasks.Credo do
-  use Mix.Task
-
-  @shortdoc  "Statically analyse Elixir source files"
-  @moduledoc @shortdoc
-
   def run(argv) do
     if !allowed? do
       true
     else
       false
     end
-    Credo.CLI.main(argv)
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
   end
 
-  def allowed?, do: true
+  test "it should report a violation if used with parentheses" do
+"""
+defmodule Mix.Tasks.Credo do
+  def run(argv) do
+    if (!allowed?) do
+      true
+    else
+      false
+    end
+  end
 end
 """ |> to_source_file
     |> assert_issue(@described_check)

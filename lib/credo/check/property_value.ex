@@ -1,5 +1,5 @@
 defmodule Credo.Check.PropertyValue do
-  def for(value, meta), do: {__MODULE__, value, meta}
+  def for(value, meta_info), do: {__MODULE__, value, meta_info}
 
   def get({__MODULE__, value, _}), do: value
   def get(list) when is_list(list), do: list |> Enum.map(&get/1)

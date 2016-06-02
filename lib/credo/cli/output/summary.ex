@@ -81,8 +81,8 @@ defmodule Credo.CLI.Output.Summary do
   end
 
   defp format_time_spent(time_load, time_run) do
-    time_run  = time_run |> div(10000)
-    time_load = time_load |> div(10000)
+    time_run  = time_run |> div(10_000)
+    time_load = time_load |> div(10_000)
 
     formatted_total = format_in_seconds(time_run + time_load)
     total_in_seconds =
@@ -125,7 +125,7 @@ defmodule Credo.CLI.Output.Summary do
         String.replace(last_part, ", ", "")
        end)
 
-    if Enum.empty?(parts), do: parts = "no issues"
+    parts = if Enum.empty?(parts), do: "no issues", else: parts
 
     [
       :green,

@@ -5,7 +5,7 @@ defmodule Credo.Priority do
   alias Credo.SourceFile
 
   @def_ops [:def, :defp, :defmacro]
-  @many_functions 5
+  @many_functions_count 5
 
   def scope_priorities(%SourceFile{} = source_file) do
     empty_priorities =
@@ -66,7 +66,7 @@ defmodule Credo.Priority do
   end
 
   defp priority_for({:defmodule, _, _} = ast) do
-    if Module.def_count(ast) >= @many_functions do
+    if Module.def_count(ast) >= @many_functions_count do
       2
     else
       1

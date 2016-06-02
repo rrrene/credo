@@ -2,9 +2,10 @@ sudo: false
 language: elixir
 elixir:
   - 1.1.1
-  - 1.2.3
+  - 1.2.4
 otp_release:
   - 18.0
   - 18.1
+  - 18.2
 after_script:
   - MIX_ENV=test mix inch.report

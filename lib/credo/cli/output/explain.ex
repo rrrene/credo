@@ -63,11 +63,20 @@ defmodule Credo.CLI.Output.Explain do
     |> Enum.each(&print_issue(&1, source_file, term_width))
   end
 
-  defp filter_issues(issues, line_no, column) do
-    if line_no, do: issues = issues |> Enum.filter(&(&1.line_no == line_no |> String.to_integer))
-    if column, do: issues = issues |> Enum.filter(&(&1.column == column |> String.to_integer))
-    issues
+  defp filter_issues(issues, line_no, nil) do
+    line_no = line_no |> String.to_integer
+    issues |> Enum.filter(&filter_issue(&1, line_no, nil))
   end
+  defp filter_issues(issues, line_no, column) do
+    line_no = line_no |> String.to_integer
+    column = column |> String.to_integer
+
+    issues |> Enum.filter(&filter_issue(&1, line_no, column))
+  end
+
+  defp filter_issue(%Issue{line_no: a, column: b}, a, b), do: true
+  defp filter_issue(%Issue{line_no: a}, a, _), do: true
+  defp filter_issue(_, _, _), do: false
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
     pos =
@@ -128,22 +137,20 @@ defmodule Credo.CLI.Output.Explain do
 
       [
         UI.edge([outer_color, :faint]), :reset, :color239,
-          String.duplicate(" ", @indent-5), "__ CODE IN QUESTION"
+          String.duplicate(" ", @indent - 5), "__ CODE IN QUESTION"
       ]
       |> UI.puts
 
       UI.edge([outer_color, :faint])
       |> UI.puts
 
-      [
-        UI.edge([outer_color, :faint]), :reset, :cyan, :bright,
-          String.duplicate(" ", @indent-2),
-          UI.trim_to_length(line, term_width - @indent)
-      ]
-      |> UI.puts
+      code_color = :faint
+      print_source_line(source_file, issue.line_no-2, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no-1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no, term_width, [:cyan, :bright], outer_color)
 
       if issue.column do
-        offset = String.length(line) - String.length(String.strip(line))
+        offset = 0
         x = max(issue.column - offset - 1, 0) # column is one-based
         w =
           case issue.trigger do
@@ -158,6 +165,8 @@ defmodule Credo.CLI.Output.Explain do
         ]
         |> UI.puts
       end
+      print_source_line(source_file, issue.line_no+1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no+2, term_width, code_color, outer_color)
     end
 
     UI.edge([outer_color, :faint], @indent)
@@ -165,7 +174,7 @@ defmodule Credo.CLI.Output.Explain do
 
     [
       UI.edge([outer_color, :faint]), :reset, :color239,
-        String.duplicate(" ", @indent-5), "__ WHY IT MATTERS"
+        String.duplicate(" ", @indent - 5), "__ WHY IT MATTERS"
     ]
     |> UI.puts
 
@@ -186,6 +195,21 @@ defmodule Credo.CLI.Output.Explain do
     |> print_params_explanation(outer_color)
 
     UI.edge([outer_color, :faint])
+    |> UI.puts
+  end
+
+  defp print_source_line(source_file, line_no, term_width, color, outer_color) do
+    {_, line} = Enum.at(source_file.lines, line_no - 1)
+
+    line_no_str =
+      "#{line_no} "
+      |> String.rjust(@indent - 2)
+
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        :faint, line_no_str, :reset,
+        color, UI.truncate(line, term_width - @indent)
+    ]
     |> UI.puts
   end
 
