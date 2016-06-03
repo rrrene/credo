@@ -40,7 +40,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should report a violation /2" do
+  test "it should report a violation /3" do
 """
 defp credo_SampleFunction do
 end
@@ -48,7 +48,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should report a violation /3" do
+  test "it should report a violation /4" do
 """
 defmacro credo_Sample_Function do
 end

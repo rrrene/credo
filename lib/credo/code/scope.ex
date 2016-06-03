@@ -42,7 +42,16 @@ defmodule Credo.Code.Scope do
 
   # Returns a List for the scope name
   defp find_scope({:__block__, _meta, arguments}, line, name_list, last_op) do
-    arguments
+    find_scope(arguments, line, name_list, last_op)
+  end
+  defp find_scope({:do, arguments}, line, name_list, last_op) do
+    find_scope(arguments, line, name_list, last_op)
+  end
+  defp find_scope({:else, arguments}, line, name_list, last_op) do
+    find_scope(arguments, line, name_list, last_op)
+  end
+  defp find_scope(list, line, name_list, last_op) when is_list(list) do
+    list
     |> Enum.find_value(&find_scope(&1, line, name_list, last_op))
   end
   defp find_scope({:defmodule, meta, [{:__aliases__, _, module_name}, arguments]}, line, name_list, _last_op) do
@@ -64,12 +73,14 @@ defmodule Credo.Code.Scope do
       end
     end
   end
-  defp find_scope({_atom, meta, _arguments}, line, name_list, last_op) do
+  defp find_scope({_atom, meta, arguments}, line, name_list, last_op) do
     if meta[:line] == line do
       {last_op, name_list}
     else
-      nil
+      find_scope(arguments, line, name_list, last_op)
     end
   end
-  defp find_scope(_, _line, _name_list, _last_op), do: nil
+  defp find_scope(_value, _line, _name_list, _last_op) do
+    nil
+  end
 end

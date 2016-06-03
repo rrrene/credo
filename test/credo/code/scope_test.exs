@@ -39,6 +39,44 @@ end
     assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 21)
   end
 
+  test "it should report the correct scope even if the file does not start with defmodule" do
+    {:ok, ast} = """
+if some_compile_time_check do
+  defmodule Credo.Sample do
+    @test_attribute :foo
+
+    def foobar(parameter1, parameter2) do
+      String.split(parameter1) + parameter2
+    end
+
+    defmodule InlineModule do
+      def foobar(v) when is_atom(v) do
+        {:ok} = File.read
+      end
+    end
+  end
+
+  defmodule OtherModule do
+    defmacro foo do
+      {:ok} = File.read
+    end
+
+    defp bar do
+      :ok
+    end
+  end
+end
+""" |> Code.string_to_quoted
+
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 2)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 3)
+    assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 4)
+    assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 6)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 11)
+    assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 18)
+    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 22)
+  end
+
   @tag :to_be_implemented
   test "it should report the correct scope (pedanticly)" do
     {:ok, ast} = """
