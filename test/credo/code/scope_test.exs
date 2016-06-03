@@ -24,6 +24,10 @@ defmodule OtherModule do
     {:ok} = File.read
   end
 
+  test do
+    something_during_compile_time___probably_magic!
+  end
+
   defp bar do
     :ok
   end
@@ -36,7 +40,9 @@ end
     assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 5)
     assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 10)
     assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 17)
-    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 21)
+    assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 22)
+    assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 23)
+    assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 25)
   end
 
   test "it should report the correct scope even if the file does not start with defmodule" do

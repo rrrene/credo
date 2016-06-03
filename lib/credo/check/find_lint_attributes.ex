@@ -12,10 +12,10 @@ defmodule Credo.Check.FindLintAttributes do
   @doc false
   def run(source_files, _params) when is_list(source_files) do
     source_files
-    |> Enum.map(&run_source_file/1)
+    |> Enum.map(&find_and_set_in_source_file/1)
   end
 
-  def run_source_file(source_file) do
+  def find_and_set_in_source_file(source_file) do
     lint_attributes =
       Credo.Code.traverse(source_file, &traverse(&1, &2, source_file))
     %SourceFile{source_file | lint_attributes: lint_attributes}
@@ -50,10 +50,15 @@ defmodule Credo.Check.FindLintAttributes do
   end
   def process_calls([head|tail], current_lint_attribute, attribute_list) do
     case head do
+      # a lint attribute was found
       {:@, meta, [{:lint, _, arguments}]} ->
         # TODO: warn that a new lint attribute was read while one was still active
         process_calls(tail, %LintAttribute{meta: meta, arguments: arguments}, attribute_list)
-      {op, meta, _} when op in [:def, :defp] ->
+      # another module attribute was found
+      {:@, meta, _} ->
+        process_calls(tail, current_lint_attribute, attribute_list)
+      # an operation was found (at the module level)
+      {op, meta, arguments} when is_atom(op) and is_list(arguments) ->
         attribute_list = [%LintAttribute{current_lint_attribute | line: meta[:line]} | attribute_list]
         process_calls(tail, nil, attribute_list)
       _ ->
