@@ -186,6 +186,11 @@ defmodule Credo.Check.Design.DuplicatedCode do
       node_mass = this_node.mass
       line_no = line_no_for(this_node.node)
 
+      if is_nil(line_no) do
+        IO.inspect this_node
+        IO.inspect CodeHelper.do_block_for!(this_node.node)
+      end
+
       format_issue issue_meta,
         message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
         line_no: line_no,
@@ -196,8 +201,17 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   # TODO: Put in AST helper
 
+  def line_no_for({:__block__, _meta, arguments}) do
+    arguments |> line_no_for()
+  end
+  def line_no_for({:do, arguments}) do
+    arguments |> line_no_for()
+  end
   def line_no_for({atom, meta, _}) when is_atom(atom) do
     meta[:line]
+  end
+  def line_no_for(list) when is_list(list) do
+    list |> Enum.find_value(&line_no_for/1)
   end
   def line_no_for(nil), do: nil
   def line_no_for(block) do
