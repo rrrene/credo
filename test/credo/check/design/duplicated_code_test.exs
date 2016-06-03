@@ -38,6 +38,90 @@ end
     refute Enum.empty?(s2.issues)
   end
 
+  test "should raise an issue for duplicated code via macros" do
+    s1 = """
+defmodule M1 do
+  test "something is duplicated" do
+    if p1 == p2 do
+      p1
+    else
+      p2 + p1
+      if p1 == p2 do
+        p1
+      else
+        p2 + p1
+      end
+    end
+  end
+end
+""" |> to_source_file
+    s2 = """
+defmodule M2 do
+  test "something is duplicated" do
+    if p1 == p2 do
+      p1
+    else
+      p2 + p1
+      if p1 == p2 do
+        p1
+      else
+        p2 + p1
+      end
+    end
+  end
+end
+""" |> to_source_file
+
+    source_files = [s1, s2]
+    :ok = @described_check.run(source_files)
+    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
+
+    refute Enum.empty?(s1.issues)
+    refute Enum.empty?(s2.issues)
+  end
+
+  test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
+    s1 = """
+defmodule M1 do
+  test "something is duplicated" do
+    if p1 == p2 do
+      p1
+    else
+      p2 + p1
+      if p1 == p2 do
+        p1
+      else
+        p2 + p1
+      end
+    end
+  end
+end
+""" |> to_source_file
+    s2 = """
+defmodule M2 do
+  test "something is duplicated" do
+    if p1 == p2 do
+      p1
+    else
+      p2 + p1
+      if p1 == p2 do
+        p1
+      else
+        p2 + p1
+      end
+    end
+  end
+end
+""" |> to_source_file
+
+    source_files = [s1, s2]
+    :ok = @described_check.run(source_files, [excluded_macros: [:test]])
+    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
+
+    assert Enum.empty?(s1.issues)
+    assert Enum.empty?(s2.issues)
+  end
+
 
 
   # unit tests for different aspects

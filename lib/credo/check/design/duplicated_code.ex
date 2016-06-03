@@ -28,6 +28,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   @default_params [
     mass_threshold: 16,
     nodes_threshold: 2,
+    excluded_macros: [],
   ]
 
   alias Credo.SourceFile
@@ -56,7 +57,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
           other_nodes = List.delete(nodes, this_node)
 
           issue_meta = IssueMeta.for(source_file, params)
-          issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
+          issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
 
           if issue do
             Credo.Service.SourceFileIssues.append(source_file, issue)
@@ -179,7 +180,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     {ast, acc}
   end
 
-  defp issue_for(issue_meta, this_node, other_nodes, nodes_threshold) do
+  defp issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params) do
     if Enum.count(other_nodes) >= nodes_threshold - 1 do
       filenames =
         other_nodes
@@ -187,8 +188,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
         |> Enum.join(", ")
       node_mass = this_node.mass
       line_no = line_no_for(this_node.node)
+      excluded_macros = params[:excluded_macros] || []
 
-      if create_issue?(this_node.node) do
+      if create_issue?(this_node.node, excluded_macros) do
         format_issue issue_meta,
           message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
           line_no: line_no,
@@ -198,8 +200,14 @@ defmodule Credo.Check.Design.DuplicatedCode do
   end
 
   # ignore similar module attributes, no matter how complex
-  def create_issue?({:@, _, _}), do: false
-  def create_issue?(_ast), do: true
+  def create_issue?({:@, _, _}, _), do: false
+  def create_issue?([do: {atom, _, arguments}], excluded_macros) when is_atom(atom) and is_list(arguments) do
+    !Enum.member?(excluded_macros, atom)
+  end
+  def create_issue?({atom, _, arguments}, excluded_macros) when is_atom(atom) and is_list(arguments) do
+    !Enum.member?(atom, excluded_macros)
+  end
+  def create_issue?(_ast, _), do: true
 
 
   # TODO: Put in AST helper
