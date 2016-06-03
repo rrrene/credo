@@ -58,7 +58,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
           issue_meta = IssueMeta.for(source_file, params)
           issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold)
 
-          Credo.Service.SourceFileIssues.append(source_file, issue)
+          if issue do
+            Credo.Service.SourceFileIssues.append(source_file, issue)
+          end
         end
       end)
     end)
@@ -186,12 +188,18 @@ defmodule Credo.Check.Design.DuplicatedCode do
       node_mass = this_node.mass
       line_no = line_no_for(this_node.node)
 
-      format_issue issue_meta,
-        message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
-        line_no: line_no,
-        severity: Severity.compute(1 + Enum.count(other_nodes), 1)
+      if create_issue?(this_node.node) do
+        format_issue issue_meta,
+          message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
+          line_no: line_no,
+          severity: Severity.compute(1 + Enum.count(other_nodes), 1)
+      end
     end
   end
+
+  # ignore similar module attributes, no matter how complex
+  def create_issue?({:@, _, _}), do: false
+  def create_issue?(_ast), do: true
 
 
   # TODO: Put in AST helper
