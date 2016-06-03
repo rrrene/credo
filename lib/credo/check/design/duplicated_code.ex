@@ -186,11 +186,6 @@ defmodule Credo.Check.Design.DuplicatedCode do
       node_mass = this_node.mass
       line_no = line_no_for(this_node.node)
 
-      if is_nil(line_no) do
-        IO.inspect this_node
-        IO.inspect CodeHelper.do_block_for!(this_node.node)
-      end
-
       format_issue issue_meta,
         message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
         line_no: line_no,
