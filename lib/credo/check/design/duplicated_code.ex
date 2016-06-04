@@ -98,7 +98,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   Returns the resulting map.
   """
-  def prune_hashes(given_hashes) do
+  def prune_hashes(given_hashes, mass_threshold \\ @default_params[:mass_threshold]) do
     # remove entries containing a single node
     hashes_with_multiple_nodes =
       given_hashes
@@ -106,7 +106,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
       |> Enum.into(%{})
 
     hashes_to_prune =
-      Enum.flat_map(hashes_with_multiple_nodes, &collect_subhashes/1)
+      Enum.flat_map(hashes_with_multiple_nodes, &collect_subhashes(&1, mass_threshold))
 
     delete_keys(hashes_to_prune, hashes_with_multiple_nodes)
   end
@@ -116,13 +116,13 @@ defmodule Credo.Check.Design.DuplicatedCode do
     delete_keys(tail, Map.delete(acc, head))
   end
 
-  defp collect_subhashes({_hash, node_items}) do
+  defp collect_subhashes({_hash, node_items}, mass_threshold) do
     %{node: first_node, filename: filename} = Enum.at(node_items, 0)
 
     my_hash = first_node |> CodeHelper.remove_metadata |> to_hash
     subhashes =
       first_node
-      |> calculate_hashes(%{}, filename)
+      |> calculate_hashes(%{}, filename, mass_threshold)
       |> Map.keys
       |> List.delete(my_hash) # don't count self
 
@@ -205,7 +205,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     !Enum.member?(excluded_macros, atom)
   end
   def create_issue?({atom, _, arguments}, excluded_macros) when is_atom(atom) and is_list(arguments) do
-    !Enum.member?(atom, excluded_macros)
+    !Enum.member?(excluded_macros, atom)
   end
   def create_issue?(_ast, _), do: true
 

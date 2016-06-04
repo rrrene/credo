@@ -31,7 +31,7 @@ end
 """ |> to_source_file
 
     source_files = [s1, s2]
-    :ok = @described_check.run(source_files)
+    :ok = @described_check.run(source_files, [mass_threshold: 16])
     [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
 
     refute Enum.empty?(s1.issues)
@@ -73,7 +73,7 @@ end
 """ |> to_source_file
 
     source_files = [s1, s2]
-    :ok = @described_check.run(source_files)
+    :ok = @described_check.run(source_files, [mass_threshold: 16])
     [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
 
     refute Enum.empty?(s1.issues)
@@ -149,8 +149,9 @@ defmodule M2 do
 end
 """ |> Code.string_to_quoted
 
-    hashes = DuplicatedCode.calculate_hashes(ast)
-    pruned = DuplicatedCode.prune_hashes(hashes)
+    mass_threshold = 16
+    hashes = DuplicatedCode.calculate_hashes(ast, %{}, "foo.ex", mass_threshold)
+    pruned = DuplicatedCode.prune_hashes(hashes, mass_threshold)
     assert 1 == Enum.count(pruned)
 
     with_masses = DuplicatedCode.add_masses(pruned)
@@ -184,9 +185,10 @@ defmodule M2 do
 end
 """ |> Code.string_to_quoted
 
-    hashes = DuplicatedCode.calculate_hashes(ast1, %{}, "m1.ex")
-    hashes = DuplicatedCode.calculate_hashes(ast2, hashes, "m2.ex")
-    pruned = DuplicatedCode.prune_hashes(hashes)
+    mass_threshold = 16
+    hashes = DuplicatedCode.calculate_hashes(ast1, %{}, "m1.ex", mass_threshold)
+    hashes = DuplicatedCode.calculate_hashes(ast2, hashes, "m2.ex", mass_threshold)
+    pruned = DuplicatedCode.prune_hashes(hashes, mass_threshold)
     assert 1 == Enum.count(pruned)
 
     with_masses = DuplicatedCode.add_masses(pruned)
