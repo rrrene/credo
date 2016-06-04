@@ -30,7 +30,7 @@
       #
       # To disable a check put `false` as second element:
       #
-      #      {Credo.Check.Consistency.ExceptionNames, false}
+      #     {Credo.Check.Consistency.ExceptionNames, false}
       #
       checks: [
         {Credo.Check.Consistency.ExceptionNames},
@@ -42,8 +42,13 @@
         # For some checks, like AliasUsage, you can only customize the priority
         # Priority values are: `low, normal, high, higher`
         {Credo.Check.Design.AliasUsage, priority: :low},
+
         # For others you can set parameters
-        {Credo.Check.Design.DuplicatedCode, mass_threshold: 16, nodes_threshold: 2},
+
+        # If you don't want the `test` macro calls in ExUnit tests or the
+        # `field` macro in Ecto schemas to trigger DuplicatedCode, just set the
+        # `excluded_macros` parameter to `[:field, :test]`.
+        {Credo.Check.Design.DuplicatedCode, excluded_macros: []},
 
         # You can also customize the exit_status of each check.
         # If you don't want TODO comments to cause `mix credo` to fail, just

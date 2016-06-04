@@ -26,9 +26,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
     ]
   ]
   @default_params [
-    mass_threshold: 16,
+    mass_threshold: 40,
     nodes_threshold: 2,
-    excluded_macros: [],
+    excluded_macros: []
   ]
 
   alias Credo.SourceFile
