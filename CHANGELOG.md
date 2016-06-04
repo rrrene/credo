@@ -27,6 +27,7 @@
 
 ### Minor Improvements
 
+- Ready for Elixir 1.3
 - Umbrella apps work out of the box now
 - DuplicatedCode can now ignore macro calls
 - ModuleDoc now ignores modules declaring exceptions
