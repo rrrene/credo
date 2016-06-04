@@ -55,7 +55,7 @@ defmodule Credo.Check.FindLintAttributes do
         # TODO: warn that a new lint attribute was read while one was still active
         process_calls(tail, %LintAttribute{meta: meta, arguments: arguments}, attribute_list)
       # another module attribute was found
-      {:@, meta, _} ->
+      {:@, _meta, _} ->
         process_calls(tail, current_lint_attribute, attribute_list)
       # an operation was found (at the module level)
       {op, meta, arguments} when is_atom(op) and is_list(arguments) ->

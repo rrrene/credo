@@ -21,7 +21,7 @@ defmodule Credo.Check.Runner do
       :timer.tc fn ->
         source_files_after_run_on_all
         |> Enum.map(&Task.async(fn -> run(&1, config) end))
-        |> Enum.map(&Task.await(&1, 600_000))
+        |> Enum.map(&Task.await(&1, :infinity))
       end
 
     #IO.inspect time_run
@@ -75,7 +75,7 @@ defmodule Credo.Check.Runner do
     |> Enum.map(&Task.async(fn ->
         run_check(&1, source_files, config)
       end))
-    |> Enum.each(&Task.await(&1, 600_000))
+    |> Enum.each(&Task.await(&1, :infinity))
 
     source_files
     |> SourceFileIssues.update_in_source_files

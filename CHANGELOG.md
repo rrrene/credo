@@ -28,6 +28,7 @@
 ### Minor Improvements
 
 - Umbrella apps work out of the box now
+- DuplicatedCode can now ignore macro calls
 - ModuleDoc now ignores modules declaring exceptions
 - MatchInCondition now allows "simple" wildcard assignments in conditionals
 - Checks analysing all files in the codebase sequentially (consistency checks)
