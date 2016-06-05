@@ -36,10 +36,6 @@ defmodule Credo.Priority do
     |> Enum.into(%{})
   end
 
-  defp sum(list, acc \\ 0)
-  defp sum([], acc), do: acc
-  defp sum([head|tail], acc), do: sum(tail, acc + head)
-
   defp make_base_map(priority_list, %SourceFile{} = source_file) do
     priority_list
     |> Enum.with_index
@@ -48,7 +44,7 @@ defmodule Credo.Priority do
         [] -> nil
         _ ->
           {_, scope_name} = Scope.name(source_file.ast, line: index + 1)
-          {scope_name, sum(list)}
+          {scope_name, Enum.sum(list)}
       end
     end)
     |> Enum.reject(&is_nil/1)
