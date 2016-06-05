@@ -48,5 +48,4 @@ defmodule Credo.CLI.Output.UI do
         String.slice(display_line, 0, chars_to_display) <> ellipsis
     end
   end
-
 end

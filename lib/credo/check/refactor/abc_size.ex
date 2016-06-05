@@ -98,7 +98,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   # A - assignments
   defp traverse_abc({:=, _meta, [lhs | rhs]}, [a: a, b: b, c: c, var_names: var_names]) do
     name = var_name(lhs)
-    if name, do: var_names = Enum.into var_names, [name]
+    var_names = if name, do: [name | var_names], else: var_names
     {rhs, [a: a + 1, b: b, c: c, var_names: var_names]}
   end
 

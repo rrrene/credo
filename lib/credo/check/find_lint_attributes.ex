@@ -37,31 +37,19 @@ defmodule Credo.Check.FindLintAttributes do
     {ast, attribute_list}
   end
 
-  def process_calls([], _, attribute_list), do: attribute_list
-  def process_calls([head|tail], nil, attribute_list) do
-    current_lint_attribute =
-      case head do
-        {:@, _, [{:lint, _, _}]} = ast ->
-          LintAttribute.from_ast(ast)
-        _ ->
-          nil
-      end
-    process_calls(tail, current_lint_attribute, attribute_list)
+  def process_calls([], _, attributes), do: attributes
+  def process_calls([{:@, _, [{:lint, _, _}] = ast} | tail], nil, attributes) do
+    current_lint_attribute = LintAttribute.from_ast(ast)
+    process_calls(tail, current_lint_attribute, attributes)
   end
-  def process_calls([head|tail], current_lint_attribute, attribute_list) do
-    case head do
-      {:@, meta, [{:lint, _, arguments}]} ->
-        # TODO: warn that a new lint attribute was read while one was still active
-        current_lint_attribute =
-          %LintAttribute{meta: meta, arguments: arguments}
-      {op, meta, _} when op in [:def, :defp] ->
-        current_lint_attribute =
-          %LintAttribute{current_lint_attribute | line: meta[:line]}
-        attribute_list = [current_lint_attribute | attribute_list]
-        current_lint_attribute = nil
-      _ ->
-        nil
-    end
-    process_calls(tail, current_lint_attribute, attribute_list)
+  def process_calls([{:@, _, [{:lint, _, _}] = ast} | tail], _old, attributes) do
+    # TODO: warn that a new lint attribute was read while one was still active
+    current_lint_attribute = LintAttribute.from_ast(ast)
+    process_calls(tail, current_lint_attribute, attributes)
+  end
+  def process_calls([{op, meta, _}|tail], current_attr, attributes)
+      when op in [:def, :defp] do
+    updated = %LintAttribute{current_attr | line: meta[:line]}
+    process_calls(tail, nil, [updated | attributes])
   end
 end

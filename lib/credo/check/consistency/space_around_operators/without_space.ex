@@ -1,7 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   use Credo.Check.CodePattern
 
-  alias Credo.Check.CodeHelper
   alias Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper
 
   def property_value, do: :without_space
@@ -23,31 +22,30 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
     |> PropertyValue.for(filename: filename, line_no: line_no, column: column, trigger: trigger)
   end
 
-  defp check_tokens([], acc), do: acc
+  defp check_tokens([], acc), do: List.flatten(acc)
   defp check_tokens([prev | t], acc) do
-    current = t |> List.first
-    next = t |> Enum.at(1)
-
+    destructure [current, next], t
     if SpaceHelper.operator?(current) do
-      acc = acc ++ collect_tokens(prev, current, next)
+      check_tokens(t, [acc, trigger_tokens_before(prev, current, next),
+                            trigger_tokens_after(prev, current, next)])
+    else
+      check_tokens(t, acc)
     end
-
-    check_tokens(t, acc)
   end
 
-  def collect_tokens(prev, operator, next) do
-    list = []
-    if SpaceHelper.no_space_between?(prev, operator) && !SpaceHelper.usually_no_space_before?(prev, operator, next) do
-      list = list ++ [SpaceHelper.trigger_token(operator)]
+  defp trigger_tokens_before(prev, operator, next) do
+    if SpaceHelper.no_space_between?(prev, operator) and not SpaceHelper.usually_no_space_before?(prev, operator, next) do
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
-    if SpaceHelper.no_space_between?(operator, next) && !SpaceHelper.usually_no_space_after?(prev, operator, next) do
-      case next do
-        {:eol, _} ->
-          nil
-        _ ->
-          list = list ++ [SpaceHelper.trigger_token(operator)]
-      end
+  end
+
+  defp trigger_tokens_after(prev, operator, next) do
+    if not match?({:eol, _}, next) and SpaceHelper.no_space_between?(operator, next) and not SpaceHelper.usually_no_space_after?(prev, operator, next) do
+      [SpaceHelper.trigger_token(operator)]
+    else
+      []
     end
-    list
   end
 end
