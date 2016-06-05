@@ -64,7 +64,8 @@ defmodule Credo.Sources do
     |> Enum.any?(&matches?(file, &1))
   end
   defp matches?(file, string) when is_binary(string) do
-    find(string)
+    string
+    |> find
     |> Enum.member?(file)
   end
   defp matches?(file, regex) do

@@ -53,8 +53,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     if config.verbose do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
-      UI.edge([outer_color, :faint])
-      |> UI.puts
+      UI.puts_edge([outer_color, :faint])
     end
   end
 

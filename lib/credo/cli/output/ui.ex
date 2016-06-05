@@ -11,8 +11,15 @@ defmodule Credo.CLI.Output.UI do
   defdelegate puts(v), to: Bunt
   def puts(v, color), do: Bunt.puts([color, v])
 
+  def puts_edge(color, indent \\ 2) when is_integer(indent) do
+    [color, indent]
+    |> edge
+    |> puts
+  end
+
   def wrap_at(text, number) do
-    Regex.compile!("(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{number}})(?:\\r?\\n)?|(?:\\r?\\n|$))")
+    "(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{number}})(?:\\r?\\n)?|(?:\\r?\\n|$))"
+    |> Regex.compile!
     |> Regex.scan(text)
     |> Enum.map(&List.first/1)
     |> List.delete_at(-1)
