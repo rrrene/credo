@@ -132,7 +132,8 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.traverse(source_file, &traverse(&1, &2, issue_meta, @excluded_names))
+    source_file
+    |> Credo.Code.traverse(&traverse(&1, &2, issue_meta, @excluded_names))
     |> List.flatten
     |> Enum.reject(&is_nil/1)
   end

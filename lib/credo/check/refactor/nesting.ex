@@ -44,7 +44,8 @@ defmodule Credo.Check.Refactor.Nesting do
 
   for op <- @def_ops do
     defp traverse({unquote(op) = op, meta, arguments} = ast, issues, issue_meta, max_nesting) when is_list(arguments) do
-      find_depth(arguments, [], meta[:line], op)
+      arguments
+      |> find_depth([], meta[:line], op)
       |> handle_depth(ast, issue_meta, issues, max_nesting)
     end
   end
