@@ -12,7 +12,9 @@ defmodule Credo.Priority do
       1..length(source_file.lines)
       |> Enum.map(fn(_) -> [] end)
 
-    priority_list = Credo.Code.traverse(source_file, &traverse/2, empty_priorities)
+    priority_list =
+      source_file
+      |> Credo.Code.traverse(&traverse/2, empty_priorities)
 
     base_map =
       priority_list
