@@ -64,7 +64,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
     line_ending = String.slice(line, 0..column1 - 1)
 
     underscore_count =
-      Regex.run(~r/\d_\d/, line_ending)
+      ~r/\d_\d/
+      |> Regex.run(line_ending)
       |> List.wrap
       |> Enum.count
 

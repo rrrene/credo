@@ -62,22 +62,26 @@ defmodule Credo.Check.Consistency.ExceptionNames do
     source_file = IssueMeta.source_file(issue_meta)
     case expected_prop do
       {prefix, :prefix} ->
-        find_exception_modules_without_prefix(source_file, prefix)
+        source_file
+        |> find_exception_modules_without_prefix(prefix)
         |> issues_for_wrong(:prefix, issue_meta, prefix)
       {suffix, :suffix} ->
-        find_exception_modules_without_suffix(source_file, suffix)
+        source_file
+        |> find_exception_modules_without_suffix(suffix)
         |> issues_for_wrong(:suffix, issue_meta, suffix)
       _ -> nil
     end
   end
 
   defp find_exception_modules_without_suffix(%SourceFile{ast: ast}, suffix) do
-    Credo.Code.traverse(ast, &find_exception_modules(&1, &2))
+    ast
+    |> Credo.Code.traverse(&find_exception_modules(&1, &2))
     |> Enum.reject(&name_with_suffix?(&1, suffix))
   end
 
   defp find_exception_modules_without_prefix(%SourceFile{ast: ast}, prefix) do
-    Credo.Code.traverse(ast, &find_exception_modules(&1, &2))
+    ast
+    |> Credo.Code.traverse(&find_exception_modules(&1, &2))
     |> Enum.reject(&name_with_prefix?(&1, prefix))
   end
 

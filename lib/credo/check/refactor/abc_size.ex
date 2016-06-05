@@ -40,7 +40,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_abc_size) when is_list(arguments) do
-      abc_size = abc_size_for(ast) |> round
+      abc_size = ast |> abc_size_for |> round
       if abc_size > max_abc_size do
         fun_name = CodeHelper.def_name(ast)
         {ast, [issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size) | issues]}

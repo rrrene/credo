@@ -56,8 +56,7 @@ defmodule Credo.CLI.Output.Explain do
     ]
     |> UI.puts
 
-    UI.edge(color)
-    |> UI.puts
+    UI.puts_edge(color)
 
     issues
     |> Enum.each(&print_issue(&1, source_file, term_width))
@@ -108,9 +107,7 @@ defmodule Credo.CLI.Output.Explain do
     ]
     |> UI.puts
 
-    outer_color
-    |> UI.edge
-    |> UI.puts
+    UI.puts_edge(outer_color)
 
     [
       UI.edge(outer_color),
@@ -132,8 +129,7 @@ defmodule Credo.CLI.Output.Explain do
     if issue.line_no do
       {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
 
-      UI.edge([outer_color, :faint])
-      |> UI.puts
+      UI.puts_edge([outer_color, :faint])
 
       [
         UI.edge([outer_color, :faint]), :reset, :color239,
@@ -141,8 +137,7 @@ defmodule Credo.CLI.Output.Explain do
       ]
       |> UI.puts
 
-      UI.edge([outer_color, :faint])
-      |> UI.puts
+      UI.puts_edge([outer_color, :faint])
 
       code_color = :faint
       print_source_line(source_file, issue.line_no - 2, term_width, code_color, outer_color)
@@ -169,8 +164,7 @@ defmodule Credo.CLI.Output.Explain do
       print_source_line(source_file, issue.line_no + 2, term_width, code_color, outer_color)
     end
 
-    UI.edge([outer_color, :faint], @indent)
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint], @indent)
 
     [
       UI.edge([outer_color, :faint]), :reset, :color239,
@@ -178,8 +172,7 @@ defmodule Credo.CLI.Output.Explain do
     ]
     |> UI.puts
 
-    UI.edge([outer_color, :faint])
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint])
 
     (issue.check.explanation || "TODO: Insert explanation")
     |> String.strip
@@ -188,14 +181,12 @@ defmodule Credo.CLI.Output.Explain do
     |> Enum.slice(0..-2)
     |> UI.puts
 
-    UI.edge([outer_color, :faint])
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint])
 
     issue.check.explanation_for_params
     |> print_params_explanation(outer_color)
 
-    UI.edge([outer_color, :faint])
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint])
   end
 
   defp print_source_line(source_file, line_no, term_width, color, outer_color) do
@@ -244,8 +235,7 @@ defmodule Credo.CLI.Output.Explain do
     ]
     |> UI.puts
 
-    UI.edge([outer_color, :faint])
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint])
 
     keywords
     |> Enum.each(fn({param, text}) ->
@@ -258,5 +248,4 @@ defmodule Credo.CLI.Output.Explain do
         |> UI.puts
       end)
   end
-
 end

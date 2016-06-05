@@ -91,8 +91,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     if issue.line_no do
       {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
 
-      UI.edge([outer_color, :faint])
-      |> UI.puts
+      UI.puts_edge([outer_color, :faint])
 
       [
         UI.edge([outer_color, :faint]), :cyan, :faint,
@@ -119,8 +118,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       end
     end
 
-    UI.edge([outer_color, :faint], @indent)
-    |> UI.puts
+    UI.puts_edge([outer_color, :faint], @indent)
   end
 
 end
