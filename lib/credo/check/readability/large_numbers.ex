@@ -61,7 +61,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
 
-    line_ending = String.slice(line, 0..column1-1)
+    line_ending = String.slice(line, 0..column1 - 1)
 
     underscore_count =
       Regex.run(~r/\d_\d/, line_ending)
@@ -70,7 +70,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
     temp_string =
       line
-      |> String.slice(column1-1+underscore_count..-1)
+      |> String.slice(column1 - 1 + underscore_count..-1)
 
     found_string =
       ~r/([0-9\_]*\.[0-9]+|[0-9\_]+)/

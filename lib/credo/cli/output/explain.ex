@@ -145,8 +145,8 @@ defmodule Credo.CLI.Output.Explain do
       |> UI.puts
 
       code_color = :faint
-      print_source_line(source_file, issue.line_no-2, term_width, code_color, outer_color)
-      print_source_line(source_file, issue.line_no-1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no - 2, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no - 1, term_width, code_color, outer_color)
       print_source_line(source_file, issue.line_no, term_width, [:cyan, :bright], outer_color)
 
       if issue.column do
@@ -165,8 +165,8 @@ defmodule Credo.CLI.Output.Explain do
         ]
         |> UI.puts
       end
-      print_source_line(source_file, issue.line_no+1, term_width, code_color, outer_color)
-      print_source_line(source_file, issue.line_no+2, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no + 1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no + 2, term_width, code_color, outer_color)
     end
 
     UI.edge([outer_color, :faint], @indent)
