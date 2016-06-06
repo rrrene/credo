@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.4.0 (pre)
+## 0.4.0
 
 ### Custom check support
 
@@ -28,6 +28,7 @@
 ### Minor Improvements
 
 - Ready for Elixir 1.3
+- Checks for new Credo versions automatically, like Hex does (can be disabled)
 - Umbrella apps work out of the box now
 - DuplicatedCode can now ignore macro calls
 - ModuleDoc now ignores modules declaring exceptions
