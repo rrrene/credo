@@ -12,20 +12,13 @@ defmodule Credo.Priority do
       1..length(source_file.lines)
       |> Enum.map(fn(_) -> [] end)
 
-    priority_list = Credo.Code.traverse(source_file, &traverse/2, empty_priorities)
+    priority_list =
+      source_file
+      |> Credo.Code.traverse(&traverse/2, empty_priorities)
 
     base_map =
       priority_list
-      |> Enum.with_index
-      |> Enum.map(fn({list, index}) ->
-          case list do
-            [] -> nil
-            _ ->
-              {_, scope_name} = Scope.name(source_file.ast, line: index + 1)
-              {scope_name, sum(list)}
-          end
-        end)
-      |> Enum.reject(&is_nil/1)
+      |> make_base_map(source_file)
 
     lookup =
       base_map
@@ -45,9 +38,19 @@ defmodule Credo.Priority do
     |> Enum.into(%{})
   end
 
-  defp sum(list, acc \\ 0)
-  defp sum([], acc), do: acc
-  defp sum([head|tail], acc), do: sum(tail, acc + head)
+  defp make_base_map(priority_list, %SourceFile{} = source_file) do
+    priority_list
+    |> Enum.with_index
+    |> Enum.map(fn({list, index}) ->
+      case list do
+        [] -> nil
+        _ ->
+          {_, scope_name} = Scope.name(source_file.ast, line: index + 1)
+          {scope_name, Enum.sum(list)}
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
 
   defp traverse({:defmodule, meta, _} = ast, acc) do
     added_prio = priority_for(ast)
