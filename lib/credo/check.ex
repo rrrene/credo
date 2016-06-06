@@ -35,6 +35,19 @@ defmodule Credo.Check do
 
       # TODO: def config_explanation(key), do: explanation_for(@explanation, key)
 
+      @doc """
+      format_issue takes an issue_meta and returns an issue.
+      The resulting issue can be made more explicit by passing the following
+      options to `format_issue/2`:
+
+      - `:priority`     Sets the issue's priority.
+      - `:trigger`      Sets the issue's trigger.
+      - `:line_no`      Sets the issue's line number.
+                          Tries to find `column` if `:trigger` is supplied.
+      - `:column`       Sets the issue's column.
+      - `:exit_status`  Sets the issue's exit_status.
+      - `:severity`     Sets the issue's severity.
+      """
       def format_issue(issue_meta, opts) do
         source_file = IssueMeta.source_file(issue_meta)
         params = IssueMeta.params(issue_meta)
