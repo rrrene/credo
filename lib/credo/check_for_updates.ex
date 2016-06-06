@@ -1,4 +1,4 @@
-defmodule Credo.Outdated do
+defmodule Credo.CheckForUpdates do
   def run() do
     Hex.start
     Hex.Utils.ensure_registry!()

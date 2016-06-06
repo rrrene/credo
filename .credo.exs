@@ -25,6 +25,10 @@
       # them here, so they can be loaded by Credo before running the analysis.
       requires: [],
       #
+      # Credo automatically checks for updates, like e.g. Hex does.
+      # You can disable this behaviour below:
+      check_for_updates: true,
+      #
       # You can customize the parameters of any check by adding a second element
       # to the tuple.
       #

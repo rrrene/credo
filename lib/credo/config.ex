@@ -4,21 +4,21 @@ defmodule Credo.Config do
   manipulated via the `Credo.Config` module.
   """
 
-  defstruct files:            nil,
-            checks:           nil,
-            requires:         [],
-            min_priority:     0,
-            help:             false,
-            version:          false,
-            verbose:          false,
-            all:              false,
-            format:           nil,
-            match_checks:     nil,
-            ignore_checks:    nil,
-            crash_on_error:   true,
-            check_outdated?:  true, # checks if there is a new version of Credo
-            read_from_stdin:  false,
-            lint_attribute_map: %{} # maps filenames to @lint attributes
+  defstruct files:              nil,
+            checks:             nil,
+            requires:           [],
+            min_priority:       0,
+            help:               false,
+            version:            false,
+            verbose:            false,
+            all:                false,
+            format:             nil,
+            match_checks:       nil,
+            ignore_checks:      nil,
+            crash_on_error:     true,
+            check_for_updates:  true, # checks if there is a new version of Credo
+            read_from_stdin:    false,
+            lint_attribute_map:   %{} # maps filenames to @lint attributes
 
   @config_filename ".credo.exs"
   @default_config_name "default"
@@ -130,6 +130,7 @@ defmodule Credo.Config do
       |> Enum.find(&(&1[:name] == config_name))
 
     %__MODULE__{
+      check_for_updates: data[:check_for_updates] || false,
       requires: data[:requires] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data)
@@ -181,6 +182,7 @@ defmodule Credo.Config do
   end
   def merge(base, other) do
     %__MODULE__{
+      check_for_updates: other.check_for_updates,
       requires: base.requires ++ other.requires,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
