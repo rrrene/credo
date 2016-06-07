@@ -21,7 +21,7 @@ Add as a dependency in your mix.exs file:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 0.3", only: [:dev, :test]}
+    {:credo, "~> 0.4", only: [:dev, :test]}
   ]
 end
 ```
@@ -343,7 +343,7 @@ Do note with the passed option as filename is a stub that is just used to prefix
 
 ### Using Credo as stand alone
 
-If you do not want or are not allowed to include credo in the current project you can also use it stand alone by installing it as follows:
+If you do not want or are not allowed to include Credo in the current project you can also install it as an archive:
 
 ```bash
 $ git clone git@github.com:rrrene/credo.git
@@ -353,7 +353,16 @@ $ mix archive.build
 $ mix archive.install
 ```
 
-You will now be able to invoke credo as usual through mix with `mix credo`. This option is especially handy so credo can be used by external editors.
+**Important:** You have to install `bunt` as well:
+
+```bash
+git clone https://github.com/rrrene/bunt
+cd bunt
+mix archive.build
+mix archive.install
+```
+
+You will now be able to invoke credo as usual through Mix with `mix credo`. This option is especially handy so credo can be used by external editors.
 
 
 ### Show code snippets in the output
