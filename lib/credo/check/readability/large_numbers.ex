@@ -81,10 +81,11 @@ defmodule Credo.Check.Readability.LargeNumbers do
     underscored_number = number_with_underscores(number)
 
     new_issue =
-      cond do
-        found_string != underscored_number ->
-          [issue_for(issue_meta, line_no, column1, found_string, underscored_number)]
-        true ->
+      if found_string != underscored_number do
+          [issue_for(
+            issue_meta, line_no, column1, found_string, underscored_number
+          )]
+      else
           []
       end
 
