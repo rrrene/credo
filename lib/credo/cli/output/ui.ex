@@ -12,8 +12,8 @@ defmodule Credo.CLI.Output.UI do
   def puts(v, color), do: Bunt.puts([color, v])
 
   def puts_edge(color, indent \\ 2) when is_integer(indent) do
-    [color, indent]
-    |> edge
+    color
+    |> edge(indent)
     |> puts
   end
 
