@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.4.1
+
+- Maintenance release because I apparently don't understand how merging works :sweat:
+
 ## 0.4.0
 
 ### Custom check support
