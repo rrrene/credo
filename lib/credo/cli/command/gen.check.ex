@@ -18,12 +18,7 @@ defmodule Credo.CLI.Command.GenCheck do
     |> Bunt.puts
   end
   defp create_check_file(filename) do
-    check_name =
-      filename
-      |> String.replace(~r/(.+)\/(lib|web)\//, "")
-      |> String.replace(~r/\.ex$/, "")
-      |> Macro.camelize
-      |> String.replace(~r/\_/, "")
+    check_name = check_name_for(filename)
 
     if File.exists?(filename) do
       Bunt.puts [:red, :bright, "File exists: #{filename}, aborted."]
@@ -33,7 +28,16 @@ defmodule Credo.CLI.Command.GenCheck do
       Bunt.puts
       print_config_instructions(filename, check_name)
     end
+
     :ok
+  end
+
+  def check_name_for(filename) do
+    filename
+    |> String.replace(~r/(\A|(.+)\/)(lib|web)\//, "")
+    |> String.replace(~r/\.ex$/, "")
+    |> Macro.camelize
+    |> String.replace(~r/\_/, "")
   end
 
   defp write_template_file(filename, check_name) do
