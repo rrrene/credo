@@ -32,6 +32,7 @@
 - Umbrella apps work out of the box now
 - DuplicatedCode can now ignore macro calls
 - ModuleDoc now ignores modules declaring exceptions
+- ModuleDoc now allows modules to be ignored based on their name
 - MatchInCondition now allows "simple" wildcard assignments in conditionals
 - Checks analysing all files in the codebase sequentially (consistency checks)
   are now run in parallel
