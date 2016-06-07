@@ -1,7 +1,7 @@
 defmodule Credo.Check.CodeHelper do
   @moduledoc """
-  This module contains functions that are used by several
-  checks when dealing with the AST.
+  This module contains functions that are used by several checks when dealing
+  with the AST.
   """
 
   alias Credo.Code.Block
@@ -89,6 +89,10 @@ defmodule Credo.Check.CodeHelper do
 
   defp find_child(parent, acc, child), do: {parent, acc || parent == child}
 
+  @doc """
+  Takes a SourceFile and returns its source code stripped of all Strings, Sigils
+  and code comments.
+  """
   def clean_strings_sigils_and_comments(%SourceFile{filename: filename, source: source}) do
     case SourceFileCodeOnly.get(filename) do
       {:ok, value} ->
@@ -106,6 +110,10 @@ defmodule Credo.Check.CodeHelper do
     |> String.replace(~r/([^\?])#.+/, "\\1")
   end
 
+  @doc """
+  Takes a SourceFile and returns its source code stripped of all Strings and
+  Sigils.
+  """
   def clean_strings_and_sigils(%SourceFile{filename: filename, source: source}) do
     case SourceFileWithoutStringAndSigils.get(filename) do
       {:ok, value} ->

@@ -5,13 +5,21 @@ defmodule Credo.Code do
 
   Whenever a function serves a general purpose in this area, e.g. getting the
   value of a module attribute inside a given module, we want to extract that
-  function and put it here, so others can utilize them without reinventing
-  the wheel.
+  function and put it in the Credo.Code namespace, so others can utilize them
+  without reinventing the wheel.
+
+  The most often utilized functions are conveniently imported to
+  `Credo.Check.CodeHelper`.
   """
 
   alias Credo.SourceFile
 
   defmodule ParserError do
+    @moduledoc """
+    This is an internal Issue raised by Credo when it finds itself unable to
+    parse the source code in a file.
+    """
+
     @explanation []
     #use Credo.Check, category: :error, base_priority: :normal
   end
@@ -73,5 +81,4 @@ defmodule Credo.Code do
       line_no:  line_no
     }
   end
-
 end
