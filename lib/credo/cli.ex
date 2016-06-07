@@ -70,6 +70,14 @@ defmodule Credo.CLI do
       Credo.CLI.Command.Help
   """
   def command_for(nil), do: nil
+  def command_for(command) when is_atom(command) do
+    command_modules = Map.values(@command_map)
+    if Enum.member?(command_modules, command) do
+      command
+    else
+      nil
+    end
+  end
   def command_for(command) when is_binary(command) do
     if Enum.member?(commands, command) do
       @command_map[command]
@@ -99,12 +107,12 @@ defmodule Credo.CLI do
     {switches_kw, args, []} =
       OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
-    {command_name, dir} =
+    {command_name, dir, args} =
       case args |> List.first |> command_for() do
         nil ->
-          {nil, Enum.at(args, 0)}
+          {nil, Enum.at(args, 0), args}
         command_name ->
-          {command_name, Enum.at(args, 1)}
+          {command_name, Enum.at(args, 1), args |> Enum.slice(1..-1)}
       end
 
     dir = dir || @default_dir
