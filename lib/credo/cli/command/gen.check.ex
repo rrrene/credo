@@ -36,7 +36,7 @@ defmodule Credo.CLI.Command.GenCheck do
     filename
     |> String.replace(~r/(\A|(.+)\/)(lib|web)\//, "")
     |> String.replace(~r/\.ex$/, "")
-    |> Macro.camelize
+    |> __MODULE__.MacroPort.camelize
     |> String.replace(~r/\_/, "")
   end
 
@@ -64,4 +64,25 @@ defmodule Credo.CLI.Command.GenCheck do
     Bunt.puts ["If you do not have a config file yet, use `mix credo gen.config`"]
   end
 
+  # This module ensures we have access to Macro.camelize in Elixir 1.1
+  #
+  defmodule MacroPort do
+    def camelize(str)
+
+    def camelize(""), do: ""
+    def camelize(<<?_, t::binary>>), do: camelize(t)
+    def camelize(<<h, t::binary>>), do: <<upcase(h)>> <> _camelize(t)
+
+    defp _camelize(<<?_, ?_, t::binary>>), do: _camelize(<<?_, t::binary >>)
+    defp _camelize(<<?_, h, t::binary>>) when h >= ?a and h <= ?z do
+      <<upcase(h)>> <> _camelize(t)
+    end
+    defp _camelize(<<?_>>), do: <<>>
+    defp _camelize(<<?/, t::binary>>), do: <<?.>> <> camelize(t)
+    defp _camelize(<<h, t::binary>>), do: <<h>> <> _camelize(t)
+    defp _camelize(<<>>), do: <<>>
+
+    defp upcase(char) when char >= ?a and char <= ?z, do: char - 32
+    defp upcase(char), do: char
+  end
 end
