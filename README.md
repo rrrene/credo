@@ -148,9 +148,8 @@ Credo is configured via a file called `.credo.exs`. This file can live in your p
         # set this value to 0 (zero).
         {Credo.Check.Design.TagTODO, exit_status: 2},
 
-        # There are two ways of deactivating a check:
-        # 1. deleting the check from this list
-        # 2. putting `false` as second element (to quickly "comment it out"):
+        # To deactivate a check:
+        # Put `false` as second element:
         {Credo.Check.Design.TagFIXME, false},
 
         # ... several checks omitted for readability ...
