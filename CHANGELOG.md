@@ -1,6 +1,11 @@
 # Changelog
 
 
+## 0.4.2
+
+- Fix outdated comments in .credo.exs template
+- Fix name generator including "Lib." prefix for custom checks
+
 ## 0.4.1
 
 - Maintenance release because I apparently don't understand how merging works :sweat:
