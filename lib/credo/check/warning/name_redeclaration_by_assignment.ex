@@ -123,6 +123,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
   ]
   @excluded_names [:_, :sigil_r, :sigil_R]
 
+  alias Credo.Code
   alias Credo.Code.Module
 
   use Credo.Check, base_priority: :high
@@ -131,33 +132,35 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
-    |> Credo.Code.traverse(&traverse(&1, &2, issue_meta, @excluded_names))
+    |> Code.traverse(&traverse(&1, &2, issue_meta, @excluded_names))
     |> List.flatten
     |> Enum.reject(&is_nil/1)
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_names) do
-    def_names = Module.def_names_with_op(ast)
-    issues =
-      issues ++ Credo.Code.traverse(ast, &mod_traverse(&1, &2, issue_meta, def_names, excluded_names))
-    {ast, issues}
+    names = %{
+      def_names: Module.def_names_with_op(ast),
+      excluded_names: excluded_names
+    }
+
+    new_issues = Code.traverse(ast, &mod_traverse(&1, &2, issue_meta, names))
+
+    {ast, issues ++ new_issues}
   end
   defp traverse(ast, issues, _issue_meta, _excluded_names) do
     {ast, issues}
   end
 
-  defp mod_traverse({:=, _meta, [lhs, _rhs]} = ast, issues, issue_meta, def_names, excluded_names) do
-    case find_issue(lhs, issue_meta, def_names, excluded_names) do
+  defp mod_traverse({:=, _meta, [lhs, _rhs]} = ast, issues, issue_meta, %{} = names) do
+    case find_issue(lhs, issue_meta, names.def_names, names.excluded_names) do
       nil -> {ast, issues}
       list when is_list(list) -> {ast, issues ++ list}
       new_issue -> {ast, issues ++ [new_issue]}
     end
   end
-  defp mod_traverse(ast, issues, _issue_meta, _def_names, _excluded_names) do
+  defp mod_traverse(ast, issues, _issue_meta, _names) do
     {ast, issues}
   end
-
-
 
   def find_issue({:->, _meta2, [lhs, _rhs]}, issue_meta, def_names, excluded_names) do
     find_issue(lhs, issue_meta, def_names, excluded_names)
@@ -178,25 +181,18 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
     find_issue(map, issue_meta, def_names, excluded_names)
   end
   def find_issue({name, meta, _}, issue_meta, def_names, excluded_names) do
-    def_name_with_op =
-      def_names
-      |> Enum.find(fn({def_name, _op}) -> def_name == name end)
+    line_no = meta[:line]
+    def_op = def_names |> find_def_op(name)
+
     cond do
       excluded_names |> Enum.member?(name) ->
         nil
-      def_name_with_op ->
-        what =
-          case def_name_with_op do
-            {_, :def} -> "a function in the same module"
-            {_, :defp} -> "a private function in the same module"
-            {_, :defmacro} -> "a macro in the same module"
-            _ -> "ERROR"
-          end
-        issue_for(issue_meta, meta[:line], name, what)
+      def_op ->
+        issue_for(issue_meta, line_no, name, message_for_def(def_op))
       @kernel_fun_names |> Enum.member?(name) ->
-        issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` function")
+        issue_for(issue_meta, line_no, name, "the `Kernel.#{name}` function")
       @kernel_macro_names |> Enum.member?(name) ->
-        issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` macro")
+        issue_for(issue_meta, line_no, name, "the `Kernel.#{name}` macro")
       true ->
         nil
     end
@@ -212,6 +208,24 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
   end
   def find_issue(_, _, _, _) do
     nil
+  end
+
+  defp find_def_op(def_names, name) do
+    def_names
+    |> Enum.find(fn({def_name, _op}) -> def_name == name end)
+    |> extract_def_op
+  end
+
+  defp extract_def_op({_, op}), do: op
+  defp extract_def_op(nil), do: nil
+
+  defp message_for_def(op) do
+    case op do
+      :def -> "a function in the same module"
+      :defp -> "a private function in the same module"
+      :defmacro -> "a macro in the same module"
+      _ -> "ERROR"
+    end
   end
 
   defp issue_for(issue_meta, line_no, trigger, what) do
