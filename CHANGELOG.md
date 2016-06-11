@@ -3,7 +3,7 @@
 
 ## 0.4.2
 
-- Fix outdated comments in .credo.exs template
+- Fix outdated comments regarding .credo.exs in README
 - Fix name generator including "Lib." prefix for custom checks
 
 ## 0.4.1
