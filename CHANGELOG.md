@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 0.4.3
+
+- Fix compatibility issues in `Credo.CLI.Command.GenCheck` for Elixir < 1.2
+
 ## 0.4.2
 
 - Fix outdated comments regarding .credo.exs in README
