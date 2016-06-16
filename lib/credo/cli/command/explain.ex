@@ -13,6 +13,7 @@ defmodule Credo.CLI.Command.Explain do
   # TODO: explain used config options
 
   def run(_args, %Config{help: true}), do: print_help
+  def run([], _), do: print_help
   def run([file | _], config) do
     {_, source_files} = load_and_validate_source_files(config)
     {_, {source_files, config}}  = run_checks(source_files, config)
@@ -74,7 +75,7 @@ defmodule Credo.CLI.Command.Explain do
 
 
   defp print_help do
-    ["Usage: ", :olive, "mix credo explain [path_line_no_column] [options]"]
+    ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
     |> UI.puts
     """
 
