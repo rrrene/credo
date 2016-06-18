@@ -27,20 +27,4 @@ end
     |> refute_issues(@described_check)
   end
 
-
-  test "it should report a violation" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    if something? do
-      parameter2
-    else
-      raise "error!!!"
-      parameter1 + parameter2
-    end
-  end
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-  end
 end
