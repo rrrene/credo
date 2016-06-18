@@ -1,5 +1,7 @@
 /_build
 /deps
 /docs
+/.idea
+*.iml
 erl_crash.dump
 *.ez
