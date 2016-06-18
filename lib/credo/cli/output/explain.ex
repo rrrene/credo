@@ -183,7 +183,7 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint])
 
-    issue.check.explanation_for_params
+    issue.check
     |> print_params_explanation(outer_color)
 
     UI.puts_edge([outer_color, :faint])
@@ -231,24 +231,77 @@ defmodule Credo.CLI.Output.Explain do
   defp pos_string(line_no, column), do: ":#{line_no}:#{column}"
 
   def print_params_explanation(nil, _), do: nil
-  def print_params_explanation(keywords, outer_color) do
+  def print_params_explanation(check, outer_color) do
+    keywords = check.explanation_for_params
+    check_name = check |> to_string |> String.replace(~r/^Elixir\./, "")
+
     [
       UI.edge([outer_color, :faint]), :reset, :color239,
-        String.duplicate(" ", @indent-5), "__ CONFIGURATION OPTIONS"
+        String.duplicate(" ", @indent-5), "__ CONFIGURATION OPTIONS",
     ]
     |> UI.puts
 
     UI.puts_edge([outer_color, :faint])
 
-    keywords
-    |> Enum.each(fn({param, text}) ->
-        [
-          UI.edge([outer_color, :faint]), :reset,
-            String.duplicate(" ", @indent-2),
-            :cyan, "#{param}:" |> String.ljust(20),
-            :reset, text
-        ]
-        |> UI.puts
-      end)
+    if keywords |> List.wrap |> Enum.any? do
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "To configure this check, use this tuple"
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, :faint, "<params>", :reset ,"}"
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset ," being ", :cyan, "false", :reset, " or any combination of these keywords:"
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+
+      keywords
+      |> Enum.each(fn({param, text}) ->
+          [
+            UI.edge([outer_color, :faint]), :reset,
+              String.duplicate(" ", @indent-2),
+              :cyan, "  #{param}:" |> String.ljust(20),
+              :reset, text
+          ]
+          |> UI.puts
+        end)
+    else
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "You can disable this check, by using this tuple"
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset ,"}"
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+
+      [
+        UI.edge([outer_color, :faint]), :reset,
+          String.duplicate(" ", @indent-2), "There not other configuration options."
+      ]
+      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+    end
   end
 end
