@@ -92,4 +92,27 @@ end
     assert expected == Module.def_names_with_op(ast)
   end
 
+  test "returns the correct names with defining op and arity" do
+    {:ok, ast} = """
+defmodule CredoSampleModule do
+  def fun1(nil), do: 1
+  def fun1(x), do: fun2 + 1
+
+  defp fun2, do: 42
+  defmacro funny_macro do
+    something = 3
+    quote do
+      true
+    end
+  end
+end
+    """ |> Code.string_to_quoted
+
+    expected0 = [{:fun2, :defp}, {:funny_macro, :defmacro}]
+    assert expected0 == Module.def_names_with_op(ast, 0)
+
+    expected1 = [{:fun1, :def}]
+    assert expected1 == Module.def_names_with_op(ast, 1)
+  end
+
 end
