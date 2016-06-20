@@ -1,11 +1,13 @@
 # Changelog
 
+## 0.4.5 (pre)
+
+- Warnings about redeclaring names of Kernel or local functions now only consider function of arity zero.
+- Better explanation how to configure checks in `explain` output
 
 ## 0.4.4
 
-- Warnings about redeclaring names of Kernel or local functions now only consider function of arity zero.
 - New check: readability/parentheses_in_condition
-- Better explanation how to configure checks in `explain` output
 
 ## 0.4.3
 
