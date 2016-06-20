@@ -65,8 +65,8 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp find_issues([], acc, _issue_meta) do
     acc
   end
-  defp find_issues([{_, {line_no, _, _}, _} | t], acc, issue_meta) do
-    new_issue = issue_for(issue_meta, line_no, "()")
+  defp find_issues([{_, {line_no, _, _}, trigger} | t], acc, issue_meta) do
+    new_issue = issue_for(issue_meta, line_no, trigger)
 
     acc = acc ++ [new_issue]
 
@@ -75,7 +75,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "The condition of `if` or `unless` should not be wrapped in parentheses.",
+      message: "The condition of `#{trigger}` should not be wrapped in parentheses.",
       trigger: trigger,
       line_no: line_no
   end
