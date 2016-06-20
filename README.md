@@ -1,4 +1,4 @@
-# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/rrrene/credo.svg)](https://beta.hexfaktor.org/github/rrrene/credo) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo) [![Hex Version](https://img.shields.io/hexpm/v/credo.svg)](https://hex.pm/packages/credo)
+# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/rrrene/credo.svg?branch=master)](https://beta.hexfaktor.org/github/rrrene/credo) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo) [![Hex Version](https://img.shields.io/hexpm/v/credo.svg)](https://hex.pm/packages/credo)
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
