@@ -38,14 +38,13 @@ defmodule CredoSampleModule do
   use ExUnit.Case
 
   def some_fun(x, y) do
-    y / 1   # always returns y
     x * 1   # always returns x
     x * 0   # always returns 0
   end
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 3 == Enum.count(issues), "found: #{to_inspected(issues)}"
+        assert 2 == Enum.count(issues), "found: #{to_inspected(issues)}"
       end)
   end
 

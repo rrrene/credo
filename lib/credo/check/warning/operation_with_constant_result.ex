@@ -5,7 +5,6 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
 
   Examples:
 
-      y / 1   # always returns y
       x * 1   # always returns x
       x * 0   # always returns 0
 
@@ -15,7 +14,6 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
 
   @explanation [check: @moduledoc]
   @ops_and_constant_results [
-      {:/, "the left side of the expression", 1},
       {:*, "zero", 0},
       {:*, "the left side of the expression", 1}
     ]
