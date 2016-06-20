@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.4.5 (pre)
+## 0.4.5
 
 - Warnings about redeclaring names of Kernel or local functions now only consider function of arity zero.
+- Warnings for operations with constant result now ignore division by 1
 - Better explanation how to configure checks in `explain` output
 
 ## 0.4.4
