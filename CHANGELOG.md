@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 0.4.4
+
+- Warnings about redeclaring names of Kernel or local functions now only consider function of arity zero.
+- New check: readability/parentheses_in_condition
+- Better explanation how to configure checks in `explain` output
+
 ## 0.4.3
 
 - Fix compatibility issues in `Credo.CLI.Command.GenCheck` for Elixir < 1.2
