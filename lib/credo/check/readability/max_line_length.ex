@@ -10,11 +10,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
     params: [
       max_length: "The maximum number of characters a line may consist of.",
       ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+      ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
     ]
   ]
   @default_params [
     max_length: 80,
     ignore_definitions: true,
+    ignore_specs: false,
     ignore_strings: true
   ]
 
@@ -26,13 +28,15 @@ defmodule Credo.Check.Readability.MaxLineLength do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = params |> Params.get(:max_length, @default_params)
     ignore_definitions = params |> Params.get(:ignore_definitions, @default_params)
+    ignore_specs = params |> Params.get(:ignore_specs, @default_params)
     ignore_strings = params |> Params.get(:ignore_strings, @default_params)
 
     definitions = Credo.Code.traverse(ast, &find_definitions/2)
+    specs = Credo.Code.traverse(ast, &find_specs/2)
 
     Enum.reduce(lines, [], fn({line_no, line}, issues) ->
       if String.length(line) > max_length do
-        if refute_issue?(line_no, definitions, ignore_definitions, ignore_strings) do
+        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, ignore_strings) do
           issues
         else
           [issue_for(line_no, max_length, line, issue_meta) | issues]
@@ -52,14 +56,24 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  defp refute_issue?(line_no, definitions, ignore_definitions, ignore_strings) do
+  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
+    {ast, [meta[:line] | specs]}
+  end
+  defp find_specs(ast, specs) do
+    {ast, specs}
+  end
+
+  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, ignore_strings) do
     ignore_definitions? =
       fn -> if ignore_definitions, do: Enum.member?(definitions, line_no), else: false end
+
+    ignore_specs? =
+      fn -> if ignore_specs, do: Enum.member?(specs, line_no), else: false end
 
     ignore_strings? = # TODO: implement ignore_strings check
       fn -> if ignore_strings, do: false, else: false end
 
-    ignore_definitions?.() || ignore_strings?.()
+    ignore_definitions?.() || ignore_specs?.() || ignore_strings?.()
   end
 
 

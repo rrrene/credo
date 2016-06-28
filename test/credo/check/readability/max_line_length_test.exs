@@ -29,6 +29,20 @@ end
     |> refute_issues(@described_check, ignore_definitions: true)
   end
 
+  test "it should NOT report expected code if @spec's are excluded" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  @spec some_fun(binary, binary, binary, binary, binary, binary, binary, binary, binary)
+  def some_fun(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) do
+    assert 1 + 1 == 2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, ignore_specs: true)
+  end
+
   @tag :to_be_implemented
   test "it should NOT report a violation if strings are excluded" do
 """
