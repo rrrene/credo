@@ -96,4 +96,15 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should format floating point numbers nicely" do
+"""
+def numbers do
+  10000.00001
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, fn(%Credo.Issue{message: message}) ->
+      assert Regex.run(~r/[\d\._]+/, message) |> hd ==  "10_000.00001"
+    end)
+  end
 end

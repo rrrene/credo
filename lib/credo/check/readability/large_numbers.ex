@@ -94,9 +94,26 @@ defmodule Credo.Check.Readability.LargeNumbers do
     find_issues(t, acc, issue_meta)
   end
 
-  defp number_with_underscores(number) do
+  defp number_with_underscores(number) when is_integer(number) do
     number
     |> to_string
+    |> add_underscores_to_number_string
+  end
+
+  # TODO: this would better be done using the text from the code rather
+  # than the floating point value as we're bound to be bitten by rounding
+  # errors...
+  defp number_with_underscores(number) when is_number(number) do
+    [num, decimal] =
+      number
+      |> to_string
+      |> String.split(".", parts: 2)
+
+    [num |> add_underscores_to_number_string, decimal] |> Enum.join(".")
+  end
+
+  defp add_underscores_to_number_string(string) do
+    string
     |> String.reverse
     |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
     |> String.reverse
