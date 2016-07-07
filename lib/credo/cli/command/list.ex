@@ -11,7 +11,7 @@ defmodule Credo.CLI.Command.List do
   alias Credo.CLI.Output
   alias Credo.Sources
 
-  def run(_args, %Config{help: true}), do: print_help
+  def run(_args, %Config{help: true}), do: print_help()
   def run(_args, config) do
     {time_load, source_files} = load_and_validate_source_files(config)
     {time_run, {source_files, config}}  = run_checks(source_files, config)

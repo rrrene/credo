@@ -18,7 +18,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   end
 
   defp to_property_values({{line_no, column, _}, trigger}, filename) do
-    property_value
+    property_value()
     |> PropertyValue.for(filename: filename, line_no: line_no, column: column, trigger: trigger)
   end
 

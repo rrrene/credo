@@ -19,7 +19,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.WithSpace do
     results = Regex.run(@regex, line)
     if results do
       trigger = results |> Enum.at(1)
-      property_value
+      property_value()
       |> PropertyValue.for(filename: filename, line_no: line_no, trigger: trigger)
     end
   end

@@ -9,11 +9,11 @@ defmodule Credo.Mixfile do
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps,
+      deps: deps(),
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
       description: "A static code analysis tool for the Elixir language with a focus on code consistency and teaching.",
-      package: package
+      package: package()
     ]
   end
 

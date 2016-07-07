@@ -9,7 +9,7 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Tabs do
   end
 
   defp property_value_for_line({line_no, "\t" <> _line}, filename) do
-    property_value
+    property_value()
     |> PropertyValue.for(filename: filename, line_no: line_no)
   end
   defp property_value_for_line({_, _}, _), do: nil
