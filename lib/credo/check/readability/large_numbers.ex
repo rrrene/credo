@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     underscored_number = number_with_underscores(number, source)
 
     new_issue =
-      if source != underscored_number do
+      if decimal_in_source?(source) && source != underscored_number do
         [issue_for(
           issue_meta, line_no, column1, source, underscored_number
         )]
@@ -100,6 +100,15 @@ defmodule Credo.Check.Readability.LargeNumbers do
       line_no: line_no,
       column: column,
       trigger: trigger
+  end
+
+  defp decimal_in_source?(source) do
+    case String.slice(source, 0, 2) do
+      "0b" -> false
+      "0o" -> false
+      "0x" -> false
+      _ -> true
+    end
   end
 
   defp source_fragment({line_no, column1, column2} = tuple, issue_meta) do

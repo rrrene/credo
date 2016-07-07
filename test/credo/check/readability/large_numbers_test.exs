@@ -131,4 +131,16 @@ end
       assert Regex.run(~r/[\d\._]+/, message) |> hd ==  "10_000.000010"
     end)
   end
+
+  test "it should not complain about non-decimal numbers" do
+"""
+def numbers do
+  0xFFFF
+  0b1111_1111_1111_1111
+  0o777_777
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 end
