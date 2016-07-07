@@ -34,8 +34,8 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.1.6"},
-      {:inch_ex, "~> 0.4", only: [:dev, :test]},
-      {:coverex, "~> 1.4.1", only: :test}
+      {:inch_ex, "~> 0.5.3", only: [:dev, :test]},
+      {:coverex, "~> 1.4.9", only: :test}
     ]
   end
 end
