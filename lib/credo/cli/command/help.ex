@@ -14,12 +14,12 @@ defmodule Credo.CLI.Command.Help do
   alias Credo.CLI.Sorter
 
   def run(_, _) do
-    print_banner
-    print_message
+    print_banner()
+    print_message()
   end
 
   def print_banner do
-    banner
+    banner()
     |> String.split("")
     |> Enum.flat_map(fn(x) -> [color_for(x), x] end)
     |> UI.puts

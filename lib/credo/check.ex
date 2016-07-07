@@ -53,12 +53,12 @@ defmodule Credo.Check do
         params = IssueMeta.params(issue_meta)
         priority =
           case params[:priority] do
-            nil -> base_priority
+            nil -> base_priority()
             val -> val |> Check.to_priority
           end
         exit_status =
           case params[:exit_status] do
-            nil -> category |> Check.to_exit_status
+            nil -> category() |> Check.to_exit_status
             val -> val |> Check.to_exit_status
           end
 
@@ -86,7 +86,7 @@ defmodule Credo.Check do
         %Issue{
           issue |
           check: __MODULE__,
-          category: category
+          category: category()
         }
       end
 

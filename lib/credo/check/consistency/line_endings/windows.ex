@@ -10,7 +10,7 @@ defmodule Credo.Check.Consistency.LineEndings.Windows do
 
   defp property_value_for_line({line_no, line}, filename) do
     if String.ends_with?(line, "\r") do
-      property_value
+      property_value()
       |> PropertyValue.for(filename: filename, line_no: line_no)
     end
   end

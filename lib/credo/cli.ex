@@ -79,7 +79,7 @@ defmodule Credo.CLI do
     end
   end
   def command_for(command) when is_binary(command) do
-    if Enum.member?(commands, command) do
+    if Enum.member?(commands(), command) do
       @command_map[command]
     else
       nil
