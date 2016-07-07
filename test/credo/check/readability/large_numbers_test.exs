@@ -4,16 +4,29 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   @described_check Credo.Check.Readability.LargeNumbers
 
   test "it should NOT report expected code" do
+    if System.version |> Version.compare("1.3.2") == :lt do
+"""
+def numbers do
+  1024 +
+  1_000_000 +
+  11_000 +
+  22_000 +
+  33_000
+  10_000..
+  20_000
+end
+"""
+    else
 """
 def numbers do
   1024 + 1_000_000 + 11_000 + 22_000 + 33_000
   10_000..20_000
 end
-""" |> to_source_file
+"""
+  end
+    |> to_source_file
     |> refute_issues(@described_check)
   end
-
-
 
   test "it should report a violation" do
 """
@@ -105,6 +118,17 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(%Credo.Issue{message: message}) ->
       assert Regex.run(~r/[\d\._]+/, message) |> hd ==  "10_000.00001"
+    end)
+  end
+
+  test "it should report all digits from the source" do
+"""
+def numbers do
+  10000.000010
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, fn(%Credo.Issue{message: message}) ->
+      assert Regex.run(~r/[\d\._]+/, message) |> hd ==  "10_000.000010"
     end)
   end
 end
