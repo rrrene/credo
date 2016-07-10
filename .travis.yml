@@ -8,5 +8,10 @@ otp_release:
   - 18.0
   - 18.1
   - 18.2
+  - 19.0
 after_script:
   - MIX_ENV=test mix inch.report
+matrix:
+  exclude:
+  - elixir: 1.1.1
+    otp_release: 19.0
