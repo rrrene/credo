@@ -55,35 +55,16 @@ defmodule Credo.Check.Readability.LargeNumbers do
   defp find_issues([], acc, _issue_meta) do
     acc
   end
-  defp find_issues([{:number, {line_no, column1, _column2}, number} | t], acc, issue_meta) do
-    line =
-      issue_meta
-      |> IssueMeta.source_file
-      |> SourceFile.line_at(line_no)
 
-    line_ending = String.slice(line, 0..column1 - 1)
+  defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
+    source = source_fragment(location, issue_meta)
 
-    underscore_count =
-      ~r/\d_\d/
-      |> Regex.run(line_ending)
-      |> List.wrap
-      |> Enum.count
-
-    temp_string =
-      line
-      |> String.slice(column1 - 1 + underscore_count..-1)
-
-    found_string =
-      ~r/([0-9\_]*\.[0-9]+|[0-9\_]+)/
-      |> Regex.run(temp_string)
-      |> List.first
-
-    underscored_number = number_with_underscores(number)
+    underscored_number = number_with_underscores(number, source)
 
     new_issue =
-      if found_string != underscored_number do
+      if decimal_in_source?(source) && source != underscored_number do
         [issue_for(
-          issue_meta, line_no, column1, found_string, underscored_number
+          issue_meta, line_no, column1, source, underscored_number
         )]
       else
         []
@@ -94,9 +75,20 @@ defmodule Credo.Check.Readability.LargeNumbers do
     find_issues(t, acc, issue_meta)
   end
 
-  defp number_with_underscores(number) do
+  defp number_with_underscores(number, _) when is_integer(number) do
     number
     |> to_string
+    |> add_underscores_to_number_string
+  end
+
+  defp number_with_underscores(number, source_fragment) when is_number(number) do
+    [num, decimal] = String.split(source_fragment, ".", parts: 2)
+
+    [num |> add_underscores_to_number_string, decimal] |> Enum.join(".")
+  end
+
+  defp add_underscores_to_number_string(string) do
+    string
     |> String.reverse
     |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
     |> String.reverse
@@ -108,5 +100,47 @@ defmodule Credo.Check.Readability.LargeNumbers do
       line_no: line_no,
       column: column,
       trigger: trigger
+  end
+
+  defp decimal_in_source?(source) do
+    case String.slice(source, 0, 2) do
+      "0b" -> false
+      "0o" -> false
+      "0x" -> false
+      _ -> true
+    end
+  end
+
+  defp source_fragment({line_no, column1, column2} = tuple, issue_meta) do
+    fragment =
+      issue_meta
+      |> IssueMeta.source_file
+      |> SourceFile.line_at(line_no)
+      |> String.slice((column1 - 1)..(column2 - 2))
+
+    if System.version |> Version.compare("1.3.2") == :lt do
+      source_fragment_pre_132(tuple, issue_meta, fragment)
+    else
+      fragment
+    end
+  end
+
+  # There's a bug in the :elixir_tokenizer.tokenize/3 in versions prior to
+  # 1.3.2 where the _ in the source code is not included in the token's
+  # length, so that means we have to re-calculate the token if it has _ in it.
+  #
+  # Unfortuately this leaves the line and column counts out of sync so this
+  # "fix" only works "reliably" for the first number with _ in the line.
+  defp source_fragment_pre_132({line_no, column1, column2}, issue_meta, first_fragment) do
+    underscores = (first_fragment |> String.split("_") |> Enum.count) - 1
+
+    if underscores > 0 do
+      issue_meta
+      |> IssueMeta.source_file
+      |> SourceFile.line_at(line_no)
+      |> String.slice((column1 - 1)..(column2 - 2 + underscores))
+    else
+      first_fragment
+    end
   end
 end
