@@ -118,7 +118,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 2))
 
-    if System.version |> Version.compare("1.3.2") == :lt do
+    if System.version |> Version.match?("< 1.3.2-dev") do
       source_fragment_pre_132(tuple, issue_meta, fragment)
     else
       fragment
