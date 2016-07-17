@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.6 (pre)
+
+- Add `ignore_specs` option to `MaxLineLength`
+- Fix false positives for `LargeNumbers` in Elixir `>= 1.3.2`
+- Fix compiler warnings in preparation for Elixir v1.4
+
 ## 0.4.5
 
 - Warnings about redeclaring names of Kernel or local functions now only consider function of arity zero.
