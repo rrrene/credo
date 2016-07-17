@@ -5,10 +5,16 @@ Credo.Test.Application.start([], [])
 ExUnit.start()
 
 check_version =
-  cond do
-    System.version |> Version.compare("1.2.0") == :lt -> [needs_elixir: "1.2.0"]
-    true -> []
-  end
+  ~w(1.2.0 1.3.2)
+  |> Enum.reduce([], fn(version, acc) ->
+    # allow -dev versions so we can test before the Elixir release.
+    if System.version |> Version.match?("< #{version}-dev") do
+      acc ++ [needs_elixir: version]
+    else
+      acc
+    end
+  end)
+
 exclude = Keyword.merge([to_be_implemented: true], check_version)
 
 ExUnit.configure(exclude: exclude)

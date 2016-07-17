@@ -3,27 +3,14 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 
   @described_check Credo.Check.Readability.LargeNumbers
 
+  @tag needs_elixir: "1.3.2"
   test "it should NOT report expected code" do
-    if System.version |> Version.compare("1.3.2") == :lt do
-"""
-def numbers do
-  1024 +
-  1_000_000 +
-  11_000 +
-  22_000 +
-  33_000
-  10_000..
-  20_000
-end
-"""
-    else
 """
 def numbers do
   1024 + 1_000_000 + 11_000 + 22_000 + 33_000
   10_000..20_000
 end
 """
-  end
     |> to_source_file
     |> refute_issues(@described_check)
   end
@@ -150,21 +137,8 @@ end
     |> refute_issues(@described_check)
   end
 
+  @tag needs_elixir: "1.3.2"
   test "check old false positive is fixed /2" do
-    if System.version |> Version.compare("1.3.2") == :lt do
-"""
-%{
-  bounds: [
-    0, 1, 2, 5, 10, 20, 30, 65, 85,
-    100, 200, 400, 800,
-    1_000,
-    2_000,
-    4_000,
-    8_000,
-    16_000]
-}
-"""
-    else
 """
 %{
   bounds: [
@@ -173,7 +147,6 @@ end
     1_000, 2_000, 4_000, 8_000, 16_000]
 }
 """
-    end
     |> to_source_file
     |> refute_issues(@described_check)
   end
