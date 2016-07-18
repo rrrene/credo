@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.6 (pre)
+## 0.4.6
 
 - Add `ignore_specs` option to `MaxLineLength`
 - Fix false positives for `LargeNumbers` in Elixir `>= 1.3.2`
