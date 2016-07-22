@@ -39,6 +39,20 @@ defmodule Credo.Code do
   end
 
   @doc """
+  Postwalks a given SourceFile's AST or a given AST.
+
+  Technically this is just a wrapper around `Macro.postwalk/3`.
+  """
+  def postwalk(ast_or_source_file, fun, accumulator \\ [])
+  def postwalk(%SourceFile{ast: source_ast}, fun, accumulator) do
+    postwalk(source_ast, fun, accumulator)
+  end
+  def postwalk(source_ast, fun, accumulator) do
+    {_, accumulated} = Macro.postwalk(source_ast, accumulator, fun)
+    accumulated
+  end
+
+  @doc """
   Takes a SourceFile or String and returns an AST.
   """
   def ast(%SourceFile{source: source, filename: filename}) do
