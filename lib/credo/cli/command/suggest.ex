@@ -37,11 +37,9 @@ defmodule Credo.CLI.Command.Suggest do
   def load_and_validate_source_files(config) do
     {time_load, {valid_source_files, invalid_source_files}} =
       :timer.tc fn ->
-        source_files = config |> Sources.find
-        valid_source_files = Enum.filter(source_files, &(&1.valid?))
-        invalid_source_files = Enum.filter(source_files, &(!&1.valid?))
-
-        {valid_source_files, invalid_source_files}
+        config
+        |> Sources.find
+        |> Enum.partition(&(&1.valid?))
       end
 
     invalid_source_files
