@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.7
+
+- Ignore module attributes like `@spec` in `AliasUsage`
+- Improve source file loading
+
 ## 0.4.6
 
 - Add `ignore_specs` option to `MaxLineLength`
