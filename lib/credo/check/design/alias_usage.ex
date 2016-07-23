@@ -70,6 +70,10 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, issues}
   end
 
+  # Ignore module attributes
+  defp find_alias_usage({:@, _, _}, issues, _issue_meta, _excluded_namespaces, _excluded_lastnames, _aliases) do
+    {nil, issues}
+  end
   # Ignore multi alias call
   defp find_alias_usage({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _issue_meta, _excluded_namespaces, _excluded_lastnames, _aliases) do
     {ast, issues}
