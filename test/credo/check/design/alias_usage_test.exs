@@ -23,6 +23,21 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report violation in `@spec`s" do
+"""
+defmodule Sample do
+  alias Sample.Foo
+
+  @spec foo(Sample.Foo.t) :: false
+  def foo(%Foo{} = _), do: false
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+
+
+
   test "it should report a violation" do
 """
 defmodule CredoSampleModule do
