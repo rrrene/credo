@@ -6,6 +6,15 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   @tag needs_elixir: "1.3.2"
   test "it should NOT report expected code" do
 """
+@budgets %{
+  "budget1": 100_000,
+  "budget2": 200_000,
+  "budget3": 300_000,
+  "budget4": 500_000,
+  "budget5": 1_000_000,
+  "budget6": 2_000_000
+}
+
 def numbers do
   1024 + 1_000_000 + 11_000 + 22_000 + 33_000
   10_000..20_000
