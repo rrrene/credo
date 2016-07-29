@@ -51,7 +51,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByCase do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
-    |> Credo.Code.traverse(&traverse(&1, &2, issue_meta, @excluded_names))
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, @excluded_names))
     |> List.flatten
     |> Enum.reject(&is_nil/1)
   end
@@ -59,7 +59,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByCase do
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_names) do
     def_names = Module.def_names_with_op(ast)
     issues =
-      issues ++ Credo.Code.traverse(ast, &mod_traverse(&1, &2, issue_meta, def_names, excluded_names))
+      issues ++ Credo.Code.prewalk(ast, &mod_traverse(&1, &2, issue_meta, def_names, excluded_names))
     {ast, issues}
   end
   defp traverse(ast, issues, _issue_meta, _excluded_names) do

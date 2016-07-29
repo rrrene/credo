@@ -19,7 +19,7 @@ defmodule Credo.Priority do
 
     priority_list =
       source_file
-      |> Credo.Code.traverse(&traverse/2, empty_priorities)
+      |> Credo.Code.prewalk(&traverse/2, empty_priorities)
 
     base_map =
       priority_list
@@ -66,7 +66,12 @@ defmodule Credo.Priority do
     defp traverse({unquote(op), meta, arguments} = ast, acc) when is_list(arguments) do
       added_prio = priority_for(ast)
 
-      {ast, List.update_at(acc, meta[:line] - 1, &(&1 ++ [added_prio]))}
+      case arguments do
+        [{_func_name, _meta, _func_arguments}, _do_block] ->
+          {ast, List.update_at(acc, meta[:line] - 1, &(&1 ++ [added_prio]))}
+        _ ->
+          {ast, acc}
+      end
     end
   end
   defp traverse(ast, acc) do

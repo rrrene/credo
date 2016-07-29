@@ -39,7 +39,7 @@ defmodule Credo.Check.Refactor.Nesting do
     issue_meta = IssueMeta.for(source_file, params)
     max_nesting = params |> Params.get(:max_nesting, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, max_nesting))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_nesting))
   end
 
   for op <- @def_ops do

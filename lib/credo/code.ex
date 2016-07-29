@@ -25,16 +25,30 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Traverses a given SourceFile's AST or a given AST.
+  Prewalks a given SourceFile's AST or a given AST.
 
   Technically this is just a wrapper around `Macro.prewalk/3`.
   """
-  def traverse(ast_or_source_file, fun, accumulator \\ [])
-  def traverse(%SourceFile{ast: source_ast}, fun, accumulator) do
-    traverse(source_ast, fun, accumulator)
+  def prewalk(ast_or_source_file, fun, accumulator \\ [])
+  def prewalk(%SourceFile{ast: source_ast}, fun, accumulator) do
+    prewalk(source_ast, fun, accumulator)
   end
-  def traverse(source_ast, fun, accumulator) do
+  def prewalk(source_ast, fun, accumulator) do
     {_, accumulated} = Macro.prewalk(source_ast, accumulator, fun)
+    accumulated
+  end
+
+  @doc """
+  Postwalks a given SourceFile's AST or a given AST.
+
+  Technically this is just a wrapper around `Macro.postwalk/3`.
+  """
+  def postwalk(ast_or_source_file, fun, accumulator \\ [])
+  def postwalk(%SourceFile{ast: source_ast}, fun, accumulator) do
+    postwalk(source_ast, fun, accumulator)
+  end
+  def postwalk(source_ast, fun, accumulator) do
+    {_, accumulated} = Macro.postwalk(source_ast, accumulator, fun)
     accumulated
   end
 

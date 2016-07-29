@@ -11,10 +11,84 @@ defmodule Credo.Code.Module do
 
   @doc "Reads an attribute from a module's `ast`"
   def attribute(ast, attr_name) do
-    case Credo.Code.traverse(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
+    case Credo.Code.postwalk(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
       {:ok, value} -> value
       error -> error
     end
+  end
+
+  @doc "Returns the function/macro count for the given module's AST"
+  def def_count(nil), do: 0
+  def def_count({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Code.postwalk(&traverse_mod/2)
+    |> Enum.count
+  end
+
+  @doc "Returns the arity of the given function definition `ast`"
+  for op <- @def_ops do
+    def def_arity({unquote(op) = op, _, [{:when, _, fun_ast}, _]}) do
+      def_arity({op, nil, fun_ast})
+    end
+    def def_arity({unquote(op), _, [{_fun_name, _, arguments}, _]}) when is_list(arguments) do
+      Enum.count(arguments)
+    end
+    def def_arity({unquote(op), _, [{_fun_name, _, _}, _]}), do: 0
+  end
+  def def_arity(_), do: nil
+
+  @doc "Returns the name of the function/macro defined in the given `ast`"
+  for op <- @def_ops do
+    def def_name({unquote(op) = op, _, [{:when, _, fun_ast}, _]}) do
+      def_name({op, nil, fun_ast})
+    end
+    def def_name({unquote(op), _, [{fun_name, _, _arguments}, _]}) when is_atom(fun_name) do
+      fun_name
+    end
+  end
+  def def_name(_), do: nil
+
+  @doc "Returns the {fun_name, op} tuple of the function/macro defined in the given `ast`"
+  for op <- @def_ops do
+    def def_name_with_op({unquote(op) = op, _, _} = ast) do
+      {ast |> def_name, op}
+    end
+    def def_name_with_op({unquote(op) = op, _, _} = ast, arity) do
+      if ast |> def_arity() == arity do
+        {ast |> def_name, op}
+      else
+        nil
+      end
+    end
+  end
+  def def_name_with_op(_), do: nil
+
+  @doc "Returns the name of the functions/macros for the given module's `ast`"
+  def def_names(nil), do: []
+  def def_names({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Code.postwalk(&traverse_mod/2)
+    |> Enum.map(&def_name/1)
+    |> Enum.uniq
+  end
+
+  @doc "Returns the name of the functions/macros for the given module's `ast`"
+  def def_names_with_op(nil), do: []
+  def def_names_with_op({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Code.postwalk(&traverse_mod/2)
+    |> Enum.map(&def_name_with_op/1)
+    |> Enum.uniq
+  end
+
+  @doc "Returns the name of the functions/macros for the given module's `ast` if it has the given `arity`."
+  def def_names_with_op(nil, _arity), do: []
+  def def_names_with_op({:defmodule, _, _arguments} = ast, arity) do
+    ast
+    |> Code.postwalk(&traverse_mod/2)
+    |> Enum.map(&def_name_with_op(&1, arity))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq
   end
 
   defp find_attribute({:@, _meta, arguments} = ast, tuple, attribute_name) do
@@ -27,86 +101,15 @@ defmodule Credo.Code.Module do
     {ast, tuple}
   end
 
-  @doc "Returns the function/macro count for the given module's AST"
-  def def_count(nil), do: 0
-  def def_count({:defmodule, _, _arguments} = ast) do
-    ast
-    |> Code.traverse(&traverse_mod/2)
-    |> Enum.count
-  end
-
-  @doc """
-  Returns of the name of the function/macro defined in the given `ast`.
-  """
-  for op <- @def_ops ++ [:when] do
-    def def_name_with_op({unquote(op) = op, _meta, arguments}) when is_list(arguments) do
-      {arguments |> List.first |> def_name, op}
-    end
-    def def_name_with_op({unquote(op) = op, _meta, arguments}, arity) when is_list(arguments) do
-      fun_def = arguments |> List.first
-      if fun_def |> def_arity() == arity do
-        {fun_def |> def_name, op}
-      else
-        nil
-      end
-    end
-  end
-
-  @doc """
-  Returns the arity of the given function definition.
-  """
-  def def_arity({_fun_name, _, nil}), do: 0
-  def def_arity({_fun_name, _, arguments}), do: Enum.count(arguments)
-
-  @doc """
-  Returns of the name of the function/macro defined in the given `ast`.
-  """
-  for op <- @def_ops ++ [:when] do
-    def def_name({unquote(op), _meta, arguments}) when is_list(arguments) do
-      arguments
-      |> List.first
-      |> def_name
-    end
-  end
-  def def_name({fun_name, _meta, _arguments}) when is_atom(fun_name) do
-    fun_name
-  end
-  def def_name(_), do: nil
-
-  @doc "Returns the name of the functions/macros for the given module's `ast`"
-  def def_names_with_op(nil), do: []
-  def def_names_with_op({:defmodule, _, _arguments} = ast) do
-    ast
-    |> Code.traverse(&traverse_mod/2)
-    |> Enum.map(&def_name_with_op/1)
-    |> Enum.uniq
-  end
-
-  @doc "Returns the name of the functions/macros for the given module's `ast` if it has the given `arity`."
-  def def_names_with_op(nil, _arity), do: []
-  def def_names_with_op({:defmodule, _, _arguments} = ast, arity) do
-    ast
-    |> Code.traverse(&traverse_mod/2)
-    |> Enum.map(&def_name_with_op(&1, arity))
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq
-  end
-
-  @doc "Returns the name of the functions/macros for the given module's `ast`"
-  def def_names(nil), do: []
-  def def_names({:defmodule, _, _arguments} = ast) do
-    ast
-    |> Code.traverse(&traverse_mod/2)
-    |> Enum.map(&def_name/1)
-    |> Enum.uniq
-  end
-
   for op <- @def_ops do
-    def traverse_mod({unquote(op), _, arguments} = ast, defs) when is_list(arguments) do
+    defp traverse_mod({:@, _, [{unquote(op), _, arguments} = ast]}, defs) when is_list(arguments) do
+      {ast, defs -- [ast]}
+    end
+    defp traverse_mod({unquote(op), _, arguments} = ast, defs) when is_list(arguments) do
       {ast, defs ++ [ast]}
     end
   end
-  def traverse_mod(ast, defs) do
+  defp traverse_mod(ast, defs) do
     {ast, defs}
   end
 
@@ -126,5 +129,5 @@ defmodule Credo.Code.Module do
 
   defp defexception?({:defexception, _, _}), do: true
   defp defexception?(_), do: false
-
 end
+

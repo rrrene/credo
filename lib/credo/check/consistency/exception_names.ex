@@ -75,13 +75,13 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   defp find_exception_modules_without_suffix(%SourceFile{ast: ast}, suffix) do
     ast
-    |> Credo.Code.traverse(&find_exception_modules(&1, &2))
+    |> Credo.Code.prewalk(&find_exception_modules(&1, &2))
     |> Enum.reject(&name_with_suffix?(&1, suffix))
   end
 
   defp find_exception_modules_without_prefix(%SourceFile{ast: ast}, prefix) do
     ast
-    |> Credo.Code.traverse(&find_exception_modules(&1, &2))
+    |> Credo.Code.prewalk(&find_exception_modules(&1, &2))
     |> Enum.reject(&name_with_prefix?(&1, prefix))
   end
 

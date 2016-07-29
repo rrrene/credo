@@ -47,7 +47,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
-    |> Code.traverse(&traverse(&1, &2, issue_meta, @excluded_names))
+    |> Code.prewalk(&traverse(&1, &2, issue_meta, @excluded_names))
     |> List.flatten
     |> Enum.reject(&is_nil/1)
   end
@@ -58,7 +58,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
       excluded_names: excluded_names
     }
 
-    new_issues = Code.traverse(ast, &mod_traverse(&1, &2, issue_meta, names))
+    new_issues = Code.prewalk(ast, &mod_traverse(&1, &2, issue_meta, names))
 
     {ast, issues ++ new_issues}
   end

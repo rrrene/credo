@@ -8,7 +8,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector do
   def property_value, do: nil
 
   def property_value_for(%SourceFile{ast: ast, filename: filename}, _params) do
-    Credo.Code.traverse(ast, &traverse(&1, &2, filename))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, filename))
   end
 
   defp traverse({:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, property_values, filename) do

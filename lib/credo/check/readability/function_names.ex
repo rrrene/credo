@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.traverse(source_file, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   for op <- @def_ops do
