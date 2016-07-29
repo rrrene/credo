@@ -32,7 +32,7 @@ defmodule Credo.Check.Refactor.ABCSize do
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = params |> Params.get(:max_size, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, max_abc_size))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_abc_size))
   end
 
   defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
@@ -75,7 +75,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   def abc_size_for(ast, arguments) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] = Credo.Code.traverse(ast, &traverse_abc/2,
+    [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2,
                                               initial_acc)
     #IO.inspect [a: a, b: b, c: c]
     #IO.inspect ast

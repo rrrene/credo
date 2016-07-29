@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     issue_meta = IssueMeta.for(source_file, params)
     ignore_names = params |> Params.get(:ignore_names, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, ignore_names))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names))
   end
 
   defp traverse({:defmodule, meta, _arguments} = ast, issues, issue_meta, ignore_names) do

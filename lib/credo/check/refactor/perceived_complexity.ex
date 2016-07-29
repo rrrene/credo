@@ -48,7 +48,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = params |> Params.get(:max_complexity, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, max_complexity))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_complexity))
   end
 
   # exception for `__using__` macros
@@ -83,7 +83,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
       1.0
   """
   def complexity_for({_def_op, _meta, _arguments} = ast) do
-    Credo.Code.traverse(ast, &traverse_complexity/2, 0)
+    Credo.Code.prewalk(ast, &traverse_complexity/2, 0)
   end
 
   for op <- @def_ops do

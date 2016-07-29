@@ -45,7 +45,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta))
   end
 
   for op <- @condition_ops do
@@ -55,7 +55,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
         |> Enum.reject(&Keyword.keyword?/1) # remove do/else blocks
 
       new_issues =
-        Credo.Code.traverse(condition_arguments, &traverse_condition(&1, &2, unquote(op), condition_arguments, issue_meta))
+        Credo.Code.prewalk(condition_arguments, &traverse_condition(&1, &2, unquote(op), condition_arguments, issue_meta))
 
       {ast, issues ++ new_issues}
     end

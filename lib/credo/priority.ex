@@ -19,7 +19,7 @@ defmodule Credo.Priority do
 
     priority_list =
       source_file
-      |> Credo.Code.traverse(&traverse/2, empty_priorities)
+      |> Credo.Code.prewalk(&traverse/2, empty_priorities)
 
     base_map =
       priority_list

@@ -28,7 +28,7 @@ defmodule Credo.Check.Refactor.CondStatements do
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta))
   end
 
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do

@@ -58,12 +58,12 @@ defmodule Credo.Check.Design.AliasUsage do
     excluded_namespaces = params |> Params.get(:excluded_namespaces, @default_params)
     excluded_lastnames = params |> Params.get(:excluded_lastnames, @default_params)
 
-    Credo.Code.traverse(ast, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
+    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) do
-    aliases = Credo.Code.traverse(ast, &find_aliases/2)
-    new_issues = Credo.Code.traverse(ast, &find_alias_usage(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases))
+    aliases = Credo.Code.prewalk(ast, &find_aliases/2)
+    new_issues = Credo.Code.prewalk(ast, &find_alias_usage(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases))
     {ast, issues ++ new_issues}
   end
   defp traverse(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames) do

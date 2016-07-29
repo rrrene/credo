@@ -31,8 +31,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_specs = params |> Params.get(:ignore_specs, @default_params)
     ignore_strings = params |> Params.get(:ignore_strings, @default_params)
 
-    definitions = Credo.Code.traverse(ast, &find_definitions/2)
-    specs = Credo.Code.traverse(ast, &find_specs/2)
+    definitions = Credo.Code.prewalk(ast, &find_definitions/2)
+    specs = Credo.Code.prewalk(ast, &find_specs/2)
 
     Enum.reduce(lines, [], fn({line_no, line}, issues) ->
       if String.length(line) > max_length do

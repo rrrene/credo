@@ -84,7 +84,7 @@ defmodule Credo.Check.CodeHelper do
   `parent` AST node.
   """
   def contains_child?(parent, child) do
-    Credo.Code.traverse(parent, &find_child(&1, &2, child), false)
+    Credo.Code.prewalk(parent, &find_child(&1, &2, child), false)
   end
 
   defp find_child(parent, acc, child), do: {parent, acc || parent == child}

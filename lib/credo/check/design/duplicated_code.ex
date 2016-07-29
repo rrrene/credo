@@ -135,7 +135,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   Returns a map with the hashes as keys and the nodes as values.
   """
   def calculate_hashes(ast, existing_hashes \\ %{}, filename \\ "foo.ex", mass_threshold \\ @default_params[:mass_threshold]) when is_map(existing_hashes) do
-    Credo.Code.traverse(ast,
+    Credo.Code.prewalk(ast,
                 &collect_hashes(&1, &2, filename, mass_threshold), existing_hashes)
   end
 
@@ -170,7 +170,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   Returns the mass (count of instructions) for an AST.
   """
   def mass(ast) do
-    Credo.Code.traverse(ast, &calc_mass/2, 0)
+    Credo.Code.prewalk(ast, &calc_mass/2, 0)
   end
 
   defp calc_mass(ast, acc) when is_tuple(ast) do
