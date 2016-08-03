@@ -242,5 +242,80 @@ end
     expected1 = [{:fun1, :def}]
     assert expected1 == Module.def_names_with_op(ast, 1)
   end
+
+  #
+  # modules
+  #
+
+  test "returns the list of modules used in a given module source code when using multi alias" do
+    {:ok, ast} = """
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+    """ |> Code.string_to_quoted
+
+    expected = ["Socket", "Exzmq.Socket"]
+    assert expected == Module.modules(ast)
+  end
+
+  test "returns the list of modules used in a given module source code" do
+    {:ok, ast} = """
+defmodule Test do
+  alias Exzmq.Socket
+  alias Exzmq.Tcp
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+    """ |> Code.string_to_quoted
+
+    expected = ["Socket", "Exzmq.Socket"]
+    assert expected == Module.modules(ast)
+  end
+
+  #
+  # aliases
+  #
+
+  test "returns the list of aliases used in a given module source code when using multi alias" do
+    {:ok, ast} = """
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+    """ |> Code.string_to_quoted
+
+    expected = ["Exzmq.Socket", "Exzmq.Tcp"]
+    assert expected == Module.aliases(ast)
+  end
+
+  test "returns the list of aliases used in a given module source code" do
+    {:ok, ast} = """
+defmodule Test do
+  alias Exzmq.Socket
+  alias Exzmq.Tcp
+  alias Some.Very.Long.Name
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+    """ |> Code.string_to_quoted
+
+    expected = ["Exzmq.Socket", "Exzmq.Tcp", "Some.Very.Long.Name"]
+    assert expected == Module.aliases(ast)
+  end
 end
 
