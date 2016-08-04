@@ -91,6 +91,43 @@ defmodule Credo.Code.Module do
     |> Enum.uniq
   end
 
+  @doc "Returns the list of modules used in a given module source code (dependent modules)"
+  def modules({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Code.postwalk(&find_dependent_modules/2)
+    |> Enum.uniq
+  end
+
+  @doc "Returns the list of aliases defined in a given module source code"
+  def aliases({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Credo.Code.postwalk(&find_aliases/2)
+    |> Enum.uniq
+  end
+
+  #
+  # PRIVATE STUFF
+  #
+
+  # Single alias
+  defp find_aliases({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
+    module_names = mod_list |> Credo.Code.Name.full_name |> List.wrap
+    {ast, aliases ++ module_names}
+  end
+  # Multi alias
+  defp find_aliases({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, aliases) do
+    module_names =
+      multi_mod_list
+      |> Enum.map(fn(tuple) ->
+          [Credo.Code.Name.full_name(mod_list), Credo.Code.Name.full_name(tuple)] |> Credo.Code.Name.full_name
+        end)
+
+    {ast, aliases ++ module_names}
+  end
+  defp find_aliases(ast, aliases) do
+    {ast, aliases}
+  end
+
   defp find_attribute({:@, _meta, arguments} = ast, tuple, attribute_name) do
     case arguments |> List.first do
       {^attribute_name, _meta, [value]} -> {:ok, value}
@@ -100,6 +137,34 @@ defmodule Credo.Code.Module do
   defp find_attribute(ast, tuple, _name) do
     {ast, tuple}
   end
+
+  defp find_dependent_modules({:defmodule, _, [{:__aliases__, _, mod_list}, _do_block]} = ast, modules) do
+    module_name = mod_list |> Credo.Code.Name.full_name
+    {ast, modules -- [module_name]}
+  end
+  # single alias
+  defp find_dependent_modules({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
+    module_names = mod_list |> Credo.Code.Name.full_name |> List.wrap
+    {ast, aliases -- module_names}
+  end
+  # multi alias
+  defp find_dependent_modules({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, modules) do
+    module_names =
+      multi_mod_list
+      |> Enum.flat_map(fn(tuple) ->
+          [Credo.Code.Name.full_name(mod_list), Credo.Code.Name.full_name(tuple)]
+        end)
+
+    {ast, modules -- module_names}
+  end
+  defp find_dependent_modules({:__aliases__, _, mod_list} = ast, modules) do
+    module_name = mod_list |> Credo.Code.Name.full_name
+    {ast, modules ++ [module_name]}
+  end
+  defp find_dependent_modules(ast, modules) do
+    {ast, modules}
+  end
+
 
   for op <- @def_ops do
     defp traverse_mod({:@, _, [{unquote(op), _, arguments} = ast]}, defs) when is_list(arguments) do

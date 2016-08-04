@@ -3,6 +3,10 @@ defmodule Credo.Check.Design.AliasUsageTest do
 
   @described_check Credo.Check.Design.AliasUsage
 
+  #
+  # single alias cases
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -35,29 +39,37 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report violation on impossible additional alias" do
+"""
+defmodule Test do
+  alias Exzmq.Socket
+  alias Exzmq.Tcp
 
+  def just_an_example do
+    Socket.test1  # Exzmq.Socket.test
+    Tcp.Socket.test2 # Exzmq.Tcp.Socket.test – how can this be further aliased?
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
+  test "it should NOT report violation in case of ambiguous module deps" do
+"""
+defmodule Test do
+  def just_an_example do
+    Switch.Uri.parse Sip.Uri.generate!(uri)
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
   test "it should report a violation" do
 """
 defmodule CredoSampleModule do
   def fun1 do
     ExUnit.Case.something
-  end
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-  end
-
-  @tag needs_elixir: "1.2.0"
-  test "it should report violation on impossible additional alias when using multi alias" do
-"""
-defmodule Test do
-  alias Exzmq.{Socket, Tcp}
-
-  def just_an_example do
-    Socket.test1
-    Exzmq.Socket.test2
   end
 end
 """ |> to_source_file
@@ -73,9 +85,25 @@ end
     |> refute_issues(@described_check)
   end
 
+  #
+  # multi alias cases
+  #
 
+  @tag needs_elixir: "1.2.0"
+  test "it should report violation on impossible additional alias when using multi alias" do
+"""
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
 
-
+  def just_an_example do
+    Socket.test1
+    Tcp.test2
+    Exzmq.Socket.test3
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
 
   @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on multi-use alias" do
@@ -96,21 +124,6 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report violation on impossible additional alias" do
-"""
-defmodule Test do
-  alias Exzmq.Socket
-  alias Exzmq.Tcp
-
-  def just_an_example do
-    Socket.test1  # Exzmq.Socket.test
-    Tcp.Socket.test2 # Exzmq.Tcp.Socket.test – how can this be further aliased?
-  end
-end
-""" |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
   @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on impossible additional alias when using multi alias" do
 """
@@ -125,5 +138,4 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
-
 end
