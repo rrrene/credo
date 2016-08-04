@@ -55,6 +55,26 @@ end
     assert expected == tags
   end
 
+  test "it should report a violation when lower case" do
+    tags = """
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  # todo find a better name for this
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> TagHelper.tags(:TODO)
+
+    expected = [
+        {4, "  # todo find a better name for this",
+            "# todo find a better name for this"}
+      ]
+
+    assert expected == tags
+  end
+
   test "it should report a violation for all defined operations" do
     tags = """
 defmodule CredoSampleModule do

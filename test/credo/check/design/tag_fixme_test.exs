@@ -31,6 +31,18 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report an issue when lower case" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    # fixme blah blah
+    Repo.preload(:comments)
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report a couple of issues" do
 """
 defmodule CredoSampleModule do

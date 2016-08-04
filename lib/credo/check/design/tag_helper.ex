@@ -6,7 +6,7 @@ defmodule Credo.Check.Design.TagHelper do
   use Credo.Check
 
   def tags(source, tag_name) do
-    {:ok, regex} = Regex.compile("[^\?]# #{tag_name}:? .+")
+    {:ok, regex} = Regex.compile("[^\?]# #{tag_name}:? .+", "i")
 
     source
     |> CodeHelper.clean_strings_and_sigils
