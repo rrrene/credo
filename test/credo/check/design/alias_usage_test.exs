@@ -65,6 +65,17 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report violation in case of ambiguous module deps (different modules binary parts count)" do
+"""
+defmodule Test do
+  def just_an_example do
+    Switch.Uri.parse Sip.SomeModule.Uri.generate!(uri)
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should report a violation" do
 """
 defmodule CredoSampleModule do
