@@ -247,6 +247,7 @@ end
   # modules
   #
 
+  @tag needs_elixir: "1.2.0"
   test "returns the list of modules used in a given module source code when using multi alias" do
     {:ok, ast} = """
 defmodule Test do
@@ -284,6 +285,7 @@ end
   # aliases
   #
 
+  @tag needs_elixir: "1.2.0"
   test "returns the list of aliases used in a given module source code when using multi alias" do
     {:ok, ast} = """
 defmodule Test do
