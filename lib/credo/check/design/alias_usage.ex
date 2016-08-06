@@ -62,8 +62,9 @@ defmodule Credo.Check.Design.AliasUsage do
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) do
-    aliases = Credo.Code.prewalk(ast, &find_aliases/2)
-    new_issues = Credo.Code.prewalk(ast, &find_alias_usage(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases))
+    aliases = Credo.Code.Module.aliases(ast)
+    mod_deps = Credo.Code.Module.modules(ast)
+    new_issues = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases, mod_deps))
     {ast, issues ++ new_issues}
   end
   defp traverse(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames) do
@@ -71,90 +72,68 @@ defmodule Credo.Check.Design.AliasUsage do
   end
 
   # Ignore module attributes
-  defp find_alias_usage({:@, _, _}, issues, _issue_meta, _excluded_namespaces, _excluded_lastnames, _aliases) do
+  defp find_issues({:@, _, _}, issues, _, _, _, _, _) do
     {nil, issues}
   end
   # Ignore multi alias call
-  defp find_alias_usage({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _issue_meta, _excluded_namespaces, _excluded_lastnames, _aliases) do
+  defp find_issues({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _, _, _, _, _) do
     {ast, issues}
   end
-  defp find_alias_usage({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames, aliases) when is_list(mod_list) and is_atom(fun_atom) do
-    if Enum.count(mod_list) > 1 && !Enum.any?(mod_list, &tuple?/1) do
-      first_name = mod_list |> List.first |> to_string
-      last_name = mod_list |> List.last |> to_string
-      excluded? =
-        Enum.member?(excluded_namespaces, first_name) ||
-        Enum.member?(excluded_lastnames, last_name)
-
-      if excluded? do
+  defp find_issues({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames, aliases, mod_deps) when is_list(mod_list) and is_atom(fun_atom) do
+    cond do
+      (Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1)) ->
         {ast, issues}
-      else
-        conflicting_alias =
-          aliases
-          |> Enum.find(&conflicting_alias?(&1, mod_list))
-
-        if conflicting_alias do
-          {ast, issues}
-        else
-          trigger = mod_list |> Enum.join(".")
-          {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
-        end
-      end
-    else
-      {ast, issues}
+      excluded_lastname_or_namespace?(mod_list, excluded_namespaces, excluded_lastnames) ->
+        {ast, issues}
+      conflicting_with_aliases?(mod_list, aliases) ->
+        {ast, issues}
+      conflicting_with_other_modules?(mod_list, mod_deps) ->
+        {ast, issues}
+      true ->
+        trigger = mod_list |> Enum.join(".")
+        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end
-  defp find_alias_usage(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames, _aliases) do
+  defp find_issues(ast, issues, _, _, _, _, _) do
     {ast, issues}
+  end
+
+  defp excluded_lastname_or_namespace?(mod_list, excluded_namespaces, excluded_lastnames) do
+    first_name = mod_list |> Credo.Code.Name.first
+    last_name = mod_list |> Credo.Code.Name.last
+
+    Enum.member?(excluded_namespaces, first_name) ||
+    Enum.member?(excluded_lastnames, last_name)
   end
 
   # Returns true if mod_list and alias_name would result in the same alias
   # since they share the same last name.
-  defp conflicting_alias?(alias_name, mod_list) do
-    last_name = mod_list |> List.last |> to_string
-    full_name = mod_list |> to_module_name
-    alias_last_name = alias_name |> String.split(".") |> List.last
+  defp conflicting_with_aliases?(mod_list, aliases) do
+    last_name = mod_list |> Credo.Code.Name.last
+
+    aliases |> Enum.find(&conflicting_alias?(&1, mod_list, last_name))
+  end
+  defp conflicting_alias?(alias_name, mod_list, last_name) do
+    full_name = mod_list |> Credo.Code.Name.full
+    alias_last_name = alias_name |> Credo.Code.Name.last
 
     full_name != alias_name && alias_last_name == last_name
   end
 
-  # Single alias
-  defp find_aliases({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
-    module_names = mod_list |> to_module_name |> List.wrap
-    {ast, aliases ++ module_names}
-  end
-  # Multi alias
-  defp find_aliases({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, aliases) do
-    module_names =
-      multi_mod_list
-      |> Enum.map(fn(tuple) ->
-          [to_module_name(mod_list), to_module_name(tuple)] |> to_module_name
-        end)
+  # Returns true if mod_list and any dependent module would result in the same alias
+  # since they share the same last name.
+  defp conflicting_with_other_modules?(mod_list, mod_deps) do
+    last_name = mod_list |> Credo.Code.Name.last
+    full_name = mod_list |> Credo.Code.Name.full
 
-    {ast, aliases ++ module_names}
-  end
-  defp find_aliases(ast, aliases) do
-    {ast, aliases}
+    (mod_deps -- [full_name])
+    |> Enum.filter(&Credo.Code.Name.parts_count(&1) > 1)
+    |> Enum.map(&Credo.Code.Name.last/1)
+    |> Enum.any?(&(&1 == last_name))
   end
 
   def tuple?(t) when is_tuple(t), do: true
   def tuple?(_), do: false
-
-  defp to_module_name(mod_list) when is_list(mod_list) do
-    mod_list
-    |> Enum.map(&to_module_name/1)
-    |> Enum.join(".")
-  end
-  defp to_module_name({:__aliases__, _, mod_list}) do
-    mod_list |> to_module_name()
-  end
-  defp to_module_name({name, _, nil}) when is_atom(name) do
-    name |> to_module_name
-  end
-  defp to_module_name(name) when is_binary(name) or is_atom(name) do
-    name
-  end
-
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
