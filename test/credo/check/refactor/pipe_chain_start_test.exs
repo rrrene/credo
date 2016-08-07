@@ -97,6 +97,31 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for an excluded function call" do
+"""
+String.strip("users") |> String.upcase
+""" |> to_source_file
+    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+  end
+
+  test "it should NOT report a violation for an excluded function call /2" do
+"""
+table("users")
+|> insert(%{name: "Bob Jones"})
+|> DB.run
+""" |> to_source_file
+    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+  end
+
+  test "it should NOT report a violation for an excluded function call /3" do
+"""
+put_in(users["john"][:age], 28)
+|> some_other_fun()
+""" |> to_source_file
+    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+  end
+
+
 
 
 
