@@ -24,6 +24,9 @@ end
     |> refute_issues(@described_check)
   end
 
+
+
+
   test "it should report a violation" do
 """
 def numbers do
@@ -32,7 +35,6 @@ end
 """ |> to_source_file
     |> assert_issues(@described_check)
   end
-
 
   test "it should report a violation, since it is formatted incorrectly" do
 """

@@ -55,7 +55,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
   defp find_issues([], acc, _issue_meta) do
     acc
   end
-
   defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
     source = source_fragment(location, issue_meta)
 
@@ -80,7 +79,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
     |> to_string
     |> add_underscores_to_number_string
   end
-
   defp number_with_underscores(number, source_fragment) when is_number(number) do
     [num, decimal] = String.split(source_fragment, ".", parts: 2)
 
@@ -116,7 +114,9 @@ defmodule Credo.Check.Readability.LargeNumbers do
       issue_meta
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
-      |> String.slice((column1 - 1)..(column2 - 2))
+      |> String.slice((column1 - 1)..(column2 - 1))
+      |> String.strip
+      |> String.replace(~r/\D$/, "")
 
     if System.version |> Version.match?("< 1.3.2-dev") do
       source_fragment_pre_132(tuple, issue_meta, fragment)
@@ -139,6 +139,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 2 + underscores))
+      |> String.strip
+      |> String.replace(~r/\D$/, "")
     else
       first_fragment
     end
