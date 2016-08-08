@@ -11,18 +11,18 @@ defmodule Credo.SourcesTest do
     assert %Credo.SourceFile{} = (Credo.Sources.find(config) |> List.first)
   end
 
-  test "Credo.Sources.find with credo config with exclueded files" do
+  test "Credo.Sources.find with credo config with excluded files" do
     config = %Credo.Config{files: %{excluded: ["lib/credo.ex"], included: ["lib/credo.ex"]}}
 
     expected = []
     assert expected == Credo.Sources.find(config)
   end
 
-  test "Credo.Sources.find with list of pathes" do
-    pathes = ["lib/credo.ex", "lib/credo/cli.ex"]
+  test "Credo.Sources.find with list of paths" do
+    paths = ["lib/credo.ex", "lib/credo/cli.ex"]
 
-    expected = pathes
-    assert expected == Credo.Sources.find(pathes)
+    expected = paths
+    assert expected == Credo.Sources.find(paths)
   end
 
   test "Credo.Sources.find with binary path" do
