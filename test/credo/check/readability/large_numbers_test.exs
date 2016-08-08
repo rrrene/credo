@@ -15,6 +15,11 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   "budget6": 2_000_000
 }
 
+@int32_min -2_147_483_648
+@int32_max  2_147_483_647
+@int64_min -9_223_372_036_854_775_808
+@int64_max  9_223_372_036_854_775_807
+
 def numbers do
   1024 + 1_000_000 + 11_000 + 22_000 + 33_000
   10_000..20_000
