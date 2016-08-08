@@ -23,12 +23,14 @@ defmodule Credo.Sources do
   def find(%Credo.Config{files: files}) do
     files.included
     |> Enum.flat_map(&find/1)
+    |> Enum.uniq
     |> exclude(files.excluded)
     |> to_source_files
   end
   def find(paths) when is_list(paths) do
     paths
     |> Enum.flat_map(&find/1)
+    |> Enum.uniq
   end
   def find(path) when is_binary(path) do
     path

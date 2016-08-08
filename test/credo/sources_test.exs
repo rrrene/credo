@@ -18,10 +18,31 @@ defmodule Credo.SourcesTest do
     assert expected == Credo.Sources.find(config)
   end
 
+  test "Credo.Sources.find with credo config with duplicate paths" do
+    config = %Credo.Config{
+      files: %{
+        excluded: [],
+        included: ["lib/credo/s*.ex", "lib/credo/sources.ex"]
+      }
+    }
+
+    expected = ["lib/credo/severity.ex", "lib/credo/source_file.ex", "lib/credo/sources.ex"]
+    found = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == found
+  end
+
   test "Credo.Sources.find with list of paths" do
     paths = ["lib/credo.ex", "lib/credo/cli.ex"]
 
     expected = paths
+    assert expected == Credo.Sources.find(paths)
+  end
+
+  test "Credo.Sources.find with duplicate paths" do
+    paths = ["lib/credo/s*.ex", "lib/credo/sources.ex"]
+
+    expected = ["lib/credo/severity.ex", "lib/credo/source_file.ex", "lib/credo/sources.ex"]
     assert expected == Credo.Sources.find(paths)
   end
 
