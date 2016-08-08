@@ -47,6 +47,17 @@ defmodule Credo.Code.Name do
     name
   end
 
+  def to_module(mod_list) when is_list(mod_list) do
+    mod_list
+    |> full
+    |> with_prefix
+    |> String.to_atom
+  end
+
+  def with_prefix(name) do
+    "Elixir.#{name}"
+  end
+
   def parts_count(module_name) do
     module_name
     |> String.split(".")

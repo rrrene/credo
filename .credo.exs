@@ -100,6 +100,7 @@
         {Credo.Check.Warning.UnusedStringOperation},
         {Credo.Check.Warning.UnusedTupleOperation},
         {Credo.Check.Warning.OperationWithConstantResult},
+        {Credo.Check.Warning.CallbacksArity}
 
         # Custom checks can be created using `mix credo.gen.check`.
         #

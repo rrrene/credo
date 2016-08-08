@@ -32,6 +32,12 @@ defmodule Credo.SourcesTest do
     assert expected == Credo.Sources.find(path)
   end
 
+  test "Credo.Sources.find returns source_file by module name" do
+    module = GenServer
+
+    assert %Credo.SourceFile{} = Credo.Sources.find(module)
+  end
+
   #
   # exclude
   #
