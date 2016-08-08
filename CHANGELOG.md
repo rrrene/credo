@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.8
+
+- Add `exclude_functions` option to `PipeChainStart`
+- No longer report issues in case of ambiguous aliases in `AliasUsage`
+- Fix false positives for `LargeNumbers` in Elixir `>= 1.3.2` (again)
+- Lots of refactorings
+
 ## 0.4.7
 
 - Ignore module attributes like `@spec` in `AliasUsage`
