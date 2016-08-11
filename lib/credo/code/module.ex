@@ -123,15 +123,10 @@ defmodule Credo.Code.Module do
 
   @doc "Returns the keyword list of callbacks defined in a given module"
   def callbacks(behaviour) when is_atom(behaviour) do
-
-    if Code.ensure_loaded?(behaviour) do
       [callbacks_from_module_attributes(behaviour) |
        callbacks_from_source_file(behaviour)]
       |> List.flatten
       |> Enum.uniq
-    else
-      []
-    end
   end
   def callbacks(_), do: []
 
@@ -140,13 +135,19 @@ defmodule Credo.Code.Module do
   #
 
   defp callbacks_from_module_attributes(behaviour) do
-    behaviour.module_info[:attributes]
-    |> Keyword.get_values(:callback)
-    |> List.flatten
-    |> Enum.map(&(elem(&1, 0)))
+    if Code.ensure_loaded?(behaviour) do
+      behaviour.module_info[:attributes]
+      |> Keyword.get_values(:callback)
+      |> List.flatten
+      |> Enum.map(&(elem(&1, 0)))
+    else
+      []
+    end
   end
 
   defp callbacks_from_source_file(behaviour) do
+    Code.ensure_compiled(behaviour)
+
     source_file = behaviour |> Credo.Sources.find
     ast = source_file.ast
 
