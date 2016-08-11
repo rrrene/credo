@@ -119,7 +119,7 @@ defmodule Credo.Code.Module do
       []
     end
   end
-  def behaviour(_), do: []
+  def behaviours(_), do: []
 
   @doc "Returns the keyword list of callbacks defined in a given module"
   def callbacks(behaviour) when is_atom(behaviour) do
