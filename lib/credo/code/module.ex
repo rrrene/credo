@@ -123,6 +123,7 @@ defmodule Credo.Code.Module do
 
   @doc "Returns the keyword list of callbacks defined in a given module"
   def callbacks(behaviour) when is_atom(behaviour) do
+
     if Code.ensure_loaded?(behaviour) do
       [callbacks_from_module_attributes(behaviour) |
        callbacks_from_source_file(behaviour)]
@@ -157,7 +158,7 @@ defmodule Credo.Code.Module do
 
     if Credo.Code.Name.snake_case?(behaviour_name) do
       behaviour_name
-      |> Macro.camelize
+      |> Mix.Utils.camelize
       |> Credo.Code.Name.with_prefix
       |> String.to_atom
     else
@@ -236,6 +237,9 @@ defmodule Credo.Code.Module do
   end
 
 
+  def find_callbacks({:callback, meta, [{:when, _, [{:::, _, [{callback_name, _, args}, _return_type]} = ast, _]}]}, callbacks) when is_list(args) do
+    find_callbacks({:callback, meta, [ast]}, callbacks)
+  end
   def find_callbacks({:callback, _, [{:::, _, [{callback_name, _, args}, _return_type]}]} = ast, callbacks) when is_list(args) do
     callback_arity = args |> Enum.count
 
