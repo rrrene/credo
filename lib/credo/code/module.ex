@@ -146,12 +146,15 @@ defmodule Credo.Code.Module do
   end
 
   defp callbacks_from_source_file(behaviour) do
-    Code.ensure_compiled(behaviour)
-
     source_file = behaviour |> Credo.Sources.find
-    ast = source_file.ast
 
-    Credo.Code.postwalk(ast, &find_callbacks/2)
+    if source_file do
+      ast = source_file.ast
+
+      Credo.Code.postwalk(ast, &find_callbacks/2)
+    else
+      []
+    end
   end
 
   defp camelize_behaviour(behaviour) do
