@@ -1,56 +1,126 @@
 defmodule Credo.SourcesTest do
   use ExUnit.Case
 
-  #
-  # find
-  #
+  test "it finds all files inside directories recursively" do
+    config = %Credo.Config{files: %{excluded: [], included: ["lib/mix"]}}
 
-  test "Credo.Sources.find with credo config with included files" do
-    config = %Credo.Config{files: %{excluded: [], included: ["lib/credo.ex"]}}
+    expected = [
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
 
-    assert %Credo.SourceFile{} = (Credo.Sources.find(config) |> List.first)
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
   end
 
-  test "Credo.Sources.find with credo config with exclueded files" do
-    config = %Credo.Config{files: %{excluded: ["lib/credo.ex"], included: ["lib/credo.ex"]}}
+  test "it accepts glob patterns that expand to files" do
+    config = %Credo.Config{files: %{excluded: [], included: ["lib/mix/**/*gen*.ex"]}}
 
-    expected = []
-    assert expected == Credo.Sources.find(config)
+    expected = [
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
   end
 
-  test "Credo.Sources.find with list of pathes" do
-    pathes = ["lib/credo.ex", "lib/credo/cli.ex"]
+  test "it accepts glob patterns that expand to directories" do
+    config = %Credo.Config{files: %{excluded: [], included: ["lib/**/tasks/"]}}
 
-    expected = pathes
-    assert expected == Credo.Sources.find(pathes)
+    expected = [
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
   end
 
-  test "Credo.Sources.find with binary path" do
-    path = "lib/*.ex"
+  test "it accepts full file paths" do
+    full_paths = ["lib/credo.ex", "lib/mix/tasks/credo.ex"]
+    config = %Credo.Config{files: %{excluded: [], included: full_paths}}
 
-    expected = ["lib/credo.ex"]
-    assert expected == Credo.Sources.find(path)
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert full_paths == files
   end
 
-  #
-  # exclude
-  #
+  test "it rejects duplicate paths" do
+    paths = ["lib/mix/tasks/credo.ex", "lib/mix", "lib/mix/tasks/credo.gen.check.ex"]
+    config = %Credo.Config{files: %{excluded: [], included: paths}}
 
-  test "Credo.Sources.exclude" do
-    files = ["credo.ex", "credo_test.exs", "config.exs"]
-    expected = ["credo.ex"]
-    assert expected == Credo.Sources.exclude(files, [~r/test/, ~r/\.exs$/])
+    expected = [
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
   end
 
-  test "Credo.Sources.exclude with directories" do
-    files = ["lib/credo.ex", "lib/test/credo_test.exs", "config/config.exs"]
-    expected = ["lib/credo.ex", "lib/test/credo_test.exs"]
-    assert expected == Credo.Sources.exclude(files, ["config/"])
+  test "it reads and parses found source files" do
+    config = %Credo.Config{files: %{excluded: [], included: ["lib/mix/tasks/credo.ex"]}}
+
+    [%Credo.SourceFile{ast: ast, valid?: true}] = Credo.Sources.find(config)
+
+    assert ast != nil
   end
 
-  test "Credo.Sources.exclude with globs" do
-    files = ["lib/credo.ex", "lib/test/credo_test.exs", "config/config.exs"]
-    expected = ["lib/test/credo_test.exs", "config/config.exs"]
-    assert expected == Credo.Sources.exclude(files, ["lib/*.ex"])
+  test "it excludes paths that match the `excluded` patterns" do
+    config = %Credo.Config{files: %{excluded: [~r/chec/, ~r/conf/], included: ["lib/mix"]}}
+
+    expected = ["lib/mix/tasks/credo.ex"]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
+  end
+
+  test "it excludes paths from the `excluded` directories" do
+    config = %Credo.Config{files: %{excluded: ["lib/credo"], included: ["lib"]}}
+
+    expected = [
+      "lib/credo.ex",
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
+  end
+
+  test "it excludes paths that match the `excluded` file globs" do
+    config = %Credo.Config{files: %{excluded: ["lib/**/*gen*.ex"], included: ["lib/mix"]}}
+
+    expected = ["lib/mix/tasks/credo.ex"]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
+  end
+
+  test "it excludes paths that match the `excluded` directory globs" do
+    config = %Credo.Config{files: %{excluded: ["lib/**/credo/"], included: ["lib"]}}
+
+    expected = [
+      "lib/credo.ex",
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert expected == files
   end
 end
