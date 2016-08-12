@@ -1,4 +1,5 @@
 Code.require_file("support/test_application.exs", __DIR__)
+Code.require_file("support/callbacks/test_behaviour.exs", __DIR__)
 
 Credo.Test.Application.start([], [])
 
@@ -119,5 +120,15 @@ defmodule CredoCheckCase do
     |> Inspect.Algebra.to_doc(%Inspect.Opts{})
     |> Inspect.Algebra.format(50)
     |> Enum.join("")
+  end
+
+  def ensure_loaded(ast) do
+    Code.compile_quoted(ast)
+    ast
+  end
+
+  def ensure_loaded_source_file(%Credo.SourceFile{ast: ast} = source_file) do
+    ensure_loaded(ast)
+    source_file
   end
 end

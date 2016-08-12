@@ -319,5 +319,56 @@ end
     expected = ["Exzmq.Socket", "Exzmq.Tcp", "Some.Very.Long.Name"]
     assert expected == Module.aliases(ast)
   end
+
+  #
+  # behaviours
+  #
+
+
+  test "it returns behaviours list from implementing OTP behaviour" do
+    {:ok, ast} = """
+    defmodule ModuleWithOTPBehaviour do
+      use GenServer
+    end
+    """ |> Code.string_to_quoted
+        |> ensure_loaded
+
+    expected = [GenServer]
+
+    assert expected == Module.behaviours(ast)
+  end
+
+  test "it returns behaviours list from module with @behaviour module attribute" do
+    {:ok, ast} = """
+    defmodule ModuleWithBehaviour do
+      @behaviour TestBehaviour
+
+      def parse(str), do: str
+    end
+    """ |> Code.string_to_quoted
+        |> ensure_loaded
+
+    expected = [TestBehaviour]
+
+    assert expected == Module.behaviours(ast)
+  end
+
+  #
+  # callbacks
+  #
+
+  test "returns the list of callbacks used in a OTP behaviour modules" do
+    behaviour = GenServer
+    expected_key = :handle_call
+
+    assert Keyword.has_key?(Module.callbacks(behaviour), expected_key)
+  end
+
+  test "returns the list of callbacks used in a custom behaviour modules" do
+    behaviour = TestBehaviour
+    expected = [parse: 1]
+
+    assert expected == Module.callbacks(behaviour)
+  end
 end
 

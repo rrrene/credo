@@ -4,7 +4,6 @@ defmodule Credo.Code.Module do
   funcions or module attributes.
   """
 
-  alias Credo.Code
   alias Credo.Code.Block
 
   @def_ops [:def, :defp, :defmacro]
@@ -21,7 +20,7 @@ defmodule Credo.Code.Module do
   def def_count(nil), do: 0
   def def_count({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&traverse_mod/2)
+    |> Credo.Code.postwalk(&traverse_mod/2)
     |> Enum.count
   end
 
@@ -67,7 +66,7 @@ defmodule Credo.Code.Module do
   def def_names(nil), do: []
   def def_names({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&traverse_mod/2)
+    |> Credo.Code.postwalk(&traverse_mod/2)
     |> Enum.map(&def_name/1)
     |> Enum.uniq
   end
@@ -76,7 +75,7 @@ defmodule Credo.Code.Module do
   def def_names_with_op(nil), do: []
   def def_names_with_op({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&traverse_mod/2)
+    |> Credo.Code.postwalk(&traverse_mod/2)
     |> Enum.map(&def_name_with_op/1)
     |> Enum.uniq
   end
@@ -85,7 +84,7 @@ defmodule Credo.Code.Module do
   def def_names_with_op(nil, _arity), do: []
   def def_names_with_op({:defmodule, _, _arguments} = ast, arity) do
     ast
-    |> Code.postwalk(&traverse_mod/2)
+    |> Credo.Code.postwalk(&traverse_mod/2)
     |> Enum.map(&def_name_with_op(&1, arity))
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq
@@ -94,20 +93,83 @@ defmodule Credo.Code.Module do
   @doc "Returns the list of modules used in a given module source code (dependent modules)"
   def modules({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&find_dependent_modules/2)
+    |> Credo.Code.postwalk(&find_dependent_modules/2)
     |> Enum.uniq
   end
 
-  @doc "Returns the list of aliases defined in a given module source code"
+  @doc "Returns the list of aliases defined in a given module ast"
   def aliases({:defmodule, _, _arguments} = ast) do
     ast
     |> Credo.Code.postwalk(&find_aliases/2)
     |> Enum.uniq
   end
 
+  @doc "Returns the list of behaviours defined in a given module ast"
+  # We need to camelize_behaviour, because there are different return values
+  # from module_info[:attributes][:behaviour] depending on elixir version
+  def behaviours({:defmodule, _, [{:__aliases__, _, mod_list}, _do_block]}) do
+    module = mod_list |> Credo.Code.Name.to_module
+
+    if Code.ensure_loaded?(module) do
+      module.module_info[:attributes]
+      |> Keyword.get_values(:behaviour)
+      |> List.flatten
+      |> Enum.map(&camelize_behaviour/1)
+    else
+      []
+    end
+  end
+  def behaviours(_), do: []
+
+  @doc "Returns the keyword list of callbacks defined in a given module"
+  def callbacks(behaviour) when is_atom(behaviour) do
+      [callbacks_from_module_attributes(behaviour) |
+       callbacks_from_source_file(behaviour)]
+      |> List.flatten
+      |> Enum.uniq
+  end
+  def callbacks(_), do: []
+
   #
   # PRIVATE STUFF
   #
+
+  defp callbacks_from_module_attributes(behaviour) do
+    if Code.ensure_loaded?(behaviour) do
+      behaviour.module_info[:attributes]
+      |> Keyword.get_values(:callback)
+      |> List.flatten
+      |> Enum.map(&(elem(&1, 0)))
+    else
+      []
+    end
+  end
+
+  defp callbacks_from_source_file(behaviour) do
+    source_file = behaviour |> Credo.Sources.find
+
+    if source_file do
+      ast = source_file.ast
+
+      Credo.Code.postwalk(ast, &find_callbacks/2)
+    else
+      []
+    end
+  end
+
+  defp camelize_behaviour(behaviour) do
+    behaviour_name = behaviour |> to_string
+
+    if Credo.Code.Name.snake_case?(behaviour_name) do
+      behaviour_name
+      |> Mix.Utils.camelize
+      |> Credo.Code.Name.with_prefix
+      |> String.to_atom
+    else
+      behaviour
+    end
+  end
+
 
   # Single alias
   defp find_aliases({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
@@ -176,6 +238,19 @@ defmodule Credo.Code.Module do
   end
   defp traverse_mod(ast, defs) do
     {ast, defs}
+  end
+
+
+  def find_callbacks({:callback, meta, [{:when, _, [{:::, _, [{callback_name, _, args}, _return_type]} = ast, _]}]}, callbacks) when is_list(args) do
+    find_callbacks({:callback, meta, [ast]}, callbacks)
+  end
+  def find_callbacks({:callback, _, [{:::, _, [{callback_name, _, args}, _return_type]}]} = ast, callbacks) when is_list(args) do
+    callback_arity = args |> Enum.count
+
+    {ast, [{callback_name, callback_arity} | callbacks]}
+  end
+  def find_callbacks(ast, callbacks) do
+    {ast, callbacks}
   end
 
   # TODO: write unit test

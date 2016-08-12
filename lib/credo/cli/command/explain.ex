@@ -7,7 +7,6 @@ defmodule Credo.CLI.Command.Explain do
   alias Credo.Config
   alias Credo.CLI.Output.Explain
   alias Credo.CLI.Output.UI
-  alias Credo.CLI.Output
   alias Credo.Sources
 
   # TODO: explain used config options
@@ -15,7 +14,7 @@ defmodule Credo.CLI.Command.Explain do
   def run(_args, %Config{help: true}), do: print_help()
   def run([], _), do: print_help()
   def run([file | _], config) do
-    {_, source_files} = load_and_validate_source_files(config)
+    {_, source_files} = Sources.load_and_validate_source_files(config)
     {_, {source_files, config}}  = run_checks(source_files, config)
 
     file
@@ -25,20 +24,6 @@ defmodule Credo.CLI.Command.Explain do
     # TODO: return :error if there are issues so the CLI can exit with a status
     #       code other than zero
     :ok
-  end
-
-  defp load_and_validate_source_files(config) do
-    {time_load, {valid_source_files, invalid_source_files}} =
-      :timer.tc fn ->
-        config
-        |> Sources.find
-        |> Enum.partition(&(&1.valid?))
-      end
-
-    invalid_source_files
-    |> Output.complain_about_invalid_source_files
-
-    {time_load, valid_source_files}
   end
 
   defp run_checks(source_files, config) do

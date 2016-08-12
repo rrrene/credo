@@ -1,5 +1,6 @@
 defmodule Credo.Sources do
   alias Credo.SourceFile
+  alias Credo.CLI.Output
 
   @default_sources_glob ~w(** *.{ex,exs})
   @stdin_filename "stdin"
@@ -35,9 +36,32 @@ defmodule Credo.Sources do
     |> to_glob
     |> Path.wildcard
   end
+  def find(module) when is_atom(module) do
+    path =
+    module.module_info[:compile][:source]
+    |> to_string
+
+    %Credo.Config{files: %{excluded: [], included: [path]}}
+    |> find
+    |> List.first
+  end
 
   def exclude(files, patterns \\ []) do
     Enum.reject(files, &matches?(&1, patterns))
+  end
+
+  def load_and_validate_source_files(config) do
+    {time_load, {valid_source_files, invalid_source_files}} =
+      :timer.tc fn ->
+        config
+        |> find
+        |> Enum.partition(&(&1.valid?))
+      end
+
+    invalid_source_files
+    |> Output.complain_about_invalid_source_files
+
+    {time_load, valid_source_files}
   end
 
   defp to_glob(path) do
