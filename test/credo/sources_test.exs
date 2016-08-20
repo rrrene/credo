@@ -123,4 +123,27 @@ defmodule Credo.SourcesTest do
 
     assert expected == files
   end
+
+  test "it find list of pathes" do
+    pathes = ["lib/credo.ex", "lib/credo/cli.ex"]
+
+    expected = pathes
+    assert expected == Credo.Sources.find(pathes)
+   end
+
+  test "it finds with empty list path" do
+    path = []
+
+    expected = []
+
+    assert expected == Credo.Sources.find(path)
+  end
+
+  test "it finds with binary path" do
+    path = "lib/*.ex"
+
+    expected = ["lib/credo.ex"]
+
+    assert expected == Credo.Sources.find(path)
+  end
 end

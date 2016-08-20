@@ -28,6 +28,24 @@ defmodule Credo.Sources do
     |> exclude(files.excluded)
     |> Enum.map(&to_source_file/1)
   end
+  def find(paths) when is_list(paths) do
+    paths
+    |> Enum.flat_map(&find/1)
+  end
+  def find(path) when is_binary(path) do
+    path
+    |> to_glob
+    |> Path.wildcard
+  end
+
+  defp to_glob(path) do
+    if File.dir?(path) do
+      [path | @default_sources_glob]
+      |> Path.join
+    else
+      path
+    end
+  end
 
   defp include(files, []), do: files
   defp include(files, [path | remaining_paths]) do
