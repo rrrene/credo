@@ -107,7 +107,7 @@ defmodule Credo.CLI do
     {switches_kw, args, []} =
       OptionParser.parse(argv, switches: @switches, aliases: @aliases)
 
-    {command_name, dir, args} =
+    {command_name, given_directory, args} =
       case args |> List.first |> command_for() do
         nil ->
           {nil, Enum.at(args, 0), args}
@@ -115,7 +115,7 @@ defmodule Credo.CLI do
           {command_name, Enum.at(args, 1), args |> Enum.slice(1..-1)}
       end
 
-    dir = dir || @default_dir
+    dir = given_directory || @default_dir
     switches = switches_kw |> Enum.into(%{})
     config = dir |> to_config(switches)
 
