@@ -4,8 +4,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   @block_ops [:if, :unless, :case, :quote, :try, :after, :rescue]
 
   alias Credo.Check.CodeHelper
-
-  use Credo.Check
+  alias Credo.SourceFile
 
   def find_unused_calls(%SourceFile{ast: ast} = source_file, _params, required_mod_list, restrict_fun_names) do
     Credo.Code.prewalk(ast, &traverse(&1, &2, source_file, required_mod_list, restrict_fun_names))

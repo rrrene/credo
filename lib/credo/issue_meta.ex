@@ -5,6 +5,8 @@ defmodule Credo.IssueMeta do
   params (by default).
   """
 
+  @type t :: module
+
   alias Credo.SourceFile
 
   def for(current_source_file, check_params) do

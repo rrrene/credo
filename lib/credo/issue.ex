@@ -12,4 +12,6 @@ defmodule Credo.Issue do
             meta:         [],   # optional: metadata filled in by the check
             scope:        nil   # optional: the name of the module, macro or
                                 #  function where the issue was found
+
+  @type t :: module
 end

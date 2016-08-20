@@ -7,6 +7,8 @@ defmodule Credo.SourceFile do
             issues:   [],
             lint_attributes: []
 
+  @type t :: module
+
   def parse(source, filename) do
     %Credo.SourceFile{
       filename: filename,

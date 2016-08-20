@@ -8,8 +8,12 @@ defmodule Credo.Check do
     warning: 16,
   }
 
+  @type t :: module
+
   defmacro __using__(opts) do
     quote do
+      @behaviour Credo.Check
+
       alias Credo.Check
       alias Credo.Issue
       alias Credo.IssueMeta
@@ -20,105 +24,153 @@ defmodule Credo.Check do
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
 
-      def base_priority, do: unquote(to_priority(opts[:base_priority]))
+      def base_priority do
+        unquote(to_priority(opts[:base_priority]))
+      end
+
       def category do
         default = unquote(category_body(opts[:category]))
         default || :unknown
       end
-      def run_on_all?, do: unquote(run_on_all_body(opts[:run_on_all]))
 
-      def explanation, do: explanation_for(@explanation, :check)
-      def explanation_for_params, do: explanation_for(@explanation, :params)
+      def run_on_all? do
+        unquote(run_on_all_body(opts[:run_on_all]))
+      end
 
-      defp explanation_for(nil, _), do: nil
-      defp explanation_for(kw, key), do: kw[key]
+      def explanation do
+        Check.explanation_for(@explanation, :check)
+      end
 
-      # TODO: def config_explanation(key), do: explanation_for(@explanation, key)
+      def explanation_for_params do
+        Check.explanation_for(@explanation, :params)
+      end
 
-      @doc """
-      format_issue takes an issue_meta and returns an issue.
-      The resulting issue can be made more explicit by passing the following
-      options to `format_issue/2`:
-
-      - `:priority`     Sets the issue's priority.
-      - `:trigger`      Sets the issue's trigger.
-      - `:line_no`      Sets the issue's line number.
-                          Tries to find `column` if `:trigger` is supplied.
-      - `:column`       Sets the issue's column.
-      - `:exit_status`  Sets the issue's exit_status.
-      - `:severity`     Sets the issue's severity.
-      """
       def format_issue(issue_meta, opts) do
-        source_file = IssueMeta.source_file(issue_meta)
-        params = IssueMeta.params(issue_meta)
-        priority =
-          case params[:priority] do
-            nil -> base_priority()
-            val -> val |> Check.to_priority
-          end
-        exit_status =
-          case params[:exit_status] do
-            nil -> category() |> Check.to_exit_status
-            val -> val |> Check.to_exit_status
-          end
-
-        line_no = opts[:line_no]
-        trigger = opts[:trigger]
-        column = opts[:column]
-        severity = opts[:severity] || Severity.default_value
-        issue =
-          %Issue{
-            priority: priority,
-            filename: source_file.filename,
-            message: opts[:message],
-            trigger: trigger,
-            line_no: line_no,
-            column: column,
-            severity: severity,
-            exit_status: exit_status
-          }
-          |> add_line_no_options(line_no, source_file)
-          |> add_custom_column(trigger, line_no, column, source_file)
-
-        format_issue(issue)
-      end
-      def format_issue(issue \\ %Issue{}) do
-        %Issue{
-          issue |
-          check: __MODULE__,
-          category: category()
-        }
-      end
-
-      defp add_line_no_options(issue, line_no, source_file) do
-        if line_no do
-          {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
-          %Issue{
-            issue |
-            priority: issue.priority + priority_for(source_file, scope),
-            scope: scope
-          }
-        else
-          issue
-        end
-      end
-      defp add_custom_column(issue, trigger, line_no, column, source_file) do
-        if trigger && line_no && !column do
-          %Issue{
-            issue |
-            column: SourceFile.column(source_file, line_no, trigger)
-          }
-        else
-          issue
-        end
-      end
-
-      defp priority_for(source_file, scope) do
-        scope_prio_map = Priority.scope_priorities(source_file)
-        scope_prio_map[scope] || 0
+        Check.format_issue(issue_meta, opts, category(), base_priority(), __MODULE__)
       end
     end
   end
+
+  alias Credo.Check
+  alias Credo.Issue
+  alias Credo.IssueMeta
+  alias Credo.Priority
+  alias Credo.Severity
+  alias Credo.SourceFile
+  alias Credo.Check.CodeHelper
+
+  @doc """
+  Returns the base priority for the check.
+  """
+  @callback base_priority() :: integer
+
+  @doc """
+  Returns the category for the check.
+  """
+  @callback category() :: atom
+
+  @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+
+  @callback run_on_all?() :: boolean
+
+  @callback explanation() :: String.t
+
+  @callback explanation_for_params() :: Keyword.t
+
+  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t) :: Issue.t
+
+  def explanation_for(nil, _) do
+    nil
+  end
+  def explanation_for(keywords, key) do
+    keywords[key]
+  end
+
+  @doc """
+  format_issue takes an issue_meta and returns an issue.
+  The resulting issue can be made more explicit by passing the following
+  options to `format_issue/2`:
+
+  - `:priority`     Sets the issue's priority.
+  - `:trigger`      Sets the issue's trigger.
+  - `:line_no`      Sets the issue's line number.
+                      Tries to find `column` if `:trigger` is supplied.
+  - `:column`       Sets the issue's column.
+  - `:exit_status`  Sets the issue's exit_status.
+  - `:severity`     Sets the issue's severity.
+  """
+  def format_issue(issue_meta, opts, category, base_priority, check) do
+    source_file = IssueMeta.source_file(issue_meta)
+    params = IssueMeta.params(issue_meta)
+    priority =
+      case params[:priority] do
+        nil -> base_priority
+        val -> val |> Check.to_priority
+      end
+    exit_status =
+      case params[:exit_status] do
+        nil -> category |> Check.to_exit_status
+        val -> val |> Check.to_exit_status
+      end
+
+    line_no = opts[:line_no]
+    trigger = opts[:trigger]
+    column = opts[:column]
+    severity = opts[:severity] || Severity.default_value
+
+    %Issue{
+      priority: priority,
+      filename: source_file.filename,
+      message: opts[:message],
+      trigger: trigger,
+      line_no: line_no,
+      column: column,
+      severity: severity,
+      exit_status: exit_status
+    }
+    |> add_line_no_options(line_no, source_file)
+    |> add_custom_column(trigger, line_no, column, source_file)
+    |> add_check_and_category(check, category)
+  end
+
+  defp add_check_and_category(issue, check, category) do
+    %Issue{
+      issue |
+      check: check,
+      category: category
+    }
+  end
+
+  defp add_custom_column(issue, trigger, line_no, column, source_file) do
+    if trigger && line_no && !column do
+      %Issue{
+        issue |
+        column: SourceFile.column(source_file, line_no, trigger)
+      }
+    else
+      issue
+    end
+  end
+
+  defp add_line_no_options(issue, line_no, source_file) do
+    if line_no do
+      {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
+      %Issue{
+        issue |
+        priority: issue.priority + priority_for(source_file, scope),
+        scope: scope
+      }
+    else
+      issue
+    end
+  end
+
+  defp priority_for(source_file, scope) do
+    scope_prio_map = Priority.scope_priorities(source_file)
+    scope_prio_map[scope] || 0
+  end
+
+
 
   defp category_body(nil) do
     quote do

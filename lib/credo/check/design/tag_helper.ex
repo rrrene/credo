@@ -3,8 +3,6 @@ defmodule Credo.Check.Design.TagHelper do
 
   alias Credo.Check.CodeHelper
 
-  use Credo.Check
-
   def tags(source, tag_name) do
     {:ok, regex} = Regex.compile("[^\?]# #{tag_name}:? .+", "i")
 
