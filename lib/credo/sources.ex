@@ -33,18 +33,7 @@ defmodule Credo.Sources do
     |> Enum.flat_map(&find/1)
   end
   def find(path) when is_binary(path) do
-    path
-    |> to_glob
-    |> Path.wildcard
-  end
-
-  defp to_glob(path) do
-    if File.dir?(path) do
-      [path | @default_sources_glob]
-      |> Path.join
-    else
-      path
-    end
+    path |> recurse_path()
   end
 
   defp include(files, []), do: files
