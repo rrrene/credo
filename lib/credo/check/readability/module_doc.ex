@@ -21,7 +21,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   @explanation [check: @moduledoc]
   @default_params [
     ignore_names: [
-      ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
+      ~r/(\.\w+Controller|\.Endpoint|\.Mixfile|\.Repo|\.Router|\.\w+Socket|\w+Test|\.\w+View)$/
     ]
   ]
 
