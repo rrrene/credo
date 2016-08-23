@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.9
+
+- Fix issues with finding sources
+- Don't enforce @moduledoc requirement for Mixfile or Test modules
+
 ## 0.4.8
 
 - Add `exclude_functions` option to `PipeChainStart`
