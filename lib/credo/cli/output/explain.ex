@@ -281,7 +281,7 @@ defmodule Credo.CLI.Output.Explain do
     else
       [
         UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "You can disable this check, by using this tuple"
+          String.duplicate(" ", @indent-2), "You can disable this check by using this tuple"
       ]
       |> UI.puts
 
@@ -297,7 +297,7 @@ defmodule Credo.CLI.Output.Explain do
 
       [
         UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "There not other configuration options."
+          String.duplicate(" ", @indent-2), "There are no other configuration options."
       ]
       |> UI.puts
 
