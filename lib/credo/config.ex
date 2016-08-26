@@ -223,7 +223,8 @@ defmodule Credo.Config do
         files[:included]
         |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq,
-      excluded: files[:excluded]
+      excluded:
+        files[:excluded]
         |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq
     }
@@ -232,7 +233,11 @@ defmodule Credo.Config do
 
   defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
     if File.dir?(dir) do
-      Path.join(dir, file_or_glob)
+      if dir == "." do
+        file_or_glob
+      else
+        Path.join(dir, file_or_glob)
+      end
     else
       dir
     end
