@@ -146,4 +146,25 @@ defmodule Credo.SourcesTest do
 
     assert expected == Credo.Sources.find(path)
   end
+
+  test "it does not break" do
+    config = %Credo.Config{files: %{included: ["lib/", "src/", "web/", "apps/"],
+        excluded: [
+          ~r"/_build/",
+          ~r"/deps/",
+          "apps/foo/mix.exs",
+          "apps/foo/test/",
+          "apps/bar/mix.exs",
+          "apps/bar/test/",
+          "apps/baz/mix.exs",
+          "apps/baz/test/",
+          "apps/bat/test/",
+          "apps/bat/mix.exs",
+        ]
+        }}
+
+    files = Credo.Sources.find(config) |> Enum.map(&(&1.filename))
+
+    assert files |> Enum.count > 0
+  end
 end
