@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.10
+
+- Fix another issue with finding sources
+
 ## 0.4.9
 
 - Fix issues with finding sources
