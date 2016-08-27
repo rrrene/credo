@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.11
+
+- Fix compatibility issues with Elixir < 1.2
+- Fix yet another issue with finding sources
+
 ## 0.4.10
 
 - Fix another issue with finding sources
