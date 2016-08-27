@@ -48,7 +48,7 @@ defmodule Credo.Sources do
   defp exclude(files, []), do: files
   defp exclude(files, [pattern | remaining_patterns]) when is_list(files) do
     files
-    |> MapSet.new
+    |> Enum.into(MapSet.new)
     |> exclude([pattern | remaining_patterns])
   end
   defp exclude(files, [pattern | remaining_patterns]) when is_binary(pattern) do
