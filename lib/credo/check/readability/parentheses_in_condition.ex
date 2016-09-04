@@ -27,20 +27,20 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
 
     source_file.source
     |> Credo.Code.to_tokens
-    |> collect_parenthetical_tokens([])
+    |> collect_parenthetical_tokens([], nil)
     |> find_issues([], issue_meta)
   end
 
-  defp collect_parenthetical_tokens([], acc), do: acc
-  defp collect_parenthetical_tokens([head | t], acc) do
+  defp collect_parenthetical_tokens([], acc, _), do: acc
+  defp collect_parenthetical_tokens([head | t], acc, prev_head) do
     acc =
-      case parenthetical_condition?(head, t) do
+      case parenthetical_condition?(head, t, prev_head) do
         nil -> acc
         false -> acc
         token -> acc ++ [token]
       end
 
-    collect_parenthetical_tokens(t, acc)
+    collect_parenthetical_tokens(t, acc, head)
   end
 
   defp parenthetical_condition?({:"(", _} = token) do
@@ -48,19 +48,31 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   end
   defp parenthetical_condition?(_), do: false
 
-  defp parenthetical_condition?({:identifier, _, :if}, [next_token | _t]) do
+  defp parenthetical_condition?({:identifier, _, :if}, [next_token | _t],
+                                _prev_head) do
     parenthetical_condition?(next_token)
   end
-  defp parenthetical_condition?({:identifier, _, :unless}, [next_token | _t]) do
+  defp parenthetical_condition?({:identifier, _, :unless}, [next_token | _t],
+                                _prev_head) do
     parenthetical_condition?(next_token)
   end
-  defp parenthetical_condition?({:paren_identifier, _, :if} = token, _) do
+  defp parenthetical_condition?({:paren_identifier, _, :if}, _,
+                                {:arrow_op, _, :|>}) do
+    false
+  end
+  defp parenthetical_condition?({:paren_identifier, _, :if} = token, _,
+                                _prev_head) do
     token
   end
-  defp parenthetical_condition?({:paren_identifier, _, :unless} = token, _) do
+  defp parenthetical_condition?({:paren_identifier, _, :unless}, _,
+                                {:arrow_op, _, :|>}) do
+    false
+  end
+  defp parenthetical_condition?({:paren_identifier, _, :unless} = token, _,
+                                _prev_head) do
     token
   end
-  defp parenthetical_condition?(_, _), do: false
+  defp parenthetical_condition?(_, _, _), do: false
 
   defp find_issues([], acc, _issue_meta) do
     acc

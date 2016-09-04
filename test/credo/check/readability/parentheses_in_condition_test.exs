@@ -10,14 +10,21 @@ defmodule CredoSampleModule do
     unless allowed? do
       something
     end
+
     if !allowed? || (something_in_parentheses == 42) do
       something
     end
+
+    boolean |> if(do: :ok, else: :error)
+    boolean |> unless(do: :ok)
   end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+
+
 
   test "it should report a violation" do
 """
