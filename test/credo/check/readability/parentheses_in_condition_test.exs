@@ -14,9 +14,9 @@ defmodule CredoSampleModule do
     if !allowed? || (something_in_parentheses == 42) do
       something
     end
-
     boolean |> if(do: :ok, else: :error)
     boolean |> unless(do: :ok)
+    if (thing && other_thing) || better_thing, do: something
   end
 end
 """ |> to_source_file
