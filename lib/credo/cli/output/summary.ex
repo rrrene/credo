@@ -41,8 +41,14 @@ defmodule Credo.CLI.Output.Summary do
     # print_badge(source_files, issues)
     UI.puts
 
+    show_priority = if shown_issues != [] do
+      "Showing priority issues: ↑ ↗ →  "
+    else
+      ""
+    end
+
     if config.min_priority >= 0 do
-      "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
+      show_priority <> "(use `--strict` to show all issues, `--help` for options)."
       |> UI.puts(:faint)
     end
   end
