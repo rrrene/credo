@@ -33,25 +33,27 @@ defmodule Credo.Check.Readability.ModuleDoc do
     issue_meta = IssueMeta.for(source_file, params)
     ignore_names = params |> Params.get(:ignore_names, @default_params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names))
+    {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
+    issues
   end
 
-  defp traverse({:defmodule, meta, _arguments} = ast, issues, issue_meta, ignore_names) do
-    exception? = Module.exception?(ast)
-    case Module.attribute(ast, :moduledoc)  do
-      {:error, _} when not exception? ->
-        mod_name = Module.name(ast)
-        if mod_name |> matches?(ignore_names) do
-          {ast, issues}
-        else
-          {ast, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}
-        end
-      _ ->
-        {ast, issues}
+  defp traverse({:defmodule, meta, _arguments} = ast, {true, issues}, issue_meta, ignore_names) do
+    mod_name = Module.name(ast)
+    if mod_name |> matches?(ignore_names) do
+      {ast, {false, issues}}
+    else
+      exception? = Module.exception?(ast)
+      case Module.attribute(ast, :moduledoc)  do
+        {:error, _} when not exception? ->
+          {ast, {true, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}}
+        _ ->
+          {ast, {true, issues}}
+      end
     end
   end
-  defp traverse(ast, issues, _issue_meta, _ignore_names) do
-    {ast, issues}
+
+  defp traverse(ast, {continue, issues}, _issue_meta, _ignore_names) do
+    {ast, {continue, issues}}
   end
 
   defp matches?(name, patterns) when is_list(patterns) do

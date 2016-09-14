@@ -12,6 +12,16 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report test submodules" do
+"""
+defmodule ModuleTest do
+  defmodule SubModule do
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should not report exception modules" do
 """
 defmodule CredoSampleModule do
