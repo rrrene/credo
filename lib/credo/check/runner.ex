@@ -103,7 +103,7 @@ defmodule Credo.Check.Runner do
       check.run(source_file, params)
     rescue
       _ ->
-        IO.puts "Error while running #{check} on #{source_file.filename}"
+        IO.puts(:stderr, "Error while running #{check} on #{source_file.filename}")
         []
     end
   end
