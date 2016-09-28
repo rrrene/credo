@@ -65,7 +65,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   defp to_function_call_name({_, _, _} = ast) do
     {ast, [], []}
     |> Macro.to_string()
-    |> String.replace(~r/\.?\(.*\)$/, "")
+    |> String.replace(~r/\.?\(.*\)$/s, "")
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
