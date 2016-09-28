@@ -97,6 +97,28 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /2" do
+~S"""
+defmodule CredoSampleModule do
+  def some_function(parameter1, parameter2) do
+    jobs = Stream.repeatedly(fn ->
+             {:ok, job_created_by_pid} = Client.Job.create_dag(interpreter_connection_created_by_pid, context)
+             {:ok, %{^job_client_pid => job}} = Client.Job.with_job_assignment_state(
+               job_created_by_pid,
+               context,
+               %{},
+               "invited"
+             )
+
+             job
+           end)
+           |> Enum.take(2)
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, [excluded_functions: ["Stream.repeatedly"]])
+  end
+
   test "it should NOT report a violation for an excluded function call" do
 """
 String.strip("users") |> String.upcase
