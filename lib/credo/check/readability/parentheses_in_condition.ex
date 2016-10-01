@@ -43,18 +43,13 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
     collect_parenthetical_tokens(t, acc, head)
   end
 
-  defp parenthetical_condition?({:"(", _} = token) do
-    {elem(token, 0), elem(token, 1), nil}
+  defp parenthetical_condition?({:identifier, _, :if} = start, [next_token | t],
+                                prev_head) do
+    parenthetical_grouped_condition?(start, next_token, t, prev_head)
   end
-  defp parenthetical_condition?(_), do: false
-
-  defp parenthetical_condition?({:identifier, _, :if}, [next_token | _t],
-                                _prev_head) do
-    parenthetical_condition?(next_token)
-  end
-  defp parenthetical_condition?({:identifier, _, :unless}, [next_token | _t],
-                                _prev_head) do
-    parenthetical_condition?(next_token)
+  defp parenthetical_condition?({:identifier, _, :unless} = start, [next_token | t],
+                                prev_head) do
+    parenthetical_grouped_condition?(start, next_token, t, prev_head)
   end
   defp parenthetical_condition?({:paren_identifier, _, :if}, _,
                                 {:arrow_op, _, :|>}) do
@@ -73,6 +68,28 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
     token
   end
   defp parenthetical_condition?(_, _, _), do: false
+
+  defp parenthetical_grouped_condition?(token, {:do, _}, _, {:")", _}) do
+    token
+  end
+  defp parenthetical_grouped_condition?(token, {:",", _}, _, {:")", _}) do
+    token
+  end
+  defp parenthetical_grouped_condition?(_, {:or_op, _, _}, [{:"(",  _} | _], _) do
+     false
+  end
+  defp parenthetical_grouped_condition?(_, {:and_op, _, _}, [{:"(", _} | _], _) do
+     false
+  end
+  defp parenthetical_grouped_condition?(_, {:comp_op, _, _}, [{:"(", _} | _], _) do
+     false
+  end
+  defp parenthetical_grouped_condition?(start, token, [next_token | t], _) do
+     parenthetical_grouped_condition?(start, next_token, t, token)
+  end
+  defp parenthetical_grouped_condition?(_, _, _, _) do
+    false
+  end
 
   defp find_issues([], acc, _issue_meta) do
     acc
