@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.12
+
+- Prevent ModuleDoc from checking nested modules for ignored modules
+- Fix issue with ParenthesesInCondition
+- Fix issue with PipChainStart
+- Fix issue with reading from stdin
+- Log errors to stderr
+
+
 ## 0.4.11
 
 - Fix compatibility issues with Elixir < 1.2
