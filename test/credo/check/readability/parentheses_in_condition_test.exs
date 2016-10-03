@@ -11,10 +11,18 @@ defmodule CredoSampleModule do
       something
     end
 
+    if File.exists?(filename) do
+      something
+    else
+      something_else
+    end
     if !allowed? || (something_in_parentheses == 42) do
       something
     end
     if (something_in_parentheses == 42) || !allowed? do
+      something
+    end
+    if !allowed? == (something_in_parentheses == 42) do
       something
     end
     unless (something_in_parentheses != 42) || allowed? do
@@ -29,6 +37,9 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+
+
 
   test "it should report a violation" do
 """

@@ -34,7 +34,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp collect_parenthetical_tokens([], acc, _), do: acc
   defp collect_parenthetical_tokens([head | t], acc, prev_head) do
     acc =
-      case parenthetical_condition?(head, t, prev_head) do
+      case check_for_opening_paren(head, t, prev_head) do
         nil -> acc
         false -> acc
         token -> acc ++ [token]
@@ -43,53 +43,41 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
     collect_parenthetical_tokens(t, acc, head)
   end
 
-  defp parenthetical_condition?({:identifier, _, :if} = start, [next_token | t],
-                                prev_head) do
-    parenthetical_grouped_condition?(start, next_token, t, prev_head)
+  defp check_for_opening_paren({:identifier, _, if_or_unless} = start, [{:"(", _} = next_token | t], prev_head) when if_or_unless in [:if, :unless] do
+    check_for_closing_paren(start, next_token, t, prev_head)
   end
-  defp parenthetical_condition?({:identifier, _, :unless} = start, [next_token | t],
-                                prev_head) do
-    parenthetical_grouped_condition?(start, next_token, t, prev_head)
-  end
-  defp parenthetical_condition?({:paren_identifier, _, :if}, _,
-                                {:arrow_op, _, :|>}) do
+  defp check_for_opening_paren({:paren_identifier, _, if_or_unless}, _, {:arrow_op, _, :|>}) when if_or_unless in [:if, :unless] do
     false
   end
-  defp parenthetical_condition?({:paren_identifier, _, :if} = token, _,
-                                _prev_head) do
+  defp check_for_opening_paren({:paren_identifier, _, if_or_unless} = token, _, _prev_head) when if_or_unless in [:if, :unless] do
     token
   end
-  defp parenthetical_condition?({:paren_identifier, _, :unless}, _,
-                                {:arrow_op, _, :|>}) do
-    false
-  end
-  defp parenthetical_condition?({:paren_identifier, _, :unless} = token, _,
-                                _prev_head) do
-    token
-  end
-  defp parenthetical_condition?(_, _, _), do: false
+  defp check_for_opening_paren(_, _, _), do: false
 
-  defp parenthetical_grouped_condition?(token, {:do, _}, _, {:")", _}) do
+  # matches:  if( something ) do
+  #                         ^^^^
+  defp check_for_closing_paren(token, {:do, _}, _, {:")", _}) do
     token
   end
-  defp parenthetical_grouped_condition?(token, {:",", _}, _, {:")", _}) do
+  # matches:  if( something ), do:
+  #                         ^^
+  defp check_for_closing_paren(token, {:",", _}, _, {:")", _}) do
     token
   end
-  defp parenthetical_grouped_condition?(_, {:or_op, _, _}, [{:"(",  _} | _], _) do
+  defp check_for_closing_paren(_, {:or_op, _, _}, [{:"(", _} | _], _) do
      false
   end
-  defp parenthetical_grouped_condition?(_, {:and_op, _, _}, [{:"(", _} | _], _) do
+  defp check_for_closing_paren(_, {:and_op, _, _}, [{:"(", _} | _], _) do
      false
   end
-  defp parenthetical_grouped_condition?(_, {:comp_op, _, _}, [{:"(", _} | _], _) do
+  defp check_for_closing_paren(_, {:comp_op, _, _}, [{:"(", _} | _], _) do
      false
   end
-  defp parenthetical_grouped_condition?(start, token, [next_token | t], _) do
-     parenthetical_grouped_condition?(start, next_token, t, token)
+  defp check_for_closing_paren(start, token, [next_token | t], _prev_head) do
+    check_for_closing_paren(start, next_token, t, token)
   end
-  defp parenthetical_grouped_condition?(_, _, _, _) do
-    false
-  end
+  defp check_for_closing_paren(_, _, _, _), do: false
+
 
   defp find_issues([], acc, _issue_meta) do
     acc
