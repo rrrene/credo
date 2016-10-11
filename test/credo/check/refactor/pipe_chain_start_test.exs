@@ -143,6 +143,33 @@ put_in(users["john"][:age], 28)
     |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
   end
 
+  test "it should NOT report a violation for ++" do
+"""
+  def build(%Ecto.Query{} = query) do
+    document_pred(query)
+    ++ wheres_preds(query)
+    |> Enum.map(&wrap/1)
+    |> Enum.join("")
+    |> wrap()
+  end
+""" |> to_source_file
+    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+  end
+
+  test "it should NOT report a violation for captures" do
+"""
+defmodule Test do
+  def test do
+    foo = %{bar: %{}}
+    update_in foo.bar, &(
+      &1
+      |> Map.put(:a, :b))
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+  end
+
 
 
 
