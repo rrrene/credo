@@ -156,6 +156,17 @@ put_in(users["john"][:age], 28)
     |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
   end
 
+    test "it should NOT report a violation for --" do
+  """
+    def test do
+      [1,2,3]
+      -- [2]
+      |> Enum.max
+    end
+  """ |> to_source_file
+      |> refute_issues(@described_check)
+    end
+
   test "it should NOT report a violation for captures" do
 """
 defmodule Test do
