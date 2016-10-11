@@ -112,6 +112,9 @@ defmodule Credo.Check.Refactor.ABCSize do
     {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
   end
   for op <- @branch_ops do
+    defp traverse_abc({unquote(op), _meta, [{_, _, nil}, _] = arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) when is_list(arguments) do
+      {ast, [a: a, b: b, c: c, var_names: var_names]}
+    end
     defp traverse_abc({unquote(op), _meta, arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) when is_list(arguments) do
       {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
     end

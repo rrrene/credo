@@ -195,4 +195,18 @@ end
     |> assert_issue(@described_check, max_size: 3)
   end
 
+  test "it should NOT count map/struct field access with dot notation for abc size" do
+    source =
+"""
+  def test do
+    %{
+      foo: foo.bar,
+      bar: bar.baz,
+      baz: bux.bus
+    }
+  end
+"""
+    assert rounded_abc_size(source) == 3
+  end
+
 end
