@@ -170,9 +170,18 @@ end
     |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
   end
 
-
-
-
+  test "it should NOT report a violation for string concatenation" do
+"""
+defmodule Test do
+  def test do
+    "hello"
+    <> "world"
+    |> String.captialize
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
   test "it should report a violation for a function call" do
 """
