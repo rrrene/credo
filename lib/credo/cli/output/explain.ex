@@ -127,7 +127,7 @@ defmodule Credo.CLI.Output.Explain do
     |> UI.puts
 
     if issue.line_no do
-      {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
+      {_, _line} = Enum.at(source_file.lines, issue.line_no - 1)
 
       UI.puts_edge([outer_color, :faint])
 

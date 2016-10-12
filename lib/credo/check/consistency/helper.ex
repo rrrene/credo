@@ -115,21 +115,20 @@ defmodule Credo.Check.Consistency.Helper do
       [^expected_prop] ->
         nil
       list ->
-        new_issues =
-          prop_list
-          |> Enum.map(fn(prop) ->
-              value = PropertyValue.get(prop)
-              if value != expected_prop && Enum.member?(list, value) do
-                issue_meta = IssueMeta.for(source_file, params)
-                new_issue_fun.(issue_meta, prop, expected_prop, picked_count, total_count)
-              end
-            end)
-          |> List.flatten
-          |> Enum.reject(&is_nil/1)
-          |> Enum.uniq  # TODO: should we really "squash" the issues here?
-          |> Enum.each(fn(issue) ->
-              Credo.Service.SourceFileIssues.append(source_file, issue)
-            end)
+        prop_list
+        |> Enum.map(fn(prop) ->
+            value = PropertyValue.get(prop)
+            if value != expected_prop && Enum.member?(list, value) do
+              issue_meta = IssueMeta.for(source_file, params)
+              new_issue_fun.(issue_meta, prop, expected_prop, picked_count, total_count)
+            end
+          end)
+        |> List.flatten
+        |> Enum.reject(&is_nil/1)
+        |> Enum.uniq  # TODO: should we really "squash" the issues here?
+        |> Enum.each(fn(issue) ->
+            Credo.Service.SourceFileIssues.append(source_file, issue)
+          end)
     end
   end
 
