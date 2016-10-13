@@ -44,6 +44,10 @@ defmodule Credo.CLI.Output.Summary do
     shown_issues |> print_priority_hint(config)
   end
 
+  def print_priority_hint([], %Config{min_priority: min_priority}) when min_priority >= 0 do
+    "Use `--strict` to show all issues, `--help` for options."
+    |> UI.puts(:faint)
+  end
   def print_priority_hint([], _config), do: nil
   def print_priority_hint(_, %Config{min_priority: min_priority}) when min_priority >= 0 do
     "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
