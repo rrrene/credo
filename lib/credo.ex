@@ -14,6 +14,7 @@ defmodule Credo do
     ]
 
     opts = [strategy: :one_for_one, name: Credo.Supervisor]
+
     Supervisor.start_link(children, opts)
   end
 

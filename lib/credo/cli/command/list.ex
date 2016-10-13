@@ -79,7 +79,7 @@ defmodule Credo.CLI.Command.List do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+          --format          Display the list in a specific format (oneline,flycheck,json)
 
     General options:
       -v, --version         Show version

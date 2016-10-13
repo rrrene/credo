@@ -339,7 +339,6 @@ $ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin
 
 Do note with the passed option as filename is a stub that is just used to prefix the error and so certain editors can annotate the original file.
 
-
 ### Using Credo as stand alone
 
 If you do not want or are not allowed to include Credo in the current project you can also install it as an archive:
@@ -363,6 +362,24 @@ mix archive.install
 
 You will now be able to invoke credo as usual through Mix with `mix credo`. This option is especially handy so credo can be used by external editors.
 
+### Using standalone with JSON output
+
+First install json dependency as global dependency:
+
+```bash
+git clone https://github.com/cblage/elixir-json
+cd elixir-json
+mix archive.build
+mix archive.install
+```
+
+Now install credo as standalone described before.
+
+Call credo with output format as JSON
+
+```bash
+mix credo --format=json
+```
 
 ### Show code snippets in the output
 

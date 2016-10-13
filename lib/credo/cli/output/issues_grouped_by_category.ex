@@ -29,6 +29,9 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   @per_category 5
 
   @doc "Called before the analysis is run."
+  def print_before_info(_source_files, %Config{format: "json"}) do
+    :ok
+  end
   def print_before_info(_source_files, %Config{format: "flycheck"}) do
     :ok
   end
@@ -75,11 +78,22 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
       |> Enum.map(&({&1.filename, &1}))
       |> Enum.into(%{})
 
-    categories
-    |> Sorter.ensure(@category_starting_order, @category_ending_order)
-    |> Enum.each(fn(category) ->
-        print_issues(category, issue_map[category], source_file_map, config, term_width)
-      end)
+    case config do
+      %Config{format: "json"} ->
+        categories
+        |> Sorter.ensure(@category_starting_order, @category_ending_order)
+        |> Enum.map(fn(category) ->
+            print_issues(category, issue_map[category], source_file_map, config, term_width)
+          end)
+        |> Poison.Encoder.encode([])
+        |> UI.puts
+      _ ->
+        categories
+        |> Sorter.ensure(@category_starting_order, @category_ending_order)
+        |> Enum.each(fn(category) ->
+            print_issues(category, issue_map[category], source_file_map, config, term_width)
+          end)
+    end
 
     source_files
     |> Summary.print(config, time_load, time_run)
@@ -88,6 +102,12 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   defp print_issues(_category, nil, _source_file_map, _config, _term_width) do
     nil
   end
+
+  defp print_issues(_category, issues, source_file_map, %Config{format: "json"} = config, term_width) do
+    print_issues(issues, source_file_map, config, term_width)
+    |> List.flatten
+  end
+
   defp print_issues(_category, issues, source_file_map, %Config{format: "flycheck"} = config, term_width) do
     print_issues(issues, source_file_map, config, term_width)
   end
@@ -119,6 +139,14 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
       [UI.edge(color), :faint, " ...  (#{not_shown} more, use `-a` to show them)"]
       |> UI.puts
     end
+  end
+
+  defp print_issues(issues, source_file_map, %Config{format: "json"} = config, term_width) do
+    issues
+    |> Enum.sort_by(fn(issue) -> {issue.priority, issue.severity} end)
+    |> Enum.reverse
+    |> Enum.take(config |> per_category)
+    |> Enum.map(&print_issue(&1, source_file_map, config, term_width))
   end
 
   defp print_issues(issues, source_file_map, config, term_width) do
