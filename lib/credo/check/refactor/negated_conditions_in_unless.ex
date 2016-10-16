@@ -47,7 +47,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "Unless conditions should not have a negated condition.",
+      message: "Avoid negated conditions in unless blocks.",
       trigger: trigger,
       line_no: line_no
   end

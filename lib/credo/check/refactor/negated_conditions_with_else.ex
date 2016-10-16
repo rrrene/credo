@@ -74,7 +74,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "If/else blocks should not have a negated condition in `if`.",
+      message: "Avoid negated conditions in if-else blocks.",
       trigger: trigger,
       line_no: line_no
   end
