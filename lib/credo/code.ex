@@ -1,7 +1,7 @@
 defmodule Credo.Code do
   @moduledoc """
   Credo.Code contains a lot of utility or helper functions that deal with the
-  analysis if - you guessed it - Code.
+  analysis of - you guessed it - Code.
 
   Whenever a function serves a general purpose in this area, e.g. getting the
   value of a module attribute inside a given module, we want to extract that
