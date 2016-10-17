@@ -28,7 +28,7 @@ defmodule Credo.Code.Module do
   def defs(nil), do: []
   def defs({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&traverse_mod/2)    
+    |> Code.postwalk(&traverse_mod/2)
   end
 
   @doc "Returns the arity of the given function definition `ast`"
