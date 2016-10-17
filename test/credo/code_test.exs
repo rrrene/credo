@@ -31,4 +31,13 @@ end
 """ |> Credo.Code.ast
     refute is_nil(ast)
   end
+
+  test "it issues a parser error when reading non-utf8 files" do
+    # This is `"René"` encoded as ISO-8859-1, which causes a `UnicodeConversionError`.
+    source_file = <<34, 82, 101, 110, 233, 34>>
+    {:error, [error]} = Credo.Code.ast(source_file)
+    %Credo.Issue{message: message, line_no: 1} = error
+
+    assert "invalid encoding starting at <<233, 34>>" == message
+  end
 end
