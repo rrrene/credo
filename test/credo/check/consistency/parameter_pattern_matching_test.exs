@@ -6,7 +6,6 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
 defmodule Credo.Sample do
   defmodule InlineModule do
 
-    def list_before(foo = [bar, baz]), do: :ok
     def list_after([bar, baz] = foo), do: :ok
 
     def struct_before(foo = %User{name: name}), do: :ok
@@ -63,9 +62,19 @@ end
 """
 
   test "it should report errors when variable decalrations are mixed on the left and right side when pattern matching" do
-    [@left_and_right_mix]
+    errors = [@left_and_right_mix]
     |> to_source_files
     |> assert_issues(@described_check)
+
+    assert 2 == Enum.count(errors)
+  end
+
+  test "it should report errors when variable decalrations are inconsistent throughout sourcefiles" do
+    errors = [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_list]
+    |> to_source_files
+    |> assert_issues(@described_check)
+
+    assert 3 == Enum.count(errors)
   end
 
   test "it should NOT report errors when variable decalrations are consistently on the left side" do
@@ -79,11 +88,5 @@ end
     [@var_right_map, @var_right_struct, @var_right_list]
     |> to_source_files
     |> refute_issues(@described_check)
-  end
-
-  test "it should report errors when variable decalrations are inconsistent throughout sourcefiles" do
-    [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_list]
-    |> to_source_files
-    |> assert_issues(@described_check)
   end
 end

@@ -37,7 +37,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   end
 
   defp message_for(:before) do
-    "the variable name after the pattern"
+    "the variable name before the pattern"
   end
 
   defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
