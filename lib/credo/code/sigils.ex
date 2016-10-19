@@ -4,7 +4,7 @@ defmodule Credo.Code.Sigils do
   """
 
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
-                      {"|", "|"}, {"/", "/"}, {"\"", "\""}, {"'", "'"}]
+                      {"|", "|"}, {"/", "/"}, {"\"\"\"", "\"\"\""}, {"\"", "\""}, {"'", "'"}]
   @all_sigil_chars  ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
                     |> Enum.flat_map(fn a -> [a, a |> String.upcase] end)
   @all_sigil_starts @all_sigil_chars |> Enum.map(fn c -> "~#{c}" end)

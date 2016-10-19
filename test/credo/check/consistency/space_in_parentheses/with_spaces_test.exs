@@ -26,6 +26,16 @@ defmodule Credo.Sample2 do
 end
 """
 
+  @heredoc_example """
+string = ~s\"\"\"
+  "[]"
+\"\"\"
+
+another_string = ~s\"\"\"
+  "[ ]"
+\"\"\"
+  """
+
   test "it should report the correct most picked prop_value" do
     result =
       @without_spaces
@@ -45,6 +55,15 @@ end
       |> Enum.reject(&is_nil/1)
 
     assert 1 == Enum.count(result)
+  end
+
+  test "it should NOT report an error when heredoc contains sigil chars" do
+    errors = @heredoc_example
+      |> to_source_file
+      |> WithSpace.property_value_for([])
+      |> Enum.reject(&is_nil/1)
+
+    assert [] == errors
   end
 
 end
