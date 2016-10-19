@@ -59,9 +59,14 @@ defmodule Credo.Code do
     ast(source, filename)
   end
   def ast(source, filename \\ "nofilename") do
-    case Code.string_to_quoted(source, line: 1) do
-      {:ok, value} -> {:ok, value}
-      {:error, error} -> {:error, [issue_for(error, filename)]}
+    try do
+      case Code.string_to_quoted(source, line: 1) do
+        {:ok, value} -> {:ok, value}
+        {:error, error} -> {:error, [issue_for(error, filename)]}
+      end
+    rescue
+      e in UnicodeConversionError ->
+        {:error, [issue_for({1, e.message, nil}, filename)]}
     end
   end
 
