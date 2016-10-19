@@ -11,7 +11,7 @@ defmodule Credo.SourceFile do
 
   def parse(source, filename) do
     %Credo.SourceFile{
-      filename: filename,
+      filename: filename |> Path.relative_to_cwd(),
       source:   source,
       lines:    source |> Credo.Code.to_lines,
     } |> with_ast

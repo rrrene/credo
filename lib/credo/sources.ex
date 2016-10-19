@@ -65,18 +65,21 @@ defmodule Credo.Sources do
   end
 
   defp recurse_path(path) do
-    cond do
-      File.regular?(path) ->
-        [path]
-      File.dir?(path) ->
-        [path | @default_sources_glob]
-        |> Path.join
-        |> Path.wildcard
-      true ->
-        path
-        |> Path.wildcard
-        |> Enum.flat_map(&recurse_path/1)
-    end
+    paths =
+      cond do
+        File.regular?(path) ->
+          [path]
+        File.dir?(path) ->
+          [path | @default_sources_glob]
+          |> Path.join
+          |> Path.wildcard
+        true ->
+          path
+          |> Path.wildcard
+          |> Enum.flat_map(&recurse_path/1)
+      end
+
+    paths |> Enum.map(&Path.expand/1)
   end
 
   defp to_source_file(filename) do
