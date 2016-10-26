@@ -319,5 +319,28 @@ end
     expected = ["Exzmq.Socket", "Exzmq.Tcp", "Some.Very.Long.Name"]
     assert expected == Module.aliases(ast)
   end
+
+  test "returns a string when nested defmodule name cannot be found when Module.name is called" do
+    nested_module =
+    quote do
+      defmodule CredoTestParent do
+        a = "TestName"
+        defmodule a do
+        end
+      end
+    end
+
+    Module.name(nested_module) === "<Unknown Module Name>"
+  end
+
+  test "returns the name of the module when Module.name is called" do
+    module =
+    quote do
+      defmodule CredoTestParent.AnotherModule do
+      end
+    end
+
+      Module.name(module) === "CredoTestParent.AnotherModule"
+    end
 end
 

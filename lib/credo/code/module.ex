@@ -178,11 +178,10 @@ defmodule Credo.Code.Module do
     {ast, defs}
   end
 
-  # TODO: write unit test
   def name({:defmodule, _, [{:__aliases__, _, name_list}, _]}) do
     Enum.join(name_list, ".")
   end
-  def name(_), do: nil
+  def name(_), do: "<Unknown Module Name>"
 
   # TODO: write unit test
   def exception?({:defmodule, _, [{:__aliases__, _, _name_list}, arguments]}) do
