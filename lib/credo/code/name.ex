@@ -65,6 +65,10 @@ defmodule Credo.Code.Name do
     name |> String.match?(~r/^[a-z0-9\_\?\!]+$/)
   end
 
+  def no_case?(name) do
+    name |> String.match?(~r/^[^a-zA-Z0-9]*$/)
+  end
+
   defp name_from_splitted_parts(splitted_parts) when length(splitted_parts) > 1 do
     splitted_parts
     |> Enum.slice(1, length(splitted_parts))

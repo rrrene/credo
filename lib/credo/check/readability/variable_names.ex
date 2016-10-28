@@ -60,7 +60,8 @@ defmodule Credo.Check.Readability.VariableNames do
     defp issue_for_name({unquote(name), _, nil}, _), do: nil
   end
   defp issue_for_name({name, meta, nil}, issue_meta) do
-    unless name |> to_string |> Name.snake_case? do
+    string_name = name |> to_string
+    unless Name.snake_case?(string_name) or Name.no_case?(string_name) do
       issue_for(issue_meta, meta[:line], name)
     end
   end
