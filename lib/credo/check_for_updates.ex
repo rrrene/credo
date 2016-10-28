@@ -1,12 +1,6 @@
 defmodule Credo.CheckForUpdates do
   def run() do
-    Hex.start
-    Hex.Utils.ensure_registry!()
-
-    all_versions =
-      :credo
-      |> Atom.to_string
-      |> Hex.Registry.get_versions
+    all_versions = all_hex_versions("credo")
     current = Credo.version
 
     if should_update?(all_versions, current) do
@@ -21,6 +15,14 @@ defmodule Credo.CheckForUpdates do
       ]
       |> warn
     end
+  end
+
+  def all_hex_versions(package_name) do
+    Hex.start
+    Hex.Registry.open!(Hex.Registry.Server)
+    Hex.Registry.prefetch([package_name])
+
+    Hex.Registry.versions(package_name)
   end
 
   def should_update?(all_versions, current) do
