@@ -166,4 +166,14 @@ end
     |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  test "it should allow multiple large floats on a line" do
+"""
+def numbers do
+  10_000.1 + 50_000.2
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 end
