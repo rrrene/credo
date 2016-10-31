@@ -29,6 +29,15 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should allow multiple large floats on a line" do
+"""
+def numbers do
+  100_000.1 + 5_000_000.2 + 66_000.3
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
 
 
@@ -167,13 +176,13 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should allow multiple large floats on a line" do
+  test "it should detect report issues with multiple large floats on a line" do
 """
 def numbers do
-  10_000.1 + 50_000.2
+  100_000.1 + 5_000_000.2 + 66000.3
 end
 """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 end

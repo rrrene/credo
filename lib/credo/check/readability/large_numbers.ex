@@ -80,9 +80,12 @@ defmodule Credo.Check.Readability.LargeNumbers do
     |> add_underscores_to_number_string
   end
   defp number_with_underscores(number, source_fragment) when is_number(number) do
-    [num, decimal] = String.split(source_fragment, ".", parts: 2)
-
-    [num |> add_underscores_to_number_string, decimal] |> Enum.join(".")
+    case String.split(source_fragment, ".", parts: 2) do
+      [num, decimal] ->
+        [num |> add_underscores_to_number_string(), decimal] |> Enum.join(".")
+      [num] ->
+        num |> add_underscores_to_number_string()
+    end
   end
 
   defp add_underscores_to_number_string(string) do
