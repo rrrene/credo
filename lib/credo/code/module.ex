@@ -25,6 +25,12 @@ defmodule Credo.Code.Module do
     |> Enum.count
   end
 
+  def defs(nil), do: []
+  def defs({:defmodule, _, _arguments} = ast) do
+    ast
+    |> Code.postwalk(&traverse_mod/2)
+  end
+
   @doc "Returns the arity of the given function definition `ast`"
   for op <- @def_ops do
     def def_arity({unquote(op) = op, _, [{:when, _, fun_ast}, _]}) do
