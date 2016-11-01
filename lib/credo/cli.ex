@@ -171,7 +171,13 @@ defmodule Credo.CLI do
   defp set_strict(config, %{strict: true}) do
     %Config{config | all: true, min_priority: -99}
   end
-  defp set_strict(config, _), do: config
+  defp set_strict(config, _) do
+    if config.strict do
+      set_strict(config, %{strict: true})
+    else
+      config
+    end
+  end
 
   defp set_help(config, %{help: true}) do
     %Config{config | help: true}

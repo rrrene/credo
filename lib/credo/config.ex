@@ -11,6 +11,7 @@ defmodule Credo.Config do
             help:               false,
             version:            false,
             verbose:            false,
+            strict:             false,
             all:                false,
             format:             nil,
             match_checks:       nil,
@@ -133,7 +134,8 @@ defmodule Credo.Config do
       check_for_updates: data[:check_for_updates] || false,
       requires: data[:requires] || [],
       files: files_from_data(data, dir),
-      checks: checks_from_data(data)
+      checks: checks_from_data(data),
+      strict: data[:strict] || false
     }
   end
 
@@ -186,6 +188,7 @@ defmodule Credo.Config do
       requires: base.requires ++ other.requires,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
+      strict: other.strict,
     }
   end
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
