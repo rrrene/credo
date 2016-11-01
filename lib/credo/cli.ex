@@ -169,15 +169,10 @@ defmodule Credo.CLI do
     set_strict(config, %{strict: true})
   end
   defp set_strict(config, %{strict: true}) do
-    %Config{config | all: true, min_priority: -99}
+    %Config{config | strict: true}
+    |> Config.set_strict()
   end
-  defp set_strict(config, _) do
-    if config.strict do
-      set_strict(config, %{strict: true})
-    else
-      config
-    end
-  end
+  defp set_strict(config, _), do: config
 
   defp set_help(config, %{help: true}) do
     %Config{config | help: true}
@@ -219,8 +214,8 @@ defmodule Credo.CLI do
     set_only(config, %{checks: only})
   end
   defp set_only(config, %{checks: check_pattern}) do
-    %Config{config | all: true, min_priority: -99,
-                      match_checks: check_pattern |> String.split(",")}
+    %Config{config | strict: true, match_checks: check_pattern |> String.split(",")}
+    |> Config.set_strict()
   end
   defp set_only(config, _), do: config
 

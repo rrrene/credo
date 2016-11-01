@@ -81,6 +81,7 @@ defmodule Credo.Config do
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
+    |> set_strict()
   end
 
   defp relevant_config_files(dir) do
@@ -246,4 +247,12 @@ defmodule Credo.Config do
     end
   end
   defp add_directory_to_file(regex, _), do: regex
+
+  @doc """
+  Sets the config values which `strict` implies (if applicable).
+  """
+  def set_strict(%__MODULE__{strict: true} = config) do
+    %__MODULE__{config | all: true, min_priority: -99}
+  end
+  def set_strict(config), do: config
 end
