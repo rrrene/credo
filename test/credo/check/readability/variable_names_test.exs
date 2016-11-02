@@ -14,6 +14,7 @@ defmodule CredoSampleModule do
     "e" <> some_value = parameter1
     ^some_value = parameter1
     %{some_value: some_value} = parameter1
+    ... = parameter1
   end
 end
 """ |> to_source_file

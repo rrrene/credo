@@ -99,6 +99,16 @@ defmodule Credo.Code.NameTest do
   end
 
   #
+  # no_case?
+  #
+
+  test "returns true if name is no_case" do
+    assert "..." |> Name.no_case?
+    refute "SnakeCase_mixed" |> Name.no_case?
+  end
+
+
+  #
   # pascal_case?
   #
 
