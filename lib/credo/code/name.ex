@@ -66,7 +66,7 @@ defmodule Credo.Code.Name do
   end
 
   def no_case?(name) do
-    name |> String.match?(~r/^[^a-zA-Z0-9]*$/)
+    name |> String.match?(~r/^[^a-zA-Z0-9]+$/)
   end
 
   defp name_from_splitted_parts(splitted_parts) when length(splitted_parts) > 1 do
