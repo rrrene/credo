@@ -320,17 +320,24 @@ end
     assert expected == Module.aliases(ast)
   end
 
-  test "returns a string when nested defmodule name cannot be found when Module.name is called" do
+  test "returns a default string when nested defmodule name cannot be found when Module.name is called" do
     nested_module =
       quote do
-        defmodule CredoTestParent do
-          a = "TestName"
-          defmodule a do
-          end
+        defmodule Credo.Sample1 do
+          testing_list = ["One", "Two", "Three"]
+
+          testing_list
+          |> Enum.each(fn(test_item) ->
+            defmodule test_item do
+            end
+          end)
         end
       end
 
-    assert Module.name(nested_module) === "<Unknown Module Name>"
+    {:defmodule, _, [{:__aliases__, _, _}, inner_module]} = nested_module
+
+    assert Module.name(nested_module) === "Credo.Sample1"
+    assert Module.name(inner_module) === "<Unknown Module Name>"
   end
 
   test "returns the name of the module when Module.name is called" do
