@@ -31,6 +31,10 @@ defmodule CredoSampleModule do
     Map.put acc, key, process_exs(value)
   end
 
+  def test(%{one: Type.one}) do
+    IO.inspect("hi")
+  end
+
   defmacro fun2 do
     42
   end
