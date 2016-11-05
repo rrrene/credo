@@ -10,6 +10,7 @@ defmodule CredoSampleModule do
 
   def some_fun do
     assert x == x + 2
+    2 - 2+3
   end
 end
 """ |> to_source_file
