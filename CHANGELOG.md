@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.5.2
+
+- Add ability to specify `strict` in `.credo.exs` config file
+- Add `no_case?` to variable name checks
+- Add `Module.name` utility method
+- Fix bug in NameRedeclarationByDef
+- Fix bug in LargeNumbers
+
+## 0.5.1
+
+- Use Hex.pm API to retrieve update information for Credo
+
+## 0.5.0
+
+- See below
+
+## 0.4.14
+
+- Fix compiler error due to usage of undocumented Hex APIs (sorry)
+
 ## 0.4.13
 
 - Prevent crashing when parsing non-UTF-8 source files
