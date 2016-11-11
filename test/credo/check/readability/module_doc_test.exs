@@ -12,13 +12,23 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report test submodules" do
+  test "it should NOT report controller submodules" do
+"""
+defmodule MyApp.SomePhoenixController do
+  defmodule SubModule do
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report .exs scripts" do
 """
 defmodule ModuleTest do
   defmodule SubModule do
   end
 end
-""" |> to_source_file
+""" |> to_source_file("module_doc_test_1.exs")
     |> refute_issues(@described_check)
   end
 

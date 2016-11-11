@@ -21,7 +21,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   @explanation [check: @moduledoc]
   @default_params [
     ignore_names: [
-      ~r/(\.\w+Controller|\.Endpoint|\.Mixfile|\.Repo|\.Router|\.\w+Socket|\w+Test|\.\w+View)$/
+      ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
     ]
   ]
 
@@ -29,12 +29,16 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   use Credo.Check
 
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-    ignore_names = params |> Params.get(:ignore_names, @default_params)
+  def run(%SourceFile{ast: ast, filename: filename} = source_file, params \\ []) do
+    if String.match?(filename, ~r/\.exs$/) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
+      ignore_names = params |> Params.get(:ignore_names, @default_params)
 
-    {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
-    issues
+      {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
+      issues
+    end
   end
 
   defp traverse({:defmodule, meta, _arguments} = ast, {true, issues}, issue_meta, ignore_names) do

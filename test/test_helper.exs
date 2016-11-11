@@ -33,7 +33,9 @@ defmodule CredoSourceFileCase do
   alias Credo.Test.FilenameGenerator
 
   def to_source_file(source) do
-    filename = FilenameGenerator.next
+    to_source_file(source, FilenameGenerator.next)
+  end
+  def to_source_file(source, filename) do
     case Credo.SourceFile.parse(source, filename) do
       %{valid?: true} = source_file -> source_file
       _ -> raise "Source could not be parsed!"
