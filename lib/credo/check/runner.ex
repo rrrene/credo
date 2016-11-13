@@ -95,16 +95,17 @@ defmodule Credo.Check.Runner do
   defp run_check({check}, source_file, config) do
     run_check({check, []}, source_file, config)
   end
-  defp run_check({check, params}, source_file, %Config{crash_on_error: true}) do
-    check.run(source_file, params)
-  end
-  defp run_check({check, params}, source_file, _config) do
+  defp run_check({check, params}, source_file, config) do
     try do
       check.run(source_file, params)
     rescue
-      _ ->
+      error ->
         IO.puts(:stderr, "Error while running #{check} on #{source_file.filename}")
-        []
+        if config.crash_on_error do
+          reraise error, System.stacktrace()
+        else
+          []
+        end
     end
   end
 
