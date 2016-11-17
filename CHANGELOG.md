@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3
+
+- Fix crash in CheckForUpdates
+
 ## 0.5.2
 
 - Add ability to specify `strict` in `.credo.exs` config file
