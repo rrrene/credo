@@ -138,9 +138,9 @@ defmodule Credo.CLI.Output.Explain do
       UI.puts_edge([outer_color, :faint])
 
       code_color = :faint
-      print_source_line(source_file.lines, issue.line_no - 2, term_width, code_color, outer_color)
-      print_source_line(source_file.lines, issue.line_no - 1, term_width, code_color, outer_color)
-      print_source_line(source_file.lines, issue.line_no, term_width, [:cyan, :bright], outer_color)
+      print_source_line(source_file, issue.line_no - 2, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no - 1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no, term_width, [:cyan, :bright], outer_color)
 
       if issue.column do
         offset = 0
@@ -158,8 +158,8 @@ defmodule Credo.CLI.Output.Explain do
         ]
         |> UI.puts
       end
-      print_source_line(source_file.lines, issue.line_no + 1, term_width, code_color, outer_color)
-      print_source_line(source_file.lines, issue.line_no + 2, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no + 1, term_width, code_color, outer_color)
+      print_source_line(source_file, issue.line_no + 2, term_width, code_color, outer_color)
     end
 
     UI.puts_edge([outer_color, :faint], @indent)
@@ -187,11 +187,11 @@ defmodule Credo.CLI.Output.Explain do
     UI.puts_edge([outer_color, :faint])
   end
 
-  defp print_source_line(source_file_lines, line_no, _, _, _) when line_no < 1 or line_no > length(source_file_lines) do
+  defp print_source_line(%SourceFile{lines: lines}, line_no, _, _, _) when line_no < 1 or line_no > length(lines) do
     nil
   end
-  defp print_source_line(source_file_lines, line_no, term_width, color, outer_color) do
-    {_, line} = Enum.at(source_file_lines, line_no - 1)
+  defp print_source_line(%SourceFile{lines: lines}, line_no, term_width, color, outer_color) do
+    {_, line} = Enum.at(lines, line_no - 1)
 
     line_no_str =
       "#{line_no} "
