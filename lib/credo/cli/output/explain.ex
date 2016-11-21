@@ -187,11 +187,11 @@ defmodule Credo.CLI.Output.Explain do
     UI.puts_edge([outer_color, :faint])
   end
 
-  defp print_source_line(_, line_no, _, _, _) when line_no < 1 do
+  defp print_source_line(%SourceFile{lines: lines}, line_no, _, _, _) when line_no < 1 or line_no > length(lines) do
     nil
   end
-  defp print_source_line(source_file, line_no, term_width, color, outer_color) do
-    {_, line} = Enum.at(source_file.lines, line_no - 1)
+  defp print_source_line(%SourceFile{lines: lines}, line_no, term_width, color, outer_color) do
+    {_, line} = Enum.at(lines, line_no - 1)
 
     line_no_str =
       "#{line_no} "
