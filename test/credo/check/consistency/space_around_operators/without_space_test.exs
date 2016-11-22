@@ -34,6 +34,7 @@ defmodule Credo.Sample2 do
   defmodule InlineModule do
     def foobar do
       child_sources = Enum.drop(child_sources, -1)
+      TestRepo.all(from p in Post, where: field(p, ^field) = datetime_add(^inserted_at, ^-3, ^"week"))
       {literal(-number, type, vars), params}
       {time2, _} = :timer.tc(&flush/0, [])
       {{:{}, [], [:==, [], [to_escaped_field(field), value]]}, params}

@@ -5,6 +5,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   Examples:
   x..-1   # .. is the operator here and there is usually no space before that
   """
+  def usually_no_space_before?({_, _, :^}, {_, _, :-}, _), do: true
   def usually_no_space_before?({:identifier, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?({:number, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?(_, {_, _, :-}, _), do: true
@@ -17,6 +18,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   Examples:
   x..-1   # .. is the operator here and there is usually no space before that
   """
+  def usually_no_space_after?({_, _, :^}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :=}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :..}, {_, _, :-}, _), do: true
   def usually_no_space_after?(_, {_, _, :-}, _), do: false
