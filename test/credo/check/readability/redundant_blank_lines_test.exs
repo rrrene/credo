@@ -57,4 +57,14 @@ end
     file
     |> assert_issue(@described_check, max_blank_lines: 3)
   end
+
+  test "it should not fail when file doesn't have empty lines" do
+"defmodule ModuleWithoutEmptyLines do
+  def foo do
+    :bar
+  end
+end"
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 end
