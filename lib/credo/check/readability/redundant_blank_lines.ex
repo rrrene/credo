@@ -38,7 +38,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     |> Enum.map(fn {pos, _} -> pos end)
   end
 
-  defp consecutive_lines([], _), do: false
+  defp consecutive_lines([], _), do: []
 
   defp consecutive_lines([first_line|other_lines], max_blank_lines) do
     reducer = consecutive_lines_reducer(max_blank_lines)
