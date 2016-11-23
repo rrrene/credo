@@ -89,4 +89,21 @@ end
     |> to_source_files
     |> refute_issues(@described_check)
   end
+
+  test "it should NOT break when input has a function without bindings or private funs" do
+    module_with_fun_without_bindings = """
+    defmodule SurviveThisIfYouCan do
+      def start do
+        GenServer.start(__MODULE__, [])
+      end
+
+      defp foo(bar) do
+        bar + 1
+      end
+    end
+    """
+    [module_with_fun_without_bindings]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
 end
