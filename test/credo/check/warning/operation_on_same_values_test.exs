@@ -10,7 +10,6 @@ defmodule CredoSampleModule do
 
   def some_fun do
     assert x == x + 2
-    2 - 2+3
   end
 end
 """ |> to_source_file
@@ -47,11 +46,12 @@ defmodule CredoSampleModule do
     y - y   # always 0
     y -
       y # on different lines
+    y - y + x
   end
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 8 == Enum.count(issues)
+        assert 9 == Enum.count(issues)
       end)
   end
 
