@@ -25,7 +25,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
       |> Enum.map(&(property_values_for_parameter(&1, filename)))
       |> Enum.reject(&is_nil/1)
   end
-  defp property_values_for_def(_, _), do: nil
+  defp property_values_for_def(_, _), do: []
 
   defp property_values_for_parameter({:=, [line: line_no], [[_ | _] | _]} = _vals, filename) do
     :after
