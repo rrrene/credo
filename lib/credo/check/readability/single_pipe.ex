@@ -1,12 +1,29 @@
-defmodule Credo.Check.Refactor.SinglePipe do
+defmodule Credo.Check.Readability.SinglePipe do
   @moduledoc """
-    "The pipe was designed to express pipelines and you don't have a pipeline if you have only one call"
-    So instead of foo |> bar, just use foo(bar)
+  Pipes (`|>`) should only be used when piping data through multiple calls.
+
+  So while this is fine:
+
+      list
+      |> Enum.take(5)
+      |> Enum.shuffle
+      |> evaluate
+
+  The code in this example ...
+
+      list
+      |> evaluate
+
+  ... should be refactored to look like this:
+
+      evaluate(list)
+
+    Using a single |> to invoke functions makes the code harder to read. Instead, write a function call when a pipeline is only one function long.
   """
 
   @explanation [check: @moduledoc]
 
-  use Credo.Check
+  use Credo.Check, base_priority: :high
 
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
@@ -15,7 +32,7 @@ defmodule Credo.Check.Refactor.SinglePipe do
     issues
   end
 
-  defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues} = state, issue_meta) do
+  defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _) do
     {ast, {false, issues}}
   end
 
@@ -29,7 +46,7 @@ defmodule Credo.Check.Refactor.SinglePipe do
 
   def issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "There's no reason to use a single pipe character. Replace with a simple function call",
+      message: "Use a function call when a pipeline is only one function long",
       trigger: trigger,
       line_no: line_no
   end

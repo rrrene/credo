@@ -1,7 +1,7 @@
-defmodule Credo.Check.Refactor.SinglePipeTest do
+defmodule Credo.Check.Readability.SinglePipeTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Refactor.SinglePipe
+  @described_check Credo.Check.Readability.SinglePipe
 
   test "it should NOT report expected code" do
 """
@@ -40,7 +40,8 @@ defmodule CredoSampleModule do
 
   def some_fun do
     some_val |> do_something
-    some_other_val |> do_something
+    some_other_val 
+    |> do_something
   end
 end
 """ |> to_source_file
