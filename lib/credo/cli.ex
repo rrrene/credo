@@ -172,6 +172,10 @@ defmodule Credo.CLI do
     %Config{config | strict: true}
     |> Config.set_strict()
   end
+  defp set_strict(config, %{strict: false}) do
+    %Config{config | strict: false}
+    |> Config.set_strict()
+  end
   defp set_strict(config, _), do: config
 
   defp set_help(config, %{help: true}) do
