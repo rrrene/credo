@@ -170,8 +170,6 @@ defmodule Credo.Check.CodeHelper do
   end
   defp clean_node(v) when is_atom(v)
                       or is_binary(v)
-                      or is_boolean(v)
                       or is_float(v)
-                      or is_integer(v)
-                      or is_nil(v), do: v
+                      or is_integer(v), do: v
 end

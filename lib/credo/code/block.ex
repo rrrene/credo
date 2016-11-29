@@ -202,9 +202,7 @@ defmodule Credo.Code.Block do
   defp instructions_for(v) when is_atom(v)
                       or is_tuple(v)
                       or is_binary(v)
-                      or is_boolean(v)
                       or is_float(v)
-                      or is_integer(v)
-                      or is_nil(v), do: List.wrap(v)
+                      or is_integer(v), do: List.wrap(v)
   defp instructions_for(v) when is_list(v), do: [v]
 end
