@@ -38,7 +38,7 @@ defmodule Credo.Sources do
 
   defp include(files, []), do: files
   defp include(files, [path | remaining_paths]) do
-    include_paths = recurse_path(path) |> Enum.into(MapSet.new)
+    include_paths = path |> recurse_path |> Enum.into(MapSet.new)
 
     files
     |> MapSet.union(include_paths)
@@ -52,7 +52,7 @@ defmodule Credo.Sources do
     |> exclude([pattern | remaining_patterns])
   end
   defp exclude(files, [pattern | remaining_patterns]) when is_binary(pattern) do
-    exclude_paths = recurse_path(pattern) |> Enum.into(MapSet.new)
+    exclude_paths = pattern |> recurse_path |> Enum.into(MapSet.new)
 
     files
     |> MapSet.difference(exclude_paths)

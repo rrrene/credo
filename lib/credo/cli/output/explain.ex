@@ -172,7 +172,9 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint])
 
-    (issue.check.explanation || "TODO: Insert explanation")
+    explanation = issue.check.explanation || "TODO: Insert explanation"
+
+    explanation
     |> String.strip
     |> String.split("\n")
     |> Enum.flat_map(&format_explanation(&1, outer_color))

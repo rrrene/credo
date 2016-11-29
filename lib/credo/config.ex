@@ -142,8 +142,10 @@ defmodule Credo.Config do
 
   defp files_from_data(data, dir) do
     files = data[:files] || %{}
+    included_files = files[:included] || dir
+
     included_dir =
-      (files[:included] || dir)
+      included_files
       |> List.wrap
       |> Enum.map(&join_default_files_if_directory/1)
 
