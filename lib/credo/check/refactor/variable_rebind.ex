@@ -30,6 +30,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
           {other, _} -> key == other
         end) >= 2
       end)
+      |> Enum.reverse
       |> Enum.uniq_by(fn 
         {v, _} -> v
       end)
