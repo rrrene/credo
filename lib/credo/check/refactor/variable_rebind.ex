@@ -58,6 +58,10 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp find_assignments(_), do: nil
 
+  defp find_variables({:=, _, args} = ast) do
+    Enum.map(args, &find_variables/1)
+  end
+
   defp find_variables({variable_name, meta, nil}) when is_list(meta) do
     {variable_name, meta[:line]}
   end

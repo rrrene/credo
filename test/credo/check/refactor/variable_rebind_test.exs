@@ -54,4 +54,16 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report violations when using destructuring with nested assignments" do
+"""
+defmodule CredoSampleModule do
+  def some_function() do
+    {a = b, a = b} = {1, 2}
+    b = 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
