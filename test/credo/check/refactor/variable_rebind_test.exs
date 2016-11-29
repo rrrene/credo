@@ -32,7 +32,7 @@ end
 defmodule CredoSampleModule do
   def some_function() do
     var_1 = 1 + 3
-    var_b = var1 + 7
+    var_b = var_1 + 7
     var_1 = 34
     var_c = 2456
     var_b = 2
