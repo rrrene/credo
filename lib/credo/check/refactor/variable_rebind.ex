@@ -27,8 +27,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       variables
       |> Enum.filter(fn {key, _} ->
         Enum.count(variables, fn 
-          {^key, _} -> true
-          _ -> false
+          {other, _} -> key == other
         end) >= 2
       end)
       |> Enum.uniq_by(fn 
