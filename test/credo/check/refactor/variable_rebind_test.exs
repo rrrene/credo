@@ -41,4 +41,17 @@ end
 """ |> to_source_file
     |> assert_issues(@described_check, nil, &(length(&1) == 2))
   end
+
+  test "it should report violations when using destructuring" do
+"""
+defmodule CredoSampleModule do
+  def some_function() do
+    something = "ABABAB"
+    {:ok, something} = Base.decode16(something)
+    {a, a} = {2, 2} # this should _not_ trigger it
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
