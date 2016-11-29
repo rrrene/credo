@@ -69,6 +69,11 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   defp find_variables(tuple) when is_tuple(tuple) do
     tuple
     |> Tuple.to_list
+    |> find_variables
+  end
+
+  defp find_variables(list) when is_list(list) do
+    list
     |> Enum.map(&find_variables/1)
     |> List.flatten
     |> Enum.uniq_by(&get_variable_name/1)
