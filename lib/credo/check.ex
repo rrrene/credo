@@ -170,15 +170,12 @@ defmodule Credo.Check do
     scope_prio_map[scope] || 0
   end
 
-
-
   defp category_body(nil) do
     quote do
-      value =
-        __MODULE__
-        |> Module.split
-        |> Enum.at(2)
-      (value || :unknown)
+      __MODULE__
+      |> Module.split
+      |> Enum.at(2)
+      |> fn value -> value || :unknown end.()
       |> to_string
       |> String.downcase
       |> String.to_atom
