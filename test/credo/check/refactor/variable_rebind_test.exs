@@ -42,7 +42,7 @@ end
     |> assert_issues(@described_check, nil, &(length(&1) == 2))
   end
 
-  test "it should report violations when using destructuring" do
+  test "it should report violations when using destructuring tuples" do
 """
 defmodule CredoSampleModule do
   def some_function() do
@@ -60,6 +60,18 @@ end
 defmodule CredoSampleModule do
   def some_function() do
     {a = b, a = b} = {1, 2}
+    b = 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report violations when using destructuring lists" do
+"""
+defmodule CredoSampleModule do
+  def some_function() do
+    [a, b] = [1, 2]
     b = 2
   end
 end
