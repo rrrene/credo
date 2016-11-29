@@ -9,6 +9,7 @@ otp_release:
   - 18.1
   - 18.2
   - 19.0
+  - 19.1
 after_script:
   - MIX_ENV=test mix inch.report
 matrix:
