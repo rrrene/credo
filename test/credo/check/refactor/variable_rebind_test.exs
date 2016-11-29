@@ -78,4 +78,16 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report violations when using destructuring maps" do
+"""
+defmodule CredoSampleModule do
+  def some_function(opts) do
+    %{a: foo, b: bar} = opts
+    bar = 3
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end

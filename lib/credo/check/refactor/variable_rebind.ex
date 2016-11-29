@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp find_assignments(_), do: nil
 
-  defp find_variables({:=, _, args} = ast) do
+  defp find_variables({:=, _, args}) do
     Enum.map(args, &find_variables/1)
   end
 
@@ -74,6 +74,15 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp find_variables(list) when is_list(list) do
     list
+    |> Enum.map(&find_variables/1)
+    |> List.flatten
+    |> Enum.uniq_by(&get_variable_name/1)
+  end
+
+  defp find_variables(map) when is_map(map) do
+    map
+    |> Enum.into([])
+    |> Enum.map(fn {_, value} -> value end)
     |> Enum.map(&find_variables/1)
     |> List.flatten
     |> Enum.uniq_by(&get_variable_name/1)
