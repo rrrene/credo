@@ -16,3 +16,5 @@ matrix:
   exclude:
   - elixir: 1.1.1
     otp_release: 19.0
+  - elixir: 1.1.1
+    otp_release: 19.1
