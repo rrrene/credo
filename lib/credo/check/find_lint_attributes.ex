@@ -11,8 +11,7 @@ defmodule Credo.Check.FindLintAttributes do
 
   @doc false
   def run(source_files, _params) when is_list(source_files) do
-    source_files
-    |> Enum.map(&find_and_set_in_source_file/1)
+    Enum.map(source_files, &find_and_set_in_source_file/1)
   end
 
   def find_and_set_in_source_file(source_file) do

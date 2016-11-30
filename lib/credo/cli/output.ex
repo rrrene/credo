@@ -86,15 +86,15 @@ defmodule Credo.CLI.Output do
   def complain_about_invalid_source_files([]), do: nil
   def complain_about_invalid_source_files(invalid_source_files) do
     invalid_source_filenames = Enum.map(invalid_source_files, &(&1.filename))
-    [
+    output = [
       :red, "Some source files could not be parsed correctly and are excluded:\n",
     ]
-    |> UI.puts
+    UI.puts(output)
 
     invalid_source_filenames
     |> Enum.with_index
     |> Enum.flat_map(fn({filename, index}) ->
-        [:reset, "#{index+1})" |> String.rjust(5), :faint, " #{filename}\n"]
+        [:reset, String.rjust("#{index+1})", 5), :faint, " #{filename}\n"]
       end)
     |> UI.puts
   end
