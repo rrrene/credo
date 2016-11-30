@@ -44,22 +44,21 @@ defmodule Credo.CLI.Output.Categories do
   ]
 
   def print do
-    @order
-    |> Enum.each(&print_category/1)
+    Enum.each(@order, &print_category/1)
   end
 
   defp print_category(category) do
     term_width = Output.term_columns
     color = @category_colors[category]
     title = @category_titles[category]
+    output = [
+      :bright, String.to_atom("#{color}_background"), color, " ",
+      Output.foreground_color(color), :normal,
+      String.ljust(" #{title}", term_width - 1),
+    ]
 
     UI.puts
-    [
-      :bright, "#{color}_background" |> String.to_atom, color, " ",
-        Output.foreground_color(color), :normal,
-      " #{title}" |> String.ljust(term_width - 1),
-    ]
-    |> UI.puts
+    UI.puts(output)
 
     color
     |> UI.edge
@@ -71,8 +70,8 @@ defmodule Credo.CLI.Output.Categories do
   end
 
   defp print_line(line, color) do
-    [UI.edge(color), " ", :reset, line]
-    |> UI.puts
+    output = [UI.edge(color), " ", :reset, line]
+    UI.puts(output)
   end
 
 end

@@ -11,8 +11,7 @@ defmodule Credo.Check.Runner do
 
     {_time_run_on_all, source_files_after_run_on_all} =
       :timer.tc fn ->
-        source_files
-        |> run_checks_that_run_on_all(config)
+        run_checks_that_run_on_all(source_files, config)
       end
 
     #IO.inspect time_run_on_all
@@ -59,8 +58,7 @@ defmodule Credo.Check.Runner do
 
   defp exclude_low_priority_checks(config, below_priority) do
     checks =
-      config.checks
-      |> Enum.reject(fn
+      Enum.reject(config.checks, fn
           ({check}) -> check.base_priority < below_priority
           ({check, _}) -> check.base_priority < below_priority
         end)
@@ -77,13 +75,11 @@ defmodule Credo.Check.Runner do
       end))
     |> Enum.each(&Task.await(&1, :infinity))
 
-    source_files
-    |> SourceFileIssues.update_in_source_files
+    SourceFileIssues.update_in_source_files(source_files)
   end
 
   defp run_checks(%SourceFile{} = source_file, checks, config) when is_list(checks) do
-    checks
-    |> Enum.flat_map(&run_check(&1, source_file, config))
+    Enum.flat_map(checks, &run_check(&1, source_file, config))
   end
 
   defp run_check({_check, false}, source_files, _config) when is_list(source_files) do

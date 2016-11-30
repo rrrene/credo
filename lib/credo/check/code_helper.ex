@@ -70,10 +70,9 @@ defmodule Credo.Check.CodeHelper do
         value
       :notfound ->
         result =
-          lines
-          |> Enum.map(fn({line_no, _}) ->
-              Scope.name(ast, line: line_no)
-            end)
+          Enum.map(lines, fn({line_no, _}) ->
+            Scope.name(ast, line: line_no)
+          end)
         SourceFileScopes.put(filename, result)
         result
     end
