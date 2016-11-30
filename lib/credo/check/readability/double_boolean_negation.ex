@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.DoubleBooleanNegation do
     {ast, [issue | issues]}
   end
 
-  defp traverse(ast, issues, issue_meta) do
+  defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 end
