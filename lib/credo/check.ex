@@ -172,10 +172,13 @@ defmodule Credo.Check do
 
   defp category_body(nil) do
     quote do
-      __MODULE__
+      name = __MODULE__
       |> Module.split
       |> Enum.at(2)
-      |> fn value -> value || :unknown end.()
+
+      safe_name = name || :unknown
+
+      safe_name
       |> to_string
       |> String.downcase
       |> String.to_atom

@@ -10,9 +10,9 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
   end
 
   defp traverse({:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, property_values, filename) do
-    defs = Module.defs(ast)
     new_property_values =
-      defs
+      ast
+      |> Module.defs
       |> Enum.flat_map(&(property_values_for_def(&1, filename)))
     {:ast, property_values ++ new_property_values}
   end
