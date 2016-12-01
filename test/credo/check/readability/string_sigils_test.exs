@@ -21,32 +21,32 @@ defmodule Credo.Check.Readability.StringSigilsTest do
 
   test "does NOT report for empty string" do
     create_snippet("")
-      |> to_source_file
-      |> refute_issues(@described_check)
+    |> to_source_file
+    |> refute_issues(@described_check)
   end
 
   test "does NOT report when exactly 3 quotes are found" do
     create_snippet(~s(f\\"b\\"\\"))
-      |> to_source_file
-      |> refute_issues(@described_check)
+    |> to_source_file
+    |> refute_issues(@described_check)
   end
 
   test "reports for more than 3 quotes" do
     create_snippet(~s(f\\"\\"b\\"\\"))
-      |> to_source_file
-      |> assert_issue(@described_check)
+    |> to_source_file
+    |> assert_issue(@described_check)
   end
 
   test "reports for more than :maximum_allowed_quotes quotes" do
     create_snippet(~s(f\\"\\"b\\"\\\"\\"\\"))
-      |> to_source_file
-      |> assert_issue(@described_check, maximum_allowed_quotes: 5)
+    |> to_source_file
+    |> assert_issue(@described_check, maximum_allowed_quotes: 5)
   end
 
   test "does NOT report when less than :maximum_allowed_quotes quotes are found" do
     create_snippet(~s(f\\"\\"\\"\\"))
-      |> to_source_file
-      |> refute_issues(@described_check, maximum_allowed_quotes: 5)
+    |> to_source_file
+    |> refute_issues(@described_check, maximum_allowed_quotes: 5)
   end
 
   test "does NOT report when exactly :maximum_allowed_quotes quotes are found" do
@@ -57,13 +57,13 @@ defmodule Credo.Check.Readability.StringSigilsTest do
 
   test "does NOT report for quotes in sigil_s" do
     create_sigil_snippet(~s(f\\"\\"b\\"\\"))
-      |> to_source_file
-      |> refute_issues(@described_check)
+    |> to_source_file
+    |> refute_issues(@described_check)
   end
 
   test "does NOT report for quotes in sigil_r" do
     create_sigil_snippet(~s(f\\"\\"b\\"\\"), "r")
-     |> to_source_file
-     |> refute_issues(@described_check)
+    |> to_source_file
+    |> refute_issues(@described_check)
   end
 end
