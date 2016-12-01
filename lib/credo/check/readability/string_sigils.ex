@@ -39,8 +39,8 @@ defmodule Credo.Check.Readability.StringSigils do
 
   defp is_sigil?(maybe_sigil) do
     maybe_sigil
-     |> Atom.to_string
-     |> String.starts_with?("sigil_")
+    |> Atom.to_string
+    |> String.starts_with?("sigil_")
   end
 
   defp issues_for_string_literal(string, maximum_allowed_quotes, issues, issue_meta, line_no) do
@@ -55,19 +55,16 @@ defmodule Credo.Check.Readability.StringSigils do
     too_many_quotes?(string, 0, limit)
   end
 
+  @quote_codepoint 34
   defp too_many_quotes?(_string, count, limit) when count > limit do
     true
   end
-
   defp too_many_quotes?(<<>>, _count,  _limit) do
     false
   end
-
-  @quote_codepoint 34
   defp too_many_quotes?(<<c::utf8, rest::binary>>, count, limit) when c == @quote_codepoint do
     too_many_quotes?(rest, count + 1, limit)
   end
-
   defp too_many_quotes?(<<_::utf8, rest::binary>>, count, limit) do
     too_many_quotes?(rest, count, limit)
   end
