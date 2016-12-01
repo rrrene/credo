@@ -24,20 +24,22 @@ defmodule Credo.Check.Readability.DoubleBooleanNegation do
 
   # Checking for `!!`
   defp traverse({:!, [line: line_no], [{:!, _, ast}]}, issues, issue_meta) do
-    issue = format_issue issue_meta,
-      message: "Double boolean negation found.",
-      trigger: "!!",
-      line_no: line_no
+    issue =
+      format_issue issue_meta,
+        message: "Double boolean negation found.",
+        trigger: "!!",
+        line_no: line_no
 
     {ast, [issue | issues]}
   end
 
   # Checking for `not not`
   defp traverse({:not, [line: line_no], [{:not, _, ast}]}, issues, issue_meta) do
-    issue = format_issue issue_meta,
-      message: "Double boolean negation found.",
-      trigger: "not not",
-      line_no: line_no
+    issue =
+      format_issue issue_meta,
+        message: "Double boolean negation found.",
+        trigger: "not not",
+        line_no: line_no
 
     {ast, [issue | issues]}
   end
