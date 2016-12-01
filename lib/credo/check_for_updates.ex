@@ -38,12 +38,13 @@ defmodule Credo.CheckForUpdates do
   end
 
   defp highest_version(versions, including_pre_versions?) do
-    if including_pre_versions? do
+    included_versions = if including_pre_versions? do
       versions
     else
       versions |> Enum.reject(&pre_version?/1)
     end
-    |> List.last
+
+    List.last(included_versions)
   end
 
   defp pre_version?(version) do
@@ -65,10 +66,12 @@ defmodule Credo.CheckForUpdates do
   defp fetch(url) do
     :inets.start()
     :ssl.start()
-    :httpc.request(:get, {String.to_charlist(url),
-          [{'User-Agent', user_agent()},
-           {'Accept', 'application/vnd.hex+erlang'}]}, [], [])
-    |> convert_response_body()
+    response = :httpc.request(:get, {String.to_charlist(url),
+                                    [{'User-Agent', user_agent()},
+                                     {'Accept', 'application/vnd.hex+erlang'}]
+                                    }, [], [])
+
+    convert_response_body(response)
   end
 
   defp user_agent do

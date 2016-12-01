@@ -99,17 +99,17 @@ defmodule Credo.Check do
   - `:exit_status`  Sets the issue's exit_status.
   - `:severity`     Sets the issue's severity.
   """
-  def format_issue(issue_meta, opts, category, base_priority, check) do
+  def format_issue(issue_meta, opts, issue_category, issue_base_priority, check) do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
     priority =
       case params[:priority] do
-        nil -> base_priority
+        nil -> issue_base_priority
         val -> val |> Check.to_priority
       end
     exit_status =
       case params[:exit_status] do
-        nil -> category |> Check.to_exit_status
+        nil -> issue_category |> Check.to_exit_status
         val -> val |> Check.to_exit_status
       end
 
@@ -130,14 +130,14 @@ defmodule Credo.Check do
     }
     |> add_line_no_options(line_no, source_file)
     |> add_custom_column(trigger, line_no, column, source_file)
-    |> add_check_and_category(check, category)
+    |> add_check_and_category(check, issue_category)
   end
 
-  defp add_check_and_category(issue, check, category) do
+  defp add_check_and_category(issue, check, issue_category) do
     %Issue{
       issue |
       check: check,
-      category: category
+      category: issue_category
     }
   end
 
@@ -170,15 +170,15 @@ defmodule Credo.Check do
     scope_prio_map[scope] || 0
   end
 
-
-
   defp category_body(nil) do
     quote do
-      value =
-        __MODULE__
-        |> Module.split
-        |> Enum.at(2)
-      (value || :unknown)
+      name = __MODULE__
+      |> Module.split
+      |> Enum.at(2)
+
+      safe_name = name || :unknown
+
+      safe_name
       |> to_string
       |> String.downcase
       |> String.to_atom
