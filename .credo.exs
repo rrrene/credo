@@ -90,6 +90,7 @@
         {Credo.Check.Refactor.NegatedConditionsWithElse},
         {Credo.Check.Refactor.Nesting},
         {Credo.Check.Refactor.UnlessWithElse},
+        {Credo.Check.Refactor.VariableRebinding},
 
         {Credo.Check.Warning.IExPry},
         {Credo.Check.Warning.IoInspect},
