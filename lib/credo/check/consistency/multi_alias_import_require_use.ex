@@ -23,7 +23,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   ]
 
   alias Credo.Check.Consistency.Helper
-  alias Credo.Check.PropertyValue
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
@@ -37,7 +36,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
 
   defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
   defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
-  defp issue_for(issue_meta, {_x, value, meta} = actual_prop, expected_prop, _picked_count, _total_count) do    
+  defp issue_for(issue_meta, {_x, _value, meta} = actual_prop, _expected_prop, _picked_count, _total_count) do    
     format_issue issue_meta,
       message: message_for(actual_prop),
       line_no: meta[:line_no]

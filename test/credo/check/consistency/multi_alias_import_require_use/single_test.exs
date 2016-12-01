@@ -30,7 +30,7 @@ end
       @single
       |> to_source_file()
       |> Single.property_value_for([])       
-      assert 4 == Enum.count(result)
+    assert 4 == Enum.count(result)
   end
 
   test "it should not report anything when the pattern is not matched" do
@@ -38,7 +38,7 @@ end
       @no_single
       |> to_source_file()
       |> Single.property_value_for([])       
-      assert result == []
+    assert result == []
   end
 
 end

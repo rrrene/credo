@@ -3,13 +3,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
 
   @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
 
-  @mixed """
-defmodule Credo.Sample do
-  alias Foo.{Bar, Quux}
-  alias Foo.Bar
-  alias Foo.Quux
-end
-"""
   @single """
 defmodule Credo.Sample2 do
   alias Foo.Bar
@@ -26,9 +19,8 @@ defmodule Credo.Sample3 do
 end  
 """
 
-
   test "it should report errors when the multi and single syntaxes are mixed" do
-    [@mixed]
+    [@single, @multi]
     |> to_source_files
     |> assert_issue(@described_check)
   end
