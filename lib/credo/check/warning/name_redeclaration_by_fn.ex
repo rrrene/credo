@@ -80,8 +80,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
     find_issue(lhs, issue_meta, def_names, excluded_names)
   end
   def find_issue({:%{}, _meta2, keywords}, issue_meta, def_names, excluded_names) do
-    keywords
-    |> Enum.map(fn
+    Enum.map(keywords, fn
       {_lhs, rhs} ->
         find_issue(rhs, issue_meta, def_names, excluded_names)
       _ ->
@@ -96,10 +95,9 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
   end
   def find_issue({name, meta, _}, issue_meta, def_names, excluded_names) when is_atom(name) do
     def_name_with_op =
-      def_names
-      |> Enum.find(fn({def_name, _op}) -> def_name == name end)
+      Enum.find(def_names, fn({def_name, _op}) -> def_name == name end)
     cond do
-      excluded_names |> Enum.member?(name) ->
+      Enum.member?(excluded_names, name) ->
         nil
       def_name_with_op ->
         what =
@@ -110,17 +108,16 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
             _ -> "ERROR"
           end
         issue_for(issue_meta, meta[:line], name, what)
-      @kernel_fun_names |> Enum.member?(name) ->
+      Enum.member?(@kernel_fun_names, name) ->
         issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` function")
-      @kernel_macro_names |> Enum.member?(name) ->
+      Enum.member?(@kernel_macro_names, name) ->
         issue_for(issue_meta, meta[:line], name, "the `Kernel.#{name}` macro")
       true ->
         nil
     end
   end
   def find_issue(list, issue_meta, def_names, excluded_names) when is_list(list) do
-    list
-    |> Enum.map(&find_issue(&1, issue_meta, def_names, excluded_names))
+    Enum.map(list, &find_issue(&1, issue_meta, def_names, excluded_names))
   end
   def find_issue(tuple, issue_meta, def_names, excluded_names) when is_tuple(tuple) do
     tuple

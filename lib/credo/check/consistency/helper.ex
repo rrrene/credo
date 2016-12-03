@@ -54,8 +54,7 @@ defmodule Credo.Check.Consistency.Helper do
   """
   def most_picked_prop_value(list) when is_list(list) do
     all_property_values =
-      list
-      |> Enum.flat_map(fn({property_list, _source_file}) -> PropertyValue.get(property_list) end)
+      Enum.flat_map(list, fn({property_list, _source_file}) -> PropertyValue.get(property_list) end)
 
     result =
       all_property_values
@@ -91,8 +90,7 @@ defmodule Credo.Check.Consistency.Helper do
   Returns a tuple: {property_tuples, most_picked}
   """
   def run_code_patterns(source_files, pattern_mods, params) do
-    source_files
-    |> most_picked_prop(&create_property_tuples(&1, pattern_mods, params))
+    most_picked_prop(source_files, &create_property_tuples(&1, pattern_mods, params))
   end
 
   @doc """
@@ -102,8 +100,7 @@ defmodule Credo.Check.Consistency.Helper do
   Does call `new_issue_fun/4` when necessary to create a new issue.
   """
   def append_issues_via_issue_service({property_tuples, most_picked}, new_issue_fun, params) do
-    property_tuples
-    |> Enum.map(&append_issues_if_necessary(&1, most_picked, new_issue_fun, params))
+    Enum.map(property_tuples, &append_issues_if_necessary(&1, most_picked, new_issue_fun, params))
   end
 
   defp append_issues_if_necessary({_prop_list, _source_file}, nil, _, _) do
@@ -145,11 +142,10 @@ defmodule Credo.Check.Consistency.Helper do
   end
 
   defp collect_property_values(pattern_mods, source_file, params) do
-    pattern_mods
-    |> Enum.reduce([], fn(pattern_mod, acc) ->
-        result = pattern_mod.property_value_for(source_file, params)
-        acc ++ List.wrap(result)
-      end)
+    Enum.reduce(pattern_mods, [], fn(pattern_mod, acc) ->
+      result = pattern_mod.property_value_for(source_file, params)
+      acc ++ List.wrap(result)
+    end)
   end
 
 end

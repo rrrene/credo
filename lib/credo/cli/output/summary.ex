@@ -41,17 +41,17 @@ defmodule Credo.CLI.Output.Summary do
     # print_badge(source_files, issues)
     UI.puts
 
-    shown_issues |> print_priority_hint(config)
+    print_priority_hint(shown_issues, config)
   end
 
   def print_priority_hint([], %Config{min_priority: min_priority}) when min_priority >= 0 do
-    "Use `--strict` to show all issues, `--help` for options."
-    |> UI.puts(:faint)
+    hint = "Use `--strict` to show all issues, `--help` for options."
+    UI.puts(hint, :faint)
   end
   def print_priority_hint([], _config), do: nil
   def print_priority_hint(_, %Config{min_priority: min_priority}) when min_priority >= 0 do
-    "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
-    |> UI.puts(:faint)
+    hint = "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
+    UI.puts(hint, :faint)
   end
   def print_priority_hint(_, _config), do: nil
 
@@ -59,9 +59,7 @@ defmodule Credo.CLI.Output.Summary do
   def print_badge(source_files, issues) do
     scopes = scope_count(source_files)
 
-    parts =
-      @category_wording
-      |> Enum.map(fn({category, _, _}) -> category_count(issues, category) end)
+    parts = Enum.map(@category_wording, fn({category, _, _}) -> category_count(issues, category) end)
 
     parts = [scopes] ++ parts
     sum = Enum.sum(parts)
@@ -78,19 +76,18 @@ defmodule Credo.CLI.Output.Summary do
             if index == 0 do
               :green
             else
-              {category, _, _} = @category_wording |> Enum.at(index - 1)
+              {category, _, _} = Enum.at(@category_wording, index - 1)
               Output.check_color(category)
             end
           [color, String.duplicate("=", round(quota * width))]
         end)
 
-    [bar]
-    |> UI.puts
+    UI.puts([bar])
   end
 
   defp format_time_spent(time_load, time_run) do
-    time_run  = time_run |> div(10_000)
-    time_load = time_load |> div(10_000)
+    time_run  = div(time_run, 10_000)
+    time_load = div(time_load, 10_000)
 
     formatted_total = format_in_seconds(time_run + time_load)
     total_in_seconds =
@@ -124,12 +121,10 @@ defmodule Credo.CLI.Output.Summary do
   end
 
   defp summary_parts(source_files, issues) do
-    parts =
-      @category_wording
-      |> Enum.flat_map(&summary_part(&1, issues))
+    parts = Enum.flat_map(@category_wording, &summary_part(&1, issues))
 
     parts =
-      parts |> List.update_at(Enum.count(parts) - 1, fn(last_part) ->
+      List.update_at(parts, Enum.count(parts) - 1, fn(last_part) ->
         String.replace(last_part, ", ", "")
        end)
 

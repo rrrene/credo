@@ -97,7 +97,7 @@ defmodule Credo.CLI.Output.Explain do
         inner_color,
         tag_style,
         "   ",
-        priority |> Output.priority_arrow,
+        Output.priority_arrow(priority),
         :reset, "  Priority: #{Output.priority_name(priority)} "
     ]
     UI.puts(priority_output)
@@ -115,7 +115,7 @@ defmodule Credo.CLI.Output.Explain do
 
     scope_output = [
       UI.edge(outer_color, @indent),
-        filename_color, :faint, filename |> to_string,
+        filename_color, :faint, to_string(filename),
         :default_color, :faint, pos,
         :faint, " (#{issue.scope})"
     ]
@@ -202,7 +202,7 @@ defmodule Credo.CLI.Output.Explain do
   def format_explanation(line, outer_color) do
     [
       UI.edge([outer_color, :faint], @indent),
-      :reset, line |> format_explanation_text,
+      :reset, format_explanation_text(line),
       "\n"
     ]
   end
@@ -264,7 +264,7 @@ defmodule Credo.CLI.Output.Explain do
         output = [
           UI.edge([outer_color, :faint]), :reset,
             String.duplicate(" ", @indent-2),
-            :cyan, "  #{param}:" |> String.ljust(20),
+            :cyan, String.ljust("  #{param}:", 20),
             :reset, text
         ]
         UI.puts(output)
