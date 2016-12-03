@@ -121,7 +121,9 @@ Now you might want to know more about that particular entry, **just copy the fil
 
 ### Configuration via .credo.exs
 
-Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine.
+Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine. 
+
+This also works for umbrella projects, where you can have individual `.credo.exs` files for each app or a global one in the umbrella's `config/` or root folder.
 
 ```elixir
 # config/.credo.exs
