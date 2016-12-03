@@ -49,7 +49,7 @@ defmodule Credo.CLI.Output.Explain do
     output = [
       :bright, String.to_atom("#{color}_background" ), color, " ",
         Output.foreground_color(color), :normal,
-      " #{scope_name}" |> String.ljust(term_width - 1),
+      String.ljust(" #{scope_name}", term_width - 1),
     ]
 
     UI.puts
