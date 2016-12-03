@@ -50,9 +50,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
 
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
-      condition_arguments =
-        arguments
-        |> Enum.reject(&Keyword.keyword?/1) # remove do/else blocks
+      condition_arguments = Enum.reject(arguments, &Keyword.keyword?/1) # remove do/else blocks
 
       new_issues =
         Credo.Code.prewalk(condition_arguments, &traverse_condition(&1, &2, unquote(op), condition_arguments, issue_meta))
@@ -68,7 +66,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     case arguments do
       [{atom, _, nil}, _right] when is_atom(atom) ->
         # this means that the current ast is part of the `if/unless`
-        if op_arguments |> Enum.member?(ast) do
+        if Enum.member?(op_arguments, ast) do
           {ast, issues}
         else
           new_issue = issue_for(op, meta[:line], "=", issue_meta)

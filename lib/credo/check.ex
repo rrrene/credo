@@ -105,12 +105,12 @@ defmodule Credo.Check do
     priority =
       case params[:priority] do
         nil -> issue_base_priority
-        val -> val |> Check.to_priority
+        val -> Check.to_priority(val)
       end
     exit_status =
       case params[:exit_status] do
-        nil -> issue_category |> Check.to_exit_status
-        val -> val |> Check.to_exit_status
+        nil -> Check.to_exit_status(issue_category)
+        val -> Check.to_exit_status(val)
       end
 
     line_no = opts[:line_no]
@@ -197,8 +197,7 @@ defmodule Credo.Check do
   @doc "Converts a given category to an exit status"
   def to_exit_status(nil), do: 0
   def to_exit_status(atom) when is_atom(atom) do
-    @base_category_exit_status_map[atom]
-    |> to_exit_status
+    to_exit_status(@base_category_exit_status_map[atom])
   end
   def to_exit_status(value), do: value
 
