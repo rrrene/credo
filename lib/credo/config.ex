@@ -52,16 +52,14 @@ defmodule Credo.Config do
       |> List.first
       |> to_string
 
-    regexes
-    |> Enum.any?(&Regex.run(&1, check_name))
+    Enum.any?(regexes, &Regex.run(&1, check_name))
   end
 
   defp to_match_regexes(list) do
-    list
-    |> Enum.map(fn(match_check) ->
-        {:ok, match_pattern} = Regex.compile(match_check, "i")
-        match_pattern
-      end)
+    Enum.map(list, fn(match_check) ->
+      {:ok, match_pattern} = Regex.compile(match_check, "i")
+      match_pattern
+    end)
   end
 
   @doc """
@@ -176,8 +174,8 @@ defmodule Credo.Config do
   The `checks:` field is merged.
   """
   def merge(list) when is_list(list) do
-    base = list |> List.first
-    tail = list |> List.delete_at(0)
+    base = List.first(list)
+    tail = List.delete_at(list, 0)
     merge(tail, base)
   end
   def merge([], config), do: config
@@ -208,8 +206,7 @@ defmodule Credo.Config do
 
   defp normalize_check_tuples(nil), do: []
   defp normalize_check_tuples(list) when is_list(list) do
-    list
-    |> Enum.map(&normalize_check_tuple/1)
+    Enum.map(list, &normalize_check_tuple/1)
   end
 
   defp normalize_check_tuple({name}), do: {name, []}
