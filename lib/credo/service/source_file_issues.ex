@@ -32,14 +32,14 @@ defmodule Credo.Service.SourceFileIssues do
   end
 
   def handle_call({:append, filename, issue}, _from, current_state) do
-    issues = current_state[filename] |> List.wrap
+    issues = List.wrap(current_state[filename])
     new_issue_list = [issue] ++ issues
-    new_current_state = current_state |> Map.put(filename, new_issue_list)
+    new_current_state = Map.put(current_state, filename, new_issue_list)
 
     {:reply, new_issue_list, new_current_state}
   end
 
   def handle_call({:get, filename}, _from, current_state) do
-    {:reply, current_state[filename] |> List.wrap, current_state}
+    {:reply, List.wrap(current_state[filename]), current_state}
   end
 end
