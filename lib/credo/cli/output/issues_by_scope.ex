@@ -29,8 +29,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> Enum.sort_by(&(&1.filename))
     |> Enum.each(&print_issues(&1, config, term_width))
 
-    source_files
-    |> Summary.print(config, time_load, time_run)
+    Summary.print(source_files, config, time_load, time_run)
   end
 
   @lint {Credo.Check.Refactor.PipeChainStart, false}
@@ -41,21 +40,21 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> print_issues(filename, source_file, config, term_width)
   end
   defp print_issues(issues, _filename, source_file, _config, term_width) do
-    if issues |> Enum.any? do
-      first_issue = issues |> List.first
+    if Enum.any?(issues) do
+      first_issue = List.first(issues)
       scope_name = Scope.mod_name(first_issue.scope)
       color = Output.check_color(first_issue)
+      output = [
+        :bright, String.to_atom("#{color}_background" ), color, " ",
+          Output.foreground_color(color), :normal,
+        String.ljust(" #{scope_name}", term_width - 1),
+      ]
 
       UI.puts
+      UI.puts(output)
 
-      [
-        :bright, "#{color}_background" |> String.to_atom, color, " ",
-          Output.foreground_color(color), :normal,
-        " #{scope_name}" |> String.ljust(term_width - 1),
-      ]
-      |> UI.puts
-
-      UI.edge(color)
+      color
+      |> UI.edge
       |> UI.puts
 
       issues
@@ -71,34 +70,33 @@ defmodule Credo.CLI.Output.IssuesByScope do
     filename_color = :default_color
     tag_style = if outer_color == inner_color, do: :faint, else: :bright
 
-    [
+    output = [
       UI.edge(outer_color),
         inner_color,
         tag_style,
-        Output.check_tag(check.category), " ", priority |> Output.priority_arrow,
+        Output.check_tag(check.category), " ", Output.priority_arrow(priority),
         :normal, message_color, " ", message,
     ]
-    |> UI.puts
+    UI.puts(output)
 
-    [
+    edge = [
       UI.edge(outer_color, @indent),
-        filename_color, :faint, filename |> to_string,
+        filename_color, :faint, to_string(filename),
         :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
         :faint, " (#{issue.scope})"
     ]
-    |> UI.puts
+    UI.puts(edge)
 
     if issue.line_no do
       {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
-
-      UI.puts_edge([outer_color, :faint])
-
-      [
+      line_edge = [
         UI.edge([outer_color, :faint]), :cyan, :faint,
           String.duplicate(" ", @indent - 2),
           UI.truncate(line, term_width - @indent)
       ]
-      |> UI.puts
+
+      UI.puts_edge([outer_color, :faint])
+      UI.puts(line_edge)
 
       if issue.column do
         offset = String.length(line) - String.length(String.strip(line))
@@ -108,13 +106,13 @@ defmodule Credo.CLI.Output.IssuesByScope do
             nil -> 1
             atom -> atom |> to_string |> String.length
           end
-
-        [
+        column_edge = [
           UI.edge([outer_color, :faint], @indent),
             inner_color, String.duplicate(" ", x),
             :faint, String.duplicate("^", w)
         ]
-        |> UI.puts
+
+        UI.puts(column_edge)
       end
     end
 
