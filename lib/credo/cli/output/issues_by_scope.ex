@@ -45,7 +45,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       scope_name = Scope.mod_name(first_issue.scope)
       color = Output.check_color(first_issue)
       output = [
-        :bright, String.to_atom("#{color}_background" ), color, " ",
+        :bright, String.to_atom("#{color}_background"), color, " ",
           Output.foreground_color(color), :normal,
         String.ljust(" #{scope_name}", term_width - 1),
       ]

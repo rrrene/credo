@@ -65,7 +65,7 @@ defmodule Credo.CLI.Command.Help do
   def color_for(_), do: [:reset, :white]
 
   def banner do
-banner = """
+output = """
 #   ____                    __
 #  /\\  _`\\                 /\\ \\
 #  \\ \\ \\/\\_\\  _ __    __   \\_\\ \\    ___
@@ -75,7 +75,7 @@ banner = """
 #      \\/___/  \\/_/ \\/____/\\/__,_ /\\/___/
 #
 """
-    String.strip(banner)
+    String.strip(output)
   end
 
 end
