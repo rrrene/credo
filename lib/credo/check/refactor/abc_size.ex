@@ -30,7 +30,7 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_abc_size = params |> Params.get(:max_size, @default_params)
+    max_abc_size = Params.get(params, :max_size, @default_params)
 
     Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_abc_size))
   end
@@ -83,7 +83,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
 
   def get_parameters(arguments) do
-    case arguments |> Enum.at(0) do
+    case Enum.at(arguments, 0) do
       {_name, _meta, nil} -> []
       {_name, _meta, parameters} -> Enum.map(parameters, &var_name/1)
     end

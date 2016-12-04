@@ -29,14 +29,12 @@ defmodule Credo.ExsLoader do
   end
 
   defp process_exs({:sigil_w, _, [{:<<>>, _, [list_as_string]}, []]}) do
-    list_as_string
-    |> String.split(~r/\s+/)
+    String.split(list_as_string, ~r/\s+/)
   end
 
   # TODO: support regex modifiers
   defp process_exs({:sigil_r, _, [{:<<>>, _, [regex_as_string]}, []]}) do
-    regex_as_string
-    |> Regex.compile!
+    Regex.compile!(regex_as_string)
   end
 
   defp process_exs({:%{}, _meta, body}) do

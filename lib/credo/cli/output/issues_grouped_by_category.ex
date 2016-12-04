@@ -52,7 +52,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   def print_after_info(source_files, config, time_load, time_run) do
     term_width = Output.term_columns
 
-    issues = source_files |> Enum.flat_map(&(&1.issues))
+    issues = Enum.flat_map(source_files, &(&1.issues))
     shown_issues =
       issues
       |> Filter.important(config)
@@ -66,7 +66,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     issue_map =
       categories
       |> Enum.map(fn(category) ->
-          {category, shown_issues |> Enum.filter(&(&1.category == category))}
+          {category, Enum.filter(shown_issues, &(&1.category == category))}
         end)
       |> Enum.into(%{})
 
@@ -81,8 +81,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
         print_issues(category, issue_map[category], source_file_map, config, term_width)
       end)
 
-    source_files
-    |> Summary.print(config, time_load, time_run)
+    Summary.print(source_files, config, time_load, time_run)
   end
 
   defp print_issues(_category, nil, _source_file_map, _config, _term_width) do
@@ -100,12 +99,12 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
 
     UI.puts
 
-    [
-      :bright, "#{color}_background" |> String.to_atom, color, " ",
+    title_output = [
+      :bright, String.to_atom("#{color}_background"), color, " ",
         Output.foreground_color(color), :normal,
-      " #{title}" |> String.ljust(term_width - 1),
+      String.ljust(" #{title}", term_width - 1),
     ]
-    |> UI.puts
+    UI.puts(title_output)
 
     color
     |> UI.edge
@@ -116,8 +115,8 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     if Enum.count(issues) > per_category(config) do
       not_shown = Enum.count(issues) - per_category(config)
 
-      [UI.edge(color), :faint, " ...  (#{not_shown} more, use `-a` to show them)"]
-      |> UI.puts
+      not_shown_output = [UI.edge(color), :faint, " ...  (#{not_shown} more, use `-a` to show them)"]
+      UI.puts(not_shown_output)
     end
   end
 
@@ -125,7 +124,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     issues
     |> Enum.sort_by(fn(issue) -> {issue.priority, issue.severity} end)
     |> Enum.reverse
-    |> Enum.take(config |> per_category)
+    |> Enum.take(per_category(config))
     |> Enum.each(&print_issue(&1, source_file_map, config, term_width))
   end
 

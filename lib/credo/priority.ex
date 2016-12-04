@@ -14,24 +14,20 @@ defmodule Credo.Priority do
 
   def scope_priorities(%SourceFile{} = source_file) do
     empty_priorities =
-      1..length(source_file.lines)
-      |> Enum.map(fn(_) -> [] end)
+      Enum.map(1..length(source_file.lines), fn(_) -> [] end)
 
     priority_list =
-      source_file
-      |> Credo.Code.prewalk(&traverse/2, empty_priorities)
+      Credo.Code.prewalk(source_file, &traverse/2, empty_priorities)
 
     base_map =
-      priority_list
-      |> make_base_map(source_file)
+      make_base_map(priority_list, source_file)
 
     lookup =
-      base_map
-      |> Enum.into(%{})
+      Enum.into(base_map, %{})
 
     base_map
     |> Enum.map(fn({scope_name, prio}) ->
-        names = scope_name |> String.split(".")
+        names = String.split(scope_name, ".")
         if names |> List.last |> String.match?(~r/^[a-z]/) do
           mod_name = names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
           mod_prio = lookup[mod_name]

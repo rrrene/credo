@@ -24,8 +24,8 @@ defmodule Credo.CLI.Output.IssueHelper do
 
     output = [
       inner_color,
-      Output.check_tag(check.category), " ", priority |> Output.priority_arrow, " ",
-      :reset, filename_color, :faint, filename |> to_string,
+      Output.check_tag(check.category), " ", Output.priority_arrow(priority), " ",
+      :reset, filename_color, :faint, to_string(filename),
       :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
       :reset, message_color,  " ", message,
     ]
@@ -44,7 +44,7 @@ defmodule Credo.CLI.Output.IssueHelper do
 
     output = [
       UI.edge(outer_color, @indent),
-        filename_color, :faint, filename |> to_string,
+        filename_color, :faint, to_string(filename),
         :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
         :faint, " (#{issue.scope})"
     ]
@@ -62,7 +62,7 @@ defmodule Credo.CLI.Output.IssueHelper do
       UI.edge(outer_color),
         outer_color,
         tag_style,
-        Output.check_tag(check.category), " ", priority |> Output.priority_arrow,
+        Output.check_tag(check.category), " ", Output.priority_arrow(priority),
         :normal, message_color, " ", first_line,
     ]
     UI.puts(output)
