@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   def run(%SourceFile{lines: lines} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    max_blank_lines = params |> Params.get(:max_blank_lines, @default_params)
+    max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
 
     lines
     |> blank_lines

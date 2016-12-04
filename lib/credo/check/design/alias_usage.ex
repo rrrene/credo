@@ -123,8 +123,8 @@ defmodule Credo.Check.Design.AliasUsage do
   # Returns true if mod_list and any dependent module would result in the same alias
   # since they share the same last name.
   defp conflicting_with_other_modules?(mod_list, mod_deps) do
-    last_name = mod_list |> Credo.Code.Name.last
-    full_name = mod_list |> Credo.Code.Name.full
+    last_name = Credo.Code.Name.last(mod_list)
+    full_name = Credo.Code.Name.full(mod_list)
 
     (mod_deps -- [full_name])
     |> Enum.filter(&Credo.Code.Name.parts_count(&1) > 1)
