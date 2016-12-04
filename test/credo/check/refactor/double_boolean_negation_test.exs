@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.DoubleBooleanNegationTest do
+defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Readability.DoubleBooleanNegation
+  @described_check Credo.Check.Refactor.DoubleBooleanNegation
 
   test "it should NOT report expected code" do
 """
