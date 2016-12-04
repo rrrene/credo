@@ -11,7 +11,7 @@ defmodule Credo.CheckForUpdates do
 
     if should_update?(all_versions, current) do
       latest = latest_version(all_versions, current)
-      [
+      warning = [
         :orange,
         :bright,
         "A new Credo version is available (#{latest})",
@@ -19,7 +19,7 @@ defmodule Credo.CheckForUpdates do
         :orange,
         ", please update with `mix deps.update credo`"
       ]
-      |> warn()
+      warn(warning)
     end
   end
 
@@ -31,8 +31,7 @@ defmodule Credo.CheckForUpdates do
   defp latest_version(all_versions, default) do
     including_pre_versions? = pre_version?(default)
     latest =
-      all_versions
-      |> highest_version(including_pre_versions?)
+      highest_version(all_versions, including_pre_versions?)
 
     latest || default
   end
@@ -41,7 +40,7 @@ defmodule Credo.CheckForUpdates do
     included_versions = if including_pre_versions? do
       versions
     else
-      versions |> Enum.reject(&pre_version?/1)
+      Enum.reject(versions, &pre_version?/1)
     end
 
     List.last(included_versions)
@@ -59,7 +58,7 @@ defmodule Credo.CheckForUpdates do
   defp fetch_all_hex_versions(package_name) do
     case fetch("https://hex.pm/api/packages/#{package_name}") do
       nil -> nil
-      package_info -> package_info |> hex_versions()
+      package_info -> hex_versions(package_info)
     end
   end
 
@@ -85,6 +84,6 @@ defmodule Credo.CheckForUpdates do
 
   defp hex_versions(nil), do: nil
   defp hex_versions(%{"releases" => releases}) do
-    releases |> Enum.map(&(&1["version"]))
+    Enum.map(releases, &(&1["version"]))
   end
 end

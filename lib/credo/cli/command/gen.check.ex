@@ -13,9 +13,9 @@ defmodule Credo.CLI.Command.GenCheck do
   end
 
   defp create_check_file(nil) do
-    [:red, :bright, "Please provide a filename:", "\n\n",
+    output = [:red, :bright, "Please provide a filename:", "\n\n",
       "  mix credo gen.check lib/my_first_credo_check.ex", "\n"]
-    |> Bunt.puts
+    Bunt.puts(output)
   end
   defp create_check_file(filename) do
     check_name = check_name_for(filename)
