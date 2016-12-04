@@ -18,14 +18,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   end
 
   defp to_property_values({{line_no, column, _}, trigger}, filename) do
-    property_value()
-    |> PropertyValue.for(filename: filename, line_no: line_no, column: column, trigger: trigger)
+    PropertyValue.for(property_value(), filename: filename, line_no: line_no, column: column, trigger: trigger)
   end
 
   defp check_tokens([], acc), do: acc
   defp check_tokens([prev | t], acc) do
-    current = t |> List.first
-    next = t |> Enum.at(1)
+    current = List.first(t)
+    next = Enum.at(t, 1)
 
     acc =
       if SpaceHelper.operator?(current) do

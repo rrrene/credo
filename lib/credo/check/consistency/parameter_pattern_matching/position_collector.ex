@@ -29,23 +29,19 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
   defp property_values_for_def(_, _), do: []
 
   defp property_values_for_parameter({:=, [line: line_no], [[_ | _] | _]} = _vals, filename) do
-    :after
-      |> PropertyValue.for(filename: filename, line_no: line_no)
+    PropertyValue.for(:after, filename: filename, line_no: line_no)
   end
 
   defp property_values_for_parameter({:=, [line: line_no], [{:%, _, _}, _]} = _vals, filename) do
-    :after
-      |> PropertyValue.for(filename: filename, line_no: line_no)
+    PropertyValue.for(:after, filename: filename, line_no: line_no)
   end
 
   defp property_values_for_parameter({:=, [line: line_no], [{:%{}, _, _}, _]} = _vals, filename) do
-    :after
-      |> PropertyValue.for(filename: filename, line_no: line_no)
+    PropertyValue.for(:after, filename: filename, line_no: line_no)
   end
 
   defp property_values_for_parameter({:=, [line: line_no], _} = _vals, filename) do
-    :before
-      |> PropertyValue.for(filename: filename, line_no: line_no)
+    PropertyValue.for(:before, filename: filename, line_no: line_no)
   end
 
   defp property_values_for_parameter(_, _), do: nil

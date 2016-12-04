@@ -46,7 +46,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
 
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_complexity = params |> Params.get(:max_complexity, @default_params)
+    max_complexity = Params.get(params, :max_complexity, @default_params)
 
     Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_complexity))
   end

@@ -9,10 +9,10 @@ defmodule Credo.Code.Block do
   """
   def all_blocks_for!(ast) do
     [
-      ast |> do_block_for!,
-      ast |> else_block_for!,
-      ast |> rescue_block_for!,
-      ast |> after_block_for!,
+      do_block_for!(ast),
+      else_block_for!(ast),
+      rescue_block_for!(ast),
+      after_block_for!(ast),
     ]
   end
 
@@ -46,8 +46,7 @@ defmodule Credo.Code.Block do
     {:ok, block}
   end
   def do_block_for(arguments) when is_list(arguments) do
-    arguments
-    |> Enum.find_value(&find_keyword(&1, :do))
+    Enum.find_value(arguments, &find_keyword(&1, :do))
   end
   def do_block_for(_) do
     nil
@@ -85,8 +84,7 @@ defmodule Credo.Code.Block do
     {:ok, else_block}
   end
   def else_block_for(arguments) when is_list(arguments) do
-    arguments
-    |> Enum.find_value(&find_keyword(&1, :else))
+    Enum.find_value(arguments, &find_keyword(&1, :else))
   end
   def else_block_for(_) do
     nil
@@ -125,8 +123,7 @@ defmodule Credo.Code.Block do
     {:ok, rescue_block}
   end
   def rescue_block_for(arguments) when is_list(arguments) do
-    arguments
-    |> Enum.find_value(&find_keyword(&1, :rescue))
+    Enum.find_value(arguments, &find_keyword(&1, :rescue))
   end
   def rescue_block_for(_) do
     nil
@@ -165,8 +162,7 @@ defmodule Credo.Code.Block do
     {:ok, after_block}
   end
   def after_block_for(arguments) when is_list(arguments) do
-    arguments
-    |> Enum.find_value(&find_keyword(&1, :after))
+    Enum.find_value(arguments, &find_keyword(&1, :after))
   end
   def after_block_for(_) do
     nil

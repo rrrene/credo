@@ -29,11 +29,10 @@ defmodule Credo.Sources do
     |> Enum.map(&to_source_file/1)
   end
   def find(paths) when is_list(paths) do
-    paths
-    |> Enum.flat_map(&find/1)
+    Enum.flat_map(paths, &find/1)
   end
   def find(path) when is_binary(path) do
-    path |> recurse_path()
+    recurse_path(path)
   end
 
   defp include(files, []), do: files
@@ -79,7 +78,7 @@ defmodule Credo.Sources do
           |> Enum.flat_map(&recurse_path/1)
       end
 
-    paths |> Enum.map(&Path.expand/1)
+    Enum.map(paths, &Path.expand/1)
   end
 
   defp to_source_file(filename) do
@@ -89,8 +88,7 @@ defmodule Credo.Sources do
   end
 
   defp source_file_from_stdin(filename) do
-    read_from_stdin!()
-    |> SourceFile.parse(filename)
+    SourceFile.parse(read_from_stdin(), filename)
   end
 
   defp read_from_stdin! do

@@ -123,7 +123,7 @@ defmodule Credo.Code.Module do
   defp find_aliases({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, aliases) do
     module_names =
       Enum.map(multi_mod_list, fn(tuple) ->
-        [Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)] |> Credo.Code.Name.full
+        Credo.Code.Name.full([Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)])
       end)
 
     {ast, aliases ++ module_names}
