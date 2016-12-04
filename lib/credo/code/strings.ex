@@ -5,7 +5,7 @@ defmodule Credo.Code.Strings do
 
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"\"", "\""}, {"'", "'"}]
-  @all_string_sigils @sigil_delimiters |> Enum.flat_map(fn({b, e}) -> [{"~s#{b}", e}, {"~S#{b}", e}] end)
+  @all_string_sigils Enum.flat_map(@sigil_delimiters, fn({b, e}) -> [{"~s#{b}", e}, {"~S#{b}", e}] end)
 
   @doc """
   Replaces all characters inside string literals and string sigils
@@ -39,7 +39,7 @@ defmodule Credo.Code.Strings do
     parse_code(t, acc <> <<h :: utf8>>, replacement)
   end
   defp parse_code(str, acc, replacement) when is_binary(str) do
-    {h, t} = str |> String.next_codepoint
+    {h, t} = String.next_codepoint(str)
     parse_code(t, acc <> h, replacement)
   end
 

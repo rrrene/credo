@@ -1,19 +1,19 @@
 defmodule Credo.Code.Sigils do
   @moduledoc """
-  This module let's you strip sigils from source code.
+  This module lets you strip sigils from source code.
   """
 
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"/", "/"}, {"\"\"\"", "\"\"\""}, {"\"", "\""}, {"'", "'"}]
-  @all_sigil_chars  ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
-                    |> Enum.flat_map(fn a -> [a, a |> String.upcase] end)
-  @all_sigil_starts @all_sigil_chars |> Enum.map(fn c -> "~#{c}" end)
-  @removable_sigils @sigil_delimiters
-                    |> Enum.flat_map(fn({b, e}) ->
-                        Enum.flat_map(@all_sigil_starts, fn(start) ->
-                          [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
-                        end)
+  @all_sigil_chars Enum.flat_map(~w(a b c d e f g h i j k l m n o p q r s t u v w x y z), fn a ->
+                     [a, String.upcase(a)]
+                   end)
+  @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
+  @removable_sigils Enum.flat_map(@sigil_delimiters, fn({b, e}) ->
+                      Enum.flat_map(@all_sigil_starts, fn(start) ->
+                        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
                       end)
+                    end)
 
   @doc """
   Replaces all characters inside all sigils with the equivalent amount of
@@ -47,7 +47,7 @@ defmodule Credo.Code.Sigils do
     parse_code(t, acc <> <<h :: utf8>>, replacement)
   end
   defp parse_code(str, acc, replacement) when is_binary(str) do
-    {h, t} = str |> String.next_codepoint
+    {h, t} = String.next_codepoint(str)
     parse_code(t, acc <> h, replacement)
   end
 
@@ -67,7 +67,7 @@ defmodule Credo.Code.Sigils do
     parse_string_literal(t, acc <> "\n", replacement)
   end
   defp parse_string_literal(str, acc, replacement) when is_binary(str) do
-    {h, t} = str |> String.next_codepoint
+    {h, t} = String.next_codepoint(str)
     parse_string_literal(t, acc <> h, replacement)
   end
 
@@ -108,7 +108,7 @@ defmodule Credo.Code.Sigils do
     parse_heredoc(t, acc <> "\n", replacement)
   end
   defp parse_heredoc(str, acc, replacement) when is_binary(str) do
-    {h, t} = str |> String.next_codepoint
+    {h, t} = String.next_codepoint(str)
     parse_heredoc(t, acc <> h, replacement)
   end
 end

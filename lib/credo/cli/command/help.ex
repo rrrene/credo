@@ -39,7 +39,7 @@ defmodule Credo.CLI.Command.Help do
     CLI.commands
     |> Sorter.ensure(@starting_order, @ending_order)
     |> Enum.each(fn(name) ->
-      module = name |> CLI.command_for
+      module = CLI.command_for(name)
       name2 = name |> to_string |> String.ljust(@ljust)
       case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
         {:shortdoc, [shortdesc]} ->
@@ -51,11 +51,11 @@ defmodule Credo.CLI.Command.Help do
 
     UI.puts "\nUse `--help` on any command to get further information."
 
-    [
+    example = [
       "For example, `", :olive, "mix credo suggest --help",
         :reset, "` for help on the default command."
     ]
-    |> UI.puts
+    UI.puts(example)
   end
 
   def color_for("#"), do: [:faint]
@@ -65,7 +65,7 @@ defmodule Credo.CLI.Command.Help do
   def color_for(_), do: [:reset, :white]
 
   def banner do
-"""
+banner = """
 #   ____                    __
 #  /\\  _`\\                 /\\ \\
 #  \\ \\ \\/\\_\\  _ __    __   \\_\\ \\    ___
@@ -74,7 +74,8 @@ defmodule Credo.CLI.Command.Help do
 #     \\ \\____/\\ \\_\\\\ \\____\\ \\___,_\\ \\____/
 #      \\/___/  \\/_/ \\/____/\\/__,_ /\\/___/
 #
-""" |> String.strip
+"""
+    String.strip(banner)
   end
 
 end
