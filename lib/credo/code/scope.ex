@@ -12,7 +12,7 @@ defmodule Credo.Code.Scope do
 
   def mod_name(nil), do: nil
   def mod_name(scope_name) do
-    names = scope_name |> String.split(".")
+    names = String.split(scope_name, ".")
     if names |> List.last |> String.match?(~r/^[a-z]/) do
       names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
     else
@@ -51,8 +51,7 @@ defmodule Credo.Code.Scope do
     find_scope(arguments, line, name_list, last_op)
   end
   defp find_scope(list, line, name_list, last_op) when is_list(list) do
-    list
-    |> Enum.find_value(&find_scope(&1, line, name_list, last_op))
+    Enum.find_value(list, &find_scope(&1, line, name_list, last_op))
   end
   defp find_scope({:defmodule, meta, [{:__aliases__, _, module_name}, arguments]}, line, name_list, _last_op) do
     name_list = name_list ++ module_name

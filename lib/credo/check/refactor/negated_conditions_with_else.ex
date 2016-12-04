@@ -65,7 +65,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
   # parentheses around the condition wrap it in a __block__
   defp negated_condition?({:__block__, _meta, arguments}) do
-    arguments |> negated_condition?()
+    negated_condition?(arguments)
   end
   defp negated_condition?(_) do
     false
