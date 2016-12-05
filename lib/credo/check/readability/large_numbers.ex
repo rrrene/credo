@@ -23,7 +23,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     only_greater_than: 9_999,
   ]
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, base_priority: :high, elixir_version: ">= 1.3.2"
 
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
