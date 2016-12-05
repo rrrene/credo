@@ -34,6 +34,7 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts
     UI.puts [:faint, @cry_for_help]
     UI.puts
+    print_skipped_checks(config.skipped_checks)
     UI.puts [:faint, format_time_spent(time_load, time_run)]
 
     UI.puts summary_parts(source_files, shown_issues)
@@ -42,6 +43,17 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts
 
     print_priority_hint(shown_issues, config)
+  end
+
+  defp print_skipped_checks(checks) do
+    msg = """
+The following checks were skipped because they're not compatible with your
+version of Elixir (#{System.version()}). Upgrade to the newest version of Elixir to
+get the most out of Credo!
+    """
+    UI.puts(msg, :faint)
+    Enum.each(checks, fn({check, _check_info}) -> UI.puts("  - #{check}", :faint) end)
+    UI.puts
   end
 
   def print_priority_hint([], %Config{min_priority: min_priority}) when min_priority >= 0 do
