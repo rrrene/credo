@@ -33,6 +33,11 @@ defmodule Credo.Check do
         default || :unknown
       end
 
+      def elixir_version do
+        default = unquote(opts[:elixir_version])
+        default || ">= 0.0.1"
+      end
+
       def run_on_all? do
         unquote(run_on_all_body(opts[:run_on_all]))
       end
