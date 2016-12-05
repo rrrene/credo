@@ -34,7 +34,6 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts
     UI.puts [:faint, @cry_for_help]
     UI.puts
-    print_skipped_checks(config.skipped_checks)
     UI.puts [:faint, format_time_spent(time_load, time_run)]
 
     UI.puts summary_parts(source_files, shown_issues)
@@ -42,28 +41,17 @@ defmodule Credo.CLI.Output.Summary do
     # print_badge(source_files, issues)
     UI.puts
 
-    print_priority_hint(shown_issues, config)
-  end
-
-  defp print_skipped_checks(checks) do
-    msg = """
-The following checks were skipped because they're not compatible with your
-version of Elixir (#{System.version()}). Upgrade to the newest version of Elixir to
-get the most out of Credo!
-    """
-    UI.puts(msg, :faint)
-    Enum.each(checks, fn({check, _check_info}) -> UI.puts("  - #{check}", :faint) end)
-    UI.puts
+    shown_issues |> print_priority_hint(config)
   end
 
   def print_priority_hint([], %Config{min_priority: min_priority}) when min_priority >= 0 do
-    hint = "Use `--strict` to show all issues, `--help` for options."
-    UI.puts(hint, :faint)
+    "Use `--strict` to show all issues, `--help` for options."
+    |> UI.puts(:faint)
   end
   def print_priority_hint([], _config), do: nil
   def print_priority_hint(_, %Config{min_priority: min_priority}) when min_priority >= 0 do
-    hint = "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
-    UI.puts(hint, :faint)
+    "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
+    |> UI.puts(:faint)
   end
   def print_priority_hint(_, _config), do: nil
 
@@ -71,7 +59,9 @@ get the most out of Credo!
   def print_badge(source_files, issues) do
     scopes = scope_count(source_files)
 
-    parts = Enum.map(@category_wording, fn({category, _, _}) -> category_count(issues, category) end)
+    parts =
+      @category_wording
+      |> Enum.map(fn({category, _, _}) -> category_count(issues, category) end)
 
     parts = [scopes] ++ parts
     sum = Enum.sum(parts)
@@ -88,18 +78,19 @@ get the most out of Credo!
             if index == 0 do
               :green
             else
-              {category, _, _} = Enum.at(@category_wording, index - 1)
+              {category, _, _} = @category_wording |> Enum.at(index - 1)
               Output.check_color(category)
             end
           [color, String.duplicate("=", round(quota * width))]
         end)
 
-    UI.puts([bar])
+    [bar]
+    |> UI.puts
   end
 
   defp format_time_spent(time_load, time_run) do
-    time_run  = div(time_run, 10_000)
-    time_load = div(time_load, 10_000)
+    time_run  = time_run |> div(10_000)
+    time_load = time_load |> div(10_000)
 
     formatted_total = format_in_seconds(time_run + time_load)
     total_in_seconds =
@@ -133,10 +124,12 @@ get the most out of Credo!
   end
 
   defp summary_parts(source_files, issues) do
-    parts = Enum.flat_map(@category_wording, &summary_part(&1, issues))
+    parts =
+      @category_wording
+      |> Enum.flat_map(&summary_part(&1, issues))
 
     parts =
-      List.update_at(parts, Enum.count(parts) - 1, fn(last_part) ->
+      parts |> List.update_at(Enum.count(parts) - 1, fn(last_part) ->
         String.replace(last_part, ", ", "")
        end)
 

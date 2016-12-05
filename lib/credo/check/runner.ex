@@ -4,12 +4,6 @@ defmodule Credo.Check.Runner do
   alias Credo.Service.SourceFileIssues
 
   def run(source_files, config) when is_list(source_files) do
-    config =
-      config
-      |> set_lint_attributes(source_files)
-      |> exclude_low_priority_checks(config.min_priority - 9)
-      |> exclude_checks_based_on_elixir_version
-
     {_time_run_on_all, source_files_after_run_on_all} =
       :timer.tc fn ->
         run_checks_that_run_on_all(source_files, config)
@@ -34,6 +28,16 @@ defmodule Credo.Check.Runner do
 
     issues = run_checks(source_file, checks, config)
     %SourceFile{source_file | issues: source_file.issues ++ issues}
+  end
+
+  @doc """
+  Prepares the Config struct based on a given list of `source_files`.
+  """
+  def prepare_config(source_files, config) do
+    config
+    |> set_lint_attributes(source_files)
+    |> exclude_low_priority_checks(config.min_priority - 9)
+    |> exclude_checks_based_on_elixir_version
   end
 
   defp set_lint_attributes(config, source_files) do
@@ -69,16 +73,16 @@ defmodule Credo.Check.Runner do
 
   defp exclude_checks_based_on_elixir_version(config) do
     version = System.version()
-    skipped_checks = Enum.reject(config.checks, fn
-      ({check}) -> Version.match?(version, check.elixir_version)
-      ({check, _}) -> Version.match?(version, check.elixir_version)
-    end)
-    checks = Enum.filter(config.checks, fn
-      ({check}) -> Version.match?(version, check.elixir_version)
-      ({check, _}) -> Version.match?(version, check.elixir_version)
-    end)
+    skipped_checks =
+      Enum.reject(config.checks, &matches_requirement?(&1, version))
+    checks =
+      Enum.filter(config.checks, &matches_requirement?(&1, version))
 
     %Config{config | checks: checks, skipped_checks: skipped_checks}
+  end
+
+  defp matches_requirement?({check, _}, version) do
+    Version.match?(version, check.elixir_version)
   end
 
   defp run_checks_that_run_on_all(source_files, config) do
