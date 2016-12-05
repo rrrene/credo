@@ -69,12 +69,16 @@ defmodule Credo.Check.Runner do
 
   defp exclude_checks_based_on_elixir_version(config) do
     version = System.version()
+    skipped_checks = Enum.reject(config.checks, fn
+      ({check}) -> Version.match?(version, check.elixir_version)
+      ({check, _}) -> Version.match?(version, check.elixir_version)
+    end)
     checks = Enum.filter(config.checks, fn
       ({check}) -> Version.match?(version, check.elixir_version)
       ({check, _}) -> Version.match?(version, check.elixir_version)
     end)
 
-    %Config{config | checks: checks}
+    %Config{config | checks: checks, skipped_checks: skipped_checks}
   end
 
   defp run_checks_that_run_on_all(source_files, config) do
