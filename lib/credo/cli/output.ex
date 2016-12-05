@@ -1,5 +1,6 @@
 defmodule Credo.CLI.Output do
   alias Credo.CLI.Output.UI
+  alias Credo.Config
 
   @category_tag_map %{"refactor" => "F"}
 
@@ -97,5 +98,28 @@ defmodule Credo.CLI.Output do
         [:reset, String.rjust("#{index+1})", 5), :faint, " #{filename}\n"]
       end)
     |> UI.puts
+  end
+
+  def print_skipped_checks(%Config{skipped_checks: []}), do: nil
+  def print_skipped_checks(%Config{skipped_checks: skipped_checks}) do
+    msg =
+      [
+        :reset, :bright, :orange, "info: ", :reset, :faint, "the following checks were skipped because they're not compatible with\n",
+        :reset, :faint, "your version of Elixir (#{System.version()}). Upgrade to the newest version of Elixir to\n",
+        :reset, :faint, "get the most out of Credo!\n",
+      ]
+    UI.puts
+    UI.puts(msg, :faint)
+    Enum.each(skipped_checks, &print_skipped_check_name/1)
+    UI.puts
+  end
+
+  defp print_skipped_check_name({check, _check_info}) do
+    check_name =
+      check
+      |> to_string
+      |> String.replace(~r/^Elixir\./, "")
+
+    UI.puts("  - #{check_name}", :faint)
   end
 end

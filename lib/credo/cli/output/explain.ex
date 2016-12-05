@@ -9,13 +9,15 @@ defmodule Credo.CLI.Output.Explain do
   @indent 8
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files, _config) do
+  def print_before_info(source_files, config) do
     UI.puts
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
       1 -> UI.puts "Checking 1 source file ..."
       count -> UI.puts "Checking #{count} source files ..."
     end
+
+    Output.print_skipped_checks(config)
   end
 
   @doc "Called after the analysis has run."
@@ -43,31 +45,34 @@ defmodule Credo.CLI.Output.Explain do
   end
 
   defp print_issues(issues, _filename, source_file, _config, term_width, _line_no, _column) do
-    first_issue = List.first(issues)
+    first_issue = issues |> List.first
     scope_name = Scope.mod_name(first_issue.scope)
     color = Output.check_color(first_issue)
-    output = [
-      :bright, String.to_atom("#{color}_background"), color, " ",
-        Output.foreground_color(color), :normal,
-      String.ljust(" #{scope_name}", term_width - 1),
-    ]
 
     UI.puts
-    UI.puts(output)
+
+    [
+      :bright, "#{color}_background" |> String.to_atom, color, " ",
+        Output.foreground_color(color), :normal,
+      " #{scope_name}" |> String.ljust(term_width - 1),
+    ]
+    |> UI.puts
+
     UI.puts_edge(color)
 
-    Enum.each(issues, &print_issue(&1, source_file, term_width))
+    issues
+    |> Enum.each(&print_issue(&1, source_file, term_width))
   end
 
   defp filter_issues(issues, line_no, nil) do
-    line_no = String.to_integer(line_no)
-    Enum.filter(issues, &filter_issue(&1, line_no, nil))
+    line_no = line_no |> String.to_integer
+    issues |> Enum.filter(&filter_issue(&1, line_no, nil))
   end
   defp filter_issues(issues, line_no, column) do
-    line_no = String.to_integer(line_no)
-    column = String.to_integer(column)
+    line_no = line_no |> String.to_integer
+    column = column |> String.to_integer
 
-    Enum.filter(issues, &filter_issue(&1, line_no, column))
+    issues |> Enum.filter(&filter_issue(&1, line_no, column))
   end
 
   defp filter_issue(%Issue{line_no: a, column: b}, a, b), do: true
@@ -75,14 +80,16 @@ defmodule Credo.CLI.Output.Explain do
   defp filter_issue(_, _, _), do: false
 
   defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, term_width) do
-    pos = pos_string(issue.line_no, issue.column)
+    pos =
+      pos_string(issue.line_no, issue.column)
+
     outer_color = Output.check_color(issue)
     inner_color = Output.check_color(issue)
     message_color  = inner_color
     filename_color = :default_color
     tag_style = if outer_color == inner_color, do: :faint, else: :bright
 
-    category_output = [
+    [
       UI.edge(outer_color),
         inner_color,
         tag_style,
@@ -90,45 +97,45 @@ defmodule Credo.CLI.Output.Explain do
         Output.check_tag(check.category),
         :reset, " Category: #{check.category} "
     ]
-    UI.puts(category_output)
+    |> UI.puts
 
-    priority_output = [
+    [
       UI.edge(outer_color),
         inner_color,
         tag_style,
         "   ",
-        Output.priority_arrow(priority),
+        priority |> Output.priority_arrow,
         :reset, "  Priority: #{Output.priority_name(priority)} "
     ]
-    UI.puts(priority_output)
+    |> UI.puts
 
     UI.puts_edge(outer_color)
 
-    message_output = [
+    [
       UI.edge(outer_color),
         inner_color,
         tag_style,
         "    ",
         :normal, message_color, "  ", message,
     ]
-    UI.puts(message_output)
+    |> UI.puts
 
-    scope_output = [
+    [
       UI.edge(outer_color, @indent),
-        filename_color, :faint, to_string(filename),
+        filename_color, :faint, filename |> to_string,
         :default_color, :faint, pos,
         :faint, " (#{issue.scope})"
     ]
-    UI.puts(scope_output)
+    |> UI.puts
 
     if issue.line_no do
       UI.puts_edge([outer_color, :faint])
 
-      question_output = [
+      [
         UI.edge([outer_color, :faint]), :reset, :color239,
           String.duplicate(" ", @indent - 5), "__ CODE IN QUESTION"
       ]
-      UI.puts(question_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
@@ -146,12 +153,12 @@ defmodule Credo.CLI.Output.Explain do
             atom -> atom |> to_string |> String.length
           end
 
-        column_output = [
+        [
           UI.edge([outer_color, :faint], @indent),
             inner_color, String.duplicate(" ", x),
             :faint, String.duplicate("^", w)
         ]
-        UI.puts(column_output)
+        |> UI.puts
       end
       print_source_line(source_file, issue.line_no + 1, term_width, code_color, outer_color)
       print_source_line(source_file, issue.line_no + 2, term_width, code_color, outer_color)
@@ -159,17 +166,15 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint], @indent)
 
-    why_it_matters_output = [
+    [
       UI.edge([outer_color, :faint]), :reset, :color239,
         String.duplicate(" ", @indent - 5), "__ WHY IT MATTERS"
     ]
-    UI.puts(why_it_matters_output)
+    |> UI.puts
 
     UI.puts_edge([outer_color, :faint])
 
-    explanation = issue.check.explanation || "TODO: Insert explanation"
-
-    explanation
+    (issue.check.explanation || "TODO: Insert explanation")
     |> String.strip
     |> String.split("\n")
     |> Enum.flat_map(&format_explanation(&1, outer_color))
@@ -178,31 +183,34 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint])
 
-    print_params_explanation(issue.check, outer_color)
+    issue.check
+    |> print_params_explanation(outer_color)
 
     UI.puts_edge([outer_color, :faint])
   end
 
-  defp print_source_line(%SourceFile{lines: lines}, line_no, _, _, _) when line_no < 1 or line_no > length(lines) do
+  defp print_source_line(_, line_no, _, _, _) when line_no < 1 do
     nil
   end
-  defp print_source_line(%SourceFile{lines: lines}, line_no, term_width, color, outer_color) do
-    {_, line} = Enum.at(lines, line_no - 1)
+  defp print_source_line(source_file, line_no, term_width, color, outer_color) do
+    {_, line} = Enum.at(source_file.lines, line_no - 1)
 
-    line_no_str = String.rjust("#{line_no} ", @indent - 2)
+    line_no_str =
+      "#{line_no} "
+      |> String.rjust(@indent - 2)
 
-    line_no_output = [
+    [
       UI.edge([outer_color, :faint]), :reset,
         :faint, line_no_str, :reset,
         color, UI.truncate(line, term_width - @indent)
     ]
-    UI.puts(line_no_output)
+    |> UI.puts
   end
 
   def format_explanation(line, outer_color) do
     [
       UI.edge([outer_color, :faint], @indent),
-      :reset, format_explanation_text(line),
+      :reset, line |> format_explanation_text,
       "\n"
     ]
   end
@@ -227,70 +235,71 @@ defmodule Credo.CLI.Output.Explain do
     keywords = check.explanation_for_params
     check_name = check |> to_string |> String.replace(~r/^Elixir\./, "")
 
-    config_output = [
+    [
       UI.edge([outer_color, :faint]), :reset, :color239,
         String.duplicate(" ", @indent-5), "__ CONFIGURATION OPTIONS",
     ]
-    UI.puts(config_output)
+    |> UI.puts
 
     UI.puts_edge([outer_color, :faint])
 
     if keywords |> List.wrap |> Enum.any? do
-      keywords_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "To configure this check, use this tuple"
       ]
-      UI.puts(keywords_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
-      params_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, :faint, "<params>", :reset ,"}"
       ]
-      UI.puts(params_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
-      additional_params_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset ," being ", :cyan, "false", :reset, " or any combination of these keywords:"
       ]
-      UI.puts(additional_params_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
-      Enum.each(keywords, fn({param, text}) ->
-        output = [
-          UI.edge([outer_color, :faint]), :reset,
-            String.duplicate(" ", @indent-2),
-            :cyan, String.ljust("  #{param}:", 20),
-            :reset, text
-        ]
-        UI.puts(output)
-      end)
+      keywords
+      |> Enum.each(fn({param, text}) ->
+          [
+            UI.edge([outer_color, :faint]), :reset,
+              String.duplicate(" ", @indent-2),
+              :cyan, "  #{param}:" |> String.ljust(20),
+              :reset, text
+          ]
+          |> UI.puts
+        end)
     else
-      disable_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "You can disable this check by using this tuple"
       ]
-      UI.puts(disable_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
-      edge_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset ,"}"
       ]
-      UI.puts(edge_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
 
-      config_output = [
+      [
         UI.edge([outer_color, :faint]), :reset,
           String.duplicate(" ", @indent-2), "There are no other configuration options."
       ]
-      UI.puts(config_output)
+      |> UI.puts
 
       UI.puts_edge([outer_color, :faint])
     end

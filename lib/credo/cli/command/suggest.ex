@@ -14,6 +14,7 @@ defmodule Credo.CLI.Command.Suggest do
   def run(_args, %Config{help: true}), do: print_help()
   def run(_args, config) do
     {time_load, source_files} = load_and_validate_source_files(config)
+    config = Runner.prepare_config(source_files, config)
 
     out = output_mod(config)
     out.print_before_info(source_files, config)
