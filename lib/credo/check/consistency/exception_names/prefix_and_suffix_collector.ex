@@ -31,8 +31,8 @@ defmodule Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector do
     prefix = List.first(name_list)
     suffix = List.last(name_list)
     [
-       PropertyValue.for({prefix, :prefix}, filename),
-       PropertyValue.for({suffix, :suffix}, filename)
+      PropertyValue.for({prefix, :prefix}, filename),
+      PropertyValue.for({suffix, :suffix}, filename)
     ]
   end
 end
