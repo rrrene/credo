@@ -38,8 +38,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
   use Credo.Check, run_on_all: true, base_priority: :higher
 
   def run(source_files, params \\ []) when is_list(source_files) do
-    mass_threshold = params |> Params.get(:mass_threshold, @default_params)
-    nodes_threshold = params |> Params.get(:nodes_threshold, @default_params)
+    mass_threshold = Params.get(params, :mass_threshold, @default_params)
+    nodes_threshold = Params.get(params, :nodes_threshold, @default_params)
 
     source_files
     |> duplicate_nodes(mass_threshold)
@@ -50,7 +50,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params) when is_map(found_hashes) do
     Enum.each(found_hashes, fn({_hash, nodes}) ->
-      filenames = nodes |> Enum.map(&(&1.filename))
+      filenames = Enum.map(nodes, &(&1.filename))
       Enum.each(source_files, fn(source_file) ->
         if Enum.member?(filenames, source_file.filename) do
           this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
@@ -84,10 +84,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   defp add_mass_to_subnode({hash, node_items}) do
     node_items =
-      node_items
-      |> Enum.map(fn(node_item) ->
-          %{node_item | mass: mass(node_item.node)}
-         end)
+      Enum.map(node_items, fn(node_item) ->
+        %{node_item | mass: mass(node_item.node)}
+      end)
 
     {hash, node_items}
   end
@@ -213,16 +212,16 @@ defmodule Credo.Check.Design.DuplicatedCode do
   # TODO: Put in AST helper
 
   def line_no_for({:__block__, _meta, arguments}) do
-    arguments |> line_no_for()
+    line_no_for(arguments)
   end
   def line_no_for({:do, arguments}) do
-    arguments |> line_no_for()
+    line_no_for(arguments)
   end
   def line_no_for({atom, meta, _}) when is_atom(atom) do
     meta[:line]
   end
   def line_no_for(list) when is_list(list) do
-    list |> Enum.find_value(&line_no_for/1)
+    Enum.find_value(list, &line_no_for/1)
   end
   def line_no_for(nil), do: nil
   def line_no_for(block) do

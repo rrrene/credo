@@ -11,10 +11,10 @@ defmodule Credo.CLI.Output.IssueHelper do
                     %Config{format: "flycheck"} = _config, _term_width) do
     tag = Output.check_tag(issue, false)
 
-    [
-      filename |> to_string, Filename.pos_suffix(issue.line_no, issue.column), ": ", tag, ": ", message,
+    output = [
+      to_string(filename), Filename.pos_suffix(issue.line_no, issue.column), ": ", tag, ": ", message,
     ]
-    |> UI.puts
+    UI.puts(output)
   end
   def print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
                     %Config{format: "oneline"} = _config, _term_width) do
@@ -22,14 +22,14 @@ defmodule Credo.CLI.Output.IssueHelper do
     message_color  = inner_color
     filename_color = :default_color
 
-    [
+    output = [
       inner_color,
-      Output.check_tag(check.category), " ", priority |> Output.priority_arrow, " ",
-      :reset, filename_color, :faint, filename |> to_string,
+      Output.check_tag(check.category), " ", Output.priority_arrow(priority), " ",
+      :reset, filename_color, :faint, to_string(filename),
       :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
       :reset, message_color,  " ", message,
     ]
-    |> UI.puts
+    UI.puts(output)
   end
   def print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file, %Config{format: _} = config, term_width) do
     outer_color = Output.check_color(issue)
@@ -42,13 +42,13 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.wrap_at(term_width - @indent)
     |> print_issue_message(check, outer_color, message_color, tag_style, priority)
 
-    [
+    output = [
       UI.edge(outer_color, @indent),
-        filename_color, :faint, filename |> to_string,
+        filename_color, :faint, to_string(filename),
         :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
         :faint, " (#{issue.scope})"
     ]
-    |> UI.puts
+    UI.puts(output)
 
     if config.verbose do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
@@ -58,28 +58,27 @@ defmodule Credo.CLI.Output.IssueHelper do
   end
 
   defp print_issue_message([first_line | other_lines], check, outer_color, message_color, tag_style, priority) do
-    [
+    output = [
       UI.edge(outer_color),
         outer_color,
         tag_style,
-        Output.check_tag(check.category), " ", priority |> Output.priority_arrow,
+        Output.check_tag(check.category), " ", Output.priority_arrow(priority),
         :normal, message_color, " ", first_line,
     ]
-    |> UI.puts
+    UI.puts(output)
 
-    other_lines
-    |> Enum.each(&print_issue_message(&1, outer_color, message_color))
+    Enum.each(other_lines, &print_issue_message(&1, outer_color, message_color))
   end
   defp print_issue_message("", _outer_color, _message_color) do
   end
   defp print_issue_message(message, outer_color, message_color) do
-    [
+    output = [
       UI.edge(outer_color),
         outer_color,
         String.duplicate(" ", @indent - 3),
         :normal, message_color, " ", message,
     ]
-    |> UI.puts
+    UI.puts(output)
   end
 
   defp print_issue_line(%Issue{line_no: nil}, _source_file, _inner_color, _outer_color, _term_width) do
@@ -87,18 +86,18 @@ defmodule Credo.CLI.Output.IssueHelper do
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
     {_, raw_line} = Enum.at(source_file.lines, issue.line_no - 1)
-    line = raw_line |> String.strip
+    line = String.strip(raw_line)
 
     [outer_color, :faint]
     |> UI.edge
     |> UI.puts
 
-    [
+    output = [
       UI.edge([outer_color, :faint]), :cyan, :faint,
         String.duplicate(" ", @indent-2),
         UI.truncate(line, term_width - @indent)
     ]
-    |> UI.puts
+    UI.puts(output)
 
     print_issue_trigger_marker(issue, raw_line, inner_color, outer_color)
   end
@@ -115,11 +114,11 @@ defmodule Credo.CLI.Output.IssueHelper do
         atom -> atom |> to_string |> String.length
       end
 
-    [
+    output = [
       UI.edge([outer_color, :faint], @indent),
         inner_color, String.duplicate(" ", x),
         :faint, String.duplicate("^", w)
     ]
-    |> UI.puts
+    UI.puts(output)
   end
 end

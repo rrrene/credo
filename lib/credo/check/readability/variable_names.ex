@@ -50,7 +50,7 @@ defmodule Credo.Check.Readability.VariableNames do
     Enum.reduce(list, issues, &issues_for_lhs(&1, &2, issue_meta))
   end
   defp issues_for_lhs(tuple, issues, issue_meta) when is_tuple(tuple) do
-    Enum.reduce(tuple |> Tuple.to_list, issues, &issues_for_lhs(&1, &2, issue_meta))
+    Enum.reduce(Tuple.to_list(tuple), issues, &issues_for_lhs(&1, &2, issue_meta))
   end
   defp issues_for_lhs(_, issues, _issue_meta) do
     issues
@@ -60,7 +60,7 @@ defmodule Credo.Check.Readability.VariableNames do
     defp issue_for_name({unquote(name), _, nil}, _), do: nil
   end
   defp issue_for_name({name, meta, nil}, issue_meta) do
-    string_name = name |> to_string
+    string_name = to_string(name)
     unless Name.snake_case?(string_name) or Name.no_case?(string_name) do
       issue_for(issue_meta, meta[:line], name)
     end

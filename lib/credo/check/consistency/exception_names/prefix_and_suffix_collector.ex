@@ -26,13 +26,13 @@ defmodule Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector do
   end
 
   defp property_value_for_exception_name(name, {_, meta, _}, filename) do
-    filename = filename |> Filename.with(line_no: meta[:line])
+    filename = Filename.with(filename, line_no: meta[:line])
     name_list = name |> Name.last |> Name.split_pascal_case
-    prefix = name_list |> List.first
-    suffix = name_list |> List.last
+    prefix = List.first(name_list)
+    suffix = List.last(name_list)
     [
-      {prefix, :prefix} |> PropertyValue.for(filename),
-      {suffix, :suffix} |> PropertyValue.for(filename)
+       PropertyValue.for({prefix, :prefix}, filename),
+       PropertyValue.for({suffix, :suffix}, filename)
     ]
   end
 end

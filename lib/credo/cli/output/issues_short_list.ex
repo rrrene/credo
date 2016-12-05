@@ -44,15 +44,15 @@ defmodule Credo.CLI.Output.IssuesShortList do
     message_color  = inner_color
     filename_color = :default_color
 
-    [
+    output = [
       inner_color,
       check_tag_style(outer_color, inner_color),
-      Output.check_tag(check.category), " ", priority |> Output.priority_arrow, " ",
-      :reset, filename_color, :faint, filename |> to_string,
+      Output.check_tag(check.category), " ", Output.priority_arrow(priority), " ",
+      :reset, filename_color, :faint, to_string(filename),
       :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
       :reset, message_color,  " ", message,
     ]
-    |> UI.puts
+    UI.puts(output)
   end
 
   defp check_tag_style(a, a), do: :faint

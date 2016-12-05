@@ -61,7 +61,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   end
 
   def issues_for_name(_op, name, meta, issues, issue_meta) do
-    name = name |> to_string
+    name =  to_string(name)
     cond do
       String.starts_with?(name, "is_") && String.ends_with?(name, "?") ->
         [issue_for(issue_meta, meta[:line], name, :predicate_and_question_mark) | issues]

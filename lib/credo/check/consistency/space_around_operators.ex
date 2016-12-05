@@ -47,8 +47,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     actual_prop = PropertyValue.get(actual_prop)
 
     line = issue_meta |> IssueMeta.source_file() |> SourceFile.line_at(line_no)
-    params = issue_meta |> IssueMeta.params()
-    ignored_triggers = params |> Params.get(:ignore, @default_params)
+    params = IssueMeta.params(issue_meta)
+    ignored_triggers = Params.get(params, :ignore, @default_params)
 
     if !Enum.member?(ignored_triggers, trigger) && create_issue?(line, column, trigger) do
       format_issue issue_meta,

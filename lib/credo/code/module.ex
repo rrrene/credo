@@ -27,8 +27,7 @@ defmodule Credo.Code.Module do
 
   def defs(nil), do: []
   def defs({:defmodule, _, _arguments} = ast) do
-    ast
-    |> Code.postwalk(&traverse_mod/2)
+    Code.postwalk(ast, &traverse_mod/2)
   end
 
   @doc "Returns the arity of the given function definition `ast`"
@@ -57,11 +56,11 @@ defmodule Credo.Code.Module do
   @doc "Returns the {fun_name, op} tuple of the function/macro defined in the given `ast`"
   for op <- @def_ops do
     def def_name_with_op({unquote(op) = op, _, _} = ast) do
-      {ast |> def_name, op}
+      {def_name(ast), op}
     end
     def def_name_with_op({unquote(op) = op, _, _} = ast, arity) do
-      if ast |> def_arity() == arity do
-        {ast |> def_name, op}
+      if def_arity(ast) == arity do
+        {def_name(ast), op}
       else
         nil
       end
@@ -123,10 +122,9 @@ defmodule Credo.Code.Module do
   # Multi alias
   defp find_aliases({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, aliases) do
     module_names =
-      multi_mod_list
-      |> Enum.map(fn(tuple) ->
-          [Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)] |> Credo.Code.Name.full
-        end)
+      Enum.map(multi_mod_list, fn(tuple) ->
+        Credo.Code.Name.full([Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)])
+      end)
 
     {ast, aliases ++ module_names}
   end
@@ -135,7 +133,7 @@ defmodule Credo.Code.Module do
   end
 
   defp find_attribute({:@, _meta, arguments} = ast, tuple, attribute_name) do
-    case arguments |> List.first do
+    case List.first(arguments) do
       {^attribute_name, _meta, [value]} -> {:ok, value}
       _ -> {ast, tuple}
     end
@@ -157,10 +155,9 @@ defmodule Credo.Code.Module do
   # multi alias
   defp find_dependent_modules({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, modules) do
     module_names =
-      multi_mod_list
-      |> Enum.flat_map(fn(tuple) ->
-          [Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)]
-        end)
+      Enum.flat_map(multi_mod_list, fn(tuple) ->
+        [Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)]
+      end)
 
     {ast, modules -- module_names}
   end

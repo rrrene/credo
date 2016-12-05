@@ -91,7 +91,7 @@ defmodule Credo.CLI do
 
     if config.check_for_updates, do: Credo.CheckForUpdates.run()
 
-    config |> require_requires()
+    require_requires(config)
 
     command_mod.run(dir, config)
   end
@@ -112,12 +112,12 @@ defmodule Credo.CLI do
         nil ->
           {nil, Enum.at(args, 0), args}
         command_name ->
-          {command_name, Enum.at(args, 1), args |> Enum.slice(1..-1)}
+          {command_name, Enum.at(args, 1), Enum.slice(args, 1..-1)}
       end
 
     dir = given_directory || @default_dir
-    switches = switches_kw |> Enum.into(%{})
-    config = dir |> to_config(switches)
+    switches = Enum.into(switches_kw, %{})
+    config = to_config(dir, switches)
 
     command_name_dir_config(command_name, args, config)
   end
@@ -158,5 +158,5 @@ defmodule Credo.CLI do
   end
 
   defp halt_if_failed(0), do: nil
-  defp halt_if_failed(x), do: x |> System.halt
+  defp halt_if_failed(x), do: System.halt(x)
 end

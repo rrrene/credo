@@ -27,7 +27,7 @@ defmodule Credo.Code.Name do
   end
 
   def full({:__aliases__, _, mod_list}) do
-    mod_list |> full
+    full(mod_list)
   end
   def full(mod_list) when is_list(mod_list) do
     mod_list
@@ -35,7 +35,7 @@ defmodule Credo.Code.Name do
     |> Enum.join(".")
   end
   def full({name, _, nil}) when is_atom(name) do
-    name |> full
+    full(name)
   end
   def full(name) when is_atom(name) do
     name
@@ -54,7 +54,7 @@ defmodule Credo.Code.Name do
   end
 
   def pascal_case?(name) do
-    name |> String.match?(~r/^[A-Z][a-zA-Z0-9]*$/)
+    String.match?(name, ~r/^[A-Z][a-zA-Z0-9]*$/)
   end
 
   def split_pascal_case(name) do
@@ -62,11 +62,11 @@ defmodule Credo.Code.Name do
   end
 
   def snake_case?(name) do
-    name |> String.match?(~r/^[a-z0-9\_\?\!]+$/)
+    String.match?(name, ~r/^[a-z0-9\_\?\!]+$/)
   end
 
   def no_case?(name) do
-    name |> String.match?(~r/^[^a-zA-Z0-9]+$/)
+    String.match?(name, ~r/^[^a-zA-Z0-9]+$/)
   end
 
   defp name_from_splitted_parts(splitted_parts) when length(splitted_parts) > 1 do
@@ -75,7 +75,6 @@ defmodule Credo.Code.Name do
     |> Enum.join(".")
   end
   defp name_from_splitted_parts(splitted_parts) do
-    splitted_parts
-    |> Enum.join(".")
+    Enum.join(splitted_parts, ".")
   end
 end

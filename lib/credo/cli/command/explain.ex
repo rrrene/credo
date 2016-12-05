@@ -35,8 +35,7 @@ defmodule Credo.CLI.Command.Explain do
         |> Enum.partition(&(&1.valid?))
       end
 
-    invalid_source_files
-    |> Output.complain_about_invalid_source_files
+    Output.complain_about_invalid_source_files(invalid_source_files)
 
     {time_load, valid_source_files}
   end
@@ -67,27 +66,26 @@ defmodule Credo.CLI.Command.Explain do
     output = output_mod(config)
     output.print_before_info([source_file], config)
 
-    source_file
-    |> output.print_after_info(config, line_no, column)
+    output.print_after_info(source_file, config, line_no, column)
   end
 
-
   defp print_help do
-    ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
-    |> UI.puts
-    """
+    usage = ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
+    explain = """
 
     Explain the given issue.
     """
-    |> UI.puts
-    ["Example: ", :olive, :faint, "$ mix credo explain lib/foo/bar.ex:13:6"]
-    |> UI.puts
-    """
+    example = ["Example: ", :olive, :faint, "$ mix credo explain lib/foo/bar.ex:13:6"]
+    options = """
 
     General options:
       -v, --version       Show version
       -h, --help          Show this help
     """
-    |> UI.puts
+
+    UI.puts(usage)
+    UI.puts(explain)
+    UI.puts(example)
+    UI.puts(options)
   end
 end

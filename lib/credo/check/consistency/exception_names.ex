@@ -39,18 +39,16 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   def run(source_files, params \\ []) when is_list(source_files) do
     {property_tuples, most_picked} =
-      source_files
-      |> Helper.run_code_patterns(@code_patterns, params)
+      Helper.run_code_patterns(source_files, @code_patterns, params)
 
     count =
-      property_tuples
-      |> Enum.reduce(0, fn({prop_list, _}, acc) ->
-          acc + Enum.count(prop_list)
-        end)
+      Enum.reduce(property_tuples, 0, fn({prop_list, _}, acc) ->
+        acc + Enum.count(prop_list)
+      end)
 
     if count > 2 do # we found more than one prefix and one suffix
-      {property_tuples, most_picked}
-      |> Helper.append_issues_via_issue_service(&check_for_issues/5, params)
+      info_tuple = {property_tuples, most_picked}
+      Helper.append_issues_via_issue_service(info_tuple, &check_for_issues/5, params)
     end
 
     :ok
@@ -119,18 +117,20 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   end
 
   def message_for(:prefix, expected, trigger) do
-    """
+    message = """
     Exception modules should be named consistently.
     It seems your strategy is to prefix them with `#{expected}`,
     but `#{trigger}` does not follow that convention."
-    """ |> to_one_line
+    """
+    to_one_line(message)
   end
   def message_for(:suffix, expected, trigger) do
-    """
+    message = """
     Exception modules should be named consistently.
     It seems your strategy is to have `#{expected}` as a suffix,
     but `#{trigger}` does not follow that convention.
-    """ |> to_one_line
+    """
+    to_one_line(message)
   end
 
   def to_one_line(str), do: str |> String.split |> Enum.join(" ")

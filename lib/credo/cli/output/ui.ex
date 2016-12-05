@@ -4,7 +4,7 @@ defmodule Credo.CLI.Output.UI do
   @ellipsis "…"
 
   def edge(color, indent \\ 2) when is_integer(indent) do
-    [:reset, color, @edge |> String.ljust(indent)]
+    [:reset, color, String.ljust(@edge, indent)]
   end
 
   defdelegate puts, to: Bunt

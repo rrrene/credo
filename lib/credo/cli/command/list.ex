@@ -31,8 +31,7 @@ defmodule Credo.CLI.Command.List do
         |> Enum.partition(&(&1.valid?))
       end
 
-    invalid_source_files
-    |> Output.complain_about_invalid_source_files
+    Output.complain_about_invalid_source_files(invalid_source_files)
 
     {time_load, valid_source_files}
   end
@@ -54,22 +53,21 @@ defmodule Credo.CLI.Command.List do
     output = output_mod(config)
     output.print_before_info(source_files, config)
 
-    source_files
-    |> output.print_after_info(config, time_load, time_run)
+    output.print_after_info(source_files, config, time_load, time_run)
   end
 
 
   defp print_help do
-    ["Usage: ", :olive, "mix credo list [paths] [options]"]
-    |> UI.puts
-    """
+    usage_output = ["Usage: ", :olive, "mix credo list [paths] [options]"]
+    UI.puts(usage_output)
+    list_output = """
 
     Lists objects that Credo thinks can be improved ordered by their priority.
     """
-    |> UI.puts
-    ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
-    |> UI.puts
-    """
+    UI.puts(list_output)
+    example_output = ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
+    UI.puts(example_output)
+    config_output = """
 
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
@@ -85,6 +83,6 @@ defmodule Credo.CLI.Command.List do
       -v, --version         Show version
       -h, --help            Show this help
     """
-    |> UI.puts
+    UI.puts(config_output)
   end
 end

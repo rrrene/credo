@@ -55,8 +55,8 @@ defmodule Credo.Check.Design.AliasUsage do
   @doc false
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    excluded_namespaces = params |> Params.get(:excluded_namespaces, @default_params)
-    excluded_lastnames = params |> Params.get(:excluded_lastnames, @default_params)
+    excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
+    excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
 
     Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
   end
@@ -90,7 +90,7 @@ defmodule Credo.Check.Design.AliasUsage do
       conflicting_with_other_modules?(mod_list, mod_deps) ->
         {ast, issues}
       true ->
-        trigger = mod_list |> Enum.join(".")
+        trigger = Enum.join(mod_list, ".")
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end
@@ -99,8 +99,8 @@ defmodule Credo.Check.Design.AliasUsage do
   end
 
   defp excluded_lastname_or_namespace?(mod_list, excluded_namespaces, excluded_lastnames) do
-    first_name = mod_list |> Credo.Code.Name.first
-    last_name = mod_list |> Credo.Code.Name.last
+    first_name = Credo.Code.Name.first(mod_list)
+    last_name = Credo.Code.Name.last(mod_list)
 
     Enum.member?(excluded_namespaces, first_name) ||
     Enum.member?(excluded_lastnames, last_name)
@@ -109,13 +109,13 @@ defmodule Credo.Check.Design.AliasUsage do
   # Returns true if mod_list and alias_name would result in the same alias
   # since they share the same last name.
   defp conflicting_with_aliases?(mod_list, aliases) do
-    last_name = mod_list |> Credo.Code.Name.last
+    last_name = Credo.Code.Name.last(mod_list)
 
-    aliases |> Enum.find(&conflicting_alias?(&1, mod_list, last_name))
+    Enum.find(aliases, &conflicting_alias?(&1, mod_list, last_name))
   end
   defp conflicting_alias?(alias_name, mod_list, last_name) do
-    full_name = mod_list |> Credo.Code.Name.full
-    alias_last_name = alias_name |> Credo.Code.Name.last
+    full_name = Credo.Code.Name.full(mod_list)
+    alias_last_name = Credo.Code.Name.last(alias_name)
 
     full_name != alias_name && alias_last_name == last_name
   end
@@ -123,8 +123,8 @@ defmodule Credo.Check.Design.AliasUsage do
   # Returns true if mod_list and any dependent module would result in the same alias
   # since they share the same last name.
   defp conflicting_with_other_modules?(mod_list, mod_deps) do
-    last_name = mod_list |> Credo.Code.Name.last
-    full_name = mod_list |> Credo.Code.Name.full
+    last_name = Credo.Code.Name.last(mod_list)
+    full_name = Credo.Code.Name.full(mod_list)
 
     (mod_deps -- [full_name])
     |> Enum.filter(&Credo.Code.Name.parts_count(&1) > 1)

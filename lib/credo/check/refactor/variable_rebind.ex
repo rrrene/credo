@@ -26,8 +26,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
 
     duplicates = 
-      variables
-      |> Enum.filter(fn {key, _} ->
+      Enum.filter(variables, fn {key, _} ->
         Enum.count(variables, fn 
           {other, _} -> key == other
         end) >= 2
@@ -36,8 +35,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       |> Enum.uniq_by(&get_variable_name/1)
 
     new_issues = 
-      duplicates
-      |> Enum.map(fn {variable_name, line} ->
+      Enum.map(duplicates, fn {variable_name, line} ->
         issue_for(issue_meta, Atom.to_string(variable_name), line)
       end)
 

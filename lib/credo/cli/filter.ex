@@ -4,29 +4,25 @@ defmodule Credo.CLI.Filter do
   alias Credo.Check.LintAttribute
 
   def important(list, config) when is_list(list) do
-    list
-    |> Enum.filter(&important?(&1, config))
+    Enum.filter(list, &important?(&1, config))
   end
 
   def important?(%Issue{} = issue, config) do
     issue.priority >= config.min_priority
   end
   def important?(%SourceFile{} = source_file, config) do
-    source_file.issues
-    |> Enum.any?(&important?(&1, config))
+    Enum.any?(source_file.issues, &important?(&1, config))
   end
 
 
   def valid_issues(list, config) when is_list(list) do
-    list
-    |> Enum.reject(&ignored?(&1, config))
+    Enum.reject(list, &ignored?(&1, config))
   end
 
   def ignored?(%Issue{} = issue, config) do
     case config.lint_attribute_map[issue.filename] do
       list when is_list(list) ->
-        list
-        |> Enum.any?(&(LintAttribute.ignores_issue?(&1, issue)))
+        Enum.any?(list, &(LintAttribute.ignores_issue?(&1, issue)))
       _ ->
         false
     end

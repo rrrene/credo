@@ -42,8 +42,7 @@ defmodule Credo.CLI.Command.Suggest do
         |> Enum.partition(&(&1.valid?))
       end
 
-    invalid_source_files
-    |> Output.complain_about_invalid_source_files
+    Output.complain_about_invalid_source_files(invalid_source_files)
 
     {time_load, valid_source_files}
   end
@@ -64,21 +63,17 @@ defmodule Credo.CLI.Command.Suggest do
   defp print_results_and_summary(source_files, config, time_load, time_run) do
     out = output_mod(config)
 
-    source_files
-    |> out.print_after_info(config, time_load, time_run)
+    out.print_after_info(source_files, config, time_load, time_run)
   end
 
   defp print_help do
-    ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
-    |> UI.puts
-    """
+    usage = ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
+    suggestions = """
 
     Suggests objects from every category that Credo thinks can be improved.
     """
-    |> UI.puts
-    ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
-    |> UI.puts
-    """
+    command = ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
+    arrows = """
 
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
@@ -94,6 +89,9 @@ defmodule Credo.CLI.Command.Suggest do
       -v, --version         Show version
       -h, --help            Show this help
     """
-    |> UI.puts
+    UI.puts(usage)
+    UI.puts(suggestions)
+    UI.puts(command)
+    UI.puts(arrows)
   end
 end

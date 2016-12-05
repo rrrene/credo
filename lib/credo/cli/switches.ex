@@ -33,12 +33,12 @@ defmodule Credo.CLI.Switches do
     set_strict(config, %{strict: true})
   end
   defp set_strict(config, %{strict: true}) do
-    %Config{config | strict: true}
-    |> Config.set_strict()
+    new_config = %Config{config | strict: true}
+    Config.set_strict(new_config)
   end
   defp set_strict(config, %{strict: false}) do
-    %Config{config | strict: false}
-    |> Config.set_strict()
+    new_config = %Config{config | strict: false}
+    Config.set_strict(new_config)
   end
   defp set_strict(config, _), do: config
   defp set_help(config, %{help: true}) do
@@ -81,8 +81,8 @@ defmodule Credo.CLI.Switches do
     set_only(config, %{checks: only})
   end
   defp set_only(config, %{checks: check_pattern}) do
-    %Config{config | strict: true, match_checks: check_pattern |> String.split(",")}
-    |> Config.set_strict()
+    new_config = %Config{config | strict: true, match_checks: String.split(check_pattern, ",")}
+    Config.set_strict(new_config)
   end
   defp set_only(config, _), do: config
 
@@ -91,7 +91,7 @@ defmodule Credo.CLI.Switches do
     set_ignore(config, %{ignore_checks: ignore})
   end
   defp set_ignore(config, %{ignore_checks: ignore_pattern}) do
-    %Config{config | ignore_checks: ignore_pattern |> String.split(",")}
+    %Config{config | ignore_checks: String.split(ignore_pattern, ",")}
   end
   defp set_ignore(config, _), do: config
 
