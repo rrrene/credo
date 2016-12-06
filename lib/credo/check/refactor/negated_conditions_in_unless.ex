@@ -30,10 +30,9 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   end
 
   defp traverse({:unless, meta, arguments} = ast, issues, issue_meta) do
-    new_issue =
-      issue_for_first_condition(List.first(arguments), meta, issue_meta)
+    issue = issue_for_first_condition(List.first(arguments), meta, issue_meta)
 
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, issues ++ [issue]}
   end
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}

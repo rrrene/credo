@@ -14,6 +14,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
       ast
       |> Module.defs
       |> Enum.flat_map(&(property_values_for_def(&1, filename)))
+
     {:ast, property_values ++ new_property_values}
   end
 
@@ -23,8 +24,8 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
 
   defp property_values_for_def({:def, [line: _line_no], [{_name, _line_no_two, parameters}, _]}, filename) when is_list(parameters) do
     parameters
-      |> Enum.map(&(property_values_for_parameter(&1, filename)))
-      |> Enum.reject(&is_nil/1)
+    |> Enum.map(&(property_values_for_parameter(&1, filename)))
+    |> Enum.reject(&is_nil/1)
   end
   defp property_values_for_def(_, _), do: []
 

@@ -17,6 +17,7 @@ defmodule Credo.Check.FindLintAttributes do
   def find_and_set_in_source_file(source_file) do
     lint_attributes =
       Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
+
     %SourceFile{source_file | lint_attributes: lint_attributes}
   end
 
@@ -45,6 +46,7 @@ defmodule Credo.Check.FindLintAttributes do
         _ ->
           nil
       end
+
     process_calls(tail, current_lint_attribute, attribute_list)
   end
   def process_calls([head|tail], current_lint_attribute, attribute_list) do

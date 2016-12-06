@@ -42,8 +42,10 @@ defmodule Credo.Check.Readability.VariableNames do
   end
   defp issues_for_lhs({_name, _meta, nil} = value, issues, issue_meta) do
     case issue_for_name(value, issue_meta) do
-      nil -> issues
-      new_issue -> [new_issue | issues]
+      nil ->
+        issues
+      new_issue ->
+        [new_issue | issues]
     end
   end
   defp issues_for_lhs(list, issues, issue_meta) when is_list(list) do
@@ -61,6 +63,7 @@ defmodule Credo.Check.Readability.VariableNames do
   end
   defp issue_for_name({name, meta, nil}, issue_meta) do
     string_name = to_string(name)
+
     unless Name.snake_case?(string_name) or Name.no_case?(string_name) do
       issue_for(issue_meta, meta[:line], name)
     end

@@ -57,9 +57,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
   end
   defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
     source = source_fragment(location, issue_meta)
-
     underscored_number = number_with_underscores(number, source)
-
     new_issue =
       if decimal_in_source?(source) && source != underscored_number do
         [issue_for(

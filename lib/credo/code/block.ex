@@ -21,8 +21,10 @@ defmodule Credo.Code.Block do
   """
   def do_block?(ast) do
     case do_block_for(ast) do
-      {:ok, _block} -> true
-      nil -> false
+      {:ok, _block} ->
+        true
+      nil ->
+        false
     end
   end
 
@@ -31,8 +33,10 @@ defmodule Credo.Code.Block do
   """
   def do_block_for!(ast) do
     case do_block_for(ast) do
-      {:ok, block} -> block
-      nil -> nil
+      {:ok, block} ->
+        block
+      nil ->
+        nil
     end
   end
 
@@ -59,8 +63,10 @@ defmodule Credo.Code.Block do
   """
   def else_block?(ast) do
     case else_block_for(ast) do
-      {:ok, _block} -> true
-      nil -> false
+      {:ok, _block} ->
+        true
+      nil ->
+        false
     end
   end
 
@@ -69,8 +75,10 @@ defmodule Credo.Code.Block do
   """
   def else_block_for!(ast) do
     case else_block_for(ast) do
-      {:ok, block} -> block
-      nil -> nil
+      {:ok, block} ->
+        block
+      nil ->
+        nil
     end
   end
 
@@ -98,8 +106,10 @@ defmodule Credo.Code.Block do
   """
   def rescue_block?(ast) do
     case rescue_block_for(ast) do
-      {:ok, _block} -> true
-      nil -> false
+      {:ok, _block} ->
+        true
+      nil ->
+        false
     end
   end
 
@@ -108,8 +118,10 @@ defmodule Credo.Code.Block do
   """
   def rescue_block_for!(ast) do
     case rescue_block_for(ast) do
-      {:ok, block} -> block
-      nil -> nil
+      {:ok, block} ->
+        block
+      nil ->
+        nil
     end
   end
 
@@ -137,8 +149,10 @@ defmodule Credo.Code.Block do
   """
   def after_block?(ast) do
     case after_block_for(ast) do
-      {:ok, _block} -> true
-      nil -> false
+      {:ok, _block} ->
+        true
+      nil ->
+        false
     end
   end
 
@@ -147,8 +161,10 @@ defmodule Credo.Code.Block do
   """
   def after_block_for!(ast) do
     case after_block_for(ast) do
-      {:ok, block} -> block
-      nil -> nil
+      {:ok, block} ->
+        block
+      nil ->
+        nil
     end
   end
 

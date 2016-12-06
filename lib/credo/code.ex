@@ -61,8 +61,10 @@ defmodule Credo.Code do
   def ast(source, filename \\ "nofilename") do
     try do
       case Code.string_to_quoted(source, line: 1) do
-        {:ok, value} -> {:ok, value}
-        {:error, error} -> {:error, [issue_for(error, filename)]}
+        {:ok, value} ->
+          {:ok, value}
+        {:error, error} ->
+          {:error, [issue_for(error, filename)]}
       end
     rescue
       e in UnicodeConversionError ->
@@ -88,6 +90,7 @@ defmodule Credo.Code do
       source
       |> String.to_char_list
       |> :elixir_tokenizer.tokenize(1, [])
+
     tokens
   end
 

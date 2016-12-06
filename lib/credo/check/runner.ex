@@ -10,8 +10,6 @@ defmodule Credo.Check.Runner do
         run_checks_that_run_on_all(source_files, config)
       end
 
-    #IO.inspect time_run_on_all
-
     {_time_run, source_files} =
       :timer.tc fn ->
         source_files_after_run_on_all
@@ -19,15 +17,17 @@ defmodule Credo.Check.Runner do
         |> Enum.map(&Task.await(&1, :infinity))
       end
 
-    #IO.inspect time_run
-
     {source_files, config}
   end
 
   def run(%SourceFile{} = source_file, config) do
-    checks = config |> Config.checks |> Enum.reject(&run_on_all_check?/1)
+    checks =
+      config
+      |> Config.checks
+      |> Enum.reject(&run_on_all_check?/1)
 
     issues = run_checks(source_file, checks, config)
+
     %SourceFile{source_file | issues: source_file.issues ++ issues}
   end
 
@@ -65,19 +65,17 @@ defmodule Credo.Check.Runner do
   defp exclude_low_priority_checks(config, below_priority) do
     checks =
       Enum.reject(config.checks, fn
-          ({check}) -> check.base_priority < below_priority
-          ({check, _}) -> check.base_priority < below_priority
-        end)
+        ({check}) -> check.base_priority < below_priority
+        ({check, _}) -> check.base_priority < below_priority
+      end)
 
     %Config{config | checks: checks}
   end
 
   defp exclude_checks_based_on_elixir_version(config) do
     version = System.version()
-    skipped_checks =
-      Enum.reject(config.checks, &matches_requirement?(&1, version))
-    checks =
-      Enum.filter(config.checks, &matches_requirement?(&1, version))
+    skipped_checks = Enum.reject(config.checks, &matches_requirement?(&1, version))
+    checks = Enum.filter(config.checks, &matches_requirement?(&1, version))
 
     %Config{config | checks: checks, skipped_checks: skipped_checks}
   end
@@ -90,7 +88,10 @@ defmodule Credo.Check.Runner do
   end
 
   defp run_checks_that_run_on_all(source_files, config) do
-    checks = config |> Config.checks |> Enum.filter(&run_on_all_check?/1)
+    checks =
+      config
+      |> Config.checks
+      |> Enum.filter(&run_on_all_check?/1)
 
     checks
     |> Enum.map(&Task.async(fn ->

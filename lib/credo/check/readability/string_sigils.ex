@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.StringSigils do
   use Credo.Check, base_priority: :low
 
   def run(source_file, params \\ []) do
-    issue_meta             = IssueMeta.for(source_file, params)
+    issue_meta = IssueMeta.for(source_file, params)
     maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
@@ -27,9 +27,12 @@ defmodule Credo.Check.Readability.StringSigils do
 
   def traverse({maybe_sigil, [line: line_no], [str | rest_ast]} = ast, issues, issue_meta, maximum_allowed_quotes) do
     cond do
-      is_sigil(maybe_sigil) -> {rest_ast, issues}
-      is_binary(str)         -> {rest_ast, issues_for_string_literal(str, maximum_allowed_quotes, issues, issue_meta, line_no)}
-      true                   -> {ast, issues}
+      is_sigil(maybe_sigil) ->
+        {rest_ast, issues}
+      is_binary(str) ->
+        {rest_ast, issues_for_string_literal(str, maximum_allowed_quotes, issues, issue_meta, line_no)}
+      true ->
+        {ast, issues}
     end
   end
   def traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do

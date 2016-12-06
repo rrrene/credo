@@ -5,6 +5,7 @@ defmodule Credo.CLI.Command.Categories do
 
   def run(_args, _config) do
     output_mod().print
+
     :ok
   end
 

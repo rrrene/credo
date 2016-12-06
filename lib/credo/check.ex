@@ -30,11 +30,13 @@ defmodule Credo.Check do
 
       def category do
         default = unquote(category_body(opts[:category]))
+
         default || :unknown
       end
 
       def elixir_version do
         default = unquote(opts[:elixir_version])
+
         default || ">= 0.0.1"
       end
 
@@ -84,12 +86,8 @@ defmodule Credo.Check do
 
   @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t) :: Issue.t
 
-  def explanation_for(nil, _) do
-    nil
-  end
-  def explanation_for(keywords, key) do
-    keywords[key]
-  end
+  def explanation_for(nil, _), do: nil
+  def explanation_for(keywords, key), do: keywords[key]
 
   @doc """
   format_issue takes an issue_meta and returns an issue.
@@ -107,11 +105,13 @@ defmodule Credo.Check do
   def format_issue(issue_meta, opts, issue_category, issue_base_priority, check) do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
+
     priority =
       case params[:priority] do
         nil -> issue_base_priority
         val -> Check.to_priority(val)
       end
+
     exit_status =
       case params[:exit_status] do
         nil -> Check.to_exit_status(issue_category)
@@ -160,6 +160,7 @@ defmodule Credo.Check do
   defp add_line_no_options(issue, line_no, source_file) do
     if line_no do
       {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
+
       %Issue{
         issue |
         priority: issue.priority + priority_for(source_file, scope),
@@ -172,6 +173,7 @@ defmodule Credo.Check do
 
   defp priority_for(source_file, scope) do
     scope_prio_map = Priority.scope_priorities(source_file)
+
     scope_prio_map[scope] || 0
   end
 

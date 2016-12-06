@@ -13,8 +13,12 @@ defmodule Credo.Code.Scope do
   def mod_name(nil), do: nil
   def mod_name(scope_name) do
     names = String.split(scope_name, ".")
-    if names |> List.last |> String.match?(~r/^[a-z]/) do
-      names |> Enum.slice(0..length(names) - 2) |> Enum.join(".")
+    base_name = List.last(names)
+
+    if String.match?(base_name, ~r/^[a-z]/) do
+      names
+      |> Enum.slice(0..length(names) - 2)
+      |> Enum.join(".")
     else
       scope_name
     end
@@ -37,6 +41,7 @@ defmodule Credo.Code.Scope do
         nil -> name(ast, line: line - 1)
         {op, list} -> {op, Enum.join(list, ".")}
       end
+
     result || {nil, ""}
   end
 
@@ -55,20 +60,32 @@ defmodule Credo.Code.Scope do
   end
   defp find_scope({:defmodule, meta, [{:__aliases__, _, module_name}, arguments]}, line, name_list, _last_op) do
     name_list = name_list ++ module_name
+
     cond do
-      meta[:line] == line -> {:defmodule, name_list}
-      meta[:line] > line -> nil
-      true -> arguments |> Block.do_block_for! |> find_scope(line, name_list, :defmodule)
+      meta[:line] == line ->
+        {:defmodule, name_list}
+      meta[:line] > line ->
+        nil
+      true ->
+        arguments
+        |> Block.do_block_for!
+        |> find_scope(line, name_list, :defmodule)
     end
   end
   for op <- @def_ops do
     defp find_scope({unquote(op) = op, meta, arguments} = ast, line, name_list, _last_op) when is_list(arguments) do
       fun_name = Module.def_name(ast)
       name_list = name_list ++ [fun_name]
+
       cond do
-        meta[:line] == line -> {op, name_list}
-        meta[:line] > line -> nil
-        true -> arguments |> Block.do_block_for! |> find_scope(line, name_list, op)
+        meta[:line] == line ->
+          {op, name_list}
+        meta[:line] > line ->
+          nil
+        true ->
+          arguments
+          |> Block.do_block_for!
+          |> find_scope(line, name_list, op)
       end
     end
   end

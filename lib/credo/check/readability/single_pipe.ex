@@ -28,7 +28,9 @@ defmodule Credo.Check.Readability.SinglePipe do
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta), {true, []})
+    {_continue, issues} =
+      Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta), {true, []})
+
     issues
   end
 
@@ -36,11 +38,11 @@ defmodule Credo.Check.Readability.SinglePipe do
     {ast, {false, issues}}
   end
 
-  defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta) do    
+  defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta) do
     {ast, {false, issues ++ [issue_for(issue_meta, meta[:line], "single pipe")]}}
   end
-  
-  defp traverse(ast, {_, issues}, _issue_meta) do    
+
+  defp traverse(ast, {_, issues}, _issue_meta) do
     {ast, {true, issues}}
   end
 

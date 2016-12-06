@@ -49,9 +49,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     {ast, issues}
   end
 
-  defp issue_for_else_block(nil, _meta, _issue_meta) do
-    nil
-  end
+  defp issue_for_else_block(nil, _meta, _issue_meta), do: nil
   defp issue_for_else_block(_else_block, meta, issue_meta) do
     issue_for(issue_meta, meta[:line], "unless")
   end

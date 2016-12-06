@@ -3,9 +3,10 @@ defmodule Credo.Code.Sigils do
   This module lets you strip sigils from source code.
   """
 
+  @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"/", "/"}, {"\"\"\"", "\"\"\""}, {"\"", "\""}, {"'", "'"}]
-  @all_sigil_chars Enum.flat_map(~w(a b c d e f g h i j k l m n o p q r s t u v w x y z), fn a ->
+  @all_sigil_chars Enum.flat_map(@alphabet, fn a ->
                      [a, String.upcase(a)]
                    end)
   @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
@@ -48,6 +49,7 @@ defmodule Credo.Code.Sigils do
   end
   defp parse_code(str, acc, replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
+
     parse_code(t, acc <> h, replacement)
   end
 

@@ -40,9 +40,14 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_abc_size) when is_list(arguments) do
-      abc_size = ast |> abc_size_for |> round
+      abc_size =
+        ast
+        |> abc_size_for
+        |> round
+
       if abc_size > max_abc_size do
         fun_name = CodeHelper.def_name(ast)
+
         {ast, [issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size) | issues]}
       else
         {ast, issues}
@@ -70,22 +75,24 @@ defmodule Credo.Check.Refactor.ABCSize do
     |> CodeHelper.do_block_for!
     |> abc_size_for(arguments)
   end
-  def abc_size_for(nil, _arguments), do: 0
+
   @doc false
+  def abc_size_for(nil, _arguments), do: 0
   def abc_size_for(ast, arguments) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
     [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2,
                                               initial_acc)
-    #IO.inspect [a: a, b: b, c: c]
-    #IO.inspect ast
+
     :math.sqrt(a * a + b * b + c * c)
   end
 
   def get_parameters(arguments) do
     case Enum.at(arguments, 0) do
-      {_name, _meta, nil} -> []
-      {_name, _meta, parameters} -> Enum.map(parameters, &var_name/1)
+      {_name, _meta, nil} ->
+        []
+      {_name, _meta, parameters} ->
+        Enum.map(parameters, &var_name/1)
     end
   end
 
@@ -99,9 +106,12 @@ defmodule Credo.Check.Refactor.ABCSize do
   defp traverse_abc({:=, _meta, [lhs | rhs]}, [a: a, b: b, c: c, var_names: var_names]) do
     var_names =
       case var_name(lhs) do
-        nil -> var_names
-        false -> var_names
-        name -> Enum.into var_names, [name]
+        nil ->
+          var_names
+        false ->
+          var_names
+        name ->
+          Enum.into var_names, [name]
       end
     {rhs, [a: a + 1, b: b, c: c, var_names: var_names]}
   end
@@ -121,6 +131,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
   defp traverse_abc({fun_or_var_name, _meta, nil} = ast, [a: a, b: b, c: c, var_names: var_names]) do
     is_variable = Enum.member?(var_names, fun_or_var_name)
+
     if is_variable do
       {ast, [a: a, b: b, c: c, var_names: var_names]}
     else

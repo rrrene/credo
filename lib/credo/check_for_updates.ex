@@ -13,50 +13,52 @@ defmodule Credo.CheckForUpdates do
 
     if should_update?(all_versions, current) do
       latest = latest_version(all_versions, current)
-      warning = [
-        :orange,
-        :bright,
-        "A new Credo version is available (#{latest})",
-        :reset,
-        :orange,
-        ", please update with `mix deps.update credo`"
-      ]
+      warning =
+        [
+          :orange, :bright, "A new Credo version is available (#{latest})",
+          :reset, :orange, ", please update with `mix deps.update credo`"
+        ]
+
       UI.warn(warning)
     end
   end
 
   def should_update?(all_versions, current) do
     latest = latest_version(all_versions, current)
+
     Version.compare(current, latest) == :lt
   end
 
   defp latest_version(all_versions, default) do
     including_pre_versions? = pre_version?(default)
-    latest =
-      highest_version(all_versions, including_pre_versions?)
+    latest = highest_version(all_versions, including_pre_versions?)
 
     latest || default
   end
 
   defp highest_version(versions, including_pre_versions?) do
-    included_versions = if including_pre_versions? do
-      versions
-    else
-      Enum.reject(versions, &pre_version?/1)
-    end
+    included_versions =
+      if including_pre_versions? do
+        versions
+      else
+        Enum.reject(versions, &pre_version?/1)
+      end
 
     List.last(included_versions)
   end
 
   defp pre_version?(version) do
     {:ok, version} = Version.parse(version)
+
     version.pre != []
   end
 
   defp fetch_all_hex_versions(package_name) do
     case fetch("https://hex.pm/api/packages/#{package_name}") do
-      nil -> nil
-      package_info -> hex_versions(package_info)
+      nil ->
+        nil
+      package_info ->
+        hex_versions(package_info)
     end
   end
 
@@ -76,7 +78,9 @@ defmodule Credo.CheckForUpdates do
   end
 
   defp convert_response_body({:ok, {_status, _headers, body}}) do
-    body |> IO.iodata_to_binary() |> :erlang.binary_to_term()
+    body
+    |> IO.iodata_to_binary()
+    |> :erlang.binary_to_term()
   end
   defp convert_response_body(_), do: nil
 

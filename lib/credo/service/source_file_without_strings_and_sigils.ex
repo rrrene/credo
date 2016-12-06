@@ -33,6 +33,7 @@ defmodule Credo.Service.SourceFileWithoutStringAndSigils do
 
   def handle_call({:put, filename, source}, _from, current_state) do
     :ets.insert(@table_name, {filename, source})
+
     {:reply, source, current_state}
   end
 end

@@ -37,8 +37,15 @@ defmodule Credo.Config do
   any patterns to include or exclude certain checks given via the command line.
   """
   def checks(%__MODULE__{checks: checks, match_checks: match_checks, ignore_checks: ignore_checks}) do
-    match_regexes = match_checks |> List.wrap |> to_match_regexes
-    ignore_regexes = ignore_checks |> List.wrap |> to_match_regexes
+    match_regexes =
+      match_checks
+      |> List.wrap
+      |> to_match_regexes
+
+    ignore_regexes =
+      ignore_checks
+      |> List.wrap
+      |> to_match_regexes
 
     checks
     |> Enum.filter(&match_regex(&1, match_regexes, true))
@@ -106,7 +113,12 @@ defmodule Credo.Config do
 
   defp do_get_dir_paths(dirs, acc) when length(dirs) < 2, do: acc
   defp do_get_dir_paths([dir | tail], acc) do
-    expanded_path = tail |> Enum.reverse |> Path.join |> Path.join(dir)
+    expanded_path =
+      tail
+      |> Enum.reverse
+      |> Path.join
+      |> Path.join(dir)
+
     do_get_dir_paths(tail, [expanded_path | acc])
   end
 
@@ -156,8 +168,10 @@ defmodule Credo.Config do
 
   defp checks_from_data(data) do
     case data[:checks] do
-      checks when is_list(checks) -> checks
-      _ -> []
+      checks when is_list(checks) ->
+        checks
+      _ ->
+        []
     end
   end
 
