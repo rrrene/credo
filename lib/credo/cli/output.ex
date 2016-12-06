@@ -92,12 +92,7 @@ defmodule Credo.CLI.Output do
     ]
     UI.puts(output)
 
-    invalid_source_filenames
-    |> Enum.with_index
-    |> Enum.flat_map(fn({filename, index}) ->
-        [:reset, String.rjust("#{index+1})", 5), :faint, " #{filename}\n"]
-      end)
-    |> UI.puts
+    print_numbered_list(invalid_source_filenames)
   end
 
   def print_skipped_checks(%Config{skipped_checks: []}), do: nil
@@ -110,16 +105,24 @@ defmodule Credo.CLI.Output do
       ]
     UI.puts
     UI.puts(msg, :faint)
-    Enum.each(skipped_checks, &print_skipped_check_name/1)
-    UI.puts
+
+    skipped_checks
+    |> Enum.map(&check_name/1)
+    |> print_numbered_list
   end
 
-  defp print_skipped_check_name({check, _check_info}) do
-    check_name =
-      check
-      |> to_string
-      |> String.replace(~r/^Elixir\./, "")
+  defp check_name({check, _check_info}) do
+    check
+    |> to_string
+    |> String.replace(~r/^Elixir\./, "")
+  end
 
-    UI.puts("  - #{check_name}", :faint)
+  defp print_numbered_list(list) do
+    list
+    |> Enum.with_index
+    |> Enum.flat_map(fn({string, index}) ->
+        [:reset, String.rjust("#{index+1})", 5), :faint, " #{string}\n"]
+      end)
+    |> UI.puts
   end
 end
