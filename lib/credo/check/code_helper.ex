@@ -73,7 +73,9 @@ defmodule Credo.Check.CodeHelper do
           Enum.map(lines, fn({line_no, _}) ->
             Scope.name(ast, line: line_no)
           end)
+
         SourceFileScopes.put(filename, result)
+
         result
     end
   end
@@ -98,7 +100,9 @@ defmodule Credo.Check.CodeHelper do
         value
       :notfound ->
         result = clean_strings_sigils_and_comments(source)
+
         SourceFileCodeOnly.put(filename, result)
+
         result
     end
   end
@@ -119,7 +123,9 @@ defmodule Credo.Check.CodeHelper do
         value
       :notfound ->
         result = clean_strings_and_sigils(source)
+
         SourceFileWithoutStringAndSigils.put(filename, result)
+
         result
     end
   end

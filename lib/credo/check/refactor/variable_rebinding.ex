@@ -26,11 +26,10 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
 
     duplicates =
-      Enum.filter(variables, fn {key, _} ->
-        Enum.count(variables, fn
-          {other, _} -> key == other
-        end) >= 2
-      end)
+      variables
+      |> Enum.filter(fn {key, _} ->
+          Enum.count(variables, fn({other, _}) -> key == other end) >= 2
+        end)
       |> Enum.reverse
       |> Enum.uniq_by(&get_variable_name/1)
 

@@ -7,6 +7,7 @@ defmodule Credo.Check.PropertyValue do
 
   def meta(tuple, key) do
     m = meta(tuple)
+
     m[key]
   end
   def meta({__MODULE__, _, value}), do: value

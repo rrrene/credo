@@ -14,13 +14,16 @@ defmodule Credo.Sources do
   iex> Sources.find(%Credo.Config{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
 
   iex> Sources.find(%Credo.Config{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
-
   """
   def find(%Credo.Config{files: %{included: [filename]}, read_from_stdin: true}) do
-    filename |> source_file_from_stdin() |> List.wrap
+    filename
+    |> source_file_from_stdin()
+    |> List.wrap
   end
   def find(%Credo.Config{read_from_stdin: true}) do
-    @stdin_filename |> source_file_from_stdin() |> List.wrap
+    @stdin_filename
+    |> source_file_from_stdin()
+    |> List.wrap
   end
   def find(%Credo.Config{files: files}) do
     MapSet.new
@@ -37,7 +40,10 @@ defmodule Credo.Sources do
 
   defp include(files, []), do: files
   defp include(files, [path | remaining_paths]) do
-    include_paths = path |> recurse_path |> Enum.into(MapSet.new)
+    include_paths =
+      path
+      |> recurse_path
+      |> Enum.into(MapSet.new)
 
     files
     |> MapSet.union(include_paths)
@@ -51,7 +57,10 @@ defmodule Credo.Sources do
     |> exclude([pattern | remaining_patterns])
   end
   defp exclude(files, [pattern | remaining_patterns]) when is_binary(pattern) do
-    exclude_paths = pattern |> recurse_path |> Enum.into(MapSet.new)
+    exclude_paths =
+      pattern
+      |> recurse_path
+      |> Enum.into(MapSet.new)
 
     files
     |> MapSet.difference(exclude_paths)
@@ -98,9 +107,12 @@ defmodule Credo.Sources do
 
   defp read_from_stdin(source \\ "") do
     case IO.read(:stdio, :line) do
-      {:error, reason} -> {:error, reason}
-      :eof             -> {:ok, source}
-      data             -> source = source <> data
+      {:error, reason} ->
+        {:error, reason}
+      :eof ->
+        {:ok, source}
+      data ->
+        source = source <> data
         read_from_stdin(source)
     end
   end

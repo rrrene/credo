@@ -8,6 +8,7 @@ defmodule Credo.CLI.Command.GenConfig do
 
   def run(_args, _config) do
     create_config_file(@config_filename)
+
     :ok
   end
 

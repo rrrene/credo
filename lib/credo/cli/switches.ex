@@ -34,10 +34,12 @@ defmodule Credo.CLI.Switches do
   end
   defp set_strict(config, %{strict: true}) do
     new_config = %Config{config | strict: true}
+
     Config.set_strict(new_config)
   end
   defp set_strict(config, %{strict: false}) do
     new_config = %Config{config | strict: false}
+
     Config.set_strict(new_config)
   end
   defp set_strict(config, _), do: config
@@ -81,7 +83,13 @@ defmodule Credo.CLI.Switches do
     set_only(config, %{checks: only})
   end
   defp set_only(config, %{checks: check_pattern}) do
-    new_config = %Config{config | strict: true, match_checks: String.split(check_pattern, ",")}
+    new_config =
+      %Config{
+        config |
+        strict: true,
+        match_checks: String.split(check_pattern, ",")
+      }
+
     Config.set_strict(new_config)
   end
   defp set_only(config, _), do: config
@@ -98,6 +106,7 @@ defmodule Credo.CLI.Switches do
   # DEPRECATED command line switches
   defp set_deprecated_switches(config, %{one_line: true}) do
     UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
+
     %Config{config | format: "oneline"}
   end
   defp set_deprecated_switches(config, _), do: config

@@ -52,11 +52,13 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
 
     Enum.reduce(all_unused_calls, [], fn(invalid_call, issues) ->
       {_, meta, _} = invalid_call
+
       trigger =
         invalid_call
         |> Macro.to_string
         |> String.split("(")
         |> List.first
+
       issues ++ [issue_for(issue_meta, meta[:line], trigger)]
     end)
   end

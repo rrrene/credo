@@ -30,8 +30,10 @@ defmodule Credo.CLI.Command.Suggest do
       |> Filter.valid_issues(config)
 
     case issues do
-      [] -> :ok
-      issues -> {:error, issues}
+      [] ->
+        :ok
+      issues ->
+        {:error, issues}
     end
   end
 
@@ -69,30 +71,33 @@ defmodule Credo.CLI.Command.Suggest do
 
   defp print_help do
     usage = ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
-    suggestions = """
+    description =
+      """
 
-    Suggests objects from every category that Credo thinks can be improved.
-    """
-    command = ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
-    arrows = """
+      Suggests objects from every category that Credo thinks can be improved.
+      """
+    example = ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
+    options =
+      """
 
-    Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
+      Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
-    Suggest options:
-      -a, --all             Show all issues
-      -A, --all-priorities  Show all issues including low priority ones
-      -c, --checks          Only include checks that match the given strings
-      -C, --config-name     Use the given config instead of "default"
-      -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+      Suggest options:
+        -a, --all             Show all issues
+        -A, --all-priorities  Show all issues including low priority ones
+        -c, --checks          Only include checks that match the given strings
+        -C, --config-name     Use the given config instead of "default"
+        -i, --ignore-checks   Ignore checks that match the given strings
+            --format          Display the list in a specific format (oneline,flycheck)
 
-    General options:
-      -v, --version         Show version
-      -h, --help            Show this help
-    """
+      General options:
+        -v, --version         Show version
+        -h, --help            Show this help
+      """
+
     UI.puts(usage)
-    UI.puts(suggestions)
-    UI.puts(command)
-    UI.puts(arrows)
+    UI.puts(description)
+    UI.puts(example)
+    UI.puts(options)
   end
 end

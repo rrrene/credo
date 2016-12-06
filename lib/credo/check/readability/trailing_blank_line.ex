@@ -12,6 +12,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
     issue_meta = IssueMeta.for(source_file, params)
 
     {line_no, last_line} = List.last(lines)
+
     if String.strip(last_line) == "" do
       []
     else

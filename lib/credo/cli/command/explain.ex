@@ -23,8 +23,6 @@ defmodule Credo.CLI.Command.Explain do
     |> String.split(":")
     |> print_result(source_files, config)
 
-    # TODO: return :error if there are issues so the CLI can exit with a status
-    #       code other than zero
     :ok
   end
 
@@ -72,20 +70,22 @@ defmodule Credo.CLI.Command.Explain do
 
   defp print_help do
     usage = ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
-    explain = """
+    description =
+      """
 
-    Explain the given issue.
-    """
+      Explain the given issue.
+      """
     example = ["Example: ", :olive, :faint, "$ mix credo explain lib/foo/bar.ex:13:6"]
-    options = """
+    options =
+      """
 
-    General options:
-      -v, --version       Show version
-      -h, --help          Show this help
-    """
+      General options:
+        -v, --version       Show version
+        -h, --help          Show this help
+      """
 
     UI.puts(usage)
-    UI.puts(explain)
+    UI.puts(description)
     UI.puts(example)
     UI.puts(options)
   end

@@ -30,6 +30,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector do
     name_list = name |> Name.last |> Name.split_pascal_case
     prefix = List.first(name_list)
     suffix = List.last(name_list)
+
     [
       PropertyValue.for({prefix, :prefix}, filename),
       PropertyValue.for({suffix, :suffix}, filename)

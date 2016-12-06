@@ -1,5 +1,4 @@
 defmodule Credo.CLI.Output.UI do
-
   @edge "┃"
   @ellipsis "…"
 
@@ -52,14 +51,13 @@ defmodule Credo.CLI.Output.UI do
   def truncate(_line, max_length, _ellipsis) when max_length <= 0, do: ""
   def truncate(line, max_length, ellipsis) when max_length > 0 do
     cond do
-      String.length(line) <= max_length -> line
-
-      String.length(ellipsis) >= max_length -> ellipsis
-
+      String.length(line) <= max_length ->
+        line
+      String.length(ellipsis) >= max_length ->
+        ellipsis
       true ->
         chars_to_display = max_length - String.length(ellipsis)
         String.slice(line, 0, chars_to_display) <> ellipsis
     end
   end
-
 end

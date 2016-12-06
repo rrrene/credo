@@ -95,11 +95,23 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   end
 
   defp name_with_suffix?(module_ast, suffix) do
-    module_ast |> Module.name |> Name.split_pascal_case |> List.last == suffix
+    last_name =
+      module_ast
+      |> Module.name
+      |> Name.split_pascal_case
+      |> List.last
+
+    last_name == suffix
   end
 
   defp name_with_prefix?(module_ast, prefix) do
-    module_ast |> Module.name |> Name.split_pascal_case |> List.first == prefix
+    first_name =
+      module_ast
+      |> Module.name
+      |> Name.split_pascal_case
+      |> List.first
+
+    first_name == prefix
   end
 
   defp issues_for_wrong(exception_list, prefix_or_suffix, issue_meta, suffix) do
@@ -110,6 +122,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   defp issue_for_wrong({:defmodule, meta, _} = ast, prefix_or_suffix, issue_meta, expected) do
     trigger = Module.name(ast)
+
     format_issue issue_meta,
       message: message_for(prefix_or_suffix, expected, trigger),
       line_no: meta[:line],
@@ -117,21 +130,29 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   end
 
   def message_for(:prefix, expected, trigger) do
-    message = """
-    Exception modules should be named consistently.
-    It seems your strategy is to prefix them with `#{expected}`,
-    but `#{trigger}` does not follow that convention."
-    """
+    message =
+      """
+      Exception modules should be named consistently.
+      It seems your strategy is to prefix them with `#{expected}`,
+      but `#{trigger}` does not follow that convention."
+      """
+
     to_one_line(message)
   end
   def message_for(:suffix, expected, trigger) do
-    message = """
-    Exception modules should be named consistently.
-    It seems your strategy is to have `#{expected}` as a suffix,
-    but `#{trigger}` does not follow that convention.
-    """
+    message =
+      """
+      Exception modules should be named consistently.
+      It seems your strategy is to have `#{expected}` as a suffix,
+      but `#{trigger}` does not follow that convention.
+      """
+
     to_one_line(message)
   end
 
-  def to_one_line(str), do: str |> String.split |> Enum.join(" ")
+  def to_one_line(str) do
+    str
+    |> String.split
+    |> Enum.join(" ")
+  end
 end

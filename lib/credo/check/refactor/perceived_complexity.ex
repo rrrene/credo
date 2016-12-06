@@ -57,9 +57,14 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   end
   for op <- @def_ops do
     defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_complexity) when is_list(arguments) do
-      complexity = ast |> complexity_for |> round
+      complexity =
+        ast
+        |> complexity_for
+        |> round
+
       if complexity > max_complexity do
         fun_name = CodeHelper.def_name(ast)
+
         {ast, issues ++ [issue_for(issue_meta, meta[:line], fun_name, max_complexity, complexity)]}
       else
         {ast, issues}
@@ -117,7 +122,11 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
 
   defp do_block_complexity(nil, _), do: 0
   defp do_block_complexity(block, op) do
-    count = block |> List.wrap |> Enum.count
+    count =
+      block
+      |> List.wrap
+      |> Enum.count
+
     count * @op_complexity_map[op]
   end
 

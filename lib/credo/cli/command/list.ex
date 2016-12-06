@@ -27,8 +27,10 @@ defmodule Credo.CLI.Command.List do
       |> Filter.valid_issues(config)
 
     case issues do
-      [] -> :ok
-      issues -> {:error, issues}
+      [] ->
+        :ok
+      issues ->
+        {:error, issues}
     end
   end
 
@@ -67,31 +69,34 @@ defmodule Credo.CLI.Command.List do
 
 
   defp print_help do
-    usage_output = ["Usage: ", :olive, "mix credo list [paths] [options]"]
-    UI.puts(usage_output)
-    list_output = """
+    usage = ["Usage: ", :olive, "mix credo list [paths] [options]"]
+    description =
+      """
 
-    Lists objects that Credo thinks can be improved ordered by their priority.
-    """
-    UI.puts(list_output)
-    example_output = ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
-    UI.puts(example_output)
-    config_output = """
+      Lists objects that Credo thinks can be improved ordered by their priority.
+      """
+    example = ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
+    options =
+      """
 
-    Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
+      Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
-    List options:
-      -a, --all             Show all issues
-      -A, --all-priorities  Show all issues including low priority ones
-      -c, --checks          Only include checks that match the given strings
-      -C, --config-name     Use the given config instead of "default"
-      -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+      List options:
+        -a, --all             Show all issues
+        -A, --all-priorities  Show all issues including low priority ones
+        -c, --checks          Only include checks that match the given strings
+        -C, --config-name     Use the given config instead of "default"
+        -i, --ignore-checks   Ignore checks that match the given strings
+            --format          Display the list in a specific format (oneline,flycheck)
 
-    General options:
-      -v, --version         Show version
-      -h, --help            Show this help
-    """
-    UI.puts(config_output)
+      General options:
+        -v, --version         Show version
+        -h, --help            Show this help
+      """
+
+    UI.puts(usage)
+    UI.puts(description)
+    UI.puts(example)
+    UI.puts(options)
   end
 end

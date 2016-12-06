@@ -17,8 +17,10 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.WithSpace do
 
   defp property_value_for_line({line_no, line}, filename) do
     results = Regex.run(@regex, line)
+
     if results do
       trigger = Enum.at(results, 1)
+
       PropertyValue.for(property_value(), filename: filename, line_no: line_no, trigger: trigger)
     end
   end

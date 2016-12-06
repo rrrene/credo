@@ -74,6 +74,6 @@ defmodule Credo.ExsLoader do
   end
 
   defp process_map_item({key, value}, acc) when is_atom(key) or is_binary(key) do
-    Map.put acc, key, process_exs(value)
+    Map.put(acc, key, process_exs(value))
   end
 end

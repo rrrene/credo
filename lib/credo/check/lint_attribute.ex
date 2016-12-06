@@ -23,20 +23,18 @@ defmodule Credo.Check.LintAttribute do
       false
     end
   end
-  def ignores_issue?(_lint_attribute, _issue) do
-    false
-  end
+  def ignores_issue?(_, _), do: false
 
   defp check_tuple_ignores_issue?({check_or_regex, false}, issue) do
     if Regex.regex?(check_or_regex) do
-      issue.check |> to_string |> String.match?(check_or_regex)
+      issue.check
+      |> to_string
+      |> String.match?(check_or_regex)
     else
       issue.check == check_or_regex
     end
   end
-  defp check_tuple_ignores_issue?(_, _issue) do
-    false
-  end
+  defp check_tuple_ignores_issue?(_, _issue), do: false
 
   def value_for([false]), do: false
   def value_for([list]) when is_list(list) do
@@ -50,14 +48,13 @@ defmodule Credo.Check.LintAttribute do
   end
   def value_for({{:sigil_r, _, _} = sigil, params}) do
     {result, _binding} = Code.eval_quoted(sigil)
+
     {result, params}
   end
   def value_for({{:sigil_R, _, _} = sigil, params}) do
     {result, _binding} = Code.eval_quoted(sigil)
+
     {result, params}
   end
-  def value_for(_) do
-    nil
-  end
-
+  def value_for(_), do: nil
 end

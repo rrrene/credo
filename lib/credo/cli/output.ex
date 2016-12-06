@@ -7,8 +7,13 @@ defmodule Credo.CLI.Output do
   def check_tag(category, in_parens \\ true)
 
   def check_tag(category, in_parens) when is_binary(category) do
-    default_tag = category |> String.at(0) |> String.upcase
+    default_tag =
+      category
+      |> String.at(0)
+      |> String.upcase
+
     tag = Map.get(@category_tag_map, category, default_tag)
+
     if in_parens do
       "[#{tag}]"
     else
@@ -16,10 +21,14 @@ defmodule Credo.CLI.Output do
     end
   end
   def check_tag(category, in_parens) when is_atom(category) do
-    category |> to_string |> check_tag(in_parens)
+    category
+    |> to_string
+    |> check_tag(in_parens)
   end
   def check_tag(check_mod, in_parens) do
-    check_mod.category |> to_string |> check_tag(in_parens)
+    check_mod.category
+    |> to_string
+    |> check_tag(in_parens)
   end
 
   def check_color(category) when is_binary(category) do
@@ -33,14 +42,19 @@ defmodule Credo.CLI.Output do
     end
   end
   def check_color(category) when is_atom(category) do
-    category |> to_string |> check_color
+    category
+    |> to_string
+    |> check_color
   end
   def check_color(check_mod) do
-    check_mod.category |> to_string |> check_color
+    check_mod.category
+    |> to_string
+    |> check_color
   end
 
   def issue_color(issue) do
     priority = issue.priority
+
     cond do
       priority in    20..999 -> :red
       priority in    10..19  -> :red
@@ -79,8 +93,10 @@ defmodule Credo.CLI.Output do
 
   def term_columns(default \\ 80) do
     case :io.columns do
-      {:ok, columns} -> columns
-      _ -> default
+      {:ok, columns} ->
+        columns
+      _ ->
+        default
     end
   end
 
@@ -91,6 +107,7 @@ defmodule Credo.CLI.Output do
       [
         :reset, :bright, :orange, "info: ", :red, "Some source files could not be parsed correctly and are excluded:\n",
       ]
+
     UI.puts(output)
 
     print_numbered_list(invalid_source_filenames)

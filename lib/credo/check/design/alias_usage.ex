@@ -103,7 +103,7 @@ defmodule Credo.Check.Design.AliasUsage do
     last_name = Credo.Code.Name.last(mod_list)
 
     Enum.member?(excluded_namespaces, first_name) ||
-    Enum.member?(excluded_lastnames, last_name)
+      Enum.member?(excluded_lastnames, last_name)
   end
 
   # Returns true if mod_list and alias_name would result in the same alias

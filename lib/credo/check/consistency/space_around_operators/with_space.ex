@@ -33,7 +33,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
         acc
       end
 
-
     check_tokens(t, acc)
   end
 

@@ -31,6 +31,7 @@ defmodule Credo.Check.Consistency.LineEndings do
   defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
   defp issue_for(issue_meta, actual_prop, expected_prop, _picked_count, _total_count) do
     actual_prop = PropertyValue.get(actual_prop)
+
     format_issue issue_meta,
       message: "File is using #{actual_prop} line endings while most of the files use #{expected_prop} line endings."
   end

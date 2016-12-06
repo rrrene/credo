@@ -14,7 +14,11 @@ defmodule Credo.CLI.Filename do
       false
   """
   def contains_line_no?(filename) do
-    count = filename |> String.split(":") |> Enum.count
+    count =
+      filename
+      |> String.split(":")
+      |> Enum.count
+
     count == 2 || count == 3
   end
 
@@ -40,7 +44,9 @@ defmodule Credo.CLI.Filename do
       "lib/credo/sources.ex"
   """
   def remove_line_no_and_column(filename) do
-    filename |> String.split(":") |> List.first
+    filename
+    |> String.split(":")
+    |> List.first
   end
 
 

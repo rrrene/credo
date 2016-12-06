@@ -24,10 +24,8 @@ defmodule Credo.CLI.Command.Help do
     |> Enum.flat_map(fn(x) -> [color_for(x), x] end)
     |> UI.puts
 
-    #"# #{@cry_for_help}"
-    #|> UI.puts(:faint)
-
     UI.puts
+
     :ok
   end
 
@@ -39,22 +37,28 @@ defmodule Credo.CLI.Command.Help do
     CLI.commands
     |> Sorter.ensure(@starting_order, @ending_order)
     |> Enum.each(fn(name) ->
-      module = CLI.command_for(name)
-      name2 = name |> to_string |> String.ljust(@ljust)
-      case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
-        {:shortdoc, [shortdesc]} ->
-          UI.puts "  " <> name2 <> shortdesc
-        _ ->
-          nil # skip commands without @shortdesc
-      end
-    end)
+        module = CLI.command_for(name)
+        name2 =
+          name
+          |> to_string
+          |> String.ljust(@ljust)
+
+        case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
+          {:shortdoc, [shortdesc]} ->
+            UI.puts "  " <> name2 <> shortdesc
+          _ ->
+            nil # skip commands without @shortdesc
+        end
+      end)
 
     UI.puts "\nUse `--help` on any command to get further information."
 
-    example = [
-      "For example, `", :olive, "mix credo suggest --help",
+    example =
+      [
+        "For example, `", :olive, "mix credo suggest --help",
         :reset, "` for help on the default command."
-    ]
+      ]
+
     UI.puts(example)
   end
 

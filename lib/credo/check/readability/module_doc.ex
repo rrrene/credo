@@ -37,6 +37,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       ignore_names = Params.get(params, :ignore_names, @default_params)
 
       {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
+
       issues
     end
   end
@@ -47,6 +48,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       {ast, {false, issues}}
     else
       exception? = Module.exception?(ast)
+
       case Module.attribute(ast, :moduledoc)  do
         {:error, _} when not exception? ->
           {ast, {true, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}}

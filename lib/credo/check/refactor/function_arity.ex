@@ -31,8 +31,10 @@ defmodule Credo.Check.Refactor.FunctionArity do
   for op <- @def_ops do
     defp traverse({unquote(op) = op, meta, arguments} = ast, issues, issue_meta, max_arity, ignore_defp) when is_list(arguments) do
       arity = Parameters.count(ast)
+
       if issue?(op, ignore_defp, arity, max_arity) do
         fun_name = CodeHelper.def_name(ast)
+
         {ast, issues ++ [issue_for(issue_meta, meta[:line], fun_name, max_arity, arity)]}
       else
         {ast, issues}

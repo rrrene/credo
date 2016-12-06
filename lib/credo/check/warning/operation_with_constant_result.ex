@@ -33,6 +33,7 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
   for {op, constant_result, operand} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [_lhs, unquote(operand)]} = ast, issues, issue_meta) do
       new_issue = issue_for(issue_meta, meta[:line], unquote(op), unquote(constant_result))
+
       {ast, issues ++ [new_issue]}
     end
   end

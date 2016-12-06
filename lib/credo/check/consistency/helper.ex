@@ -117,6 +117,7 @@ defmodule Credo.Check.Consistency.Helper do
             value = PropertyValue.get(prop)
             if value != expected_prop && Enum.member?(list, value) do
               issue_meta = IssueMeta.for(source_file, params)
+
               new_issue_fun.(issue_meta, prop, expected_prop, picked_count, total_count)
             end
           end)
@@ -131,6 +132,7 @@ defmodule Credo.Check.Consistency.Helper do
 
   defp create_property_tuples(source_file, pattern_mods, params) do
     list = property_list_for(source_file, pattern_mods, params)
+
     {list, source_file}
   end
 
@@ -144,6 +146,7 @@ defmodule Credo.Check.Consistency.Helper do
   defp collect_property_values(pattern_mods, source_file, params) do
     Enum.reduce(pattern_mods, [], fn(pattern_mod, acc) ->
       result = pattern_mod.property_value_for(source_file, params)
+
       acc ++ List.wrap(result)
     end)
   end

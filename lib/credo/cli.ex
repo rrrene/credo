@@ -72,6 +72,7 @@ defmodule Credo.CLI do
   def command_for(nil), do: nil
   def command_for(command) when is_atom(command) do
     command_modules = Map.values(@command_map)
+
     if Enum.member?(command_modules, command) do
       command
     else

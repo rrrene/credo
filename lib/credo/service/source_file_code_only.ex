@@ -19,6 +19,7 @@ defmodule Credo.Service.SourceFileCodeOnly do
 
   def init(_) do
     ets = :ets.new(@table_name, [:named_table, read_concurrency: true])
+
     {:ok, ets}
   end
 
@@ -33,6 +34,7 @@ defmodule Credo.Service.SourceFileCodeOnly do
 
   def handle_call({:put, filename, source}, _from, current_state) do
     :ets.insert(@table_name, {filename, source})
+
     {:reply, source, current_state}
   end
 end

@@ -5,25 +5,39 @@ defmodule Credo.Code.Name do
   """
 
   def last(name) when is_atom(name) do
-    name |> to_string |> String.split(".") |> List.last
+    name
+    |> to_string
+    |> String.split(".")
+    |> List.last
   end
   def last(name) when is_binary(name) do
-    name |> String.split(".") |> List.last
+    name
+    |> String.split(".")
+    |> List.last
   end
   def last(mod_list) when is_list(mod_list) do
-    mod_list |> List.last |> to_string
+    mod_list
+    |> List.last
+    |> to_string
   end
 
-  # Credo.Code.Name |> to_string 
+  # Credo.Code.Name |> to_string
   # => "Elixir.Credo.Code.Name"
   def first(name) when is_atom(name) do
-    name |> to_string |> String.split(".") |> Enum.at(1)
+    name
+    |> to_string
+    |> String.split(".")
+    |> Enum.at(1)
   end
   def first(name) when is_binary(name) do
-    name |> String.split(".") |> List.first
+    name
+    |> String.split(".")
+    |> List.first
   end
   def first(mod_list) when is_list(mod_list) do
-    mod_list |> List.first |> to_string
+    mod_list
+    |> List.first
+    |> to_string
   end
 
   def full({:__aliases__, _, mod_list}) do
@@ -58,7 +72,9 @@ defmodule Credo.Code.Name do
   end
 
   def split_pascal_case(name) do
-    name |> String.replace(~r/([A-Z])/, " \\1") |> String.split
+    name
+    |> String.replace(~r/([A-Z])/, " \\1")
+    |> String.split
   end
 
   def snake_case?(name) do
@@ -69,12 +85,12 @@ defmodule Credo.Code.Name do
     String.match?(name, ~r/^[^a-zA-Z0-9]+$/)
   end
 
-  defp name_from_splitted_parts(splitted_parts) when length(splitted_parts) > 1 do
-    splitted_parts
-    |> Enum.slice(1, length(splitted_parts))
+  defp name_from_splitted_parts(parts) when length(parts) > 1 do
+    parts
+    |> Enum.slice(1, length(parts))
     |> Enum.join(".")
   end
-  defp name_from_splitted_parts(splitted_parts) do
-    Enum.join(splitted_parts, ".")
+  defp name_from_splitted_parts(parts) do
+    Enum.join(parts, ".")
   end
 end
