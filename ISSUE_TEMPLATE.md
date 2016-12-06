@@ -9,7 +9,7 @@
 * Erlang/Elixir version (`elixir -v`):
 * Operating system:
 
-### What where you trying to do?
+### What were you trying to do?
 
 
 
