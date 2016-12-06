@@ -1,4 +1,5 @@
 defmodule Credo.Check.Runner do
+  alias Credo.CLI.Output.UI
   alias Credo.Config
   alias Credo.SourceFile
   alias Credo.Service.SourceFileIssues
@@ -82,6 +83,9 @@ defmodule Credo.Check.Runner do
   end
 
   defp matches_requirement?({check, _}, version) do
+    matches_requirement?({check}, version)
+  end
+  defp matches_requirement?({check}, version) do
     Version.match?(version, check.elixir_version)
   end
 
@@ -115,7 +119,7 @@ defmodule Credo.Check.Runner do
       check.run(source_file, params)
     rescue
       error ->
-        IO.puts(:stderr, "Error while running #{check} on #{source_file.filename}")
+        UI.warn("Error while running #{check} on #{source_file.filename}")
         if config.crash_on_error do
           reraise error, System.stacktrace()
         else

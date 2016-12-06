@@ -9,12 +9,20 @@ defmodule Credo.CLI.Output.UI do
 
   defdelegate puts, to: Bunt
   defdelegate puts(v), to: Bunt
-  def puts(v, color), do: Bunt.puts([color, v])
+  def puts(v, color) when is_atom(color) do
+    Bunt.puts([color, v])
+  end
 
   def puts_edge(color, indent \\ 2) when is_integer(indent) do
     color
     |> edge(indent)
     |> puts
+  end
+
+  @doc "Like `puts`, but writes to `:stderr`."
+  def warn(v) do
+    formatted_message = Bunt.format(v)
+    IO.puts(:stderr, formatted_message)
   end
 
   def wrap_at(text, number) do

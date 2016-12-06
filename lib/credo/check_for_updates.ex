@@ -1,4 +1,6 @@
 defmodule Credo.CheckForUpdates do
+  alias Credo.CLI.Output.UI
+
   def run() do
     "credo"
     |> fetch_all_hex_versions()
@@ -19,7 +21,7 @@ defmodule Credo.CheckForUpdates do
         :orange,
         ", please update with `mix deps.update credo`"
       ]
-      warn(warning)
+      UI.warn(warning)
     end
   end
 
@@ -49,10 +51,6 @@ defmodule Credo.CheckForUpdates do
   defp pre_version?(version) do
     {:ok, version} = Version.parse(version)
     version.pre != []
-  end
-
-  defp warn(value) do
-    IO.puts(:stderr, Bunt.format(value))
   end
 
   defp fetch_all_hex_versions(package_name) do
