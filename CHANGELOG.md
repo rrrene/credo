@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0 (pre)
+
+- Do not warn about ParenthesesInCondition in one-line `if` call
+- Add `--no-strict` CLI switch
+- Fixed exit status for `mix credo list`
+
+### New Checks
+
+- readability/single_pipe
+- readability/string_sigils
+- refactor/double_boolean_negation
+- refactor/variable_rebinding
+
 ## 0.5.3
 
 - Fix crash in CheckForUpdates
