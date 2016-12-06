@@ -111,18 +111,6 @@ defmodule OtherModule do
 end
 """ |> Code.string_to_quoted
 
-    IO.puts ""
-    (1..25)
-    |> Enum.each(fn(line) ->
-      tuple =
-        ast
-        |> Scope.name(line: line)
-        |> to_inspected
-
-      "#{line |> to_string |> String.rjust(2)}: #{tuple}"
-      |> IO.puts
-    end)
-
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 1)
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 2)
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 3)

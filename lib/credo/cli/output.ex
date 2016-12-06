@@ -112,7 +112,8 @@ defmodule Credo.CLI.Output do
     |> print_numbered_list
   end
 
-  defp check_name({check, _check_info}) do
+  defp check_name({check, _check_info}), do: check_name({check})
+  defp check_name({check}) do
     check
     |> to_string
     |> String.replace(~r/^Elixir\./, "")
