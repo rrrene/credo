@@ -5,6 +5,7 @@ defmodule Credo.CLI.Command.List do
 
   alias Credo.Check.Runner
   alias Credo.Config
+  alias Credo.CLI.Filter
   alias Credo.CLI.Output.IssuesByScope
   alias Credo.CLI.Output.IssuesShortList
   alias Credo.CLI.Output.UI
@@ -19,9 +20,16 @@ defmodule Credo.CLI.Command.List do
 
     print_results_and_summary(source_files, config, time_load, time_run)
 
-    # TODO: return :error if there are issues so the CLI can exit with a status
-    #       code other than zero
-    :ok
+    issues =
+      source_files
+      |> Enum.flat_map(&(&1.issues))
+      |> Filter.important(config)
+      |> Filter.valid_issues(config)
+
+    case issues do
+      [] -> :ok
+      issues -> {:error, issues}
+    end
   end
 
   def load_and_validate_source_files(config) do
