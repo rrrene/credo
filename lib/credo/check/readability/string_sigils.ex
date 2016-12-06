@@ -11,10 +11,10 @@ defmodule Credo.Check.Readability.StringSigils do
       maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
     ]
   ]
-
   @default_params [
     maximum_allowed_quotes: 3
   ]
+  @quote_codepoint 34
 
   use Credo.Check, base_priority: :low
 
@@ -27,17 +27,16 @@ defmodule Credo.Check.Readability.StringSigils do
 
   def traverse({maybe_sigil, [line: line_no], [str | rest_ast]} = ast, issues, issue_meta, maximum_allowed_quotes) do
     cond do
-      is_sigil?(maybe_sigil) -> {rest_ast, issues}
+      is_sigil(maybe_sigil) -> {rest_ast, issues}
       is_binary(str)         -> {rest_ast, issues_for_string_literal(str, maximum_allowed_quotes, issues, issue_meta, line_no)}
       true                   -> {ast, issues}
     end
   end
-
   def traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
     {ast, issues}
   end
 
-  defp is_sigil?(maybe_sigil) do
+  defp is_sigil(maybe_sigil) do
     maybe_sigil
     |> Atom.to_string
     |> String.starts_with?("sigil_")
@@ -55,7 +54,6 @@ defmodule Credo.Check.Readability.StringSigils do
     too_many_quotes?(string, 0, limit)
   end
 
-  @quote_codepoint 34
   defp too_many_quotes?(_string, count, limit) when count > limit do
     true
   end

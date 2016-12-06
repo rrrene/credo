@@ -88,7 +88,7 @@ defmodule Credo.Sources do
   end
 
   defp source_file_from_stdin(filename) do
-    SourceFile.parse(read_from_stdin(), filename)
+    SourceFile.parse(read_from_stdin!(), filename)
   end
 
   defp read_from_stdin! do
