@@ -33,12 +33,34 @@ end
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:try, [line: line_no], _} = ast, issues, issue_meta) do
+  defp traverse({:def, _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast, issues, issue_meta) do
     {ast, issues ++ [issue_for(issue_meta, line_no)]}
+  end
+
+  defp traverse({:def, _, [{_, _, _}, [do: {:__block__, _, function_body}]]} = ast, issues, issue_meta) do
+    process_function_body(function_body, ast, issues, issue_meta)
+  end
+
+  defp traverse({:def, _, [{_, _, _}, function_body]} = ast, issues, issue_meta) do
+    process_function_body(function_body, ast, issues, issue_meta)
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
+  end
+
+  defp process_function_body(function_body, ast, issues, issue_meta) do
+    found = Enum.find(function_body, fn
+      ({:try, _, _}) -> true
+      (_) -> false
+    end)
+
+    if is_nil(found) do
+      {ast, issues }
+    else
+      {:try, [line: line_no], _} = found
+      {ast, issues ++ [issue_for(issue_meta, line_no)]}
+    end
   end
 
   defp issue_for(issue_meta, line_no) do
