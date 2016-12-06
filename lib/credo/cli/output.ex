@@ -87,9 +87,10 @@ defmodule Credo.CLI.Output do
   def complain_about_invalid_source_files([]), do: nil
   def complain_about_invalid_source_files(invalid_source_files) do
     invalid_source_filenames = Enum.map(invalid_source_files, &(&1.filename))
-    output = [
-      :red, "Some source files could not be parsed correctly and are excluded:\n",
-    ]
+    output =
+      [
+        :reset, :bright, :orange, "info: ", :red, "Some source files could not be parsed correctly and are excluded:\n",
+      ]
     UI.puts(output)
 
     print_numbered_list(invalid_source_filenames)
@@ -104,7 +105,7 @@ defmodule Credo.CLI.Output do
         :reset, :faint, "get the most out of Credo!\n",
       ]
     UI.puts
-    UI.puts(msg, :faint)
+    UI.puts(msg)
 
     skipped_checks
     |> Enum.map(&check_name/1)
