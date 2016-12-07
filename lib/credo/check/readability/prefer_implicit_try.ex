@@ -44,7 +44,7 @@ end
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
       message: "Prefer using an implicit `try` rather than explicit `try`",
-      trigger: "implicit_try",
+      trigger: "try",
       line_no: line_no
   end
 end
