@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
-  
+  alias Credo.Code.Name
+
   @reuse_ops [:alias, :import, :require, :use]
   @name_delimiter "."
 
@@ -29,7 +30,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
   
   for op <- @reuse_ops do
     defp single_names_only({unquote(op) = op, [line: line_no], [{:__aliases__, _, mod_list}]} = ast, usages) do
-      {ast, usages ++ [%{reuse_op: op, name: Credo.Code.Name.full(mod_list), line_no: line_no}]}
+      {ast, usages ++ [%{reuse_op: op, name: Name.full(mod_list), line_no: line_no}]}
     end
 
     defp single_names_only({unquote(op), _, [{{:., _, [{:__aliases__, _, _mod_list}, :{}]}, _, _multi_mod_list}]} = ast, usages) do
@@ -39,7 +40,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
     defp multi_names_only({unquote(op) = op, _, [{{:., [line: line_no], [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, usages) do
       names = 
         multi_mod_list
-        |> Enum.map(fn(tuple) -> Credo.Code.Name.full([Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)]) end)            
+        |> Enum.map(fn(tuple) -> Name.full([Name.full(mod_list), Name.full(tuple)]) end)            
       {ast, usages ++ [%{reuse_op: op, names: names, line_no: line_no}]}
     end  
   end
@@ -53,10 +54,9 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
   end  
   
   defp base_name(name) do
-    name
-    |> String.split(@name_delimiter)
-    |> Enum.slice(0, Enum.count(String.split(name, @name_delimiter)) - 1)
+    parts = String.split(name, @name_delimiter)
+    parts
+    |> Enum.slice(0, Enum.count(parts) - 1)
     |> Enum.join(@name_delimiter)
   end
-
 end

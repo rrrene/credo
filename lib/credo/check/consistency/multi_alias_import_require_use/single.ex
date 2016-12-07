@@ -7,7 +7,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Single do
 
   def property_value_for(%SourceFile{ast: ast, filename: filename}, _params) do
     ast 
-    |> ReuseOpHelper.multiple_single_names    
+    |> ReuseOpHelper.multiple_single_names
     |> Enum.map(fn ns -> property_value_for_namespace(ns, filename) end)   
   end
 

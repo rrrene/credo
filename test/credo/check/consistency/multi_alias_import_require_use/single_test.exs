@@ -25,6 +25,7 @@ defmodule Credo.Sample1 do
 end
 """
 
+  @tag needs_elixir: "1.2.0"
   test "it should report the correct property value when the pattern is matched" do
     result =
       @single
@@ -33,6 +34,7 @@ end
     assert 4 == Enum.count(result)
   end
 
+  @tag needs_elixir: "1.2.0"
   test "it should not report anything when the pattern is not matched" do
     result =
       @no_single

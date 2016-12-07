@@ -15,6 +15,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Multi do
     PropertyValue.for(property_value, %{line_no: line_no, filename: filename, names: names, reuse_op: reuse_op})
   end
 
-  defp property_value_for_imported_namespace(x, y), do: IO.puts("falling through with #{x} #{y}")
+  defp property_value_for_imported_namespace(x, y), do: nil
 
 end
