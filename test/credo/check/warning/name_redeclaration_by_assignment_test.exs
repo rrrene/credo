@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignmentTest do
 
   @described_check Credo.Check.Warning.NameRedeclarationByAssignment
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -26,7 +30,9 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation 3" do
 """
@@ -135,9 +141,6 @@ end
     |> assert_issue(@described_check)
   end
 
-
-
-
   test "it should report a violation when a variable is declared with the same name as a function" do
 """
 defmodule CredoSampleModule do
@@ -174,7 +177,6 @@ end
 """ |> to_source_file
     |> assert_issues(@described_check)
   end
-
 
   test "it should report violation when a name matches names in Kernel" do
 """

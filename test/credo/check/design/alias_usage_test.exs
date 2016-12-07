@@ -7,6 +7,10 @@ defmodule Credo.Check.Design.AliasUsageTest do
   # single alias cases
   #
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -76,6 +80,19 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should work with __MODULE__" do
+"""
+defmodule Test do
+  alias __MODULE__.SubModule
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  #
+  # cases raising issues
+  #
+
   test "it should report a violation" do
 """
 defmodule CredoSampleModule do
@@ -87,33 +104,13 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should work with __MODULE__" do
-"""
-defmodule Test do
-  alias __MODULE__.SubModule
-end
-""" |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
   #
   # multi alias cases
   #
 
-  @tag needs_elixir: "1.2.0"
-  test "it should report violation on impossible additional alias when using multi alias" do
-"""
-defmodule Test do
-  alias Exzmq.{Socket, Tcp}
-
-  def just_an_example do
-    Socket.test1
-    Exzmq.Socket.test2
-  end
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-  end
+  #
+  # cases NOT raising issues
+  #
 
   @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on multi-use alias" do
@@ -148,4 +145,24 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
+
+  @tag needs_elixir: "1.2.0"
+  test "it should report violation on impossible additional alias when using multi alias" do
+"""
+defmodule Test do
+  alias Exzmq.{Socket, Tcp}
+
+  def just_an_example do
+    Socket.test1
+    Exzmq.Socket.test2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
 end

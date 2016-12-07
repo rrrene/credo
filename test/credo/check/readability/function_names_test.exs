@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
 
   @described_check Credo.Check.Readability.FunctionNames
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 def credo_sample do
@@ -23,6 +27,10 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """

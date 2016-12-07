@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
 
   @described_check Credo.Check.Readability.PreferImplicitTry
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report implicit use of `try`" do
 """
 defmodule ModuleWithImplicitTry do
@@ -36,7 +40,9 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  #
+  # cases raising issues
+  #
 
   test "it should report cases where a `try` block is the entire body of the function" do
 """

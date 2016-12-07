@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.SinglePipeTest do
 
   @described_check Credo.Check.Readability.SinglePipe
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -18,7 +22,9 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """
@@ -40,7 +46,7 @@ defmodule CredoSampleModule do
 
   def some_fun do
     some_val |> do_something
-    some_other_val 
+    some_other_val
     |> do_something
   end
 end

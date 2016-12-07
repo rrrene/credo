@@ -3,6 +3,10 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 
   @described_check Credo.Check.Refactor.PipeChainStart
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 ~S"""
 defmodule CredoSampleModule do
@@ -194,9 +198,9 @@ end
     |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
   end
 
-
-
-
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation for a function call" do
 """

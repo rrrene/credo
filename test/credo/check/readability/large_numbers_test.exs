@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 
   @described_check Credo.Check.Readability.LargeNumbers
 
+  #
+  # cases NOT raising issues
+  #
+
   @tag needs_elixir: "1.3.2"
   test "it should NOT report expected code" do
 """
@@ -39,7 +43,41 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should not complain about non-decimal numbers" do
+"""
+def numbers do
+  0xFFFF
+  0b1111_1111_1111_1111
+  0o777_777
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 
+  test "check old false positive is fixed /1" do
+    " defmacro oid_ansi_x9_62, do: quote do: {1,2,840,10_045}"
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  @tag needs_elixir: "1.3.2"
+  test "check old false positive is fixed /2" do
+"""
+%{
+  bounds: [
+    0, 1, 2, 5, 10, 20, 30, 65, 85,
+    100, 200, 400, 800,
+    1_000, 2_000, 4_000, 8_000, 16_000]
+}
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """
@@ -142,38 +180,6 @@ end
     |> assert_issue(@described_check, fn(%Credo.Issue{message: message}) ->
       assert Regex.run(~r/[\d\._]+/, message) |> hd ==  "10_000.000010"
     end)
-  end
-
-  test "it should not complain about non-decimal numbers" do
-"""
-def numbers do
-  0xFFFF
-  0b1111_1111_1111_1111
-  0o777_777
-end
-"""
-    |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
-  test "check old false positive is fixed /1" do
-    " defmacro oid_ansi_x9_62, do: quote do: {1,2,840,10_045}"
-    |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
-  @tag needs_elixir: "1.3.2"
-  test "check old false positive is fixed /2" do
-"""
-%{
-  bounds: [
-    0, 1, 2, 5, 10, 20, 30, 65, 85,
-    100, 200, 400, 800,
-    1_000, 2_000, 4_000, 8_000, 16_000]
-}
-"""
-    |> to_source_file
-    |> refute_issues(@described_check)
   end
 
   test "it should detect report issues with multiple large floats on a line" do

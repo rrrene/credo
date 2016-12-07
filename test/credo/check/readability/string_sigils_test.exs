@@ -19,6 +19,10 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     """
   end
 
+  #
+  # cases NOT raising issues
+  #
+
   test "does NOT report for empty string" do
     create_snippet("")
     |> to_source_file
@@ -29,18 +33,6 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     create_snippet(~s(f\\"b\\"\\"))
     |> to_source_file
     |> refute_issues(@described_check)
-  end
-
-  test "reports for more than 3 quotes" do
-    create_snippet(~s(f\\"\\"b\\"\\"))
-    |> to_source_file
-    |> assert_issue(@described_check)
-  end
-
-  test "reports for more than :maximum_allowed_quotes quotes" do
-    create_snippet(~s(f\\"\\"b\\"\\\"\\"\\"))
-    |> to_source_file
-    |> assert_issue(@described_check, maximum_allowed_quotes: 5)
   end
 
   test "does NOT report when less than :maximum_allowed_quotes quotes are found" do
@@ -66,4 +58,21 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
+
+  test "reports for more than 3 quotes" do
+    create_snippet(~s(f\\"\\"b\\"\\"))
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "reports for more than :maximum_allowed_quotes quotes" do
+    create_snippet(~s(f\\"\\"b\\"\\\"\\"\\"))
+    |> to_source_file
+    |> assert_issue(@described_check, maximum_allowed_quotes: 5)
+  end
+
 end

@@ -5,6 +5,10 @@ defmodule Credo.Check.Warning.UnreachableCodeTest do
 
   @moduletag :to_be_implemented
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -33,6 +37,9 @@ end
     |> refute_issues(@described_check)
   end
 
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """

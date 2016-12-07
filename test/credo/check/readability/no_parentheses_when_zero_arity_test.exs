@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.NoParenthesesWhenZeroArityTest do
 
   @described_check Credo.Check.Readability.NoParenthesesWhenZeroArity
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -17,6 +21,10 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """

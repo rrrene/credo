@@ -141,6 +141,10 @@ defmodule OtherModule3 do
 end
 """
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should not report issues if spaces are used everywhere" do
     [
       @with_spaces, @with_spaces2, @with_spaces3, @with_spaces4
@@ -156,6 +160,10 @@ end
     |> to_source_files()
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report an issue for mixed styles /1" do
     [

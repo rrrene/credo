@@ -5,6 +5,10 @@ defmodule Credo.Check.Readability.FunctionParenthesesTest do
 
   @moduletag :to_be_implemented
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 def fun_name do
@@ -15,7 +19,9 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """

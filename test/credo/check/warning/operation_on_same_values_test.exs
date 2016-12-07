@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
 
   @described_check Credo.Check.Warning.OperationOnSameValues
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -16,7 +20,9 @@ end
     |> refute_issues(@described_check)
   end
 
-
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation for ==" do
 """

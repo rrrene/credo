@@ -5,6 +5,10 @@ defmodule Credo.Check.Refactor.RegexMultipleSpacesTest do
 
   @moduletag :to_be_implemented
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do

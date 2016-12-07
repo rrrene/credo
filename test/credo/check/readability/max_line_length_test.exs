@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
 
   @described_check Credo.Check.Readability.MaxLineLength
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -58,11 +62,25 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    |> IO.inspect
     |> refute_issues(@described_check, ignore_multi_line_strings: true)
   end
 
+  test "it should NOT report a violation with config" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
 
+  def some_fun do
+    assert 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 == 2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, max_length: 90)
+  end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """
@@ -78,19 +96,6 @@ end
         assert 81 == issue.column
         assert "2" == issue.trigger
       end)
-  end
-
-  test "it should NOT report a violation with config" do
-"""
-defmodule CredoSampleModule do
-  use ExUnit.Case
-
-  def some_fun do
-    assert 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 == 2
-  end
-end
-""" |> to_source_file
-    |> refute_issues(@described_check, max_length: 90)
   end
 
 end

@@ -3,6 +3,10 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
 
   @described_check Credo.Check.Refactor.DoubleBooleanNegation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 !true
@@ -10,6 +14,10 @@ not true
 """ |> to_source_file
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """
