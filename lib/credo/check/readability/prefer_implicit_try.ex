@@ -1,27 +1,29 @@
 defmodule Credo.Check.Readability.PreferImplicitTry do
   @moduledoc """
-We don't need to explicity use `try` in function definitions. For example, this:
+  Prefer using an implicit `try` rather than explicit `try` if you try to rescue
+  anything the function does.
 
-defmodule ModuleWithRescue do
-  def failing_function(first) do
-    try do
-      to_string(first)
-    rescue
-      _ -> :rescued
-    end
-  end
-end
+  For example, this:
 
-Could be rewritten without `try` as below:
+      def failing_function(first) do
+        try do
+          to_string(first)
+        rescue
+          _ -> :rescued
+        end
+      end
 
-defmodule ModuleWithRescue do
-  def failing_function(first) do
-    to_string(first)
-  rescue
-    _ -> :rescued
-  end
-end
-"""
+  Can be rewritten without `try` as below:
+
+      def failing_function(first) do
+        to_string(first)
+      rescue
+        _ -> :rescued
+      end
+
+  Like all `Readability` issues, this one is not a technical concern.
+  The code will behave identical in both ways.
+  """
 
   @explanation [check: @moduledoc]
 
@@ -43,7 +45,7 @@ end
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Prefer using an implicit `try` rather than explicit `try`",
+      message: "Prefer using an implicit `try` rather than explicit `try`.",
       trigger: "try",
       line_no: line_no
   end
