@@ -78,6 +78,14 @@ defmodule Credo.Code.NameTest do
     assert mod_list |> Name.full == expected
   end
 
+
+  test "returns full name when list containing module attribute provided" do
+    mod_list = [{:@, [line: 2], [{:credo_code, [line: 2], nil}]}, :Module]
+
+    expected = "@credo_code.Module"
+    assert mod_list |> Name.full == expected
+  end
+
   #
   # parts_count
   #

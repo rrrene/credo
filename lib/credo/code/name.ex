@@ -60,6 +60,9 @@ defmodule Credo.Code.Name do
   def full(name) when is_binary(name) do
     name
   end
+  def full({:@, _, [{name, _, nil}]}) when is_atom(name) do
+    "@#{name}"
+  end
 
   def parts_count(module_name) do
     module_name
