@@ -17,11 +17,11 @@ defmodule Credo.Sample2 do
   alias Foo.Bar
   alias Foo.Baz
   import Foo.Bar
-  import Foo.Baz  
+  import Foo.Baz
   require Foo.Bar
   require Foo.Baz
   use Foo.Bar
-  use Foo.Baz  
+  use Foo.Baz
 end
 """
 
@@ -30,7 +30,7 @@ end
     result =
       @multi
       |> to_source_file()
-      |> Multi.property_value_for([])       
+      |> Multi.property_value_for([])
     assert 4 == Enum.count(result)
   end
 
@@ -39,7 +39,7 @@ end
     result =
       @no_multi
       |> to_source_file()
-      |> Multi.property_value_for([])       
+      |> Multi.property_value_for([])
     assert result == []
   end
 

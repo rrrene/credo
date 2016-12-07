@@ -12,7 +12,6 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   you should use a consistent style throughout your codebase.
   """
 
-
   @explanation [check: @moduledoc]
   @code_patterns [
     Credo.Check.Consistency.ParameterPatternMatching.PositionCollector
