@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.NameRedeclarationByFnTestTest do
 
   @described_check Credo.Check.Warning.NameRedeclarationByFn
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -28,6 +32,9 @@ end
     |> refute_issues(@described_check)
   end
 
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation when a variable is declared with the same name as a function" do
 """

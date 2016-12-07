@@ -3,6 +3,10 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
 
   @described_check Credo.Check.Refactor.FunctionArity
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
 """
 defmodule Credo.Sample.Module do
@@ -24,6 +28,10 @@ end
 """ |> to_source_file
     |> refute_issues(@described_check, ignore_defp: true)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
 """

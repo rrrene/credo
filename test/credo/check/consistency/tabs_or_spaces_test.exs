@@ -33,6 +33,10 @@ defmodule OtherModule do
 end
 """
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report for only tabs" do
     [
       @with_tabs
@@ -49,6 +53,10 @@ end
     |> refute_issues(@described_check)
   end
 
+  #
+  # cases NOT raising issues
+  #
+
   @tag :to_be_implemented
   test "it should NOT report for forced, valid props" do
     [
@@ -57,8 +65,6 @@ end
     |> to_source_files
     |> assert_issues(@described_check, force: :spaces)
   end
-
-
 
   test "it should report for mixed indentation" do
     [

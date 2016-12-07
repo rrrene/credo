@@ -54,6 +54,10 @@ defmodule OtherModule3 do
 end
 """
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should report the correct result " do
     [
       @without_spaces
@@ -69,6 +73,10 @@ end
     |> to_source_files()
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report the correct result 2" do
     [

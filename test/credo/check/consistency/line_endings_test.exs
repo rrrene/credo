@@ -27,13 +27,21 @@ end
 defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
 """
 
-  test "it should report the correct scope" do
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should not report expected code" do
     [@unix_line_endings, @unix_line_endings2]
     |> to_source_files
     |> refute_issues(@described_check)
   end
 
-  test "it should report the correct scope 2" do
+  #
+  # cases raising issues
+  #
+
+  test "it should report an issue here" do
     [@unix_line_endings, @windows_line_endings]
     |> to_source_files
     |> assert_issue(@described_check)

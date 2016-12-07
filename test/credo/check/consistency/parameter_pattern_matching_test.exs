@@ -61,21 +61,9 @@ end
   end
 """
 
-  test "it should report errors when variable decalrations are mixed on the left and right side when pattern matching" do
-    errors = [@left_and_right_mix]
-    |> to_source_files
-    |> assert_issues(@described_check)
-
-    assert 2 == Enum.count(errors)
-  end
-
-  test "it should report errors when variable decalrations are inconsistent throughout sourcefiles" do
-    errors = [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_list]
-    |> to_source_files
-    |> assert_issues(@described_check)
-
-    assert 3 == Enum.count(errors)
-  end
+  #
+  # cases NOT raising issues
+  #
 
   test "it should NOT report errors when variable decalrations are consistently on the left side" do
     [@var_left_map, @var_left_struct, @var_left_list]
@@ -106,4 +94,25 @@ end
     |> to_source_files
     |> refute_issues(@described_check)
   end
+
+  #
+  # cases raising issues
+  #
+
+  test "it should report errors when variable decalrations are mixed on the left and right side when pattern matching" do
+    errors = [@left_and_right_mix]
+    |> to_source_files
+    |> assert_issues(@described_check)
+
+    assert 2 == Enum.count(errors)
+  end
+
+  test "it should report errors when variable decalrations are inconsistent throughout sourcefiles" do
+    errors = [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_list]
+    |> to_source_files
+    |> assert_issues(@described_check)
+
+    assert 3 == Enum.count(errors)
+  end
+
 end

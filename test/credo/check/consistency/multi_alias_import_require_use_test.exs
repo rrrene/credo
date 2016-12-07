@@ -15,9 +15,23 @@ defmodule Credo.Sample3 do
   alias Foo.{Bar, Quux}
   alias Bar.{Baz, Bang}
   alias Foo.Bar
-  require Foo.Quux  
-end  
+  require Foo.Quux
+end
 """
+
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should not report errors when the multi syntax is used consistently" do
+    [@multi]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report errors when the multi and single syntaxes are mixed" do
     [@single, @multi]
@@ -28,13 +42,6 @@ end
   test "it should not report errors when the single syntax is used consistently" do
     [@single]
     |> to_source_files
-    |> refute_issues(@described_check)    
+    |> refute_issues(@described_check)
   end
-
-  test "it should not report errors when the multi syntax is used consistently" do
-    [@multi]
-    |> to_source_files
-    |> refute_issues(@described_check)    
-  end  
-
 end
