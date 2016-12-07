@@ -13,6 +13,7 @@ defmodule Credo.CLI do
   alias Credo.Sources
   alias Credo.CLI.Filename
   alias Credo.CLI.Switches
+  alias Credo.CLI.Output.UI
 
   @default_dir "."
   @default_command_name "suggest"
@@ -30,6 +31,7 @@ defmodule Credo.CLI do
     all: :boolean,
     all_priorities: :boolean,
     checks: :string,
+    color: :boolean,
     crash_on_error: :boolean,
     format: :string,
     help: :boolean,
@@ -89,6 +91,7 @@ defmodule Credo.CLI do
 
   defp run(argv) do
     {command_mod, dir, config} = parse_options(argv)
+    UI.use_colors(config.color)
 
     if config.check_for_updates, do: Credo.CheckForUpdates.run()
 

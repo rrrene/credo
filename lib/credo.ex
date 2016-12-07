@@ -8,6 +8,7 @@ defmodule Credo do
 
     children =
       [
+        worker(Credo.CLI.Output.Shell, []),
         worker(Credo.Service.SourceFileWithoutStringAndSigils, []),
         worker(Credo.Service.SourceFileCodeOnly, []),
         worker(Credo.Service.SourceFileScopes, []),

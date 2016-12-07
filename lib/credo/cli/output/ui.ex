@@ -1,27 +1,26 @@
 defmodule Credo.CLI.Output.UI do
   @edge "┃"
   @ellipsis "…"
+  @shell_service Credo.CLI.Output.Shell
 
   def edge(color, indent \\ 2) when is_integer(indent) do
     [:reset, color, @edge |> String.ljust(indent)]
   end
 
-  defdelegate puts, to: Bunt
-  defdelegate puts(v), to: Bunt
+  defdelegate use_colors(v), to: @shell_service
+
+  defdelegate puts, to: @shell_service
+  defdelegate puts(v), to: @shell_service
   def puts(v, color) when is_atom(color) do
-    Bunt.puts([color, v])
+    @shell_service.puts([color, v])
   end
+
+  defdelegate warn(v), to: @shell_service
 
   def puts_edge(color, indent \\ 2) when is_integer(indent) do
     color
     |> edge(indent)
     |> puts
-  end
-
-  @doc "Like `puts`, but writes to `:stderr`."
-  def warn(v) do
-    formatted_message = Bunt.format(v)
-    IO.puts(:stderr, formatted_message)
   end
 
   def wrap_at(text, number) do

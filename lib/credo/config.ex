@@ -5,6 +5,7 @@ defmodule Credo.Config do
   """
 
   defstruct files:              nil,
+            color:              true,
             checks:             nil,
             skipped_checks:     nil,
             requires:           [],
@@ -147,7 +148,8 @@ defmodule Credo.Config do
       requires: data[:requires] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data),
-      strict: data[:strict] || false
+      strict: data[:strict] || false,
+      color: data[:color] || false
     }
   end
 
@@ -205,6 +207,7 @@ defmodule Credo.Config do
       files: merge_files(base, other),
       checks: merge_checks(base, other),
       strict: other.strict,
+      color: other.color,
     }
   end
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do

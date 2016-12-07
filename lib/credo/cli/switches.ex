@@ -11,6 +11,7 @@ defmodule Credo.CLI.Switches do
   def parse_to_config(config, switches) do
     config
     |> set_all(switches)
+    |> set_color(switches)
     |> set_strict(switches)
     |> set_crash_on_error(switches)
     |> set_deprecated_switches(switches)
@@ -29,6 +30,11 @@ defmodule Credo.CLI.Switches do
   end
   defp set_all(config, _), do: config
 
+  defp set_color(config, %{color: color}) do
+    %Config{config | color: color}
+  end
+  defp set_color(config, _), do: config
+
   defp set_strict(config, %{all_priorities: true}) do
     set_strict(config, %{strict: true})
   end
@@ -43,6 +49,7 @@ defmodule Credo.CLI.Switches do
     Config.set_strict(new_config)
   end
   defp set_strict(config, _), do: config
+
   defp set_help(config, %{help: true}) do
     %Config{config | help: true}
   end
