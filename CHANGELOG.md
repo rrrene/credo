@@ -8,6 +8,7 @@
 
 ### New Checks
 
+- consistency/multi_alias_import_require_use
 - readability/single_pipe
 - readability/string_sigils
 - refactor/double_boolean_negation
