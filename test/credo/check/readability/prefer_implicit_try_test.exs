@@ -3,21 +3,6 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
 
   @described_check Credo.Check.Readability.PreferImplicitTry
 
-  test "it should report cases where a `try` block is the entire body of the function" do
-"""
-defmodule ModuleWithExplicitTry do
-  def failing_function(first) do
-    try do
-      to_string(first)
-    rescue
-      _ -> :rescued
-    end
-  end
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-  end
-
   test "it should NOT report implicit use of `try`" do
 """
 defmodule ModuleWithImplicitTry do
@@ -49,6 +34,23 @@ defmodule ModuleWithExplicitTry do
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
+  end
+
+
+
+  test "it should report cases where a `try` block is the entire body of the function" do
+"""
+defmodule ModuleWithExplicitTry do
+  def failing_function(first) do
+    try do
+      to_string(first)
+    rescue
+      _ -> :rescued
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
   end
 
 end
