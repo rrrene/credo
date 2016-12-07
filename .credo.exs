@@ -77,6 +77,7 @@
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
+        {Credo.Check.Readability.PreferImplictTry},
         {Credo.Check.Refactor.DoubleBooleanNegation},
 
         {Credo.Check.Refactor.ABCSize},
