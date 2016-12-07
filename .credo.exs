@@ -14,11 +14,11 @@
       # "default" is used.
       name: "default",
       #
-      # these are the files included in the analysis
+      # These are the files included in the analysis:
       files: %{
         #
-        # you can give explicit globs or simply directories
-        # in the latter case `**/*.{ex,exs}` will be used
+        # You can give explicit globs or simply directories.
+        # In the latter case `**/*.{ex,exs}` will be used.
         included: ["lib/", "src/", "web/", "apps/"],
         excluded: [~r"/_build/", ~r"/deps/"]
       },
@@ -77,7 +77,7 @@
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
-        {Credo.Check.Readability.PreferImplictTry},
+        {Credo.Check.Readability.PreferImplicitTry},
         {Credo.Check.Refactor.DoubleBooleanNegation},
 
         {Credo.Check.Refactor.ABCSize},
