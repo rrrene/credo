@@ -49,19 +49,16 @@ defmodule Credo.CLI.Output.Shell do
   end
 
   def handle_call({:warn, value}, _from, %{use_colors: true} = current_state) do
-    formatted_message = Bunt.format(value)
-    IO.puts(:stderr, formatted_message)
+    Bunt.warn(value)
 
     {:reply, nil, current_state}
   end
   def handle_call({:warn, value}, _from, %{use_colors: false} = current_state) do
-    formatted_message =
-      value
-      |> List.wrap
-      |> List.flatten
-      |> Enum.reject(&is_atom/1)
-
-    IO.puts(:stderr, formatted_message)
+    value
+    |> List.wrap
+    |> List.flatten
+    |> Enum.reject(&is_atom/1)
+    |> Bunt.warn
 
     {:reply, nil, current_state}
   end
