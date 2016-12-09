@@ -49,6 +49,12 @@ defmodule CredoSampleModule do
     props =
       if(valid?(username), do: [:authorized]) ++
       unless(admin?(username), do: [:restricted])
+
+    if (assocs != [] or prepare != []) and
+       Keyword.get(opts, :skip_transaction) != true and
+       function_exported?(adapter, :transaction, 3) do
+      some_fun()
+    end
   end
 end
 """ |> to_source_file
