@@ -47,8 +47,22 @@ end
     |> refute_issues(@described_check, ignore_specs: true)
   end
 
-  @tag :to_be_implemented
   test "it should NOT report a violation if strings are excluded" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  def some_fun do
+    IO.puts 1
+    "long string, right? 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 == 2"
+    IO.puts 2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, ignore_strings: true)
+  end
+
+  test "it should NOT report a violation if strings are excluded for heredocs" do
 """
 defmodule CredoSampleModule do
   use ExUnit.Case
@@ -62,7 +76,7 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    |> refute_issues(@described_check, ignore_multi_line_strings: true)
+    |> refute_issues(@described_check, ignore_strings: true)
   end
 
   test "it should NOT report a violation with config" do
