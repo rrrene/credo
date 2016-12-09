@@ -74,4 +74,19 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report cases where a `try` block is the entire body of macro definition" do
+"""
+defmodule ModuleWithExplicitTry do
+  defmacro failing_function(first) do
+    try do
+      to_string(unquote(first))
+    rescue
+      _ -> :rescued
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
 end

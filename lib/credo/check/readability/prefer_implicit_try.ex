@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
 
   @explanation [check: @moduledoc]
 
-  @def_ops [:def, :defp]
+  @def_ops [:def, :defp, :defmacro]
 
   use Credo.Check, base_priority: :low
 
