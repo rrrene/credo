@@ -2,9 +2,10 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   @moduledoc """
   When capturing a parameter using pattern matching you can either put the name before or after the value
   i.e.
+
     def parse({:ok, values} = pair)
 
-    or
+  or
 
     def parse(pair = {:ok, values})
 
