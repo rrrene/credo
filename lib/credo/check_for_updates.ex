@@ -65,7 +65,7 @@ defmodule Credo.CheckForUpdates do
   defp fetch(url) do
     :inets.start()
     :ssl.start()
-    response = :httpc.request(:get, {String.to_charlist(url),
+    response = :httpc.request(:get, {String.to_char_list(url),
                                     [{'User-Agent', user_agent()},
                                      {'Accept', 'application/vnd.hex+erlang'}]
                                     }, [], [])
@@ -74,7 +74,11 @@ defmodule Credo.CheckForUpdates do
   end
 
   defp user_agent do
-    'Credo/#{Credo.version} (Elixir/#{System.version}) (OTP/#{System.otp_release})'
+    'Credo/#{Credo.version} (Elixir/#{System.version}) (OTP/#{otp_release})'
+  end
+
+  defp otp_release do
+    :erlang.list_to_binary :erlang.system_info(:otp_release)
   end
 
   defp convert_response_body({:ok, {_status, _headers, body}}) do
