@@ -27,6 +27,8 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
 
   @explanation [check: @moduledoc]
 
+  @def_ops [:def, :defp, :defmacro]
+
   use Credo.Check, base_priority: :low
 
   def run(%SourceFile{} = source_file, params \\ []) do
@@ -35,8 +37,10 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:def, _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast, issues, issue_meta) do
-    {ast, issues ++ [issue_for(issue_meta, line_no)]}
+  for op <- @def_ops do
+    defp traverse({unquote(op), _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast, issues, issue_meta) do
+      {ast, issues ++ [issue_for(issue_meta, line_no)]}
+    end
   end
 
   defp traverse(ast, issues, _issue_meta) do
