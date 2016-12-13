@@ -95,6 +95,11 @@ defmodule CredoSampleModule do
       unquote(foo)
       |> bar
     end
+
+    block =
+      (options[:do] || contents[:do])
+      |> prewalk_block(name)
+      |> handler_builder(type)
   end
 end
 """ |> to_source_file

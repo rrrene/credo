@@ -30,7 +30,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   end
 
 
-  for atom <- [:%, :%{}, :.., :<<>>, :@, :__aliases__, :unquote, :{}, :&, :<>, :++, :--] do
+  for atom <- [:%, :%{}, :.., :<<>>, :@, :__aliases__, :unquote, :{}, :&, :<>, :++, :--, :&&, :||] do
     defp valid_chain_start?({unquote(atom), _meta, _arguments}, _excluded_functions) do
       true
     end
