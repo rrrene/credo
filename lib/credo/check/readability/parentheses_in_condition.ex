@@ -49,20 +49,35 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp check_for_opening_paren({:paren_identifier, _, if_or_unless}, _, {:arrow_op, _, :|>}) when if_or_unless in [:if, :unless] do
     false
   end
-  defp check_for_opening_paren({:paren_identifier, _, if_or_unless} = token, [{:"(", _} | t], _) when if_or_unless in [:if, :unless] do    
-    if(Enum.any?(collect_paren_children(t),&is_do?/1), do: false, else: token)
+  defp check_for_opening_paren({:paren_identifier, _, if_or_unless} = token, [{:"(", _} | t], _) when if_or_unless in [:if, :unless] do
+    if(Enum.any?(collect_paren_children(t),&is_do/1), do: false, else: token)
   end
   defp check_for_opening_paren(_, _, _), do: false
 
   # matches:  if( something ) do
   #                         ^^^^
-  defp check_for_closing_paren(token, {:do, _}, _, {:")", _}) do
-    token
+  defp check_for_closing_paren(start, {:do, _}, _tail, {:")", _}) do
+    start
+  end
+  # matches:  if( something ) == something_else do
+  #                           ^^
+  defp check_for_closing_paren(start, {:")", _}, [{:comp_op, _, _} | _tail], _prev_head) do
+    false
+  end
+  # matches:  if( something ) or something_else do
+  #                           ^^
+  defp check_for_closing_paren(start, {:")", _}, [{:or_op, _, _} | _tail], _prev_head) do
+    false
+  end
+  # matches:  if( something ) and something_else do
+  #                           ^^^
+  defp check_for_closing_paren(start, {:")", _}, [{:and_op, _, _} | _tail], _prev_head) do
+    false
   end
   # matches:  if( something ), do:
   #                         ^^
-  defp check_for_closing_paren(token, {:",", _}, _, {:")", _}) do
-    token
+  defp check_for_closing_paren(start, {:",", _}, _, {:")", _}) do
+    start
   end
   defp check_for_closing_paren(_, {:or_op, _, _}, [{:"(", _} | _], _) do
      false
@@ -73,13 +88,13 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp check_for_closing_paren(_, {:comp_op, _, _}, [{:"(", _} | _], _) do
      false
   end
-  defp check_for_closing_paren(start, token, [next_token | t], _prev_head) do
+  defp check_for_closing_paren(start, token, [next_token | t], prev_head) do
     check_for_closing_paren(start, next_token, t, token)
   end
   defp check_for_closing_paren(_, _, _, _), do: false
 
-  defp is_do?({_, _, :do}), do: true
-  defp is_do?(_), do: false
+  defp is_do({_, _, :do}), do: true
+  defp is_do(_), do: false
 
   defp collect_paren_children(x) do
     {_, children} = Enum.reduce(x, {0, []}, &collect_paren_child/2)

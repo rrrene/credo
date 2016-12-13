@@ -44,18 +44,19 @@ end
 
   test "it should NOT report expected code /2" do
 """
-defmodule CredoSampleModule do
-  def some_function(username) do
-    props =
-      if(valid?(username), do: [:authorized]) ++
-      unless(admin?(username), do: [:restricted])
-
-    if (assocs != [] or prepare != []) and
-       Keyword.get(opts, :skip_transaction) != true and
-       function_exported?(adapter, :transaction, 3) do
-      some_fun()
-    end
+props =
+  if(valid?(username), do: [:authorized]) ++
+  unless(admin?(username), do: [:restricted])
+""" |> to_source_file
+    |> refute_issues(@described_check)
   end
+
+  test "it should NOT report expected code /3" do
+"""
+if (assocs != [] or prepare != []) and
+   Keyword.get(opts, :skip_transaction) != true and
+   function_exported?(adapter, :transaction, 3) do
+  some_fun()
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
