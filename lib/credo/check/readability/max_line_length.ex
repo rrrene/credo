@@ -11,6 +11,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
       max_length: "The maximum number of characters a line may consist of.",
       ignore_definitions: "Set to `true` to ignore lines including function definitions.",
       ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
+      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs",
     ]
   ]
   @default_params [
@@ -33,10 +34,11 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
     definitions = Credo.Code.prewalk(ast, &find_definitions/2)
     specs = Credo.Code.prewalk(ast, &find_specs/2)
+    [_in_heredoc, strings] = Enum.reduce(lines, [false, []], &find_strings/2)
 
     Enum.reduce(lines, [], fn({line_no, line}, issues) ->
       if String.length(line) > max_length do
-        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, ignore_strings) do
+        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, strings, ignore_strings) do
           issues
         else
           [issue_for(line_no, max_length, line, issue_meta) | issues]
@@ -63,20 +65,45 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, specs}
   end
 
-  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, ignore_strings) do
-    ignore_definitions? =
-      fn -> if ignore_definitions, do: Enum.member?(definitions, line_no), else: false end
-
-    ignore_specs? =
-      fn -> if ignore_specs, do: Enum.member?(specs, line_no), else: false end
-
-    ignore_strings? = # TODO: implement ignore_strings check
-      fn -> if ignore_strings, do: false, else: false end
-
-    ignore_definitions?.() || ignore_specs?.() || ignore_strings?.()
+  defp find_strings({line_no, line}, [true, strings]) do
+    if heredoc_delimiter?(line) do
+      [false, strings]
+    else
+      [true, strings ++ [line_no]]
+    end
   end
 
+  defp find_strings({line_no, line}, [false, strings]) do
+    cond do
+      heredoc_delimiter?(line) ->
+        [true, strings]
+      string_literal?(line) ->
+        [false, strings ++ [line_no]]
+      true ->
+        [false, strings]
+    end
+  end
 
+  defp string_literal?(line) do
+    String.match?(line, ~r/\A\s*\\*\".+\\*\"\s*\z/)
+  end
+
+  defp heredoc_delimiter?(line) do
+    String.match?(line, ~r/\A\s*\\?\"\\?\"\\?\"\s*\z/)
+  end
+
+  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs, strings, ignore_strings) do
+    ignore_definitions? =
+      if ignore_definitions, do: Enum.member?(definitions, line_no), else: false
+
+    ignore_specs? =
+      if ignore_specs, do: Enum.member?(specs, line_no), else: false
+
+    ignore_strings? =
+      if ignore_strings, do: Enum.member?(strings, line_no), else: false
+
+    ignore_definitions? || ignore_specs? || ignore_strings?
+  end
 
   defp issue_for(line_no, max_length, line, issue_meta) do
     line_length = String.length(line)
