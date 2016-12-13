@@ -1,8 +1,8 @@
 defmodule Credo.Check.Readability.MaxLineLength do
   @moduledoc """
-    Checks for the length of lines.
+  Checks for the length of lines.
 
-    Ignores function definitions and (multi-)line strings by default.
+  Ignores function definitions and (multi-)line strings by default.
   """
 
   @explanation [

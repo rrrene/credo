@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
   @moduledoc """
   Module attribute names are always written in snake_case in Elixir.
 
-      # snake_case:
+      # snake_case
 
       @inbox_name "incoming"
 

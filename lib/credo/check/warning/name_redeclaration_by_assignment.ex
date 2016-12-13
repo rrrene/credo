@@ -3,16 +3,16 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
   The names of local variables should not be the same as names of functions
   or macros in the same module or in `Kernel`.
 
-    Example:
+  Example:
 
-        def handle_something do
-          time = 42
-          IO.puts time  # not clear if we are talking about time/0 or time
-        end
+      def handle_something do
+        time = 42
+        IO.puts time  # not clear if we are talking about time/0 or time
+      end
 
-        def time do
-          TimeHelper.now
-        end
+      def time do
+        TimeHelper.now
+      end
 
   This might not seem like a big deal, especially for small functions.
   But there is no downside to avoiding it, especially in the case of functions

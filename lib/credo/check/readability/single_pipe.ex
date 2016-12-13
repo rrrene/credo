@@ -18,7 +18,8 @@ defmodule Credo.Check.Readability.SinglePipe do
 
       evaluate(list)
 
-    Using a single |> to invoke functions makes the code harder to read. Instead, write a function call when a pipeline is only one function long.
+  Using a single |> to invoke functions makes the code harder to read. Instead,
+  write a function call when a pipeline is only one function long.
   """
 
   @explanation [check: @moduledoc]
