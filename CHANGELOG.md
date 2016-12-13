@@ -9,6 +9,8 @@
 ### New Checks
 
 - consistency/multi_alias_import_require_use
+- readability/no_parentheses_when_zero_arity
+- readability/redundant_blank_lines
 - readability/single_pipe
 - readability/string_sigils
 - refactor/double_boolean_negation
