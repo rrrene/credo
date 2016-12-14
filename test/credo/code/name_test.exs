@@ -79,10 +79,17 @@ defmodule Credo.Code.NameTest do
   end
 
 
-  test "returns full name when list containing module attribute provided" do
+  test "returns full name for list containing module attribute" do
     mod_list = [{:@, [line: 2], [{:credo_code, [line: 2], nil}]}, :Module]
 
     expected = "@credo_code.Module"
+    assert mod_list |> Name.full == expected
+  end
+
+  test "returns full name for list containing unquote" do
+    mod_list = [{:unquote, [line: 62], [{:credo_code, [line: 62], nil}]}, :Module]
+
+    expected = "unquote(credo_code).Module"
     assert mod_list |> Name.full == expected
   end
 

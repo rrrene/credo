@@ -63,6 +63,9 @@ defmodule Credo.Code.Name do
   def full({:@, _, [{name, _, nil}]}) when is_atom(name) do
     "@#{name}"
   end
+  def full({:unquote, _, [{name, _, nil}]}) when is_atom(name) do
+    "unquote(#{name})"
+  end
 
   def parts_count(module_name) do
     module_name
