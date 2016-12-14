@@ -29,15 +29,11 @@ defmodule Credo.Check do
       end
 
       def category do
-        default = unquote(category_body(opts[:category]))
-
-        default || :unknown
+        unquote(category_body(opts[:category]) || :unknown)
       end
 
       def elixir_version do
-        default = unquote(opts[:elixir_version])
-
-        default || ">= 0.0.1"
+        unquote(opts[:elixir_version] || ">= 0.0.1")
       end
 
       def run_on_all? do
