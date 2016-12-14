@@ -61,17 +61,17 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   end
   # matches:  if( something ) == something_else do
   #                           ^^
-  defp check_for_closing_paren(start, {:")", _}, [{:comp_op, _, _} | _tail], _prev_head) do
+  defp check_for_closing_paren(_start, {:")", _}, [{:comp_op, _, _} | _tail], _prev_head) do
     false
   end
   # matches:  if( something ) or something_else do
   #                           ^^
-  defp check_for_closing_paren(start, {:")", _}, [{:or_op, _, _} | _tail], _prev_head) do
+  defp check_for_closing_paren(_start, {:")", _}, [{:or_op, _, _} | _tail], _prev_head) do
     false
   end
   # matches:  if( something ) and something_else do
   #                           ^^^
-  defp check_for_closing_paren(start, {:")", _}, [{:and_op, _, _} | _tail], _prev_head) do
+  defp check_for_closing_paren(_start, {:")", _}, [{:and_op, _, _} | _tail], _prev_head) do
     false
   end
   # matches:  if( something ), do:
@@ -88,7 +88,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp check_for_closing_paren(_, {:comp_op, _, _}, [{:"(", _} | _], _) do
      false
   end
-  defp check_for_closing_paren(start, token, [next_token | t], prev_head) do
+  defp check_for_closing_paren(start, token, [next_token | t], _prev_head) do
     check_for_closing_paren(start, next_token, t, token)
   end
   defp check_for_closing_paren(_, _, _, _), do: false
