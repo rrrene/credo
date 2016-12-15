@@ -39,11 +39,12 @@ defmodule Credo.Check.Readability.StringSigils do
     {ast, issues}
   end
 
-  defp is_sigil(maybe_sigil) do
+  defp is_sigil(maybe_sigil) when is_atom(maybe_sigil) do
     maybe_sigil
     |> Atom.to_string
     |> String.starts_with?("sigil_")
   end
+  defp is_sigil(_), do: false
 
   defp issues_for_string_literal(string, maximum_allowed_quotes, issues, issue_meta, line_no) do
     if too_many_quotes?(string, maximum_allowed_quotes) do

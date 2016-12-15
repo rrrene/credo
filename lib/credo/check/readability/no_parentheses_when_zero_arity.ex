@@ -30,17 +30,22 @@ defmodule Credo.Check.Readability.NoParenthesesWhenZeroArity do
   end
   defp issues_for_definition({name, meta, _}, issues, issue_meta) do
     line_no = meta[:line]
-    source_file = IssueMeta.source_file(issue_meta)
-    line = SourceFile.line_at(source_file, line_no)
-    name_size = name |> to_string |> String.length
-    skip = SourceFile.column(source_file, line_no, name) + name_size - 1
-    rest = String.slice(line, skip..-1)
+    text = remaining_line_after(issue_meta, line_no, name)
 
-    if Regex.match?(~r/^\((\w*)\)(.)*/, rest) do
+    if String.match?(text, ~r/^\((\w*)\)(.)*/) do
       issues ++ [issue_for(issue_meta, line_no)]
     else
       issues
     end
+  end
+
+  defp remaining_line_after(issue_meta, line_no, text) do
+    source_file = IssueMeta.source_file(issue_meta)
+    line = SourceFile.line_at(source_file, line_no)
+    name_size = text |> to_string |> String.length
+    skip = (SourceFile.column(source_file, line_no, text) || -1) + name_size - 1
+
+    String.slice(line, skip..-1)
   end
 
   defp issue_for(issue_meta, line_no) do
