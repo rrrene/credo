@@ -34,6 +34,7 @@ defmodule CredoSampleModule do
     end
     boolean |> if(do: :ok, else: :error)
     boolean |> unless(do: :ok)
+    if(allowed_keyword?(a) || measured_unit?(a), do: a, else: "")
     if (thing && other_thing) || better_thing, do: something
     if !better_thing && (thing || other_thing), do: something_else
   end
