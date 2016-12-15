@@ -161,7 +161,7 @@ This also works for umbrella projects, where you can have individual `.credo.exs
 }
 ```
 
-Take a look at Credo's own `.credo.exs` for a [complete example configuration](https://github.com/rrrene/credo/blob/master/.credo.exs).
+You can use `mix credo gen.config` to generate a complete example configuration.
 
 
 ### Inline configuration via @lint attributes
