@@ -80,12 +80,12 @@
         {Credo.Check.Readability.ParenthesesInCondition},
         {Credo.Check.Readability.PredicateFunctionNames},
         {Credo.Check.Readability.RedundantBlankLines},
-        {Credo.Check.Readability.StringSigils},
+        # {Credo.Check.Readability.StringSigils}, # module does not exist in 0.5.3
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
-        {Credo.Check.Readability.PreferImplicitTry},
-        {Credo.Check.Refactor.DoubleBooleanNegation},
+        # {Credo.Check.Readability.PreferImplicitTry}, # module does not exist in 0.5.3
+        # {Credo.Check.Refactor.DoubleBooleanNegation}, # module does not exist in 0.5.3
 
         {Credo.Check.Refactor.ABCSize},
         # {Credo.Check.Refactor.CaseTrivialMatches}, # deprecated in 0.4.0
@@ -98,7 +98,7 @@
         {Credo.Check.Refactor.NegatedConditionsWithElse},
         {Credo.Check.Refactor.Nesting},
         {Credo.Check.Refactor.UnlessWithElse},
-        {Credo.Check.Refactor.VariableRebinding},
+        # {Credo.Check.Refactor.VariableRebinding}, # module does not exist in 0.5.3
 
         {Credo.Check.Warning.IExPry},
         {Credo.Check.Warning.IoInspect},
