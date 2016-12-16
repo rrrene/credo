@@ -25,6 +25,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   use Credo.Check, base_priority: :high, elixir_version: ">= 1.3.2"
 
+  @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     min_number = Params.get(params, :only_greater_than, @default_params)

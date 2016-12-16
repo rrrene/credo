@@ -4,6 +4,7 @@ defmodule Credo.Check.Runner do
   alias Credo.SourceFile
   alias Credo.Service.SourceFileIssues
 
+  @doc false
   def run(source_files, config) when is_list(source_files) do
     {_time_run_on_all, source_files_after_run_on_all} =
       :timer.tc fn ->
@@ -19,7 +20,6 @@ defmodule Credo.Check.Runner do
 
     {source_files, config}
   end
-
   def run(%SourceFile{} = source_file, config) do
     checks =
       config

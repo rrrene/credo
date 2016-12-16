@@ -31,6 +31,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
 
   use Credo.Check, base_priority: :high
 
+  @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

@@ -35,6 +35,7 @@ defmodule Credo.Check.Refactor.Nesting do
 
   use Credo.Check
 
+  @doc false
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_nesting = Params.get(params, :max_nesting, @default_params)

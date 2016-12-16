@@ -44,6 +44,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
 
   use Credo.Check
 
+  @doc false
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = Params.get(params, :max_complexity, @default_params)

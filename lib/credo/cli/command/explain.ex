@@ -12,6 +12,7 @@ defmodule Credo.CLI.Command.Explain do
 
   # TODO: explain used config options
 
+  @doc false
   def run(_args, %Config{help: true}), do: print_help()
   def run([], _), do: print_help()
   def run([file | _], config) do

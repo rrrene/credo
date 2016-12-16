@@ -37,6 +37,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
+  @doc false
   def run(source_files, params \\ []) when is_list(source_files) do
     {property_tuples, most_picked} =
       Helper.run_code_patterns(source_files, @code_patterns, params)

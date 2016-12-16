@@ -29,6 +29,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   use Credo.Check
 
+  @doc false
   def run(%SourceFile{ast: ast, filename: filename} = source_file, params \\ []) do
     if String.match?(filename, ~r/\.exs$/) do
       []

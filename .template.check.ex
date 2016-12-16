@@ -18,6 +18,7 @@ defmodule <%= @check_name %> do
   # you can configure the basics of your check via the `use Credo.Check` call
   use Credo.Check, base_priority: :high, category: :custom, exit_status: 0
 
+  @doc false
   def run(%SourceFile{ast: ast, lines: lines} = source_file, params \\ []) do
     # IssueMeta helps us pass down both the source_file and params of a check
     # run to the lower levels where issues are created, formatted and returned

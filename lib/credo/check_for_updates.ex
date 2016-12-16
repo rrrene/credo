@@ -1,6 +1,7 @@
 defmodule Credo.CheckForUpdates do
   alias Credo.CLI.Output.UI
 
+  @doc false
   def run() do
     "credo"
     |> fetch_all_hex_versions()

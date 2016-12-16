@@ -6,6 +6,7 @@ defmodule Credo.CLI.Command.GenConfig do
   @config_filename ".credo.exs"
   @default_config_file File.read!(@config_filename)
 
+  @doc false
   def run(_args, _config) do
     create_config_file(@config_filename)
 

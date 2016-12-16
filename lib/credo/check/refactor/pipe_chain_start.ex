@@ -8,6 +8,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
 
   use Credo.Check
 
+  @doc false
   def run(%SourceFile{ast: ast} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     excluded_functions = Params.get(params, :excluded_functions, @default_params)

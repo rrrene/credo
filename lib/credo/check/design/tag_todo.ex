@@ -23,6 +23,7 @@ defmodule Credo.Check.Design.TagTODO do
 
   use Credo.Check
 
+  @doc false
   def run(%SourceFile{source: source} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

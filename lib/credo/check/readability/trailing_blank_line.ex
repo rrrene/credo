@@ -8,6 +8,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
 
   use Credo.Check, base_priority: :low
 
+  @doc false
   def run(%SourceFile{lines: lines} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
