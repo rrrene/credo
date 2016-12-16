@@ -27,19 +27,19 @@ defmodule Credo.Check.Readability.Specs do
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    spec_names = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
+    specs = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, spec_names, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, specs, issue_meta))
   end
 
-  defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs) do
+  defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs) when is_list(args) do
     {ast, [{name, length(args)} | specs]}
   end
   defp find_specs(ast, issues) do
     {ast, issues}
   end
 
-  defp traverse({:def, meta, [{name, _, args} | _]} = ast, issues, specs, issue_meta) do
+  defp traverse({:def, meta, [{name, _, args} | _]} = ast, issues, specs, issue_meta) when is_list(args) do
     if {name, length(args)} in specs do
       {ast, issues}
     else
