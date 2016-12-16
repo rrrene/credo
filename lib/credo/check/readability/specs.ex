@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.MissingTypespecs do
+defmodule Credo.Check.Readability.Specs do
   @moduledoc """
   Functions, callbacks and macros need typespecs.
 
