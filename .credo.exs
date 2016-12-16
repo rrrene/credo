@@ -73,6 +73,7 @@
         {Credo.Check.Readability.FunctionNames},
         {Credo.Check.Readability.LargeNumbers},
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
+        {Credo.Check.Readability.MissingTypespecs, priority: :low},
         {Credo.Check.Readability.ModuleAttributeNames},
         {Credo.Check.Readability.ModuleDoc},
         {Credo.Check.Readability.ModuleNames},
