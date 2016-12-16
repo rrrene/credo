@@ -24,6 +24,13 @@ end
     end
   end
 """
+  @var_left_tuple """
+  defmodule Test do
+    def test(foo = {x, y, x}) do
+      nil
+    end
+  end
+"""
   @var_left_struct """
   defmodule Test do
     def test(foo = %Foo{hello: "world"}) do
@@ -42,6 +49,13 @@ end
   @var_right_list """
     defmodule Test do
       def test([x, y, x] = foo) do
+        nil
+      end
+    end
+  """
+  @var_right_tuple """
+    defmodule Test do
+      def test({x, y, x} = foo) do
         nil
       end
     end
@@ -65,31 +79,33 @@ end
   # cases NOT raising issues
   #
 
-  test "it should NOT report errors when variable decalrations are consistently on the left side" do
+  test "it should NOT report issues when variable decalrations are consistently on the left side" do
     [@var_left_map, @var_left_struct, @var_left_list]
     |> to_source_files
     |> refute_issues(@described_check)
   end
 
 
-  test "it should NOT report errors when variable decalrations are consistently on the right side" do
+  test "it should NOT report issues when variable decalrations are consistently on the right side" do
     [@var_right_map, @var_right_struct, @var_right_list]
     |> to_source_files
     |> refute_issues(@described_check)
   end
 
   test "it should NOT break when input has a function without bindings or private funs" do
-    module_with_fun_without_bindings = """
-    defmodule SurviveThisIfYouCan do
-      def start do
-        GenServer.start(__MODULE__, [])
-      end
+    module_with_fun_without_bindings =
+      """
+      defmodule SurviveThisIfYouCan do
+        def start do
+          GenServer.start(__MODULE__, [])
+        end
 
-      defp foo(bar) do
-        bar + 1
+        defp foo(bar) do
+          bar + 1
+        end
       end
-    end
-    """
+      """
+
     [module_with_fun_without_bindings]
     |> to_source_files
     |> refute_issues(@described_check)
@@ -99,20 +115,31 @@ end
   # cases raising issues
   #
 
-  test "it should report errors when variable decalrations are mixed on the left and right side when pattern matching" do
-    errors = [@left_and_right_mix]
-    |> to_source_files
-    |> assert_issues(@described_check)
+  test "it should report issues when variable declarations are mixed on the left and right side when pattern matching" do
+    issues =
+      [@left_and_right_mix]
+      |> to_source_files
+      |> assert_issues(@described_check)
 
-    assert 2 == Enum.count(errors)
+    assert 2 == Enum.count(issues)
   end
 
-  test "it should report errors when variable decalrations are inconsistent throughout sourcefiles" do
-    errors = [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_list]
-    |> to_source_files
-    |> assert_issues(@described_check)
+  test "it should report issues when variable decalrations are inconsistent throughout sourcefiles" do
+    issues =
+      [@var_right_map, @var_right_struct, @var_right_tuple, @var_right_list, @var_left_map, @var_left_tuple, @var_left_list]
+      |> to_source_files
+      |> assert_issues(@described_check)
 
-    assert 3 == Enum.count(errors)
+    assert 3 == Enum.count(issues)
+  end
+
+  test "it should report issues when variable decalrations are inconsistent throughout sourcefiles (preffering left side)" do
+    issues =
+      [@var_right_map, @var_right_struct, @var_right_list, @var_left_map, @var_left_struct, @var_left_tuple, @var_left_list]
+      |> to_source_files
+      |> assert_issues(@described_check)
+
+    assert 3 == Enum.count(issues)
   end
 
 end
