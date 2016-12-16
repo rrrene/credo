@@ -51,7 +51,7 @@ defmodule Credo.Check.Readability.Specs do
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "Functions should have a @spec type specification",
+      message: "Functions should have a @spec type specification.",
       trigger: trigger,
       line_no: line_no
   end
