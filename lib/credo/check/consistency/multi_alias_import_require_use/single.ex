@@ -16,6 +16,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Single do
       imports
       |> Enum.map(&(&1[:line_no]))
       |> Enum.max
-    PropertyValue.for(property_value, %{line_no: line_no, reuse_op: reuse_op, filename: filename, namespace: namespace})
+    PropertyValue.for(property_value(), %{line_no: line_no, reuse_op: reuse_op, filename: filename, namespace: namespace})
   end
 end

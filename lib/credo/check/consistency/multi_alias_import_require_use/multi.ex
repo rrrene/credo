@@ -12,6 +12,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Multi do
   end
 
   defp property_value_for_namespace(%{names: names, line_no: line_no, reuse_op: reuse_op}, filename) do
-    PropertyValue.for(property_value, %{line_no: line_no, filename: filename, names: names, reuse_op: reuse_op})
+    PropertyValue.for(property_value(), %{line_no: line_no, filename: filename, names: names, reuse_op: reuse_op})
   end
 end
