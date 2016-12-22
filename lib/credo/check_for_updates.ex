@@ -75,7 +75,7 @@ defmodule Credo.CheckForUpdates do
   end
 
   defp user_agent do
-    'Credo/#{Credo.version} (Elixir/#{System.version}) (OTP/#{otp_release})'
+    'Credo/#{Credo.version} (Elixir/#{System.version}) (OTP/#{otp_release()})'
   end
 
   defp otp_release do
