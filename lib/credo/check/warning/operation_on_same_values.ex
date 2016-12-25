@@ -13,7 +13,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
       y / y   # always returns 1
       y - y   # always returns 0
 
-  In pratice they are likely the result of a debugging session or were made by
+  In practice they are likely the result of a debugging session or were made by
   mistake.
   """
 
