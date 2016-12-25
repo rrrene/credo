@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
       x * 1   # always returns x
       x * 0   # always returns 0
 
-  In pratice they are likely the result of a debugging session or were made by
+  In practice they are likely the result of a debugging session or were made by
   mistake.
   """
 
