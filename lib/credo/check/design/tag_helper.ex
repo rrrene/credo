@@ -4,7 +4,7 @@ defmodule Credo.Check.Design.TagHelper do
   alias Credo.Check.CodeHelper
 
   def tags(source, tag_name) do
-    {:ok, regex} = Regex.compile("[^\?]?#\s*#{tag_name}:?\s*.+", "i")
+    {:ok, regex} = Regex.compile("(\A|[^\?])#\s*#{tag_name}:?\s*.+", "i")
 
     source
     |> CodeHelper.clean_strings_and_sigils
