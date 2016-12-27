@@ -39,6 +39,48 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report an issue when not indented" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case # FIXME: this should not appear in the TODO test
+
+# TODO: this should appear
+
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report an issue when no spaces" do
+"""
+defmodule CredoSampleModule do
+  #TODO: this should appear
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report an issue with more spaces after #" do
+"""
+defmodule CredoSampleModule do
+  #       TODO: this should appear
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report an issue with more spaces after tag" do
+"""
+defmodule CredoSampleModule do
+  # TODO:         this should appear
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report an issue at the end of a line w/o space" do
 """
 defmodule CredoSampleModule do
