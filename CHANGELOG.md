@@ -5,6 +5,7 @@
 - Do not warn about ParenthesesInCondition in one-line `if` call
 - Add `--no-strict` CLI switch
 - Fixed exit status for `mix credo list`
+- Fixed exclusion of checks set to `low` priority
 
 ### New Checks
 
