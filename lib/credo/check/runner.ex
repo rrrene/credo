@@ -121,13 +121,20 @@ defmodule Credo.Check.Runner do
       check.run(source_file, params)
     rescue
       error ->
-        UI.warn("Error while running #{check} on #{source_file.filename}")
+        warn_about_failed_run(check, source_file)
         if config.crash_on_error do
           reraise error, System.stacktrace()
         else
           []
         end
     end
+  end
+
+  defp warn_about_failed_run(check, %SourceFile{} = source_file) do
+    UI.warn("Error while running #{check} on #{source_file.filename}")
+  end
+  defp warn_about_failed_run(check, _) do
+    UI.warn("Error while running #{check}")
   end
 
   defp run_on_all_check?({check}), do: check.run_on_all?
