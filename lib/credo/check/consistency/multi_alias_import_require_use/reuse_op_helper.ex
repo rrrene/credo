@@ -9,12 +9,14 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
     |> Credo.Code.postwalk(&multi_names_only/2)
     |> Enum.uniq
   end
+  def multi_names(_), do: []
 
   def single_names({:defmodule, _, _arguments} = ast) do
     ast
     |> Credo.Code.postwalk(&single_names_only/2)
     |> Enum.uniq
   end
+  def single_names(_), do: []
 
   def multiple_single_names(ast) do
     ast

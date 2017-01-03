@@ -60,6 +60,9 @@ defmodule Credo.Code.Name do
   def full(name) when is_binary(name) do
     name
   end
+  def full({{:., _, [{:__aliases__, _, mod_list}, name]}, _, _}) do
+    full([full(mod_list), name])
+  end
   def full({:@, _, [{name, _, nil}]}) when is_atom(name) do
     "@#{name}"
   end
