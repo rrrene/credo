@@ -99,5 +99,7 @@ defmodule Credo.CLI.Command.List do
     UI.puts(description)
     UI.puts(example)
     UI.puts(options)
+
+    :ok
   end
 end

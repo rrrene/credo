@@ -100,5 +100,7 @@ defmodule Credo.CLI.Command.Suggest do
     UI.puts(description)
     UI.puts(example)
     UI.puts(options)
+
+    :ok
   end
 end

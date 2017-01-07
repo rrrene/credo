@@ -89,5 +89,7 @@ defmodule Credo.CLI.Command.Explain do
     UI.puts(description)
     UI.puts(example)
     UI.puts(options)
+
+    :ok
   end
 end
