@@ -61,6 +61,8 @@ defmodule Credo.CLI.Command.Help do
       ]
 
     UI.puts(example)
+
+    :ok
   end
 
   def color_for("#"), do: [:faint]
