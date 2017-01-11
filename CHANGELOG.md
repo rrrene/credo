@@ -13,6 +13,7 @@
 - readability/no_parentheses_when_zero_arity
 - readability/redundant_blank_lines
 - readability/single_pipe
+- readability/specs
 - readability/string_sigils
 - refactor/double_boolean_negation
 - refactor/variable_rebinding
