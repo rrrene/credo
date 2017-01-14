@@ -66,7 +66,7 @@ defmodule Credo.Check.Runner do
     checks =
       Enum.reject(config.checks, fn
         ({check}) -> check.base_priority < below_priority
-        ({check, false}) -> true
+        ({_check, false}) -> true
         ({check, opts}) ->
           (opts[:priority] || check.base_priority) < below_priority
       end)
@@ -119,7 +119,11 @@ defmodule Credo.Check.Runner do
   end
   defp run_check({check, params}, source_file, config) do
     try do
-      check.run(source_file, params)
+      if excluded_for_check(source_file, params) do
+        []
+      else
+        check.run(source_file, params)
+      end
     rescue
       error ->
         warn_about_failed_run(check, source_file)
@@ -128,6 +132,13 @@ defmodule Credo.Check.Runner do
         else
           []
         end
+    end
+  end
+
+  defp excluded_for_check(source_file, params) do
+    case Keyword.pop(params, :excluded) do
+      {nil, _} -> false
+      {pattern, _} -> Regex.match?(pattern, source_file.filename)
     end
   end
 
