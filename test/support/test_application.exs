@@ -1,8 +1,6 @@
 defmodule Credo.Test.FilenameGenerator do
   use GenServer
 
-  @table_name __MODULE__
-
   def start_link(opts \\ []) do
     {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end

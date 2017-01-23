@@ -19,9 +19,6 @@ defmodule Credo.Code do
     This is an internal Issue raised by Credo when it finds itself unable to
     parse the source code in a file.
     """
-
-    @explanation []
-    #use Credo.Check, category: :error, base_priority: :normal
   end
 
   @doc """

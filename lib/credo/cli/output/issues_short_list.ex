@@ -6,8 +6,6 @@ defmodule Credo.CLI.Output.IssuesShortList do
   alias Credo.SourceFile
   alias Credo.Issue
 
-  @indent 8
-
   @doc "Called before the analysis is run."
   def print_before_info(source_files, config) do
     case Enum.count(source_files) do

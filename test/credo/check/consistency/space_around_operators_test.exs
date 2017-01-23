@@ -128,18 +128,6 @@ defmodule OtherModule3 do
   end
 end
 """
-  @with_and_without_spaces2 """
-defmodule OtherModule3 do
-  defmacro foo do
-    3+4
-  end
-
-  defp bar do
-    [3 /4]
-    |> my_func(&Some.Deep.Module.is_something/1)
-  end
-end
-"""
 
   #
   # cases NOT raising issues

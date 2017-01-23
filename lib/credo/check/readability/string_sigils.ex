@@ -5,15 +5,15 @@ defmodule Credo.Check.Readability.StringSigils do
 
       # okay
 
-      "<a href=\"http://elixirweekly.net\">#{text}</a>"
+      "<a href=\"http://elixirweekly.net\">#\{text}</a>"
 
       # not okay, lots of escaped quotes
 
-      "<a href=\"http://elixirweekly.net\" target=\"_blank\">#{text}</a>"
+      "<a href=\"http://elixirweekly.net\" target=\"_blank\">#\{text}</a>"
 
       # refactor to
 
-      ~S(<a href="http://elixirweekly.net" target="_blank">#{text}</a>)
+      ~S(<a href="http://elixirweekly.net" target="_blank">#\{text}</a>)
 
   This allows us to remove the noise which results from the need to escape
   quotes within quotes.

@@ -15,8 +15,6 @@ defmodule Credo.Check.CodeHelper do
   alias Credo.Service.SourceFileWithoutStringAndSigils
   alias Credo.SourceFile
 
-  @def_ops [:def, :defp, :defmacro]
-
   defdelegate do_block?(ast), to: Block, as: :do_block?
   defdelegate do_block_for!(ast), to: Block, as: :do_block_for!
   defdelegate do_block_for(ast), to: Block, as: :do_block_for

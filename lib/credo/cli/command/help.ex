@@ -7,8 +7,6 @@ defmodule Credo.CLI.Command.Help do
   @starting_order [:suggest, :explain]
   @ending_order [:help]
 
-  @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
-
   alias Credo.CLI
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
