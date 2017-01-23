@@ -2,13 +2,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @moduledoc """
   There should be no white-space (i.e. tabs, spaces) at the end of a line.
 
-  One of the reason for avoiding trailing white space is they cuould produce
-  bugs difficult to find.
-
-  Some editor include seeting for removing it automatically.
-
-  - For Sublime users, set the trim_trailing_white_space_on_save option to true.
-  - For Atom you could install the whitespace package
+  Most text editors provide a way to remove them automatically.
   """
 
   @explanation [check: @moduledoc]
