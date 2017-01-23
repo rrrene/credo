@@ -25,7 +25,6 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     consistency: "Consistency",
   ]
   @many_source_files 60
-  @indent 8
   @per_category 5
 
   @doc "Called before the analysis is run."

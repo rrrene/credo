@@ -1,6 +1,4 @@
 defmodule Credo.Check.Design.TagHelper do
-  @explanation ""
-
   alias Credo.Check.CodeHelper
 
   def tags(source, tag_name) do

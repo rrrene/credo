@@ -66,7 +66,7 @@ defmodule Credo.Check.Runner do
     checks =
       Enum.reject(config.checks, fn
         ({check}) -> check.base_priority < below_priority
-        ({check, false}) -> true
+        ({_check, false}) -> true
         ({check, opts}) ->
           (opts[:priority] || check.base_priority) < below_priority
       end)

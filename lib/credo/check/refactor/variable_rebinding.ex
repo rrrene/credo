@@ -30,9 +30,6 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     check: @moduledoc
   ]
 
-  @def_ops [:def, :defp, :defmacro]
-  @nest_ops [:if, :unless, :case, :cond, :fn]
-
   alias Credo.Check.CodeHelper
 
   use Credo.Check

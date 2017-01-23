@@ -1,5 +1,4 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
-  @explanation ""
   @def_ops [:def, :defp, :defmacro]
   @block_ops [:if, :unless, :case, :quote, :try, :after, :rescue]
 
