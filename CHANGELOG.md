@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 (pre)
+## 0.6.0
 
 - Do not warn about ParenthesesInCondition in one-line `if` call
 - Add `--no-strict` CLI switch
