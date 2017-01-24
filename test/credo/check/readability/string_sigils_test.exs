@@ -75,7 +75,6 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> refute_issues(@described_check)
   end
 
-
   #
   # cases raising issues
   #
