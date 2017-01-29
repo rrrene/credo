@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.StringSigils do
-  @moduledoc """
+  @moduledoc ~S"""
   If you used quoted strings that contain quotes, you might want to consider
   switching to the use of sigils instead.
 
