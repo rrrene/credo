@@ -31,7 +31,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   @doc false
   def run(%SourceFile{ast: ast, filename: filename} = source_file, params \\ []) do
-    if String.match?(filename, ~r/\.exs$/) do
+    if Path.extname(filename) == ".exs" do
       []
     else
       issue_meta = IssueMeta.for(source_file, params)
