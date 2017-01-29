@@ -6,7 +6,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
   #
   # cases NOT raising issues
   #
-  @tag :to_be_implemented
+
   test "it should NOT report expected code" do
 """
 defmodule CredoSampleModule do
@@ -25,7 +25,7 @@ end
   #
   # cases raising issues
   #
-  @tag :to_be_implemented
+
   test "it should report a violation" do
 """
 defmodule CredoSampleModule do
@@ -42,7 +42,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  @tag :to_be_implemented
+
   test "it should report a violation /2" do
 """
 defmodule CredoSampleModule do
@@ -58,7 +58,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  @tag :to_be_implemented
+
   test "it should report a violation /3" do
 """
 defmodule CredoSampleModule do
