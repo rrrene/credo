@@ -22,6 +22,22 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code 2" do
+"""
+defmodule CredoSampleModule do
+def some_function(parameter1, parameter2) do
+  IO.inspect parameter1 + parameter2
+
+    %{}
+    |> Map.get(:foo, [])
+    |> Enum.each(&IO.puts/1)
+
+end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+    end
+
   #
   # cases raising issues
   #
