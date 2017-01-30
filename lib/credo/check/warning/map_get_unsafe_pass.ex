@@ -46,7 +46,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     pipewalk(left) ++ pipewalk(List.first(right))
   end
 
-  defp pipewalk({{:., _, [{:__aliases__, _, [namespace]}, callable]} = ast, _, args}) do
+  defp pipewalk({{:., _, [{:__aliases__, _, [_namespace]}, _callable]} = ast, _, args}) do
     [{to_function_call_name(ast), args}]
   end
 
