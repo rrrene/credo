@@ -29,12 +29,12 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:|>, meta , [left | right]} = ast, [] = issues, issue_meta) do
+  defp traverse({:|>, _meta , [left | right]} = ast, [] = issues, issue_meta) do
     order = pipewalk(left) ++ pipewalk(List.first(right))
 
-    {ast, case is_unsafe?(order) do
-            true -> issues_for_call(meta, issues, issue_meta)
-            false -> issues
+    {ast, case unsafe_lines(order) do
+            [] -> issues
+            found_issues -> issues ++ Enum.map(found_issues, fn x -> issues_for_call([line: x], issues, issue_meta) end)
           end}
   end
 
@@ -46,28 +46,33 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     pipewalk(left) ++ pipewalk(List.first(right))
   end
 
-  defp pipewalk({{:., _, [{:__aliases__, _, [_namespace]}, _callable]} = ast, _, args}) do
-    [{to_function_call_name(ast), args}]
+  defp pipewalk({{:., meta, [{:__aliases__, _, [_namespace]}, _callable]} = ast, _, args}) do
+    [{to_function_call_name(ast), args, meta[:line]}]
   end
 
-  defp pipewalk({value, _meta, args} = _ast) when is_atom(value),  do: [{value, args}]
-  defp pipewalk({value, _meta, []} = _ast),  do: [{value}]
-  defp pipewalk({value, _meta, nil} = _ast), do: [{value}]
+  defp pipewalk({value, meta, args} = _ast) when is_atom(value),  do: [{value, args, meta[:line]}]
+  defp pipewalk({value, meta, []} = _ast),  do: [{value, meta[:line]}]
+  defp pipewalk({value, meta, nil} = _ast), do: [{value, meta[:line]}]
 
-  defp is_unsafe?(expression) do
+  defp unsafe_lines(expression) do
+    # The last expression inside the pipe doesn't really matter
     len = Enum.count(expression) - 1
-    {_, [{head, head_arguments} | expression]} = List.pop_at(expression, len)
+    {_, [head | pipe]} = List.pop_at(expression, len)
 
-    unsafe_head = (head == "Map.get" and length(head_arguments) != 3)
+    unsafe_head = case head do
+                    {"Map.get", args, line} when length(args) != 3 -> [line]
+                    _ -> []
+                  end
 
-    check = fn x ->
-              case x do
-               {"Map.get", [_]} -> true
-               _ -> false
-              end
-            end
+    tail_mapper = fn x, acc ->
+                    case x do
+                      {"Map.get", [_], line} -> acc ++ [line]
+                      _ -> acc
+                    end
+                  end
 
-    true in Enum.map(expression, check) or unsafe_head
+    unsafe_tail = List.foldl(pipe, [], tail_mapper)
+    unsafe_head ++ unsafe_tail
   end
 
   def issues_for_call(meta, issues, issue_meta) do
