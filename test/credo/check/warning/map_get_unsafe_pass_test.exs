@@ -49,8 +49,7 @@ defmodule CredoSampleModule do
 
     %{}
     |> Map.get(:foo)
-    |> Map.put(:bar, "123")
-    |> Enum.each(&IO.puts/1)
+    |> Enum.sum
 
   end
 end
