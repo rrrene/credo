@@ -130,7 +130,7 @@ defmodule Credo.Check do
       exit_status: exit_status
     }
     |> add_line_no_options(line_no, source_file)
-    |> add_custom_column(trigger, line_no, column, source_file)
+    |> add_column_if_missing(trigger, line_no, column, source_file)
     |> add_check_and_category(check, issue_category)
   end
 
@@ -142,7 +142,7 @@ defmodule Credo.Check do
     }
   end
 
-  defp add_custom_column(issue, trigger, line_no, column, source_file) do
+  defp add_column_if_missing(issue, trigger, line_no, column, source_file) do
     if trigger && line_no && !column do
       %Issue{
         issue |
