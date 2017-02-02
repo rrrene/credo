@@ -1,6 +1,22 @@
 defmodule Credo.Check.Readability.NoParenthesesWhenZeroArity do
   @moduledoc """
-  Do not write parentheses when function receives no arguments
+  Do not use parentheses when defining a function which has no arguments.
+
+  The code in this example ...
+
+      def summer?() do
+        # ...
+      end
+
+  ... should be refactored to look like this:
+
+      def summer? do
+        # ...
+      end
+
+  Like all `Readability` issues, this one is not a technical concern.
+  But you can improve the odds of others reading and liking your code by making
+  it easier to follow.
   """
 
   @explanation [check: @moduledoc]
@@ -51,7 +67,7 @@ defmodule Credo.Check.Readability.NoParenthesesWhenZeroArity do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Do not write parentheses when function receives no arguments.",
+      message: "Do not use parentheses when defining a function which has no arguments.",
       line_no: line_no
   end
 end
