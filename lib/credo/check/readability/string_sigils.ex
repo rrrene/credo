@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.StringSigils do
-  @moduledoc """
+  @moduledoc ~S"""
   If you used quoted strings that contain quotes, you might want to consider
   switching to the use of sigils instead.
 
@@ -62,11 +62,17 @@ defmodule Credo.Check.Readability.StringSigils do
   defp is_sigil(_), do: false
 
   defp issues_for_string_literal(string, maximum_allowed_quotes, issues, issue_meta, line_no) do
-    if too_many_quotes?(string, maximum_allowed_quotes) do
+    if !is_heredoc(issue_meta, line_no) && too_many_quotes?(string, maximum_allowed_quotes) do
       [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
     else
       issues
     end
+  end
+
+  defp is_heredoc({_, source_file, _}, line_no) do
+    lines = source_file.lines
+    {_, line} = Enum.find(lines, fn {n, _} -> n == line_no end)
+    Regex.match?(~r/"""$/, line)
   end
 
   defp too_many_quotes?(string, limit) do
