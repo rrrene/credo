@@ -20,7 +20,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   @explanation [check: @moduledoc]
   @call_string "Map.get/2"
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, base_priority: :normal
 
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do
