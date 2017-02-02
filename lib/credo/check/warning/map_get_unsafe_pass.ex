@@ -53,8 +53,8 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   end
 
   defp pipewalk({value, meta, args} = _ast) when is_atom(value),  do: [{value, args, meta[:line]}]
-  defp pipewalk({value, meta, []} = _ast),  do: [{value, meta[:line]}]
-  defp pipewalk({value, meta, nil} = _ast), do: [{value, meta[:line]}]
+  defp pipewalk({value, meta, []} = _ast),  do: [{value, [], meta[:line]}]
+  defp pipewalk({value, meta, nil} = _ast), do: [{value, [], meta[:line]}]
   defp pipewalk(any_literal),               do: [{any_literal, [], nil}]
 
   defp unsafe_lines(expression) do
