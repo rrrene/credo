@@ -47,7 +47,7 @@ defmodule Credo.SourceFile do
 
   NOTE: Both +line_no+ and the returned index are 1-based.
   """
-  def column(source_file, line_no, trigger) do
+  def column(source_file, line_no, trigger) when is_binary(trigger) or is_atom(trigger) do
     line = line_at(source_file, line_no)
     regexed =
       trigger
@@ -62,6 +62,7 @@ defmodule Credo.SourceFile do
         col + 1
     end
   end
+  def column(_, _, _), do: nil
 
   defp with_ast(%Credo.SourceFile{} = source_file) do
     case Credo.Code.ast(source_file) do
