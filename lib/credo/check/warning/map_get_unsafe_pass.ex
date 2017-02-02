@@ -29,13 +29,15 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:|>, _meta , [left | right]} = ast, [] = issues, issue_meta) do
+  defp traverse({:|>, meta , [left | right]} = ast, [] = issues, issue_meta) do
     order = pipewalk(left) ++ pipewalk(List.first(right))
 
-    {ast, case unsafe_lines(order) do
-            [] -> issues
-            found_issues -> issues ++ Enum.map(found_issues, fn x -> issues_for_call([line: x], issues, issue_meta) end)
-          end}
+    pipe_issues = order
+                  |> unsafe_lines
+                  |> Enum.map(fn x -> issues_for_call([line: x || meta[:line]], issues, issue_meta) end)
+                  |> List.flatten
+
+    {ast, issues ++ pipe_issues}
   end
 
   defp traverse(ast, issues, _issue_meta) do
@@ -53,11 +55,11 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   defp pipewalk({value, meta, args} = _ast) when is_atom(value),  do: [{value, args, meta[:line]}]
   defp pipewalk({value, meta, []} = _ast),  do: [{value, meta[:line]}]
   defp pipewalk({value, meta, nil} = _ast), do: [{value, meta[:line]}]
+  defp pipewalk(any_literal),               do: [{any_literal, [], nil}]
 
   defp unsafe_lines(expression) do
     # The last expression inside the pipe doesn't really matter
-    len = Enum.count(expression) - 1
-    {_, [head | pipe]} = List.pop_at(expression, len)
+    [head | pipe] = Enum.drop(expression, -1)
 
     unsafe_head = case head do
                     {"Map.get", args, line} when length(args) != 3 -> [line]
@@ -65,13 +67,13 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
                   end
 
     tail_mapper = fn x, acc ->
-                    case x do
-                      {"Map.get", [_], line} -> acc ++ [line]
-                      _ -> acc
+                    acc ++ case x do
+                      {"Map.get", [_], line} -> [line]
+                      _ -> []
                     end
                   end
 
-    unsafe_tail = List.foldl(pipe, [], tail_mapper)
+    unsafe_tail = Enum.reduce(pipe, [], tail_mapper)
     unsafe_head ++ unsafe_tail
   end
 
