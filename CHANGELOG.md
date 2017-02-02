@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+
+- Fixed false positives for `StringSigils` in heredocs
+- Fixed a bug in `SourceFile.column`
+
 ## 0.6.0
 
 - Do not warn about ParenthesesInCondition in one-line `if` call
