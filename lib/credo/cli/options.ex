@@ -5,26 +5,18 @@ defmodule Credo.CLI.Options do
             unknown_switches: nil,
             unknown_args: nil
 
-  # %Credo.CLI.Options{
-  #   command: "suggest", # based on collection of commands
-  #   given_directory: "",
-  #   given_switches: %{
-  #     based_on: :@switches,
-  #   },
-  #   unknown_switches: [],
-  #   unknown_args: []
-  # }
-
   @switches [
-    all: :boolean,
     all_priorities: :boolean,
+    all: :boolean,
     checks: :string,
     color: :boolean,
     crash_on_error: :boolean,
     format: :string,
     help: :boolean,
     ignore_checks: :string,
+    ignore: :string,
     min_priority: :integer,
+    only: :string,
     read_from_stdin: :boolean,
     strict: :boolean,
     verbose: :boolean,
@@ -43,7 +35,7 @@ defmodule Credo.CLI.Options do
   def parse(argv, dir, command_names) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)
-    |> parse_result(dir)
+    |> parse_result(dir, command_names)
   end
 
   defp parse_result({switches_keywords, args, unknown_switches_keywords}, dir, command_names) do
@@ -58,19 +50,33 @@ defmodule Credo.CLI.Options do
     }
   end
 
-  defp split_args(tail, dir, command_names) when command in command_names do
-    command = "TODO"
-    {path, unknown_args} = extract_path(tail, dir)
+  defp split_args([], dir, _) do
+      {path, unknown_args} = extract_path([], dir)
 
-    {command, path, unknown_args}
+      {nil, path, unknown_args}
+  end
+  defp split_args([head | tail] = args, dir, command_names) do
+    if Enum.member?(command_names, head) do
+      {path, unknown_args} = extract_path(tail, dir)
+
+      {head, path, unknown_args}
+    else
+      {path, unknown_args} = extract_path(args, dir)
+
+      {nil, path, unknown_args}
+    end
   end
 
-  def extract_path([], base_dir) do
+  defp extract_path([], base_dir) do
     {base_dir, []}
   end
-  def extract_path([head | tail], base_dir) do
+  defp extract_path([head | tail] = args, base_dir) do
     path = Path.join(base_dir, head)
 
-    {path, tail}
+    if File.exists?(path) or path =~ ~r/[\?\*]/ do
+      {path, tail}
+    else
+      {base_dir, args}
+    end
   end
 end

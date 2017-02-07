@@ -12,45 +12,13 @@ defmodule Credo.CLI do
   alias Credo.Config
   alias Credo.Sources
   alias Credo.CLI.Filename
+  alias Credo.CLI.Options
   alias Credo.CLI.Switches
   alias Credo.CLI.Output.UI
+  alias Credo.Service.Commands
 
   @default_dir "."
   @default_command_name "suggest"
-  @command_map %{
-    "categories" => Credo.CLI.Command.Categories,
-    "explain" => Credo.CLI.Command.Explain,
-    "gen.check" => Credo.CLI.Command.GenCheck,
-    "gen.config" => Credo.CLI.Command.GenConfig,
-    "help" => Credo.CLI.Command.Help,
-    "list" => Credo.CLI.Command.List,
-    "suggest" => Credo.CLI.Command.Suggest,
-    "version" => Credo.CLI.Command.Version,
-  }
-  @switches [
-    all: :boolean,
-    all_priorities: :boolean,
-    checks: :string,
-    color: :boolean,
-    crash_on_error: :boolean,
-    format: :string,
-    help: :boolean,
-    ignore_checks: :string,
-    min_priority: :integer,
-    read_from_stdin: :boolean,
-    strict: :boolean,
-    verbose: :boolean,
-    version: :boolean
-  ]
-  @aliases [
-    a: :all,
-    A: :all_priorities,
-    c: :checks,
-    C: :config_name,
-    h: :help,
-    i: :ignore_checks,
-    v: :version
-  ]
 
   @doc false
   def main(argv) do
@@ -62,9 +30,6 @@ defmodule Credo.CLI do
     |> halt_if_failed()
   end
 
-  @doc "Returns a List with the names of all commands."
-  def commands, do: Map.keys(@command_map)
-
   @doc """
   Returns the module of a given `command`.
 
@@ -72,25 +37,27 @@ defmodule Credo.CLI do
       Credo.CLI.Command.Help
   """
   def command_for(nil), do: nil
-  def command_for(command) when is_atom(command) do
-    command_modules = Map.values(@command_map)
-
-    if Enum.member?(command_modules, command) do
-      command
+  def command_for(command_mod) when is_atom(command_mod) do
+    if Enum.member?(Commands.modules, command_mod) do
+      command_mod
     else
       nil
     end
   end
-  def command_for(command) when is_binary(command) do
-    if Enum.member?(commands(), command) do
-      @command_map[command]
+  def command_for(command_name) when is_binary(command_name) do
+    if Enum.member?(Commands.names, command_name) do
+      Commands.get(command_name)
     else
       nil
     end
   end
 
-  defp run(argv) do
-    {command_mod, dir, config} = parse_options(argv)
+  defp run(argv) when is_list(argv) do
+    argv
+    |> parse_options()
+    |> run()
+  end
+  defp run({:ok, command_mod, dir, config}) do
     UI.use_colors(config.color)
 
     if config.check_for_updates, do: Credo.CheckForUpdates.run()
@@ -98,6 +65,35 @@ defmodule Credo.CLI do
     require_requires(config)
 
     command_mod.run(dir, config)
+  end
+  defp run({:error, options, config}) do
+    UI.use_colors(config.color)
+
+    if options.unknown_args != [] do
+      args =
+        options.unknown_args
+        |> Enum.map(&inspect/1)
+        |> Enum.join(", ")
+
+      UI.warn "Unknown arguments: #{args}"
+    end
+
+    if options.unknown_switches != [] do
+      UI.warn "Unknown switches:"
+      options.unknown_switches
+      |> Enum.each(&print_switch/1)
+    end
+
+    :error
+  end
+
+  defp print_switch({name, _value}) do
+    print_switch(name)
+  end
+  defp print_switch(name) do
+    name
+    |> String.pad_leading(8)
+    |> UI.warn
   end
 
   # Requires the additional files specified in the config.
@@ -107,45 +103,38 @@ defmodule Credo.CLI do
     |> Enum.each(&Code.require_file/1)
   end
 
-  defp parse_options(argv) do
-    {switches_kw, args, []} =
-      OptionParser.parse(argv, switches: @switches, aliases: @aliases)
+  defp parse_options(argv) when is_list(argv) do
+    options = Options.parse(argv, File.cwd!, Commands.names)
+    config = to_config(options.path, options.switches)
 
-    {command_name, given_directory, args} =
-      case args |> List.first |> command_for() do
-        nil ->
-          {nil, Enum.at(args, 0), args}
-        command_name ->
-          {command_name, Enum.at(args, 1), Enum.slice(args, 1..-1)}
-      end
-
-    dir = given_directory || @default_dir
-    switches = Enum.into(switches_kw, %{})
-    config = to_config(dir, switches)
-
-    command_name_dir_config(command_name, args, config)
+    options
+    |> set_command_in_options(config)
+    |> validate_options(config)
   end
 
-  defp command_name_dir_config(nil, args, %Config{help: true} = config) do
-    command_name_dir_config("help", args, config)
+  defp validate_options(%Options{unknown_args: [], unknown_switches: []} = options, config) do
+    {:ok, command_for(options.command), options.path, config}
   end
-  defp command_name_dir_config(nil, args, %Config{version: true} = config) do
-    command_name_dir_config("version", args, config)
+  defp validate_options(options, config) do
+    {:error, options, config}
   end
-  defp command_name_dir_config(nil, [], config) do
-    command_name_dir_config(@default_command_name, [], config)
+
+  defp set_command_in_options(%Options{command: nil} = options, %Config{help: true}) do
+    %Options{options | command: "help"}
   end
-  defp command_name_dir_config(nil, args, config) do
-    if args |> List.first |> Filename.contains_line_no?() do
-      command_name_dir_config("explain", args, config)
+  defp set_command_in_options(%Options{command: nil} = options, %Config{version: true}) do
+    %Options{options | command: "version"}
+  end
+  defp set_command_in_options(%Options{command: nil, path: path} = options, _config) do
+    if Filename.contains_line_no?(path) do
+      %Options{options | command: "explain"}
     else
-      command_name_dir_config(@default_command_name, args, config)
+      %Options{options | command: @default_command_name}
     end
   end
-  defp command_name_dir_config(command_name, args, config) do
-    {command_for(command_name), args, config}
-  end
+  defp set_command_in_options(options, _config), do: options
 
+  defp to_config(nil, switches), do: to_config(@default_dir, switches)
   defp to_config(dir, switches) do
     dir
     |> Filename.remove_line_no_and_column
@@ -155,6 +144,7 @@ defmodule Credo.CLI do
 
   # Converts the return value of a Command.run() call into an exit_status
   defp to_exit_status(:ok), do: 0
+  defp to_exit_status(:error), do: 255
   defp to_exit_status({:error, issues}) do
     issues
     |> Enum.map(&(&1.exit_status))
