@@ -31,6 +31,38 @@ defmodule Credo.Check.CodeHelper do
   defdelegate parameter_count(ast), to: Parameters, as: :count
 
   @doc """
+  Matches a given `name` against a given `list` of "patterns" (Regex or String)
+  and returns `true` if *any* of the patterns matches.
+
+  For Strings, it returns `true` if the String is part of the given value.
+
+      iex> matches?("Credo.Check.ModuleDoc", ["Check", "CLI"])
+      true
+
+      iex> matches?("Credo.CLI.Command", ["Check", "CLI"])
+      true
+
+      iex> matches?("Credo.Config", ["Check", "CLI"])
+      false
+
+  For Regexes, it returns `true` if the Regex matches.
+
+      iex> matches?("Credo.Check.ModuleDoc", [~/Check/, ~/CLI/])
+      true
+
+  """
+  def matches?(name, list) when is_list(list) do
+    Enum.any?(list, &matches?(name, &1))
+  end
+  def matches?(name, string) when is_binary(string) do
+    String.contains?(name, string)
+  end
+  def matches?(name, regex) do
+    String.match?(name, regex)
+  end
+
+
+  @doc """
   Returns the scope for the given line as a tuple consisting of the call to
   define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
   name of the scope.
