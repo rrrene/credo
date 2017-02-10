@@ -18,7 +18,12 @@ defmodule Credo.Check.Readability.ModuleDoc do
   to make it clear that there is no intention in documenting it.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore_names: "All modules matching this regex (or list of regexes) will be ignored.",
+    ]
+  ]
   @default_params [
     ignore_names: [
       ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/

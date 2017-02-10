@@ -56,7 +56,8 @@ defmodule Credo.CLI.Output.IssuesByScope do
       ]
       |> UI.puts
 
-      UI.edge(color)
+      color
+      |> UI.edge
       |> UI.puts
 
       issues

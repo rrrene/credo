@@ -39,7 +39,7 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
-  defp traverse({:def, meta, [{:when, _, def_ast} |_ ]}, issues, specs, issue_meta) do
+  defp traverse({:def, meta, [{:when, _, def_ast} | _]}, issues, specs, issue_meta) do
     traverse({:def, meta, def_ast}, issues, specs, issue_meta)
   end
   defp traverse({:def, meta, [{name, _, args} | _]} = ast, issues, specs, issue_meta) when is_list(args) do
