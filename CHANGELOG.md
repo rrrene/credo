@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0 (pre)
+
+- Renamed `NoParenthesesWhenZeroArity` to `ParenthesesOnZeroArityDefs`
+
 ## 0.6.1
 
 - Fixed false positives for `StringSigils` in heredocs

@@ -18,7 +18,12 @@ defmodule Credo.Check.Readability.ModuleDoc do
   to make it clear that there is no intention in documenting it.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore_names: "All modules matching this regex (or list of regexes) will be ignored.",
+    ]
+  ]
   @default_params [
     ignore_names: [
       ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
@@ -45,7 +50,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   defp traverse({:defmodule, meta, _arguments} = ast, {true, issues}, issue_meta, ignore_names) do
     mod_name = Module.name(ast)
-    if matches?(mod_name, ignore_names) do
+    if CodeHelper.matches?(mod_name, ignore_names) do
       {ast, {false, issues}}
     else
       exception? = Module.exception?(ast)
@@ -61,16 +66,6 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   defp traverse(ast, {continue, issues}, _issue_meta, _ignore_names) do
     {ast, {continue, issues}}
-  end
-
-  defp matches?(name, patterns) when is_list(patterns) do
-    Enum.any?(patterns, &matches?(name, &1))
-  end
-  defp matches?(name, string) when is_binary(string) do
-    String.contains?(name, string)
-  end
-  defp matches?(name, regex) do
-    String.match?(name, regex)
   end
 
   defp issue_for(issue_meta, line_no, trigger) do

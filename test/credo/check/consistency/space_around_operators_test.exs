@@ -50,6 +50,13 @@ defmodule Credo.Sample2 do
       end
     end
 
+    test "date_add with negative interval" do
+      dec = Decimal.new(-1)
+      assert [{2013, 1, 1}] = TestRepo.all(from p in Post, select: date_add(p.posted, ^-1, "year"))
+      assert [{2013, 1, 1}] = TestRepo.all(from p in Post, select: date_add(p.posted, ^-1.0, "year"))
+      assert [{2013, 1, 1}] = TestRepo.all(from p in Post, select: date_add(p.posted, ^dec, "year"))
+    end
+
     def parse_response(<< _correlation_id :: 32-signed, error_code :: 16-signed, generation_id :: 32-signed,
                          protocol_len :: 16-signed, _protocol :: size(protocol_len)-binary,
                          leader_len :: 16-signed, leader :: size(leader_len)-binary,

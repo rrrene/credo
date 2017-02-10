@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.NoParenthesesWhenZeroArityTest do
+defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Readability.NoParenthesesWhenZeroArity
+  @described_check Credo.Check.Readability.ParenthesesOnZeroArityDefs
 
   #
   # cases NOT raising issues
