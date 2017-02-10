@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.NoParenthesesWhenZeroArity do
+defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   @moduledoc """
   Do not use parentheses when defining a function which has no arguments.
 
