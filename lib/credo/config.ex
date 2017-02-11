@@ -254,7 +254,7 @@ defmodule Credo.Config do
 
   defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
     if File.dir?(dir) do
-      if dir == "." do
+      if dir == "." || file_or_glob =~ ~r/^\// do
         file_or_glob
       else
         Path.join(dir, file_or_glob)
