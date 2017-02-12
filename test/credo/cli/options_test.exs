@@ -55,7 +55,7 @@ defmodule Credo.CLI.OptionsTest do
     options = parse(args)
     assert is_nil(options.command)
     assert expand_path("") == options.path
-    assert ["unknown_cmd"] == options.unknown_args
+    assert ["unknown_cmd"] == options.args
   end
 
   test "path: it should work w/ folder named like command when trailing slash is given" do
