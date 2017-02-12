@@ -94,7 +94,7 @@ defmodule Credo.CLI do
   defp set_command_in_options(%Options{command: nil} = options, %Config{version: true}) do
     %Options{options | command: "version"}
   end
-  defp set_command_in_options(%Options{command: nil, path: path, args: args} = options, _config) do
+  defp set_command_in_options(%Options{command: nil, args: args} = options, _config) do
     potential_path = List.first(args)
 
     if Filename.contains_line_no?(potential_path) do
