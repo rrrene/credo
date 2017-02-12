@@ -7,20 +7,24 @@ defmodule Credo.Config do
   defstruct files:              nil,
             color:              true,
             checks:             nil,
-            skipped_checks:     nil,
             requires:           [],
+            strict:             false,
+            check_for_updates:  true, # checks if there is a new version of Credo
+
+            # options, set by the command line
             min_priority:       0,
             help:               false,
             version:            false,
             verbose:            false,
-            strict:             false,
             all:                false,
             format:             nil,
             match_checks:       nil,
             ignore_checks:      nil,
             crash_on_error:     true,
-            check_for_updates:  true, # checks if there is a new version of Credo
             read_from_stdin:    false,
+
+            # state, which is maintained over the course of Credo's execution
+            skipped_checks:     nil,
             lint_attribute_map:   %{} # maps filenames to @lint attributes
 
   @config_filename ".credo.exs"
