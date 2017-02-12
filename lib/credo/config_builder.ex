@@ -5,17 +5,18 @@ defmodule Credo.ConfigBuilder do
   alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
-  def parse(%Options{path: path, switches: switches}) do
+  def parse(%Options{args: args, path: path, switches: switches}) do
     path
     |> Filename.remove_line_no_and_column
     |> ConfigFile.read_or_default(switches[:config_name])
-    |> cast_to_config()
+    |> cast_to_config(args)
     |> add_switches_to_config(switches)
   end
 
 
-  defp cast_to_config(%ConfigFile{} = config_file) do
+  defp cast_to_config(%ConfigFile{} = config_file, args) do
     %Config{
+      args: args,
       files: config_file.files,
       color: config_file.color,
       checks: config_file.checks,

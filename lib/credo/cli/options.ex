@@ -1,9 +1,10 @@
 defmodule Credo.CLI.Options do
   defstruct command: nil,
             path: nil,
+            args: [],
             switches: nil,
-            unknown_switches: nil,
-            unknown_args: nil
+            unknown_switches: [],
+            unknown_args: []
 
   @switches [
     all_priorities: :boolean,
@@ -44,8 +45,8 @@ defmodule Credo.CLI.Options do
     %__MODULE__{
       command: command,
       path: path,
+      args: unknown_args,
       switches: Enum.into(switches_keywords, %{}),
-      unknown_args: unknown_args,
       unknown_switches: unknown_switches_keywords
     }
   end

@@ -13,8 +13,8 @@ defmodule Credo.CLI.Command.List do
   alias Credo.Sources
 
   @doc false
-  def run(_args, %Config{help: true}), do: print_help()
-  def run(_args, config) do
+  def run(%Config{help: true}), do: print_help()
+  def run(config) do
     {time_load, source_files} = load_and_validate_source_files(config)
     config = Runner.prepare_config(source_files, config)
     {time_run, {source_files, config}}  = run_checks(source_files, config)

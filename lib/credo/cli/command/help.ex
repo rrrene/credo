@@ -12,7 +12,7 @@ defmodule Credo.CLI.Command.Help do
   alias Credo.CLI.Sorter
 
   @doc false
-  def run(_, _) do
+  def run(_) do
     print_banner()
     print_message()
   end

@@ -13,9 +13,9 @@ defmodule Credo.CLI.Command.Explain do
   # TODO: explain used config options
 
   @doc false
-  def run(_args, %Config{help: true}), do: print_help()
-  def run([], _), do: print_help()
-  def run([file | _], config) do
+  def run(%Config{help: true}), do: print_help()
+  def run(%Config{args: []}), do: print_help()
+  def run(%Config{args: [file | _]} = config) do
     {_, source_files} = load_and_validate_source_files(config)
     config = Runner.prepare_config(source_files, config)
     {_, {source_files, config}}  = run_checks(source_files, config)

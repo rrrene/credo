@@ -64,7 +64,7 @@ defmodule Credo.CLI do
 
     require_requires(config)
 
-    command_mod.run(dir, config)
+    command_mod.run(config)
   end
   defp run({:error, options, config}) do
     UI.use_colors(config.color)

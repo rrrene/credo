@@ -4,7 +4,8 @@ defmodule Credo.Config do
   manipulated via the `Credo.Config` module.
   """
 
-  defstruct files:              nil,
+  defstruct args:               [],
+            files:              nil,
             color:              true,
             checks:             nil,
             requires:           [],
