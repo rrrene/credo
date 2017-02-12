@@ -70,30 +70,21 @@ defmodule Credo.CLI do
     UI.use_colors(config.color)
 
     if options.unknown_args != [] do
-      args =
-        options.unknown_args
-        |> Enum.map(&inspect/1)
-        |> Enum.join(", ")
-
-      UI.warn "Unknown arguments: #{args}"
+      options.unknown_args
+      |> Enum.each(&print_switch(&1, "argument"))
     end
 
     if options.unknown_switches != [] do
-      UI.warn "Unknown switches:"
       options.unknown_switches
-      |> Enum.each(&print_switch/1)
+      |> Enum.each(&print_switch(&1, "switch"))
     end
 
     :error
   end
 
-  defp print_switch({name, _value}) do
-    print_switch(name)
-  end
-  defp print_switch(name) do
-    name
-    |> String.pad_leading(8)
-    |> UI.warn
+  defp print_switch({name, _value}, type), do: print_switch(name, type)
+  defp print_switch(name, type) do
+    UI.warn [:red, "Unknown #{type}: #{name}"]
   end
 
   # Requires the additional files specified in the config.

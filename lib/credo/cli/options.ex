@@ -32,14 +32,14 @@ defmodule Credo.CLI.Options do
     v: :version
   ]
 
-  def parse(argv, dir, command_names) do
+  def parse(argv, current_dir, command_names) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)
-    |> parse_result(dir, command_names)
+    |> parse_result(current_dir, command_names)
   end
 
-  defp parse_result({switches_keywords, args, unknown_switches_keywords}, dir, command_names) do
-    {command, path, unknown_args} = split_args(args, dir, command_names)
+  defp parse_result({switches_keywords, args, unknown_switches_keywords}, current_dir, command_names) do
+    {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
     %__MODULE__{
       command: command,
@@ -50,18 +50,18 @@ defmodule Credo.CLI.Options do
     }
   end
 
-  defp split_args([], dir, _) do
-      {path, unknown_args} = extract_path([], dir)
+  defp split_args([], current_dir, _) do
+      {path, unknown_args} = extract_path([], current_dir)
 
       {nil, path, unknown_args}
   end
-  defp split_args([head | tail] = args, dir, command_names) do
+  defp split_args([head | tail] = args, current_dir, command_names) do
     if Enum.member?(command_names, head) do
-      {path, unknown_args} = extract_path(tail, dir)
+      {path, unknown_args} = extract_path(tail, current_dir)
 
       {head, path, unknown_args}
     else
-      {path, unknown_args} = extract_path(args, dir)
+      {path, unknown_args} = extract_path(args, current_dir)
 
       {nil, path, unknown_args}
     end
