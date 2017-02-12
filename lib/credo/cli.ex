@@ -10,6 +10,7 @@ defmodule Credo.CLI do
   use Bitwise
 
   alias Credo.Config
+  alias Credo.ConfigBuilder
   alias Credo.Sources
   alias Credo.CLI.Filename
   alias Credo.CLI.Options
@@ -96,7 +97,7 @@ defmodule Credo.CLI do
 
   defp parse_options(argv) when is_list(argv) do
     options = Options.parse(argv, File.cwd!, Commands.names)
-    config = to_config(options.path, options.switches)
+    config = ConfigBuilder.parse(options)
 
     options
     |> set_command_in_options(config)
@@ -124,14 +125,6 @@ defmodule Credo.CLI do
     end
   end
   defp set_command_in_options(options, _config), do: options
-
-  defp to_config(nil, switches), do: to_config(@default_dir, switches)
-  defp to_config(dir, switches) do
-    dir
-    |> Filename.remove_line_no_and_column
-    |> Config.read_or_default(switches[:config_name])
-    |> Switches.parse_to_config(switches)
-  end
 
   # Converts the return value of a Command.run() call into an exit_status
   defp to_exit_status(:ok), do: 0
