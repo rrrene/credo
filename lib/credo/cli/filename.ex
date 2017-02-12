@@ -13,6 +13,7 @@ defmodule Credo.CLI.Filename do
       iex> Credo.CLI.Filename.contains_line_no?("lib/credo/sources.ex")
       false
   """
+  def contains_line_no?(nil), do: false
   def contains_line_no?(filename) do
     count =
       filename

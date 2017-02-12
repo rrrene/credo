@@ -30,44 +30,20 @@ defmodule Credo.CLI do
     |> halt_if_failed()
   end
 
-  @doc """
-  Returns the module of a given `command`.
-
-      iex> command_for(:help)
-      Credo.CLI.Command.Help
-  """
-  def command_for(nil), do: nil
-  def command_for(command_mod) when is_atom(command_mod) do
-    if Enum.member?(Commands.modules, command_mod) do
-      command_mod
-    else
-      nil
-    end
-  end
-  def command_for(command_name) when is_binary(command_name) do
-    if Enum.member?(Commands.names, command_name) do
-      Commands.get(command_name)
-    else
-      nil
-    end
-  end
-
   defp run(argv) when is_list(argv) do
     argv
     |> parse_options()
     |> run()
   end
-  defp run({:ok, command_mod, dir, config}) do
-    UI.use_colors(config.color)
-
-    if config.check_for_updates, do: Credo.CheckForUpdates.run()
-
-    require_requires(config)
-
-    command_mod.run(config)
+  defp run({:ok, command_mod, _dir, config}) do
+    config
+    |> UI.use_colors
+    |> Credo.CheckForUpdates.run
+    |> require_requires()
+    |> command_mod.run
   end
   defp run({:error, options, config}) do
-    UI.use_colors(config.color)
+    UI.use_colors(config)
 
     if options.unknown_args != [] do
       options.unknown_args
@@ -88,10 +64,12 @@ defmodule Credo.CLI do
   end
 
   # Requires the additional files specified in the config.
-  defp require_requires(%Config{requires: requires}) do
+  defp require_requires(%Config{requires: requires} = config) do
     requires
     |> Sources.find
     |> Enum.each(&Code.require_file/1)
+
+    config
   end
 
   defp parse_options(argv) when is_list(argv) do
@@ -116,14 +94,38 @@ defmodule Credo.CLI do
   defp set_command_in_options(%Options{command: nil} = options, %Config{version: true}) do
     %Options{options | command: "version"}
   end
-  defp set_command_in_options(%Options{command: nil, path: path} = options, _config) do
-    if Filename.contains_line_no?(path) do
-      %Options{options | command: "explain"}
+  defp set_command_in_options(%Options{command: nil, path: path, args: args} = options, _config) do
+    potential_path = List.first(args)
+
+    if Filename.contains_line_no?(potential_path) do
+      %Options{options | command: "explain", path: potential_path}
     else
       %Options{options | command: @default_command_name}
     end
   end
   defp set_command_in_options(options, _config), do: options
+
+  @doc """
+  Returns the module of a given `command`.
+
+      iex> command_for(:help)
+      Credo.CLI.Command.Help
+  """
+  def command_for(nil), do: nil
+  def command_for(command_mod) when is_atom(command_mod) do
+    if Enum.member?(Commands.modules, command_mod) do
+      command_mod
+    else
+      nil
+    end
+  end
+  def command_for(command_name) when is_binary(command_name) do
+    if Enum.member?(Commands.names, command_name) do
+      Commands.get(command_name)
+    else
+      nil
+    end
+  end
 
   # Converts the return value of a Command.run() call into an exit_status
   defp to_exit_status(:ok), do: 0

@@ -7,7 +7,11 @@ defmodule Credo.CLI.Output.UI do
     [:reset, color, @edge |> String.ljust(indent)]
   end
 
-  defdelegate use_colors(v), to: @shell_service
+  def use_colors(config) do
+    @shell_service.use_colors(config.color)
+
+    config
+  end
 
   defdelegate puts, to: @shell_service
   defdelegate puts(v), to: @shell_service
