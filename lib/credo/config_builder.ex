@@ -1,14 +1,32 @@
-defmodule Credo.CLI.Switches do
-  @moduledoc """
-  Credo.CLI.Switches is responsible for taking the options passed to the command
-  line and the options set in the `.credo.exs` config file and parsing them into
-  a single Credo.Config struct.
-  """
-
+defmodule Credo.ConfigBuilder do
   alias Credo.Config
+  alias Credo.ConfigFile
+  alias Credo.CLI.Filename
+  alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
-  def parse_to_config(config, switches) do
+  def parse(%Options{args: args, path: path, switches: switches}) do
+    path
+    |> Filename.remove_line_no_and_column
+    |> ConfigFile.read_or_default(switches[:config_name])
+    |> cast_to_config(args)
+    |> add_switches_to_config(switches)
+  end
+
+
+  defp cast_to_config(%ConfigFile{} = config_file, args) do
+    %Config{
+      args: args,
+      files: config_file.files,
+      color: config_file.color,
+      checks: config_file.checks,
+      requires: config_file.requires,
+      strict: config_file.strict,
+      check_for_updates: config_file.check_for_updates,
+    }
+  end
+
+  defp add_switches_to_config(%Config{} = config, switches) do
     config
     |> set_all(switches)
     |> set_color(switches)
@@ -94,7 +112,7 @@ defmodule Credo.CLI.Switches do
       %Config{
         config |
         strict: true,
-        match_checks: String.split(check_pattern, ",")
+        only_checks: String.split(check_pattern, ",")
       }
 
     Config.set_strict(new_config)
@@ -117,4 +135,5 @@ defmodule Credo.CLI.Switches do
     %Config{config | format: "oneline"}
   end
   defp set_deprecated_switches(config, _), do: config
+
 end

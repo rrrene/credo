@@ -4,15 +4,15 @@ defmodule Credo.CLI.Command.Help do
 
   @shortdoc "Show this help message"
   @ljust 12
-  @starting_order [:suggest, :explain]
-  @ending_order [:help]
+  @starting_order ~w(suggest explain)
+  @ending_order ~w(help)
 
   alias Credo.CLI
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
 
   @doc false
-  def run(_, _) do
+  def run(_) do
     print_banner()
     print_message()
   end
@@ -33,7 +33,7 @@ defmodule Credo.CLI.Command.Help do
     UI.puts ["Usage: ", :olive, "$ mix credo <command> [options]"]
     UI.puts "\nCommands:\n"
 
-    CLI.commands
+    Credo.Service.Commands.names
     |> Sorter.ensure(@starting_order, @ending_order)
     |> Enum.each(fn(name) ->
         module = CLI.command_for(name)

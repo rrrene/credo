@@ -1,8 +1,17 @@
 defmodule Credo.CheckForUpdates do
   alias Credo.CLI.Output.UI
+  alias Credo.Config
 
   @doc false
-  def run do
+  def run(%Config{check_for_updates: true} = config) do
+    run()
+
+    config
+  end
+  def run(%Config{check_for_updates: false} = config) do
+    config
+  end
+  def run() do
     "credo"
     |> fetch_all_hex_versions()
     |> do_run()
