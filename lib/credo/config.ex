@@ -18,7 +18,7 @@ defmodule Credo.Config do
             verbose:            false,
             all:                false,
             format:             nil,
-            match_checks:       nil,
+            only_checks:        nil,
             ignore_checks:      nil,
             crash_on_error:     true,
             read_from_stdin:    false,
@@ -33,9 +33,9 @@ defmodule Credo.Config do
   Takes all checks from the `checks:` field of the config, matches those against
   any patterns to include or exclude certain checks given via the command line.
   """
-  def checks(%__MODULE__{checks: checks, match_checks: match_checks, ignore_checks: ignore_checks}) do
+  def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
     match_regexes =
-      match_checks
+      only_checks
       |> List.wrap
       |> to_match_regexes
 

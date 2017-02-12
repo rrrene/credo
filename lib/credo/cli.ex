@@ -14,7 +14,6 @@ defmodule Credo.CLI do
   alias Credo.Sources
   alias Credo.CLI.Filename
   alias Credo.CLI.Options
-  alias Credo.CLI.Switches
   alias Credo.CLI.Output.UI
   alias Credo.Service.Commands
 

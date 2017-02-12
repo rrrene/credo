@@ -111,7 +111,7 @@ defmodule Credo.ConfigBuilder do
       %Config{
         config |
         strict: true,
-        match_checks: String.split(check_pattern, ",")
+        only_checks: String.split(check_pattern, ",")
       }
 
     Config.set_strict(new_config)
