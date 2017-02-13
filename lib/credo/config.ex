@@ -6,6 +6,7 @@ defmodule Credo.Config do
 
   defstruct args:               [],
             files:              nil,
+            source_files:       [],
             color:              true,
             checks:             nil,
             requires:           [],
@@ -26,6 +27,7 @@ defmodule Credo.Config do
 
             # state, which is maintained over the course of Credo's execution
             skipped_checks:     nil,
+            assigns:            %{},
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @doc """
@@ -78,4 +80,16 @@ defmodule Credo.Config do
     %__MODULE__{config | all: false, min_priority: 0}
   end
   def set_strict(config), do: config
+
+  def get_assign(config, name) do
+    Map.get(config.assigns, name)
+  end
+
+  def put_assign(config, name, value) do
+    %__MODULE__{config | assigns: Map.put(config.assigns, name, value)}
+  end
+
+  def put_source_files(config, source_files) do
+    %__MODULE__{config | source_files: source_files}
+  end
 end

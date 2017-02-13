@@ -6,6 +6,7 @@ defmodule Credo.CLI.Command.Version do
   @doc false
   def run(_) do
     UI.puts Credo.version
+
     :ok
   end
 end

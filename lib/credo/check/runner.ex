@@ -34,7 +34,11 @@ defmodule Credo.Check.Runner do
   @doc """
   Prepares the Config struct based on a given list of `source_files`.
   """
-  def prepare_config(source_files, config) do
+  def prepare_config(config) do
+    prepare_config(config, config.source_files)
+  end
+  def prepare_config(config, source_files) do
+    # TODO: remove prepare_config/2
     config
     |> set_lint_attributes(source_files)
     |> exclude_low_priority_checks(config.min_priority - 9)

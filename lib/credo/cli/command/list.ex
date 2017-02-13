@@ -15,24 +15,13 @@ defmodule Credo.CLI.Command.List do
   @doc false
   def run(%Config{help: true}), do: print_help()
   def run(config) do
-    {time_load, source_files} = load_and_validate_source_files(config)
-    config = Runner.prepare_config(source_files, config)
-    {time_run, {source_files, config}}  = run_checks(source_files, config)
-
-    print_results_and_summary(source_files, config, time_load, time_run)
-
-    issues =
-      source_files
-      |> Enum.flat_map(&(&1.issues))
-      |> Filter.important(config)
-      |> Filter.valid_issues(config)
-
-    case issues do
-      [] ->
-        :ok
-      issues ->
-        {:error, issues}
-    end
+    config
+    |> load_and_validate_source_files()
+    |> Runner.prepare_config
+    |> print_before_info()
+    |> run_checks()
+    |> print_results_and_summary()
+    |> determine_success()
   end
 
   def load_and_validate_source_files(config) do
@@ -45,12 +34,51 @@ defmodule Credo.CLI.Command.List do
 
     Output.complain_about_invalid_source_files(invalid_source_files)
 
-    {time_load, valid_source_files}
+    config
+    |> Config.put_source_files(valid_source_files)
+    |> Config.put_assign("credo.time.source_files", time_load)
   end
 
-  def run_checks(source_files, config) do
-    :timer.tc fn ->
-      Runner.run(source_files, config)
+  defp print_before_info(config) do
+    out = output_mod(config)
+    out.print_before_info(config.source_files, config)
+
+    config
+  end
+
+  defp run_checks(%Config{source_files: source_files} = config) do
+    {time_run, {source_files, config}} =
+      :timer.tc fn ->
+        Runner.run(source_files, config)
+      end
+
+    config
+    |> Config.put_source_files(source_files)
+    |> Config.put_assign("credo.time.run_checks", time_run)
+  end
+
+  defp print_results_and_summary(%Config{source_files: source_files} = config) do
+    time_load = Config.get_assign(config, "credo.time.source_files")
+    time_run = Config.get_assign(config, "credo.time.run_checks")
+    out = output_mod(config)
+
+    out.print_after_info(source_files, config, time_load, time_run)
+
+    config
+  end
+
+  defp determine_success(config) do
+    issues =
+      config.source_files
+      |> Enum.flat_map(&(&1.issues))
+      |> Filter.important(config)
+      |> Filter.valid_issues(config)
+
+    case issues do
+      [] ->
+        :ok
+      issues ->
+        {:error, issues}
     end
   end
 
@@ -59,13 +87,6 @@ defmodule Credo.CLI.Command.List do
   end
   defp output_mod(%Config{format: _}) do
     IssuesByScope
-  end
-
-  defp print_results_and_summary(source_files, config, time_load, time_run) do
-    output = output_mod(config)
-    output.print_before_info(source_files, config)
-
-    output.print_after_info(source_files, config, time_load, time_run)
   end
 
 

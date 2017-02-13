@@ -14,18 +14,61 @@ defmodule Credo.CLI.Command.Suggest do
   @doc false
   def run(%Config{help: true}), do: print_help()
   def run(config) do
-    {time_load, source_files} = load_and_validate_source_files(config)
-    config = Runner.prepare_config(source_files, config)
+    config
+    |> load_and_validate_source_files()
+    |> Runner.prepare_config
+    |> print_before_info()
+    |> run_checks()
+    |> print_results_and_summary()
+    |> determine_success()
+  end
 
+  defp load_and_validate_source_files(config) do
+    {time_load, {valid_source_files, invalid_source_files}} =
+      :timer.tc fn ->
+        config
+        |> Sources.find
+        |> Enum.partition(&(&1.valid?))
+      end
+
+    Output.complain_about_invalid_source_files(invalid_source_files)
+
+    config
+    |> Config.put_source_files(valid_source_files)
+    |> Config.put_assign("credo.time.source_files", time_load)
+  end
+
+  defp print_before_info(config) do
     out = output_mod(config)
-    out.print_before_info(source_files, config)
+    out.print_before_info(config.source_files, config)
 
-    {time_run, {source_files, config}}  = run_checks(source_files, config)
+    config
+  end
 
-    print_results_and_summary(source_files, config, time_load, time_run)
+  defp run_checks(%Config{source_files: source_files} = config) do
+    {time_run, {source_files, config}} =
+      :timer.tc fn ->
+        Runner.run(source_files, config)
+      end
 
+    config
+    |> Config.put_source_files(source_files)
+    |> Config.put_assign("credo.time.run_checks", time_run)
+  end
+
+  defp print_results_and_summary(%Config{source_files: source_files} = config) do
+    time_load = Config.get_assign(config, "credo.time.source_files")
+    time_run = Config.get_assign(config, "credo.time.run_checks")
+    out = output_mod(config)
+
+    out.print_after_info(source_files, config, time_load, time_run)
+
+    config
+  end
+
+  defp determine_success(config) do
     issues =
-      source_files
+      config.source_files
       |> Enum.flat_map(&(&1.issues))
       |> Filter.important(config)
       |> Filter.valid_issues(config)
@@ -38,36 +81,11 @@ defmodule Credo.CLI.Command.Suggest do
     end
   end
 
-  def load_and_validate_source_files(config) do
-    {time_load, {valid_source_files, invalid_source_files}} =
-      :timer.tc fn ->
-        config
-        |> Sources.find
-        |> Enum.partition(&(&1.valid?))
-      end
-
-    Output.complain_about_invalid_source_files(invalid_source_files)
-
-    {time_load, valid_source_files}
-  end
-
-  def run_checks(source_files, config) do
-    :timer.tc fn ->
-      Runner.run(source_files, config)
-    end
-  end
-
   defp output_mod(%Config{format: "oneline"}) do
     IssuesGroupedByCategory # TODO: offer short list (?)
   end
   defp output_mod(%Config{format: _}) do
     IssuesGroupedByCategory
-  end
-
-  defp print_results_and_summary(source_files, config, time_load, time_run) do
-    out = output_mod(config)
-
-    out.print_after_info(source_files, config, time_load, time_run)
   end
 
   defp print_help do

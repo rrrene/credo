@@ -15,16 +15,13 @@ defmodule Credo.CLI.Command.Explain do
   @doc false
   def run(%Config{help: true}), do: print_help()
   def run(%Config{args: []}), do: print_help()
-  def run(%Config{args: [file | _]} = config) do
-    {_, source_files} = load_and_validate_source_files(config)
-    config = Runner.prepare_config(source_files, config)
-    {_, {source_files, config}}  = run_checks(source_files, config)
-
-    file
-    |> String.split(":")
-    |> print_result(source_files, config)
-
-    :ok
+  def run(config) do
+    config
+    |> load_and_validate_source_files()
+    |> Runner.prepare_config
+    |> run_checks()
+    |> print_results_and_summary()
+    |> determine_success()
   end
 
   defp load_and_validate_source_files(config) do
@@ -37,13 +34,32 @@ defmodule Credo.CLI.Command.Explain do
 
     Output.complain_about_invalid_source_files(invalid_source_files)
 
-    {time_load, valid_source_files}
+    config
+    |> Config.put_source_files(valid_source_files)
+    |> Config.put_assign("credo.time.source_files", time_load)
   end
 
-  defp run_checks(source_files, config) do
-    :timer.tc fn ->
-      Runner.run(source_files, config)
-    end
+  defp run_checks(%Config{source_files: source_files} = config) do
+    {time_run, {source_files, config}} =
+      :timer.tc fn ->
+        Runner.run(source_files, config)
+      end
+
+    config
+    |> Config.put_source_files(source_files)
+    |> Config.put_assign("credo.time.run_checks", time_run)
+  end
+
+  defp print_results_and_summary(%Config{args: [file | _]} = config) do
+    file
+    |> String.split(":")
+    |> print_result(config.source_files, config)
+
+    config
+  end
+
+  defp determine_success(_) do
+    :ok
   end
 
   defp output_mod(_) do
