@@ -17,7 +17,6 @@ defmodule Credo.CLI do
   alias Credo.CLI.Output.UI
   alias Credo.Service.Commands
 
-  @default_dir "."
   @default_command_name "suggest"
 
   @doc false
@@ -47,20 +46,24 @@ defmodule Credo.CLI do
 
     if options.unknown_args != [] do
       options.unknown_args
-      |> Enum.each(&print_switch(&1, "argument"))
+      |> Enum.each(&print_argument/1)
     end
 
     if options.unknown_switches != [] do
       options.unknown_switches
-      |> Enum.each(&print_switch(&1, "switch"))
+      |> Enum.each(&print_switch/1)
     end
 
     :error
   end
 
-  defp print_switch({name, _value}, type), do: print_switch(name, type)
-  defp print_switch(name, type) do
-    UI.warn [:red, "Unknown #{type}: #{name}"]
+  defp print_argument(name) do
+    UI.warn [:red, "Unknown argument: #{name}"]
+  end
+
+  defp print_switch({name, _value}), do: print_switch(name)
+  defp print_switch(name) do
+    UI.warn [:red, "Unknown switch: #{name}"]
   end
 
   # Requires the additional files specified in the config.
