@@ -44,15 +44,8 @@ defmodule Credo.CLI do
   defp run({:error, options, config}) do
     UI.use_colors(config)
 
-    if options.unknown_args != [] do
-      options.unknown_args
-      |> Enum.each(&print_argument/1)
-    end
-
-    if options.unknown_switches != [] do
-      options.unknown_switches
-      |> Enum.each(&print_switch/1)
-    end
+    Enum.each(options.unknown_args, &print_argument/1)
+    Enum.each(options.unknown_switches, &print_switch/1)
 
     :error
   end
