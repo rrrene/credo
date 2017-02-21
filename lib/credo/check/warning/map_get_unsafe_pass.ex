@@ -20,6 +20,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
 
   @explanation [check: @moduledoc]
   @call_string "Map.get"
+  @unsafe_modules [:Enum, :String]
 
   use Credo.Check, base_priority: :normal
 
@@ -34,13 +35,9 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     pipe_issues =
       ast
       |> Macro.unpipe
-      |> Enum.drop(-1) # The last expression doesn't really matter
       |> Enum.with_index
-      |> Enum.filter_map(&unsafe_expr?/1,
-                         fn ({expr, _}) ->
-                           {{{_, meta, _}, _, _}, _} = expr
-                           issue_for(issue_meta, meta[:line], @call_string)
-                         end)
+      |> find_pipe_issues(issue_meta)
+
     {ast, issues ++ pipe_issues}
   end
 
@@ -48,18 +45,30 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     {ast, issues}
   end
 
-  defp unsafe_expr?({expr, idx}) do
-    required_length =
-      case idx do
-        0 -> 3
-        _ -> 2
-      end
+  defp find_pipe_issues(pipe, issue_meta) do
+    pipe
+    |> Enum.reduce([], fn ({expr, idx}, acc) ->
+         required_length = required_argument_length(idx)
+         {next_expr, _} = Enum.at(pipe, idx + 1, {nil, nil})
 
+         case {expr, nil_safe?(next_expr)} do
+           {{{{:., meta, [{_, _, [:Map]}, :get]}, _, args}, _}, false} when length(args) != required_length ->
+             acc ++ [issue_for(issue_meta, meta[:line], @call_string)]
+           _ ->
+             acc
+         end
+       end)
+  end
+
+  defp required_argument_length(idx) when idx == 0, do: 3
+  defp required_argument_length(_), do: 2
+
+  defp nil_safe?(expr) do
     case expr do
-      {{{:., _, [{_, _, [:Map]}, :get]}, _, args}, _} ->
-        length(args) != required_length
+      {{{:., _, [{_, _, [module]}, _]}, _, _}, _} ->
+        !(module in @unsafe_modules)
       _ ->
-        false
+        true
     end
   end
 

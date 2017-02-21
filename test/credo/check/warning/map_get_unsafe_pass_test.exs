@@ -25,14 +25,28 @@ end
   test "it should NOT report expected code 2" do
 """
 defmodule CredoSampleModule do
-def some_function(parameter1, parameter2) do
-  IO.inspect parameter1 + parameter2
+  def some_function(parameter1, parameter2) do
+    IO.inspect parameter1 + parameter2
 
     %{}
     |> Map.get(:foo, [])
     |> Enum.each(&IO.puts/1)
 
+  end
 end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+    end
+
+  test "it should NOT report expected code 3" do
+"""
+defmodule CredoSampleModule do
+  def some_function(parameter1) do
+
+      %{}
+      |> Map.get(:foo)
+      |> some_arbitrary_function
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
