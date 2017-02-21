@@ -97,7 +97,7 @@ defmodule CredoSampleModule do
     |> Enum.map(fn x ->
                   x
                   |> Map.get(b)
-                  |> String.to_int
+                  |> Enum.reduce([], &some_fun/1)
                 end)
     |> some_other_function(c)
 

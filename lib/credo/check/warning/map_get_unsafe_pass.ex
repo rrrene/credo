@@ -20,7 +20,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
 
   @explanation [check: @moduledoc]
   @call_string "Map.get"
-  @unsafe_modules [:Enum, :String]
+  @unsafe_modules [:Enum]
 
   use Credo.Check, base_priority: :normal
 
