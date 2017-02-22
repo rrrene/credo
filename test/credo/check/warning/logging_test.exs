@@ -20,7 +20,7 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report imported Logger" do
+  test "it should NOT report imported :debug from Logger" do
 """
 defmodule CredoSampleModule do
   import Logger
@@ -49,7 +49,7 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should report a violation with imported name" do
+  test "it should report a violation with imported :debug from Logger" do
 """
 defmodule CredoSampleModule do
   import Logger

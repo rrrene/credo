@@ -1,7 +1,7 @@
 defmodule Credo.Check.Warning.LazyLogging do
   @moduledoc """
-  Ensures laiziness of Logger calls.
-  The best practice is to wrap an expensive logger expression into a zero argument function (fn -> "input" end)
+  Ensures laziness of Logger calls.
+  The best practice is to wrap an expensive logger calls into a zero argument function (fn -> "input" end)
   Example:
     Logger.debug fn ->
         "my_fun/1: input: #{inspect :expensive_to_compute}"
@@ -49,7 +49,7 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Logger input is not lazzy",
+      message: "Logger call is not lazzy",
       line_no: line_no
   end
 end
