@@ -1,7 +1,7 @@
-defmodule Credo.Check.Warning.LoggingTest do
+defmodule Credo.Check.Warning.LazyLoggingTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Warning.Logging
+  @described_check Credo.Check.Warning.LazyLogging
 
   #
   # cases NOT raising issues

@@ -1,4 +1,4 @@
-defmodule Credo.Check.Warning.Logging do
+defmodule Credo.Check.Warning.LazyLogging do
   @moduledoc """
   Ensures laiziness of Logger calls.
   The best practice is to wrap an expensive logger expression into a zero argument function (fn -> "input" end)
