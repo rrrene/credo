@@ -16,7 +16,9 @@ If you are a Rubyist it is best described as an opinionated mix between [Inch](h
 
 ## Installation
 
-Add as a dependency in your mix.exs file:
+The easiest way to add Credo to your project is by [using Mix](http://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html).
+
+Add `:credo` as a dependency to your project's `mix.exs`:
 
 ```elixir
 defp deps do
@@ -121,7 +123,7 @@ Now you might want to know more about that particular entry, **just copy the fil
 
 ### Configuration via .credo.exs
 
-Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine. 
+Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine.
 
 This also works for umbrella projects, where you can have individual `.credo.exs` files for each app or a global one in the umbrella's `config/` or root folder.
 
