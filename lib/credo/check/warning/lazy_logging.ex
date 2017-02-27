@@ -50,7 +50,7 @@ defmodule Credo.Check.Warning.LazyLogging do
     {ast, issues}
   end
 
-  def issues_for_call([{:fn, _, __}] = _args, _meta, issues, _issue_meta) do
+  def issues_for_call([{:fn, _, __}] = _args, _meta, issues, _issue_meta, _) do
     issues
   end
   def issues_for_call(_args, meta, {true, issues}, issue_meta) do
