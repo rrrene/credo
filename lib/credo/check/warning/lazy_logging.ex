@@ -18,11 +18,13 @@ defmodule Credo.Check.Warning.LazyLogging do
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    state = {false, []} # Logger seen ?, list of issues
+    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+    issues
   end
 
   defp traverse({{:., _, [{:__aliases__, _, [:Logger]}, _]}, meta, arguments} = ast, issues, issue_meta) do
-    {ast, issues_for_call(arguments, meta, issues, issue_meta)}
+    {ast, issues_for_call(arguments, meta, issues, issue_meta, logger_call: true)}
   end
   defp traverse({:debug, meta, arguments} = ast, issues, issue_meta) do
     {ast, issues_for_call(arguments, meta, issues, issue_meta)}
@@ -36,6 +38,14 @@ defmodule Credo.Check.Warning.LazyLogging do
   defp traverse({:error, meta, arguments} = ast, issues, issue_meta) do
     {ast, issues_for_call(arguments, meta, issues, issue_meta)}
   end
+  defp traverse({:import, meta, arguments} = ast, issues, issue_meta) do
+     if logger_import?(arguments) do
+        {_, issue_list} = issues
+        {ast, {true, issue_list} }
+     else
+        {ast, issues}
+     end
+  end
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -43,8 +53,14 @@ defmodule Credo.Check.Warning.LazyLogging do
   def issues_for_call([{:fn, _, __}] = _args, _meta, issues, _issue_meta) do
     issues
   end
-  def issues_for_call(_args, meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line]) | issues]
+  def issues_for_call(_args, meta, {true, issues}, issue_meta) do
+    {true, [issue_for(issue_meta, meta[:line]) | issues]}
+  end
+  def issues_for_call(_args, meta, {import?, issues} = state, issue_meta, logger_call: true) do
+    {import?, [issue_for(issue_meta, meta[:line]) | issues]}
+  end
+  def issues_for_call(_args, _meta, issues, _issue_meta) do
+    issues
   end
 
   defp issue_for(issue_meta, line_no) do
@@ -52,4 +68,12 @@ defmodule Credo.Check.Warning.LazyLogging do
       message: "Logger call is not lazzy",
       line_no: line_no
   end
+
+  defp logger_import?([{:__aliases__, _meta, [:Logger]}]) do
+    true
+  end
+  defp logger_import?(_ast) do
+    false
+  end
+
 end
