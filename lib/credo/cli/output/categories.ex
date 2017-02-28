@@ -2,7 +2,7 @@ defmodule Credo.CLI.Output.Categories do
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
 
-  @order [:design, :readability, :refactor, :warning, :consistency]
+  @order [:readability, :design, :refactor, :warning, :consistency]
   @category_colors [
     design: :olive,
     readability: :blue,
@@ -18,7 +18,7 @@ defmodule Credo.CLI.Output.Categories do
     consistency: "Consistency",
   ]
   @category_texts [
-    design: """
+    consistency: """
     These checks take a look at your code and ensure a consistent coding style.
     Using tabs or spaces? Both is fine, just don't mix them or Credo will tell
     you.
@@ -31,12 +31,12 @@ defmodule Credo.CLI.Output.Categories do
     The Refactor checks show you opportunities to avoid future problems and
     technical debt.
     """,
-    warning: """
+    design: """
     While refactor checks show you possible problems, these checks try to
     highlight possibilities, like - potentially intended - duplicated code or
     TODO and FIXME comments.
     """,
-    consistency: """
+    warning: """
     These checks warn you about things that are potentially dangerous, like a
     missed call to `IEx.pry` you put in during a debugging session or a call
     to String.downcase without using the result.
