@@ -3,11 +3,9 @@ defmodule Credo.Check.Warning.LazyLogging do
   Ensures laziness of Logger calls.
   The best practice is to wrap an expensive logger calls into a zero argument function (fn -> "input" end)
   Example:
-    Logger.debug fn ->
-        "my_fun/1: input: #{inspect :expensive_to_compute}"
-    end
+    Logger.info fn -> "expensive to calculate info" end
   Instead of:
-    Logger.debug "my_fun/1: input: #{inspect :expensive_to_compute}"
+      Logger.info "mission accomplished"
 
   """
 
@@ -38,10 +36,10 @@ defmodule Credo.Check.Warning.LazyLogging do
   defp traverse({:error, meta, arguments} = ast, issues, issue_meta) do
     {ast, issues_for_call(arguments, meta, issues, issue_meta)}
   end
-  defp traverse({:import, meta, arguments} = ast, issues, issue_meta) do
+  defp traverse({:import, _meta, arguments} = ast, issues, _issue_meta) do
      if logger_import?(arguments) do
         {_, issue_list} = issues
-        {ast, {true, issue_list} }
+        {ast, {true, issue_list}}
      else
         {ast, issues}
      end
@@ -50,16 +48,22 @@ defmodule Credo.Check.Warning.LazyLogging do
     {ast, issues}
   end
 
-  def issues_for_call([{:fn, _, __}] = _args, _meta, issues, _issue_meta, _) do
+  defp issues_for_call([{:fn, _, __}] = _args, _meta, issues, _issue_meta, _) do
     issues
   end
-  def issues_for_call(_args, meta, {true, issues}, issue_meta) do
-    {true, [issue_for(issue_meta, meta[:line]) | issues]}
+  defp issues_for_call(args, meta, {true, issues}, issue_meta) do
+    #  arity check
+    case Enum.count(args) do
+        1 ->
+            {true, [issue_for(issue_meta, meta[:line]) | issues]}
+        _ ->
+            {true, issues}
+    end
   end
-  def issues_for_call(_args, meta, {import?, issues} = state, issue_meta, logger_call: true) do
+  defp issues_for_call(_args, meta, {import?, issues}, issue_meta, logger_call: true) do
     {import?, [issue_for(issue_meta, meta[:line]) | issues]}
   end
-  def issues_for_call(_args, _meta, issues, _issue_meta) do
+  defp issues_for_call(_args, _meta, issues, _issue_meta) do
     issues
   end
 
