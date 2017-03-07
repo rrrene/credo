@@ -25,6 +25,10 @@ defmodule CredoSampleModule do
     |> is_atom
     |> &(&1)
 
+    -1
+    |> Kernel.+(1)
+    |> Kernel.*(0)
+
     FooBar
     |> to_string
 
