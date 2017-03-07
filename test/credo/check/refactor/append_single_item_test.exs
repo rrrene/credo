@@ -1,9 +1,9 @@
-defmodule Credo.Check.Warning.AppendSingleItemTest do
+defmodule Credo.Check.Refactor.AppendSingleItemTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Warning.AppendSingleItem
+  @described_check Credo.Check.Refactor.AppendSingleItem
 
-  test "it shoult NOT report appending 2 items" do
+  test "it should NOT report appending 2 items" do
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
@@ -14,7 +14,7 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it shoult NOT report prepending an item" do
+  test "it should NOT report prepending an item" do
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
@@ -25,11 +25,22 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it shoult NOT report on 2 lists" do
+  test "it should NOT report on 2 lists" do
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     parameter1 ++ parameter2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report appending 2 items on a pre-existing list" do
+"""
+defmodule CredoSampleModule do
+  def some_function(list, parameter1, parameter2) do
+    list ++ [parameter1, parameter2]
   end
 end
 """ |> to_source_file
