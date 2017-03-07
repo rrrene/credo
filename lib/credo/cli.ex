@@ -78,7 +78,7 @@ defmodule Credo.CLI do
   end
 
   defp validate_options(%Options{unknown_args: [], unknown_switches: []} = options, config) do
-    {:ok, command_for(options.command), options.path, config}
+    {:ok, command_for(options.command), options.paths, config}
   end
   defp validate_options(options, config) do
     {:error, options, config}
@@ -91,10 +91,10 @@ defmodule Credo.CLI do
     %Options{options | command: "version"}
   end
   defp set_command_in_options(%Options{command: nil, args: args} = options, _config) do
-    potential_path = List.first(args)
+    potential_paths = args
 
-    if Filename.contains_line_no?(potential_path) do
-      %Options{options | command: "explain", path: potential_path}
+    if Filename.contains_line_no?(potential_paths) do
+      %Options{options | command: "explain", paths: potential_paths}
     else
       %Options{options | command: @default_command_name}
     end
