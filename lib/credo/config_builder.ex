@@ -5,9 +5,9 @@ defmodule Credo.ConfigBuilder do
   alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
-  def parse(%Options{args: args, path: path, switches: switches}) do
-    path
-    |> Filename.remove_line_no_and_column
+  def parse(%Options{args: args, paths: paths, switches: switches}) do
+    paths
+    |> Enum.map(&Filename.remove_line_no_and_column/1)
     |> ConfigFile.read_or_default(switches[:config_name])
     |> cast_to_config(args)
     |> add_switches_to_config(switches)
