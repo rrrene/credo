@@ -115,14 +115,20 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     typed_after? =
       line
       |> String.slice(column..-1) # -1 because we need to subtract the operator
-      |> String.match?(~r/^\s*(signed|unsigned|binary|size)/)
+      |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size)/)
+
+    typed_before? =
+      line
+      |> String.slice(0..column - 2) # -2 because we need to subtract the operator
+      |> String.match?(~r/(integer|native|signed|unsigned|binary|size)\s*$/)
 
     heuristics_met_count =
       [
         binary_pattern_start_before?,
         binary_pattern_end_after?,
         double_colon_before?,
-        typed_after?
+        typed_after?,
+        typed_before?
       ]
       |> Enum.filter(&(&1))
       |> Enum.count
