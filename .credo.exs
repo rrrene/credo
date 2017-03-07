@@ -118,13 +118,13 @@
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
+
+        # Deprecated checks (these will be deleted after a grace period)
+        {Credo.Check.Readability.Specs, false},
         {Credo.Check.Warning.NameRedeclarationByAssignment, false},
         {Credo.Check.Warning.NameRedeclarationByCase, false},
         {Credo.Check.Warning.NameRedeclarationByDef, false},
         {Credo.Check.Warning.NameRedeclarationByFn, false},
-
-        # Deprecated checks (these will be deleted after a grace period)
-        {Credo.Check.Readability.Specs, false},
 
         # Custom checks can be created using `mix credo.gen.check`.
         #
