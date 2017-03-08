@@ -44,7 +44,7 @@ defmodule Credo.CLI.Options do
 
     %__MODULE__{
       command: command,
-      paths: paths,
+      paths: Enum.reverse(paths),
       args: unknown_args,
       switches: Enum.into(switches_keywords, %{}),
       unknown_switches: unknown_switches_keywords
