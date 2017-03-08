@@ -93,7 +93,7 @@ defmodule Credo.CLI do
   defp set_command_in_options(%Options{command: nil, args: args} = options, _config) do
     potential_paths = args
 
-    if Filename.contains_line_no?(potential_paths) do
+    if Enum.any?(args, &Filename.contains_line_no?/1) do
       %Options{options | command: "explain", paths: potential_paths}
     else
       %Options{options | command: @default_command_name}
