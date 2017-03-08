@@ -48,13 +48,20 @@ defmodule Credo.ConfigFile do
   Returns all parent directories of the given `dir` as well as each `./config`
   sub-directory.
   """
-  def relevant_directories(dir) do
+  def relevant_directories(dirs) do
+    dirs
+    |> Enum.map(&get_dir_paths_for_dir/1)
+    |> List.flatten
+    |> Enum.uniq
+    |> add_config_dirs
+  end
+
+  defp get_dir_paths_for_dir(dir) do
     dir
     |> Path.expand
     |> Path.split
     |> Enum.reverse
     |> get_dir_paths
-    |> add_config_dirs
   end
 
   defp get_dir_paths(dirs), do: do_get_dir_paths(dirs, [])
