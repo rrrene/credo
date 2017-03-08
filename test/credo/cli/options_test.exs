@@ -13,6 +13,10 @@ defmodule Credo.CLI.OptionsTest do
     Path.join(Path.expand(fixture_path(@fixture_name)), name)
   end
 
+  defp expand_paths(names) do
+    Enum.map(names, &expand_path/1)
+  end
+
   defp parse(args) do
     dir = fixture_path(@fixture_name)
     Options.parse(args, dir, @command_names)
@@ -54,7 +58,7 @@ defmodule Credo.CLI.OptionsTest do
     args = String.split("unknown_cmd --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("") == options.path
+    assert expand_paths([""]) == options.paths
     assert ["unknown_cmd"] == options.args
   end
 
@@ -62,27 +66,27 @@ defmodule Credo.CLI.OptionsTest do
     args = String.split("cmd1/ --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("cmd1/") == options.path
+    assert expand_paths(["cmd1/"]) == options.paths
   end
 
   test "path: it should work w/ folder" do
     args = String.split("src --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("src") == options.path
+    assert expand_paths(["src"]) == options.paths
   end
 
   test "path: it should work w/ file" do
     args = String.split("foo.ex --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("foo.ex") == options.path
+    assert expand_paths(["foo.ex"]) == options.paths
   end
 
   test "path: it should work w/ glob" do
     args = String.split("src/**/*.ex --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("src/**/*.ex") == options.path
+    assert expand_paths(["src/**/*.ex"]) == options.paths
   end
 end
