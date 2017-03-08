@@ -104,6 +104,17 @@ defmodule CredoSampleModule do
       (options[:do] || contents[:do])
       |> prewalk_block(name)
       |> handler_builder(type)
+
+    for i <- 1..4 do
+      i
+    end
+    |> Enum.map(fn(i) -> i + 2 end)
+
+    (i <- 1..4)
+    |> for do
+      i
+    end
+    |> Enum.map(fn(i) -> i + 2 end)
   end
 end
 """ |> to_source_file
