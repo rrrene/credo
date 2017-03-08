@@ -50,8 +50,7 @@ defmodule Credo.ConfigFile do
   """
   def relevant_directories(dirs) do
     dirs
-    |> Enum.map(&get_dir_paths_for_dir/1)
-    |> List.flatten
+    |> Enum.flat_map(&get_dir_paths_for_dir/1)
     |> Enum.uniq
     |> add_config_dirs
   end
