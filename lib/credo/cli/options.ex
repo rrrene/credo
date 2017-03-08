@@ -68,6 +68,10 @@ defmodule Credo.CLI.Options do
     end
   end
 
+  defp extract_paths([], base_dir, [], unknown_args) do
+    {[base_dir], unknown_args}
+  end
+
   defp extract_paths([], _base_dir, paths, unknown_args) do
     {paths, unknown_args}
   end
@@ -77,7 +81,7 @@ defmodule Credo.CLI.Options do
     if File.exists?(path) or path =~ ~r/[\?\*]/ do
       extract_paths(tail, base_dir, [path | paths], unknown_args)
     else
-      extract_paths(tail, base_dir, paths, [path | unknown_args])
+      extract_paths(tail, base_dir, paths, [head | unknown_args])
     end
   end
 end
