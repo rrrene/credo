@@ -7,7 +7,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   Example:
 
         %{foo: [1, 2 ,3], bar: [4, 5, 6]}
-        |> Map.get(:baz)
+        |> Map.get(:missing_key)
         |> Enum.each(&IO.puts/1)
 
   This will cause a `Protocol.UndefinedError`, since `nil` isn't `Enumerable`.
@@ -15,7 +15,8 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   to being forced to deal with an exception. Had there been a `[]` default
   parameter this could have been averted.
 
-  Encourage use of `Map.get/3` instead to provide safer default values.
+  If you are sure the value exists and can't be nil, please use `Map.fetch!/2`.
+  If you are not sure, `Map.get/3` can help you provide a safe default value.
   """
 
   @explanation [check: @moduledoc]
