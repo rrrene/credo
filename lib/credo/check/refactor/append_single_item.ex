@@ -19,7 +19,7 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
 
   @explanation [check: @moduledoc]
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, base_priority: :low
 
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do
