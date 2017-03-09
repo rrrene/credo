@@ -3,8 +3,6 @@ defmodule Credo.Check.Readability.SemicolonsTest do
 
   @described_check Credo.Check.Readability.Semicolons
 
-  @moduletag :to_be_implemented
-
   #
   # cases NOT raising issues
   #
