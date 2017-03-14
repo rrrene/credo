@@ -29,7 +29,7 @@ defmodule Credo.CLI.Output.UI do
 
   def wrap_at(text, number) do
     "(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{number}})(?:\\r?\\n)?|(?:\\r?\\n|$))"
-    |> Regex.compile!
+    |> Regex.compile!("u")
     |> Regex.scan(text)
     |> Enum.map(&List.first/1)
     |> List.delete_at(-1)
