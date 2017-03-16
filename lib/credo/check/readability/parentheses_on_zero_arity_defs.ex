@@ -42,6 +42,10 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     {ast, issues}
   end
 
+  # skip the false positive for a metaprogrammed definition
+  defp issues_for_definition({{:unquote, _, _}, _, _}, issues, _) do
+    issues
+  end
   defp issues_for_definition({_, _, args}, issues, _) when length(args) > 0 do
     issues
   end

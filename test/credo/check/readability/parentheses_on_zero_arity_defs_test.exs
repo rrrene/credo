@@ -36,4 +36,17 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should not crash on macros creating zero arity functions" do
+"""
+defmodule Credo.Sample.Module do
+  defmacro dynamic_methoder(attribute, value) do
+    quote do
+      def unquote(attribute)(), do: unquote(value)
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
 end
