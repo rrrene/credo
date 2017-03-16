@@ -29,6 +29,7 @@ defmodule Credo.Config do
             issues_pid:         nil,
             skipped_checks:     nil,
             assigns:            %{},
+            config_comment_map: %{},
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @doc """

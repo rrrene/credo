@@ -44,6 +44,7 @@ defmodule Credo.Check.Runner do
 
     config
     |> set_lint_attributes(source_files)
+    |> set_config_comments(source_files)
     |> exclude_low_priority_checks(config.min_priority - 9)
     |> exclude_checks_based_on_elixir_version
   end
@@ -68,6 +69,28 @@ defmodule Credo.Check.Runner do
     {Credo.Check.FindLintAttributes}
     |> run_check(source_files, config)
     |> Enum.into(%{})
+  end
+
+  defp set_config_comments(config, source_files) do
+    config_comment_map =
+      source_files
+      |> run_config_comment_finder(config)
+      |> Enum.reduce(%{}, fn(source_file, memo) ->
+          # TODO: we should modify the config "directly" instead of going
+          # through the SourceFile
+          Map.put(memo, source_file.filename, source_file.config_comments)
+        end)
+
+    %Config{config | config_comment_map: config_comment_map}
+  end
+
+  defp run_config_comment_finder(source_files, config) do
+    checks = [{Credo.Check.ConfigCommentFinder}]
+
+    Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
+      run_check(check_tuple, source_files, config)
+    end)
+>>>>>>> Add config comment
   end
 
   defp exclude_low_priority_checks(config, below_priority) do
