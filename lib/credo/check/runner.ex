@@ -55,6 +55,16 @@ defmodule Credo.Check.Runner do
           Map.put(memo, source_file.filename, source_file.lint_attributes)
         end)
 
+    if Map.size(lint_attribute_map) > 0 do
+      Credo.CLI.Output.UI.warn ""
+      Credo.CLI.Output.UI.warn [:orange,
+        "@lint attributes will be deprecated in the Credo v0.8 because they trigger\n",
+        "compiler warnings on Elixir v1.4.\n\n",
+        "Please consider reporting the cases where you needed @lint attributes\n",
+        "to help us devise a new solution: https://github.com/rrrene/credo/issues/new"]
+      Credo.CLI.Output.UI.warn ""
+    end
+
     %Config{config | lint_attribute_map: lint_attribute_map}
   end
 
