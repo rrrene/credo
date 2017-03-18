@@ -1,7 +1,8 @@
 # Changelog
 
-## 0.7.0 (pre)
+## 0.7.0
 
+- Added deprecation hint about `@lint` attributes
 - Fixed file inclusion/exclusion bug
 - Fixed false positives in `SpaceAroundOperators`
 - Deprecated `NameRedeclarationBy*` checks
