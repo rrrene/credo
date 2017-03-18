@@ -2,7 +2,31 @@
 
 ## 0.7.0 (pre)
 
+- Fixed file inclusion/exclusion bug
+- Fixed false positives in `SpaceAroundOperators`
+- Deprecated `NameRedeclarationBy*` checks
+- Fixed false positives in `PipeChainStart`
+- Changed `AppendSingleItem`'s priority and make it opt-in
 - Renamed `NoParenthesesWhenZeroArity` to `ParenthesesOnZeroArityDefs`
+- Fixed a bug in `ParenthesesOnZeroArityDefs`
+
+### Added/deprecated checks
+
+- Credo.Check.Warning.MapGetUnsafePass
+- Credo.Check.Refactor.AppendSingleItem
+- Credo.Check.Readability.Semicolons
+
+Switched some checks to opt-in by default
+
+- Credo.Check.Readability.Specs
+- Credo.Check.Refactor.ABCSize
+- Credo.Check.Refactor.VariableRebinding
+- Credo.Check.Warning.MapGetUnsafePass
+- Credo.Check.Warning.NameRedeclarationByAssignment
+- Credo.Check.Warning.NameRedeclarationByCase
+- Credo.Check.Warning.NameRedeclarationByDef
+- Credo.Check.Warning.NameRedeclarationByFn
+
 
 ## 0.6.1
 
