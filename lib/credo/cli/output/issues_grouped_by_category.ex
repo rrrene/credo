@@ -127,7 +127,9 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     count = per_category(config)
 
     issues
-    |> Enum.sort_by(fn(issue) -> {issue.priority, issue.severity} end)
+    |> Enum.sort_by(fn(issue) ->
+        {issue.priority, issue.severity, issue.filename, issue.line_no}
+      end)
     |> Enum.reverse
     |> Enum.take(count)
     |> IssueHelper.print_issues(source_file_map, config, term_width)
