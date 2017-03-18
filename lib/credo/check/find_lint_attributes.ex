@@ -20,12 +20,15 @@ defmodule Credo.Check.FindLintAttributes do
     {source_file.filename, lint_attributes}
   end
 
+  @lint false
   defp traverse({:defmodule, _meta, _arguments} = ast, attribute_list, source_file) do
     found_attributes =
       ast
       |> CodeHelper.calls_in_do_block()
       |> process_calls(nil, [])
       |> Enum.map(fn(lint) ->
+          Credo.CLI.Output.UI.warn [:orange, "#{source_file.filename}:#{lint.line} - @lint is deprecated."]
+
           {_, scope} = CodeHelper.scope_for(source_file, line: lint.line)
 
           %LintAttribute{lint | scope: scope}
