@@ -19,14 +19,6 @@ end
   # cases raising issues
   #
 
-  test "it should report a violation" do
-"""
-defmodule credo_sample_module do
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-  end
-
   test "it should report a violation /2" do
 """
 defmodule Credo_SampleModule do
