@@ -11,6 +11,12 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   @explanation [check: @moduledoc]
 
+  @levels [:debug, :info, :warn, :error]
+  @default_params [
+    levels: @levels,
+  ]
+
+
   use Credo.Check, base_priority: :high
 
   @doc false
@@ -24,17 +30,14 @@ defmodule Credo.Check.Warning.LazyLogging do
   defp traverse({{:., _, [{:__aliases__, _, [:Logger]}, _]}, meta, arguments} = ast, state, issue_meta) do
     {ast, issues_for_call(arguments, meta, state, issue_meta)}
   end
-  defp traverse({:debug, meta, arguments} = ast, {true, _issues} = state, issue_meta) do
-    {ast, issues_for_call(arguments, meta, state, issue_meta)}
-  end
-  defp traverse({:info, meta, arguments} = ast, {true, _issues} = state, issue_meta) do
-    {ast, issues_for_call(arguments, meta, state, issue_meta)}
-  end
-  defp traverse({:warn, meta, arguments} = ast, {true, _issues} = state, issue_meta) do
-    {ast, issues_for_call(arguments, meta, state, issue_meta)}
-  end
-  defp traverse({:error, meta, arguments} = ast, {true, _issues} = state, issue_meta) do
-    {ast, issues_for_call(arguments, meta, state, issue_meta)}
+  defp traverse({level, meta, arguments} = ast, {true, _issues} = state, issue_meta) when level in @levels do
+    levels = Params.get(@default_params, :levels)
+    case Enum.member?(levels, level) do
+        true ->
+            {ast, issues_for_call(arguments, meta, state, issue_meta)}
+        _ ->
+            {ast, state}
+    end
   end
   defp traverse({:import, _meta, arguments} = ast, state, _issue_meta) do
      if logger_import?(arguments) do
