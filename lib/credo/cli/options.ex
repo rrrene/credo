@@ -10,6 +10,7 @@ defmodule Credo.CLI.Options do
     all_priorities: :boolean,
     all: :boolean,
     checks: :string,
+    config_name: :string,
     color: :boolean,
     crash_on_error: :boolean,
     format: :string,
