@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+- Fix `--config_name`CLI switch
+- Fix `UI.wrap_at/2` for Unicode strings
+- Fix false positive for `ModuleNames`
+
 ## 0.7.0
 
 - Added deprecation hint about `@lint` attributes
