@@ -10,7 +10,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   test "it should NOT report when commas have spaces" do
 """
 defmodule CredoSampleModule do
-  alias Project.{Sample, Other}
+    @attribute {:foo, :bar}
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -33,12 +33,12 @@ end
   test "it should report when commas are not followed by spaces" do
 """
 defmodule CredoSampleModule do
-  alias Project.{Sample,Other}
+    @attribute {:foo,:bar}
 end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(issue) ->
-        assert 24 == issue.column
-        assert ",O" ==  issue.trigger
+        assert 21 == issue.column
+        assert ",:" ==  issue.trigger
       end)
   end
 
