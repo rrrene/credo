@@ -34,6 +34,9 @@ defmodule Credo.Code.Strings do
   defp parse_code(<< "\"\"\""::utf8, t::binary >>, acc, replacement) do
     parse_heredoc(t, acc <> ~s("""), replacement)
   end
+  defp parse_code(<< "\'\'\'"::utf8, t::binary >>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s("""), replacement)
+  end
   defp parse_code(<< "\""::utf8, t::binary >>, acc, replacement) do
     parse_string_literal(t, acc <> "\"", replacement)
   end
