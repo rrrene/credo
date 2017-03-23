@@ -55,7 +55,7 @@ defmodule Credo.Check.Runner do
           Map.put(memo, source_file.filename, source_file.lint_attributes)
         end)
 
-    if Map.size(lint_attribute_map) > 0 do
+    if lint_attribute_map |> Enum.filter(fn({_, value}) -> value != [] end) != [] do
       Credo.CLI.Output.UI.warn ""
       Credo.CLI.Output.UI.warn [:orange,
         "@lint attributes will be deprecated in the Credo v0.8 because they trigger\n",
