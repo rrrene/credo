@@ -1,28 +1,34 @@
 defmodule Credo.Check.Readability.SpaceAfterCommas do
   @moduledoc """
-  Don't use spaces after commas.
+  You can use white-space after commas to make items of lists,
+  tuples and other enumerations easier to separate from one another.
 
-      # good
+      # preferred
       alias Project.{Alpha, Beta}
       arr = [1, 2, 3, 4, 5]
       def some_func(first, second, third) do
         ...
       end
 
-      # hard to read
+      # NOT preferred - items are harder to separate
       alias Project.{Alpha,Beta}
       arr = [1,2,3,4,5]
       def some_func(first,second,third) do
         ...
       end
 
-  To make your code more readable put spaces or newlines after your commas.
+  Like all `Readability` issues, this one is not a technical concern.
+  But you can improve the odds of others reading and liking your code by making
+  it easier to follow.
   """
 
   @explanation [check: @moduledoc]
-  @unspaced_commas ~r/(\,\S)/
 
-  use Credo.Check, base_priority: :low
+  # Matches commas followed by non-whitespace unless preceded by
+  # a question mark that is not part of a variable or function name
+  @unspaced_commas ~r/(?<!\W\?)(\,\S)/
+
+  use Credo.Check
   alias Credo.Check.CodeHelper
   alias Credo.Code
 
