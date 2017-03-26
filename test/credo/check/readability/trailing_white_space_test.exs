@@ -15,6 +15,19 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report trailing whitespace inside heredocs" do
+"""
+defmodule CredoSampleModule do
+  @doc '''
+  Foo  
+  Bar
+  '''
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+
   #
   # cases raising issues
   #

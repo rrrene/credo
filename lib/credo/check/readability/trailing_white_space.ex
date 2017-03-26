@@ -8,12 +8,16 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @explanation [check: @moduledoc]
 
   use Credo.Check, base_priority: :low
+  alias Credo.Code
+  alias Credo.Code.Strings
 
   @doc false
-  def run(%SourceFile{lines: lines} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-
-    traverse_line(lines, [], issue_meta)
+    source_file.source
+    |> Strings.replace_with_spaces(".")
+    |> Code.to_lines
+    |> traverse_line([], issue_meta)
   end
 
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do
