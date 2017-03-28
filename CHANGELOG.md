@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.2
+
+- Fix `@lint` attribute deprecation hint
+- Fix filename handling bug for Windows
+- Fix flycheck formatting
+- Add param to ignore strings/heredocs in `TrailingWhiteSpace`
+
+### New check
+
+- Credo.Check.Readability.SpaceAfterCommas
+
 ## 0.7.1
 
 - Fix `--config_name`CLI switch
