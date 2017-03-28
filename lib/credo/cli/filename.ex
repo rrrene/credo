@@ -20,7 +20,11 @@ defmodule Credo.CLI.Filename do
       |> String.split(":")
       |> Enum.count
 
-    count == 2 || count == 3
+    if windows_path?(filename) do
+      count == 3 || count == 4
+    else
+      count == 2 || count == 3
+    end
   end
 
   @doc """
@@ -47,9 +51,19 @@ defmodule Credo.CLI.Filename do
   def remove_line_no_and_column(filename) do
     filename
     |> String.split(":")
-    |> List.first
+    |> remove_line_no_and_column(windows_path?(filename))
   end
 
+  defp remove_line_no_and_column(parts, true) do
+    Enum.at(parts, 0) <> ":" <> Enum.at(parts, 1)
+  end
+  defp remove_line_no_and_column(parts, false) do
+    List.first(parts)
+  end
+
+  defp windows_path?(path) do
+    String.contains?(path, ":\\")
+  end
 
   @doc """
   Adds a pos_suffix to a filename.
