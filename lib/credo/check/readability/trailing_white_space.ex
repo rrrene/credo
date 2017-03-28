@@ -5,7 +5,15 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   Most text editors provide a way to remove them automatically.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore_strings: "Set to `false` to check lines that are strings or in heredocs",
+    ]
+  ]
+  @default_params [
+    ignore_strings: true
+  ]
 
   use Credo.Check, base_priority: :low
   alias Credo.Code
@@ -14,10 +22,22 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
+
+    issue_meta = IssueMeta.for(source_file, params)
+    ignore_strings = Params.get(params, :ignore_strings, @default_params)
+
+    source_file
+    |> to_lines(ignore_strings)
+    |> traverse_line([], issue_meta)
+  end
+
+  defp to_lines(source_file, true) do
     source_file.source
     |> Strings.replace_with_spaces(".")
     |> Code.to_lines
-    |> traverse_line([], issue_meta)
+  end
+  defp to_lines(source_file, false) do
+    source_file.lines
   end
 
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do

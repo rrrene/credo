@@ -19,11 +19,12 @@ end
 """
 defmodule CredoSampleModule do
   @doc '''
-  Foo  
+  Foo++
   Bar
   '''
 end
-""" |> to_source_file
+""" |> String.replace("++", "  ")
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -45,5 +46,18 @@ end
     "defmodule CredoSampleModule do   \n@test true   \nend"
     |> to_source_file
     |> assert_issues(@described_check)
+  end
+
+  test "it should report trailing whitespace inside heredocs if :ignore_strings is false" do
+"""
+defmodule CredoSampleModule do
+  @doc '''
+  Foo++
+  Bar
+  '''
+end
+""" |> String.replace("++", "  ")
+    |> to_source_file
+    |> assert_issue(@described_check, ignore_strings: false)
   end
 end
