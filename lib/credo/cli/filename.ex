@@ -62,7 +62,7 @@ defmodule Credo.CLI.Filename do
   end
 
   defp windows_path?(path) do
-    String.contains?(path, ":\\")
+    String.contains?(path, ":\/")
   end
 
   @doc """
