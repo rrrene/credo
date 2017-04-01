@@ -1,12 +1,16 @@
 defmodule Credo.Check.Warning.LazyLogging do
   @moduledoc """
   Ensures laziness of Logger calls.
-  The best practice is to wrap an expensive logger calls into a zero argument function (fn -> "input" end)
-  Example:
-    Logger.info fn -> "expensive to calculate info" end
-  Instead of:
-      Logger.info "mission accomplished"
 
+  The best practice is to wrap an expensive logger calls into a zero argument function (fn -> "input" end)
+
+  Example:
+
+    Logger.info fn -> "expensive to calculate info" end
+
+  Instead of:
+
+    Logger.info "mission accomplished"
   """
 
   @explanation [check: @moduledoc]
@@ -31,28 +35,28 @@ defmodule Credo.Check.Warning.LazyLogging do
     {ast, issues_for_call(arguments, meta, state, issue_meta)}
   end
   defp traverse({level, meta, arguments} = ast, {true, _issues} = state, issue_meta) when level in @levels do
-    levels = Params.get(@default_params, :levels)
-    case Enum.member?(levels, level) do
-        true ->
-            {ast, issues_for_call(arguments, meta, state, issue_meta)}
-        _ ->
-            {ast, state}
+    params = IssueMeta.params(issue_meta)
+    levels = Params.get(params, :levels, @default_params)
+    if Enum.member?(levels, level) do
+        {ast, issues_for_call(arguments, meta, state, issue_meta)}
+    else
+        {ast, state}
     end
   end
   defp traverse({:import, _meta, arguments} = ast, state, _issue_meta) do
-     if logger_import?(arguments) do
+    if logger_import?(arguments) do
         {_, issue_list} = state
         {ast, {true, issue_list}}
-     else
+    else
         {ast, state}
-     end
+    end
   end
   defp traverse(ast, state, _issue_meta) do
     {ast, state}
   end
 
   defp issues_for_call([{:<<>>, _, [_ | _]} | _] = _args, meta, {import?, issues}, issue_meta) do
-      {import?, [issue_for(issue_meta, meta[:line]) | issues]}
+    {import?, [issue_for(issue_meta, meta[:line]) | issues]}
   end
   defp issues_for_call(_args, _meta, state, _issue_meta) do
     state
@@ -60,8 +64,8 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Logger usage is not lazzy",
-      line_no: line_no
+        message: "Logger usage is not lazzy",
+        line_no: line_no
   end
 
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]) do
