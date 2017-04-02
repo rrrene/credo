@@ -38,17 +38,17 @@ defmodule Credo.Check.Warning.LazyLogging do
     params = IssueMeta.params(issue_meta)
     levels = Params.get(params, :levels, @default_params)
     if Enum.member?(levels, level) do
-        {ast, issues_for_call(arguments, meta, state, issue_meta)}
+      {ast, issues_for_call(arguments, meta, state, issue_meta)}
     else
-        {ast, state}
+      {ast, state}
     end
   end
   defp traverse({:import, _meta, arguments} = ast, state, _issue_meta) do
     if logger_import?(arguments) do
-        {_, issue_list} = state
-        {ast, {true, issue_list}}
+      {_, issue_list} = state
+      {ast, {true, issue_list}}
     else
-        {ast, state}
+      {ast, state}
     end
   end
   defp traverse(ast, state, _issue_meta) do
@@ -64,8 +64,8 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-        message: "Logger usage is not lazzy",
-        line_no: line_no
+      message: "Logger usage is not lazzy",
+      line_no: line_no
   end
 
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]) do
