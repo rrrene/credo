@@ -10,7 +10,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.WithoutSpace do
 
   def property_value_for(source_file, _params) do
     source_file
-    |> CodeHelper.clean_strings_sigils_and_comments
+    |> CodeHelper.clean_charlists_strings_sigils_and_comments
     |> Code.to_lines
     |> Enum.map(&property_value_for_line(&1, source_file.filename))
   end

@@ -8,6 +8,7 @@ defmodule Credo.Check.CodeHelper do
   alias Credo.Code.Parameters
   alias Credo.Code.Module
   alias Credo.Code.Scope
+  alias Credo.Code.Charlists
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
   alias Credo.Service.SourceFileScopes
@@ -124,22 +125,23 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """
-  def clean_strings_sigils_and_comments(%SourceFile{filename: filename, source: source}) do
+  def clean_charlists_strings_sigils_and_comments(%SourceFile{filename: filename, source: source}) do
     case SourceFileCodeOnly.get(filename) do
       {:ok, value} ->
         value
       :notfound ->
-        result = clean_strings_sigils_and_comments(source)
+        result = clean_charlists_strings_sigils_and_comments(source)
 
         SourceFileCodeOnly.put(filename, result)
 
         result
     end
   end
-  def clean_strings_sigils_and_comments(source) do
+  def clean_charlists_strings_sigils_and_comments(source) do
     source
     |> Sigils.replace_with_spaces("")
     |> Strings.replace_with_spaces
+    |> Charlists.replace_with_spaces
     |> String.replace(~r/([^\?])#.+/, "\\1")
   end
 

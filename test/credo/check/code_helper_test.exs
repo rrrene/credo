@@ -43,7 +43,7 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    assert expected == source_file |> CodeHelper.clean_strings_sigils_and_comments
+    assert expected == source_file |> CodeHelper.clean_charlists_strings_sigils_and_comments
   end
 
   test "it should NOT report expected code 2" do
@@ -55,7 +55,7 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    assert expected == source_file |> CodeHelper.clean_strings_sigils_and_comments
+    assert expected == source_file |> CodeHelper.clean_charlists_strings_sigils_and_comments
   end
 
 
