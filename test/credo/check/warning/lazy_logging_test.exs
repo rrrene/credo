@@ -35,7 +35,7 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report for debug function" do
+  test "it should NOT report for user-defined debug function" do
 """
 defmodule CredoSampleModule do
   import Enum
@@ -79,6 +79,17 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation with :levels param" do
+"""
+defmodule CredoSampleModule do
+  def some_function(parameter1, parameter2) do
+    Logger.warn "Ok #\{inspect 1\}"
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, ignore: [:warn])
+  end
+
   #
   # cases raising issues
   #
@@ -89,11 +100,13 @@ defmodule CredoSampleModule do
 
   def some_function(parameter1, parameter2) do
     var_1 = "Hello world"
-    Logger.warn "The module: #\{var1\}"
+    Logger.debug "The module: #\{var1\}"
+    Logger.debug "The module: #\{var1\}"
+    Logger.debug "The module: #\{var1\}"
   end
 end
 """ |> to_source_file
-    |> assert_issue(@described_check)
+    |> assert_issues(@described_check)
   end
 
   test "it should report a violation with imported :debug from Logger" do
