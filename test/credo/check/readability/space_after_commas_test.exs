@@ -10,7 +10,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   test "it should NOT report when commas have spaces" do
 """
 defmodule CredoSampleModule do
-    @attribute {:foo, :bar}
+  @attribute {:foo, :bar}
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -19,8 +19,19 @@ end
   test "it should NOT report when commas have newlines" do
 """
 defmodule CredoSampleModule do
-    defstruct foo: nil,
-              bar: nil
+  defstruct foo: nil,
+            bar: nil
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report commas in sigils" do
+"""
+defmodule CredoSampleModule do
+  def fun(value) do
+    Regex.match?(~r/^\\d{1,2}\\/\\d{1,2}\\/\\d{4}$/, value)
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -29,7 +40,7 @@ end
   test "it should NOT require spaces after commas preceded by the `?` operator" do
 """
 defmodule CredoSampleModule do
-    @some_char_codes [?,, ?;]
+  @some_char_codes [?,, ?;]
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
@@ -42,11 +53,11 @@ end
   test "it should report when commas are not followed by spaces" do
 """
 defmodule CredoSampleModule do
-    @attribute {:foo,:bar}
+  @attribute {:foo,:bar}
 end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(issue) ->
-        assert 21 == issue.column
+        assert 19 == issue.column
         assert ",:" ==  issue.trigger
       end)
   end
@@ -67,7 +78,7 @@ end
   test "it requires spaces after commas preceded by the `?,`" do
 """
 defmodule CredoSampleModule do
-    @some_char_codes [?,,?;]
+  @some_char_codes [?,,?;]
 end
 """ |> to_source_file
     |> assert_issue(@described_check)
@@ -76,7 +87,7 @@ end
   test "it requires spaces after commas preceded by variables ending with a ?" do
 """
 defmodule CredoSampleModule do
-    @attribute [question?,answer]
+  @attribute [question?,answer]
 end
 """ |> to_source_file
     |> assert_issue(@described_check)
