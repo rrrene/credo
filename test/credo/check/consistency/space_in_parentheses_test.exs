@@ -20,6 +20,11 @@ defmodule Credo.Sample1 do
     defp count([?( | t], acc), do: count(t, acc + 1)
     defp count([?) | t], acc), do: count(t, acc - 1)
   end
+
+  def credo_test do
+    sh_snip = 'if [ ! -d /somedir ] ...'
+    foo = 'and here are some ( parenthesis )'
+  end
 end
 """
   @with_spaces """
