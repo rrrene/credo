@@ -42,6 +42,17 @@ x = ~S<     >
     assert expected == result
   end
 
+  test "it should return the source without string literals 4" do
+    source = """
+x = Regex.match?(~r/^\\d{1,2}\\/\\d{1,2}\\/\\d{4}$/, value)
+"""
+    expected = """
+x = Regex.match?(~r/                         /, value)
+"""
+    result = source |> Sigils.replace_with_spaces
+    assert expected == result
+  end
+
   test "it should not crash and burn" do
     source = """
 defmodule Credo.CLI.Command.List do
