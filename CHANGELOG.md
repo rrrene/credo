@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.3
+
+- Fix filename annotation when using `--read-from-stdin`
+- Fix filename handling on Windows
+- Fix consistency checks triggered by contents of sigils
+- Fix consistency checks triggered by contents of charlists
+
+### New check
+
+- Credo.Check.Warning.LazyLogging
+
 ## 0.7.2
 
 - Fix `@lint` attribute deprecation hint
