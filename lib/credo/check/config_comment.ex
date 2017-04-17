@@ -89,6 +89,14 @@ defmodule Credo.Check.ConfigComment do
 
   defp value_for(""), do: nil
   defp value_for(param_string) do
-    String.to_atom("Elixir.#{param_string}")
+    if regex_value?(param_string) do
+      param_string
+      |> String.slice(1..-2)
+      |> Regex.compile!("i")
+    else
+      String.to_atom("Elixir.#{param_string}")
+    end
   end
+
+  defp regex_value?(param_string), do: param_string =~ ~r'^/.+/$'
 end
