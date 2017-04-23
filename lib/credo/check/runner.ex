@@ -58,7 +58,7 @@ defmodule Credo.Check.Runner do
     if Enum.any?(lint_attribute_map, fn({_, value}) -> value != [] end) do
       Credo.CLI.Output.UI.warn ""
       Credo.CLI.Output.UI.warn [:orange,
-        "@lint attributes will be deprecated in the Credo v0.8 because they trigger\n",
+        "@lint attributes will be deprecated in Credo v0.8 because they trigger\n",
         "compiler warnings on Elixir v1.4.\n\n",
         "Please consider reporting the cases where you needed @lint attributes\n",
         "to help us devise a new solution: https://github.com/rrrene/credo/issues/new"]
