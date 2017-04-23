@@ -38,27 +38,29 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
     defp single_names_only({unquote(op), _, [{{:., _, [{:__aliases__, _, _mod_list}, :{}]}, _, _multi_mod_list}]} = ast, usages) do
       {ast, usages}
     end
-
-    defp multi_names_only({unquote(op) = op, _, [{{:., [line: line_no], [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, usages) do
-      names =
-        multi_mod_list
-        |> Enum.map(fn(tuple) -> Name.full([Name.full(mod_list), Name.full(tuple)]) end)
-      {ast, usages ++ [%{reuse_op: op, names: names, line_no: line_no}]}
-    end
   end
-
   defp single_names_only(ast, usages) do
     {ast, usages}
   end
 
+  for op <- @reuse_ops do
+    defp multi_names_only({unquote(op) = op, _, [{{:., [line: line_no], [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, usages) do
+      names =
+        Enum.map(multi_mod_list, fn({:__aliases__, _, last_names}) ->
+          Name.full(mod_list ++ last_names)
+        end)
+
+      {ast, usages ++ [%{reuse_op: op, names: names, line_no: line_no}]}
+    end
+  end
   defp multi_names_only(ast, usages) do
     {ast, usages}
   end
 
   defp base_name(name) do
-    parts = String.split(name, @name_delimiter)
-    parts
-    |> Enum.slice(0, Enum.count(parts) - 1)
+    name
+    |> String.split(@name_delimiter)
+    |> Enum.slice(0..-2)
     |> Enum.join(@name_delimiter)
   end
 end

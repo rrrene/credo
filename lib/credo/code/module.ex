@@ -6,6 +6,7 @@ defmodule Credo.Code.Module do
 
   alias Credo.Code
   alias Credo.Code.Block
+  alias Credo.Code.Name
 
   @def_ops [:def, :defp, :defmacro]
 
@@ -21,7 +22,7 @@ defmodule Credo.Code.Module do
   defp find_aliases({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
     module_names =
       mod_list
-      |> Credo.Code.Name.full
+      |> Name.full
       |> List.wrap
 
     {ast, aliases ++ module_names}
@@ -30,7 +31,7 @@ defmodule Credo.Code.Module do
   defp find_aliases({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, aliases) do
     module_names =
       Enum.map(multi_mod_list, fn(tuple) ->
-        Credo.Code.Name.full([Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)])
+        Name.full([Name.full(mod_list), Name.full(tuple)])
       end)
 
     {ast, aliases ++ module_names}
@@ -181,7 +182,7 @@ defmodule Credo.Code.Module do
   defp find_dependent_modules({:defmodule, _, [{:__aliases__, _, mod_list}, _do_block]} = ast, modules) do
     module_names =
       mod_list
-      |> Credo.Code.Name.full
+      |> Name.full
       |> List.wrap
 
     {ast, modules -- module_names}
@@ -190,7 +191,7 @@ defmodule Credo.Code.Module do
   defp find_dependent_modules({:alias, _, [{:__aliases__, _, mod_list}]} = ast, aliases) do
     module_names =
       mod_list
-      |> Credo.Code.Name.full
+      |> Name.full
       |> List.wrap
 
     {ast, aliases -- module_names}
@@ -199,7 +200,7 @@ defmodule Credo.Code.Module do
   defp find_dependent_modules({:alias, _, [{{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}]} = ast, modules) do
     module_names =
       Enum.flat_map(multi_mod_list, fn(tuple) ->
-        [Credo.Code.Name.full(mod_list), Credo.Code.Name.full(tuple)]
+        [Name.full(mod_list), Name.full(tuple)]
       end)
 
     {ast, modules -- module_names}
@@ -207,7 +208,7 @@ defmodule Credo.Code.Module do
   defp find_dependent_modules({:__aliases__, _, mod_list} = ast, modules) do
     module_names =
       mod_list
-      |> Credo.Code.Name.full
+      |> Name.full
       |> List.wrap
 
     {ast, modules ++ module_names}

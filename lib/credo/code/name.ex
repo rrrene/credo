@@ -40,16 +40,10 @@ defmodule Credo.Code.Name do
     |> to_string
   end
 
-  def full({:__aliases__, _, mod_list}) do
-    full(mod_list)
-  end
   def full(mod_list) when is_list(mod_list) do
     mod_list
     |> Enum.map(&full/1)
     |> Enum.join(".")
-  end
-  def full({name, _, nil}) when is_atom(name) do
-    full(name)
   end
   def full(name) when is_atom(name) do
     name
@@ -59,6 +53,12 @@ defmodule Credo.Code.Name do
   end
   def full(name) when is_binary(name) do
     name
+  end
+  def full({name, _, nil}) when is_atom(name) do
+    full(name)
+  end
+  def full({:__aliases__, _, mod_list}) do
+    full(mod_list)
   end
   def full({{:., _, [{:__aliases__, _, mod_list}, name]}, _, _}) do
     full([full(mod_list), name])
