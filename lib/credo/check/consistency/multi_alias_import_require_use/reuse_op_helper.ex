@@ -31,7 +31,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.ReuseOpHelper do
   end
 
   for op <- @reuse_ops do
-    defp single_names_only({unquote(op) = op, [line: line_no], [{:__aliases__, _, mod_list}]} = ast, usages) do
+    defp single_names_only({unquote(op) = op, [line: line_no], [{:__aliases__, _, mod_list}]} = ast, usages) when length(mod_list) > 1 do
       {ast, usages ++ [%{reuse_op: op, name: Name.full(mod_list), line_no: line_no}]}
     end
 
