@@ -27,15 +27,15 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_or_default(dir, config_name \\ nil, safe \\ false) do
-    dir
+  def read_or_default(dirs, config_name \\ nil, safe \\ false) do
+    dirs
     |> relevant_config_files
     |> Enum.filter(&File.exists?/1)
     |> Enum.map(&File.read!/1)
     |> List.insert_at(0, @default_config_file)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
+    |> Enum.map(&from_exs(dirs, config_name || @default_config_name, &1, safe))
     |> merge
-    |> add_given_directory_to_files(dir)
+    |> add_given_directory_to_files(dirs)
   end
 
   defp relevant_config_files(dir) do
@@ -48,13 +48,19 @@ defmodule Credo.ConfigFile do
   Returns all parent directories of the given `dir` as well as each `./config`
   sub-directory.
   """
-  def relevant_directories(dir) do
+  def relevant_directories(dirs) do
+    dirs
+    |> Enum.flat_map(&get_dir_paths_for_dir/1)
+    |> Enum.uniq
+    |> add_config_dirs
+  end
+
+  defp get_dir_paths_for_dir(dir) do
     dir
     |> Path.expand
     |> Path.split
     |> Enum.reverse
     |> get_dir_paths
-    |> add_config_dirs
   end
 
   defp get_dir_paths(dirs), do: do_get_dir_paths(dirs, [])
@@ -190,10 +196,12 @@ defmodule Credo.ConfigFile do
       included:
         files[:included]
         |> Enum.map(&add_directory_to_file(&1, dir))
+        |> List.flatten
         |> Enum.uniq,
       excluded:
         files[:excluded]
         |> Enum.map(&add_directory_to_file(&1, dir))
+        |> List.flatten
         |> Enum.uniq
     }
 

@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Options do
   defstruct command: nil,
-            path: nil,
+            paths: nil,
             args: [],
             switches: nil,
             unknown_switches: [],
@@ -41,11 +41,11 @@ defmodule Credo.CLI.Options do
   end
 
   defp parse_result({switches_keywords, args, unknown_switches_keywords}, current_dir, command_names) do
-    {command, path, unknown_args} = split_args(args, current_dir, command_names)
+    {command, paths, unknown_args} = split_args(args, current_dir, command_names)
 
     %__MODULE__{
       command: command,
-      path: path,
+      paths: Enum.reverse(paths),
       args: unknown_args,
       switches: Enum.into(switches_keywords, %{}),
       unknown_switches: unknown_switches_keywords
@@ -53,32 +53,36 @@ defmodule Credo.CLI.Options do
   end
 
   defp split_args([], current_dir, _) do
-      {path, unknown_args} = extract_path([], current_dir)
+      {paths, unknown_args} = extract_paths([], current_dir, [], [])
 
-      {nil, path, unknown_args}
+      {nil, paths, unknown_args}
   end
   defp split_args([head | tail] = args, current_dir, command_names) do
     if Enum.member?(command_names, head) do
-      {path, unknown_args} = extract_path(tail, current_dir)
+      {paths, unknown_args} = extract_paths(tail, current_dir, [], [])
 
-      {head, path, unknown_args}
+      {head, paths, unknown_args}
     else
-      {path, unknown_args} = extract_path(args, current_dir)
+      {paths, unknown_args} = extract_paths(args, current_dir, [], [])
 
-      {nil, path, unknown_args}
+      {nil, paths, unknown_args}
     end
   end
 
-  defp extract_path([], base_dir) do
-    {base_dir, []}
+  defp extract_paths([], base_dir, [], unknown_args) do
+    {[base_dir], unknown_args}
   end
-  defp extract_path([head | tail] = args, base_dir) do
+
+  defp extract_paths([], _base_dir, paths, unknown_args) do
+    {paths, unknown_args}
+  end
+  defp extract_paths([head | tail], base_dir, paths, unknown_args) do
     path = Path.join(base_dir, head)
 
     if File.exists?(path) or path =~ ~r/[\?\*]/ do
-      {path, tail}
+      extract_paths(tail, base_dir, [path | paths], unknown_args)
     else
-      {base_dir, args}
+      extract_paths(tail, base_dir, paths, [head | unknown_args])
     end
   end
 end

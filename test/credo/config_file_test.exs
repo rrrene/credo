@@ -141,7 +141,7 @@ defmodule Credo.ConfigFileTest do
   end
 
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do
-    dirs = ConfigFile.relevant_directories(".")
+    dirs = ConfigFile.relevant_directories(["."])
     config_subdir_count =
       dirs
       |> Enum.filter(&(String.ends_with?(&1, "config")))
