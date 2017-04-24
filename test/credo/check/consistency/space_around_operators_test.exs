@@ -55,6 +55,7 @@ defmodule Credo.Sample2 do
       <<102::unsigned-big-integer, rest::binary>>
       <<102::unsigned-big-integer-size(8), rest::binary>>
       <<102::unsigned-big-integer-8, rest::binary>>
+      <<102::signed-little-float-8, rest::binary>>
       <<102::8-integer-big-unsigned, rest::binary>>
       <<102, rest::binary>>
       << valsize :: 32-unsigned, rest::binary >>
@@ -180,7 +181,7 @@ end
 
   test "it should report an issue for mixed styles /1" do
     [
-      @without_spaces, @with_spaces, @with_spaces2
+      @without_spaces, @with_spaces, @with_spaces2, @with_spaces3
     ]
     |> to_source_files()
     |> assert_issue(@described_check)
