@@ -72,13 +72,17 @@ defmodule Credo.CLI.Options do
   defp extract_path([], base_dir) do
     {base_dir, []}
   end
-  defp extract_path([head | tail] = args, base_dir) do
-    path = Path.join(base_dir, head)
-
+  defp extract_path([path | tail] = args, base_dir) do
     if File.exists?(path) or path =~ ~r/[\?\*]/ do
       {path, tail}
     else
-      {base_dir, args}
+      path_with_base = Path.join(base_dir, path)
+
+      if File.exists?(path_with_base) do
+        {path_with_base, tail}
+      else
+        {base_dir, args}
+      end
     end
   end
 end
