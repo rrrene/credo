@@ -49,7 +49,6 @@
       checks: [
         {Credo.Check.Consistency.ExceptionNames},
         {Credo.Check.Consistency.LineEndings},
-        {Credo.Check.Consistency.MultiAliasImportRequireUse},
         {Credo.Check.Consistency.ParameterPatternMatching},
         {Credo.Check.Consistency.SpaceAroundOperators},
         {Credo.Check.Consistency.SpaceInParentheses},
@@ -122,6 +121,7 @@
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
+        {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
 
         # Deprecated checks (these will be deleted after a grace period)
         {Credo.Check.Readability.Specs, false},
