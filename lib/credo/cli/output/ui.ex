@@ -6,6 +6,7 @@ defmodule Credo.CLI.Output.UI do
   def edge(color, indent \\ 2) when is_integer(indent) do
     [:reset, color, @edge |> String.ljust(indent)]
   end
+  def edge, do: @edge
 
   def use_colors(config) do
     @shell_service.use_colors(config.color)

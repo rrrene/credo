@@ -69,7 +69,7 @@ defmodule Credo.CLI do
   end
 
   defp parse_options(argv) when is_list(argv) do
-    options = Options.parse(argv, File.cwd!, Commands.names)
+    options = Options.parse(argv, File.cwd!, Commands.names, [UI.edge])
     config = ConfigBuilder.parse(options)
 
     options

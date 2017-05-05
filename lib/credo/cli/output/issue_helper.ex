@@ -54,7 +54,7 @@ defmodule Credo.CLI.Output.IssueHelper do
       UI.edge(outer_color, @indent),
         filename_color, :faint, filename |> to_string,
         :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
-        :faint, " (#{issue.scope})"
+        :conceal, " #", :reset, :faint, "(#{issue.scope})"
     ]
     |> UI.puts
 

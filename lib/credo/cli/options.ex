@@ -34,13 +34,14 @@ defmodule Credo.CLI.Options do
     v: :version
   ]
 
-  def parse(argv, current_dir, command_names) do
+  def parse(argv, current_dir, command_names, ignored_args) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)
-    |> parse_result(current_dir, command_names)
+    |> parse_result(current_dir, command_names, ignored_args)
   end
 
-  defp parse_result({switches_keywords, args, unknown_switches_keywords}, current_dir, command_names) do
+  defp parse_result({switches_keywords, args, unknown_switches_keywords}, current_dir, command_names, ignored_args) do
+    args = Enum.reject(args, &(Enum.member?(ignored_args, &1)))
     {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
     %__MODULE__{
