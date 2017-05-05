@@ -66,7 +66,7 @@ defmodule Credo.ConfigBuilder do
 
     Config.set_strict(new_config)
   end
-  defp set_strict(config, _), do: config
+  defp set_strict(config, _), do: Config.set_strict(config)
 
   defp set_help(config, %{help: true}) do
     %Config{config | help: true}
