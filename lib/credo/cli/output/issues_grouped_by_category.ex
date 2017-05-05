@@ -41,13 +41,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     Output.print_skipped_checks(config)
   end
 
-  defp checking_suffix(count) do
-    if count > @many_source_files do
-      " (this might take a while)"
-    else
-      ""
-    end
+  defp checking_suffix(count) when count > @many_source_files do
+    " (this might take a while)"
   end
+  defp checking_suffix(_), do: ""
 
   @doc "Called after the analysis has run."
   def print_after_info(source_files, config, time_load, time_run) do
