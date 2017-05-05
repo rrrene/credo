@@ -29,7 +29,11 @@ defmodule Credo.Check.Design.AliasUsage do
   tweaking or disabling this check.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
+    if_called_more_often_than: "Only raise an issue if a module is called more often than this.",
+  ]
   @default_params [
       excluded_namespaces: [
         "File",
