@@ -77,7 +77,7 @@ defmodule Credo.Config do
     %__MODULE__{config | all: true, min_priority: -99}
   end
   def set_strict(%__MODULE__{strict: false} = config) do
-    %__MODULE__{config | all: false, min_priority: 0}
+    %__MODULE__{config | min_priority: 0}
   end
   def set_strict(config), do: config
 
