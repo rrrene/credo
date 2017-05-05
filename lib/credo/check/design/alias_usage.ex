@@ -49,6 +49,7 @@ defmodule Credo.Check.Design.AliasUsage do
                               Record Regex Set Stream String StringIO Supervisor
                               System Task Tuple URI Version],
       if_nested_deeper_than: 0,
+      if_called_more_often_than: 0,
     ]
 
   use Credo.Check, base_priority: :normal
@@ -61,10 +62,12 @@ defmodule Credo.Check.Design.AliasUsage do
     excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
     excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
     if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
+    if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
 
     source_file
     |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
-    |> filter_issues(if_nested_deeper_than)
+    |> filter_issues_if_called_more_often_than(if_called_more_often_than)
+    |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) do
@@ -143,9 +146,26 @@ defmodule Credo.Check.Design.AliasUsage do
   defp tuple?(t) when is_tuple(t), do: true
   defp tuple?(_), do: false
 
-  defp filter_issues(issues, if_nested_deeper_than) do
+  defp filter_issues_if_called_more_often_than(issues, count) do
+    issues
+    |> Enum.reduce(%{}, fn(issue, memo) ->
+        list = memo[issue.trigger] || []
+
+        Map.put(memo, issue.trigger, [issue | list])
+      end)
+    |> Enum.filter_map(
+      fn({_, value}) ->
+        length(value) > count
+      end,
+      fn({_, value}) ->
+        value
+      end)
+    |> List.flatten
+  end
+
+  defp filter_issues_if_nested_deeper_than(issues, count) do
     Enum.filter(issues, fn(issue) ->
-      Name.parts_count(issue.trigger) > if_nested_deeper_than
+      Name.parts_count(issue.trigger) > count
     end)
   end
 

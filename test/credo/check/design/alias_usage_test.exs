@@ -37,12 +37,24 @@ defmodule CredoSampleModule do
   alias ExUnit.Case
 
   def fun1 do
-    something
-    |> Credo.Foo.Bar.call
+    Credo.Foo.Bar.call
   end
 end
 """ |> to_source_file
     |> refute_issues(@described_check, if_nested_deeper_than: 3)
+  end
+
+  test "it should NOT report if configured not to complain up to a certain number of calls to the same module" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+
+  def fun1 do
+    Credo.Foo.Bar.call
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, if_called_more_often_than: 1)
   end
 
   test "it should NOT report violation in `@spec`s" do
@@ -152,6 +164,23 @@ defmodule CredoSampleModule do
 end
 """ |> to_source_file
     |> assert_issue(@described_check, if_nested_deeper_than: 3)
+  end
+
+  test "it should report if configured to complain up to a certain number of calls to the same module" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+
+  def fun1 do
+    Credo.Foo.Bar.call
+  end
+
+  def fun1 do
+    Credo.Foo.Bar.call
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, if_called_more_often_than: 1)
   end
 
   #
