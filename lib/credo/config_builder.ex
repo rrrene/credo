@@ -21,9 +21,16 @@ defmodule Credo.ConfigBuilder do
       color: config_file.color,
       checks: config_file.checks,
       requires: config_file.requires,
-      strict: config_file.strict,
+      strict: strict_via_args_or_config_file?(args, config_file),
       check_for_updates: config_file.check_for_updates,
     }
+  end
+
+  defp strict_via_args_or_config_file?([], config_file) do
+    config_file.strict
+  end
+  defp strict_via_args_or_config_file?([potential_path | _], config_file) do
+    Filename.contains_line_no?(potential_path) || config_file.strict
   end
 
   defp add_switches_to_config(%Config{} = config, switches) do
