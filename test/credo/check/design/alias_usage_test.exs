@@ -58,6 +58,28 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report violation on impossible additional alias /2" do
+"""
+defmodule Test do
+  # Modules are
+  #
+  # - AppName.Foo.User
+  # - AppName.Bar.User
+  #
+  alias AppName.Foo.User
+
+  def foo do
+    User.some_fun() # resolves to AppName.Foo.User
+  end
+
+  def bar do
+    AppName.Bar.User.some_other_fun()
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report violation in case of ambiguous module deps" do
 """
 defmodule Test do
