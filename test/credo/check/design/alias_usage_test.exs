@@ -31,6 +31,20 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report if configured not to complain until a certain depth" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+
+  def fun1 do
+    something
+    |> Credo.Foo.Bar.call
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, if_nested_deeper_than: 3)
+  end
+
   test "it should NOT report violation in `@spec`s" do
 """
 defmodule Sample do
@@ -124,6 +138,20 @@ defmodule CredoSampleModule do
 end
 """ |> to_source_file
     |> assert_issue(@described_check)
+  end
+
+  test "it should report if configured to complain start at a certain depth" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+
+  def fun1 do
+    something
+    |> Credo.Foo.Bar.Baz.call
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, if_nested_deeper_than: 3)
   end
 
   #
