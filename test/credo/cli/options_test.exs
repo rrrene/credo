@@ -15,7 +15,7 @@ defmodule Credo.CLI.OptionsTest do
 
   defp parse(args) do
     dir = fixture_path(@fixture_name)
-    Options.parse(args, dir, @command_names)
+    Options.parse(args, dir, @command_names, [])
   end
 
   defp switches(args), do: parse(args).switches
