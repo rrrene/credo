@@ -143,6 +143,20 @@ defmodule OtherModule3 do
   end
 end
 """
+  @with_spaces5 """
+defmodule CredoTest do
+  @doc "test"
+
+  def test do
+    &String.capitalize/1
+    &String.downcase/1
+    &String.reverse/1
+
+    "foo" <> " Add more."
+    1 + 1 = 2
+  end
+end
+"""
   @with_and_without_spaces """
 defmodule OtherModule3 do
   defmacro foo do
@@ -162,6 +176,14 @@ end
   test "it should not report issues if spaces are used everywhere" do
     [
       @with_spaces, @with_spaces2, @with_spaces3, @with_spaces4
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
+
+  test "it should not report issues if spaces are used everywhere in a single file" do
+    [
+      @with_spaces5
     ]
     |> to_source_files()
     |> refute_issues(@described_check)
