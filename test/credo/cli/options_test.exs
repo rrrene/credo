@@ -83,6 +83,6 @@ defmodule Credo.CLI.OptionsTest do
     args = String.split("src/**/*.ex --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("src/**/*.ex") == options.path
+    assert "src/**/*.ex" == options.path
   end
 end
