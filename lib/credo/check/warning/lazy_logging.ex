@@ -17,8 +17,8 @@ defmodule Credo.Check.Warning.LazyLogging do
       # the interpolation is executed whether or not the info is logged
 
       Logger.debug "This happened: \#{expensive_calculation(arg1, arg2)}"
-
   """
+
   @explanation [check: @moduledoc]
   @logger_functions [:debug, :info, :warn, :error]
   @default_params [
