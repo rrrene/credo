@@ -13,13 +13,13 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
       unless allowed? do
         raise "Not allowed!"
       else
-        proceed_as_planned
+        proceed_as_planned()
       end
 
   to look like this:
 
       if allowed? do
-        proceed_as_planned
+        proceed_as_planned()
       else
         raise "Not allowed!"
       end

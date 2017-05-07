@@ -4,7 +4,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
   * For functions, they should end in a question mark.
 
-      # okay
+      # preferred
 
       defp user?(cookie) do
       end
@@ -12,7 +12,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
       defp has_attachment?(mail) do
       end
 
-      # not okay
+      # NOT preferred
 
       defp is_user?(cookie) do
       end

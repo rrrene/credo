@@ -6,14 +6,17 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
 
       def salutation(username) do
         username = String.downcase(username)
+
         "Hi #\{username}"
       end
 
   ... we forgot to save the downcased username in this example:
 
       # This is bad because it does not modify the username variable!
+
       def salutation(username) do
         String.downcase(username)
+
         "Hi #\{username}"
       end
 

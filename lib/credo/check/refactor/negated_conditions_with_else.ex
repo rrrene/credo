@@ -13,13 +13,13 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
       if !allowed? do
         raise "Not allowed!"
       else
-        proceed_as_planned
+        proceed_as_planned()
       end
 
   ... should be refactored to look like this:
 
       if allowed? do
-        proceed_as_planned
+        proceed_as_planned()
       else
         raise "Not allowed!"
       end

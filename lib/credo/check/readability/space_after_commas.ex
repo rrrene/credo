@@ -4,6 +4,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   tuples and other enumerations easier to separate from one another.
 
       # preferred
+
       alias Project.{Alpha, Beta}
       arr = [1, 2, 3, 4, 5]
       def some_func(first, second, third) do
@@ -11,6 +12,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       end
 
       # NOT preferred - items are harder to separate
+
       alias Project.{Alpha,Beta}
       arr = [1,2,3,4,5]
       def some_func(first,second,third) do

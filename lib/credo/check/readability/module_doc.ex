@@ -2,6 +2,24 @@ defmodule Credo.Check.Readability.ModuleDoc do
   @moduledoc """
   Every module should contain comprehensive documentation.
 
+      # preferred
+
+      defmodule MyApp.Web.Search do
+        @moduledoc \"\"\"
+        This module provides a public API for all search queries originating
+        in the web layer.
+        \"\"\"
+      end
+
+      # also okay: explicitly say there is no documentation
+
+      defmodule MyApp.Web.Search do
+        @moduledoc \"\"\"
+        This module provides a public API for all search queries originating
+        in the web layer.
+        \"\"\"
+      end
+
   Many times a sentence or two in plain english, explaining why the module
   exists, will suffice. Documenting your train of thought this way will help
   both your co-workers and your future-self.

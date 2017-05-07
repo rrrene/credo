@@ -11,6 +11,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
         time = MyApp.DateTime.now
         time = MyApp.DateTime.later(time, 5, :days)
         {:ok, time} = verify_available_time(time)
+
         time
       end
 
@@ -21,6 +22,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
         today = DateTime.now
         proposed_time = DateTime.later(today, 5, :days)
         {:ok, verified_time} = verify_available_time(proposed_time)
+
         verified_time
       end
 

@@ -1,9 +1,28 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
   @moduledoc """
-  Checks that each pipe chains start with a "raw" value for better readability.
+  Pipes (`|>`) can can become more readable by starting with a "raw" value.
+
+  So while this is easily comprehendable:
+
+      list
+      |> Enum.take(5)
+      |> Enum.shuffle
+      |> pick_winner()
+
+  This might be harder to read:
+
+      Enum.take(list, 5)
+      |> Enum.shuffle
+      |> pick_winner()
+
+  As always: This is just a suggestion. Check the configuration options for
+  tweaking or disabling this check.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    excluded_functions: "All functions listed will be ignored."
+  ]
   @default_params [excluded_functions: []]
 
   use Credo.Check

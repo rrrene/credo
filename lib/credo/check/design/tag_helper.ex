@@ -24,5 +24,4 @@ defmodule Credo.Check.Design.TagHelper do
 
   defp tags?({_line_no, _line, nil}), do: false
   defp tags?({_line_no, _line, _tag}), do: true
-
 end

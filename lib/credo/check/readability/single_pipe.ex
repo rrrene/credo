@@ -7,12 +7,12 @@ defmodule Credo.Check.Readability.SinglePipe do
       list
       |> Enum.take(5)
       |> Enum.shuffle
-      |> evaluate
+      |> evaluate()
 
   The code in this example ...
 
       list
-      |> evaluate
+      |> evaluate()
 
   ... should be refactored to look like this:
 

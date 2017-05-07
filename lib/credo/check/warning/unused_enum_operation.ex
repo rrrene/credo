@@ -7,14 +7,17 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
 
       def prepend_my_username(my_username, usernames) do
         valid_usernames = Enum.reject(usernames, &is_nil/1)
+
         [my_username] ++ valid_usernames
       end
 
   ... we forgot to save the downcased username in this example:
 
       # This is bad because it does not modify the usernames variable!
+
       def prepend_my_username(my_username, usernames) do
         Enum.reject(usernames, &is_nil/1)
+
         [my_username] ++ valid_usernames
       end
 

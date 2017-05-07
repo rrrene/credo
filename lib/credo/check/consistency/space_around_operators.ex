@@ -4,10 +4,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   **preferred** way, although other styles are possible, as long as it is
   applied consistently.
 
-      # preferred way
+      # preferred
+
       1 + 2 * 4
 
       # also okay
+
       1+2*4
 
   While this is not necessarily a concern for the correctness of your code,

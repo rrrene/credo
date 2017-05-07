@@ -2,6 +2,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
   @moduledoc """
   Having double negations in your code obscures a parameters original value.
 
+      # NOT preferred
+
       !!var
 
   This will return `false` for `false` and `nil`, and `true` for anything else.
@@ -19,6 +21,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
 
   In these case, you would be better off making the cast explicit by introducing
   a helper function:
+
+      # preferred
 
       defp present?(nil), do: false
       defp present?(false), do: false

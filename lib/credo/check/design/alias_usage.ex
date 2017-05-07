@@ -25,8 +25,8 @@ defmodule Credo.Check.Design.AliasUsage do
   at a glance. So if you are attempting to build a medium to large project,
   this can help you to get your boundaries/layers/contracts right.
 
-  Like all `Software Design` issues, this is just advice and might not be
-  applicable to your project/situation.
+  As always: This is just a suggestion. Check the configuration options for
+  tweaking or disabling this check.
   """
 
   @explanation [check: @moduledoc]

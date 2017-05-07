@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
       # okay, simple wildcard assignment:
 
       if contents = File.read!("foo.txt") do
-        do_something
+        do_something()
       end
 
   the following should be avoided, since it mixes a pattern match with a
@@ -17,21 +17,23 @@ defmodule Credo.Check.Refactor.MatchInCondition do
       # considered too "complex":
 
       if {:ok, contents} = File.read("foo.txt") do
-        do_something
+        do_something()
       end
 
       # also considered "complex":
 
       if allowed? && ( contents = File.read!("foo.txt") ) do
-        do_something
+        do_something()
       end
 
   If you want to match for something and execute another block otherwise,
   consider using a `case` statement:
 
       case File.read("foo.txt") do
-        {:ok, contents} -> do_something
-        _ -> do_something_else
+        {:ok, contents} ->
+          do_something()
+        _ ->
+          do_something_else()
       end
 
   """

@@ -7,7 +7,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
 
   See also: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 
-   Most text editors ensure this "final newline" automatically.
+  Most text editors ensure this "final newline" automatically.
   """
 
   @explanation [check: @moduledoc]

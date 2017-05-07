@@ -6,6 +6,7 @@ defmodule Credo.Check.Refactor.Nesting do
         def some_function(parameter1, parameter2) do
           Enum.reduce(var1, list, fn({_hash, nodes}, list) ->
             filenames = nodes |> Enum.map(&(&1.filename))
+
             Enum.reduce(list, [], fn(item, acc) ->
               if item.filename do
                 item               # <-- this is nested 3 levels deep

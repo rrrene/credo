@@ -3,12 +3,14 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   Because `if` and `unless` are macros, the preferred style is to not use
   parentheses around conditions.
 
-      # preferred way
+      # preferred
+
       if valid?(username) do
         # ...
       end
 
-      # NOT okay
+      # NOT preferred
+
       if( valid?(username) ) do
         # ...
       end
