@@ -145,12 +145,14 @@ end
 """
   @with_spaces5 """
 defmodule CredoTest do
-  @doc "test"
+  @moduledoc ""
 
   def test do
     &String.capitalize/1
     &String.downcase/1
     &String.reverse/1
+
+    [&String.capitalize/1, &String.downcase/1, &String.reverse/1]
 
     "foo" <> " Add more."
     1 + 1 = 2

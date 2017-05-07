@@ -6,19 +6,37 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   def property_value, do: :without_space
 
   def property_value_for(source_file, _params) do
-    property_values_for(source_file.source, source_file.filename)
+    property_values_for(source_file)
   end
 
-  defp property_values_for(source, filename) do
-    source
+  defp property_values_for(source_file) do
+    source_file.source
     |> Credo.Code.to_tokens
     |> check_tokens([])
     |> Enum.uniq
-    |> Enum.map(&to_property_values(&1, filename))
+    |> Enum.map(&to_property_values(&1, source_file))
   end
 
-  defp to_property_values({{line_no, column, _}, trigger}, filename) do
-    PropertyValue.for(property_value(), filename: filename, line_no: line_no, column: column, trigger: trigger)
+  defp to_property_values({{line_no, column, _}, :/ = trigger}, source_file) do
+    line = SourceFile.line_at(source_file, line_no)
+
+    function_capture? =
+      ~r/(\&[a-zA-Z0-9\.\_\?\!]+\/\d+)/     # pattern to detect &Mod.fun/4
+      |> Regex.run(line, return: :index)
+      |> List.wrap
+      |> Enum.any?(fn({start_index, _end_index}) ->
+          String.slice(line, start_index..column+1) =~ ~r/^\S+$/
+        end)
+
+    unless function_capture? do
+      to_property_values(line_no, column, trigger, source_file)
+    end
+  end
+  defp to_property_values({{line_no, column, _}, trigger}, source_file) do
+    to_property_values(line_no, column, trigger, source_file)
+  end
+  defp to_property_values(line_no, column, trigger, source_file) do
+    PropertyValue.for(property_value(), filename: source_file.filename, line_no: line_no, column: column, trigger: trigger)
   end
 
   defp check_tokens([], acc), do: acc
