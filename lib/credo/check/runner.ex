@@ -137,6 +137,7 @@ defmodule Credo.Check.Runner do
     rescue
       error ->
         warn_about_failed_run(check, source_file)
+
         if config.crash_on_error do
           reraise error, System.stacktrace()
         else
