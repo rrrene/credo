@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.4
+
+-	Fix false positives in SpacesAroundOperators
+- Fix `--all` CLI switch
+- Always enforce `strict` mode for `<filename>:<line_no>`
+- Improve docs on checks
+- Disable `MultiAliasImportRequireUse` by default
+
+### Disabled checks
+
+- Credo.Check.Consistency.MultiAliasImportRequireUse
+
 ## 0.7.3
 
 - Fix filename annotation when using `--read-from-stdin`
