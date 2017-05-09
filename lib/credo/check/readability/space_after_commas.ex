@@ -6,17 +6,19 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       # preferred
 
       alias Project.{Alpha, Beta}
-      arr = [1, 2, 3, 4, 5]
+
       def some_func(first, second, third) do
-        ...
+        list = [1, 2, 3, 4, 5]
+        # ...
       end
 
       # NOT preferred - items are harder to separate
 
       alias Project.{Alpha,Beta}
-      arr = [1,2,3,4,5]
+
       def some_func(first,second,third) do
-        ...
+        list = [1,2,3,4,5]
+        # ...
       end
 
   Like all `Readability` issues, this one is not a technical concern.
