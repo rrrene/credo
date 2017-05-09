@@ -149,19 +149,19 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings and
   Sigils.
   """
-  def clean_strings_and_sigils(%SourceFile{filename: filename, source: source}) do
+  def clean_charlists_strings_and_sigils(%SourceFile{filename: filename, source: source}) do
     case SourceFileWithoutStringAndSigils.get(filename) do
       {:ok, value} ->
         value
       :notfound ->
-        result = clean_strings_and_sigils(source)
+        result = clean_charlists_strings_and_sigils(source)
 
         SourceFileWithoutStringAndSigils.put(filename, result)
 
         result
     end
   end
-  def clean_strings_and_sigils(source) do
+  def clean_charlists_strings_and_sigils(source) do
     source
     |> Sigils.replace_with_spaces
     |> Strings.replace_with_spaces
