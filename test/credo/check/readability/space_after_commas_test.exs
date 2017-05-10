@@ -46,6 +46,18 @@ end
     |> refute_issues(@described_check)
   end
 
+
+  test "it does not get confused by ' in a comment" do
+"""
+defmodule CredoSampleModule do
+  def fun do
+    # '
+    ','
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
   #
   # cases raising issues
   #
@@ -58,20 +70,20 @@ end
 """ |> to_source_file
     |> assert_issue(@described_check, fn(issue) ->
         assert 19 == issue.column
-        assert ",:" ==  issue.trigger
+        assert ",:bar" ==  issue.trigger
       end)
   end
 
   test "it should report when there are many commas not followed by spaces" do
 """
 defmodule CredoSampleModule do
-  @attribute [1,2,3,4,5]
+  @attribute [1,2,"three",4,5]
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
         assert 4 == Enum.count(issues)
-        assert [16, 18, 20, 22] == Enum.map(issues, &(&1.column))
-        assert [",2", ",3", ",4", ",5"] == Enum.map(issues, &(&1.trigger))
+        assert [28, 26, 18, 16] == Enum.map(issues, &(&1.column))
+        assert [",5", ",4", ~s(,"three"), ",2"] == Enum.map(issues, &(&1.trigger))
     end)
   end
 
@@ -88,6 +100,15 @@ end
 """
 defmodule CredoSampleModule do
   @attribute [question?,answer]
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it requires spaces after commas followed by [" do
+"""
+defmodule CredoSampleModule do
+  @attribute [foo,[bar]]
 end
 """ |> to_source_file
     |> assert_issue(@described_check)
