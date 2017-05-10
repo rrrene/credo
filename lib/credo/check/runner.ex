@@ -54,14 +54,7 @@ defmodule Credo.Check.Runner do
   end
 
   defp set_lint_attributes(config, source_files) do
-    lint_attribute_map =
-      source_files
-      |> run_linter_attribute_reader(config)
-      |> Enum.reduce(%{}, fn(source_file, memo) ->
-          # TODO: we should modify the config "directly" instead of going
-          # through the SourceFile
-          Map.put(memo, source_file.filename, source_file.lint_attributes)
-        end)
+    lint_attribute_map = run_linter_attribute_reader(source_files, config)
 
     if Enum.any?(lint_attribute_map, fn({_, value}) -> value != [] end) do
       Credo.CLI.Output.UI.warn ""
@@ -79,9 +72,12 @@ defmodule Credo.Check.Runner do
   defp run_linter_attribute_reader(source_files, config) do
     checks = [{Credo.Check.FindLintAttributes}]
 
-    Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
-      run_check(check_tuple, source_files, config)
-    end)
+#    Enum.reduce(checks, %{}, fn(check_tuple, memo) ->
+#      lint_attributes = run_check(check_tuple, source_files, config)
+#
+#      Map.put(memo, source_file.filename, lint_attributes)
+#    end)
+    %{} # TODO: fix
   end
 
   defp exclude_low_priority_checks(config, below_priority) do

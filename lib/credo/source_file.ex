@@ -3,8 +3,7 @@ defmodule Credo.SourceFile do
             source:   nil,
             lines:    nil,
             ast:      nil,
-            valid?:   nil,
-            lint_attributes: []
+            valid?:   nil
 
   @type t :: module
 
@@ -16,7 +15,12 @@ defmodule Credo.SourceFile do
         lines:    Credo.Code.to_lines(source),
       }
 
-    with_ast(source_file)
+    case Credo.Code.ast(source_file) do
+      {:ok, ast} ->
+        %Credo.SourceFile{source_file | valid?: true, ast: ast}
+      {:error, errors} ->
+        %Credo.SourceFile{source_file | valid?: false, ast: []}
+    end
   end
 
   @doc """
@@ -65,15 +69,6 @@ defmodule Credo.SourceFile do
     end
   end
   def column(_, _, _), do: nil
-
-  defp with_ast(%Credo.SourceFile{} = source_file) do
-    case Credo.Code.ast(source_file) do
-      {:ok, ast} ->
-        %Credo.SourceFile{source_file | valid?: true, ast: ast}
-      {:error, errors} ->
-        %Credo.SourceFile{source_file | valid?: false, ast: []}
-    end
-  end
 
   defimpl Inspect, for: __MODULE__ do
     def inspect(source_file, opts) do

@@ -11,14 +11,11 @@ defmodule Credo.Check.FindLintAttributes do
 
   @doc false
   def run(source_files, _params) when is_list(source_files) do
-    Enum.map(source_files, &find_and_set_in_source_file/1)
+    Enum.map(source_files, &find_lint_attributes/1)
   end
 
-  def find_and_set_in_source_file(source_file) do
-    lint_attributes =
-      Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
-
-    %SourceFile{source_file | lint_attributes: lint_attributes}
+  def find_lint_attributes(source_file) do
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
   end
 
   defp traverse({:defmodule, _meta, _arguments} = ast, attribute_list, source_file) do

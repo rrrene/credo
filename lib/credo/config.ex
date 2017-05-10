@@ -81,6 +81,8 @@ defmodule Credo.Config do
   end
   def set_strict(config), do: config
 
+  # Assigns
+
   def get_assign(config, name) do
     Map.get(config.assigns, name)
   end
@@ -89,23 +91,27 @@ defmodule Credo.Config do
     %__MODULE__{config | assigns: Map.put(config.assigns, name, value)}
   end
 
+  # Source Files
+
+  def get_source_files(_config) do
+    Credo.Service.SourceFiles.get
+  end
+
   def put_source_files(config, source_files) do
     Credo.Service.SourceFiles.put(source_files)
 
     config
   end
 
-  def get_source_files(_config) do
-    Credo.Service.SourceFiles.get
-  end
+  # Issues
 
-  def get_issues(_config) do
-    Credo.Service.SourceFileIssues.to_map
+  def get_issues(config) do
+    config.issues
     |> Map.values
     |> List.flatten
   end
-  def get_issues(_config, filename) do
-    Credo.Service.SourceFileIssues.get(filename)
+  def get_issues(config, filename) do
+    Map.get(config.issues, filename)
   end
 
   def put_issues(config, issues) do
