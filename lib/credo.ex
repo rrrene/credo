@@ -14,6 +14,7 @@ defmodule Credo do
         worker(Credo.Service.SourceFileCodeOnly, []),
         worker(Credo.Service.SourceFileScopes, []),
         worker(Credo.Service.SourceFileIssues, []),
+        worker(Credo.Service.SourceFiles, []),
       ]
 
     opts = [strategy: :one_for_one, name: Credo.Supervisor]

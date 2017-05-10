@@ -40,13 +40,17 @@ defmodule Credo.CLI.Command.List do
   end
 
   defp print_before_info(config) do
+    source_files = Config.get_source_files(config)
+
     out = output_mod(config)
-    out.print_before_info(config.source_files, config)
+    out.print_before_info(source_files, config)
 
     config
   end
 
-  defp run_checks(%Config{source_files: source_files} = config) do
+  defp run_checks(%Config{} = config) do
+    source_files = Config.get_source_files(config)
+
     {time_run, {source_files, config}} =
       :timer.tc fn ->
         Runner.run(source_files, config)
@@ -57,7 +61,9 @@ defmodule Credo.CLI.Command.List do
     |> Config.put_assign("credo.time.run_checks", time_run)
   end
 
-  defp print_results_and_summary(%Config{source_files: source_files} = config) do
+  defp print_results_and_summary(%Config{} = config) do
+    source_files = Config.get_source_files(config)
+
     time_load = Config.get_assign(config, "credo.time.source_files")
     time_run = Config.get_assign(config, "credo.time.run_checks")
     out = output_mod(config)
@@ -68,8 +74,10 @@ defmodule Credo.CLI.Command.List do
   end
 
   defp determine_success(config) do
+    source_files = Config.get_source_files(config)
+
     issues =
-      config.source_files
+      source_files
       |> Enum.flat_map(&(&1.issues))
       |> Filter.important(config)
       |> Filter.valid_issues(config)

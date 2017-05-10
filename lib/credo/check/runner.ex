@@ -35,7 +35,9 @@ defmodule Credo.Check.Runner do
   Prepares the Config struct based on a given list of `source_files`.
   """
   def prepare_config(config) do
-    prepare_config(config, config.source_files)
+    source_files = Config.get_source_files(config)
+
+    prepare_config(config, source_files)
   end
   def prepare_config(config, source_files) do
     # TODO: remove prepare_config/2

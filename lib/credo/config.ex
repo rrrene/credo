@@ -6,7 +6,6 @@ defmodule Credo.Config do
 
   defstruct args:               [],
             files:              nil,
-            source_files:       [],
             color:              true,
             checks:             nil,
             requires:           [],
@@ -90,6 +89,12 @@ defmodule Credo.Config do
   end
 
   def put_source_files(config, source_files) do
-    %__MODULE__{config | source_files: source_files}
+    Credo.Service.SourceFiles.put(source_files)
+
+    config
+  end
+
+  def get_source_files(_config) do
+    Credo.Service.SourceFiles.get
   end
 end

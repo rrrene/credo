@@ -39,7 +39,9 @@ defmodule Credo.CLI.Command.Explain do
     |> Config.put_assign("credo.time.source_files", time_load)
   end
 
-  defp run_checks(%Config{source_files: source_files} = config) do
+  defp run_checks(%Config{} = config) do
+    source_files = Config.get_source_files(config)
+
     {time_run, {source_files, config}} =
       :timer.tc fn ->
         Runner.run(source_files, config)
@@ -51,9 +53,11 @@ defmodule Credo.CLI.Command.Explain do
   end
 
   defp print_results_and_summary(%Config{args: [file | _]} = config) do
+    source_files = Config.get_source_files(config)
+
     file
     |> String.split(":")
-    |> print_result(config.source_files, config)
+    |> print_result(source_files, config)
 
     config
   end
