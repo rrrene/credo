@@ -75,4 +75,10 @@ defmodule Credo.SourceFile do
         %Credo.SourceFile{source_file | valid?: false, ast: [], issues: errors}
     end
   end
+
+  defimpl Inspect, for: __MODULE__ do
+    def inspect(source_file, opts) do
+      "%SourceFile<#{source_file.filename}>"
+    end
+  end
 end
