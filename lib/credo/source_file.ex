@@ -28,7 +28,7 @@ defmodule Credo.SourceFile do
   def line_at(source_file, line_no) do
     Enum.find_value(source_file.lines,
       fn
-        {line_no2, text} when line_no == line_no2 -> text
+        {^line_no, text} -> text
         _ -> nil
       end
     )
