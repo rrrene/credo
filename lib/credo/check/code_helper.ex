@@ -126,16 +126,7 @@ defmodule Credo.Check.CodeHelper do
   and code comments.
   """
   def clean_charlists_strings_sigils_and_comments(%SourceFile{filename: filename, source: source}) do
-    case SourceFileCodeOnly.get(filename) do
-      {:ok, value} ->
-        value
-      :notfound ->
-        result = clean_charlists_strings_sigils_and_comments(source)
-
-        SourceFileCodeOnly.put(filename, result)
-
-        result
-    end
+    clean_charlists_strings_sigils_and_comments(source)
   end
   def clean_charlists_strings_sigils_and_comments(source) do
     source
@@ -150,16 +141,7 @@ defmodule Credo.Check.CodeHelper do
   Sigils.
   """
   def clean_charlists_strings_and_sigils(%SourceFile{filename: filename, source: source}) do
-    case SourceFileWithoutStringAndSigils.get(filename) do
-      {:ok, value} ->
-        value
-      :notfound ->
-        result = clean_charlists_strings_and_sigils(source)
-
-        SourceFileWithoutStringAndSigils.put(filename, result)
-
-        result
-    end
+    clean_charlists_strings_and_sigils(source)
   end
   def clean_charlists_strings_and_sigils(source) do
     source
