@@ -42,13 +42,12 @@ defmodule Credo.CLI.Command.Explain do
   defp run_checks(%Config{} = config) do
     source_files = Config.get_source_files(config)
 
-    {time_run, {source_files, config}} =
+    {time_run, config} =
       :timer.tc fn ->
         Runner.run(source_files, config)
       end
 
     config
-    |> Config.put_source_files(source_files)
     |> Config.put_assign("credo.time.run_checks", time_run)
   end
 

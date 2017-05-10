@@ -25,7 +25,9 @@ defmodule Credo.CLI.Output.IssuesShortList do
     |> Enum.each(&print_issues(&1, config, term_width))
   end
 
-  defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width) do
+  defp print_issues(%SourceFile{filename: filename} = source_file, config, term_width) do
+    issues = Credo.Config.get_issues(config, filename)
+
     issues
     |> Filter.important(config)
     |> Filter.valid_issues(config)

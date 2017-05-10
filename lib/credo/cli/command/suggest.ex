@@ -50,14 +50,12 @@ defmodule Credo.CLI.Command.Suggest do
   defp run_checks(%Config{} = config) do
     source_files = Config.get_source_files(config)
 
-    {time_run, {source_files, config}} =
+    {time_run, config} =
       :timer.tc fn ->
         Runner.run(source_files, config)
       end
 
-    config
-    |> Config.put_source_files(source_files)
-    |> Config.put_assign("credo.time.run_checks", time_run)
+    Config.put_assign(config, "credo.time.run_checks", time_run)
   end
 
   defp print_results_and_summary(%Config{} = config) do
@@ -76,8 +74,8 @@ defmodule Credo.CLI.Command.Suggest do
     source_files = Config.get_source_files(config)
 
     issues =
-      source_files
-      |> Enum.flat_map(&(&1.issues))
+      config
+      |> Config.get_issues
       |> Filter.important(config)
       |> Filter.valid_issues(config)
 

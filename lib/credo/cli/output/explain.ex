@@ -31,7 +31,9 @@ defmodule Credo.CLI.Output.Explain do
     nil
   end
 
-  defp print_issues(%SourceFile{issues: issues, filename: filename} = source_file, config, term_width, line_no, column) do
+  defp print_issues(%SourceFile{filename: filename} = source_file, config, term_width, line_no, column) do
+    issues = Credo.Config.get_issues(config, filename)
+
     issues
     |> Filter.important(config)
     |> Filter.valid_issues(config)

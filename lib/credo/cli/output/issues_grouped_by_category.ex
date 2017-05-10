@@ -50,7 +50,8 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   def print_after_info(source_files, config, time_load, time_run) do
     term_width = Output.term_columns
 
-    issues = source_files |> Enum.flat_map(&(&1.issues))
+    issues = Credo.Config.get_issues(config)
+
     shown_issues =
       issues
       |> Filter.important(config)

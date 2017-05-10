@@ -6,19 +6,20 @@ defmodule Credo.Check.Runner do
 
   @doc false
   def run(source_files, config) when is_list(source_files) do
-    {_time_run_on_all, source_files_after_run_on_all} =
+    {_time_run_on_all, _source_files_after_run_on_all} =
       :timer.tc fn ->
         run_checks_that_run_on_all(source_files, config)
       end
 
-    {_time_run, source_files} =
+    {_time_run, _source_files} =
       :timer.tc fn ->
-        source_files_after_run_on_all
+        source_files
         |> Enum.map(&Task.async(fn -> run(&1, config) end))
         |> Enum.map(&Task.await(&1, :infinity))
       end
 
-    {source_files, config}
+
+    Credo.Config.put_issues(config, Credo.Service.SourceFileIssues.to_map)
   end
   def run(%SourceFile{} = source_file, config) do
     checks =
@@ -26,9 +27,14 @@ defmodule Credo.Check.Runner do
       |> Config.checks
       |> Enum.reject(&run_on_all_check?/1)
 
-    issues = run_checks(source_file, checks, config)
+    case run_checks(source_file, checks, config) do
+      [] ->
+        nil
+      issues ->
+        SourceFileIssues.append(source_file, issues)
+    end
 
-    %SourceFile{source_file | issues: source_file.issues ++ issues}
+    :ok
   end
 
   @doc """
@@ -117,13 +123,14 @@ defmodule Credo.Check.Runner do
       end))
     |> Enum.each(&Task.await(&1, :infinity))
 
-    SourceFileIssues.update_in_source_files(source_files)
+    :ok
   end
 
   defp run_checks(%SourceFile{} = source_file, checks, config) when is_list(checks) do
     Enum.flat_map(checks, &run_check(&1, source_file, config))
   end
 
+  # Returns issues
   defp run_check({_check, false}, source_files, _config) when is_list(source_files) do
     source_files
   end

@@ -10,10 +10,11 @@ defmodule Credo.CLI.Filter do
   def important?(%Issue{} = issue, config) do
     issue.priority >= config.min_priority
   end
-  def important?(%SourceFile{} = source_file, config) do
-    Enum.any?(source_file.issues, &important?(&1, config))
+  def important?(%SourceFile{filename: filename}, config) do
+    config
+    |> Credo.Config.get_issues(filename)
+    |> Enum.any?(&important?(&1, config))
   end
-
 
   def valid_issues(list, config) when is_list(list) do
     Enum.reject(list, &ignored?(&1, config))

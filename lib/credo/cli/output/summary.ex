@@ -21,10 +21,7 @@ defmodule Credo.CLI.Output.Summary do
     nil
   end
   def print(source_files, config, time_load, time_run) do
-    issues =
-      source_files
-      |> Enum.map(&(&1.issues))
-      |> List.flatten
+    issues = Credo.Config.get_issues(config)
 
     shown_issues =
       issues

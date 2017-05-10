@@ -4,7 +4,6 @@ defmodule Credo.SourceFile do
             lines:    nil,
             ast:      nil,
             valid?:   nil,
-            issues:   [],
             lint_attributes: []
 
   @type t :: module
@@ -72,7 +71,7 @@ defmodule Credo.SourceFile do
       {:ok, ast} ->
         %Credo.SourceFile{source_file | valid?: true, ast: ast}
       {:error, errors} ->
-        %Credo.SourceFile{source_file | valid?: false, ast: [], issues: errors}
+        %Credo.SourceFile{source_file | valid?: false, ast: []}
     end
   end
 
