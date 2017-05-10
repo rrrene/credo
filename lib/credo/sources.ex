@@ -29,7 +29,8 @@ defmodule Credo.Sources do
     MapSet.new
     |> include(files.included)
     |> exclude(files.excluded)
-    |> Enum.map(&to_source_file/1)
+    |> Enum.map(&(Task.async(fn -> to_source_file(&1) end)))
+    |> Enum.map(&Task.await/1)
   end
   def find(paths) when is_list(paths) do
     Enum.flat_map(paths, &find/1)
