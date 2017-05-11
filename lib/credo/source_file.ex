@@ -8,19 +8,21 @@ defmodule Credo.SourceFile do
   @type t :: module
 
   def parse(source, filename) do
-    source_file =
-      %Credo.SourceFile{
-        filename: Path.relative_to_cwd(filename),
-        source:   source,
-        lines:    Credo.Code.to_lines(source),
-      }
+    {valid, ast} =
+      case Credo.Code.ast(source) do
+        {:ok, ast} ->
+          {true, ast}
+        {:error, errors} ->
+          {false, []}
+      end
 
-    case Credo.Code.ast(source_file) do
-      {:ok, ast} ->
-        %Credo.SourceFile{source_file | valid?: true, ast: ast}
-      {:error, errors} ->
-        %Credo.SourceFile{source_file | valid?: false, ast: []}
-    end
+    %Credo.SourceFile{
+      filename: Path.relative_to_cwd(filename),
+      source:   source,
+      lines:    Credo.Code.to_lines(source),
+      ast:      ast,
+      valid?:   valid
+    }
   end
 
   @doc """

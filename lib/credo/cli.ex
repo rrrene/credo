@@ -70,11 +70,20 @@ defmodule Credo.CLI do
 
   defp parse_options(argv) when is_list(argv) do
     options = Options.parse(argv, File.cwd!, Commands.names, [UI.edge])
-    config = ConfigBuilder.parse(options)
+    config =
+      options
+      |> ConfigBuilder.parse
+      |> start_servers()
 
     options
     |> set_command_in_options(config)
     |> validate_options(config)
+  end
+
+  defp start_servers(%Config{} = config) do
+    config
+    |> Credo.Service.SourceFiles.start_server
+    |> Credo.Service.SourceFileIssues.start_server
   end
 
   defp validate_options(%Options{unknown_args: [], unknown_switches: []} = options, config) do

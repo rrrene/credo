@@ -72,7 +72,7 @@ defmodule Credo.Check do
   """
   @callback category() :: atom
 
-  @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+  #@callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
 
   @callback run_on_all?() :: boolean
 

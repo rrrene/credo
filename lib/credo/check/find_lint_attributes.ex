@@ -5,12 +5,11 @@ defmodule Credo.Check.FindLintAttributes do
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
-  alias Credo.SourceFile
   alias Credo.Check.CodeHelper
   alias Credo.Check.LintAttribute
 
   @doc false
-  def run(source_files, _params) when is_list(source_files) do
+  def run(source_files, _config, _params) when is_list(source_files) do
     Enum.map(source_files, &find_lint_attributes/1)
   end
 

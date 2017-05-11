@@ -13,7 +13,6 @@ defmodule Credo.ConfigBuilder do
     |> add_switches_to_config(switches)
   end
 
-
   defp cast_to_config(%ConfigFile{} = config_file, args) do
     %Config{
       args: args,

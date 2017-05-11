@@ -25,6 +25,8 @@ defmodule Credo.Config do
             read_from_stdin:    false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            source_files_pid:   nil,
+            issues_pid:         nil,
             skipped_checks:     nil,
             assigns:            %{},
             lint_attribute_map: %{} # maps filenames to @lint attributes
@@ -92,12 +94,12 @@ defmodule Credo.Config do
 
   # Source Files
 
-  def get_source_files(_config) do
-    Credo.Service.SourceFiles.get
+  def get_source_files(config) do
+    Credo.Service.SourceFiles.get(config)
   end
 
   def put_source_files(config, source_files) do
-    Credo.Service.SourceFiles.put(source_files)
+    Credo.Service.SourceFiles.put(config, source_files)
 
     config
   end
@@ -105,11 +107,14 @@ defmodule Credo.Config do
   # Issues
 
   def get_issues(config) do
-    Credo.Service.SourceFileIssues.to_map
+    config
+    |> Credo.Service.SourceFileIssues.to_map
     |> Map.values
     |> List.flatten
   end
   def get_issues(config, filename) do
-    Map.get(Credo.Service.SourceFileIssues.to_map, filename)
+    config
+    |> Credo.Service.SourceFileIssues.to_map
+    |> Map.get(filename)
   end
 end

@@ -99,15 +99,16 @@ defmodule Credo.Check.Consistency.Helper do
 
   Does call `new_issue_fun/4` when necessary to create a new issue.
   """
-  def append_issues_via_issue_service({property_tuples, most_picked}, new_issue_fun, params) do
-    Enum.map(property_tuples, &append_issues_if_necessary(&1, most_picked, new_issue_fun, params))
+  def append_issues_via_issue_service({property_tuples, most_picked}, new_issue_fun, params, config) do
+    Enum.map(property_tuples, &append_issues_if_necessary(&1, most_picked, new_issue_fun, params, config))
   end
 
-  defp append_issues_if_necessary({_prop_list, _source_file}, nil, _, _) do
+  defp append_issues_if_necessary({_prop_list, _source_file}, nil, _, _, _) do
     nil
   end
-  defp append_issues_if_necessary({prop_list, source_file}, most_picked, new_issue_fun, params) do
+  defp append_issues_if_necessary({prop_list, source_file}, most_picked, new_issue_fun, params, config) do
     {expected_prop, picked_count, total_count} = most_picked
+
     case prop_list |> PropertyValue.get |> Enum.uniq do
       [^expected_prop] ->
         nil
@@ -125,7 +126,7 @@ defmodule Credo.Check.Consistency.Helper do
         |> Enum.reject(&is_nil/1)
         |> Enum.uniq  # TODO: should we really "squash" the issues here?
         |> Enum.each(fn(issue) ->
-            Credo.Service.SourceFileIssues.append(source_file, issue)
+            Credo.Service.SourceFileIssues.append(config, source_file, issue)
           end)
     end
   end

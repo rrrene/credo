@@ -29,10 +29,10 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
-  def run(source_files, params \\ []) when is_list(source_files) do
+  def run(source_files, config, params \\ []) when is_list(source_files) do
     source_files
     |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.append_issues_via_issue_service(&issue_for/5, params)
+    |> Helper.append_issues_via_issue_service(&issue_for/5, params, config)
     :ok
   end
 

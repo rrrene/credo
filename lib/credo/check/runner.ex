@@ -30,7 +30,7 @@ defmodule Credo.Check.Runner do
       [] ->
         nil
       issues ->
-        SourceFileIssues.append(source_file, issues)
+        SourceFileIssues.append(config, source_file, issues)
     end
 
     :ok
@@ -125,6 +125,20 @@ defmodule Credo.Check.Runner do
   end
   defp run_check({check}, source_file, config) do
     run_check({check, []}, source_file, config)
+  end
+  defp run_check({check, params}, source_files, config) when is_list(source_files) do
+    try do
+      check.run(source_files, config, params)
+    rescue
+      error ->
+        warn_about_failed_run(check, source_files)
+
+        if config.crash_on_error do
+          reraise error, System.stacktrace()
+        else
+          []
+        end
+    end
   end
   defp run_check({check, params}, source_file, config) do
     try do

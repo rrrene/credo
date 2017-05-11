@@ -2,21 +2,24 @@ defmodule Credo.Service.SourceFileIssues do
   use GenServer
 
   alias Credo.SourceFile
+  alias Credo.Config
 
-  def start_link(opts \\ []) do
-    {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  def start_server(config) do
+    {:ok, pid} = GenServer.start_link(__MODULE__, [])
+
+    %Config{config | issues_pid: pid}
   end
 
-  def to_map do
-    GenServer.call(__MODULE__, {:to_map})
+  def append(%Config{issues_pid: pid}, %SourceFile{filename: filename}, issue) do
+    GenServer.call(pid, {:append, filename, issue})
   end
 
-  def append(%SourceFile{filename: filename}, issue) do
-    GenServer.call(__MODULE__, {:append, filename, issue})
+  def get(%Config{issues_pid: pid}, %SourceFile{filename: filename}) do
+    GenServer.call(pid, {:get, filename})
   end
 
-  def get(%SourceFile{filename: filename}) do
-    GenServer.call(__MODULE__, {:get, filename})
+  def to_map(%Config{issues_pid: pid}) do
+    GenServer.call(pid, :to_map)
   end
 
   # callbacks
@@ -37,7 +40,7 @@ defmodule Credo.Service.SourceFileIssues do
     {:reply, List.wrap(current_state[filename]), current_state}
   end
 
-  def handle_call({:to_map}, _from, current_state) do
+  def handle_call(:to_map, _from, current_state) do
     {:reply, current_state, current_state}
   end
 end
