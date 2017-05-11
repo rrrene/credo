@@ -42,7 +42,7 @@ defmodule Credo.CLI.Command.Explain do
   defp run_checks(%Config{} = config) do
     source_files = Config.get_source_files(config)
 
-    {time_run, config} =
+    {time_run, :ok} =
       :timer.tc fn ->
         Runner.run(source_files, config)
       end

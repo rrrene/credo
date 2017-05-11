@@ -18,8 +18,7 @@ defmodule Credo.Check.Runner do
         |> Enum.map(&Task.await(&1, :infinity))
       end
 
-
-    Credo.Config.put_issues(config, Credo.Service.SourceFileIssues.to_map)
+    :ok
   end
   def run(%SourceFile{} = source_file, config) do
     checks =
@@ -43,10 +42,6 @@ defmodule Credo.Check.Runner do
   def prepare_config(config) do
     source_files = Config.get_source_files(config)
 
-    prepare_config(config, source_files)
-  end
-  def prepare_config(config, source_files) do
-    # TODO: remove prepare_config/2
     config
     |> set_lint_attributes(source_files)
     |> exclude_low_priority_checks(config.min_priority - 9)
@@ -70,14 +65,9 @@ defmodule Credo.Check.Runner do
   end
 
   defp run_linter_attribute_reader(source_files, config) do
-    checks = [{Credo.Check.FindLintAttributes}]
-
-#    Enum.reduce(checks, %{}, fn(check_tuple, memo) ->
-#      lint_attributes = run_check(check_tuple, source_files, config)
-#
-#      Map.put(memo, source_file.filename, lint_attributes)
-#    end)
-    %{} # TODO: fix
+    {Credo.Check.FindLintAttributes}
+    |> run_check(source_files, config)
+    |> Enum.into(%{})
   end
 
   defp exclude_low_priority_checks(config, below_priority) do

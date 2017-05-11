@@ -15,7 +15,10 @@ defmodule Credo.Check.FindLintAttributes do
   end
 
   def find_lint_attributes(source_file) do
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
+    lint_attributes =
+      Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
+
+    {source_file.filename, lint_attributes}
   end
 
   defp traverse({:defmodule, _meta, _arguments} = ast, attribute_list, source_file) do
@@ -25,6 +28,7 @@ defmodule Credo.Check.FindLintAttributes do
       |> process_calls(nil, [])
       |> Enum.map(fn(lint) ->
           {_, scope} = CodeHelper.scope_for(source_file, line: lint.line)
+
           %LintAttribute{lint | scope: scope}
         end)
 
