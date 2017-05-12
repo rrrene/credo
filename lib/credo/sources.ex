@@ -20,6 +20,11 @@ defmodule Credo.Sources do
     |> source_file_from_stdin()
     |> List.wrap
   end
+  def find(%Credo.Config{read_from_stdin: true, args: [filename]}) do
+    filename
+    |> source_file_from_stdin()
+    |> List.wrap
+  end
   def find(%Credo.Config{read_from_stdin: true}) do
     @stdin_filename
     |> source_file_from_stdin()
