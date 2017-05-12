@@ -30,23 +30,43 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
 
   # Matches commas followed by non-whitespace unless preceded by
   # a question mark that is not part of a variable or function name
-  @unspaced_commas ~r/(?<!\W\?)(\,\S)/
 
   use Credo.Check
-  alias Credo.Check.CodeHelper
-  alias Credo.Code
+  alias Credo.IssueMeta
+  alias Credo.SourceFile
 
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments
-    |> Code.to_lines
-    |> Enum.flat_map(&find_issues(issue_meta, &1))
+    source_file.source
+    |> Credo.Code.to_tokens
+    |> Enum.chunk(2, 1)
+    |> Enum.filter(&comma_and_next/1)
+    |> collect_issues([], issue_meta)
   end
 
-  defp issue_for(issue_meta, trigger, line_no, column) do
+  defp comma_and_next([{:",", {_, _, _}}, _] = args) do
+    args
+  end
+  defp comma_and_next([_, _]) do
+    false
+  end
+
+  defp collect_issues([], acc, _issue_meta), do: acc
+  defp collect_issues([[{:",", {line_no, column1, column2}}, next_token] | rest], acc, issue_meta) when is_tuple(next_token) do
+    acc = case token_location(next_token) do
+      {^line_no, ^column2, _} ->
+        [issue_for(issue_meta, line_no, column1, next_token) | acc]
+      _ -> acc
+    end
+    collect_issues(rest, acc, issue_meta)
+  end
+  defp collect_issues([_ | rest], acc, issue_meta), do: collect_issues(rest, acc, issue_meta)
+
+  defp issue_for(issue_meta, line_no, column, next_token) do
+    trigger = "," <> token_text(issue_meta, next_token)
+
     format_issue issue_meta,
       message: "Space missing after comma",
       trigger: trigger,
@@ -54,13 +74,13 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       column: column
   end
 
-  defp find_issues(issue_meta, {line_no, line}) do
-    @unspaced_commas
-    |> Regex.scan(line, capture: :all_but_first, return: :index)
-    |> List.flatten
-    |> Enum.map(fn({idx, len}) ->
-      trigger = String.slice(line, idx, len)
-      issue_for(issue_meta, trigger, line_no, idx + 1)
-    end)
+  defp token_text(issue_meta, token) do
+    {line_no, column1, column2} = token_location(token)
+
+    issue_meta
+    |> IssueMeta.source_file
+    |> SourceFile.line_at(line_no, column1, column2)
   end
+
+  defp token_location(token), do: elem(token, 1)
 end
