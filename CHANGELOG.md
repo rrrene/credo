@@ -17,10 +17,10 @@ These changes concern people writing their own checks for Credo.
 Users of Credo can now disable individual lines or files for all or just
 specific checks.
 
-* `# credo:disable-for-this-file` - disables Credo for the entire file, no matter where the comment is put (so you can put it somewhere it doesn't bother you too much)
-* `# credo:disable-for-next-line` - disables Credo for the next line
-* `# credo:disable-for-previous-line` - disables Credo for the previous line
-* `# credo:disable-for-lines:<count>` - disables Credo for the given number of lines (can be negative to disable previous lines)
+* `# credo:disable-for-this-file` - to disable for the entire file
+* `# credo:disable-for-next-line` - to disable for the next line
+* `# credo:disable-for-previous-line` - to disable for the previous line
+* `# credo:disable-for-lines:<count>` - to disable for the given number of lines (negative for previous lines)
 
 
 ## 0.7.4

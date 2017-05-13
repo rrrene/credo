@@ -166,39 +166,40 @@ This also works for umbrella projects, where you can have individual `.credo.exs
 You can use `mix credo gen.config` to generate a complete example configuration.
 
 
-### Inline configuration via @lint attributes
+### Inline Configuration via Config Comments
 
-`@lint` attributes can be used to configure linting for specific functions.
-
-This lets you exclude functions completely
+Users of Credo can now disable individual lines or files for all or just
+specific checks.
 
 ```elixir
-@lint false
-def my_fun do
+defp do_stuff() do
+  # credo:disable-for-next-line
+  IO.inspect {:we_want_this_inspect_in_production!}
 end
 ```
 
-or deactivate specific checks *with the same syntax used in the config file*:
+There are four config comments:
+
+* `# credo:disable-for-this-file` - to disable for the entire file
+* `# credo:disable-for-next-line` - to disable for the next line
+* `# credo:disable-for-previous-line` - to disable for the previous line
+* `# credo:disable-for-lines:<count>` - to disable for the given number of lines (negative for previous lines)
+
+Each of these can also take the name of the check you want to disable:
 
 ```elixir
-@lint {Credo.Check.Design.TagTODO, false}
-def my_fun do
+defp my_fun() do
+  # credo:disable-for-next-line Credo.Check.Warning.IoInspect
+  IO.inspect {:we_want_this_inspect_in_production!}
 end
 ```
 
-or use a Regex instead of the check module to exclude multiple checks at once:
+Lastly, you can put a regular expression (`/.+/`) instead of a check name to disable multiple checks (or if you do not want to type out the checks):
 
 ```elixir
-@lint {~r/Refactor/, false}
-def my_fun do
-end
-```
-
-Finally, you can supply multiple tuples as a list and combine the above:
-
-```elixir
-@lint [{Credo.Check.Design.TagTODO, false}, {~r/Refactor/, false}]
-def my_fun do
+defp my_fun() do
+  # credo:disable-for-next-line /\.Warning\./
+  IO.inspect {:we_want_this_inspect_in_production!}
 end
 ```
 
