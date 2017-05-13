@@ -63,7 +63,7 @@ end
 defmodule CredoSampleModule do
   def fun do
     *
-    *
+    ' '
   end
 end
 """ |> String.replace("*", "")
@@ -84,7 +84,7 @@ end
 defmodule CredoSampleModule do
   def fun do
     # '
-    *
+    ' '
   end
 end
 """ |> String.replace("*", "")

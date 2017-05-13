@@ -11,6 +11,7 @@ this is an example # TODO: and this is no actual comment
 
 x = ~s{also: # TODO: no comment here}
 ?" # TODO: this is the third
+# "
 
 "also: # TODO: no comment here as well"
 """
@@ -21,6 +22,7 @@ x = ~s{also: # TODO: no comment here}
 
 x = ~s{                             }
 ?" # TODO: this is the third
+# "
 
 "                                     "
 """ |> String.replace("@@EMPTY_STRING@@",

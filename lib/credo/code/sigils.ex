@@ -38,6 +38,9 @@ defmodule Credo.Code.Sigils do
   defp parse_code(<< "?\""::utf8, t::binary >>, acc, replacement) do
     parse_code(t, acc <> "?\"", replacement)
   end
+  defp parse_code(<< "#"::utf8, t::binary >>, acc, replacement) do
+    parse_comment(t, acc <> "#", replacement)
+  end
   defp parse_code(<< "\"\"\""::utf8, t::binary >>, acc, replacement) do
     parse_heredoc(t, acc <> ~s("""), replacement)
   end
@@ -51,6 +54,18 @@ defmodule Credo.Code.Sigils do
     {h, t} = String.next_codepoint(str)
 
     parse_code(t, acc <> h, replacement)
+  end
+
+  defp parse_comment("", acc, _replacement) do
+    acc
+  end
+  defp parse_comment(<< "\n"::utf8, t::binary >>, acc, replacement) do
+    parse_code(t, acc <> "\n", replacement)
+  end
+  defp parse_comment(str, acc, replacement) when is_binary(str) do
+    {h, t} = String.next_codepoint(str)
+
+    parse_comment(t, acc <> h, replacement)
   end
 
   defp parse_string_literal("", acc, _replacement) do

@@ -152,6 +152,7 @@ defmodule Credo.Check.CodeHelper do
     source
     |> Sigils.replace_with_spaces
     |> Strings.replace_with_spaces
+    |> Charlists.replace_with_spaces
   end
 
 

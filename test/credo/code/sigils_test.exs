@@ -63,6 +63,7 @@ defmodule Credo.CLI.Command.List do
     \"\"\"
     |> UI.puts
     # ↑
+    # ~r/abc/
   end
 end
 """
@@ -75,6 +76,7 @@ defmodule Credo.CLI.Command.List do
     \"\"\"
     |> UI.puts
     # ↑
+    # ~r/abc/
   end
 end
 """

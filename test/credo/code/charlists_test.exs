@@ -8,6 +8,7 @@ defmodule Credo.Code.CharlistsTest do
 x = "this 'should not be' removed!"
 y = 'also: # TODO: no comment here'
 ?' # TODO: this is the third
+# '
 
 \"\"\"
 y = 'also: # TODO: no comment here'
@@ -19,6 +20,7 @@ y = 'also: # TODO: no comment here'
 x = "this 'should not be' removed!"
 y = '                             '
 ?' # TODO: this is the third
+# '
 
 \"\"\"
 y = 'also: # TODO: no comment here'
