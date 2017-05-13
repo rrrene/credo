@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.8.0
+
+- Load source files in parallel
+- Fix high memory consumption
+
+### BREAKING CHANGES
+
+These changes concern people writing their own checks for Credo.
+
+- `Credo.SourceFile` struct was refactored. Fields `source`, `lines` and `ast` are now stored in ETS tables.
+- `run/3` callbacks for `Credo.Check` are now `run/4` callbacks as they have to receive the execution's `config` struct.
+
+### Config Comments
+
+Users of Credo can now disable individual lines or files for all or just
+specific checks.
+
+* `# credo:disable-for-this-file` - disables Credo for the entire file, no matter where the comment is put (so you can put it somewhere it doesn't bother you too much)
+* `# credo:disable-for-next-line` - disables Credo for the next line
+* `# credo:disable-for-previous-line` - disables Credo for the previous line
+* `# credo:disable-for-lines:<count>` - disables Credo for the given number of lines (can be negative to disable previous lines)
+
+
 ## 0.7.4
 
 -	Fix false positives in SpacesAroundOperators
