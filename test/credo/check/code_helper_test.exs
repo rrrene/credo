@@ -58,6 +58,47 @@ end
     assert expected == source_file |> CodeHelper.clean_charlists_strings_sigils_and_comments
   end
 
+  test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments" do
+    expected = """
+defmodule CredoSampleModule do
+  def fun do
+    *
+    *
+  end
+end
+""" |> String.replace("*", "")
+    source_file = """
+defmodule CredoSampleModule do
+  def fun do
+    # '
+    ','
+  end
+end
+""" |> to_source_file
+
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source_file)
+  end
+
+  test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
+    expected = """
+defmodule CredoSampleModule do
+  def fun do
+    # '
+    *
+  end
+end
+""" |> String.replace("*", "")
+    source_file = """
+defmodule CredoSampleModule do
+  def fun do
+    # '
+    ','
+  end
+end
+""" |> to_source_file
+
+    assert expected == CodeHelper.clean_charlists_strings_and_sigils(source_file)
+  end
 
   test "returns ast without metadata" do
     ast =
