@@ -29,6 +29,7 @@ defmodule Credo.Sources do
     MapSet.new
     |> include(files.included)
     |> exclude(files.excluded)
+    |> Enum.take(max_file_count())
     |> Enum.map(&(Task.async(fn -> to_source_file(&1) end)))
     |> Enum.map(&Task.await/1)
   end
@@ -37,6 +38,16 @@ defmodule Credo.Sources do
   end
   def find(path) when is_binary(path) do
     recurse_path(path)
+  end
+
+  defp max_file_count do
+    max_files = System.get_env("MAX_FILES")
+
+    if max_files do
+      String.to_integer(max_files)
+    else
+      1_000_000
+    end
   end
 
   defp include(files, []), do: files
