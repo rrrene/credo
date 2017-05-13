@@ -9,7 +9,7 @@
 
 These changes concern people writing their own checks for Credo.
 
-- `Credo.SourceFile` struct was refactored. Fields `source`, `lines` and `ast` are now stored in ETS tables.
+- `Credo.SourceFile` struct was refactored: `source`, `lines` and `ast` are now stored in ETS tables.
 - `run/3` callbacks for `Credo.Check` are now `run/4` callbacks as they have to receive the execution's `config` struct.
 
 ### Config Comments
