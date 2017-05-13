@@ -64,13 +64,11 @@ defmodule Credo.SourceFile do
   def line_at(%__MODULE__{} = source_file, line_no) do
     source_file
     |> lines()
-    |> Enum.find_value(
-        fn
-          {^line_no, text} -> text
-          _ -> nil
-        end
-      )
+    |> Enum.find_value(&find_line_at(&1, line_no))
   end
+
+  defp find_line_at({line_no, text}, line_no), do: text
+  defp find_line_at(_, _), do: nil
 
   @doc """
   Returns the snippet at the given +line_no+ between +column1+ and +column2+.
