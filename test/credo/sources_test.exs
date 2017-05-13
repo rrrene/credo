@@ -69,7 +69,7 @@ defmodule Credo.SourcesTest do
   test "it reads and parses found source files" do
     config = %Credo.Config{files: %{excluded: [], included: ["lib/mix/tasks/credo.ex"]}}
 
-    [%Credo.SourceFile{ast: ast, valid?: true}] = Credo.Sources.find(config)
+    [%Credo.SourceFile{__ast: ast, valid?: true}] = Credo.Sources.find(config)
 
     assert ast != nil
   end

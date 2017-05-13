@@ -73,8 +73,6 @@ defmodule Credo.CLI.Command.List do
   end
 
   defp determine_success(config) do
-    source_files = Config.get_source_files(config)
-
     issues =
       config
       |> Config.get_issues

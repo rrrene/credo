@@ -26,16 +26,17 @@ defmodule Credo.Check.Readability.MaxLineLength do
   use Credo.Check, base_priority: :low
 
   @doc false
-  def run(%SourceFile{ast: ast, source: source} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, @default_params)
     ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
     ignore_specs = Params.get(params, :ignore_specs, @default_params)
     ignore_strings = Params.get(params, :ignore_strings, @default_params)
 
-    definitions = Credo.Code.prewalk(ast, &find_definitions/2)
-    specs = Credo.Code.prewalk(ast, &find_specs/2)
+    definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
+    specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
+    source = SourceFile.source(source_file)
     source =
       if ignore_strings do
         Credo.Code.Strings.replace_with_spaces(source, "")

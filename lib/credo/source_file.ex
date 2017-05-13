@@ -1,13 +1,19 @@
 defmodule Credo.SourceFile do
   defstruct filename: nil,
-            source:   nil,
-            lines:    nil,
-            ast:      nil,
+            __source:   nil,
+            __lines:    nil,
+            __ast:      nil,
             valid?:   nil
 
   @type t :: module
 
+  alias Credo.Service.SourceFileAST
+  alias Credo.Service.SourceFileLines
+  alias Credo.Service.SourceFileSource
+
   def parse(source, filename) do
+    filename = Path.relative_to_cwd(filename)
+    lines = Credo.Code.to_lines(source)
     {valid, ast} =
       case Credo.Code.ast(source) do
         {:ok, ast} ->
@@ -16,13 +22,41 @@ defmodule Credo.SourceFile do
           {false, []}
       end
 
+    SourceFileAST.put(filename, ast)
+    SourceFileLines.put(filename, lines)
+    SourceFileSource.put(filename, source)
+
     %Credo.SourceFile{
-      filename: Path.relative_to_cwd(filename),
-      source:   source,
-      lines:    Credo.Code.to_lines(source),
-      ast:      ast,
+      filename: filename,
       valid?:   valid
     }
+  end
+
+  def ast(%__MODULE__{filename: filename}) do
+    case SourceFileAST.get(filename) do
+      {:ok, ast} ->
+        ast
+      _ ->
+        raise "Could not get source from ETS: #{filename}"
+    end
+  end
+
+  def lines(%__MODULE__{filename: filename}) do
+    case SourceFileLines.get(filename) do
+      {:ok, lines} ->
+        lines
+      _ ->
+        raise "Could not get source from ETS: #{filename}"
+    end
+  end
+
+  def source(%__MODULE__{filename: filename}) do
+    case SourceFileSource.get(filename) do
+      {:ok, source} ->
+        source
+      _ ->
+        raise "Could not get source from ETS: #{filename}"
+    end
   end
 
   @doc """
@@ -30,13 +64,15 @@ defmodule Credo.SourceFile do
 
   NOTE: +line_no+ is a 1-based index.
   """
-  def line_at(source_file, line_no) do
-    Enum.find_value(source_file.lines,
-      fn
-        {^line_no, text} -> text
-        _ -> nil
-      end
-    )
+  def line_at(%__MODULE__{} = source_file, line_no) do
+    source_file
+    |> lines()
+    |> Enum.find_value(
+        fn
+          {^line_no, text} -> text
+          _ -> nil
+        end
+      )
   end
 
   @doc """
@@ -44,7 +80,7 @@ defmodule Credo.SourceFile do
 
   NOTE: +line_no+ is a 1-based index.
   """
-  def line_at(source_file, line_no, column1, column2) do
+  def line_at(%__MODULE__{} = source_file, line_no, column1, column2) do
     source_file
     |> line_at(line_no)
     |> String.slice(column1 - 1, column2 - column1)
@@ -55,7 +91,7 @@ defmodule Credo.SourceFile do
 
   NOTE: Both +line_no+ and the returned index are 1-based.
   """
-  def column(source_file, line_no, trigger) when is_binary(trigger) or is_atom(trigger) do
+  def column(%__MODULE__{} = source_file, line_no, trigger) when is_binary(trigger) or is_atom(trigger) do
     line = line_at(source_file, line_no)
     regexed =
       trigger

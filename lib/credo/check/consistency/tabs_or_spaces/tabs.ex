@@ -3,7 +3,9 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Tabs do
 
   def property_value, do: :tabs
 
-  def property_value_for(%SourceFile{lines: lines, filename: filename}, _params) do
+  def property_value_for(%SourceFile{filename: filename} = source_file, _params) do
+    lines = SourceFile.lines(source_file)
+
     Enum.map(lines, &property_value_for_line(&1, filename))
   end
 

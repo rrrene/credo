@@ -29,11 +29,11 @@ defmodule Credo.Check.Refactor.ABCSize do
   use Credo.Check
 
   @doc false
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = Params.get(params, :max_size, @default_params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_abc_size))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_abc_size))
   end
 
   defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do

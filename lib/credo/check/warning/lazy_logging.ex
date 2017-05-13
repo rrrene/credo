@@ -28,7 +28,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   use Credo.Check, base_priority: :high
 
   @doc false
-  def run(%SourceFile{} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     state = {false, []} # {<Logger import seen?>, <list of issues>}
     {_, issues} =

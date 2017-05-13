@@ -6,11 +6,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithSpace do
   def property_value, do: :with_space
 
   def property_value_for(source_file, _params) do
-    property_values_for(source_file.source, source_file.filename)
+    property_values_for(source_file, source_file.filename)
   end
 
-  defp property_values_for(source, filename) do
-    source
+  defp property_values_for(source_file, filename) do
+    source_file
     |> Credo.Code.to_tokens
     |> check_tokens([])
     |> Enum.uniq

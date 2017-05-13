@@ -26,7 +26,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   use Credo.Check, base_priority: :normal
 
   @doc false
-  def run(%SourceFile{} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))

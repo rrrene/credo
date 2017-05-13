@@ -10,7 +10,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   end
 
   defp property_values_for(source_file) do
-    source_file.source
+    source_file
     |> Credo.Code.to_tokens
     |> check_tokens([])
     |> Enum.uniq

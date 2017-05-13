@@ -30,12 +30,13 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   end
 
   defp to_lines(source_file, true) do
-    source_file.source
+    source_file
+    |> SourceFile.source
     |> Strings.replace_with_spaces(".")
     |> Code.to_lines
   end
   defp to_lines(source_file, false) do
-    source_file.lines
+    SourceFile.lines(source_file)
   end
 
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do

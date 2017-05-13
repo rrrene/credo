@@ -5,8 +5,8 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.PositionCollector do
 
   def property_value, do: nil
 
-  def property_value_for(%SourceFile{ast: ast, filename: filename}, _params) do
-    Credo.Code.prewalk(ast, &traverse(&1, &2, filename))
+  def property_value_for(%SourceFile{filename: filename} = source_file, _params) do
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, filename))
   end
 
   defp traverse({:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, property_values, filename) do

@@ -10,10 +10,10 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   use Credo.Check
 
   @doc false
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   defp traverse({:case, meta, arguments} = ast, issues, issue_meta) do

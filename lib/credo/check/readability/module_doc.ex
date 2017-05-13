@@ -53,14 +53,14 @@ defmodule Credo.Check.Readability.ModuleDoc do
   use Credo.Check
 
   @doc false
-  def run(%SourceFile{ast: ast, filename: filename} = source_file, params \\ []) do
+  def run(%SourceFile{filename: filename} = source_file, params \\ []) do
     if Path.extname(filename) == ".exs" do
       []
     else
       issue_meta = IssueMeta.for(source_file, params)
       ignore_names = Params.get(params, :ignore_names, @default_params)
 
-      {_continue, issues} = Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
+      {_continue, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
 
       issues
     end

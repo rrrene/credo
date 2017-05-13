@@ -10,9 +10,10 @@ defmodule Credo do
       [
         worker(Credo.CLI.Output.Shell, []),
         worker(Credo.Service.Commands, []),
-        worker(Credo.Service.SourceFileWithoutStringAndSigils, []),
-        worker(Credo.Service.SourceFileCodeOnly, []),
         worker(Credo.Service.SourceFileScopes, []),
+        worker(Credo.Service.SourceFileAST, []),
+        worker(Credo.Service.SourceFileLines, []),
+        worker(Credo.Service.SourceFileSource, []),
       ]
 
     opts = [strategy: :one_for_one, name: Credo.Supervisor]

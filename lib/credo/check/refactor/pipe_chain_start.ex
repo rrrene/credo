@@ -28,11 +28,11 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   use Credo.Check
 
   @doc false
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     excluded_functions = Params.get(params, :excluded_functions, @default_params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, excluded_functions))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, excluded_functions))
   end
 
   defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, issues, _issue_meta, _excluded_functions) do

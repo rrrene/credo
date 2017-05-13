@@ -5,8 +5,9 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Multi do
 
   def property_value, do: :multi_alias_import_require_use
 
-  def property_value_for(%SourceFile{ast: ast, filename: filename}, _params) do
-    ast
+  def property_value_for(%SourceFile{filename: filename} = source_file, _params) do
+    source_file
+    |> SourceFile.ast
     |> ReuseOpHelper.multi_names
     |> Enum.map(&(property_value_for_namespace(&1, filename)))
   end

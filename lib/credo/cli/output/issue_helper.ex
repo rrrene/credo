@@ -4,6 +4,7 @@ defmodule Credo.CLI.Output.IssueHelper do
   alias Credo.CLI.Output.UI
   alias Credo.Config
   alias Credo.Issue
+  alias Credo.SourceFile
 
   @indent 8
 
@@ -94,8 +95,8 @@ defmodule Credo.CLI.Output.IssueHelper do
     nil
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
-    {_, raw_line} = Enum.at(source_file.lines, issue.line_no - 1)
-    line = raw_line |> String.strip
+    {_, raw_line} = SourceFile.line_at(source_file, issue.line_no)
+    line = String.strip(raw_line)
 
     [outer_color, :faint]
     |> UI.edge

@@ -70,8 +70,9 @@ defmodule Credo.Check.Readability.StringSigils do
   end
 
   defp is_heredoc({_, source_file, _}, line_no) do
-    lines = source_file.lines
+    lines = SourceFile.lines(source_file)
     {_, line} = Enum.find(lines, fn {n, _} -> n == line_no end)
+
     Regex.match?(~r/"""$/, line)
   end
 

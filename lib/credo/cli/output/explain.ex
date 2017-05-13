@@ -195,7 +195,7 @@ defmodule Credo.CLI.Output.Explain do
     nil
   end
   defp print_source_line(source_file, line_no, term_width, color, outer_color) do
-    {_, line} = Enum.at(source_file.lines, line_no - 1)
+    {_, line} = SourceFile.line_at(source_file, line_no)
 
     line_no_str =
       "#{line_no} "

@@ -93,7 +93,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> UI.puts
 
     if issue.line_no do
-      {_, line} = Enum.at(source_file.lines, issue.line_no - 1)
+      {_, line} = SourceFile.line_at(source_file, issue.line_no)
 
       UI.puts_edge([outer_color, :faint])
 

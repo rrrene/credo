@@ -45,7 +45,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
   use Credo.Check, base_priority: :high
 
   @doc false
-  def run(%SourceFile{} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     all_unused_calls =

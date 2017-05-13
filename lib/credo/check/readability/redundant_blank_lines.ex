@@ -20,12 +20,13 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   use Credo.Check, base_priority: :low
 
   @doc false
-  def run(%SourceFile{lines: lines} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
 
-    lines
+    source_file
+    |> SourceFile.lines
     |> blank_lines
     |> consecutive_lines(max_blank_lines)
     |> Enum.map(fn line -> issue_for(issue_meta, line, max_blank_lines) end)

@@ -41,6 +41,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
+    |> SourceFile.source
     |> CodeHelper.clean_charlists_strings_sigils_and_comments
     |> Code.to_lines
     |> Enum.flat_map(&find_issues(issue_meta, &1))

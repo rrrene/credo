@@ -95,11 +95,14 @@ defmodule Credo.Check.CodeHelper do
         {:defmodule, "Foo.Bar"}
       ]
   """
-  def scope_list(%SourceFile{filename: filename, ast: ast, lines: lines}) do
+  def scope_list(%SourceFile{filename: filename} = source_file) do
     case SourceFileScopes.get(filename) do
       {:ok, value} ->
         value
       :notfound ->
+        ast = SourceFile.ast(source_file)
+        lines = SourceFile.lines(source_file)
+
         result =
           Enum.map(lines, fn({line_no, _}) ->
             Scope.name(ast, line: line_no)
@@ -125,8 +128,10 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """
-  def clean_charlists_strings_sigils_and_comments(%SourceFile{filename: filename, source: source}) do
-    clean_charlists_strings_sigils_and_comments(source)
+  def clean_charlists_strings_sigils_and_comments(%SourceFile{filename: filename} = source_file) do
+    source_file
+    |> SourceFile.source
+    |> clean_charlists_strings_sigils_and_comments
   end
   def clean_charlists_strings_sigils_and_comments(source) do
     source
@@ -140,8 +145,10 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings and
   Sigils.
   """
-  def clean_charlists_strings_and_sigils(%SourceFile{filename: filename, source: source}) do
-    clean_charlists_strings_and_sigils(source)
+  def clean_charlists_strings_and_sigils(%SourceFile{filename: filename} = source_file) do
+    source_file
+    |> SourceFile.source
+    |> clean_charlists_strings_and_sigils
   end
   def clean_charlists_strings_and_sigils(source) do
     source

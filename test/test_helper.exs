@@ -43,8 +43,7 @@ defmodule CredoSourceFileCase do
   end
 
   def to_source_files(list) do
-    list
-    |> Enum.map(&to_source_file/1)
+    Enum.map(list, &to_source_file/1)
   end
 end
 

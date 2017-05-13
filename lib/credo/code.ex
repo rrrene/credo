@@ -27,11 +27,14 @@ defmodule Credo.Code do
   Technically this is just a wrapper around `Macro.prewalk/3`.
   """
   def prewalk(ast_or_source_file, fun, accumulator \\ [])
-  def prewalk(%SourceFile{ast: source_ast}, fun, accumulator) do
-    prewalk(source_ast, fun, accumulator)
+  def prewalk(%SourceFile{} = source_file, fun, accumulator) do
+    source_file
+    |> SourceFile.ast
+    |> prewalk(fun, accumulator)
   end
   def prewalk(source_ast, fun, accumulator) do
     {_, accumulated} = Macro.prewalk(source_ast, accumulator, fun)
+
     accumulated
   end
 
@@ -41,21 +44,26 @@ defmodule Credo.Code do
   Technically this is just a wrapper around `Macro.postwalk/3`.
   """
   def postwalk(ast_or_source_file, fun, accumulator \\ [])
-  def postwalk(%SourceFile{ast: source_ast}, fun, accumulator) do
-    postwalk(source_ast, fun, accumulator)
+  def postwalk(%SourceFile{} = source_file, fun, accumulator) do
+    source_file
+    |> SourceFile.ast
+    |> postwalk(fun, accumulator)
   end
   def postwalk(source_ast, fun, accumulator) do
     {_, accumulated} = Macro.postwalk(source_ast, accumulator, fun)
+
     accumulated
   end
 
   @doc """
   Takes a SourceFile or String and returns an AST.
   """
-  def ast(%SourceFile{source: source, filename: filename}) do
-    ast(source, filename)
+  def ast(%SourceFile{filename: filename} = source_file) do
+    source_file
+    |> SourceFile.source
+    |> ast(filename)
   end
-  def ast(source, filename \\ "nofilename") do
+  def ast(source, filename \\ "nofilename") when is_binary(source) do
     try do
       case Code.string_to_quoted(source, line: 1) do
         {:ok, value} ->
@@ -72,7 +80,12 @@ defmodule Credo.Code do
   @doc """
   Converts a String into a List of tuples of `{line_no, line}`.
   """
-  def to_lines(source) do
+  def to_lines(%SourceFile{} = source_file) do
+    source_file
+    |> SourceFile.source
+    |> to_lines()
+  end
+  def to_lines(source) when is_binary(source) do
     source
     |> String.split("\n")
     |> Enum.with_index
@@ -82,7 +95,12 @@ defmodule Credo.Code do
   @doc """
   Converts a String into a List of tokens using the `:elixir_tokenizer`.
   """
-  def to_tokens(source) do
+  def to_tokens(%SourceFile{} = source_file) do
+    source_file
+    |> SourceFile.source
+    |> to_tokens()
+  end
+  def to_tokens(source) when is_binary(source) do
     {_, _, _, tokens} =
       source
       |> String.to_char_list

@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.Semicolons do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    source_file.source
+    source_file
     |> Credo.Code.to_tokens
     |> collect_issues([], issue_meta)
   end

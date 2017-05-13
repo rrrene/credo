@@ -17,7 +17,7 @@ defmodule Credo.Check.Warning.UnusedRegexOperation do
   use Credo.Check, base_priority: :high
 
   @doc false
-  def run(%SourceFile{} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     all_unused_calls =
@@ -31,6 +31,7 @@ defmodule Credo.Check.Warning.UnusedRegexOperation do
         |> Macro.to_string
         |> String.split("(")
         |> List.first
+
       issues ++ [issue_for(issue_meta, meta[:line], trigger)]
     end)
   end

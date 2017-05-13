@@ -53,18 +53,19 @@ defmodule Credo.Check.Design.AliasUsage do
   use Credo.Check, base_priority: :normal
 
   @doc false
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
     excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
     new_issues = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases, mod_deps))
+
     {ast, issues ++ new_issues}
   end
   defp traverse(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames) do
@@ -91,6 +92,7 @@ defmodule Credo.Check.Design.AliasUsage do
         {ast, issues}
       true ->
         trigger = Enum.join(mod_list, ".")
+
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end

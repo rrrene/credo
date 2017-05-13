@@ -28,7 +28,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    source_file.source
+    source_file
     |> Credo.Code.to_tokens
     |> collect_parenthetical_tokens([], nil)
     |> find_issues([], issue_meta)

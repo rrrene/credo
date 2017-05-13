@@ -71,7 +71,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp duplicate_nodes(source_files, mass_threshold) do
     source_files
     |> Enum.reduce(%{}, fn(source_file, acc) ->
-        calculate_hashes(source_file.ast, acc, source_file.filename, mass_threshold)
+        ast = SourceFile.ast(source_file)
+
+        calculate_hashes(ast, acc, source_file.filename, mass_threshold)
       end)
     |> prune_hashes
     |> add_masses

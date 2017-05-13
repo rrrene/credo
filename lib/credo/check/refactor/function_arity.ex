@@ -21,12 +21,12 @@ defmodule Credo.Check.Refactor.FunctionArity do
   use Credo.Check
 
   @doc false
-  def run(%SourceFile{ast: ast} = source_file, params \\ []) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_arity = Params.get(params, :max_arity, @default_params)
     ignore_defp = Params.get(params, :ignore_defp, @default_params)
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, max_arity, ignore_defp))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_arity, ignore_defp))
   end
 
   for op <- @def_ops do
