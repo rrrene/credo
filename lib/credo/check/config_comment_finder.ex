@@ -11,19 +11,20 @@ defmodule Credo.Check.ConfigCommentFinder do
   alias Credo.Check.ConfigComment
 
   @doc false
-  def run(source_files, _params) when is_list(source_files) do
+  def run(source_files, _config, _params) when is_list(source_files) do
     Enum.map(source_files, &find_and_set_in_source_file/1)
   end
 
   def find_and_set_in_source_file(source_file) do
     config_comments = find_config_comments(source_file)
 
-    %SourceFile{source_file | config_comments: config_comments}
+    {source_file.filename, config_comments}
   end
 
-  defp find_config_comments(%SourceFile{source: source}) do
-    source
-    |> CodeHelper.clean_strings_and_sigils
+  defp find_config_comments(source_file) do
+    source_file
+    |> SourceFile.source
+    |> CodeHelper.clean_charlists_strings_and_sigils
     |> Credo.Code.to_lines
     |> Enum.reduce([], &find_config_comment/2)
   end

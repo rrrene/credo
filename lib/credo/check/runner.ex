@@ -54,11 +54,10 @@ defmodule Credo.Check.Runner do
 
     if Enum.any?(lint_attribute_map, fn({_, value}) -> value != [] end) do
       Credo.CLI.Output.UI.warn ""
-      Credo.CLI.Output.UI.warn [:orange,
-        "@lint attributes will be deprecated in Credo v0.8 because they trigger\n",
+      Credo.CLI.Output.UI.warn [:bright, :orange,
+        "@lint attributes are deprecated since Credo v0.8 because they trigger\n",
         "compiler warnings on Elixir v1.4.\n\n",
-        "Please consider reporting the cases where you needed @lint attributes\n",
-        "to help us devise a new solution: https://github.com/rrrene/credo/issues/new"]
+      ]
       Credo.CLI.Output.UI.warn ""
     end
 
@@ -72,25 +71,15 @@ defmodule Credo.Check.Runner do
   end
 
   defp set_config_comments(config, source_files) do
-    config_comment_map =
-      source_files
-      |> run_config_comment_finder(config)
-      |> Enum.reduce(%{}, fn(source_file, memo) ->
-          # TODO: we should modify the config "directly" instead of going
-          # through the SourceFile
-          Map.put(memo, source_file.filename, source_file.config_comments)
-        end)
+    config_comment_map = run_config_comment_finder(source_files, config)
 
     %Config{config | config_comment_map: config_comment_map}
   end
 
   defp run_config_comment_finder(source_files, config) do
-    checks = [{Credo.Check.ConfigCommentFinder}]
-
-    Enum.reduce(checks, source_files, fn(check_tuple, source_files) ->
-      run_check(check_tuple, source_files, config)
-    end)
->>>>>>> Add config comment
+    {Credo.Check.ConfigCommentFinder}
+    |> run_check(source_files, config)
+    |> Enum.into(%{})
   end
 
   defp exclude_low_priority_checks(config, below_priority) do
