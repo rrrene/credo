@@ -37,8 +37,10 @@ defmodule CredoSourceFileCase do
   end
   def to_source_file(source, filename) do
     case Credo.SourceFile.parse(source, filename) do
-      %{valid?: true} = source_file -> source_file
-      _ -> raise "Source could not be parsed!"
+      %{valid?: true} = source_file ->
+        source_file
+      _ ->
+        raise "Source could not be parsed!"
     end
   end
 
@@ -51,10 +53,13 @@ defmodule CredoCheckCase do
   use ExUnit.Case
 
   alias Credo.Service.SourceFileIssues
+  alias Credo.SourceFile
 
   def refute_issues(source_file, check \\ nil, params \\ []) do
-    issues = issues_for(source_file, check, params)
+    issues = issues_for(source_file, check, create_config(), params)
+
     assert [] == issues, "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
+
     issues
   end
 
@@ -66,10 +71,15 @@ defmodule CredoCheckCase do
   end
 
   def assert_issue(source_file, check \\ nil, params \\ [], callback \\ nil) do
-    issues = issues_for(source_file, check, params)
+    issues = issues_for(source_file, check, create_config(), params)
+
     refute Enum.count(issues) == 0, "There should be one issue, got none."
     assert Enum.count(issues) == 1, "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
-    if callback, do: callback.(issues |> List.first)
+
+    if callback do
+      issues |> List.first |> callback.()
+    end
+
     issues
   end
 
@@ -80,38 +90,44 @@ defmodule CredoCheckCase do
     assert_issues(source_file, check, [], callback)
   end
   def assert_issues(source_file, check \\ nil, params \\ [], callback \\ nil) do
-    issues = issues_for(source_file, check, params)
+    issues = issues_for(source_file, check, create_config(), params)
+
     assert Enum.count(issues) > 0, "There should be multiple issues, got none."
     assert Enum.count(issues) > 1, "There should be more than one issue, got: #{to_inspected(issues)}"
+
     if callback, do: callback.(issues)
+
     issues
   end
 
-  defp issues_for(source_files, nil, _) when is_list(source_files) do
-    source_files
-    |> Enum.flat_map(&(&1.issues))
+  defp issues_for(source_files, nil, config, _) when is_list(source_files) do
+    Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(config)))
   end
-  defp issues_for(source_files, check, params) when is_list(source_files) do
-    return_value =
-      source_files
-      |> check.run(params)
+  defp issues_for(source_files, check, _config, params) when is_list(source_files) do
+    config = create_config()
 
     if check.run_on_all? do
+      :ok = check.run(source_files, config, params)
+
       source_files
-      |> SourceFileIssues.update_in_source_files
-      |> Enum.flat_map(&(&1.issues))
+      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(config)))
     else
-      return_value
-      |> Enum.flat_map(&(&1.issues))
+      source_files
+      |> check.run(params)
+      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(config)))
     end
   end
-  defp issues_for(source_file, nil, _), do: source_file.issues
-  defp issues_for(source_file, check, params), do: check.run(source_file, params)
-
+  defp issues_for(%SourceFile{} = source_file, nil, config, _) do
+    source_file |> get_issues_from_source_file(config)
+  end
+  defp issues_for(%SourceFile{} = source_file, check, _config, params) do
+    _issues = check.run(source_file, params)
+  end
 
   def assert_trigger([issue], trigger), do: [assert_trigger(issue, trigger)]
   def assert_trigger(issue, trigger) do
     assert trigger == issue.trigger
+
     issue
   end
 
@@ -120,5 +136,15 @@ defmodule CredoCheckCase do
     |> Inspect.Algebra.to_doc(%Inspect.Opts{})
     |> Inspect.Algebra.format(50)
     |> Enum.join("")
+  end
+
+  defp create_config do
+    %Credo.Config{}
+    |> Credo.Service.SourceFiles.start_server
+    |> Credo.Service.SourceFileIssues.start_server
+  end
+
+  defp get_issues_from_source_file(source_file, config) do
+    SourceFileIssues.get(config, source_file)
   end
 end

@@ -4,7 +4,6 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   @described_check Credo.Check.Design.DuplicatedCode
 
   alias Credo.Check.Design.DuplicatedCode
-  alias Credo.Service.SourceFileIssues
 
   test "should raise an issue for duplicated code" do
     s1 = """
@@ -17,7 +16,7 @@ defmodule M1 do
     end
   end
 end
-""" |> to_source_file
+"""
     s2 = """
 defmodule M2 do
   def myfun(p1, p2) when is_list(p2) do
@@ -28,14 +27,11 @@ defmodule M2 do
     end
   end
 end
-""" |> to_source_file
+"""
 
-    source_files = [s1, s2]
-    :ok = @described_check.run(source_files, [mass_threshold: 16])
-    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
-
-    refute Enum.empty?(s1.issues)
-    refute Enum.empty?(s2.issues)
+    [s1, s2]
+    |> to_source_files
+    |> assert_issues(@described_check, [mass_threshold: 16])
   end
 
   test "should raise an issue for duplicated code via macros" do
@@ -54,7 +50,7 @@ defmodule M1 do
     end
   end
 end
-""" |> to_source_file
+"""
     s2 = """
 defmodule M2 do
   test "something is duplicated" do
@@ -70,14 +66,11 @@ defmodule M2 do
     end
   end
 end
-""" |> to_source_file
+"""
 
-    source_files = [s1, s2]
-    :ok = @described_check.run(source_files, [mass_threshold: 16])
-    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
-
-    refute Enum.empty?(s1.issues)
-    refute Enum.empty?(s2.issues)
+    [s1, s2]
+    |> to_source_files
+    |> assert_issues(@described_check, [mass_threshold: 16])
   end
 
   test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
@@ -96,7 +89,7 @@ defmodule M1 do
     end
   end
 end
-""" |> to_source_file
+"""
     s2 = """
 defmodule M2 do
   test "something is duplicated" do
@@ -112,14 +105,11 @@ defmodule M2 do
     end
   end
 end
-""" |> to_source_file
+"""
 
-    source_files = [s1, s2]
-    :ok = @described_check.run(source_files, [excluded_macros: [:test]])
-    [s1, s2] = SourceFileIssues.update_in_source_files(source_files)
-
-    assert Enum.empty?(s1.issues)
-    assert Enum.empty?(s2.issues)
+    [s1, s2]
+    |> to_source_files
+    |> refute_issues(@described_check, [excluded_macros: [:test]])
   end
 
 

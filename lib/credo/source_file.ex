@@ -1,8 +1,5 @@
 defmodule Credo.SourceFile do
   defstruct filename: nil,
-            __source:   nil,
-            __lines:    nil,
-            __ast:      nil,
             valid?:   nil
 
   @type t :: module
@@ -18,7 +15,7 @@ defmodule Credo.SourceFile do
       case Credo.Code.ast(source) do
         {:ok, ast} ->
           {true, ast}
-        {:error, errors} ->
+        {:error, _errors} ->
           {false, []}
       end
 
@@ -109,7 +106,7 @@ defmodule Credo.SourceFile do
   def column(_, _, _), do: nil
 
   defimpl Inspect, for: __MODULE__ do
-    def inspect(source_file, opts) do
+    def inspect(source_file, _opts) do
       "%SourceFile<#{source_file.filename}>"
     end
   end

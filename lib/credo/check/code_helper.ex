@@ -12,8 +12,6 @@ defmodule Credo.Check.CodeHelper do
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
   alias Credo.Service.SourceFileScopes
-  alias Credo.Service.SourceFileCodeOnly
-  alias Credo.Service.SourceFileWithoutStringAndSigils
   alias Credo.SourceFile
 
   defdelegate do_block?(ast), to: Block, as: :do_block?
@@ -128,7 +126,7 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """
-  def clean_charlists_strings_sigils_and_comments(%SourceFile{filename: filename} = source_file) do
+  def clean_charlists_strings_sigils_and_comments(%SourceFile{} = source_file) do
     source_file
     |> SourceFile.source
     |> clean_charlists_strings_sigils_and_comments
@@ -145,7 +143,7 @@ defmodule Credo.Check.CodeHelper do
   Takes a SourceFile and returns its source code stripped of all Strings and
   Sigils.
   """
-  def clean_charlists_strings_and_sigils(%SourceFile{filename: filename} = source_file) do
+  def clean_charlists_strings_and_sigils(%SourceFile{} = source_file) do
     source_file
     |> SourceFile.source
     |> clean_charlists_strings_and_sigils

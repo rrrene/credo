@@ -17,7 +17,7 @@ defmodule Credo.Issue do
 
 
   defimpl Inspect, for: __MODULE__ do
-    def inspect(issue, opts) do
+    def inspect(issue, _opts) do
       "%Issue<#{issue.filename} #{issue.category}>"
     end
   end

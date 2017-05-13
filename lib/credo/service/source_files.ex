@@ -1,7 +1,6 @@
 defmodule Credo.Service.SourceFiles do
   use GenServer
 
-  alias Credo.SourceFile
   alias Credo.Config
 
   def start_server(config) do
@@ -24,7 +23,7 @@ defmodule Credo.Service.SourceFiles do
     {:ok, []}
   end
 
-  def handle_call({:put, new_state}, _from, current_state) do
+  def handle_call({:put, new_state}, _from, _current_state) do
     {:reply, new_state, new_state}
   end
 

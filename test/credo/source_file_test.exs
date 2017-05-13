@@ -13,16 +13,15 @@ end
   end
 
   test "it should report a violation" do
-"""
+    s1 = """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     someValue = parameter1 +
 end
-""" |> Credo.SourceFile.parse("example.ex")
-    |>  assert_issue(fn(issue) ->
-          assert :error == issue.category
-          assert issue.message |> String.starts_with?("missing terminator")
-        end)
+"""
+    source_file = Credo.SourceFile.parse(s1, "example.ex")
+
+    refute source_file.valid?
   end
 
   test "it should return line and column correctly" do
@@ -35,7 +34,7 @@ end
 """ |> to_source_file
 
     assert "    some_value = parameter1 + parameter2" ==
-           Credo.SourceFile.line_at(source_file, 3)
+                                      Credo.SourceFile.line_at(source_file, 3)
     assert 18 == Credo.SourceFile.column(source_file, 3, :parameter1)
     assert 1  == Credo.SourceFile.column(source_file, 1, :defmodule)
   end

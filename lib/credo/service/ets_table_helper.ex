@@ -1,12 +1,11 @@
 defmodule Credo.Service.ETSTableHelper do
-  defmacro __using__(opts \\ []) do
+  defmacro __using__(_opts \\ []) do
     quote do
       use GenServer
 
       @table_name __MODULE__
 
       def start_link(opts \\ []) do
-        IO.puts "Starting #{@table_name}"
         {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
       end
 
