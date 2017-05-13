@@ -4,6 +4,7 @@
 
 - Load source files in parallel
 - Fix high memory consumption
+- Fix comment handling of Charlists, Sigils and Strings
 
 ### BREAKING CHANGES
 
