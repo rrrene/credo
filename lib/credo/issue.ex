@@ -15,10 +15,4 @@ defmodule Credo.Issue do
 
   @type t :: module
 
-
-  defimpl Inspect, for: __MODULE__ do
-    def inspect(issue, _opts) do
-      "%Issue<#{issue.filename} #{issue.category}>"
-    end
-  end
 end
