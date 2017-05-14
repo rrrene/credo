@@ -3,7 +3,7 @@
 ## 0.8.0
 
 - Load source files in parallel
-- Fix high memory consumption
+- Improve high memory consumption
 - Fix comment handling of Charlists, Sigils and Strings
 
 ### BREAKING CHANGES
