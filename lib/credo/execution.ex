@@ -5,12 +5,15 @@ defmodule Credo.Execution do
   """
 
   defstruct args:               [],
+            argv:               [],
+            cli_options:        nil,
             files:              nil,
             color:              true,
             checks:             nil,
             requires:           [],
             strict:             false,
             check_for_updates:  true, # checks if there is a new version of Credo
+            halted:             false,
 
             # options, set by the command line
             min_priority:       0,
@@ -29,6 +32,7 @@ defmodule Credo.Execution do
             issues_pid:         nil,
             skipped_checks:     nil,
             assigns:            %{},
+            results:            %{},
             config_comment_map: %{},
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
@@ -118,4 +122,22 @@ defmodule Credo.Execution do
     |> Credo.Execution.Issues.to_map
     |> Map.get(filename)
   end
+
+  # Results
+
+  def get_result(exec, name) do
+    Map.get(exec.results, name)
+  end
+
+  def put_result(exec, name, value) do
+    %__MODULE__{exec | results: Map.put(exec.results, name, value)}
+  end
+
+  # Halt
+
+
+  def halt(exec) do
+    %__MODULE__{exec | halted: true}
+  end
+
 end

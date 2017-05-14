@@ -34,7 +34,7 @@ defmodule Credo.CLI.Output.IssuesShortList do
     |> print_issues(filename, source_file, exec, term_width)
   end
 
-  defp print_issues(issues, _filename, source_file, _config, term_width) do
+  defp print_issues(issues, _filename, source_file, _exec, term_width) do
     issues
     |> Enum.sort_by(&(&1.line_no))
     |> Enum.each(&print_issue(&1, source_file, term_width))

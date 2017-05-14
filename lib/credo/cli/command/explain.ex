@@ -61,8 +61,8 @@ defmodule Credo.CLI.Command.Explain do
     exec
   end
 
-  defp determine_success(_) do
-    :ok
+  defp determine_success(exec) do
+    exec
   end
 
   defp output_mod(_) do

@@ -103,7 +103,7 @@ defmodule CredoCheckCase do
   defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
     Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(exec)))
   end
-  defp issues_for(source_files, check, _config, params) when is_list(source_files) do
+  defp issues_for(source_files, check, _exec, params) when is_list(source_files) do
     exec = create_config()
 
     if check.run_on_all? do
@@ -120,7 +120,7 @@ defmodule CredoCheckCase do
   defp issues_for(%SourceFile{} = source_file, nil, exec, _) do
     source_file |> get_issues_from_source_file(exec)
   end
-  defp issues_for(%SourceFile{} = source_file, check, _config, params) do
+  defp issues_for(%SourceFile{} = source_file, check, _exec, params) do
     _issues = check.run(source_file, params)
   end
 

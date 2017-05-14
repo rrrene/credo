@@ -129,10 +129,10 @@ defmodule Credo.Check.Runner do
   end
 
   # Returns issues
-  defp run_check({_check, false}, source_files, _config) when is_list(source_files) do
+  defp run_check({_check, false}, source_files, _exec) when is_list(source_files) do
     source_files
   end
-  defp run_check({_check, false}, _source_file, _config) do
+  defp run_check({_check, false}, _source_file, _exec) do
     []
   end
   defp run_check({check}, source_file, exec) do

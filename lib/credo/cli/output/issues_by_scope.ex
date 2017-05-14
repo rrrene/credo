@@ -43,7 +43,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> Filter.valid_issues(exec)
     |> print_issues(filename, source_file, exec, term_width)
   end
-  defp print_issues(issues, _filename, source_file, _config, term_width) do
+  defp print_issues(issues, _filename, source_file, _exec, term_width) do
     if issues |> Enum.any? do
       first_issue = issues |> List.first
       scope_name = Scope.mod_name(first_issue.scope)

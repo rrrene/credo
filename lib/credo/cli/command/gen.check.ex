@@ -6,13 +6,13 @@ defmodule Credo.CLI.Command.GenCheck do
   @check_template_filename ".template.check.ex"
   @default_check_template_file File.read!(@check_template_filename)
 
-  alias Credo.Execution
-
   @doc false
-  def run(%Execution{args: args}) do
-    args
+  def run(exec) do
+    exec.args
     |> List.first
     |> create_check_file
+
+    exec
   end
 
   defp create_check_file(nil) do

@@ -27,7 +27,7 @@ defmodule Credo.CLI.Output.Explain do
     print_issues(source_file, exec, term_width, line_no, column)
   end
 
-  defp print_issues(nil, _config, _term_width, _line_no, _column) do
+  defp print_issues(nil, _exec, _term_width, _line_no, _column) do
     nil
   end
 
@@ -42,11 +42,11 @@ defmodule Credo.CLI.Output.Explain do
     |> print_issues(filename, source_file, exec, term_width, line_no, column)
   end
 
-  defp print_issues([], _filename, _source_file, _config, _term_width, _line_no, _column) do
+  defp print_issues([], _filename, _source_file, _exec, _term_width, _line_no, _column) do
     nil
   end
 
-  defp print_issues(issues, _filename, source_file, _config, term_width, _line_no, _column) do
+  defp print_issues(issues, _filename, source_file, _exec, term_width, _line_no, _column) do
     first_issue = issues |> List.first
     scope_name = Scope.mod_name(first_issue.scope)
     color = Output.check_color(first_issue)

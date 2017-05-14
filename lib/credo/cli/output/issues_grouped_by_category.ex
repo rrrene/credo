@@ -84,7 +84,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     |> Summary.print(exec, time_load, time_run)
   end
 
-  defp print_issues_for_category(_category, nil, _source_file_map, _config, _term_width) do
+  defp print_issues_for_category(_category, nil, _source_file_map, _exec, _term_width) do
     nil
   end
   defp print_issues_for_category(_category, issues, source_file_map, %Execution{format: format} = exec, term_width)

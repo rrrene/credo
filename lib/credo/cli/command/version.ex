@@ -4,9 +4,9 @@ defmodule Credo.CLI.Command.Version do
   alias Credo.CLI.Output.UI
 
   @doc false
-  def run(_) do
+  def run(exec) do
     UI.puts Credo.version
 
-    :ok
+    exec
   end
 end

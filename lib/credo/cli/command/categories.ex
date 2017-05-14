@@ -4,10 +4,10 @@ defmodule Credo.CLI.Command.Categories do
   @shortdoc "Show and explain all issue categories"
 
   @doc false
-  def run(_config) do
+  def run(exec) do
     output_mod().print
 
-    :ok
+    exec
   end
 
   defp output_mod do

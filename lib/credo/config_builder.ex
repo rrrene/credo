@@ -5,24 +5,24 @@ defmodule Credo.ConfigBuilder do
   alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
-  def parse(%Options{args: args, path: path, switches: switches}) do
-    path
+  def parse(%Options{} = options) do
+    options.path
     |> Filename.remove_line_no_and_column
-    |> ConfigFile.read_or_default(switches[:config_name])
-    |> cast_to_exec(args, switches)
+    |> ConfigFile.read_or_default(options.switches[:config_name])
+    |> cast_to_exec(options)
   end
 
-  defp cast_to_exec(%ConfigFile{} = config_file, args, switches) do
+  defp cast_to_exec(%ConfigFile{} = config_file, options) do
     %Execution{
-      args: args,
+      cli_options: options,
       files: config_file.files,
       color: config_file.color,
       checks: config_file.checks,
       requires: config_file.requires,
-      strict: strict_via_args_or_config_file?(args, config_file),
+      strict: strict_via_args_or_config_file?(options.args, config_file),
       check_for_updates: config_file.check_for_updates,
     }
-    |> add_switches_to_config(switches)
+    |> add_switches_to_exec(options.switches)
   end
 
   defp strict_via_args_or_config_file?([], config_file) do
@@ -32,7 +32,7 @@ defmodule Credo.ConfigBuilder do
     Filename.contains_line_no?(potential_path) || config_file.strict
   end
 
-  defp add_switches_to_config(%Execution{} = exec, switches) do
+  defp add_switches_to_exec(%Execution{} = exec, switches) do
     exec
     |> set_all(switches)
     |> set_color(switches)

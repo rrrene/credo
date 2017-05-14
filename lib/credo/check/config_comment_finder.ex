@@ -11,7 +11,7 @@ defmodule Credo.Check.ConfigCommentFinder do
   alias Credo.Check.ConfigComment
 
   @doc false
-  def run(source_files, _config, _params) when is_list(source_files) do
+  def run(source_files, _exec, _params) when is_list(source_files) do
     Enum.map(source_files, &find_and_set_in_source_file/1)
   end
 

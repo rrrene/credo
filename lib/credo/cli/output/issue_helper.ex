@@ -16,7 +16,7 @@ defmodule Credo.CLI.Output.IssueHelper do
   end
 
   def do_print_issue(%Issue{check: _check, message: message, filename: filename, priority: _priority} = issue, _source_file,
-                    %Execution{format: "flycheck"} = _config, _term_width) do
+                    %Execution{format: "flycheck"} = _exec, _term_width) do
     tag = Output.check_tag(issue, false)
 
     [
@@ -25,7 +25,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
   end
   def do_print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
-                    %Execution{format: "oneline"} = _config, _term_width) do
+                    %Execution{format: "oneline"} = _exec, _term_width) do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
     filename_color = :default_color

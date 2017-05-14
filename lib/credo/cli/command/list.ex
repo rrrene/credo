@@ -79,12 +79,7 @@ defmodule Credo.CLI.Command.List do
       |> Filter.important(exec)
       |> Filter.valid_issues(exec)
 
-    case issues do
-      [] ->
-        :ok
-      issues ->
-        {:error, issues}
-    end
+    Execution.put_result(exec, "issues", issues)
   end
 
   defp output_mod(%Execution{format: "oneline"}) do
