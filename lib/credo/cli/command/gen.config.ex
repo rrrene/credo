@@ -1,7 +1,7 @@
 defmodule Credo.CLI.Command.GenConfig do
   use Credo.CLI.Command
 
-  @shortdoc "Initialize a new .credo.exs config file in the current directory"
+  @shortdoc "Initialize a new .credo.exs exec file in the current directory"
 
   @config_filename ".credo.exs"
   @default_config_file File.read!(@config_filename)

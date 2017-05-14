@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Output do
   alias Credo.CLI.Output.UI
-  alias Credo.Config
+  alias Credo.Execution
 
   @category_tag_map %{"refactor" => "F"}
 
@@ -113,8 +113,8 @@ defmodule Credo.CLI.Output do
     print_numbered_list(invalid_source_filenames)
   end
 
-  def print_skipped_checks(%Config{skipped_checks: []}), do: nil
-  def print_skipped_checks(%Config{skipped_checks: skipped_checks}) do
+  def print_skipped_checks(%Execution{skipped_checks: []}), do: nil
+  def print_skipped_checks(%Execution{skipped_checks: skipped_checks}) do
     msg =
       [
         :reset, :bright, :orange, "info: ", :reset, :faint, "the following checks were skipped because they're not compatible with\n",

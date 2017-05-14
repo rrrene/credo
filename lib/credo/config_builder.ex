@@ -1,5 +1,5 @@
 defmodule Credo.ConfigBuilder do
-  alias Credo.Config
+  alias Credo.Execution
   alias Credo.ConfigFile
   alias Credo.CLI.Filename
   alias Credo.CLI.Options
@@ -9,12 +9,11 @@ defmodule Credo.ConfigBuilder do
     path
     |> Filename.remove_line_no_and_column
     |> ConfigFile.read_or_default(switches[:config_name])
-    |> cast_to_config(args)
-    |> add_switches_to_config(switches)
+    |> cast_to_exec(args, switches)
   end
 
-  defp cast_to_config(%ConfigFile{} = config_file, args) do
-    %Config{
+  defp cast_to_exec(%ConfigFile{} = config_file, args, switches) do
+    %Execution{
       args: args,
       files: config_file.files,
       color: config_file.color,
@@ -23,6 +22,7 @@ defmodule Credo.ConfigBuilder do
       strict: strict_via_args_or_config_file?(args, config_file),
       check_for_updates: config_file.check_for_updates,
     }
+    |> add_switches_to_config(switches)
   end
 
   defp strict_via_args_or_config_file?([], config_file) do
@@ -32,8 +32,8 @@ defmodule Credo.ConfigBuilder do
     Filename.contains_line_no?(potential_path) || config_file.strict
   end
 
-  defp add_switches_to_config(%Config{} = config, switches) do
-    config
+  defp add_switches_to_config(%Execution{} = exec, switches) do
+    exec
     |> set_all(switches)
     |> set_color(switches)
     |> set_strict(switches)
@@ -49,97 +49,97 @@ defmodule Credo.ConfigBuilder do
     |> set_version(switches)
   end
 
-  defp set_all(config, %{all: true}) do
-    %Config{config | all: true}
+  defp set_all(exec, %{all: true}) do
+    %Execution{exec | all: true}
   end
-  defp set_all(config, _), do: config
+  defp set_all(exec, _), do: exec
 
-  defp set_color(config, %{color: color}) do
-    %Config{config | color: color}
+  defp set_color(exec, %{color: color}) do
+    %Execution{exec | color: color}
   end
-  defp set_color(config, _), do: config
+  defp set_color(exec, _), do: exec
 
-  defp set_strict(config, %{all_priorities: true}) do
-    set_strict(config, %{strict: true})
+  defp set_strict(exec, %{all_priorities: true}) do
+    set_strict(exec, %{strict: true})
   end
-  defp set_strict(config, %{strict: true}) do
-    new_config = %Config{config | strict: true}
+  defp set_strict(exec, %{strict: true}) do
+    new_config = %Execution{exec | strict: true}
 
-    Config.set_strict(new_config)
+    Execution.set_strict(new_config)
   end
-  defp set_strict(config, %{strict: false}) do
-    new_config = %Config{config | strict: false}
+  defp set_strict(exec, %{strict: false}) do
+    new_config = %Execution{exec | strict: false}
 
-    Config.set_strict(new_config)
+    Execution.set_strict(new_config)
   end
-  defp set_strict(config, _), do: Config.set_strict(config)
+  defp set_strict(exec, _), do: Execution.set_strict(exec)
 
-  defp set_help(config, %{help: true}) do
-    %Config{config | help: true}
+  defp set_help(exec, %{help: true}) do
+    %Execution{exec | help: true}
   end
-  defp set_help(config, _), do: config
+  defp set_help(exec, _), do: exec
 
-  defp set_verbose(config, %{verbose: true}) do
-    %Config{config | verbose: true}
+  defp set_verbose(exec, %{verbose: true}) do
+    %Execution{exec | verbose: true}
   end
-  defp set_verbose(config, _), do: config
+  defp set_verbose(exec, _), do: exec
 
-  defp set_crash_on_error(config, %{crash_on_error: true}) do
-    %Config{config | crash_on_error: true}
+  defp set_crash_on_error(exec, %{crash_on_error: true}) do
+    %Execution{exec | crash_on_error: true}
   end
-  defp set_crash_on_error(config, _), do: config
+  defp set_crash_on_error(exec, _), do: exec
 
-  defp set_read_from_stdin(config, %{read_from_stdin: true}) do
-    %Config{config | read_from_stdin: true}
+  defp set_read_from_stdin(exec, %{read_from_stdin: true}) do
+    %Execution{exec | read_from_stdin: true}
   end
-  defp set_read_from_stdin(config, _), do: config
+  defp set_read_from_stdin(exec, _), do: exec
 
-  defp set_version(config, %{version: true}) do
-    %Config{config | version: true}
+  defp set_version(exec, %{version: true}) do
+    %Execution{exec | version: true}
   end
-  defp set_version(config, _), do: config
+  defp set_version(exec, _), do: exec
 
-  defp set_format(config, %{format: format}) do
-    %Config{config | format: format}
+  defp set_format(exec, %{format: format}) do
+    %Execution{exec | format: format}
   end
-  defp set_format(config, _), do: config
+  defp set_format(exec, _), do: exec
 
-  defp set_min_priority(config, %{min_priority: min_priority}) do
-    %Config{config | min_priority: min_priority}
+  defp set_min_priority(exec, %{min_priority: min_priority}) do
+    %Execution{exec | min_priority: min_priority}
   end
-  defp set_min_priority(config, _), do: config
+  defp set_min_priority(exec, _), do: exec
 
   # exclude/ignore certain checks
-  defp set_only(config, %{only: only}) do
-    set_only(config, %{checks: only})
+  defp set_only(exec, %{only: only}) do
+    set_only(exec, %{checks: only})
   end
-  defp set_only(config, %{checks: check_pattern}) do
+  defp set_only(exec, %{checks: check_pattern}) do
     new_config =
-      %Config{
-        config |
+      %Execution{
+        exec |
         strict: true,
         only_checks: String.split(check_pattern, ",")
       }
 
-    Config.set_strict(new_config)
+    Execution.set_strict(new_config)
   end
-  defp set_only(config, _), do: config
+  defp set_only(exec, _), do: exec
 
   # exclude/ignore certain checks
-  defp set_ignore(config, %{ignore: ignore}) do
-    set_ignore(config, %{ignore_checks: ignore})
+  defp set_ignore(exec, %{ignore: ignore}) do
+    set_ignore(exec, %{ignore_checks: ignore})
   end
-  defp set_ignore(config, %{ignore_checks: ignore_pattern}) do
-    %Config{config | ignore_checks: String.split(ignore_pattern, ",")}
+  defp set_ignore(exec, %{ignore_checks: ignore_pattern}) do
+    %Execution{exec | ignore_checks: String.split(ignore_pattern, ",")}
   end
-  defp set_ignore(config, _), do: config
+  defp set_ignore(exec, _), do: exec
 
   # DEPRECATED command line switches
-  defp set_deprecated_switches(config, %{one_line: true}) do
+  defp set_deprecated_switches(exec, %{one_line: true}) do
     UI.puts [:yellow, "[DEPRECATED] ", :faint, "--one-line is deprecated in favor of --format=oneline"]
 
-    %Config{config | format: "oneline"}
+    %Execution{exec | format: "oneline"}
   end
-  defp set_deprecated_switches(config, _), do: config
+  defp set_deprecated_switches(exec, _), do: exec
 
 end

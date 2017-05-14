@@ -1,7 +1,7 @@
-defmodule Credo.Config do
+defmodule Credo.Execution do
   @doc """
-  Every run of Credo is configured via a `Config` object, which is created and
-  manipulated via the `Credo.Config` module.
+  Every run of Credo is configured via a `Execution` object, which is created and
+  manipulated via the `Credo.Execution` module.
   """
 
   defstruct args:               [],
@@ -33,9 +33,9 @@ defmodule Credo.Config do
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @doc """
-  Returns the checks that should be run for a given `config` object.
+  Returns the checks that should be run for a given `exec` object.
 
-  Takes all checks from the `checks:` field of the config, matches those against
+  Takes all checks from the `checks:` field of the exec, matches those against
   any patterns to include or exclude certain checks given via the command line.
   """
   def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
@@ -73,49 +73,49 @@ defmodule Credo.Config do
   end
 
   @doc """
-  Sets the config values which `strict` implies (if applicable).
+  Sets the exec values which `strict` implies (if applicable).
   """
-  def set_strict(%__MODULE__{strict: true} = config) do
-    %__MODULE__{config | all: true, min_priority: -99}
+  def set_strict(%__MODULE__{strict: true} = exec) do
+    %__MODULE__{exec | all: true, min_priority: -99}
   end
-  def set_strict(%__MODULE__{strict: false} = config) do
-    %__MODULE__{config | min_priority: 0}
+  def set_strict(%__MODULE__{strict: false} = exec) do
+    %__MODULE__{exec | min_priority: 0}
   end
-  def set_strict(config), do: config
+  def set_strict(exec), do: exec
 
   # Assigns
 
-  def get_assign(config, name) do
-    Map.get(config.assigns, name)
+  def get_assign(exec, name) do
+    Map.get(exec.assigns, name)
   end
 
-  def put_assign(config, name, value) do
-    %__MODULE__{config | assigns: Map.put(config.assigns, name, value)}
+  def put_assign(exec, name, value) do
+    %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
   # Source Files
 
-  def get_source_files(config) do
-    Credo.Service.SourceFiles.get(config)
+  def get_source_files(exec) do
+    Credo.Execution.SourceFiles.get(exec)
   end
 
-  def put_source_files(config, source_files) do
-    Credo.Service.SourceFiles.put(config, source_files)
+  def put_source_files(exec, source_files) do
+    Credo.Execution.SourceFiles.put(exec, source_files)
 
-    config
+    exec
   end
 
   # Issues
 
-  def get_issues(config) do
-    config
-    |> Credo.Service.SourceFileIssues.to_map
+  def get_issues(exec) do
+    exec
+    |> Credo.Execution.Issues.to_map
     |> Map.values
     |> List.flatten
   end
-  def get_issues(config, filename) do
-    config
-    |> Credo.Service.SourceFileIssues.to_map
+  def get_issues(exec, filename) do
+    exec
+    |> Credo.Execution.Issues.to_map
     |> Map.get(filename)
   end
 end

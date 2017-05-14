@@ -5,27 +5,27 @@ defmodule Credo.Sources do
   @stdin_filename "stdin"
 
   @doc """
-  Finds sources for a given `Credo.Config`.
+  Finds sources for a given `Credo.Execution`.
 
   Through the `files` key, configs may contain a list of `included` and `excluded`
   patterns. For `included`, patterns can be file paths, directory paths and globs.
   For `excluded`, patterns can also be specified as regular expressions.
 
-  iex> Sources.find(%Credo.Config{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
+  iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
 
-  iex> Sources.find(%Credo.Config{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
+  iex> Sources.find(%Credo.Execution{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
   """
-  def find(%Credo.Config{read_from_stdin: true, files: %{included: [filename]}}) do
+  def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename
     |> source_file_from_stdin()
     |> List.wrap
   end
-  def find(%Credo.Config{read_from_stdin: true}) do
+  def find(%Credo.Execution{read_from_stdin: true}) do
     @stdin_filename
     |> source_file_from_stdin()
     |> List.wrap
   end
-  def find(%Credo.Config{files: files}) do
+  def find(%Credo.Execution{files: files}) do
     MapSet.new
     |> include(files.included)
     |> exclude(files.excluded)

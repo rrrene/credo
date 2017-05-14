@@ -440,7 +440,7 @@ end
 defmodule CredoSampleModule do
   def testcase(configs) do
     if Path.empty?(configs) do
-      {:error, "No config"}
+      {:error, "No exec"}
     else
       anything
       {:ok, Path.flat_map(configs, fn x -> x end)}

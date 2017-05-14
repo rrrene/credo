@@ -6,10 +6,10 @@ defmodule Credo.CLI.Command.GenCheck do
   @check_template_filename ".template.check.ex"
   @default_check_template_file File.read!(@check_template_filename)
 
-  alias Credo.Config
+  alias Credo.Execution
 
   @doc false
-  def run(%Config{args: args}) do
+  def run(%Execution{args: args}) do
     args
     |> List.first
     |> create_check_file
@@ -68,7 +68,7 @@ defmodule Credo.CLI.Command.GenCheck do
     Bunt.puts ["      {", :green, check_name, :reset, "}, ", :faint, "# <-- add check here"]
     Bunt.puts ["    ]"]
     Bunt.puts
-    Bunt.puts ["If you do not have a config file yet, use `mix credo gen.config`"]
+    Bunt.puts ["If you do not have a exec file yet, use `mix credo gen.config`"]
   end
 
   # This module ensures we have access to Macro.camelize in Elixir 1.1

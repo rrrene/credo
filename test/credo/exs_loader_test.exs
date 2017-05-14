@@ -1,7 +1,7 @@
 defmodule Credo.ExsLoaderTest do
   use ExUnit.Case
 
-  test "Credo.Config.parse_exs should work" do
+  test "Credo.Execution.parse_exs should work" do
     exs_string = """
       %{"combine": {:hex, :combine, "0.5.2"},
         "cowboy": {:hex, :cowboy, "1.0.2"},

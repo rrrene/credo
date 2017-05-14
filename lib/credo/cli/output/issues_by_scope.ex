@@ -11,7 +11,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
   @indent 8
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files, config) do
+  def print_before_info(source_files, exec) do
     UI.puts ""
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
@@ -19,29 +19,29 @@ defmodule Credo.CLI.Output.IssuesByScope do
       count -> UI.puts "Checking #{count} source files ..."
     end
 
-    Output.print_skipped_checks(config)
+    Output.print_skipped_checks(exec)
   end
 
   @doc "Called after the analysis has run."
-  def print_after_info(source_files, config, time_load, time_run) do
+  def print_after_info(source_files, exec, time_load, time_run) do
     term_width = Output.term_columns
 
     source_files
-    |> Filter.important(config)
+    |> Filter.important(exec)
     |> Enum.sort_by(&(&1.filename))
-    |> Enum.each(&print_issues(&1, config, term_width))
+    |> Enum.each(&print_issues(&1, exec, term_width))
 
     source_files
-    |> Summary.print(config, time_load, time_run)
+    |> Summary.print(exec, time_load, time_run)
   end
 
-  defp print_issues(%SourceFile{filename: filename} = source_file, config, term_width) do
-    issues = Credo.Config.get_issues(config, filename)
+  defp print_issues(%SourceFile{filename: filename} = source_file, exec, term_width) do
+    issues = Credo.Execution.get_issues(exec, filename)
 
     issues
-    |> Filter.important(config)
-    |> Filter.valid_issues(config)
-    |> print_issues(filename, source_file, config, term_width)
+    |> Filter.important(exec)
+    |> Filter.valid_issues(exec)
+    |> print_issues(filename, source_file, exec, term_width)
   end
   defp print_issues(issues, _filename, source_file, _config, term_width) do
     if issues |> Enum.any? do

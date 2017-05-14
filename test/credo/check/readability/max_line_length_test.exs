@@ -79,7 +79,7 @@ end
     |> refute_issues(@described_check, ignore_strings: true)
   end
 
-  test "it should NOT report a violation with config" do
+  test "it should NOT report a violation with exec" do
 """
 defmodule CredoSampleModule do
   use ExUnit.Case

@@ -38,18 +38,18 @@ defmodule Credo.Check.Design.DuplicatedCode do
   use Credo.Check, run_on_all: true, base_priority: :higher
 
   @doc false
-  def run(source_files, config, params \\ []) when is_list(source_files) do
+  def run(source_files, exec, params \\ []) when is_list(source_files) do
     mass_threshold = Params.get(params, :mass_threshold, @default_params)
     nodes_threshold = Params.get(params, :nodes_threshold, @default_params)
 
     source_files
     |> duplicate_nodes(mass_threshold)
-    |> append_issues_via_issue_service(source_files, nodes_threshold, params, config)
+    |> append_issues_via_issue_service(source_files, nodes_threshold, params, exec)
 
     :ok
   end
 
-  defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, config) when is_map(found_hashes) do
+  defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec) when is_map(found_hashes) do
     Enum.each(found_hashes, fn({_hash, nodes}) ->
       filenames = Enum.map(nodes, &(&1.filename))
       Enum.each(source_files, fn(source_file) ->
@@ -61,7 +61,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
           issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
 
           if issue do
-            Credo.Service.SourceFileIssues.append(config, source_file, issue)
+            Credo.Execution.Issues.append(exec, source_file, issue)
           end
         end
       end)

@@ -11,5 +11,5 @@ defmodule Credo.CLI.Command do
   end
 
   @doc "Runs the Command."
-  @callback run(config :: Credo.Config.t) :: List.t
+  @callback run(exec :: Credo.Execution.t) :: List.t
 end

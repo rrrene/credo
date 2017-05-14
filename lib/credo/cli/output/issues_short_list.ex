@@ -7,31 +7,31 @@ defmodule Credo.CLI.Output.IssuesShortList do
   alias Credo.Issue
 
   @doc "Called before the analysis is run."
-  def print_before_info(source_files, config) do
+  def print_before_info(source_files, exec) do
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
       _ -> :ok
     end
 
-    Output.print_skipped_checks(config)
+    Output.print_skipped_checks(exec)
   end
 
   @doc "Called after the analysis has run."
-  def print_after_info(source_files, config, _time_load, _time_run) do
+  def print_after_info(source_files, exec, _time_load, _time_run) do
     term_width = Output.term_columns
 
     source_files
     |> Enum.sort_by(&(&1.filename))
-    |> Enum.each(&print_issues(&1, config, term_width))
+    |> Enum.each(&print_issues(&1, exec, term_width))
   end
 
-  defp print_issues(%SourceFile{filename: filename} = source_file, config, term_width) do
-    issues = Credo.Config.get_issues(config, filename)
+  defp print_issues(%SourceFile{filename: filename} = source_file, exec, term_width) do
+    issues = Credo.Execution.get_issues(exec, filename)
 
     issues
-    |> Filter.important(config)
-    |> Filter.valid_issues(config)
-    |> print_issues(filename, source_file, config, term_width)
+    |> Filter.important(exec)
+    |> Filter.valid_issues(exec)
+    |> print_issues(filename, source_file, exec, term_width)
   end
 
   defp print_issues(issues, _filename, source_file, _config, term_width) do

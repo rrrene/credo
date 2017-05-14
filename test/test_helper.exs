@@ -52,7 +52,7 @@ end
 defmodule CredoCheckCase do
   use ExUnit.Case
 
-  alias Credo.Service.SourceFileIssues
+  alias Credo.Execution.Issues
   alias Credo.SourceFile
 
   def refute_issues(source_file, check \\ nil, params \\ []) do
@@ -100,25 +100,25 @@ defmodule CredoCheckCase do
     issues
   end
 
-  defp issues_for(source_files, nil, config, _) when is_list(source_files) do
-    Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(config)))
+  defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
+    Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(exec)))
   end
   defp issues_for(source_files, check, _config, params) when is_list(source_files) do
-    config = create_config()
+    exec = create_config()
 
     if check.run_on_all? do
-      :ok = check.run(source_files, config, params)
+      :ok = check.run(source_files, exec, params)
 
       source_files
-      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(config)))
+      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(exec)))
     else
       source_files
       |> check.run(params)
-      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(config)))
+      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(exec)))
     end
   end
-  defp issues_for(%SourceFile{} = source_file, nil, config, _) do
-    source_file |> get_issues_from_source_file(config)
+  defp issues_for(%SourceFile{} = source_file, nil, exec, _) do
+    source_file |> get_issues_from_source_file(exec)
   end
   defp issues_for(%SourceFile{} = source_file, check, _config, params) do
     _issues = check.run(source_file, params)
@@ -139,12 +139,12 @@ defmodule CredoCheckCase do
   end
 
   defp create_config do
-    %Credo.Config{}
-    |> Credo.Service.SourceFiles.start_server
-    |> Credo.Service.SourceFileIssues.start_server
+    %Credo.Execution{}
+    |> Credo.Execution.SourceFiles.start_server
+    |> Credo.Execution.Issues.start_server
   end
 
-  defp get_issues_from_source_file(source_file, config) do
-    SourceFileIssues.get(config, source_file)
+  defp get_issues_from_source_file(source_file, exec) do
+    Issues.get(exec, source_file)
   end
 end

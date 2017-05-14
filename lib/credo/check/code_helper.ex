@@ -41,7 +41,7 @@ defmodule Credo.Check.CodeHelper do
       iex> matches?("Credo.CLI.Command", ["Check", "CLI"])
       true
 
-      iex> matches?("Credo.Config", ["Check", "CLI"])
+      iex> matches?("Credo.Execution", ["Check", "CLI"])
       false
 
   For Regexes, it returns `true` if the Regex matches.

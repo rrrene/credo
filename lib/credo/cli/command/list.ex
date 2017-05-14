@@ -4,7 +4,7 @@ defmodule Credo.CLI.Command.List do
   @shortdoc "List all issues grouped by files"
 
   alias Credo.Check.Runner
-  alias Credo.Config
+  alias Credo.Execution
   alias Credo.CLI.Filter
   alias Credo.CLI.Output.IssuesByScope
   alias Credo.CLI.Output.IssuesShortList
@@ -13,9 +13,9 @@ defmodule Credo.CLI.Command.List do
   alias Credo.Sources
 
   @doc false
-  def run(%Config{help: true}), do: print_help()
-  def run(config) do
-    config
+  def run(%Execution{help: true}), do: print_help()
+  def run(exec) do
+    exec
     |> load_and_validate_source_files()
     |> Runner.prepare_config
     |> print_before_info()
@@ -24,60 +24,60 @@ defmodule Credo.CLI.Command.List do
     |> determine_success()
   end
 
-  def load_and_validate_source_files(config) do
+  def load_and_validate_source_files(exec) do
     {time_load, {valid_source_files, invalid_source_files}} =
       :timer.tc fn ->
-        config
+        exec
         |> Sources.find
         |> Enum.partition(&(&1.valid?))
       end
 
     Output.complain_about_invalid_source_files(invalid_source_files)
 
-    config
-    |> Config.put_source_files(valid_source_files)
-    |> Config.put_assign("credo.time.source_files", time_load)
+    exec
+    |> Execution.put_source_files(valid_source_files)
+    |> Execution.put_assign("credo.time.source_files", time_load)
   end
 
-  defp print_before_info(config) do
-    source_files = Config.get_source_files(config)
+  defp print_before_info(exec) do
+    source_files = Execution.get_source_files(exec)
 
-    out = output_mod(config)
-    out.print_before_info(source_files, config)
+    out = output_mod(exec)
+    out.print_before_info(source_files, exec)
 
-    config
+    exec
   end
 
-  defp run_checks(%Config{} = config) do
-    source_files = Config.get_source_files(config)
+  defp run_checks(%Execution{} = exec) do
+    source_files = Execution.get_source_files(exec)
 
     {time_run, :ok} =
       :timer.tc fn ->
-        Runner.run(source_files, config)
+        Runner.run(source_files, exec)
       end
 
-    config
-    |> Config.put_assign("credo.time.run_checks", time_run)
+    exec
+    |> Execution.put_assign("credo.time.run_checks", time_run)
   end
 
-  defp print_results_and_summary(%Config{} = config) do
-    source_files = Config.get_source_files(config)
+  defp print_results_and_summary(%Execution{} = exec) do
+    source_files = Execution.get_source_files(exec)
 
-    time_load = Config.get_assign(config, "credo.time.source_files")
-    time_run = Config.get_assign(config, "credo.time.run_checks")
-    out = output_mod(config)
+    time_load = Execution.get_assign(exec, "credo.time.source_files")
+    time_run = Execution.get_assign(exec, "credo.time.run_checks")
+    out = output_mod(exec)
 
-    out.print_after_info(source_files, config, time_load, time_run)
+    out.print_after_info(source_files, exec, time_load, time_run)
 
-    config
+    exec
   end
 
-  defp determine_success(config) do
+  defp determine_success(exec) do
     issues =
-      config
-      |> Config.get_issues
-      |> Filter.important(config)
-      |> Filter.valid_issues(config)
+      exec
+      |> Execution.get_issues
+      |> Filter.important(exec)
+      |> Filter.valid_issues(exec)
 
     case issues do
       [] ->
@@ -87,10 +87,10 @@ defmodule Credo.CLI.Command.List do
     end
   end
 
-  defp output_mod(%Config{format: "oneline"}) do
+  defp output_mod(%Execution{format: "oneline"}) do
     IssuesShortList
   end
-  defp output_mod(%Config{format: _}) do
+  defp output_mod(%Execution{format: _}) do
     IssuesByScope
   end
 
@@ -112,7 +112,7 @@ defmodule Credo.CLI.Command.List do
         -a, --all             Show all issues
         -A, --all-priorities  Show all issues including low priority ones
         -c, --checks          Only include checks that match the given strings
-        -C, --config-name     Use the given config instead of "default"
+        -C, --exec-name     Use the given exec instead of "default"
         -i, --ignore-checks   Ignore checks that match the given strings
             --format          Display the list in a specific format (oneline,flycheck)
 

@@ -8,10 +8,10 @@ defmodule Credo.CLI.Output.UI do
   end
   def edge, do: @edge
 
-  def use_colors(config) do
-    @shell_service.use_colors(config.color)
+  def use_colors(exec) do
+    @shell_service.use_colors(exec.color)
 
-    config
+    exec
   end
 
   defdelegate puts, to: @shell_service

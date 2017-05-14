@@ -38,7 +38,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
-  def run(source_files, config, params \\ []) when is_list(source_files) do
+  def run(source_files, exec, params \\ []) when is_list(source_files) do
     {property_tuples, most_picked} =
       Helper.run_code_patterns(source_files, @code_patterns, params)
 
@@ -49,7 +49,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
     if count > 2 do # we found more than one prefix and one suffix
       info_tuple = {property_tuples, most_picked}
-      Helper.append_issues_via_issue_service(info_tuple, &check_for_issues/5, params, config)
+      Helper.append_issues_via_issue_service(info_tuple, &check_for_issues/5, params, exec)
     end
 
     :ok

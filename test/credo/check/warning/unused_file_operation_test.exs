@@ -440,7 +440,7 @@ end
 defmodule CredoSampleModule do
   def testcase(configs) do
     if File.empty?(configs) do
-      {:error, "No config"}
+      {:error, "No exec"}
     else
       anything
       {:ok, File.open(configs, fn x -> x end)}

@@ -5,7 +5,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Output.Summary
   alias Credo.CLI.Sorter
-  alias Credo.Config
+  alias Credo.Execution
 
   @category_starting_order [:design, :readability, :refactor]
   @category_ending_order [:warning, :consistency, :custom, :unknown]
@@ -28,17 +28,17 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   @valid_formats ~w(flycheck oneline)
 
   @doc "Called before the analysis is run."
-  def print_before_info(_source_files, %Config{format: format}) when format in @valid_formats do
+  def print_before_info(_source_files, %Execution{format: format}) when format in @valid_formats do
     :ok
   end
-  def print_before_info(source_files, config) do
+  def print_before_info(source_files, exec) do
     case Enum.count(source_files) do
       0 -> UI.puts "No files found!"
       1 -> UI.puts "Checking 1 source file ..."
       count -> UI.puts "Checking #{count} source files#{checking_suffix(count)} ..."
     end
 
-    Output.print_skipped_checks(config)
+    Output.print_skipped_checks(exec)
   end
 
   defp checking_suffix(count) when count > @many_source_files do
@@ -47,15 +47,15 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   defp checking_suffix(_), do: ""
 
   @doc "Called after the analysis has run."
-  def print_after_info(source_files, config, time_load, time_run) do
+  def print_after_info(source_files, exec, time_load, time_run) do
     term_width = Output.term_columns
 
-    issues = Credo.Config.get_issues(config)
+    issues = Credo.Execution.get_issues(exec)
 
     shown_issues =
       issues
-      |> Filter.important(config)
-      |> Filter.valid_issues(config)
+      |> Filter.important(exec)
+      |> Filter.valid_issues(exec)
 
     categories =
       shown_issues
@@ -77,24 +77,24 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     categories
     |> Sorter.ensure(@category_starting_order, @category_ending_order)
     |> Enum.each(fn(category) ->
-        print_issues_for_category(category, issue_map[category], source_file_map, config, term_width)
+        print_issues_for_category(category, issue_map[category], source_file_map, exec, term_width)
       end)
 
     source_files
-    |> Summary.print(config, time_load, time_run)
+    |> Summary.print(exec, time_load, time_run)
   end
 
   defp print_issues_for_category(_category, nil, _source_file_map, _config, _term_width) do
     nil
   end
-  defp print_issues_for_category(_category, issues, source_file_map, %Config{format: format} = config, term_width)
+  defp print_issues_for_category(_category, issues, source_file_map, %Execution{format: format} = exec, term_width)
         when not is_nil(format) and format in @valid_formats do
-    print_issues(issues, source_file_map, config, term_width)
+    print_issues(issues, source_file_map, exec, term_width)
   end
-  defp print_issues_for_category(_category, issues, source_file_map, %Config{format: "oneline"} = config, term_width) do
-    print_issues(issues, source_file_map, config, term_width)
+  defp print_issues_for_category(_category, issues, source_file_map, %Execution{format: "oneline"} = exec, term_width) do
+    print_issues(issues, source_file_map, exec, term_width)
   end
-  defp print_issues_for_category(category, issues, source_file_map, config, term_width) do
+  defp print_issues_for_category(category, issues, source_file_map, exec, term_width) do
     color = @category_colors[category] || :magenta
     title = @category_titles[category] || "Category: #{category}"
 
@@ -111,18 +111,18 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     |> UI.edge
     |> UI.puts
 
-    print_issues(issues, source_file_map, config, term_width)
+    print_issues(issues, source_file_map, exec, term_width)
 
-    if Enum.count(issues) > per_category(config) do
-      not_shown = Enum.count(issues) - per_category(config)
+    if Enum.count(issues) > per_category(exec) do
+      not_shown = Enum.count(issues) - per_category(exec)
 
       [UI.edge(color), :faint, " ...  (#{not_shown} more, use `-a` to show them)"]
       |> UI.puts
     end
   end
 
-  defp print_issues(issues, source_file_map, config, term_width) do
-    count = per_category(config)
+  defp print_issues(issues, source_file_map, exec, term_width) do
+    count = per_category(exec)
 
     issues
     |> Enum.sort_by(fn(issue) ->
@@ -130,10 +130,10 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
       end)
     |> Enum.reverse
     |> Enum.take(count)
-    |> IssueHelper.print_issues(source_file_map, config, term_width)
+    |> IssueHelper.print_issues(source_file_map, exec, term_width)
   end
 
-  def per_category(%Config{all: true}), do: 1_000_000
-  def per_category(%Config{all: false}), do: @per_category
+  def per_category(%Execution{all: true}), do: 1_000_000
+  def per_category(%Execution{all: false}), do: @per_category
 
 end

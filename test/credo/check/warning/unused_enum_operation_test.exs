@@ -440,7 +440,7 @@ end
 defmodule CredoSampleModule do
   def testcase(configs) do
     if Enum.empty?(configs) do
-      {:error, "No config"}
+      {:error, "No exec"}
     else
       anything
       {:ok, Enum.flat_map(configs, fn x -> x end)}

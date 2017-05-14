@@ -2,21 +2,21 @@ defmodule Credo.CLI.Output.IssueHelper do
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
-  alias Credo.Config
+  alias Credo.Execution
   alias Credo.Issue
   alias Credo.SourceFile
 
   @indent 8
 
-  def print_issues(issues, source_file_map, %Config{format: _} = config, term_width) do
+  def print_issues(issues, source_file_map, %Execution{format: _} = exec, term_width) do
     Enum.each(issues, fn(%Issue{filename: filename} = issue) ->
       source_file = source_file_map[filename]
-      do_print_issue(issue, source_file, config, term_width)
+      do_print_issue(issue, source_file, exec, term_width)
     end)
   end
 
   def do_print_issue(%Issue{check: _check, message: message, filename: filename, priority: _priority} = issue, _source_file,
-                    %Config{format: "flycheck"} = _config, _term_width) do
+                    %Execution{format: "flycheck"} = _config, _term_width) do
     tag = Output.check_tag(issue, false)
 
     [
@@ -25,7 +25,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
   end
   def do_print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
-                    %Config{format: "oneline"} = _config, _term_width) do
+                    %Execution{format: "oneline"} = _config, _term_width) do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
     filename_color = :default_color
@@ -40,7 +40,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
   end
   def do_print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file,
-                    %Config{format: _} = config, term_width) do
+                    %Execution{format: _} = exec, term_width) do
     outer_color = Output.check_color(issue)
     inner_color = Output.issue_color(issue)
     message_color  = outer_color
@@ -59,7 +59,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     ]
     |> UI.puts
 
-    if config.verbose do
+    if exec.verbose do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
       UI.puts_edge([outer_color, :faint])

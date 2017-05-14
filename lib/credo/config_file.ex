@@ -1,6 +1,6 @@
 defmodule Credo.ConfigFile do
   @doc """
-  The ConfigFile struct represents all loaded and merged config files run the
+  The ConfigFile struct represents all loaded and merged exec files run the
   current run.
   """
 
@@ -20,11 +20,11 @@ defmodule Credo.ConfigFile do
   @default_files_excluded []
 
   @doc """
-  Returns Config struct representing a consolidated Config for all `.credo.exs`
+  Returns Execution struct representing a consolidated Execution for all `.credo.exs`
   files in `relevant_directories/1` merged into the default configuration.
 
   - `config_name`: name of the configuration to load
-  - `safe`: if +true+, the config files are loaded using static analysis rather
+  - `safe`: if +true+, the exec files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
   def read_or_default(dir, config_name \\ nil, safe \\ false) do
@@ -45,7 +45,7 @@ defmodule Credo.ConfigFile do
   end
 
   @doc """
-  Returns all parent directories of the given `dir` as well as each `./config`
+  Returns all parent directories of the given `dir` as well as each `./exec`
   sub-directory.
   """
   def relevant_directories(dir) do
@@ -71,7 +71,7 @@ defmodule Credo.ConfigFile do
   end
 
   defp add_config_dirs(paths) do
-    Enum.flat_map(paths, fn(path) -> [path, Path.join(path, "config")] end)
+    Enum.flat_map(paths, fn(path) -> [path, Path.join(path, "exec")] end)
   end
 
   defp add_config_files(paths) do
@@ -125,7 +125,7 @@ defmodule Credo.ConfigFile do
   end
 
   @doc """
-  Merges the given Config objects from left to right, meaning that later entries
+  Merges the given Execution objects from left to right, meaning that later entries
   overwrites earlier ones.
 
       merge(base, other)
@@ -142,7 +142,7 @@ defmodule Credo.ConfigFile do
     tail = List.delete_at(list, 0)
     merge(tail, base)
   end
-  def merge([], config), do: config
+  def merge([], exec), do: exec
   def merge([other|tail], base) do
     new_base = merge(base, other)
     merge(tail, new_base)
@@ -185,7 +185,7 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp add_given_directory_to_files(%__MODULE__{files: files} = config, dir) do
+  defp add_given_directory_to_files(%__MODULE__{files: files} = exec, dir) do
     files = %{
       included:
         files[:included]
@@ -197,7 +197,7 @@ defmodule Credo.ConfigFile do
         |> Enum.uniq
     }
 
-    %__MODULE__{config | files: files}
+    %__MODULE__{exec | files: files}
   end
 
   defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do

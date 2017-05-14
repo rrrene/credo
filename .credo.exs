@@ -10,7 +10,7 @@
   configs: [
     %{
       #
-      # Run any config using `mix credo -C <name>`. If no config name is given
+      # Run any exec using `mix credo -C <name>`. If no exec name is given
       # "default" is used.
       name: "default",
       #

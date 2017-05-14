@@ -2,7 +2,7 @@ defmodule Credo.CLI.Output.Summary do
   alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
-  alias Credo.Config
+  alias Credo.Execution
   alias Credo.Check.CodeHelper
 
   @category_wording [
@@ -14,19 +14,19 @@ defmodule Credo.CLI.Output.Summary do
   ]
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
-  def print(_source_files, %Config{format: "flycheck"}, _time_load, _time_run) do
+  def print(_source_files, %Execution{format: "flycheck"}, _time_load, _time_run) do
     nil
   end
-  def print(_source_files, %Config{format: "oneline"}, _time_load, _time_run) do
+  def print(_source_files, %Execution{format: "oneline"}, _time_load, _time_run) do
     nil
   end
-  def print(source_files, config, time_load, time_run) do
-    issues = Credo.Config.get_issues(config)
+  def print(source_files, exec, time_load, time_run) do
+    issues = Credo.Execution.get_issues(exec)
 
     shown_issues =
       issues
-      |> Filter.important(config)
-      |> Filter.valid_issues(config)
+      |> Filter.important(exec)
+      |> Filter.valid_issues(exec)
 
     UI.puts
     UI.puts [:faint, @cry_for_help]
@@ -38,15 +38,15 @@ defmodule Credo.CLI.Output.Summary do
     # print_badge(source_files, issues)
     UI.puts
 
-    shown_issues |> print_priority_hint(config)
+    shown_issues |> print_priority_hint(exec)
   end
 
-  def print_priority_hint([], %Config{min_priority: min_priority}) when min_priority >= 0 do
+  def print_priority_hint([], %Execution{min_priority: min_priority}) when min_priority >= 0 do
     "Use `--strict` to show all issues, `--help` for options."
     |> UI.puts(:faint)
   end
   def print_priority_hint([], _config), do: nil
-  def print_priority_hint(_, %Config{min_priority: min_priority}) when min_priority >= 0 do
+  def print_priority_hint(_, %Execution{min_priority: min_priority}) when min_priority >= 0 do
     "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
     |> UI.puts(:faint)
   end

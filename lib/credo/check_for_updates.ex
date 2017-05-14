@@ -1,15 +1,15 @@
 defmodule Credo.CheckForUpdates do
   alias Credo.CLI.Output.UI
-  alias Credo.Config
+  alias Credo.Execution
 
   @doc false
-  def run(%Config{check_for_updates: true} = config) do
+  def run(%Execution{check_for_updates: true} = exec) do
     run()
 
-    config
+    exec
   end
-  def run(%Config{check_for_updates: false} = config) do
-    config
+  def run(%Execution{check_for_updates: false} = exec) do
+    exec
   end
   def run() do
     "credo"

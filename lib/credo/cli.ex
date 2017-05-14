@@ -4,12 +4,12 @@ defmodule Credo.CLI do
 
   It takes the parameters passed from the command line and translates them into
   a Command module (see the `Credo.CLI.Command` namespace), the work directory
-  where the Command should run and a `Credo.Config` object.
+  where the Command should run and a `Credo.Execution` object.
   """
 
   use Bitwise
 
-  alias Credo.Config
+  alias Credo.Execution
   alias Credo.ConfigBuilder
   alias Credo.Sources
   alias Credo.CLI.Filename
@@ -34,15 +34,15 @@ defmodule Credo.CLI do
     |> parse_options()
     |> run()
   end
-  defp run({:ok, command_mod, _dir, config}) do
-    config
+  defp run({:ok, command_mod, _dir, exec}) do
+    exec
     |> UI.use_colors
     |> Credo.CheckForUpdates.run
     |> require_requires()
     |> command_mod.run
   end
-  defp run({:error, options, config}) do
-    UI.use_colors(config)
+  defp run({:error, options, exec}) do
+    UI.use_colors(exec)
 
     Enum.each(options.unknown_args, &print_argument/1)
     Enum.each(options.unknown_switches, &print_switch/1)
@@ -59,44 +59,44 @@ defmodule Credo.CLI do
     UI.warn [:red, "Unknown switch: #{name}"]
   end
 
-  # Requires the additional files specified in the config.
-  defp require_requires(%Config{requires: requires} = config) do
+  # Requires the additional files specified in the exec.
+  defp require_requires(%Execution{requires: requires} = exec) do
     requires
     |> Sources.find
     |> Enum.each(&Code.require_file/1)
 
-    config
+    exec
   end
 
   defp parse_options(argv) when is_list(argv) do
     options = Options.parse(argv, File.cwd!, Commands.names, [UI.edge])
-    config =
+    exec =
       options
       |> ConfigBuilder.parse
       |> start_servers()
 
     options
-    |> set_command_in_options(config)
-    |> validate_options(config)
+    |> set_command_in_options(exec)
+    |> validate_options(exec)
   end
 
-  defp start_servers(%Config{} = config) do
-    config
-    |> Credo.Service.SourceFiles.start_server
-    |> Credo.Service.SourceFileIssues.start_server
+  defp start_servers(%Execution{} = exec) do
+    exec
+    |> Credo.Execution.SourceFiles.start_server
+    |> Credo.Execution.Issues.start_server
   end
 
-  defp validate_options(%Options{unknown_args: [], unknown_switches: []} = options, config) do
-    {:ok, command_for(options.command), options.path, config}
+  defp validate_options(%Options{unknown_args: [], unknown_switches: []} = options, exec) do
+    {:ok, command_for(options.command), options.path, exec}
   end
-  defp validate_options(options, config) do
-    {:error, options, config}
+  defp validate_options(options, exec) do
+    {:error, options, exec}
   end
 
-  defp set_command_in_options(%Options{command: nil} = options, %Config{help: true}) do
+  defp set_command_in_options(%Options{command: nil} = options, %Execution{help: true}) do
     %Options{options | command: "help"}
   end
-  defp set_command_in_options(%Options{command: nil} = options, %Config{version: true}) do
+  defp set_command_in_options(%Options{command: nil} = options, %Execution{version: true}) do
     %Options{options | command: "version"}
   end
   defp set_command_in_options(%Options{command: nil, args: args} = options, _config) do

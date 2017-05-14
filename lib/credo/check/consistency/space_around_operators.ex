@@ -32,10 +32,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   #       [head|tail] while enforcing 2 + 3 / 1 ...
 
   @doc false
-  def run(source_files, config, params \\ []) when is_list(source_files) do
+  def run(source_files, exec, params \\ []) when is_list(source_files) do
     source_files
     |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.append_issues_via_issue_service(&issue_for/5, params, config)
+    |> Helper.append_issues_via_issue_service(&issue_for/5, params, exec)
 
     :ok
   end
