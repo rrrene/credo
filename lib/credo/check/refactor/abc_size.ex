@@ -103,6 +103,11 @@ defmodule Credo.Check.Refactor.ABCSize do
     end
   end
 
+  # Ignore string interpolation
+  defp traverse_abc({:<<>>, _, x}, acc) do
+    {nil, acc}
+  end
+
   # A - assignments
   defp traverse_abc({:=, _meta, [lhs | rhs]}, [a: a, b: b, c: c, var_names: var_names]) do
     var_names =

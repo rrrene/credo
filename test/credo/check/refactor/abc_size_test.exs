@@ -24,6 +24,16 @@ end
     assert rounded_abc_size(source) == 1.0 # sqrt(1*1 + 0 + 0) = 1
   end
 
+  test "it should return the correct ABC size for value assignment 2" do
+    source =
+"""
+def first_fun(name) do
+  x = "__#\{name}__"
+end
+"""
+    assert rounded_abc_size(source) == 1.0 # sqrt(1*1 + 0 + 0) = 1
+  end
+
   test "it should return the correct ABC size for assignment to fun call" do
     source =
 """
