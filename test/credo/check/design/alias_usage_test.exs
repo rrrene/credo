@@ -180,7 +180,7 @@ defmodule CredoSampleModule do
   end
 end
 """ |> to_source_file
-    |> assert_issue(@described_check, if_called_more_often_than: 1)
+    |> assert_issues(@described_check, if_called_more_often_than: 1)
   end
 
   #
