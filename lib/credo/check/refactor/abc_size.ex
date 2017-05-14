@@ -104,7 +104,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
 
   # Ignore string interpolation
-  defp traverse_abc({:<<>>, _, x}, acc) do
+  defp traverse_abc({:<<>>, _, _}, acc) do
     {nil, acc}
   end
 
