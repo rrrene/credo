@@ -1,4 +1,8 @@
 defmodule Credo.Check do
+  @doc """
+  `Check` modules represent the checks which are run during the code analysis.
+  """
+
   @base_priority_map  %{ignore: -100, low: -10, normal: 1, high: +10, higher: +20}
   @base_category_exit_status_map %{
     consistency: 1,

@@ -1,11 +1,11 @@
 defmodule Credo.Code do
   @moduledoc """
-  Credo.Code contains a lot of utility or helper functions that deal with the
-  analysis of - you guessed it - Code.
+  `Credo.Code` contains a lot of utility or helper functions that deal with the
+  analysis of - you guessed it - code.
 
   Whenever a function serves a general purpose in this area, e.g. getting the
   value of a module attribute inside a given module, we want to extract that
-  function and put it in the Credo.Code namespace, so others can utilize them
+  function and put it in the `Credo.Code` namespace, so others can utilize them
   without reinventing the wheel.
 
   The most often utilized functions are conveniently imported to
@@ -16,7 +16,7 @@ defmodule Credo.Code do
 
   defmodule ParserError do
     @moduledoc """
-    This is an internal Issue raised by Credo when it finds itself unable to
+    This is an internal `Issue` raised by Credo when it finds itself unable to
     parse the source code in a file.
     """
   end

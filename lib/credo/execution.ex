@@ -1,6 +1,6 @@
 defmodule Credo.Execution do
   @doc """
-  Every run of Credo is configured via a `Execution` object, which is created and
+  Every run of Credo is configured via a `Execution` struct, which is created and
   manipulated via the `Credo.Execution` module.
   """
 
@@ -37,7 +37,7 @@ defmodule Credo.Execution do
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
   @doc """
-  Returns the checks that should be run for a given `exec` object.
+  Returns the checks that should be run for a given `exec` struct.
 
   Takes all checks from the `checks:` field of the exec, matches those against
   any patterns to include or exclude certain checks given via the command line.

@@ -140,11 +140,11 @@ defmodule Credo.ConfigFileTest do
     assert_sorted_equality expected, ConfigFile.merge_checks(base, other)
   end
 
-  test "loads .credo.exs from ./exec subdirs in ascending directories as well" do
+  test "loads .credo.exs from ./config subdirs in ascending directories as well" do
     dirs = ConfigFile.relevant_directories(".")
     config_subdir_count =
       dirs
-      |> Enum.filter(&(String.ends_with?(&1, "exec")))
+      |> Enum.filter(&(String.ends_with?(&1, "config")))
       |> Enum.count
 
     assert config_subdir_count > 1

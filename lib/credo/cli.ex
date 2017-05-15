@@ -4,7 +4,7 @@ defmodule Credo.CLI do
 
   It takes the parameters passed from the command line and translates them into
   a Command module (see the `Credo.CLI.Command` namespace), the work directory
-  where the Command should run and a `Credo.Execution` object.
+  where the Command should run and a `Credo.Execution` struct.
   """
 
   alias Credo.Execution

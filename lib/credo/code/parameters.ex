@@ -21,7 +21,7 @@ defmodule Credo.Code.Parameters do
     end
   end
 
-  @doc "Returns the names of parameters for the given function's AST"
+  @doc "Returns the names of all parameters for the given function's AST"
   def names(nil), do: nil
   for op <- @def_ops do
     def names({unquote(op), _meta, arguments}) when is_list(arguments) do
