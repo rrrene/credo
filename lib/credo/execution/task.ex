@@ -35,6 +35,7 @@ defmodule Credo.Execution.Task do
       value ->
         # TODO: improve message
         IO.warn "Expected task to return %Credo.Execution{}, got:"
+        # credo:disable-for-next-line
         IO.inspect value
 
         value
