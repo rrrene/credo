@@ -56,7 +56,12 @@ defmodule Credo.Check.Runner do
       Credo.CLI.Output.UI.warn ""
       Credo.CLI.Output.UI.warn [:bright, :orange,
         "@lint attributes are deprecated since Credo v0.8 because they trigger\n",
-        "compiler warnings on Elixir v1.4.\n\n",
+        "compiler warnings on Elixir v1.4.\n",
+      ]
+      Credo.CLI.Output.UI.warn [:orange,
+        "You can use comments to disable individual lines of code.\n",
+        "To see how this works, please refer to Credo's README:\n",
+        "https://github.com/rrrene/credo"
       ]
       Credo.CLI.Output.UI.warn ""
     end
