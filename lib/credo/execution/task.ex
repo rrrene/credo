@@ -24,8 +24,8 @@ defmodule Credo.Execution.Task do
 
   def run(exec, task, opts \\ [])
   def run(%Credo.Execution{halted: false} = exec, task, opts) do
-    require Logger
-    Logger.debug "Calling #{task} ..."
+    #require Logger
+    #Logger.debug "Calling #{task} ..."
 
     case task.call(exec, opts) do
       %Credo.Execution{halted: false} = exec ->
