@@ -2,7 +2,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   @moduledoc """
   Ensures laziness of Logger calls.
 
-  You might want to wrap expensive logger calls into a zero argument
+  You will want to wrap expensive logger calls into a zero argument
   function (`fn -> "string that gets logged" end`).
 
   Example:
@@ -19,10 +19,16 @@ defmodule Credo.Check.Warning.LazyLogging do
       Logger.debug "This happened: \#{expensive_calculation(arg1, arg2)}"
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore: "Do not raise an issue for these Logger calls."
+    ]
+
+  ]
   @logger_functions [:debug, :info, :warn, :error]
   @default_params [
-    ignore: [:error]
+    ignore: [:error, :warn, :info]
   ]
 
   use Credo.Check, base_priority: :high

@@ -83,11 +83,11 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    Logger.warn "Ok #\{inspect 1\}"
+    Logger.debug "Ok #\{inspect 1\}"
   end
 end
 """ |> to_source_file
-    |> refute_issues(@described_check, ignore: [:warn])
+    |> refute_issues(@described_check, ignore: [:debug])
   end
 
   #
