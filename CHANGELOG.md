@@ -5,6 +5,7 @@
 - Load source files in parallel
 - Improve high memory consumption
 - Fix comment handling of Charlists, Sigils and Strings
+- `LazyLogging` now only checks for `debug` calls by default
 
 ### BREAKING CHANGES
 
