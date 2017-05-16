@@ -125,8 +125,8 @@ defmodule Credo.Execution do
 
   # Results
 
-  def get_result(exec, name) do
-    Map.get(exec.results, name)
+  def get_result(exec, name, default \\ nil) do
+    Map.get(exec.results, name, default)
   end
 
   def put_result(exec, name, value) do

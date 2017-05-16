@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task.HaltExecution do
   def call(exec, _opts) do
     exit_status =
       exec
-      |> get_result("issues")
+      |> get_result("issues", [])
       |> to_exit_status()
 
     halt_if_failed(exit_status)
