@@ -3,10 +3,14 @@ defmodule Credo.Execution.Task.HaltExecution do
   use Bitwise
 
   def call(exec, _opts) do
+    exit_status =
+      exec
+      |> get_result("issues")
+      |> to_exit_status()
+
+    halt_if_failed(exit_status)
+
     exec
-    |> get_result("issues")
-    |> to_exit_status()
-    |> halt_if_failed()
   end
 
   # Converts the return value of a Command.run() call into an exit_status
