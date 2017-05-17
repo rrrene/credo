@@ -12,7 +12,8 @@
 These changes concern people writing their own checks for Credo.
 
 - `Credo.SourceFile` struct was refactored: `source`, `lines` and `ast` are now stored in ETS tables.
-- `run/3` callbacks for `Credo.Check` are now `run/4` callbacks as they have to receive the execution's `config` struct.
+- `Credo.Config` struct was replaced by `Credo.Execution`.
+- `run/3` callbacks for `Credo.Check` are now `run/4` callbacks as they have to receive the execution's `Credo.Execution` struct.
 
 ### Config Comments
 
@@ -24,6 +25,9 @@ specific checks.
 * `# credo:disable-for-previous-line` - to disable for the previous line
 * `# credo:disable-for-lines:<count>` - to disable for the given number of lines (negative for previous lines)
 
+### New checks
+
+- Credo.Check.Refactor.LongQuoteBlocks
 
 ## 0.7.4
 
