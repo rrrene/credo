@@ -1,5 +1,6 @@
 defmodule Credo.ExsLoaderTest do
   use ExUnit.Case
+  import ExUnit.CaptureIO
 
   test "Credo.Execution.parse_exs should work" do
     exs_string = """
@@ -28,5 +29,26 @@ defmodule Credo.ExsLoaderTest do
 
     assert expected == Credo.ExsLoader.parse(exs_string, true)
     assert expected == Credo.ExsLoader.parse(exs_string, false)
+  end
+
+  test ".validate outputs a warning when there is an invalid config file" do
+    invalid_config = %{
+      configs: [
+        %{
+          files: %{
+            included: ["lib/", "src/", "web/", "apps/"],
+            excluded: [~r"/_build/", ~r"/deps/"]
+          },
+          requires: [],
+          check_for_updates: true,
+          strict: false,
+          color: true,
+          checks: [{Credo.Check.Consistency.ExceptionNames}]
+        }
+      ]
+    }
+    test_func = fn -> Credo.ExsLoader.validate(invalid_config) end
+
+    refute capture_io(test_func) == ""
   end
 end

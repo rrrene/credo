@@ -80,6 +80,7 @@ defmodule Credo.ConfigFile do
   defp from_exs(dir, config_name, exs_string, safe) do
     exs_string
     |> Credo.ExsLoader.parse(safe)
+    |> Credo.ExsLoader.validate
     |> from_data(dir, config_name)
   end
 

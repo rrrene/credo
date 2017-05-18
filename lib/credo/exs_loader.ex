@@ -1,4 +1,14 @@
 defmodule Credo.ExsLoader do
+  def validate(parsed_file) do
+    if !Enum.all?(parsed_file[:configs], &do_validate/1) do
+      IO.puts("One or more of your .credo.exs files are invalid")
+    end
+    parsed_file
+  end
+
+  defp do_validate(%{check_for_updates: _, checks: _, color: _, files: _, name: _, requires: _, strict: _}), do: true
+  defp do_validate(_), do: false
+
   def parse(exs_string, safe \\ false)
   def parse(exs_string, true) do
     case Code.string_to_quoted(exs_string) do
