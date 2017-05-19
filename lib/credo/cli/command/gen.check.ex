@@ -35,8 +35,6 @@ defmodule Credo.CLI.Command.GenCheck do
       Bunt.puts
       print_config_instructions(filename, check_name)
     end
-
-    :ok
   end
 
   def check_name_for(filename) do

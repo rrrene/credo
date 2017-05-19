@@ -48,7 +48,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     trigger = PropertyValue.meta(actual_prop, :trigger)
     actual_prop = PropertyValue.get(actual_prop)
 
-    line = issue_meta |> IssueMeta.source_file() |> SourceFile.line_at(line_no)
+    line =
+      issue_meta
+      |> IssueMeta.source_file()
+      |> SourceFile.line_at(line_no)
+
     params = IssueMeta.params(issue_meta)
     ignored_triggers = Params.get(params, :ignore, @default_params)
 

@@ -95,7 +95,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     nil
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
-    {_, raw_line} = SourceFile.line_at(source_file, issue.line_no)
+    raw_line = SourceFile.line_at(source_file, issue.line_no)
     line = String.strip(raw_line)
 
     [outer_color, :faint]

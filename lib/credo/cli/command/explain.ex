@@ -5,6 +5,7 @@ defmodule Credo.CLI.Command.Explain do
 
   alias Credo.Check.Runner
   alias Credo.Execution
+  alias Credo.CLI.Filename
   alias Credo.CLI.Output.Explain
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Output
@@ -13,15 +14,20 @@ defmodule Credo.CLI.Command.Explain do
   # TODO: explain used exec options
 
   @doc false
-  def run(%Execution{help: true}), do: print_help()
-  def run(%Execution{args: []}), do: print_help()
+  def run(%Execution{help: true} = exec), do: print_help(exec)
   def run(exec) do
-    exec
-    |> load_and_validate_source_files()
-    |> Runner.prepare_config
-    |> run_checks()
-    |> print_results_and_summary()
-    |> determine_success()
+    filename = Execution.get_path(exec)
+
+    if Filename.contains_line_no?(filename) do
+      exec
+      |> load_and_validate_source_files()
+      |> Runner.prepare_config
+      |> run_checks()
+      |> print_results_and_summary()
+      |> determine_success()
+    else
+      print_help(exec)
+    end
   end
 
   defp load_and_validate_source_files(exec) do
@@ -51,10 +57,11 @@ defmodule Credo.CLI.Command.Explain do
     |> Execution.put_assign("credo.time.run_checks", time_run)
   end
 
-  defp print_results_and_summary(%Execution{args: [file | _]} = exec) do
+  defp print_results_and_summary(exec) do
+    filename = Execution.get_path(exec)
     source_files = Execution.get_source_files(exec)
 
-    file
+    filename
     |> String.split(":")
     |> print_result(source_files, exec)
 
@@ -88,7 +95,7 @@ defmodule Credo.CLI.Command.Explain do
     output.print_after_info(source_file, exec, line_no, column)
   end
 
-  defp print_help do
+  defp print_help(exec) do
     usage = ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
     description =
       """
@@ -109,6 +116,6 @@ defmodule Credo.CLI.Command.Explain do
     UI.puts(example)
     UI.puts(options)
 
-    :ok
+    exec
   end
 end

@@ -26,8 +26,6 @@ defmodule Credo.CLI.Command.Help do
     |> UI.puts
 
     UI.puts
-
-    :ok
   end
 
   def print_message do
@@ -61,8 +59,6 @@ defmodule Credo.CLI.Command.Help do
       ]
 
     UI.puts(example)
-
-    :ok
   end
 
   def color_for("#"), do: [:faint]

@@ -87,6 +87,19 @@ defmodule Credo.Execution do
   end
   def set_strict(exec), do: exec
 
+
+
+  @doc """
+  Returns the name of the command, which should be run by the given execution.
+  """
+  def get_command_name(exec) do
+    exec.cli_options.command
+  end
+
+  def get_path(exec) do
+    exec.cli_options.path
+  end
+
   # Assigns
 
   def get_assign(exec, name) do
@@ -120,7 +133,7 @@ defmodule Credo.Execution do
   def get_issues(exec, filename) do
     exec
     |> Credo.Execution.Issues.to_map
-    |> Map.get(filename)
+    |> Map.get(filename, [])
   end
 
   # Results

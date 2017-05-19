@@ -13,7 +13,7 @@ defmodule Credo.CLI.Command.List do
   alias Credo.Sources
 
   @doc false
-  def run(%Execution{help: true}), do: print_help()
+  def run(%Execution{help: true} = exec), do: print_help(exec)
   def run(exec) do
     exec
     |> load_and_validate_source_files()
@@ -90,7 +90,7 @@ defmodule Credo.CLI.Command.List do
   end
 
 
-  defp print_help do
+  defp print_help(exec) do
     usage = ["Usage: ", :olive, "mix credo list [paths] [options]"]
     description =
       """
@@ -121,6 +121,6 @@ defmodule Credo.CLI.Command.List do
     UI.puts(example)
     UI.puts(options)
 
-    :ok
+    exec
   end
 end
