@@ -2,6 +2,9 @@ defmodule Credo.Execution.Task.HaltExecution do
   use Credo.Execution.Task
   use Bitwise
 
+  def call(%Execution{mute_exit_status: true} = exec, _opts) do
+    exec
+  end
   def call(exec, _opts) do
     exit_status =
       exec

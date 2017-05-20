@@ -38,6 +38,7 @@ defmodule Credo.ConfigBuilder do
     |> set_color(switches)
     |> set_strict(switches)
     |> set_crash_on_error(switches)
+    |> set_mute_exit_status(switches)
     |> set_deprecated_switches(switches)
     |> set_format(switches)
     |> set_help(switches)
@@ -88,6 +89,11 @@ defmodule Credo.ConfigBuilder do
     %Execution{exec | crash_on_error: true}
   end
   defp set_crash_on_error(exec, _), do: exec
+
+  defp set_mute_exit_status(exec, %{mute_exit_status: true}) do
+    %Execution{exec | mute_exit_status: true}
+  end
+  defp set_mute_exit_status(exec, _), do: exec
 
   defp set_read_from_stdin(exec, %{read_from_stdin: true}) do
     %Execution{exec | read_from_stdin: true}

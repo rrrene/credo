@@ -25,6 +25,7 @@ defmodule Credo.Execution do
             only_checks:        nil,
             ignore_checks:      nil,
             crash_on_error:     true,
+            mute_exit_status:   false,
             read_from_stdin:    false,
 
             # state, which is accessed and changed over the course of Credo's execution
