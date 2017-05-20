@@ -104,8 +104,8 @@ defmodule Credo.Execution do
 
   # Assigns
 
-  def get_assign(exec, name) do
-    Map.get(exec.assigns, name)
+  def get_assign(exec, name, default \\ nil) do
+    Map.get(exec.assigns, name, default)
   end
 
   def put_assign(exec, name, value) do

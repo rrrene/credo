@@ -1,19 +1,14 @@
-defmodule Credo.Execution.Task.HaltExecution do
+defmodule Credo.Execution.Task.AssignExitStatusForIssues do
   use Credo.Execution.Task
   use Bitwise
 
-  def call(%Execution{mute_exit_status: true} = exec, _opts) do
-    exec
-  end
   def call(exec, _opts) do
     exit_status =
       exec
       |> get_result("credo.issues", [])
       |> to_exit_status()
 
-    halt_if_failed(exit_status)
-
-    exec
+    put_assign(exec, "credo.exit_status", exit_status)
   end
 
   # Converts the return value of a Command.run() call into an exit_status
@@ -23,7 +18,4 @@ defmodule Credo.Execution.Task.HaltExecution do
     |> Enum.map(&(&1.exit_status))
     |> Enum.reduce(0, &(&1 ||| &2))
   end
-
-  defp halt_if_failed(0), do: nil
-  defp halt_if_failed(x), do: System.halt(x)
 end

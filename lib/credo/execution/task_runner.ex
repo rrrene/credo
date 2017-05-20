@@ -18,11 +18,9 @@ defmodule Credo.Execution.TaskRunner do
   end
 
   group :resolve_config do
-    task Credo.Execution.Task.ResolveConfig
-# TODO: refactor
-#    task UseColors
-#    task CheckForUpdates
-#    task RequireRequires
+    task Credo.Execution.Task.UseColors
+    task Credo.Execution.Task.CheckForUpdates
+    task Credo.Execution.Task.RequireRequires
   end
 
 # TODO: implement
@@ -45,9 +43,7 @@ defmodule Credo.Execution.TaskRunner do
 #  end
 
   group :halt_execution do
-# TODO: refactor
-#    task PutExitStatusForIssues
-#    task HaltIfExitStatus
-    task Credo.Execution.Task.HaltExecution
+    task Credo.Execution.Task.AssignExitStatusForIssues
+    task Credo.Execution.Task.HaltIfExitStatusAssigned
   end
 end
