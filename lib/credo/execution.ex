@@ -4,16 +4,16 @@ defmodule Credo.Execution do
   manipulated via the `Credo.Execution` module.
   """
 
-  defstruct args:               [],
-            argv:               [],
+  defstruct argv:               [],
             cli_options:        nil,
+
+            # config
             files:              nil,
             color:              true,
             checks:             nil,
             requires:           [],
             strict:             false,
             check_for_updates:  true, # checks if there is a new version of Credo
-            halted:             false,
 
             # options, set by the command line
             min_priority:       0,
@@ -28,6 +28,7 @@ defmodule Credo.Execution do
             read_from_stdin:    false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            halted:             false,
             source_files_pid:   nil,
             issues_pid:         nil,
             skipped_checks:     nil,
