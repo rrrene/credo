@@ -170,6 +170,14 @@ defmodule OtherModule3 do
   end
 end
 """
+  @with_and_without_spaces2 """
+defmodule CredoTests do
+  def bar do
+    2+3
+    4 + 5
+  end
+end
+      """
 
   #
   # cases NOT raising issues
@@ -219,12 +227,29 @@ end
     |> assert_issue(@described_check)
   end
 
-  test "it should report the correct result 4" do
+  test "it should report the correct result /4" do
     [
       @with_and_without_spaces
     ]
     |> to_source_files()
     |> assert_issue(@described_check)
+  end
+
+  test "it should report the correct result /5" do
+    [
+      @with_and_without_spaces2
+    ]
+    |> to_source_files()
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report the correct result /6" do
+    [
+      @with_and_without_spaces,
+      @with_and_without_spaces2
+    ]
+    |> to_source_files()
+    |> assert_issues(@described_check)
   end
 
 end
