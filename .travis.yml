@@ -11,6 +11,8 @@ otp_release:
   - 18.2
   - 19.0
   - 19.1
+script:
+  - mix test && mix credo --mute-exit-status
 after_script:
   - MIX_ENV=test mix inch.report
 matrix:
