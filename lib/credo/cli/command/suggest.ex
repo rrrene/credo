@@ -77,7 +77,7 @@ defmodule Credo.CLI.Command.Suggest do
       |> Filter.important(exec)
       |> Filter.valid_issues(exec)
 
-    Execution.put_result(exec, "issues", issues)
+    Execution.put_result(exec, "credo.issues", issues)
   end
 
   defp output_mod(%Execution{format: "oneline"}) do
