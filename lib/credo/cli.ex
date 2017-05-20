@@ -8,20 +8,14 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
+  alias Credo.Execution.TaskRunner
   alias Credo.Service.Commands
 
   @doc false
   def main(argv) do
     Credo.start nil, nil
 
-    %Execution{argv: argv}
-    |> Credo.Execution.Task.run(Credo.Execution.Task.ParseOptions)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.ValidateOptions)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.ConvertCLIOptionsToConfig)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.ValidateConfig)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.ResolveConfig)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.RunCommand)
-    |> Credo.Execution.Task.run(Credo.Execution.Task.HaltExecution)
+    TaskRunner.call(%Execution{argv: argv})
   end
 
   @doc """

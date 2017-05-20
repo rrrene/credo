@@ -3,6 +3,8 @@ defmodule Credo.Execution.Task do
 
   @callback call(exec :: Credo.Execution.t, opts :: Keyword.t) :: Credo.Execution.t
 
+  alias Credo.Execution
+
   defmacro __using__(_opts \\ []) do
     quote do
       @behaviour Credo.Execution.Task
@@ -22,15 +24,19 @@ defmodule Credo.Execution.Task do
     end
   end
 
+  @doc """
+  Runs a given `task` if the `Execution` wasn't halted and ensures that the
+  result is also an `Execution` struct.
+  """
   def run(exec, task, opts \\ [])
   def run(%Credo.Execution{halted: false} = exec, task, opts) do
     #require Logger
     #Logger.debug "Calling #{task} ..."
 
     case task.call(exec, opts) do
-      %Credo.Execution{halted: false} = exec ->
+      %Execution{halted: false} = exec ->
         exec
-      %Credo.Execution{halted: true} = exec ->
+      %Execution{halted: true} = exec ->
         task.error(exec, opts)
       value ->
         # TODO: improve message
@@ -41,7 +47,12 @@ defmodule Credo.Execution.Task do
         value
     end
   end
+  def run(%Execution{} = exec, _task, _opts) do
+    exec
+  end
   def run(exec, _task, _opts) do
+    IO.warn "Expected task to return %Credo.Execution{}, got: #{inspect(exec)}"
+
     exec
   end
 end
