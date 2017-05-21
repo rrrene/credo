@@ -7,6 +7,7 @@
 - Fix comment handling of Charlists, Sigils and Strings
 - `LazyLogging` now only checks for `debug` calls by default
 - Add `--mute-exit-status` CLI switch, which mutes Credo's exit status (this will be used for integration tests as it means that any non-zero exit status results from a runtime error of Credo)
+- Add default param values to `mix explain` output
 
 ### BREAKING CHANGES
 
