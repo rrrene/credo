@@ -17,10 +17,42 @@ These changes concern people writing their own checks for Credo.
 - `Credo.Config` struct was replaced by `Credo.Execution`.
 - `run/3` callbacks for `Credo.Check` are now `run/4` callbacks as they have to receive the execution's `Credo.Execution` struct.
 
-### Config Comments
+### Config Comments replace `@lint` attributes
+
+`@lint` attributes are deprecated and will be removed in Credo `0.9.0` because
+they are causing a compiler warning in Elixir `>= 1.4`.
 
 Users of Credo can now disable individual lines or files for all or just
 specific checks.
+
+For now, config comments let you exclude individual files completely
+
+    # credo:disable-for-this-file
+    defmodule SomeApp.ThirdPartyCode do
+    end
+
+or deactivate specific lines:
+
+    def my_fun do
+      # credo:disable-for-next-line
+      IO.inspect :this_is_actually_okay
+    end
+
+or add the check module to exclude just that one check:
+
+    def my_fun do
+      # credo:disable-for-next-line Credo.Check.Warning.IoInspect
+      IO.inspect :this_is_actually_okay
+    end
+
+or use a Regex to be more flexible which checks to exclude:
+
+    def my_fun do
+      # credo:disable-for-next-line /IoInspect/
+      IO.inspect :this_is_actually_okay
+    end
+
+Here's a list with the syntax options:
 
 * `# credo:disable-for-this-file` - to disable for the entire file
 * `# credo:disable-for-next-line` - to disable for the next line
