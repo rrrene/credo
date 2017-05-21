@@ -51,7 +51,7 @@ defmodule Credo.Execution.Task do
     exec
   end
   def run(exec, _task, _opts) do
-    IO.warn "Expected task to return %Credo.Execution{}, got: #{inspect(exec)}"
+    IO.warn "Expected first parameter of Task.run/3 to match %Credo.Execution{}, got: #{inspect(exec)}"
 
     exec
   end

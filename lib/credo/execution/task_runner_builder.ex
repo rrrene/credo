@@ -8,7 +8,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
       @before_compile Credo.Execution.TaskRunnerBuilder
 
       def call(exec) do
-        router_builder_call(exec)
+        runner_builder_call(exec)
       end
     end
   end
@@ -16,7 +16,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
   @doc false
   defmacro __before_compile__(_env) do
     quote do
-      defp router_builder_call(exec) do
+      defp runner_builder_call(exec) do
         Credo.Execution.TaskRunnerBuilder.builder_call(exec, all_groups())
       end
 
@@ -38,8 +38,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
     Enum.reduce(groups, exec, fn(group, exec) ->
       #IO.puts ""
       #IO.inspect({:group, group})
-
-      apply(group, :call, [exec])
+      Credo.Execution.TaskGroup.run(exec, group)
     end)
   end
 
@@ -55,7 +54,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
       @groups unquote(module_name)
 
       defmodule unquote(module_name) do
-        use Credo.Execution.TaskGroupBuilder
+        use Credo.Execution.TaskGroup
 
         unquote(group_opts[:do])
 
