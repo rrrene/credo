@@ -107,7 +107,7 @@ defmodule Credo.CLI.Command.List do
         -a, --all             Show all issues
         -A, --all-priorities  Show all issues including low priority ones
         -c, --checks          Only include checks that match the given strings
-        -C, --exec-name     Use the given exec instead of "default"
+        -C, --config-name     Use the given config instead of "default"
         -i, --ignore-checks   Ignore checks that match the given strings
             --format          Display the list in a specific format (oneline,flycheck)
 
