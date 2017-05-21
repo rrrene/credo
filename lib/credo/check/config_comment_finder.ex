@@ -2,7 +2,7 @@ defmodule Credo.Check.ConfigCommentFinder do
   @moduledoc """
   """
   @explanation nil
-  @config_comment_format ~r/#\s*credo\:([\w-\:]+)\s*(.*)/
+  @config_comment_format ~r/#\s*credo\:([\w-\:]+)\s*(.*)/im
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
@@ -12,22 +12,33 @@ defmodule Credo.Check.ConfigCommentFinder do
 
   @doc false
   def run(source_files, _exec, _params) when is_list(source_files) do
-    Enum.map(source_files, &find_and_set_in_source_file/1)
+    source_files
+    |> Enum.map(&find_and_set_in_source_file/1)
+    |> Enum.reject(&is_nil/1)
   end
 
   def find_and_set_in_source_file(source_file) do
-    config_comments = find_config_comments(source_file)
-
-    {source_file.filename, config_comments}
+    case find_config_comments(source_file) do
+      [] ->
+        nil
+      config_comments ->
+        {source_file.filename, config_comments}
+    end
   end
 
   defp find_config_comments(source_file) do
-    source_file
-    |> SourceFile.source
-    |> CodeHelper.clean_charlists_strings_and_sigils
-    |> Credo.Code.to_lines
-    |> Enum.reduce([], &find_config_comment/2)
+    source = SourceFile.source(source_file)
+
+    if source =~ @config_comment_format do
+      source
+      |> CodeHelper.clean_charlists_strings_and_sigils
+      |> Credo.Code.to_lines
+      |> Enum.reduce([], &find_config_comment/2)
+    else
+      []
+    end
   end
+
   defp find_config_comment({line_no, string}, memo) do
     case Regex.run(@config_comment_format, string) do
       nil ->
