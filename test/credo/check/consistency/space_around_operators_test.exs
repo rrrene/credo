@@ -36,6 +36,9 @@ defmodule Credo.Sample2 do
     # Gives warning
     defp format_value("NPC_", "NPDT", <<stuff::integer, other_stuff::integer, even_more_stuff::integer,
       skills::binary-27>>) do
+
+
+      skip = (SourceFile.column(source_file, line_no, text) || -1) + name_size
     end
 
     defp parse_image_stats(<< @gif_89_signature,
