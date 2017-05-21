@@ -7,6 +7,7 @@ defmodule Credo.CLI.Output.Explain do
   alias Credo.Issue
 
   @indent 8
+  @params_min_indent 20
 
   @doc "Called before the analysis is run."
   def print_before_info(source_files, exec) do
@@ -234,7 +235,6 @@ defmodule Credo.CLI.Output.Explain do
 
   def print_params_explanation(nil, _), do: nil
   def print_params_explanation(check, outer_color) do
-    keywords = check.explanation_for_params
     check_name = check |> to_string |> String.replace(~r/^Elixir\./, "")
 
     [
@@ -245,65 +245,95 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint])
 
-    if keywords |> List.wrap |> Enum.any? do
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "To configure this check, use this tuple"
-      ]
-      |> UI.puts
+    print_params_explanation(outer_color, check_name, check.explanation_for_params, check.defaults_for_params)
+  end
 
-      UI.puts_edge([outer_color, :faint])
+  def print_params_explanation(outer_color, check_name, [], _defaults) do
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "You can disable this check by using this tuple"
+    ]
+    |> UI.puts
 
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, :faint, "<params>", :reset ,"}"
-      ]
-      |> UI.puts
+    UI.puts_edge([outer_color, :faint])
 
-      UI.puts_edge([outer_color, :faint])
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset ,"}"
+    ]
+    |> UI.puts
 
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset ," being ", :cyan, "false", :reset, " or any combination of these keywords:"
-      ]
-      |> UI.puts
+    UI.puts_edge([outer_color, :faint])
 
-      UI.puts_edge([outer_color, :faint])
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "There are no other configuration options."
+    ]
+    |> UI.puts
 
-      keywords
-      |> Enum.each(fn({param, text}) ->
+    UI.puts_edge([outer_color, :faint])
+  end
+  def print_params_explanation(outer_color, check_name, keywords, defaults) do
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "To configure this check, use this tuple"
+    ]
+    |> UI.puts
+
+    UI.puts_edge([outer_color, :faint])
+
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, :faint, "<params>", :reset ,"}"
+    ]
+    |> UI.puts
+
+    UI.puts_edge([outer_color, :faint])
+
+    [
+      UI.edge([outer_color, :faint]), :reset,
+        String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset ," being ", :cyan, "false", :reset, " or any combination of these keywords:"
+    ]
+    |> UI.puts
+
+    UI.puts_edge([outer_color, :faint])
+
+    params_indent = get_params_indent(keywords, @params_min_indent)
+
+    keywords
+    |> Enum.each(fn({param, text}) ->
+        [
+          UI.edge([outer_color, :faint]), :reset,
+            String.duplicate(" ", @indent-2),
+            :cyan, "  #{param}:" |> String.ljust(params_indent+3),
+            :reset, text
+        ]
+        |> UI.puts
+
+        default = defaults[param]
+
+        if default do
+          default_text = "(defaults to #{inspect(default)})"
           [
             UI.edge([outer_color, :faint]), :reset,
               String.duplicate(" ", @indent-2),
-              :cyan, "  #{param}:" |> String.ljust(20),
-              :reset, text
+              :cyan, " " |> String.ljust(params_indent+3),
+              :reset, :faint, default_text
           ]
           |> UI.puts
-        end)
-    else
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "You can disable this check by using this tuple"
-      ]
-      |> UI.puts
+        end
+      end)
+  end
 
-      UI.puts_edge([outer_color, :faint])
+  defp get_params_indent(keywords, min_indent) do
+    params_indent =
+      Enum.reduce(keywords, min_indent, fn({param, _text}, current) ->
+        size = param |> to_string |> String.length()
 
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset ,"}"
-      ]
-      |> UI.puts
+        if size > current, do: size, else: current
+      end)
 
-      UI.puts_edge([outer_color, :faint])
-
-      [
-        UI.edge([outer_color, :faint]), :reset,
-          String.duplicate(" ", @indent-2), "There are no other configuration options."
-      ]
-      |> UI.puts
-
-      UI.puts_edge([outer_color, :faint])
-    end
+    # Round up to the next multiple of 2
+    (Integer.floor_div(params_indent, 2) + 1) * 2
   end
 end

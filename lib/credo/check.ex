@@ -17,6 +17,7 @@ defmodule Credo.Check do
   defmacro __using__(opts) do
     quote do
       @behaviour Credo.Check
+      @before_compile Credo.Check
 
       alias Credo.Check
       alias Credo.Issue
@@ -54,6 +55,25 @@ defmodule Credo.Check do
 
       def format_issue(issue_meta, opts) do
         Check.format_issue(issue_meta, opts, category(), base_priority(), __MODULE__)
+      end
+    end
+  end
+
+  @doc false
+  defmacro __before_compile__(env) do
+    quote do
+      unquote(default_params_module_attribute(env))
+
+      def defaults_for_params do
+        @default_params
+      end
+    end
+  end
+
+  defp default_params_module_attribute(env) do
+    if env.module |> Module.get_attribute(:default_params) |> is_nil() do
+      quote do
+        @default_params []
       end
     end
   end
