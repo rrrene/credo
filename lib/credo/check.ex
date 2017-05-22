@@ -64,8 +64,12 @@ defmodule Credo.Check do
     quote do
       unquote(default_params_module_attribute(env))
 
-      def defaults_for_params do
+      def params_defaults do
         @default_params
+      end
+
+      def params_names do
+        Keyword.keys(params_defaults())
       end
     end
   end

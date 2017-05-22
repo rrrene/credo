@@ -245,7 +245,7 @@ defmodule Credo.CLI.Output.Explain do
 
     UI.puts_edge([outer_color, :faint])
 
-    print_params_explanation(outer_color, check_name, check.explanation_for_params, check.defaults_for_params)
+    print_params_explanation(outer_color, check_name, check.explanation_for_params, check.params_defaults)
   end
 
   def print_params_explanation(outer_color, check_name, [], _defaults) do
