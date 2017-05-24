@@ -100,7 +100,7 @@ defmodule Credo.Code.Strings do
       parse_string_sigil(t, acc <> "\n", unquote(sigil_end), replacement)
     end
     defp parse_string_sigil(<< _::utf8, t::binary >>, acc, unquote(sigil_end), replacement) do
-      parse_string_sigil(t, acc <> " ", unquote(sigil_end), replacement)
+      parse_string_sigil(t, acc <> replacement, unquote(sigil_end), replacement)
     end
   end
 
