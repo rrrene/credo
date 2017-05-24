@@ -39,6 +39,57 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report an issue for @doc tags" do
+"""
+defmodule CredoSampleModule do
+  @moduledoc \"\"\"
+  FIXME: this should not appear in the test
+  \"\"\"
+
+  @doc "TODO: this should yield an issue"
+
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report an issue for @moduledoc tags" do
+"""
+defmodule CredoSampleModule do
+  @moduledoc \"\"\"
+  TODO: this should not appear in the TODO test
+  \"\"\"
+
+  @doc "FIXME: this should yield an issue"
+
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report an issue for @shortdoc tags" do
+"""
+defmodule CredoSampleModule do
+  @shortdoc \"\"\"
+  TODO: this should not appear in the TODO test
+  \"\"\"
+
+  @doc "FIXME: this should yield an issue"
+
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report an issue when not indented" do
 """
 defmodule CredoSampleModule do
@@ -109,7 +160,7 @@ end
 defmodule CredoSampleModule do
   use ExUnit.Case # TODO: this is the first
   @moduledoc \"\"\"
-    this is an example # TODO: and this is no actual comment
+    this is an example # TODO: and this is an actual TODO
   \"\"\"
 
   def some_fun do # TODO this is the second
@@ -122,7 +173,7 @@ defmodule CredoSampleModule do
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 3 == Enum.count(issues)
+        assert 4 == Enum.count(issues)
       end)
   end
 

@@ -69,7 +69,7 @@ defmodule CredoSampleModule do
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 3 == Enum.count(issues)
+        assert 4 == Enum.count(issues)
       end)
   end
 

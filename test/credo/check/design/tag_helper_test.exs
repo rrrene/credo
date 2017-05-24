@@ -12,7 +12,8 @@ defmodule CredoSampleModule do
     assert x == x + 2
   end
 end
-""" |> TagHelper.tags(:TODO)
+""" |> to_source_file
+   |> TagHelper.tags(:TODO, true)
 
     assert [] == tags
   end
@@ -26,7 +27,8 @@ defmodule CredoSampleModule do
     assert x == x + 2
   end
 end
-""" |> TagHelper.tags(:TODO)
+""" |> to_source_file
+   |> TagHelper.tags(:TODO, true)
 
     expected = [
         {4, "  def some_fun do # TODO: find a better name for this",
@@ -45,7 +47,8 @@ defmodule CredoSampleModule do
     assert x == x + 2
   end
 end
-""" |> TagHelper.tags(:TODO)
+""" |> to_source_file
+   |> TagHelper.tags(:TODO, true)
 
     expected = [
         {4, "  def some_fun do # TODO find a better name for this",
@@ -65,7 +68,8 @@ defmodule CredoSampleModule do
     assert x == x + 2
   end
 end
-""" |> TagHelper.tags(:TODO)
+""" |> to_source_file
+   |> TagHelper.tags(:TODO, true)
 
     expected = [
         {4, "  # todo find a better name for this",
@@ -93,9 +97,10 @@ defmodule CredoSampleModule do
     "also: # TODO: no comment here as well"
   end
 end
-""" |> TagHelper.tags(:TODO)
+""" |> to_source_file
+   |> TagHelper.tags(:TODO, true)
 
-    assert 3 == Enum.count(tags)
+    assert 4 == Enum.count(tags)
   end
 
 end

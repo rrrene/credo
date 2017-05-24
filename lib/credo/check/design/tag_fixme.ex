@@ -16,7 +16,13 @@ defmodule Credo.Check.Design.TagFIXME do
   applicable to your project/situation.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      include_doc: "Set to `true` to also include tags from @doc attributes."
+    ]
+  ]
+  @default_params [include_doc: true]
   @tag_name "FIXME"
 
   alias Credo.Check.Design.TagHelper
@@ -26,10 +32,10 @@ defmodule Credo.Check.Design.TagFIXME do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
+    include_doc? = Params.get(params, :include_doc, @default_params)
 
     source_file
-    |> SourceFile.source
-    |> TagHelper.tags(@tag_name)
+    |> TagHelper.tags(@tag_name, include_doc?)
     |> Enum.map(&issue_for(issue_meta, &1))
   end
 
