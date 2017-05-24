@@ -96,4 +96,17 @@ x = ~S<    >
     assert expected == source |> Strings.replace_with_spaces
   end
 
+  test "it should return the source without string sigils and replace the contents" do
+    source = """
+t = ~s({
+})
+"""
+    expected = """
+t = ~s(.
+.)
+"""
+    result = source |> Strings.replace_with_spaces(".")
+    assert expected == result
+  end
+
 end
