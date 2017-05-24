@@ -31,19 +31,39 @@ defmodule Credo.ExsLoaderTest do
     assert expected == Credo.ExsLoader.parse(exs_string, false)
   end
 
-  test ".validate outputs a warning when there is an invalid config file" do
+  test ".validate outputs a warning when the name key is missing in config" do
     invalid_config = %{
       configs: [
         %{
-          files: %{
-            included: ["lib/", "src/", "web/", "apps/"],
-            excluded: [~r"/_build/", ~r"/deps/"]
-          },
-          requires: [],
-          check_for_updates: true,
-          strict: false,
-          color: true,
           checks: [{Credo.Check.Consistency.ExceptionNames}]
+        }
+      ]
+    }
+    test_func = fn -> Credo.ExsLoader.validate(invalid_config) end
+
+    refute capture_io(test_func) == ""
+  end
+
+  test ".validate outputs a warning when including a file that does not exist" do
+    invalid_config = %{
+      configs: [
+        %{
+          requires: ["not_there.ex"],
+          name: "default"
+        }
+      ]
+    }
+    test_func = fn -> Credo.ExsLoader.validate(invalid_config) end
+
+    refute capture_io(test_func) == ""
+  end
+
+  test ".validate outputs a warning when including a check that does not exist" do
+    invalid_config = %{
+      configs: [
+        %{
+          name: "default",
+          checks: [{Credo.Check.Consistency.NonExistantCheck}]
         }
       ]
     }

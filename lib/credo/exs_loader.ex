@@ -6,8 +6,27 @@ defmodule Credo.ExsLoader do
     parsed_file
   end
 
-  defp do_validate(%{check_for_updates: _, checks: _, color: _, files: _, name: _, requires: _, strict: _}), do: true
+  defp do_validate(%{name: name} = config) when is_binary(name) do
+    validate_requires(config) && validate_checks(config)
+  end
   defp do_validate(_), do: false
+
+  defp validate_requires(%{requires: requires}) when is_list(requires) do
+    if Enum.all?(requires, &File.exists?/1) do
+      Enum.each(requires, &Code.require_file/2)
+      true
+    else
+      false
+    end
+  end
+  defp validate_requires(_), do: true
+
+  defp validate_checks(%{checks: checks}) when is_list(checks) do
+    Enum.all?(checks, fn(tuple) ->
+      tuple |> elem(0) |> Code.ensure_compiled?
+    end)
+  end
+  defp validate_checks(_), do: true
 
   def parse(exs_string, safe \\ false)
   def parse(exs_string, true) do
