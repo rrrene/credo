@@ -14,7 +14,7 @@ defmodule Credo.Code.Sigils do
                       Enum.flat_map(@all_sigil_starts, fn(start) ->
                         [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
                       end)
-                    end)
+                    end) |> Enum.uniq
 
   @doc """
   Replaces all characters inside all sigils with the equivalent amount of
