@@ -1,6 +1,5 @@
 defmodule Credo.Check.Design.TagHelper do
   alias Credo.Check.CodeHelper
-  alias Credo.IssueMeta
   alias Credo.SourceFile
 
   @doc_attribute_names [:doc, :moduledoc, :shortdoc]
