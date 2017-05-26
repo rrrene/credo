@@ -334,6 +334,6 @@ defmodule Credo.CLI.Output.Explain do
       end)
 
     # Round up to the next multiple of 2
-    (Integer.floor_div(params_indent, 2) + 1) * 2
+    (trunc(params_indent / 2) + 1) * 2
   end
 end
