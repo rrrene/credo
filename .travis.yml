@@ -9,7 +9,7 @@ otp_release:
   - 18.3
   - 19.3
 script:
-  - mix test && mix credo --mute-exit-status
+  - mix test && mix credo --mute-exit-status && mix credo lib/credo/sources.ex:1:11
 after_script:
   - MIX_ENV=test mix inch.report
 matrix:
