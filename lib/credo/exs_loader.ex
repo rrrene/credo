@@ -1,33 +1,4 @@
 defmodule Credo.ExsLoader do
-  def validate(parsed_file) do
-    if !Enum.all?(parsed_file[:configs], &do_validate/1) do
-      IO.puts("One or more of your .credo.exs files are invalid")
-    end
-    parsed_file
-  end
-
-  defp do_validate(%{name: name} = config) when is_binary(name) do
-    validate_requires(config) && validate_checks(config)
-  end
-  defp do_validate(_), do: false
-
-  defp validate_requires(%{requires: requires}) when is_list(requires) do
-    if Enum.all?(requires, &File.exists?/1) do
-      Enum.each(requires, &Code.require_file/2)
-      true
-    else
-      false
-    end
-  end
-  defp validate_requires(_), do: true
-
-  defp validate_checks(%{checks: checks}) when is_list(checks) do
-    Enum.all?(checks, fn(tuple) ->
-      tuple |> elem(0) |> Code.ensure_compiled?
-    end)
-  end
-  defp validate_checks(_), do: true
-
   def parse(exs_string, safe \\ false)
   def parse(exs_string, true) do
     case Code.string_to_quoted(exs_string) do

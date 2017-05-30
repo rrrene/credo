@@ -1,5 +1,5 @@
 defmodule Credo.ConfigFile do
-  @doc """
+  @moduledoc """
   `ConfigFile` structs represent all loaded and merged config files in a run.
   """
 
@@ -30,6 +30,7 @@ defmodule Credo.ConfigFile do
     dir
     |> relevant_config_files
     |> Enum.filter(&File.exists?/1)
+    |> Credo.ConfigFile.Validate.all_files
     |> Enum.map(&File.read!/1)
     |> List.insert_at(0, @default_config_file)
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
@@ -80,7 +81,6 @@ defmodule Credo.ConfigFile do
   defp from_exs(dir, config_name, exs_string, safe) do
     exs_string
     |> Credo.ExsLoader.parse(safe)
-    |> Credo.ExsLoader.validate
     |> from_data(dir, config_name)
   end
 
