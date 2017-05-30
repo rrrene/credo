@@ -103,7 +103,7 @@ defmodule Credo.Code do
   def to_tokens(source) when is_binary(source) do
     {_, _, _, tokens} =
       source
-      |> String.to_char_list
+      |> String.to_charlist
       |> :elixir_tokenizer.tokenize(1, [])
 
     tokens

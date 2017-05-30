@@ -258,7 +258,7 @@ end
     else
       :ok ->
         {_in, analysis_output} = StringIO.contents(analyse_dest)
-        String.to_char_list(analysis_output)
+        String.to_charlist(analysis_output)
     after
       StringIO.close(analyse_dest)
     end

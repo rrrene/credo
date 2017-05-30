@@ -11,7 +11,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 ~S"""
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    "Fahrenheit 451" |> String.to_char_list |> IO.inspect
+    "Fahrenheit 451" |> String.to_charlist |> IO.inspect
 
     "Fahrenheit 451" |> String.trim
 
