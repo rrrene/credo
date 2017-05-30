@@ -140,7 +140,7 @@ defmodule Credo.CLI.Output do
     list
     |> Enum.with_index
     |> Enum.flat_map(fn({string, index}) ->
-        [:reset, String.rjust("#{index+1})", 5), :faint, " #{string}\n"]
+        [:reset, String.pad_leading("#{index+1})", 5), :faint, " #{string}\n"]
       end)
     |> UI.puts
   end

@@ -200,7 +200,7 @@ defmodule Credo.CLI.Output.Explain do
 
     line_no_str =
       "#{line_no} "
-      |> String.rjust(@indent - 2)
+      |> String.pad_leading(@indent - 2)
 
     [
       UI.edge([outer_color, :faint]), :reset,
