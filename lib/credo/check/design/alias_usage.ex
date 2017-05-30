@@ -159,13 +159,12 @@ defmodule Credo.Check.Design.AliasUsage do
 
         Map.put(memo, issue.trigger, [issue | list])
       end)
-    |> Enum.filter_map(
-      fn({_, value}) ->
+    |> Enum.filter(fn({_, value}) ->
         length(value) > count
-      end,
-      fn({_, value}) ->
-        value
       end)
+    |> Enum.map(fn({_, value}) ->
+      value
+    end)
     |> List.flatten
   end
 
