@@ -57,7 +57,7 @@ defmodule Credo.CLI.Output.Explain do
     [
       :bright, "#{color}_background" |> String.to_atom, color, " ",
         Output.foreground_color(color), :normal,
-      " #{scope_name}" |> String.ljust(term_width - 1),
+      " #{scope_name}" |> String.pad_trailing(term_width - 1),
     ]
     |> UI.puts
 
@@ -305,7 +305,7 @@ defmodule Credo.CLI.Output.Explain do
         [
           UI.edge([outer_color, :faint]), :reset,
             String.duplicate(" ", @indent-2),
-            :cyan, "  #{param}:" |> String.ljust(params_indent+3),
+            :cyan, "  #{param}:" |> String.pad_trailing(params_indent+3),
             :reset, text
         ]
         |> UI.puts
@@ -317,7 +317,7 @@ defmodule Credo.CLI.Output.Explain do
           [
             UI.edge([outer_color, :faint]), :reset,
               String.duplicate(" ", @indent-2),
-              :cyan, " " |> String.ljust(params_indent+3),
+              :cyan, " " |> String.pad_trailing(params_indent+3),
               :reset, :faint, default_text
           ]
           |> UI.puts

@@ -284,7 +284,7 @@ end
 """
   defp print_process(pid_atom, count, own) do
     IO.puts([?", String.duplicate("-", 100)])
-    IO.write format_item(Path.join(path, item), String.ljust(item, width))
+    IO.write format_item(Path.join(path, item), String.pad_trailing(item, width))
     print_row(["s", "B", "s", ".3f", "s"], [count, "", own, ""])
   end
 """ |> to_source_file

@@ -54,7 +54,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       [
         :bright, "#{color}_background" |> String.to_atom, color, " ",
           Output.foreground_color(color), :normal,
-        " #{scope_name}" |> String.ljust(term_width - 1),
+        " #{scope_name}" |> String.pad_trailing(term_width - 1),
       ]
       |> UI.puts
 
