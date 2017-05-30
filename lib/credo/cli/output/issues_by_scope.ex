@@ -105,7 +105,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       |> UI.puts
 
       if issue.column do
-        offset = String.length(line) - String.length(String.strip(line))
+        offset = String.length(line) - String.length(String.trim(line))
         x = max(issue.column - offset - 1, 0) # column is one-based
         w =
           case issue.trigger do

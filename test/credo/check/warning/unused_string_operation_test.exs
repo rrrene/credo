@@ -59,7 +59,7 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    offset = String.length(line) - String.length(String.strip(line))
+    offset = String.length(line) - String.length(String.trim(line))
 
     parameter1 + parameter2 + offset
   end
@@ -72,9 +72,9 @@ end
 """
 defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
-    if String.length(x1) > String.length(String.strip(x2)) do
+    if String.length(x1) > String.length(String.trim(x2)) do
       cond do
-        String.strip(x3) == "" -> IO.puts("1")
+        String.trim(x3) == "" -> IO.puts("1")
         String.length(x) == 15 -> IO.puts("2")
         String.replace(x, "a", "b") == "b" -> IO.puts("2")
       end
@@ -85,7 +85,7 @@ defmodule CredoSampleModule do
         _ -> something
       end
     end
-    unless String.strip(x4) == "" do
+    unless String.trim(x4) == "" do
       IO.puts "empty"
     end
 
@@ -129,7 +129,7 @@ defmodule CredoSampleModule do
     |> IO.puts
 
     if issue.column do
-      offset = String.length(line) - String.length(String.strip(line))
+      offset = String.length(line) - String.length(String.trim(line))
       [
           String.duplicate(" ", x), :faint, String.duplicate("^", w),
       ]
@@ -360,7 +360,7 @@ defmodule CredoSampleModule do
     if issue.column do
       IO.puts "."
     else
-      String.strip(filename)
+      String.trim(filename)
       IO.puts "x"
     end
   end
@@ -435,11 +435,11 @@ defmodule CredoSampleModule do
     parameter1
   end
   def some_function2(parameter1, parameter2) do
-   String.strip(parameter1)
+   String.trim(parameter1)
    parameter1
    end
    def some_function3(parameter1, parameter2) do
-     String.strip(parameter1)
+     String.trim(parameter1)
      parameter1
    end
 end

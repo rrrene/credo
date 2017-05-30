@@ -13,13 +13,13 @@ defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     "Fahrenheit 451" |> String.to_char_list |> IO.inspect
 
-    "Fahrenheit 451" |> String.strip
+    "Fahrenheit 451" |> String.trim
 
     do_something() |> then_something_else() |> and_last_step()
 
     something
     |> String.downcase
-    |> String.strip
+    |> String.trim
 
     :something
     |> is_atom
@@ -145,9 +145,9 @@ end
 
   test "it should NOT report a violation for an excluded function call" do
 """
-String.strip("users") |> String.upcase
+String.trim("users") |> String.upcase
 """ |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+    |> refute_issues(@described_check, excluded_functions: ~w(String.trim table put_in))
   end
 
   test "it should NOT report a violation for an excluded function call /2" do
@@ -156,7 +156,7 @@ table("users")
 |> insert(%{name: "Bob Jones"})
 |> DB.run
 """ |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+    |> refute_issues(@described_check, excluded_functions: ~w(String.trim table put_in))
   end
 
   test "it should NOT report a violation for an excluded function call /3" do
@@ -164,7 +164,7 @@ table("users")
 put_in(users["john"][:age], 28)
 |> some_other_fun()
 """ |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+    |> refute_issues(@described_check, excluded_functions: ~w(String.trim table put_in))
   end
 
   test "it should NOT report a violation for ++" do
@@ -177,7 +177,7 @@ put_in(users["john"][:age], 28)
     |> wrap()
   end
 """ |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+    |> refute_issues(@described_check, excluded_functions: ~w(String.trim table put_in))
   end
 
   test "it should NOT report a violation for --" do
@@ -215,7 +215,7 @@ defmodule Test do
   end
 end
 """ |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(String.strip table put_in))
+    |> refute_issues(@described_check, excluded_functions: ~w(String.trim table put_in))
   end
 
   #
@@ -224,10 +224,10 @@ end
 
   test "it should report a violation for a function call" do
 """
-String.strip("nope") |> String.upcase
-String.strip("nope")
+String.trim("nope") |> String.upcase
+String.trim("nope")
 |> String.downcase
-|> String.strip
+|> String.trim
 """ |> to_source_file
     |> assert_issues(@described_check)
   end

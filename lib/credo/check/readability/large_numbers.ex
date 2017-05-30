@@ -117,7 +117,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 1))
-      |> String.strip
+      |> String.trim
       |> String.replace(~r/\D$/, "")
 
     if Version.match?(System.version, "< 1.3.2-dev") do
@@ -141,7 +141,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 2 + underscores))
-      |> String.strip
+      |> String.trim
       |> String.replace(~r/\D$/, "")
     else
       first_fragment

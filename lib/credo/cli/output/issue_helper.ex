@@ -96,7 +96,7 @@ defmodule Credo.CLI.Output.IssueHelper do
   end
   defp print_issue_line(%Issue{} = issue, source_file, inner_color, outer_color, term_width) do
     raw_line = SourceFile.line_at(source_file, issue.line_no)
-    line = String.strip(raw_line)
+    line = String.trim(raw_line)
 
     [outer_color, :faint]
     |> UI.edge
@@ -116,7 +116,7 @@ defmodule Credo.CLI.Output.IssueHelper do
     nil
   end
   defp print_issue_trigger_marker(%Issue{} = issue, line, inner_color, outer_color) do
-    offset = String.length(line) - String.length(String.strip(line))
+    offset = String.length(line) - String.length(String.trim(line))
     x = max(issue.column - offset - 1, 0) # column is one-based
     w =
       case issue.trigger do

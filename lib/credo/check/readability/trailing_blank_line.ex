@@ -23,7 +23,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
       |> SourceFile.lines
       |> List.last
 
-    if String.strip(last_line) == "" do
+    if String.trim(last_line) == "" do
       []
     else
       [issue_for(issue_meta, line_no)]

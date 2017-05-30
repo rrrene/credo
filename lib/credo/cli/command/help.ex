@@ -78,7 +78,7 @@ output = """
 #      \\/___/  \\/_/ \\/____/\\/__,_ /\\/___/
 #
 """
-    String.strip(output)
+    String.trim(output)
   end
 
 end

@@ -9,7 +9,7 @@ defmodule Credo.CLI.Output.UITest do
     lines =
 """
 These checks take a look at your code and ensure a consistent coding style. Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you.
-""" |> String.strip |> UI.wrap_at(80)
+""" |> String.trim |> UI.wrap_at(80)
     expected = [
       "These checks take a look at your code and ensure a consistent coding style. ",
       "Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you."
