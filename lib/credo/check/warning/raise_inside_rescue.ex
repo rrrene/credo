@@ -42,10 +42,11 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   defp traverse({:try, _meta, _arguments} = ast, issues, issue_meta) do
     case Block.rescue_block_for(ast) do
       {:ok, branches} ->
-        issues_found =
+        {_, issues_found} =
           branches
           |> Enum.map(&extract_block/1)
-          |> List.foldr([], &issue_for_block(&1, &2, issue_meta))
+          |> Enum.reject(&is_nil/1)
+          |> Macro.prewalk([], &find_issues(&1, &2, issue_meta))
         {ast, issues ++ issues_found}
       :otherwise ->
         {ast, issues}
@@ -53,27 +54,21 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   end
   defp traverse(ast, issues, _issue_meta), do: {ast, issues}
 
-  defp extract_block({:->, _m, [_binding, {:__block__, _b_m, block}]}), do: block
-  defp extract_block(_), do: []
+  defp extract_block({:->, _m, [_binding, expression]}), do: expression
+  defp extract_block(_), do: nil
 
-  defp issue_for_block(block, issues, issue_meta) do
-    issue = Enum.find_value(block, fn
-      {:raise, raise_meta, _arguments} ->
-        issue_for(raise_meta, issue_meta)
-      _ ->
-        nil
-    end)
+  defp find_issues({:raise, meta, _arguments} = ast, issues, issue_meta) do
+    line = meta[:line]
+    issue = issue_for(issue_meta, line)
 
-    case issue do
-      nil -> issues
-      issue -> [issue | issues]
-    end
+    {ast, issues ++ [issue]}
   end
+  defp find_issues(ast, issues, _), do: {ast, issues}
 
-  defp issue_for(raise_meta, issue_meta) do
+  defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
       message: "Use reraise inside a rescue block to preserve the original stacktrace.",
       trigger: "raise",
-      line_no: raise_meta[:line]
+      line_no: line_no
   end
 end
