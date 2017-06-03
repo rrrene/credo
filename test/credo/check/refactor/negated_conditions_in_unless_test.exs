@@ -27,6 +27,11 @@ end
 """
 defmodule CredoSampleModule do
   @unless !allowed?
+
+  def some_fun do
+    unless = 123
+    :unless
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
