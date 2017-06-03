@@ -110,7 +110,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Avoid negated conditions in unless blocks.",
+      message: "Avoid long quote blocks.",
       trigger: "quote",
       line_no: line_no
   end
