@@ -30,6 +30,9 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  defp traverse({:@, _, [{:unless, _, _}]} = ast, issues, _issue_meta) do
+    {nil, issues}
+  end
   defp traverse({:unless, meta, arguments} = ast, issues, issue_meta) do
     issue = issue_for_first_condition(List.first(arguments), meta, issue_meta)
 

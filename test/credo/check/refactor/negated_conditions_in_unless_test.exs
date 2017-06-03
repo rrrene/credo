@@ -23,6 +23,15 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /2" do
+"""
+defmodule CredoSampleModule do
+  @unless !allowed?
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
