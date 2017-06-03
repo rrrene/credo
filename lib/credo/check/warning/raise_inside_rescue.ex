@@ -10,10 +10,9 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
       try do
         raise "oops"
       rescue
-        e ->
-          stacktrace = System.stacktrace # get the stacktrace of the exception
+        error ->
           Logger.warn("An exception has occurred")
-          reraise e, stacktrace
+          reraise error, System.stacktrace
       end
 
       # to
@@ -21,9 +20,9 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
       try do
         raise "oops"
       rescue
-        e ->
+        error ->
           Logger.warn("An exception has occurred")
-          raise e
+          raise error
       end
   """
 
@@ -41,25 +40,18 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
 
   defp traverse({:try, _meta, _arguments} = ast, issues, issue_meta) do
     case Block.rescue_block_for(ast) do
-      {:ok, branches} ->
-        {_, issues_found} =
-          branches
-          |> Enum.map(&extract_block/1)
-          |> Enum.reject(&is_nil/1)
-          |> Macro.prewalk([], &find_issues(&1, &2, issue_meta))
+      {:ok, ast} ->
+        issues_found = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta))
+
         {ast, issues ++ issues_found}
-      :otherwise ->
+      _ ->
         {ast, issues}
     end
   end
   defp traverse(ast, issues, _issue_meta), do: {ast, issues}
 
-  defp extract_block({:->, _m, [_binding, expression]}), do: expression
-  defp extract_block(_), do: nil
-
   defp find_issues({:raise, meta, _arguments} = ast, issues, issue_meta) do
-    line = meta[:line]
-    issue = issue_for(issue_meta, line)
+    issue = issue_for(issue_meta, meta[:line])
 
     {ast, issues ++ [issue]}
   end
@@ -67,7 +59,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Use reraise inside a rescue block to preserve the original stacktrace.",
+      message: "Use `reraise` inside a rescue block to preserve the original stacktrace.",
       trigger: "raise",
       line_no: line_no
   end
