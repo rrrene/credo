@@ -23,6 +23,21 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /2" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  def catcher do
+    try do
+      raise "oops"
+    end
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should report a violation when raise appears inside of a rescue block" do
 """
 defmodule CredoSampleModule do
