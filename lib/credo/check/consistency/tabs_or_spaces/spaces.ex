@@ -3,14 +3,14 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Spaces do
 
   def property_value, do: :spaces
 
-  def property_value_for(%SourceFile{filename: filename} = source_file, _params) do
-    lines = SourceFile.lines(source_file)
-
-    Enum.map(lines, &property_value_for_line(&1, filename))
+  def property_value_for(source_file, _params) do
+    source_file
+    |> SourceFile.lines
+    |> Enum.map(&property_value_for_line/1)
   end
 
-  defp property_value_for_line({line_no, "  " <> _line}, filename) do
-    PropertyValue.for(property_value(), filename: filename, line_no: line_no)
+  defp property_value_for_line({line_no, "  " <> _line}) do
+    PropertyValue.for(property_value(), line_no: line_no)
   end
-  defp property_value_for_line({_, _}, _), do: nil
+  defp property_value_for_line({_, _}), do: nil
 end

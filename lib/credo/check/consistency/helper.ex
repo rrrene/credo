@@ -12,8 +12,8 @@ defmodule Credo.Check.Consistency.Helper do
 
     {value, meta}
 
-  value can be anything imaginable, meta should contain a filename
-  (optionally with a line_no, trigger, etc.) or an AST
+  value can be anything imaginable, meta contains location information
+  (line_no, trigger) and optional key-value pairs.
 
   a `property_list` is simply a list of property_values
 

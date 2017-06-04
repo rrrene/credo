@@ -35,8 +35,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.WithoutSpace do
   defp to_property_values({{line_no, column, _}, trigger}, source_file) do
     to_property_values(line_no, column, trigger, source_file)
   end
-  defp to_property_values(line_no, column, trigger, source_file) do
-    PropertyValue.for(property_value(), filename: source_file.filename, line_no: line_no, column: column, trigger: trigger)
+  defp to_property_values(line_no, column, trigger, _source_file) do
+    PropertyValue.for(property_value(), line_no: line_no, column: column, trigger: trigger)
   end
 
   defp check_tokens([], acc), do: acc
