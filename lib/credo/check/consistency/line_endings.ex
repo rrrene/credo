@@ -25,8 +25,7 @@ defmodule Credo.Check.Consistency.LineEndings do
   defp issues_for(expected, {[actual], source_file, params}) do
     source_file
     |> IssueMeta.for(params)
-    |> format_issue(message: "File is using #{actual} line endings\
-while most of the files use #{expected} line endings.")
+    |> format_issue(message: "File is using #{actual} line endings while most of the files use #{expected} line endings.")
     |> List.wrap
   end
 end

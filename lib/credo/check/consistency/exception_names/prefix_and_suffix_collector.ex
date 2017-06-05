@@ -30,8 +30,8 @@ defmodule Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector do
     suffix = List.last(name_list)
 
     [
-      PropertyValue.for({prefix, :prefix}, [line_no: meta[:line]]),
-      PropertyValue.for({suffix, :suffix}, [line_no: meta[:line]])
+      PropertyValue.for({prefix, :prefix}, line_no: meta[:line]),
+      PropertyValue.for({suffix, :suffix}, line_no: meta[:line])
     ]
   end
 end
