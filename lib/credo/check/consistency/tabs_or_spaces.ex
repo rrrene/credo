@@ -13,33 +13,29 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
   """
 
   @explanation [check: @moduledoc]
-  @code_patterns [
-    Credo.Check.Consistency.TabsOrSpaces.Tabs,
-    Credo.Check.Consistency.TabsOrSpaces.Spaces
-  ]
 
-  alias Credo.Check.Consistency.Helper
-  alias Credo.Check.PropertyValue
+  @collector Credo.Check.Consistency.TabsOrSpaces.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
     source_files
-    |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.append_issues_via_issue_service(&issue_for/5, params, exec)
+    |> @collector.find_issues(params, &issues_for/2)
+    |> Enum.uniq
+    |> Enum.each(&(@collector.insert_issue(&1, exec)))
 
     :ok
   end
 
-  defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
-  defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
-  defp issue_for(issue_meta, actual_prop, expected_prop, _picked_count, _total_count) do
-    line_no = PropertyValue.meta(actual_prop, :line_no)
-    actual_prop = PropertyValue.get(actual_prop)
+  defp issues_for(expected, {[actual], source_file, params}) do
+    issue_meta = IssueMeta.for(source_file, params)
+    lines_with_issues = @collector.find_locations(actual, source_file)
 
-    format_issue issue_meta,
-      message: "File is using #{actual_prop} while most of the files use #{expected_prop} for indentation.",
-      line_no: line_no
+    Enum.map(lines_with_issues, fn(line_no) ->
+      format_issue issue_meta,
+        message: "File is using #{actual} while most of the files use #{expected} for indentation.",
+        line_no: line_no
+    end)
   end
 end
