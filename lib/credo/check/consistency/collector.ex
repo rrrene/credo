@@ -13,7 +13,7 @@ defmodule Credo.Check.Consistency.Collector do
   (e.g. %{with_space: 50, without_space: 40}) for a given file.
   """
   @callback collect_values(source_file :: SourceFile.t, params :: Keyword.t)
-    :: %{required(atom) => non_neg_integer} | %{}
+    :: %{atom => non_neg_integer} | %{}
 
   @doc """
   `find_locations` returns metadata for each occurrence of a match
