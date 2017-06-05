@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- Fix misleading issue message for `LongQuoteBlocks`
+
 ## 0.8.0
 
 - Load source files in parallel
