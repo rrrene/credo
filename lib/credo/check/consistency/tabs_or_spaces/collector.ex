@@ -6,6 +6,7 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Collector do
     |> SourceFile.lines
     |> Enum.reduce(%{}, fn(line, stats) ->
         match = indented_with(line)
+
         if match, do: Map.update(stats, match, 1, &(&1 + 1)), else: stats
       end)
   end
