@@ -38,6 +38,8 @@ defmodule Credo.Execution do
             config_comment_map: %{},
             lint_attribute_map: %{} # maps filenames to @lint attributes
 
+  @type t :: module
+
   @doc """
   Returns the checks that should be run for a given `exec` struct.
 
