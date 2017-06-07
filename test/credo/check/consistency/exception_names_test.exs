@@ -3,6 +3,19 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   @described_check Credo.Check.Consistency.ExceptionNames
 
+  test "it should NOT report modules without defexception" do
+    [
+"""
+defmodule UriParserError
+""",
+"""
+defmodule SomeOtherException
+"""
+    ]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report correct behaviour (same suffix)" do
     [
 """
@@ -58,8 +71,6 @@ end
     |> refute_issues(@described_check)
   end
 
-
-
   test "it should report a violation for different naming schemes" do
     [
 """
@@ -76,9 +87,11 @@ end
 """
     ]
     |> to_source_files
-    |> assert_issue(@described_check)
+    |> assert_issue(@described_check, fn(issue) ->
+        assert "UndefinedResponse" == issue.trigger
+        assert 1 == issue.line_no
+      end)
   end
-
 
   test "it should report a violation for different naming schemes (suffixes)" do
     [

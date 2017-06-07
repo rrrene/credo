@@ -96,7 +96,10 @@ end
       @with_and_without_spaces
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> assert_issue(@described_check, fn(issue) ->
+        assert 7 == issue.line_no
+        assert "{:" == issue.trigger
+      end)
   end
 
 end

@@ -14,40 +14,34 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   """
 
   @explanation [check: @moduledoc]
-  @code_patterns [
-    Credo.Check.Consistency.ParameterPatternMatching.PositionCollector
-  ]
 
-  alias Credo.Check.Consistency.Helper
-  alias Credo.Check.PropertyValue
+  @collector Credo.Check.Consistency.ParameterPatternMatching.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
     source_files
-    |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.append_issues_via_issue_service(&issue_for/5, params, exec)
+    |> @collector.find_issues(params, &issues_for/2)
+    |> Enum.each(&(@collector.insert_issue(&1, exec)))
 
     :ok
   end
 
-  defp message_for(:after) do
-    "the variable name after the pattern"
+  defp issues_for(expected, {[actual], source_file, params}) do
+    issue_meta = IssueMeta.for(source_file, params)
+    issue_locations = @collector.find_locations(actual, source_file)
+
+    Enum.map(issue_locations, fn(location) ->
+      format_issue issue_meta,
+        [{:message, message_for(expected, actual)} | location]
+    end)
   end
 
-  defp message_for(:before) do
-    "the variable name before the pattern"
+  defp message_for(expected, actual) do
+    "File has #{message_for(actual)} while most of the files have #{message_for(expected)} when naming parameter pattern matches"
   end
 
-  defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
-  defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
-  defp issue_for(issue_meta, actual_prop, expected_prop, _picked_count, _total_count) do
-    line_no = PropertyValue.meta(actual_prop, :line_no)
-    actual_prop = PropertyValue.get(actual_prop)
-
-    format_issue issue_meta,
-      message: "File has #{message_for(actual_prop)} while most of the files have #{message_for(expected_prop)} when naming parameter pattern matches",
-      line_no: line_no
-  end
+  defp message_for(:after), do: "the variable name after the pattern"
+  defp message_for(:before), do: "the variable name before the pattern"
 end

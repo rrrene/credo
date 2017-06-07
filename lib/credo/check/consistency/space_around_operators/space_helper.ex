@@ -59,6 +59,4 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def position({_, pos, _, _}), do: pos
   def position({_, pos, _}), do: pos
   def position({_, pos}), do: pos
-
-  def trigger_token({_, pos_tuple, trigger}), do: {pos_tuple, trigger}
 end

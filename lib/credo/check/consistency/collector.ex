@@ -9,19 +9,19 @@ defmodule Credo.Check.Consistency.Collector do
   alias Credo.SourceFile
 
   @doc """
-  `collect_values` returns a map of matches (atoms) and their frequencies
+  `collect_values` returns a map of matches and their frequencies
   (e.g. %{with_space: 50, without_space: 40}) for a given file.
   """
   @callback collect_values(source_file :: SourceFile.t, params :: Keyword.t)
-    :: %{atom => non_neg_integer} | %{}
+    :: %{term => non_neg_integer}
 
   @doc """
   `find_locations` returns metadata for each occurrence of a match
   in a given file. It is called only when the file is known to contain
   the match.
   """
-  @callback find_locations(match :: atom, source_file :: SourceFile.t)
-    :: list(any)
+  @callback find_locations(match :: term, source_file :: SourceFile.t)
+    :: list(term)
 
   @optional_callbacks find_locations: 2
 
@@ -31,7 +31,7 @@ defmodule Credo.Check.Consistency.Collector do
   (the latter two are required to build an IssueMeta).
   """
   @type issue_formatter ::
-    (atom, {nonempty_list(atom), SourceFile.t, Keyword.t} -> [Issue.t])
+    (term, {nonempty_list(term), SourceFile.t, Keyword.t} -> [Issue.t])
 
   defmacro __using__(_opts) do
     quote do
@@ -45,7 +45,7 @@ defmodule Credo.Check.Consistency.Collector do
       @spec find_issues(
         [SourceFile.t], Keyword.t, Collector.issue_formatter) :: [Issue.t]
       def find_issues(source_files, params, issue_formatter) when is_list(source_files) and is_function(issue_formatter) do
-          Collector.issues(source_files, __MODULE__, params, issue_formatter)
+        Collector.issues(source_files, __MODULE__, params, issue_formatter)
       end
 
       @spec insert_issue(Issue.t, Credo.Execution.t) :: term
@@ -61,24 +61,28 @@ defmodule Credo.Check.Consistency.Collector do
         {file, collector.collect_values(file, params)}
       end)
 
-    {most_frequent, _frequency} =
-      frequencies_per_file
-      |> total_frequencies
-      |> Enum.max_by(&elem(&1, 1))
+    frequencies = total_frequencies(frequencies_per_file)
 
-    frequencies_per_file
-    |> issues_per_file(most_frequent, params)
-    |> Enum.flat_map(&issue_formatter.(most_frequent, &1))
+    if map_size(frequencies) > 0 do
+      {most_frequent, _frequency} =
+        Enum.max_by(frequencies, &elem(&1, 1))
+
+      frequencies_per_file
+      |> issues_per_file(most_frequent, params)
+      |> Enum.flat_map(&issue_formatter.(most_frequent, &1))
+    else
+      []
+    end
   end
 
   defp issues_per_file(frequencies_per_file, most_frequent, params) do
-    Enum.reduce(frequencies_per_file, [], fn({file, frequencies}, with_issues) ->
+    Enum.reduce(frequencies_per_file, [], fn({file, frequencies}, acc) ->
       invalid_values = Map.keys(frequencies) -- [most_frequent]
 
       if invalid_values != [] do
-        [{invalid_values, file, params} | with_issues]
+        [{invalid_values, file, params} | acc]
       else
-        with_issues
+        acc
       end
     end)
   end
