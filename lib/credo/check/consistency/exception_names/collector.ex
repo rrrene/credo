@@ -7,6 +7,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
 
   def collect_values(source_file, _params) do
     exception_recorder = &record_exception/2
+
     Code.prewalk(source_file, &traverse(exception_recorder, &1, &2), %{})
   end
 
@@ -16,7 +17,10 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
   """
   def find_locations_not_matching(kind, source_file) do
     location_recorder = &record_not_matching(kind, &1, &2)
-    Code.prewalk(source_file, &traverse(location_recorder, &1, &2), [])
+
+    source_file
+    |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Enum.reverse
   end
 
   defp traverse(callback, {:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, acc) do
