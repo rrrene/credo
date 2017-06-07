@@ -27,110 +27,32 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   """
 
   @explanation [check: @moduledoc]
-  @code_patterns [
-    Credo.Check.Consistency.ExceptionNames.PrefixAndSuffixCollector
-  ]
 
-  alias Credo.Check.Consistency.Helper
-  alias Credo.Code.Module
-  alias Credo.Code.Name
+  @collector Credo.Check.Consistency.ExceptionNames.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    {property_tuples, most_picked} =
-      Helper.run_code_patterns(source_files, @code_patterns, params)
-
-    count =
-      Enum.reduce(property_tuples, 0, fn({prop_list, _}, acc) ->
-        acc + Enum.count(prop_list)
-      end)
-
-    if count > 2 do # we found more than one prefix and one suffix
-      info_tuple = {property_tuples, most_picked}
-      Helper.append_issues_via_issue_service(info_tuple, &check_for_issues/5, params, exec)
-    end
+    source_files
+    |> @collector.find_issues(params, &issues_for/2)
+    |> Enum.each(&(@collector.insert_issue(&1, exec)))
 
     :ok
   end
 
-  defp check_for_issues(_issue_meta, _actual_prop, nil, _picked_count, _total_count), do: nil
-  defp check_for_issues(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
-  defp check_for_issues(issue_meta, _actual_prop, expected_prop, _picked_count, _total_count) do
-    source_file = IssueMeta.source_file(issue_meta)
-    case expected_prop do
-      {prefix, :prefix} ->
-        source_file
-        |> find_exception_modules_without_prefix(prefix)
-        |> issues_for_wrong(:prefix, issue_meta, prefix)
-      {suffix, :suffix} ->
-        source_file
-        |> find_exception_modules_without_suffix(suffix)
-        |> issues_for_wrong(:suffix, issue_meta, suffix)
-      _ -> nil
-    end
+  defp issues_for(expected, {_actual, source_file, params}) do
+    issue_meta = IssueMeta.for(source_file, params)
+    issue_locations =
+      @collector.find_locations_not_matching(expected, source_file)
+
+    Enum.map(issue_locations, fn(location) ->
+      format_issue issue_meta,
+        [{:message, message_for(expected, location[:trigger])} | location]
+    end)
   end
 
-  defp find_exception_modules_without_suffix(%SourceFile{} = source_file, suffix) do
-    source_file
-    |> Credo.Code.prewalk(&find_exception_modules(&1, &2))
-    |> Enum.reject(&name_with_suffix?(&1, suffix))
-  end
-
-  defp find_exception_modules_without_prefix(%SourceFile{} = source_file, prefix) do
-    source_file
-    |> Credo.Code.prewalk(&find_exception_modules(&1, &2))
-    |> Enum.reject(&name_with_prefix?(&1, prefix))
-  end
-
-  defp find_exception_modules({:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, exception_names) do
-    if Module.exception?(ast) do
-      {ast, exception_names ++ [ast]}
-    else
-      {ast, exception_names}
-    end
-  end
-  defp find_exception_modules(ast, exception_names) do
-    {ast, exception_names}
-  end
-
-  defp name_with_suffix?(module_ast, suffix) do
-    last_name =
-      module_ast
-      |> Module.name
-      |> Name.split_pascal_case
-      |> List.last
-
-    last_name == suffix
-  end
-
-  defp name_with_prefix?(module_ast, prefix) do
-    first_name =
-      module_ast
-      |> Module.name
-      |> Name.split_pascal_case
-      |> List.first
-
-    first_name == prefix
-  end
-
-  defp issues_for_wrong(exception_list, prefix_or_suffix, issue_meta, suffix) do
-    exception_list
-    |> Enum.map(&issue_for_wrong(&1, prefix_or_suffix, issue_meta, suffix))
-    |> Enum.reject(&is_nil/1)
-  end
-
-  defp issue_for_wrong({:defmodule, meta, _} = ast, prefix_or_suffix, issue_meta, expected) do
-    trigger = Module.name(ast)
-
-    format_issue issue_meta,
-      message: message_for(prefix_or_suffix, expected, trigger),
-      line_no: meta[:line],
-      trigger: trigger
-  end
-
-  def message_for(:prefix, expected, trigger) do
+  defp message_for({:prefix, expected}, trigger) do
     message =
       """
       Exception modules should be named consistently.
@@ -140,7 +62,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
     to_one_line(message)
   end
-  def message_for(:suffix, expected, trigger) do
+  defp message_for({:suffix, expected}, trigger) do
     message =
       """
       Exception modules should be named consistently.
