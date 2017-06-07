@@ -40,7 +40,7 @@ end
     result =
       @single
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{single: 3} == result
   end
@@ -50,7 +50,7 @@ end
     result =
       @multi
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{multi: 4} == result
   end
@@ -60,7 +60,7 @@ end
     result =
       @mixed
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{single: 1, multi: 1} == result
   end

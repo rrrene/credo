@@ -1,7 +1,7 @@
 defmodule Credo.Check.Consistency.LineEndings.Collector do
   use Credo.Check.Consistency.Collector
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     source_file
     |> SourceFile.lines
     |> Enum.reduce(%{}, fn(line, stats) ->

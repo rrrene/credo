@@ -5,7 +5,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   import Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper,
     only: [operator?: 1, space_between?: 2, no_space_between?: 2, usually_no_space_before?: 3, usually_no_space_after?: 3]
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     source_file
     |> Code.to_tokens
     |> traverse_tokens(&record_spaces(&1, &2, &3, &4), %{})

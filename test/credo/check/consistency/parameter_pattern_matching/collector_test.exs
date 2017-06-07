@@ -30,7 +30,7 @@ defmodule Credo.Check.Readability.ParameterPatternMatching.CollectorTest do
     result =
       @special_cases
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{before: 6, after: 5} == result
   end

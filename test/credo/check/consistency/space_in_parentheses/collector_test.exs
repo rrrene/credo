@@ -40,14 +40,14 @@ another_string = ~s\"\"\"
     without_spaces =
       @without_spaces
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{without_space: 2} == without_spaces
 
     with_spaces =
       @with_spaces
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{with_space: 1} == with_spaces
   end
@@ -56,7 +56,7 @@ another_string = ~s\"\"\"
     values =
       @heredoc_example
       |> to_source_file
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{} == values
   end

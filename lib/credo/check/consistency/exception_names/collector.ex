@@ -5,7 +5,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
   alias Credo.Code.Name
   alias Credo.Code
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     exception_recorder = &record_exception/2
 
     Code.prewalk(source_file, &traverse(exception_recorder, &1, &2), %{})

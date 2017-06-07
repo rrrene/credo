@@ -5,7 +5,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
 
   @directives [:alias, :import, :require, :use]
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     source_file
     |> Code.prewalk(&traverse/2, [])
     |> group_usages
