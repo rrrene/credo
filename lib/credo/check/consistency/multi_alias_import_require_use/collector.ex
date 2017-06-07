@@ -36,7 +36,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
   defp traverse(ast, acc), do: {ast, acc}
 
   defp group_usages(usages) do
-    Enum.split_with(usages, fn
+    split_with(usages, fn
       {_directive, :multi, _line_no} -> true
       _ -> false
     end)
@@ -61,14 +61,27 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
       fn({_directive, :multi, line_no}) -> line_no end)
   end
 
-  defp multiple_single_locations(multiple_single_usages) do
-    multiple_single_usages
+  defp multiple_single_locations(single_usages) do
+    single_usages
     |> Enum.group_by(
-        fn({directive, base_name, _line_no}) -> {directive, base_name} end,
-        fn({_directive, _base_name, line_no}) -> line_no end)
+        fn({directive, base_name, _line_no}) -> {directive, base_name} end)
     |> Enum.filter(
-        fn({_grouped_by, line_nos}) -> Enum.count(line_nos) > 1 end)
+        fn({_grouped_by, occurrences}) -> Enum.count(occurrences) > 1 end)
     |> Enum.map(
-        fn({_grouped_by, line_nos}) -> List.first(line_nos) end)
+        fn({_grouped_by, [{_, _, line_no} | _]}) -> line_no end)
+  end
+
+  # Enum.split_with/2 is not available on Elixir < 1.4
+  # see https://github.com/elixir-lang/elixir/blob/v1.4.4/lib/elixir/lib/enum.ex#L1620
+  defp split_with(enumerable, fun) when is_function(fun, 1) do
+    {acc1, acc2} =
+      Enum.reduce(enumerable, {[], []}, fn(entry, {acc1, acc2}) ->
+        if fun.(entry) do
+          {[entry | acc1], acc2}
+        else
+          {acc1, [entry | acc2]}
+        end
+      end)
+    {:lists.reverse(acc1), :lists.reverse(acc2)}
   end
 end
