@@ -9,7 +9,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     without_space: ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/
   ]
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     source_file
     |> CodeHelper.clean_charlists_strings_sigils_and_comments
     |> Code.to_lines

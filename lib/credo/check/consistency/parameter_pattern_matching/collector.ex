@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
 
   alias Credo.Code
 
-  def collect_values(source_file, _params) do
+  def collect_matches(source_file, _params) do
     position_recorder = &record_position/4
 
     Code.prewalk(source_file, &traverse(position_recorder, &1, &2), %{})

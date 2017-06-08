@@ -72,7 +72,7 @@ end
     result =
       @with_space
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{with_space: 18} == result
   end
@@ -81,7 +81,7 @@ end
     result =
       @without_space
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{without_space: 1} == result
   end
@@ -90,7 +90,7 @@ end
     result =
       @mixed
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{with_space: 2, without_space: 2} == result
   end
@@ -100,7 +100,7 @@ end
     result =
       @with_spaces_special_cases
       |> to_source_file()
-      |> Collector.collect_values([])
+      |> Collector.collect_matches([])
 
     assert %{} == Map.delete(result, :with_spaces)
   end
