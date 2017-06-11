@@ -12,11 +12,11 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     |> count_occurrences
   end
 
-  def find_locations(matching, source_file) do
+  def find_locations_not_matching(expected, source_file) do
     source_file
     |> Code.prewalk(&traverse/2, [])
     |> group_usages
-    |> filter_locations(matching)
+    |> drop_locations(expected)
   end
 
   defp traverse({directive, meta, arguments} = ast, acc) when directive in @directives do
@@ -52,9 +52,9 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     |> Enum.into(%{})
   end
 
-  defp filter_locations({multi, _}, :multi), do: multi_locations(multi)
+  defp drop_locations({_, single}, :multi), do: multiple_single_locations(single)
 
-  defp filter_locations({_, single}, :single), do: multiple_single_locations(single)
+  defp drop_locations({multi, _}, :single), do: multi_locations(multi)
 
   defp multi_locations(multi_usages) do
     Enum.map(multi_usages,

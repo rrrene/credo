@@ -14,18 +14,20 @@ defmodule Credo.Check.Consistency.LineEndings do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> @collector.find_issues(params, &issues_for/2)
-    |> Enum.uniq
-    |> Enum.each(&(@collector.insert_issue(&1, exec)))
-
-    :ok
+    @collector.create_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issues_for(expected, {[actual], source_file, params}) do
+  defp issues_for(expected, source_file, params) do
     source_file
     |> IssueMeta.for(params)
-    |> format_issue(message: "File is using #{actual} line endings while most of the files use #{expected} line endings.")
+    |> format_issue(message: message_for(expected))
     |> List.wrap
+  end
+
+  defp message_for(:unix = _expected) do
+    "File is using windows line endings while most of the files use unix line endings."
+  end
+  defp message_for(:windows = _expected) do
+    "File is using unix line endings while most of the files use windows line endings."
   end
 end
