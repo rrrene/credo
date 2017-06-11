@@ -2,6 +2,8 @@ defmodule Credo.Check.Design.TagHelper do
   alias Credo.Check.CodeHelper
   alias Credo.SourceFile
 
+  use Backports
+
   @doc_attribute_names [:doc, :moduledoc, :shortdoc]
 
   def tags(source_file, tag_name, include_doc?) do

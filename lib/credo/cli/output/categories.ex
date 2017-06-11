@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.Categories do
+  use Backports
+
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
 

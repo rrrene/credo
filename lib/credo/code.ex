@@ -12,6 +12,8 @@ defmodule Credo.Code do
   `Credo.Check.CodeHelper`.
   """
 
+  use Backports
+
   alias Credo.SourceFile
 
   defmodule ParserError do

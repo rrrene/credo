@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.UI do
+  use Backports
+
   @edge "┃"
   @ellipsis "…"
   @shell_service Credo.CLI.Output.Shell

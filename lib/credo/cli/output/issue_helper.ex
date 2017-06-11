@@ -6,6 +6,8 @@ defmodule Credo.CLI.Output.IssueHelper do
   alias Credo.Issue
   alias Credo.SourceFile
 
+  use Backports
+
   @indent 8
 
   def print_issues(issues, source_file_map, %Execution{format: _} = exec, term_width) do

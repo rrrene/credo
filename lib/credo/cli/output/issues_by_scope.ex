@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.IssuesByScope do
+  use Backports
+
   alias Credo.Code.Scope
   alias Credo.CLI.Filename
   alias Credo.CLI.Filter
@@ -7,6 +9,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
   alias Credo.CLI.Output.Summary
   alias Credo.SourceFile
   alias Credo.Issue
+
 
   @indent 8
 
