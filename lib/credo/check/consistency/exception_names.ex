@@ -34,14 +34,10 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> @collector.find_issues(params, &issues_for/2)
-    |> Enum.each(&(@collector.insert_issue(&1, exec)))
-
-    :ok
+    @collector.create_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issues_for(expected, {_actual, source_file, params}) do
+  defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     issue_locations =
       @collector.find_locations_not_matching(expected, source_file)

@@ -31,34 +31,28 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> @collector.find_issues(params, &issues_for/2)
-    |> Enum.each(&(@collector.insert_issue(&1, exec)))
-
-    :ok
+    @collector.create_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issues_for(expected, {[actual], source_file, params}) do
+  defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     issue_locations =
-      @collector.find_locations(actual, source_file)
-
-    issue_locations =
-      issue_locations
+      expected
+      |> @collector.find_locations_not_matching(source_file)
       |> Enum.reject(&ignored?(&1[:trigger], params))
       |> Enum.filter(&create_issue?(&1, issue_meta))
 
     Enum.map(issue_locations, fn(location) ->
       format_issue issue_meta,
-        message: message_for(expected, actual), line_no: location[:line_no],
+        message: message_for(expected), line_no: location[:line_no],
         column: location[:column], trigger: location[:trigger]
     end)
   end
 
-  defp message_for(:with_space, :without_space) do
+  defp message_for(:with_space = _expected) do
     "There are spaces around operators most of the time, but not here."
   end
-  defp message_for(:without_space, :with_space) do
+  defp message_for(:without_space = _expected) do
     "There are no spaces around operators most of the time, but here there are."
   end
 

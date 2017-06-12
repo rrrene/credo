@@ -24,33 +24,30 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> @collector.find_issues(params, &issues_for/2)
-    |> Enum.each(&(@collector.insert_issue(&1, exec)))
-
-    :ok
+    @collector.create_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issues_for(expected, {[actual], source_file, params}) do
+  defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    lines_with_issues = @collector.find_locations(actual, source_file)
+    lines_with_issues =
+      @collector.find_locations_not_matching(expected, source_file)
 
     lines_with_issues
-    |> Enum.filter(&create_issue?(expected, actual, &1[:trigger]))
+    |> Enum.filter(&create_issue?(expected, &1[:trigger]))
     |> Enum.map(fn(location) ->
         format_issue issue_meta,
-          location ++ [message: message_for(expected, actual)]
+          [{:message, message_for(expected)} | location]
       end)
   end
 
   # Don't create issues for `&Mod.fun/4`
-  defp create_issue?(:without_space, :with_space, ", ]"), do: false
-  defp create_issue?(_expected, _actual, _trigger), do: true
+  defp create_issue?(:without_space, ", ]"), do: false
+  defp create_issue?(_expected, _trigger), do: true
 
-  defp message_for(:without_space, :with_space) do
+  defp message_for(:without_space = _expected) do
     "There is no whitespace around parentheses/brackets most of the time, but here there is."
   end
-  defp message_for(:with_space, :without_space) do
+  defp message_for(:with_space = _expected) do
     "There is whitespace around parentheses/brackets most of the time, but here there is not."
   end
 end

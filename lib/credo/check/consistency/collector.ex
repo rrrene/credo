@@ -1,19 +1,59 @@
 defmodule Credo.Check.Consistency.Collector do
   @moduledoc """
-  `Collector` is a behavior for consistency check modules
-  that run on all source files.
+  A behavior for modules that walk through source files and
+  identify consistency issues.
+
+  When defining a consistency check, you would typically use
+  this structure for the main module, responsible
+  for formatting issue messages:
+
+      defmodule Credo.Check.Consistency.SomeCheck do
+        use Credo.Check, run_on_all: true
+
+        @collector Credo.Check.Consistency.SomeCheck.Collector
+
+        def run(source_files, exec, params \\ []) when is_list(source_files) do
+          issue_formatter = &issues_for/3
+          @collector.create_issues(source_files, exec, params, issue_formatter)
+        end
+
+        defp issues_for(expected, source_file, params) do
+          issue_meta = IssueMeta.for(source_file, params)
+          issue_locations =
+            @collector.find_locations_not_matching(expected, source_file)
+
+          Enum.map(issue_locations, fn(location) ->
+            format_issue issue_meta, message: ... # write an issue message
+          end)
+        end
+
+  The actual analysis would be performed by another module
+  implementing the `Credo.Check.Consistency.Collector` behavior:
+
+      defmodule Credo.Check.Consistency.SomeCheck.Collector do
+        use Credo.Check.Consistency.Collector
+
+        def collect_matches(source_file, params), do ...
+
+        def find_locations_not_matching(expected, source_file), do ...
+      end
+
+  Read further for more information on `collect_matches/2`,
+  `find_locations_not_matching/2`, and `issue_formatter`.
   """
 
   alias Credo.Issue
   alias Credo.SourceFile
+  alias Credo.Execution.Issues
 
   @doc """
-  The first step of a `Collector` run is counting occurrences of matches
-  (e.g. :with_space and :without_space for a space around operators check).
+  When you call `@collector.create_issues/4` inside the check module,
+  the collector first counts the occurrences of different matches
+  (e.g. :with_space and :without_space for a space around operators check)
+  per each source file.
 
-  This function produces a map of matches as keys and their frequencies
-  as values (e.g. %{with_space: 50, without_space: 40}) for a single source
-  file.
+  `collect_matches/2` produces a map of matches as keys and their frequencies
+  as values (e.g. %{with_space: 50, without_space: 40}).
 
   The maps for individual source files are then merged, producing a map
   that reflects frequency trends for the whole codebase.
@@ -25,23 +65,35 @@ defmodule Credo.Check.Consistency.Collector do
   Once the most frequent match is identified, the `Collector` looks up
   source files that have other matches (e.g. both :with_space
   and :without_space or just :without_space when :with_space is the
-  most frequent) and calls the `issue_formatter` on them (see below).
+  most frequent) and calls the `issue_formatter` function on them.
 
-  `issue_formatter` functions may call `find_locations` to obtain
-  additional metadata for each occurrence of a match in a given file.
-  """
-  @callback find_locations(match :: term, source_file :: SourceFile.t)
-    :: list(term)
-
-  @optional_callbacks find_locations: 2
-
-  @doc """
   An issue formatter produces a list of `Credo.Issue` structs
-  from expected match and a tuple of {[other_matches], source_file, params}
+  from the most frequent (expected) match, a source file
+  containing other matches, and check params
   (the latter two are required to build an IssueMeta).
   """
-  @type issue_formatter ::
-    (term, {nonempty_list(term), SourceFile.t, Keyword.t} -> [Issue.t])
+  @type issue_formatter :: (term, SourceFile.t, Keyword.t -> [Issue.t])
+
+  @doc """
+  `issue_formatter` may call the `@collector.find_locations_not_matching/2`
+  function to obtain additional metadata for each occurrence of
+  an unexpected match in a given file.
+
+  An example implementation that returns a list of line numbers on
+  which unexpected occurrences were found:
+
+      def find_locations_not_matching(expected, source_file) do
+        traverse(source_file, fn(match, line_no, acc) ->
+          if match != expected, do: acc ++ [line_no], else: acc
+        end)
+      end
+
+      defp traverse(source_file, fun), do: ...
+  """
+  @callback find_locations_not_matching(
+    expected :: term, source_file :: SourceFile.t) :: list(term)
+
+  @optional_callbacks find_locations_not_matching: 2
 
   defmacro __using__(_opts) do
     quote do
@@ -49,18 +101,17 @@ defmodule Credo.Check.Consistency.Collector do
 
       alias Credo.Issue
       alias Credo.SourceFile
-      alias Credo.Execution.Issues
+      alias Credo.Execution
       alias Credo.Check.Consistency.Collector
 
-      @spec find_issues(
-        [SourceFile.t], Keyword.t, Collector.issue_formatter) :: [Issue.t]
-      def find_issues(source_files, params, issue_formatter) when is_list(source_files) and is_function(issue_formatter) do
-        Collector.issues(source_files, __MODULE__, params, issue_formatter)
-      end
+      @spec create_issues(
+        [SourceFile.t], Execution.t, Keyword.t, Collector.issue_formatter) :: atom
+      def create_issues(source_files, exec, params, issue_formatter) when is_list(source_files) and is_function(issue_formatter) do
+        source_files
+        |> Collector.issues(__MODULE__, params, issue_formatter)
+        |> Enum.each(&(Collector.append_issue_via_issue_service(&1, exec)))
 
-      @spec insert_issue(Issue.t, Credo.Execution.t) :: term
-      def insert_issue(%Issue{filename: filename} = issue, exec) do
-        Issues.append(exec, %SourceFile{filename: filename}, issue)
+        :ok
       end
     end
   end
@@ -74,32 +125,34 @@ defmodule Credo.Check.Consistency.Collector do
     frequencies = total_frequencies(frequencies_per_file)
 
     if map_size(frequencies) > 0 do
-      {most_frequent, _frequency} =
+      {most_frequent_match, _frequency} =
         Enum.max_by(frequencies, &elem(&1, 1))
 
       frequencies_per_file
-      |> issues_per_file(most_frequent, params)
-      |> Enum.flat_map(&issue_formatter.(most_frequent, &1))
+      |> files_with_issues(most_frequent_match)
+      |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
     else
       []
     end
   end
 
-  defp issues_per_file(frequencies_per_file, most_frequent, params) do
-    Enum.reduce(frequencies_per_file, [], fn({file, frequencies}, acc) ->
-      invalid_values = Map.keys(frequencies) -- [most_frequent]
+  def append_issue_via_issue_service(%Issue{filename: filename} = issue, exec) do
+    Issues.append(exec, %SourceFile{filename: filename}, issue)
+  end
 
-      if invalid_values != [] do
-        [{invalid_values, file, params} | acc]
-      else
-        acc
-      end
-    end)
+  defp files_with_issues(frequencies_per_file, most_frequent_match) do
+    Enum.reduce(frequencies_per_file, [],
+      fn({file, stats}, acc) ->
+        unexpected_matches = Map.keys(stats) -- [most_frequent_match]
+
+        if unexpected_matches != [], do: [file | acc], else: acc
+      end)
   end
 
   defp total_frequencies(frequencies_per_file) do
-    Enum.reduce(frequencies_per_file, %{}, fn({_, frequencies}, stats) ->
-      Map.merge(stats, frequencies, fn(_k, f1, f2) -> f1 + f2 end)
-    end)
+    Enum.reduce(frequencies_per_file, %{},
+      fn({_, file_stats}, stats) ->
+        Map.merge(stats, file_stats, fn(_k, f1, f2) -> f1 + f2 end)
+      end)
   end
 end

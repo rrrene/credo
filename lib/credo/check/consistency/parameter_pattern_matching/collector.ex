@@ -9,13 +9,16 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
     Code.prewalk(source_file, &traverse(position_recorder, &1, &2), %{})
   end
 
-  def find_locations(kind, source_file) do
-    location_recorder = &record_location(kind, &1, &2, &3, &4)
+  def find_locations_not_matching(expected, source_file) do
+    location_recorder = &record_not_matching(expected, &1, &2, &3, &4)
 
     source_file
     |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
     |> Enum.reverse
   end
+
+  def actual_for(:before = _expected), do: :after
+  def actual_for(:after = _expected), do: :before
 
   defp traverse(callback, {:def, _, [{_name, _, params}, _]} = ast, acc) when is_list(params) do
     {ast, traverse_params(callback, params, acc)}
@@ -40,8 +43,8 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
     Map.update(acc, kind, 1, &(&1 + 1))
   end
 
-  defp record_location(expected_kind, kind, capture_name, meta, acc) do
-    if kind == expected_kind,
+  defp record_not_matching(expected, actual, capture_name, meta, acc) do
+    if actual != expected,
       do: [[line_no: meta[:line], trigger: capture_name] | acc], else: acc
   end
 end

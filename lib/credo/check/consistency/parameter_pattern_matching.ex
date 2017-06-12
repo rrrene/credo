@@ -21,27 +21,26 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> @collector.find_issues(params, &issues_for/2)
-    |> Enum.each(&(@collector.insert_issue(&1, exec)))
-
-    :ok
+    @collector.create_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issues_for(expected, {[actual], source_file, params}) do
+  defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    issue_locations = @collector.find_locations(actual, source_file)
+    issue_locations =
+      @collector.find_locations_not_matching(expected, source_file)
 
     Enum.map(issue_locations, fn(location) ->
       format_issue issue_meta,
-        [{:message, message_for(expected, actual)} | location]
+        [{:message, message_for(expected)} | location]
     end)
   end
 
-  defp message_for(expected, actual) do
-    "File has #{message_for(actual)} while most of the files have #{message_for(expected)} when naming parameter pattern matches"
+  defp message_for(expected) do
+    actual = @collector.actual_for(expected)
+
+    "File has #{message_for_kind(actual)} while most of the files have #{message_for_kind(expected)} when naming parameter pattern matches"
   end
 
-  defp message_for(:after), do: "the variable name after the pattern"
-  defp message_for(:before), do: "the variable name before the pattern"
+  defp message_for_kind(:after), do: "the variable name after the pattern"
+  defp message_for_kind(:before), do: "the variable name before the pattern"
 end

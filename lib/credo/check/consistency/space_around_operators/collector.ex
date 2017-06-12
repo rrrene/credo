@@ -11,10 +11,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     |> traverse_tokens(&record_spaces(&1, &2, &3, &4), %{})
   end
 
-  def find_locations(kind, source_file) do
+  def find_locations_not_matching(expected, source_file) do
     source_file
     |> Code.to_tokens
-    |> traverse_tokens(&record_locations(kind, &1, &2, &3, &4), [])
+    |> traverse_tokens(&record_not_matching(expected, &1, &2, &3, &4), [])
     |> Enum.reverse
   end
 
@@ -53,11 +53,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     if matches, do: Map.update(map, key, 1, &(&1 + 1)), else: map
   end
 
-  defp record_locations(kind, prev, current, next, acc) do
+  defp record_not_matching(expected, prev, current, next, acc) do
     match_found =
-      case kind do
-        :with_space -> with_space?(prev, current, next)
-        :without_space -> without_space?(prev, current, next)
+      case expected do
+        :with_space -> without_space?(prev, current, next)
+        :without_space -> with_space?(prev, current, next)
       end
 
     if match_found do

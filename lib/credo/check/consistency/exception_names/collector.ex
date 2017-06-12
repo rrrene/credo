@@ -11,12 +11,8 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
     Code.prewalk(source_file, &traverse(exception_recorder, &1, &2), %{})
   end
 
-  @doc """
-  Unlike `find_locations` in other Collector modules, this function
-  returns locations of exceptions that do _not_ match a given pattern.
-  """
-  def find_locations_not_matching(kind, source_file) do
-    location_recorder = &record_not_matching(kind, &1, &2)
+  def find_locations_not_matching(expected, source_file) do
+    location_recorder = &record_not_matching(expected, &1, &2)
 
     source_file
     |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
@@ -37,11 +33,11 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
     |> Map.update({:suffix, suffix}, 1, &(&1 + 1))
   end
 
-  defp record_not_matching(kind, {_, meta, _} = ast, acc) do
+  defp record_not_matching(expected, {_, meta, _} = ast, acc) do
     exception_name = Module.name(ast)
     {prefix, suffix} = prefix_and_suffix(exception_name)
 
-    case kind do
+    case expected do
       {:prefix, expected_prefix} ->
         if prefix != expected_prefix,
           do: [[line_no: meta[:line], trigger: exception_name] | acc], else: acc

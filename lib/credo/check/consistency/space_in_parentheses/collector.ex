@@ -16,11 +16,16 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     |> Enum.reduce(%{}, &spaces/2)
   end
 
-  def find_locations(kind_of_space, source_file) do
+  def find_locations_not_matching(expected, source_file) do
+    actual = case expected do
+      :with_space -> :without_space
+      :without_space -> :with_space
+    end
+
     source_file
     |> CodeHelper.clean_charlists_strings_sigils_and_comments
     |> Code.to_lines
-    |> List.foldr([], &locate(kind_of_space, &1, &2))
+    |> List.foldr([], &locate(actual, &1, &2))
   end
 
   defp spaces({_line_no, line}, acc) do
