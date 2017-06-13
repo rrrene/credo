@@ -124,6 +124,7 @@
         {Credo.Check.Warning.UnusedRegexOperation},
         {Credo.Check.Warning.UnusedStringOperation},
         {Credo.Check.Warning.UnusedTupleOperation},
+        {Credo.Check.Warning.RaiseInsideRescue},
 
         # Controversial and experimental checks (opt-in, just remove `, false`)
         #
