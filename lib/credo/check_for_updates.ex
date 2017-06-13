@@ -75,7 +75,7 @@ defmodule Credo.CheckForUpdates do
   defp fetch(url) do
     :inets.start()
     :ssl.start()
-    response = :httpc.request(:get, {String.to_charlist(url),
+    response = :httpc.request(:get, {Credo.Backports.String.to_charlist(url),
                                     [{'User-Agent', user_agent()},
                                      {'Accept', 'application/vnd.hex+erlang'}]
                                     }, [], [])

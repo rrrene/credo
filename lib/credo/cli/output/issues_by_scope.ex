@@ -54,7 +54,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       [
         :bright, "#{color}_background" |> String.to_atom, color, " ",
           Output.foreground_color(color), :normal,
-        " #{scope_name}" |> String.pad_trailing(term_width - 1),
+        " #{scope_name}" |> Credo.Backports.String.pad_trailing(term_width - 1),
       ]
       |> UI.puts
 
@@ -105,7 +105,8 @@ defmodule Credo.CLI.Output.IssuesByScope do
       |> UI.puts
 
       if issue.column do
-        offset = String.length(line) - String.length(String.trim(line))
+        trimmed_line = Credo.Backports.String.trim(line)
+        offset = String.length(line) - String.length(trimmed_line)
         x = max(issue.column - offset - 1, 0) # column is one-based
         w =
           case issue.trigger do

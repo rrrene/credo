@@ -57,7 +57,7 @@ defmodule Credo.CLI.Output.Explain do
     [
       :bright, "#{color}_background" |> String.to_atom, color, " ",
         Output.foreground_color(color), :normal,
-      " #{scope_name}" |> String.pad_trailing(term_width - 1),
+      " #{scope_name}" |> Credo.Backports.String.pad_trailing(term_width - 1),
     ]
     |> UI.puts
 
@@ -178,7 +178,7 @@ defmodule Credo.CLI.Output.Explain do
     UI.puts_edge([outer_color, :faint])
 
     (issue.check.explanation || "TODO: Insert explanation")
-    |> String.trim
+    |> Credo.Backports.String.trim
     |> String.split("\n")
     |> Enum.flat_map(&format_explanation(&1, outer_color))
     |> Enum.slice(0..-2)
@@ -200,7 +200,7 @@ defmodule Credo.CLI.Output.Explain do
 
     line_no_str =
       "#{line_no} "
-      |> String.pad_leading(@indent - 2)
+      |> Credo.Backports.String.pad_leading(@indent - 2)
 
     [
       UI.edge([outer_color, :faint]), :reset,
@@ -305,7 +305,7 @@ defmodule Credo.CLI.Output.Explain do
         [
           UI.edge([outer_color, :faint]), :reset,
             String.duplicate(" ", @indent-2),
-            :cyan, "  #{param}:" |> String.pad_trailing(params_indent+3),
+            :cyan, "  #{param}:" |> Credo.Backports.String.pad_trailing(params_indent+3),
             :reset, text
         ]
         |> UI.puts
@@ -317,7 +317,7 @@ defmodule Credo.CLI.Output.Explain do
           [
             UI.edge([outer_color, :faint]), :reset,
               String.duplicate(" ", @indent-2),
-              :cyan, " " |> String.pad_trailing(params_indent+3),
+              :cyan, " " |> Credo.Backports.String.pad_trailing(params_indent+3),
               :reset, :faint, default_text
           ]
           |> UI.puts

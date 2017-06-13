@@ -4,7 +4,7 @@ defmodule Credo.CLI.Output.UI do
   @shell_service Credo.CLI.Output.Shell
 
   def edge(color, indent \\ 2) when is_integer(indent) do
-    [:reset, color, @edge |> String.pad_trailing(indent)]
+    [:reset, color, @edge |> Credo.Backports.String.pad_trailing(indent)]
   end
   def edge, do: @edge
 

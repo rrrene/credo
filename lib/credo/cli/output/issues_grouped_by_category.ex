@@ -103,7 +103,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
     [
       :bright, "#{color}_background" |> String.to_atom, color, " ",
         Output.foreground_color(color), :normal,
-      " #{title}" |> String.pad_trailing(term_width - 1),
+      " #{title}" |> Credo.Backports.String.pad_trailing(term_width - 1),
     ]
     |> UI.puts
 
