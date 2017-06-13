@@ -10,6 +10,8 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
   Most text editors ensure this "final newline" automatically.
   """
 
+  use Backports
+
   @explanation [check: @moduledoc]
 
   use Credo.Check, base_priority: :low

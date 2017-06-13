@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.IssuesGroupedByCategory do
+  use Backports
+
   alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.IssueHelper
@@ -6,6 +8,7 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory do
   alias Credo.CLI.Output.Summary
   alias Credo.CLI.Sorter
   alias Credo.Execution
+
 
   @category_starting_order [:design, :readability, :refactor]
   @category_ending_order [:warning, :consistency, :custom, :unknown]

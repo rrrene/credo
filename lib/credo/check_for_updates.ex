@@ -2,6 +2,8 @@ defmodule Credo.CheckForUpdates do
   alias Credo.CLI.Output.UI
   alias Credo.Execution
 
+  use Backports
+
   @doc false
   def run(%Execution{check_for_updates: true} = exec) do
     run()

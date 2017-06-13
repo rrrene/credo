@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output do
+  use Backports
+
   alias Credo.CLI.Output.UI
   alias Credo.Execution
 

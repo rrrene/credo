@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Command.Help do
+  use Backports
   use Credo.CLI.Command
-
 
   @shortdoc "Show this help message"
   @ljust 12
@@ -10,6 +10,8 @@ defmodule Credo.CLI.Command.Help do
   alias Credo.CLI
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
+
+  use Backports
 
   @doc false
   def run(exec) do

@@ -1,5 +1,6 @@
 defmodule Credo.CLI.Output.UITest do
   use Credo.TestHelper
+  use Backports
 
   alias Credo.CLI.Output.UI
 

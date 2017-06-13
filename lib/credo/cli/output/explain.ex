@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.Explain do
+  use Backports
+
   alias Credo.Code.Scope
   alias Credo.CLI.Filter
   alias Credo.CLI.Output

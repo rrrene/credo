@@ -23,6 +23,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     only_greater_than: 9_999,
   ]
 
+  use Backports
   use Credo.Check, base_priority: :high, elixir_version: ">= 1.3.2"
 
   @doc false
