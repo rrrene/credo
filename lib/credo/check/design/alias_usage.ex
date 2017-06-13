@@ -48,12 +48,13 @@ defmodule Credo.Check.Design.AliasUsage do
         "Version"
       ],
       excluded_lastnames:  ~w[Access Agent Application Atom Base Behaviour
-                              Bitwise Code Dict Enum Exception File Float
-                              GenEvent GenServer HashDict HashSet IO Integer
-                              Kernel Keyword List Macro Map MapSet Module Node
-                              OptionParser Path Port Process Protocol Range
-                              Record Regex Set Stream String StringIO Supervisor
-                              System Task Tuple URI Version],
+                              Bitwise Code Date DateTime Dict Enum Exception
+                              File Float GenEvent GenServer HashDict HashSet
+                              Integer IO Kernel Keyword List Macro Map MapSet
+                              Module NaiveDateTime Node OptionParser Path Port
+                              Process Protocol Range Record Regex Registry Set
+                              Stream String StringIO Supervisor System Task Time
+                              Tuple URI Version],
       if_nested_deeper_than: 0,
       if_called_more_often_than: 0,
     ]
