@@ -40,7 +40,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:@, _, [{:unless, _, _}]} = ast, issues, _issue_meta) do
+  defp traverse({:@, _, [{:unless, _, _}]}, issues, _issue_meta) do
     {nil, issues}
   end
   defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
