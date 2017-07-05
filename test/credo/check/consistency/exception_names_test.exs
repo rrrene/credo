@@ -54,6 +54,21 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report correct behaviour (same prefix, same module)" do
+    [
+"""
+defmodule MyModule.Errors.FeatureOne do
+  defexception [:message]
+end
+defmodule MyModule.Errors.FeatureTwo do
+  defexception [:message]
+end
+"""
+    ]
+    |> to_source_files
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report correct behaviour (only one exception class)" do
     [
 """
