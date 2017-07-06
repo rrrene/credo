@@ -7,7 +7,11 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Collector do
     |> Enum.reduce(%{}, fn(line, stats) ->
         match = indentation(line)
 
-        if match, do: Map.update(stats, match, 1, &(&1 + 1)), else: stats
+        if match do
+          Map.update(stats, match, 1, &(&1 + 1))
+        else
+          stats
+        end
       end)
   end
 
@@ -15,8 +19,11 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Collector do
     source_file
     |> SourceFile.lines
     |> List.foldr([], fn({line_no, _} = line, line_nos) ->
-      if indentation(line) && indentation(line) != expected,
-        do: [line_no | line_nos], else: line_nos
+      if indentation(line) && indentation(line) != expected do
+        [line_no | line_nos]
+      else
+        line_nos
+      end
     end)
   end
 

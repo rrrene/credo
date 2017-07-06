@@ -73,7 +73,12 @@ defmodule Credo.CLI.Output.IssuesByScope do
     inner_color = Output.issue_color(issue)
     message_color  = inner_color
     filename_color = :default_color
-    tag_style = if outer_color == inner_color, do: :faint, else: :bright
+    tag_style =
+      if outer_color == inner_color do
+        :faint
+      else
+        :bright
+      end
 
     [
       UI.edge(outer_color),

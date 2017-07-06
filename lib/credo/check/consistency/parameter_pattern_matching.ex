@@ -21,7 +21,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    @collector.create_issues(source_files, exec, params, &issues_for/3)
+    @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 
   defp issues_for(expected, source_file, params) do

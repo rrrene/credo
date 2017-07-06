@@ -44,7 +44,10 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
   end
 
   defp record_not_matching(expected, actual, capture_name, meta, acc) do
-    if actual != expected,
-      do: [[line_no: meta[:line], trigger: capture_name] | acc], else: acc
+    if actual != expected do
+      [[line_no: meta[:line], trigger: capture_name] | acc]
+    else
+      acc
+    end
   end
 end

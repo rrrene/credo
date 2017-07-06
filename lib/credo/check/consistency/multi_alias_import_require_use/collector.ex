@@ -31,7 +31,11 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
           nil
       end
 
-    if aliases, do: {ast, [{directive, aliases, meta[:line]} | acc]}, else: {ast, acc}
+    if aliases do
+      {ast, [{directive, aliases, meta[:line]} | acc]}
+    else
+      {ast, acc}
+    end
   end
   defp traverse(ast, acc), do: {ast, acc}
 

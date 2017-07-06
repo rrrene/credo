@@ -30,8 +30,11 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
 
   defp spaces({_line_no, line}, acc) do
     Enum.reduce(@regex, acc, fn({kind_of_space, regex}, space_map) ->
-      if Regex.match?(regex, line),
-        do: Map.update(space_map, kind_of_space, 1, &(&1 + 1)), else: space_map
+      if Regex.match?(regex, line) do
+        Map.update(space_map, kind_of_space, 1, &(&1 + 1))
+      else
+        space_map
+      end
     end)
   end
 

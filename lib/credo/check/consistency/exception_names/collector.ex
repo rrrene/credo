@@ -20,8 +20,11 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
   end
 
   defp traverse(callback, {:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, acc) do
-    if Module.exception?(ast),
-      do: {ast, callback.(ast, acc)}, else: {ast, acc}
+    if Module.exception?(ast) do
+      {ast, callback.(ast, acc)}
+    else
+      {ast, acc}
+    end
   end
   defp traverse(_callback, ast, acc), do: {ast, acc}
 
@@ -37,13 +40,20 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
     exception_name = Module.name(ast)
     {prefix, suffix} = prefix_and_suffix(exception_name)
 
+    # TODO: how is this `case` necessary
     case expected do
       {:prefix, expected_prefix} ->
-        if prefix != expected_prefix,
-          do: [[line_no: meta[:line], trigger: exception_name] | acc], else: acc
+        if prefix != expected_prefix do
+          [[line_no: meta[:line], trigger: exception_name] | acc]
+        else
+          acc
+        end
       {:suffix, expected_suffix} ->
-        if suffix != expected_suffix,
-          do: [[line_no: meta[:line], trigger: exception_name] | acc], else: acc
+        if suffix != expected_suffix do
+          [[line_no: meta[:line], trigger: exception_name] | acc]
+        else
+          acc
+        end
     end
   end
 

@@ -10,6 +10,10 @@ defmodule Credo.Check.Consistency.LineEndings.Collector do
   end
 
   defp line_ending({_line_no, line}) do
-    if String.ends_with?(line, "\r"), do: :windows, else: :unix
+    if String.ends_with?(line, "\r") do
+      :windows
+    else
+      :unix
+    end
   end
 end

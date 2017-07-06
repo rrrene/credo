@@ -23,8 +23,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     |> skip_function_capture
     |> case do
         [prev | [current | [next | rest]]] ->
-          acc = if operator?(current),
-            do: callback.(prev, current, next, acc), else: acc
+          acc =
+            if operator?(current) do
+              callback.(prev, current, next, acc)
+            else
+              acc
+            end
 
           traverse_tokens([current | [next | rest]], callback, acc)
         _ ->
@@ -50,18 +54,25 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   end
 
   defp increment(map, key, matches) do
-    if matches, do: Map.update(map, key, 1, &(&1 + 1)), else: map
+    if matches do
+      Map.update(map, key, 1, &(&1 + 1))
+    else
+      map
+    end
   end
 
   defp record_not_matching(expected, prev, current, next, acc) do
     match_found =
       case expected do
-        :with_space -> without_space?(prev, current, next)
-        :without_space -> with_space?(prev, current, next)
+        :with_space ->
+          without_space?(prev, current, next)
+        :without_space ->
+          with_space?(prev, current, next)
       end
 
     if match_found do
       {_, {line_no, column, _}, trigger} = current
+
       [[line_no: line_no, column: column, trigger: trigger] | acc]
     else
       acc

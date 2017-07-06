@@ -90,7 +90,12 @@ defmodule Credo.CLI.Output.Explain do
     inner_color = Output.check_color(issue)
     message_color  = inner_color
     filename_color = :default_color
-    tag_style = if outer_color == inner_color, do: :faint, else: :bright
+    tag_style =
+      if outer_color == inner_color do
+        :faint
+      else
+        :bright
+      end
 
     [
       UI.edge(outer_color),
@@ -330,7 +335,11 @@ defmodule Credo.CLI.Output.Explain do
       Enum.reduce(keywords, min_indent, fn({param, _text}, current) ->
         size = param |> to_string |> String.length()
 
-        if size > current, do: size, else: current
+        if size > current do
+          size
+        else
+          current
+        end
       end)
 
     # Round up to the next multiple of 2

@@ -45,7 +45,12 @@ defmodule Credo.CLI.Output.IssueHelper do
     inner_color = Output.issue_color(issue)
     message_color  = outer_color
     filename_color = :default_color
-    tag_style = if outer_color == inner_color, do: :faint, else: :bright
+    tag_style =
+      if outer_color == inner_color do
+        :faint
+      else
+        :bright
+      end
 
     message
     |> UI.wrap_at(term_width - @indent)
