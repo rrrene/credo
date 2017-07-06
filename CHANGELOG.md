@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.2
+
+- Refactor all consistency checks, providing a nice speed improvement (thx @little-bobby-tables)
+- Improve Elixir 1.5 compatibility
+
 ## 0.8.1
 
 - Fix misleading issue message for `LongQuoteBlocks`
