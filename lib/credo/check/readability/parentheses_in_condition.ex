@@ -53,7 +53,11 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
     false
   end
   defp check_for_opening_paren({:paren_identifier, _, if_or_unless} = token, [{:"(", _} | t], _) when if_or_unless in [:if, :unless] do
-    if(Enum.any?(collect_paren_children(t),&is_do/1), do: false, else: token)
+    if Enum.any?(collect_paren_children(t), &is_do/1) do
+      false
+    else
+      token
+    end
   end
   defp check_for_opening_paren(_, _, _), do: false
 

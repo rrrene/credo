@@ -71,7 +71,7 @@ defmodule Credo.Code.Block do
   end
 
   @doc """
-  Returns the else: block of a given AST node.
+  Returns the `else` block of a given AST node.
   """
   def else_block_for!(ast) do
     case else_block_for(ast) do

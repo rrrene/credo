@@ -17,48 +17,37 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   """
 
   @explanation [check: @moduledoc]
-  @code_patterns [
-    Credo.Check.Consistency.SpaceInParentheses.WithSpace,
-    Credo.Check.Consistency.SpaceInParentheses.WithoutSpace
-  ]
 
-  alias Credo.Check.Consistency.Helper
-  alias Credo.Check.PropertyValue
+  @collector Credo.Check.Consistency.SpaceInParentheses.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    source_files
-    |> Helper.run_code_patterns(@code_patterns, params)
-    |> Helper.append_issues_via_issue_service(&issue_for/5, params, exec)
-
-    :ok
+    @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 
-  defp issue_for(_issue_meta, _actual_props, nil, _picked_count, _total_count), do: nil
-  defp issue_for(_issue_meta, [], _expected_prop, _picked_count, _total_count), do: nil
-  defp issue_for(issue_meta, actual_prop, expected_prop, _picked_count, _total_count) do
-    line_no = PropertyValue.meta(actual_prop, :line_no)
-    trigger = PropertyValue.meta(actual_prop, :trigger)
-    actual_prop = PropertyValue.get(actual_prop)
+  defp issues_for(expected, source_file, params) do
+    issue_meta = IssueMeta.for(source_file, params)
+    lines_with_issues =
+      @collector.find_locations_not_matching(expected, source_file)
 
-    if create_issue?(actual_prop, expected_prop, trigger) do
-      format_issue issue_meta,
-        message: message_for(actual_prop, expected_prop),
-        line_no: line_no,
-        trigger: trigger
-    end
+    lines_with_issues
+    |> Enum.filter(&create_issue?(expected, &1[:trigger]))
+    |> Enum.map(fn(location) ->
+        format_issue issue_meta,
+          [{:message, message_for(expected)} | location]
+      end)
   end
 
   # Don't create issues for `&Mod.fun/4`
-  defp create_issue?(:with_space, :without_space, ", ]"), do: false
-  defp create_issue?(_actual_prop, _expected_prop, _trigger), do: true
+  defp create_issue?(:without_space, ", ]"), do: false
+  defp create_issue?(_expected, _trigger), do: true
 
-  defp message_for(:with_space, :without_space) do
+  defp message_for(:without_space = _expected) do
     "There is no whitespace around parentheses/brackets most of the time, but here there is."
   end
-  defp message_for(:without_space, :with_space) do
+  defp message_for(:with_space = _expected) do
     "There is whitespace around parentheses/brackets most of the time, but here there is not."
   end
 end
