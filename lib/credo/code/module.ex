@@ -227,6 +227,16 @@ defmodule Credo.Code.Module do
 
 
 
+  @doc "Returns the not fully qualified name of a module's given ast node."
+  def just_name({:defmodule, _, [{:__aliases__, _, name_list}, _]}) do
+    name_list
+    |> List.last()
+    |> Atom.to_string()
+  end
+  def just_name(_), do: "<Unknown Module Name>"
+
+
+
   # TODO: write unit test
   def exception?({:defmodule, _, [{:__aliases__, _, _name_list}, arguments]}) do
     arguments
@@ -238,4 +248,3 @@ defmodule Credo.Code.Module do
   defp defexception?({:defexception, _, _}), do: true
   defp defexception?(_), do: false
 end
-
