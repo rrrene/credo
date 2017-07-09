@@ -48,6 +48,11 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
         {ast, issues}
     end
   end
+  defp traverse({df, _meta, [_def, [do: _do, rescue: rescue_block]]}, issues, issue_meta)
+  when df == :def or df == :defp do
+    issues_found = Credo.Code.prewalk(rescue_block, &find_issues(&1, &2, issue_meta))
+    {rescue_block, issues ++ issues_found}
+  end
   defp traverse(ast, issues, _issue_meta), do: {ast, issues}
 
   defp find_issues({:raise, meta, _arguments} = ast, issues, issue_meta) do
