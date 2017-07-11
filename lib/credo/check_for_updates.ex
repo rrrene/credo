@@ -3,22 +3,25 @@ defmodule Credo.CheckForUpdates do
   alias Credo.Execution
 
   @doc false
-  def run(%Execution{check_for_updates: true} = exec) do
-    run()
-
-    exec
-  end
   def run(%Execution{check_for_updates: false} = exec) do
     exec
   end
-  def run() do
-    "credo"
-    |> fetch_all_hex_versions()
-    |> do_run()
+  def run(%Execution{check_for_updates: true} = exec) do
+    unless probably_on_ci?() || probably_editor_integration?(exec) do
+      do_run()
+    end
+
+    exec
   end
 
-  defp do_run(nil), do: nil
-  defp do_run(all_versions) do
+  defp do_run do
+    "credo"
+    |> fetch_all_hex_versions()
+    |> print_update_message()
+  end
+
+  defp print_update_message(nil), do: nil
+  defp print_update_message(all_versions) do
     current = Credo.version
 
     if should_update?(all_versions, current) do
@@ -102,4 +105,27 @@ defmodule Credo.CheckForUpdates do
   defp hex_versions(%{"releases" => releases}) do
     Enum.map(releases, &(&1["version"]))
   end
+
+  # Returns true if we are (probably) on a CI system.
+  defp probably_on_ci? do
+    circleci?() || travis?() || generic_ci?()
+  end
+
+  defp generic_ci?, do: System.get_env("CI") == "true"
+
+  defp circleci?, do: System.get_env("CIRCLECI") == "true"
+
+  defp travis?, do: System.get_env("TRAVIS") == "true"
+
+  defp probably_editor_integration?(%Execution{strict: true}) do
+    true
+  end
+  defp probably_editor_integration?(%Execution{format: "flycheck"}) do
+    true
+  end
+  defp probably_editor_integration?(%Execution{read_from_stdin: true}) do
+    true
+  end
+  defp probably_editor_integration?(_exec), do: false
+
 end
