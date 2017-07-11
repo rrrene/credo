@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.ParameterPatternMatching.CollectorTest do
+defmodule Credo.Check.Consistency.ParameterPatternMatching.CollectorTest do
   use Credo.TestHelper
 
   alias Credo.Check.Consistency.ParameterPatternMatching.Collector
