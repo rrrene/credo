@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.3
+
+- Do not run `CheckForUpdates` on CI systems and in editor integrations
+
 ## 0.8.2
 
 - Refactor all consistency checks, providing a nice speed improvement (thx @little-bobby-tables)
