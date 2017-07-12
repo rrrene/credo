@@ -7,8 +7,8 @@ defmodule Credo.Backports.Enum do
   @doc """
   Splits the enumerable in two lists according to the given function fun.
 
-      iex> Credo.Backports.Enum.split_with([1, 2, 3, 4, 5], &(Integer.mod(&1, 2) == 0))
-      {[2, 4], [1, 3, 5]}
+      iex> Credo.Backports.Enum.split_with([true, false, true, true, false], &(&1))
+      {[true, true, true], [false, false]}
 
       iex> Credo.Backports.Enum.split_with(["hello", "same", "sample"], &(String.starts_with?(&1, "he")))
       {["hello"], ["same", "sample"]}
