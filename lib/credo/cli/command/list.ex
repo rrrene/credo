@@ -29,7 +29,7 @@ defmodule Credo.CLI.Command.List do
       :timer.tc fn ->
         exec
         |> Sources.find
-        |> Enum.split_with(&(&1.valid?))
+        |> Credo.Backports.Enum.split_with(&(&1.valid?))
       end
 
     Output.complain_about_invalid_source_files(invalid_source_files)
