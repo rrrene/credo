@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.SpaceAroundOperatorsTest do
+defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   use Credo.TestHelper
 
   @described_check Credo.Check.Consistency.SpaceAroundOperators
