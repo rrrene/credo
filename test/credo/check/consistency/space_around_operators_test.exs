@@ -26,6 +26,16 @@ defmodule OtherModule3 do
   end
 end
 """
+  @without_spaces3 """
+defmodule OtherModule4 do
+  defp dictionary_changeset() do
+    fields = ~W(
+      a
+      b
+    )a
+  end
+end
+"""
   @with_spaces """
 defmodule Credo.Sample2 do
   defmodule InlineModule do
@@ -185,6 +195,14 @@ end
   #
   # cases NOT raising issues
   #
+
+  test "it should not report issues when used with sigil" do
+    [
+      @without_spaces3
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
 
   test "it should not report issues if spaces are used everywhere" do
     [
