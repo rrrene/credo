@@ -40,6 +40,9 @@ defmodule Credo.Check.Readability.StringSigils do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
   end
 
+  def traverse({_sigil, [terminator: _, line: _], [_ | rest_ast]}, issues, _issue_meta, _maximum_allowed_quotes) do
+    {rest_ast, issues}
+  end
   def traverse({maybe_sigil, [line: line_no], [str | rest_ast]} = ast, issues, issue_meta, maximum_allowed_quotes) do
     cond do
       is_sigil(maybe_sigil) ->
