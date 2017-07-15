@@ -60,6 +60,26 @@ end
       end)
   end
 
+  test "it should report a violation when raise appears inside of a rescue block for an implicit try" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  def catcher do
+    raise "oops"
+  rescue
+    e in RuntimeError ->
+      Logger.warn("Something bad happened")
+      raise e
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, fn(issue) ->
+        assert "raise" == issue.trigger
+        assert 9 == issue.line_no
+      end)
+  end
+
   test "it should report a violation when raise appears inside of an expression in rescue" do
 """
 defmodule CredoSampleModule do
