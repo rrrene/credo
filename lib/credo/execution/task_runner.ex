@@ -19,7 +19,6 @@ defmodule Credo.Execution.TaskRunner do
 
   group :resolve_config do
     task Credo.Execution.Task.UseColors
-    task Credo.Execution.Task.CheckForUpdates
     task Credo.Execution.Task.RequireRequires
   end
 
