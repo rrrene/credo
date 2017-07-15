@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.4
+
+- Remove `CheckForUpdates` for good
+- Fix `RaiseInsideRescue` for implicit try
+
 ## 0.8.3
 
 - Do not run `CheckForUpdates` on CI systems and in editor integrations
