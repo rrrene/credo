@@ -50,7 +50,7 @@ defmodule Credo.Check do
       end
 
       def explanation_for_params do
-        Check.explanation_for(@explanation, :params)
+        Check.explanation_for(@explanation, :params) || []
       end
 
       def format_issue(issue_meta, opts) do
