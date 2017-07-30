@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5
+
+- Speed up scope counting in CLI summary
+
 ## 0.8.4
 
 - Remove `CheckForUpdates` for good
