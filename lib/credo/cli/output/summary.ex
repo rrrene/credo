@@ -3,7 +3,7 @@ defmodule Credo.CLI.Output.Summary do
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.Check.CodeHelper
+  alias Credo.SourceFile
 
   @category_wording [
     {:consistency, "consistency issue", "consistency issues"},
@@ -113,13 +113,6 @@ defmodule Credo.CLI.Output.Summary do
     |> Enum.count
   end
 
-  defp scope_count(source_files) do
-    source_files
-    |> Enum.flat_map(&CodeHelper.scope_list/1)
-    |> Enum.uniq
-    |> Enum.count
-  end
-
   defp summary_parts(source_files, issues) do
     parts =
       @category_wording
@@ -155,6 +148,25 @@ defmodule Credo.CLI.Output.Summary do
       1 -> [color, "1 #{singular}, "]
       x -> [color, "#{x} #{plural}, "]
     end
+  end
+
+  defp scope_count(%SourceFile{} = source_file) do
+    Credo.Code.prewalk(source_file, &scope_count_traverse/2, 0)
+  end
+  defp scope_count(source_files) when is_list(source_files) do
+    source_files
+    |> Enum.map(&scope_count/1)
+    |> Enum.reduce(&(&1 + &2))
+  end
+
+  @def_ops [:defmodule, :def, :defp, :defmacro, :defmacro]
+  for op <- @def_ops do
+    defp scope_count_traverse({unquote(op), _, _} = ast, count) do
+      {ast, count + 1}
+    end
+  end
+  defp scope_count_traverse(ast, count) do
+    {ast, count}
   end
 
 end
