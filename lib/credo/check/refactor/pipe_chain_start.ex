@@ -55,6 +55,10 @@ defmodule Credo.Check.Refactor.PipeChainStart do
       true
     end
   end
+  # anonymous function
+  defp valid_chain_start?({:fn, _, [{:->, _, [_args, _body]}]}, _excluded_functions) do
+    true
+  end
   # function_call()
   defp valid_chain_start?({atom, _, []}, _excluded_functions) when is_atom(atom) do
     true
