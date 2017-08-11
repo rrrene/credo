@@ -36,6 +36,10 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
       set_command_and_path(exec, options, @default_command_name, options.path)
     end
   end
+  defp determine_command(exec, %Options{command: "explain", args: args} = options) do
+    potential_path = List.first(args)
+    set_command_and_path(exec, options, "explain", potential_path)
+  end
   defp determine_command(exec, _options), do: exec
 
   defp set_command_and_path(exec, options, command, path) do
