@@ -136,7 +136,7 @@ defmodule Credo.Check.CodeHelper do
     |> Sigils.replace_with_spaces("")
     |> Strings.replace_with_spaces
     |> Charlists.replace_with_spaces
-    |> String.replace(~r/([^\?])#.+/, "\\1")
+    |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
   end
 
   @doc """
