@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.6
+
+- Fix false positive in SpaceAfterCommas
+- Fix false positive in SpaceAroundOperators
+- Fix bug with extracting explain command args
+- Allow anonymous functions to be piped as raw values
+
 ## 0.8.5
 
 - Speed up scope counting in CLI summary
