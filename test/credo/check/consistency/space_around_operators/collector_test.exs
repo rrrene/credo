@@ -27,6 +27,7 @@ defmodule Credo.Sample1 do
       &function_capture/1
       &:erlang_module.function_capture/3
       &Elixir.function_capture/3
+      &@module.blah/1
     end
   end
 end

@@ -41,6 +41,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       {:atom, _, _} -> true # :erlang_module
       {:aliases, _, _} -> true # ElixirModule
       {:identifier, _, _} -> true # function_name
+      {:at_op, _, _} -> true # @module_attribute
       {:., _} -> true
       _ -> false
     end)
