@@ -16,7 +16,7 @@ defmodule Credo.CLI.Command.Explain do
   @doc false
   def run(%Execution{help: true} = exec), do: print_help(exec)
   def run(exec) do
-    filename = Execution.get_path(exec)
+    filename = get_filename(exec)
 
     if Filename.contains_line_no?(filename) do
       exec
@@ -58,7 +58,8 @@ defmodule Credo.CLI.Command.Explain do
   end
 
   defp print_results_and_summary(exec) do
-    filename = Execution.get_path(exec)
+    filename = get_filename(exec)
+
     source_files = Execution.get_source_files(exec)
 
     filename
@@ -66,6 +67,12 @@ defmodule Credo.CLI.Command.Explain do
     |> print_result(source_files, exec)
 
     exec
+  end
+
+  defp get_filename(exec) do
+    exec.cli_options.args
+    |> List.wrap
+    |> List.first
   end
 
   defp determine_success(exec) do
