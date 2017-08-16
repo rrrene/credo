@@ -150,7 +150,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     CodeHelper.contains_child?(last_call_in_def, ast) && CodeHelper.contains_child?(ast, call_to_string)
   end
   defp valid_call_to_string_mod?({_atom, _meta, arguments} = ast, call_to_string, last_call_in_def, calls_in_block_above) do
-    if fn_in_arguments?(ast) do
+    if fn_in_arguments?(ast) && Enum.any?(fn_in_arguments(ast), &CodeHelper.contains_child?(&1, call_to_string)) do
       #IO.puts IO.ANSI.format [:red, "Last fn"]
       ast
       |> fn_in_arguments

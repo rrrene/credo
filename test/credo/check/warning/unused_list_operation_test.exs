@@ -298,6 +298,18 @@ end
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation when :fn is in the surrounding function calls arguments" do
+"""
+defmodule A do
+  def a do
+    Enum.each(Enum.with_index([]), [], fn a -> a end)
+    1
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should report a violation when buried in :if, :when and :fn" do
 """
 defmodule CredoSampleModule do
