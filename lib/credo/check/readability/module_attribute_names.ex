@@ -38,11 +38,12 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     {ast, issues}
   end
 
-  defp issue_for_name(issue_meta, name, meta) do
+  defp issue_for_name(issue_meta, name, meta) when is_binary(name) or is_atom(name) do
     unless name |> to_string |> Name.snake_case? do
       issue_for(issue_meta, meta[:line], "@#{name}")
     end
   end
+  defp issue_for_name(_, _, _), do: nil
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
