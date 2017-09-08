@@ -376,7 +376,7 @@ You will now be able to invoke credo as usual through Mix with `mix credo`. This
 
 ### Show code snippets in the output
 
-Use the `--verbose` switch to include the code snippets in question in the output.
+Use the `--verbose` switch to include the code snippets in question as well as the module name of teh failed check in the output.
 
 
 ### Show compact list

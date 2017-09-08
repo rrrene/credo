@@ -56,6 +56,10 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.wrap_at(term_width - @indent)
     |> print_issue_message(check, outer_color, message_color, tag_style, priority)
 
+    if exec.verbose do
+      print_issue_check(issue, outer_color, inner_color, message_color)
+    end
+
     [
       UI.edge(outer_color, @indent),
         filename_color, :faint, filename |> to_string,
@@ -69,6 +73,24 @@ defmodule Credo.CLI.Output.IssueHelper do
 
       UI.puts_edge([outer_color, :faint])
     end
+  end
+
+  defp print_issue_check(issue, outer_color, inner_color, message_color) do
+    outer_color
+    |> UI.edge
+    |> UI.puts
+
+    [
+      UI.edge(outer_color),
+        outer_color,
+        String.duplicate(" ", @indent - 3),
+        :normal, message_color, " ", "Failed #{issue.check}",
+    ]
+    |> UI.puts
+
+    outer_color
+    |> UI.edge
+    |> UI.puts
   end
 
   defp print_issue_message([first_line | other_lines], check, outer_color, message_color, tag_style, priority) do
