@@ -35,7 +35,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
 
   @token_types [:atom_unsafe, :kw_identifier_unsafe]
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_file, params \\ []) do
@@ -72,11 +72,13 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
     end
   end
   defp safe_atom_name(token) when is_binary(token) do
-    with {:ok, _, _, [{:atom, _, atom}]} <- :elixir_tokenizer.tokenize(':#{token}', 1, []),
-        true <- is_atom(atom),
-        ^token <- Atom.to_string(atom) do
-      {:ok, atom}
-    else
+    case :elixir_tokenizer.tokenize(':#{token}', 1, []) do
+      {:ok, _, _, [{:atom, _, atom}]} ->
+        if is_atom(atom) and token == Atom.to_string(atom) do
+          {:ok, atom}
+        else
+          :error
+        end
       _ -> :error
     end
   end
