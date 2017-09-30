@@ -112,4 +112,102 @@ end
       end)
   end
 
+  test "it should report a violation with strings and code" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+  def some_fun do
+    assert "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" == "2"
+  end
+end
+"""
+    |> to_source_file
+    |> assert_issue(@described_check, max_length: 100)
+  end
+
+  test "it should report a violation with strings and code again" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+  def some_fun do
+    assert "a really long line a really long line a really long line a really long line"
+  end
+end
+"""
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with strings and code again again" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    blah = ~s{
+        a really long line a really long line a really long line a really long line
+    }
+  end
+end
+"""
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with strings and code again again again" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    blah = \"\"\"
+        a really long line a really long line a really long line a really long line
+    \"\"\"
+  end
+end
+"""
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should NOT report a violation with strings on their own line" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+  def some_fun do
+    assert
+      "a really long line a really long line a really long line a really long line"
+  end
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation with strings on their own line again" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    blah =
+    ~s{
+        a really long line a really long line a really long line a really long line
+    }
+  end
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation with strings on their own line again again" do
+"""
+defmodule CredoSampleModule do
+  def some_fun do
+    blah =
+    \"\"\"
+        a really long line a really long line a really long line a really long line
+    \"\"\"
+  end
+end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
 end
