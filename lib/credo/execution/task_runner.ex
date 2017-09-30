@@ -13,6 +13,14 @@ defmodule Credo.Execution.TaskRunner do
     task Credo.Execution.Task.ConvertCLIOptionsToConfig
   end
 
+  group :determine_command do
+    task Credo.Execution.Task.DetermineCommand
+  end
+
+  group :set_default_command do
+    task Credo.Execution.Task.SetDefaultCommand
+  end
+
   group :validate_config do
     task Credo.Execution.Task.ValidateConfig
   end
@@ -22,24 +30,9 @@ defmodule Credo.Execution.TaskRunner do
     task Credo.Execution.Task.RequireRequires
   end
 
-# TODO: implement
-#  group :validate_command do
-#    task PutCommandIntoToken
-#  end
-
   group :run_command do
     task Credo.Execution.Task.RunCommand
   end
-
-# TODO: implement
-#  group :convert_results do
-#    task ConvertResults
-#  end
-
-# TODO: implement
-#  group :present_results do
-#    task PrintResults
-#  end
 
   group :halt_execution do
     task Credo.Execution.Task.AssignExitStatusForIssues
