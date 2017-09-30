@@ -8,7 +8,7 @@ defmodule Credo.CLI.Command.GenCheck do
 
   @doc false
   def run(exec) do
-    exec.args
+    exec.cli_options.args
     |> List.first
     |> create_check_file
 
