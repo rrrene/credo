@@ -3,6 +3,22 @@ defmodule Credo.CLI.Output.UI do
   @ellipsis "…"
   @shell_service Credo.CLI.Output.Shell
 
+  if Mix.env == :test do
+    def puts, do: nil
+    def puts(_), do: nil
+    def puts(_, color) when is_atom(color), do: nil
+
+    def warn(_), do: nil
+  else
+    defdelegate puts, to: @shell_service
+    defdelegate puts(v), to: @shell_service
+    def puts(v, color) when is_atom(color) do
+      @shell_service.puts([color, v])
+    end
+
+    defdelegate warn(v), to: @shell_service
+  end
+
   def edge(color, indent \\ 2) when is_integer(indent) do
     [:reset, color, @edge |> Credo.Backports.String.pad_trailing(indent)]
   end
@@ -13,14 +29,6 @@ defmodule Credo.CLI.Output.UI do
 
     exec
   end
-
-  defdelegate puts, to: @shell_service
-  defdelegate puts(v), to: @shell_service
-  def puts(v, color) when is_atom(color) do
-    @shell_service.puts([color, v])
-  end
-
-  defdelegate warn(v), to: @shell_service
 
   def puts_edge(color, indent \\ 2) when is_integer(indent) do
     color
