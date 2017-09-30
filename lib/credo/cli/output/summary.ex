@@ -153,6 +153,7 @@ defmodule Credo.CLI.Output.Summary do
   defp scope_count(%SourceFile{} = source_file) do
     Credo.Code.prewalk(source_file, &scope_count_traverse/2, 0)
   end
+  defp scope_count([]), do: 0
   defp scope_count(source_files) when is_list(source_files) do
     source_files
     |> Enum.map(&scope_count/1)
