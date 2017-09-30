@@ -29,7 +29,9 @@ defmodule Credo.ConfigBuilder do
     config_file.strict
   end
   defp strict_via_args_or_config_file?([potential_path | _], config_file) do
-    Filename.contains_line_no?(potential_path) || config_file.strict
+    user_expecting_explain_command? = Filename.contains_line_no?(potential_path)
+
+    user_expecting_explain_command? || config_file.strict
   end
 
   defp add_switches_to_exec(%Execution{} = exec, switches) do

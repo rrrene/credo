@@ -115,6 +115,15 @@ defmodule CredoSampleModule do
       i
     end
     |> Enum.map(fn(i) -> i + 2 end)
+
+    fn a -> x end
+    |> IO.inspect
+
+    (&(Enum.map(&1, &2)))
+    |> IO.inspect
+
+    (&Math.square/1)
+    |> IO.inspect
   end
 end
 """ |> to_source_file

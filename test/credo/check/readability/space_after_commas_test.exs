@@ -9,6 +9,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
 
   test "it should NOT report when commas have spaces" do
 """
+# comments should not matter [[[,]]]
 defmodule CredoSampleModule do
   @attribute {:foo, :bar}
 end
