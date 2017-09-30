@@ -40,6 +40,9 @@ defmodule Credo.Execution do
 
   @type t :: module
 
+  alias Credo.Execution.Issues
+  alias Credo.Execution.SourceFiles
+
   @doc """
   Returns the checks that should be run for a given `exec` struct.
 
@@ -121,7 +124,7 @@ defmodule Credo.Execution do
   end
 
   def put_source_files(exec, source_files) do
-    Credo.Execution.SourceFiles.put(exec, source_files)
+    SourceFiles.put(exec, source_files)
 
     exec
   end
@@ -130,13 +133,13 @@ defmodule Credo.Execution do
 
   def get_issues(exec) do
     exec
-    |> Credo.Execution.Issues.to_map
+    |> Issues.to_map
     |> Map.values
     |> List.flatten
   end
   def get_issues(exec, filename) do
     exec
-    |> Credo.Execution.Issues.to_map
+    |> Issues.to_map
     |> Map.get(filename, [])
   end
 
@@ -157,4 +160,9 @@ defmodule Credo.Execution do
     %__MODULE__{exec | halted: true}
   end
 
+  def start_servers(%__MODULE__{} = exec) do
+    exec
+    |> SourceFiles.start_server
+    |> Issues.start_server
+  end
 end
