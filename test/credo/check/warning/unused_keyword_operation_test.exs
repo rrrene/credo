@@ -9,6 +9,13 @@ defmodule CredoSampleModule do
   def some_function(parameter1, parameter2) do
     Keyword.values(parameter1) + parameter2
   end
+
+  def invoke(task) when is_atom(task) do
+    Enum.each(Keyword.get(MyAgent.get(:before_hooks), task, []),
+      fn([module, fnref]) -> apply(module, fnref, []) end)
+    Enum.each(Keyword.get(MyAgent.get(:after_hooks), task, []),
+      fn([module, fnref]) -> apply(module, fnref, []) end)
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
