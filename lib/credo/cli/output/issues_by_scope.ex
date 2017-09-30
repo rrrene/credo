@@ -98,7 +98,8 @@ defmodule Credo.CLI.Output.IssuesByScope do
     |> UI.puts
 
     if issue.line_no do
-      line = SourceFile.line_at(source_file, issue.line_no)
+      raw_line = SourceFile.line_at(source_file, issue.line_no)
+      line = Credo.Backports.String.trim(raw_line)
 
       UI.puts_edge([outer_color, :faint])
 
@@ -110,8 +111,7 @@ defmodule Credo.CLI.Output.IssuesByScope do
       |> UI.puts
 
       if issue.column do
-        trimmed_line = Credo.Backports.String.trim(line)
-        offset = String.length(line) - String.length(trimmed_line)
+        offset = String.length(raw_line) - String.length(line)
         x = max(issue.column - offset - 1, 0) # column is one-based
         w =
           case issue.trigger do
