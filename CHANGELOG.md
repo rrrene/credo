@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.7
+
+- Fix false positive in ModuleAttributeNames
+- Fix false positives in unused return checks
+- Fix underlining in "list" action
+- Fix CLI argument parsing for `mix credo.gen.check`
+- Fix loading of custom checks
+- Prevent error when run against empty umbrella projects
+- Prevent output for tests
+
 ## 0.8.6
 
 - Fix false positive in SpaceAfterCommas
