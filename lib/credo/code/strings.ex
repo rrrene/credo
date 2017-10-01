@@ -9,6 +9,9 @@ defmodule Credo.Code.Strings do
                         [{"~s#{b}", e}, {"~S#{b}", e}]
                       end)
 
+  # TODO v1.0: this should not remove heredocs, since
+  #             there is a separate module for that
+
   @doc """
   Replaces all characters inside string literals and string sigils
   with the equivalent amount of white-space.

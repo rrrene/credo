@@ -32,14 +32,16 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
     ignore_specs = Params.get(params, :ignore_specs, @default_params)
     ignore_strings = Params.get(params, :ignore_strings, @default_params)
+    # TODO v1.0: this should be two different params
+    ignore_heredocs = ignore_strings
 
     definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
     source = SourceFile.source(source_file)
     source =
-      if ignore_strings do
-        Credo.Code.Strings.replace_with_spaces(source, "")
+      if ignore_heredocs do
+        Credo.Code.Heredocs.replace_with_spaces(source, "")
       else
         source
       end
@@ -47,7 +49,14 @@ defmodule Credo.Check.Readability.MaxLineLength do
     lines = Credo.Code.to_lines(source)
 
     Enum.reduce(lines, [], fn({line_no, line}, issues) ->
-      if String.length(line) > max_length do
+      line_for_comparison =
+        if ignore_strings do
+          Credo.Code.Strings.replace_with_spaces(line, "")
+        else
+          line
+        end
+
+      if String.length(line_for_comparison) > max_length do
         if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
           issues
         else

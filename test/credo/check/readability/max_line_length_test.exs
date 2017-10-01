@@ -112,4 +112,19 @@ end
       end)
   end
 
+  test "it should report a violation /2" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  def some_fun do
+    assert "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" <> "1" == "2"
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, fn(issue) ->
+        assert 81 == issue.column
+        assert issue.message =~ ~r/max is 80, was 112/
+      end)
+  end
 end
