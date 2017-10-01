@@ -43,10 +43,29 @@ end
     |> refute_issues(@described_check)
   end
 
-  test "it should not complain about non-decimal numbers" do
+  test "it should not complain about numbers in anon function calls" do
+"""
+  defmodule Demo.LargeNumberAnonWarning do
+    @moduledoc false
+
+    def harmless_function do
+      say_num = fn num ->
+        IO.inspect num
+      end
+
+      say_num.( say_num.(10_000), say_num.(20_000) )
+    end
+  end
+"""
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+test "it should not complain about non-decimal numbers" do
 """
 def numbers do
   0xFFFF
+  0x123456
   0b1111_1111_1111_1111
   0o777_777
 end

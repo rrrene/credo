@@ -111,14 +111,26 @@ defmodule Credo.Check.Readability.LargeNumbers do
     end
   end
 
-  defp source_fragment({line_no, column1, column2} = tuple, issue_meta) do
-    fragment =
+  defp source_fragment({line_no, column1, _column2} = tuple, issue_meta) do
+    line =
       issue_meta
       |> IssueMeta.source_file
       |> SourceFile.line_at(line_no)
-      |> String.slice((column1 - 1)..(column2 - 1))
-      |> Credo.Backports.String.trim
-      |> String.replace(~r/\D$/, "")
+
+    beginning_of_number =
+      Regex.run(~r/[^0-9_oxb]*([0-9_oxb]+$)/, String.slice(line, 1..column1))
+      |> List.wrap
+      |> List.last
+      |> to_string()
+
+    ending_of_number =
+      Regex.run(~r/^([0-9_\.]+)/, String.slice(line, column1+1..-1))
+      |> List.wrap
+      |> List.last
+      |> to_string()
+      |> String.replace(~r/\.\..+/, "")
+
+    fragment = beginning_of_number <> ending_of_number
 
     if Version.match?(System.version, "< 1.3.2-dev") do
       source_fragment_pre_132(tuple, issue_meta, fragment)
