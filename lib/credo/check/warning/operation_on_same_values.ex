@@ -18,6 +18,9 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   """
 
   @explanation [check: @moduledoc]
+
+  @def_ops [:def, :defp, :defmacro]
+  @ops ~w(== >= <= != > < / -)a
   @ops_and_constant_results [
       {:==, "Comparison", true},
       {:>=, "Comparison", true},
@@ -38,6 +41,13 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  for op <- @def_ops do
+    # exclude def arguments for operators
+    defp traverse({unquote(op), _meta, [{op, _, _} | rest]}, issues, _issue_meta) when op in @ops do
+      {rest, issues}
+    end
+  end
+
   for {op, operation_name, constant_result} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
       if CodeHelper.remove_metadata(lhs) == CodeHelper.remove_metadata(rhs) do
@@ -50,6 +60,10 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
         {ast, issues}
       end
     end
+  end
+  # exclude @spec definitions
+  defp traverse({:@, _meta, [{:spec, _, _} | _]}, issues, _issue_meta) do
+    {nil, issues}
   end
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}

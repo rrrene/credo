@@ -8,17 +8,30 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  use ExUnit.Case
+    """
+    defmodule CredoSampleModule do
+      use ExUnit.Case
 
-  def some_fun do
-    assert x == x + 2
-  end
-end
-""" |> to_source_file
-    |> refute_issues(@described_check)
-  end
+      def some_fun do
+        assert x == x + 2
+      end
+    end
+    """ |> to_source_file
+        |> refute_issues(@described_check)
+      end
+
+  test "it should NOT report operator definitions" do
+    """
+    defmodule Red do
+      @moduledoc false
+      @spec number - number :: number
+      def a - a do
+        a + 1
+      end
+    end
+    """ |> to_source_file
+        |> refute_issues(@described_check)
+      end
 
   #
   # cases raising issues
@@ -32,6 +45,17 @@ defmodule CredoSampleModule do
   def some_fun do
     assert x == x
   end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation for module attributes" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+  @a 5
+  @some_module_attribute @a - @a
 end
 """ |> to_source_file
     |> assert_issue(@described_check)
