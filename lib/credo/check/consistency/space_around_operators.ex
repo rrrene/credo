@@ -72,12 +72,21 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   # Don't create issues for `c = -1`
   # TODO: Consider moving these checks inside the Collector.
-  defp create_issue?(line, column, operator) when operator in [:+, :-] do
+  defp create_issue?(line, column, trigger) when trigger in [:+, :-] do
     !number_with_sign?(line, column) &&
       !number_in_range?(line, column) &&
-      !(operator == :- && minus_in_binary_size?(line, column))
+      !(trigger == :- && minus_in_binary_size?(line, column))
+  end
+  defp create_issue?(line, column, trigger) when trigger == :-> do
+    !arrow_in_typespec?(line, column)
   end
   defp create_issue?(_, _, _), do: true
+
+  defp arrow_in_typespec?(line, column) do
+    line
+    |> String.slice(0..column - 2) # -2 because we need to subtract the operator
+    |> String.match?(~r/\(\s*$/)
+  end
 
   defp number_with_sign?(line, column) do
     line

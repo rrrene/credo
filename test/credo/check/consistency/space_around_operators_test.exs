@@ -8,6 +8,7 @@ defmodule Credo.Sample1 do
   defmodule InlineModule do
     @min -1
     @max +1
+    @type config_or_func :: Config.t() | (-> Config.t())
 
     def foobar do
       1+2
@@ -39,6 +40,8 @@ end
   @with_spaces """
 defmodule Credo.Sample2 do
   defmodule InlineModule do
+    @type config_or_func :: Config.t() | (-> Config.t())
+
     # Fine
     defp format_value("NPC_", "NPDT", <<skills::binary-27>>) do
     end
