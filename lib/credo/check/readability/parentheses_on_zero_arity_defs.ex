@@ -33,8 +33,12 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
   for op <- @def_ops do
     # catch variables named e.g. `defp`
+    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta) do
+      {ast, issues}
+    end
     defp traverse({unquote(op), _, body} = ast, issues, issue_meta) do
       function_head = Enum.at(body, 0)
+
       {ast, issues_for_definition(function_head, issues, issue_meta)}
     end
   end

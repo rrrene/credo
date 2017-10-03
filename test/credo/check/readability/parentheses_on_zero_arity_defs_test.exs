@@ -15,7 +15,7 @@ defmodule CredoSampleModule do
   end
 
   def some_other_function do
-    18
+    defp = 18
   end
 end
 """ |> to_source_file
