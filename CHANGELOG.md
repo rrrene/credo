@@ -1,8 +1,15 @@
 # Changelog
 
+## 0.8.8
+
+- Fix false positive for `LargeNumbers`
+- Fix `SpaceAroundOperators` for @type module attributes
+- Ignore def arguments and specs for `OperationOnSameValues`
+- Fix crash in `ParenthesesOnZeroArityDefs` for variables named `defp`
+
 ## 0.8.7
 
-- Fix false positive in ModuleAttributeNames
+- Fix false positive in `ModuleAttributeNames`
 - Fix false positives in unused return checks
 - Fix underlining in "list" action
 - Fix CLI argument parsing for `mix credo.gen.check`
