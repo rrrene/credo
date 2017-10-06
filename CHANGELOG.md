@@ -6,6 +6,7 @@
 - Fix `SpaceAroundOperators` for @type module attributes
 - Ignore def arguments and specs for `OperationOnSameValues`
 - Fix crash in `ParenthesesOnZeroArityDefs` for variables named `defp`
+- Fix false positives for `TagHelper`
 
 ## 0.8.7
 
