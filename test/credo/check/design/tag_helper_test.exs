@@ -100,7 +100,7 @@ end
 """ |> to_source_file
    |> TagHelper.tags(:TODO, true)
 
-    assert 4 == Enum.count(tags)
+    assert 3 == Enum.count(tags)
   end
 
 end

@@ -12,8 +12,51 @@ defmodule Credo.Check.Design.TagTODOTest do
 defmodule CredoSampleModule do
   use ExUnit.Case
 
+  # Attempts to soft delete a todo that
+  # belongs to a user with the given user_id.
+  #
+  # Returns `{:ok, todo_id}` on success.
   def some_fun do
     assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report expected @doc values" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+
+  @doc \"\"\"
+  Attempts to soft delete a todo that
+  belongs to a user with the given user_id.
+
+  Returns `{:ok, todo_id}` on success.
+  \"\"\"
+  def some_fun do
+    assert x == x + 2
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a couple of issues" do
+"""
+defmodule CredoSampleModule do
+  use ExUnit.Case
+  @moduledoc \"\"\"
+    this is an example # TODO: and this is an actual TODO
+  \"\"\"
+
+  def some_fun do
+    x = ~s{also: # TODO: no comment here}
+    assert 2 == x
+    ?"
+
+    "also: # TODO: no comment here as well"
   end
 end
 """ |> to_source_file
@@ -173,7 +216,7 @@ defmodule CredoSampleModule do
 end
 """ |> to_source_file
     |> assert_issues(@described_check, fn(issues) ->
-        assert 4 == Enum.count(issues)
+        assert 3 == Enum.count(issues)
       end)
   end
 

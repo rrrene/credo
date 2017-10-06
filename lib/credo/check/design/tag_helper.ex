@@ -9,7 +9,7 @@ defmodule Credo.Check.Design.TagHelper do
   end
 
   defp tags_from_module_attributes(source_file, tag_name, true) do
-    regex = Regex.compile!("\\s*#{tag_name}:?\\s*.+", "i")
+    regex = Regex.compile!("\\A\\s*#{tag_name}:?\\s*.+", "i")
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, regex))
   end
