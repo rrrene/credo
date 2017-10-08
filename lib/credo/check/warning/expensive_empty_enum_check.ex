@@ -26,20 +26,21 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
   for {lhs, rhs} <- @comparisons do
     defp traverse({:==, meta, [unquote(lhs), unquote(rhs)]} = ast, issues, issue_meta) do
-      {ast, issues_for_call(meta, issues, issue_meta)}
+      {ast, issues_for_call(meta, issues, issue_meta, ast)}
     end
   end
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  def issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line]) | issues]
+  def issues_for_call(meta, issues, issue_meta, ast) do
+    [issue_for(issue_meta, meta[:line], Macro.to_string(ast)) | issues]
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue issue_meta,
-      message: "Checking that an enum is empty using its size is expensive",
+      message: "#{trigger} is expensive. Prefer Enum.empty?/1 or list == []",
+      trigger: trigger,
       line_no: line_no
   end
 end
