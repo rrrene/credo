@@ -1,7 +1,7 @@
-defmodule Credo.Check.Warning.ExpensiveEmptyListCheckTest do
+defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Warning.ExpensiveEmptyListCheck
+  @described_check Credo.Check.Warning.ExpensiveEmptyEnumCheck
 
   test "it should not report when when using length with non zero" do
 """
@@ -36,8 +36,8 @@ end
   test "it should not report when checking if Enum.count is non 0" do
 """
 defmodule CredoSampleModule do
-  def some_function(some_list) do
-    if Enum.count(some_list) == 3 do
+  def some_function(enum) do
+    if Enum.count(enum) == 3 do
       "has 3"
     else
       "something else"
@@ -51,8 +51,8 @@ end
   test "it should non report when checking if Enum.count is non 0 backwards" do
 """
 defmodule CredoSampleModule do
-  def some_function(some_list) do
-    if 3 == Enum.count(some_list) do
+  def some_function(enum) do
+    if 3 == Enum.count(enum) do
       "has 3"
     else
       "something else"
@@ -96,7 +96,7 @@ end
   test "it should report when checking if Enum.count is 0" do
 """
 defmodule CredoSampleModule do
-  def some_function(some_list) do
+  def some_function(enum) do
     if Enum.count(some_list) == 0 do
       "empty"
     else
@@ -111,8 +111,8 @@ end
   test "it should report when checking if Enum.count is 0 backwards" do
 """
 defmodule CredoSampleModule do
-  def some_function(some_list) do
-    if 0 == Enum.count(some_list) do
+  def some_function(enum) do
+    if 0 == Enum.count(enum) do
       "empty"
     else
       "not empty"

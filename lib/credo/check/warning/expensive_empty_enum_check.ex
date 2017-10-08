@@ -1,8 +1,7 @@
-defmodule Credo.Check.Warning.ExpensiveEmptyListCheck do
+defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   @moduledoc """
-  Checking if a collection is empty should be done with
-  `Enum.empty?(collection)` or `list == []`. Checking if the size of the
-  collection is `0` can be very expensive.
+  Checking if an enum is empty should be done with `Enum.empty?(enum)` or
+  `list == []`. Checking if the size of the enum is `0` can be very expensive.
   """
 
   @explanation [check: @moduledoc]
@@ -40,7 +39,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyListCheck do
 
   defp issue_for(issue_meta, line_no) do
     format_issue issue_meta,
-      message: "Checking that a collection is empty using its length is expensive",
+      message: "Checking that an enum is empty using its size is expensive",
       line_no: line_no
   end
 end
