@@ -106,6 +106,7 @@
         {Credo.Check.Refactor.UnlessWithElse},
 
         {Credo.Check.Warning.BoolOperationOnSameValues},
+        {Credo.Check.Warning.ExpensiveEmptyListCheck},
         {Credo.Check.Warning.IExPry},
         {Credo.Check.Warning.IoInspect},
         {Credo.Check.Warning.LazyLogging},
