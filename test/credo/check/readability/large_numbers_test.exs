@@ -7,7 +7,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   # cases NOT raising issues
   #
 
-  @tag needs_elixir: "1.3.2"
+  @module_tag needs_elixir: "1.3.2"
+
   test "it should NOT report expected code" do
 """
 @budgets %{
@@ -80,7 +81,6 @@ end
     |> refute_issues(@described_check)
   end
 
-  @tag needs_elixir: "1.3.2"
   test "check old false positive is fixed /2" do
 """
 %{
