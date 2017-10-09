@@ -1,6 +1,6 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
   @moduledoc """
-  Pipes (`|>`) can can become more readable by starting with a "raw" value.
+  Pipes (`|>`) can become more readable by starting with a "raw" value.
 
   So while this is easily comprehendable:
 
