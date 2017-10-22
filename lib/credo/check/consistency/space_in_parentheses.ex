@@ -16,7 +16,10 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   you should use a consistent style throughout your codebase.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    allow_empty_enums: "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase"
+  ]
 
   @collector Credo.Check.Consistency.SpaceInParentheses.Collector
 
@@ -29,8 +32,12 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+    options =
+      %{}
+      |> Map.put(:allow_empty_enums, Params.get(params, :allow_empty_enums, @default_params))
+
     lines_with_issues =
-      @collector.find_locations_not_matching(expected, source_file)
+      @collector.find_locations_not_matching(expected, source_file, options)
 
     lines_with_issues
     |> Enum.filter(&create_issue?(expected, &1[:trigger]))
