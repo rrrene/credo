@@ -25,6 +25,21 @@ defmodule Credo.Sample2 do
   end
 end
 """
+  @empty_enum """
+  defmodule Credo.Sample2 do
+    defmodule InlineModule do
+      def foobar do
+        exists = File.exists?(filename)
+        { result, %{} } = File.read( filename )
+      end
+
+      def barfoo do
+        exists = File.exists?(filename)
+        { result, [] } = File.read( filename )
+      end
+    end
+  end
+"""
 
   @heredoc_example """
 string = ~s\"\"\"
@@ -42,7 +57,7 @@ another_string = ~s\"\"\"
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{without_space: 2} == without_spaces
+    assert %{without_space: 2, without_space_allow_empty_enums: 2} == without_spaces
 
     with_spaces =
       @with_spaces
@@ -50,6 +65,13 @@ another_string = ~s\"\"\"
       |> Collector.collect_matches([])
 
     assert %{with_space: 1} == with_spaces
+
+    empty_enum =
+      @empty_enum
+      |> to_source_file()
+      |> Collector.collect_matches([])
+
+    assert %{with_space: 2, without_space: 4, without_space_allow_empty_enums: 2} == empty_enum
   end
 
   test "it should NOT report heredocs containing sigil chars" do
