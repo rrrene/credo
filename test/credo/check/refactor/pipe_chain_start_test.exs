@@ -183,6 +183,13 @@ put_in(users["john"][:age], 28)
     |> refute_issues(@described_check, excluded_functions: ~w(:crypto.hash))
   end
 
+  test "it should NOT report a violation for a erlang function call" do
+"""
+:crypto.hash(:md5, "test") |> Base.encode16(case: :lower)
+""" |> to_source_file
+    |> refute_issues(@described_check, exclude_erlang_funcs: true)
+  end
+
   test "it should NOT report a violation for ++" do
 """
   def build(%Ecto.Query{} = query) do
