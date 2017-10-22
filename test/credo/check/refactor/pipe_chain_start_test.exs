@@ -183,6 +183,13 @@ put_in(users["john"][:age], 28)
     |> refute_issues(@described_check, excluded_functions: ~w(:crypto.hash))
   end
 
+  test "it should report a violation for a erlang function call" do
+"""
+:crypto.hash(:md5, "test") |> Base.encode16(case: :lower)
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should NOT report a violation for a erlang function call" do
 """
 :crypto.hash(:md5, "test") |> Base.encode16(case: :lower)
