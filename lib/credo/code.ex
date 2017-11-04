@@ -101,12 +101,19 @@ defmodule Credo.Code do
     |> to_tokens()
   end
   def to_tokens(source) when is_binary(source) do
-    {_, _, _, tokens} =
+    result =
       source
       |> Credo.Backports.String.to_charlist
       |> :elixir_tokenizer.tokenize(1, [])
 
-    tokens
+    case result do
+      # Elixir < 1.6
+      {_, _, _, tokens} ->
+        tokens
+      # Elixir >= 1.6
+      {:ok, tokens} ->
+        tokens
+    end
   end
 
   defp issue_for({line_no, error_message, _}, filename) do
