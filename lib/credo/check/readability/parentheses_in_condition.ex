@@ -81,6 +81,11 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp check_for_closing_paren(_start, {:")", _}, [{:and_op, _, _} | _tail], _prev_head) do
     false
   end
+  # matches:  if( 1 &&& foo ) > bar do
+  #                           ^
+  defp check_for_closing_paren(_start, {:")", _}, [{:rel_op, _, _} | _tail], _prev_head) do
+    false
+  end
   # matches:  if( something ), do:
   #                         ^^
   defp check_for_closing_paren(start, {:",", _}, _, {:")", _}) do

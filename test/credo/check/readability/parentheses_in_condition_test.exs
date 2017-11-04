@@ -38,6 +38,16 @@ defmodule CredoSampleModule do
     if (thing && other_thing) || better_thing, do: something
     if !better_thing && (thing || other_thing), do: something_else
   end
+
+  import Bitwise
+
+	def bar(foo, bar) do
+		if (foo &&& 0b1000) > 0, do: bar, else: nil
+	end
+
+	def foobar(foo) do
+		foo
+  end
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
