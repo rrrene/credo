@@ -426,7 +426,11 @@ While refactor checks show you possible problems, these checks try to highlight 
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
 
+## IDE/Editor Integrations
 
+Some IDEs and editors are able to run `mix credo` in the background and mark and issues directly in the editor view.
+
+* [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 
 ## Contributing
 
