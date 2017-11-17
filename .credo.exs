@@ -55,13 +55,13 @@
         {Credo.Check.Consistency.SpaceInParentheses},
         {Credo.Check.Consistency.TabsOrSpaces},
 
-        # For some checks, like AliasUsage, you can only customize the priority
+        # You can customize the priority of any check
         # Priority values are: `low, normal, high, higher`
         #
         {Credo.Check.Design.AliasUsage, priority: :low},
 
-        # For others you can set parameters
-
+        # For some checks, you can also set other parameters
+        #
         # If you don't want the `setup` and `test` macro calls in ExUnit tests
         # or the `schema` macro in Ecto schemas to trigger DuplicatedCode, just
         # set the `excluded_macros` parameter to `[:schema, :setup, :test]`.
