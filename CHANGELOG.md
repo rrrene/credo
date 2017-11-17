@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.10
+
+- Maintenance release
+
 ## 0.8.9
 
 - Fix false positive in ParenthesesInCondition
