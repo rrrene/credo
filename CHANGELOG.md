@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.9
+
+- Fix false positive in ParenthesesInCondition
+- Fix Code.to_tokens/1 for Elixir 1.6
+- Fix documentation for several checks
+
+### New checks
+
+- Credo.Check.Warning.ExpensiveEmptyEnumCheck
+
 ## 0.8.8
 
 - Fix false positive for `LargeNumbers`
