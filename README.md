@@ -156,6 +156,10 @@ This also works for umbrella projects, where you can have individual `.credo.exs
         # Put `false` as second element:
         {Credo.Check.Design.TagFIXME, false},
 
+        # You can also excluded specific pattern for specific check
+        # Put `false` as second element:
+        {Credo.Check.Warning.IExPry, excluded: ~[^test/]},
+
         # ... several checks omitted for readability ...
       ]
     }

@@ -159,7 +159,11 @@ defmodule Credo.Check.Runner do
   end
   defp run_check({check, params}, source_file, exec) do
     try do
-      check.run(source_file, params)
+      if excluded_for_check(source_file, params) do
+        []
+      else
+        check.run(source_file, params)
+      end
     rescue
       error ->
         warn_about_failed_run(check, source_file)
@@ -169,6 +173,13 @@ defmodule Credo.Check.Runner do
         else
           []
         end
+    end
+  end
+
+  defp excluded_for_check(source_file, params) do
+    case Keyword.pop(params, :excluded) do
+      {nil, _} -> false
+      {pattern, _} -> Regex.match?(pattern, source_file.filename)
     end
   end
 
