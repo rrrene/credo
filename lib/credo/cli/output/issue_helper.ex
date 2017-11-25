@@ -65,6 +65,12 @@ defmodule Credo.CLI.Output.IssueHelper do
     |> UI.puts
 
     if exec.verbose do
+      [
+        UI.edge(outer_color, @indent),
+        :default_color,
+        :faint,
+        Macro.to_string(check),
+      ] |> UI.puts
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
       UI.puts_edge([outer_color, :faint])
