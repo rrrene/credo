@@ -32,6 +32,9 @@ defmodule Credo.Check.Readability.Specs do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, specs, issue_meta))
   end
 
+  defp find_specs({:spec, _, [{:when, _, [{:::, _, [{name, _, args}, _]}, _]} | _]} = ast, specs) do
+    {ast, [{name, length(args)} | specs]}
+  end
   defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs) when is_list(args) do
     {ast, [{name, length(args)} | specs]}
   end
