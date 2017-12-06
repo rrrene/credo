@@ -34,6 +34,7 @@ defmodule Credo.Check.Design.AliasUsage do
     params: [
       if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
       if_called_more_often_than: "Only raise an issue if a module is called more often than this.",
+      allow_shorter_alias: "Allow using shorter aliases than possible for stylistic reasons.",
     ]
   ]
   @default_params [
@@ -57,6 +58,7 @@ defmodule Credo.Check.Design.AliasUsage do
                               Tuple URI Version],
       if_nested_deeper_than: 0,
       if_called_more_often_than: 0,
+      allow_shorter_alias: false,
     ]
 
   use Credo.Check, base_priority: :normal
@@ -70,33 +72,34 @@ defmodule Credo.Check.Design.AliasUsage do
     excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
     if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
     if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
+    allow_shorter_alias = Params.get(params, :allow_shorter_alias, @default_params)
 
     source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, allow_shorter_alias))
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end
 
-  defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames) do
+  defp traverse({:defmodule, _, _} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames, allow_shorter_alias) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
-    new_issues = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, aliases, mod_deps))
+    new_issues = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, allow_shorter_alias, aliases, mod_deps))
 
     {ast, issues ++ new_issues}
   end
-  defp traverse(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames) do
+  defp traverse(ast, issues, _source_file, _excluded_namespaces, _excluded_lastnames, _allow_shorter_alias) do
     {ast, issues}
   end
 
   # Ignore module attributes
-  defp find_issues({:@, _, _}, issues, _, _, _, _, _) do
+  defp find_issues({:@, _, _}, issues, _, _, _, _, _, _) do
     {nil, issues}
   end
   # Ignore multi alias call
-  defp find_issues({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _, _, _, _, _) do
+  defp find_issues({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _, _, _, _, _, _) do
     {ast, issues}
   end
-  defp find_issues({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames, aliases, mod_deps) when is_list(mod_list) and is_atom(fun_atom) do
+  defp find_issues({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, issues, issue_meta, excluded_namespaces, excluded_lastnames, allow_shorter_alias, aliases, mod_deps) when is_list(mod_list) and is_atom(fun_atom) do
     cond do
       (Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1)) ->
         {ast, issues}
@@ -106,13 +109,15 @@ defmodule Credo.Check.Design.AliasUsage do
         {ast, issues}
       conflicting_with_other_modules?(mod_list, mod_deps) ->
         {ast, issues}
+      allow_shorter_alias && refers_to_alias?(mod_list, aliases) ->
+        {ast, issues}
       true ->
         trigger = Enum.join(mod_list, ".")
 
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end
-  defp find_issues(ast, issues, _, _, _, _, _) do
+  defp find_issues(ast, issues, _, _, _, _, _, _) do
     {ast, issues}
   end
 
@@ -148,6 +153,19 @@ defmodule Credo.Check.Design.AliasUsage do
     |> Enum.filter(&Credo.Code.Name.parts_count(&1) > 1)
     |> Enum.map(&Credo.Code.Name.last/1)
     |> Enum.any?(&(&1 == last_name))
+  end
+
+  # Returns true if mod_list refers to alias.
+  defp refers_to_alias?(mod_list, aliases) do
+    first_name = Credo.Code.Name.first(mod_list)
+
+    Enum.find(aliases, &referring_alias?(&1, mod_list, first_name))
+  end
+  defp referring_alias?(alias_name, mod_list, first_name) do
+    full_name = Credo.Code.Name.full(mod_list)
+    alias_last_name = Credo.Code.Name.last(alias_name)
+
+    full_name != alias_name && alias_last_name == first_name
   end
 
   defp tuple?(t) when is_tuple(t), do: true
