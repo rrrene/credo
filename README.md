@@ -347,7 +347,7 @@ Do note with the passed option as filename is a stub that is just used to prefix
 
 ### Using Credo as stand alone
 
-If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [https://github.com/rrrene/bunt](bunt):
+If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [bunt](https://github.com/rrrene/bunt):
 
 ```bash
 $ git clone git@github.com:rrrene/bunt.git
