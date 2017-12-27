@@ -8,6 +8,7 @@ defmodule Credo.CLI.Output.IssueHelper do
 
   @indent 8
 
+  # TODO: refactor and remove
   def print_issues(issues, source_file_map, %Execution{format: _} = exec, term_width) do
     Enum.each(issues, fn(%Issue{filename: filename} = issue) ->
       source_file = source_file_map[filename]
@@ -15,30 +16,6 @@ defmodule Credo.CLI.Output.IssueHelper do
     end)
   end
 
-  def do_print_issue(%Issue{check: _check, message: message, filename: filename, priority: _priority} = issue, _source_file,
-                    %Execution{format: "flycheck"} = _exec, _term_width) do
-    tag = Output.check_tag(issue, false)
-
-    [
-      filename |> to_string, Filename.pos_suffix(issue.line_no, issue.column), ": ", tag, ": ", message,
-    ]
-    |> UI.puts
-  end
-  def do_print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, _source_file,
-                    %Execution{format: "oneline"} = _exec, _term_width) do
-    inner_color = Output.check_color(issue)
-    message_color  = inner_color
-    filename_color = :default_color
-
-    [
-      inner_color,
-      Output.check_tag(check.category), " ", priority |> Output.priority_arrow, " ",
-      :reset, filename_color, :faint, filename |> to_string,
-      :default_color, :faint, Filename.pos_suffix(issue.line_no, issue.column),
-      :reset, message_color,  " ", message,
-    ]
-    |> UI.puts
-  end
   def do_print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file,
                     %Execution{format: _} = exec, term_width) do
     outer_color = Output.check_color(issue)
