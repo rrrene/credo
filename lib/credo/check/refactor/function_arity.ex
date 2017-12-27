@@ -13,7 +13,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
       ignore_defp: "Set to `true` to ignore private functions."
     ]
   ]
-  @default_params [max_arity: 5, ignore_defp: false]
+  @default_params [max_arity: 8, ignore_defp: false]
   @def_ops [:def, :defp, :defmacro]
 
   alias Credo.Code.Parameters
