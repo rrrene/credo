@@ -117,6 +117,125 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report a violation /9" do
+"""
+defmodule CredoSampleModule do
+  def some_function(oneParam, twoParam) do
+    :ok
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /10" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param, p2, p3) do
+    [someValue + v2 + v3 | {someValue} <- param, v2 <- p2, v3 <- p3]
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /11" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param) do
+    for someValue <- param do
+      someValue + 1
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /12" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param) do
+    case param do
+      0 -> :ok
+      1 -> :ok
+      someValue -> :error
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /13" do
+"""
+defmodule CredoSampleModule do
+  def some_function(_param) do
+    try do
+      raise "oops"
+    catch
+      someValue -> :error
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /14" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param) do
+    receive do
+      {:get, someJam} -> :ok
+      {:put, ^param} -> :ok
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /15" do
+"""
+defmodule CredoSampleModule do
+  def some_function(timeOut) do
+    receive do
+      _ -> :ok
+    after
+      timeOut -> :timeout
+    end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /16" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param) do
+    fn (otherParam) -> param + otherParam end
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /17" do
+"""
+defmodule CredoSampleModule do
+  def some_function(param) do
+    with {:ok, v1} <- M.f1(param),
+         {:ok, v2} <- M.f2(v1),
+         {:ok, someValue} <- M.f3(v2),
+         do: M.f0(someValue)
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report multiple violations" do
 """
 defmodule CredoSampleModule do
