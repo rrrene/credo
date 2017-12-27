@@ -17,6 +17,17 @@ defmodule Credo.Check.Readability.SpecsTest do
         |> refute_issues(@described_check)
   end
 
+  test "it should NOT report functions with specs containing a `with` clause" do
+    """
+    defmodule CredoTypespecTest do
+      @spec foo(a, a) :: a when a: integer
+      @doc "some docs for foo/2"
+      def foo(a, b), do: a + b
+    end
+    """ |> to_source_file()
+        |> refute_issues(@described_check)
+  end
+
   test "it should NOT report private functions" do
     """
     defmodule CredoTypespecTest do
