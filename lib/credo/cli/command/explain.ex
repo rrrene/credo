@@ -3,13 +3,10 @@ defmodule Credo.CLI.Command.Explain do
 
   @shortdoc "Show code object and explain why it is/might be an issue"
 
-  alias Credo.Check.Runner
   alias Credo.Execution
   alias Credo.CLI.Filename
   alias Credo.CLI.Output.Explain
   alias Credo.CLI.Output.UI
-  alias Credo.CLI.Output
-  alias Credo.Sources
 
   # TODO: explain used exec options
 
@@ -20,41 +17,14 @@ defmodule Credo.CLI.Command.Explain do
 
     if Filename.contains_line_no?(filename) do
       exec
-      |> load_and_validate_source_files()
-      |> Runner.prepare_config
-      |> run_checks()
+      |> Credo.CLI.Task.LoadAndValidateSourceFiles.call()
+      |> Credo.CLI.Task.PrepareChecksToRun.call()
+      |> Credo.CLI.Task.RunChecks.call()
       |> print_results_and_summary()
-      |> determine_success()
+      |> Credo.CLI.Task.SetRelevantIssues.call()
     else
       print_help(exec)
     end
-  end
-
-  defp load_and_validate_source_files(exec) do
-    {time_load, {valid_source_files, invalid_source_files}} =
-      :timer.tc fn ->
-        exec
-        |> Sources.find
-        |> Credo.Backports.Enum.split_with(&(&1.valid?))
-      end
-
-    Output.complain_about_invalid_source_files(invalid_source_files)
-
-    exec
-    |> Execution.put_source_files(valid_source_files)
-    |> Execution.put_assign("credo.time.source_files", time_load)
-  end
-
-  defp run_checks(%Execution{} = exec) do
-    source_files = Execution.get_source_files(exec)
-
-    {time_run, :ok} =
-      :timer.tc fn ->
-        Runner.run(source_files, exec)
-      end
-
-    exec
-    |> Execution.put_assign("credo.time.run_checks", time_run)
   end
 
   defp print_results_and_summary(exec) do
@@ -73,10 +43,6 @@ defmodule Credo.CLI.Command.Explain do
     exec.cli_options.args
     |> List.wrap
     |> List.first
-  end
-
-  defp determine_success(exec) do
-    exec
   end
 
   defp output_mod(_) do

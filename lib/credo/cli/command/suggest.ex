@@ -3,39 +3,20 @@ defmodule Credo.CLI.Command.Suggest do
 
   @shortdoc "Suggest code objects to look at next (default)"
 
-  alias Credo.Check.Runner
   alias Credo.Execution
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output.IssuesGroupedByCategory
   alias Credo.CLI.Output.UI
-  alias Credo.CLI.Output
-  alias Credo.Sources
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: print_help(exec)
   def call(exec, _opts) do
     exec
-    |> load_and_validate_source_files()
-    |> Runner.prepare_config
+    |> Credo.CLI.Task.LoadAndValidateSourceFiles.call()
+    |> Credo.CLI.Task.PrepareChecksToRun.call()
     |> print_before_info()
-    |> run_checks()
+    |> Credo.CLI.Task.RunChecks.call()
     |> print_results_and_summary()
-    |> determine_success()
-  end
-
-  defp load_and_validate_source_files(exec) do
-    {time_load, {valid_source_files, invalid_source_files}} =
-      :timer.tc fn ->
-        exec
-        |> Sources.find
-        |> Credo.Backports.Enum.split_with(&(&1.valid?))
-      end
-
-    Output.complain_about_invalid_source_files(invalid_source_files)
-
-    exec
-    |> Execution.put_source_files(valid_source_files)
-    |> Execution.put_assign("credo.time.source_files", time_load)
+    |> Credo.CLI.Task.SetRelevantIssues.call()
   end
 
   defp print_before_info(exec) do
@@ -45,17 +26,6 @@ defmodule Credo.CLI.Command.Suggest do
     out.print_before_info(source_files, exec)
 
     exec
-  end
-
-  defp run_checks(%Execution{} = exec) do
-    source_files = Execution.get_source_files(exec)
-
-    {time_run, :ok} =
-      :timer.tc fn ->
-        Runner.run(source_files, exec)
-      end
-
-    Execution.put_assign(exec, "credo.time.run_checks", time_run)
   end
 
   defp print_results_and_summary(%Execution{} = exec) do
@@ -68,16 +38,6 @@ defmodule Credo.CLI.Command.Suggest do
     out.print_after_info(source_files, exec, time_load, time_run)
 
     exec
-  end
-
-  defp determine_success(exec) do
-    issues =
-      exec
-      |> Execution.get_issues
-      |> Filter.important(exec)
-      |> Filter.valid_issues(exec)
-
-    Execution.put_result(exec, "credo.issues", issues)
   end
 
   defp output_mod(%Execution{format: "oneline"}) do
