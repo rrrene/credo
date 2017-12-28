@@ -14,7 +14,7 @@ defmodule Credo.CLI.Command.Explain do
   # TODO: explain used exec options
 
   @doc false
-  def run(%Execution{help: true} = exec), do: print_help(exec)
+  def call(%Execution{help: true} = exec, _opts), do: print_help(exec)
   def call(exec, _opts) do
     filename = get_filename(exec)
 

@@ -12,7 +12,7 @@ defmodule Credo.CLI.Command.Suggest do
   alias Credo.Sources
 
   @doc false
-  def run(%Execution{help: true} = exec), do: print_help(exec)
+  def call(%Execution{help: true} = exec, _opts), do: print_help(exec)
   def call(exec, _opts) do
     exec
     |> load_and_validate_source_files()
