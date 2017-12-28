@@ -1,11 +1,11 @@
-defmodule Credo.Execution.TaskRunnerBuilder do
+defmodule Credo.Execution.TaskChain do
 
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
-      import Credo.Execution.TaskRunnerBuilder
+      import Credo.Execution.TaskChain
       Module.register_attribute(__MODULE__, :groups, accumulate: true)
-      @before_compile Credo.Execution.TaskRunnerBuilder
+      @before_compile Credo.Execution.TaskChain
 
       def call(exec, opts \\ []) do
         runner_builder_call(exec)
@@ -17,7 +17,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
   defmacro __before_compile__(_env) do
     quote do
       defp runner_builder_call(exec) do
-        Credo.Execution.TaskRunnerBuilder.builder_call(exec, all_groups())
+        Credo.Execution.TaskChain.builder_call(exec, all_groups())
       end
 
       defp all_groups do

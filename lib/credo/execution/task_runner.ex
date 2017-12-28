@@ -9,7 +9,7 @@ defmodule Credo.Execution.TaskRunner do
   Tasks are organized in named groups.
   """
 
-  use Credo.Execution.TaskRunnerBuilder
+  use Credo.Execution.TaskChain
 
   group :parse_cli_options do
     task Credo.Execution.Task.ParseOptions
