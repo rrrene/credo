@@ -7,7 +7,7 @@ defmodule Credo.Execution.TaskRunnerBuilder do
       Module.register_attribute(__MODULE__, :groups, accumulate: true)
       @before_compile Credo.Execution.TaskRunnerBuilder
 
-      def call(exec) do
+      def call(exec, opts \\ []) do
         runner_builder_call(exec)
       end
     end
@@ -62,5 +62,4 @@ defmodule Credo.Execution.TaskRunnerBuilder do
       end
     end
   end
-
 end

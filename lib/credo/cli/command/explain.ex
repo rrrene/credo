@@ -15,7 +15,7 @@ defmodule Credo.CLI.Command.Explain do
 
   @doc false
   def run(%Execution{help: true} = exec), do: print_help(exec)
-  def run(exec) do
+  def call(exec, _opts) do
     filename = get_filename(exec)
 
     if Filename.contains_line_no?(filename) do

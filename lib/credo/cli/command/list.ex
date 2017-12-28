@@ -14,7 +14,7 @@ defmodule Credo.CLI.Command.List do
 
   @doc false
   def run(%Execution{help: true} = exec), do: print_help(exec)
-  def run(exec) do
+  def call(exec, _opts) do
     exec
     |> load_and_validate_source_files()
     |> Runner.prepare_config

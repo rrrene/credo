@@ -7,7 +7,7 @@ defmodule Credo.CLI.Command.GenCheck do
   @default_check_template_file File.read!(@check_template_filename)
 
   @doc false
-  def run(exec) do
+  def call(exec, _opts) do
     exec.cli_options.args
     |> List.first
     |> create_check_file
