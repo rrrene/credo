@@ -124,5 +124,4 @@ defmodule Credo.CLI.Output.IssuesGroupedByCategory.Default do
 
   def per_category(%Execution{all: true}), do: 1_000_000
   def per_category(%Execution{all: false}), do: @per_category
-
 end
