@@ -1,4 +1,7 @@
 defmodule Credo.CLI.Output.Shell do
+  @moduledoc """
+  GenServer used by Credo.CLI.Output.UI to write to the shell.
+  """
   use GenServer
 
   def start_link(opts \\ []) do
