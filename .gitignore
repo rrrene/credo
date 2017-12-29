@@ -6,4 +6,4 @@
 *.iml
 erl_crash.dump
 *.ez
-.elixir_ls/
+lib/my_first_credo_check.ex
