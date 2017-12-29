@@ -34,7 +34,7 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.2.0"},
-      {:poison, "~> 3.0"},
+      {:poison, ">= 0.0.0"},
     ]
   end
 end
