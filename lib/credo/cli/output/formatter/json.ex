@@ -20,7 +20,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
 
     column_end =
       if issue.column && issue.trigger do
-        issue.column + String.length(issue.trigger)
+        issue.column + String.length(to_string(issue.trigger))
       end
 
     %{

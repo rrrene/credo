@@ -1,6 +1,8 @@
 defmodule Credo.CLI.Command.GenCheck do
   use Credo.CLI.Command
 
+  alias Credo.CLI.Output.UI
+
   @shortdoc "Create a new custom check"
 
   @check_template_filename ".template.check.ex"
@@ -22,17 +24,19 @@ defmodule Credo.CLI.Command.GenCheck do
         "  mix credo gen.check lib/my_first_credo_check.ex", "\n"
       ]
 
-    Bunt.puts(output)
+    UI.puts(output)
   end
   defp create_check_file(filename) do
     check_name = check_name_for(filename)
 
     if File.exists?(filename) do
-      Bunt.puts [:red, :bright, "File exists: #{filename}, aborted."]
+      UI.puts [:red, :bright, "File exists: #{filename}, aborted."]
     else
       write_template_file(filename, check_name)
-      Bunt.puts [:green, "* creating ", :reset, "#{filename}"]
-      Bunt.puts
+
+      UI.puts [:green, "* creating ", :reset, "#{filename}"]
+      UI.puts
+
       print_config_instructions(filename, check_name)
     end
   end
@@ -52,21 +56,22 @@ defmodule Credo.CLI.Command.GenCheck do
 
     assigns = [check_name: check_name]
     contents = EEx.eval_string(@default_check_template_file, assigns: assigns)
+
     File.write!(filename, contents)
   end
 
   defp print_config_instructions(filename, check_name) do
-    Bunt.puts "Add the generated file to the list of `requires` in `.credo.exs`:"
-    Bunt.puts
-    Bunt.puts ["    requires: [", :green, "\"", filename, "\"", :reset, "], ", :faint, "# <-- add file here"]
-    Bunt.puts
-    Bunt.puts "Remember to add the generated module to the list of `checks`:"
-    Bunt.puts
-    Bunt.puts ["    checks: ["]
-    Bunt.puts ["      {", :green, check_name, :reset, "}, ", :faint, "# <-- add check here"]
-    Bunt.puts ["    ]"]
-    Bunt.puts
-    Bunt.puts ["If you do not have a exec file yet, use `mix credo gen.config`"]
+    UI.puts "Add the generated file to the list of `requires` in `.credo.exs`:"
+    UI.puts
+    UI.puts ["    requires: [", :green, "\"", filename, "\"", :reset, "], ", :faint, "# <-- add file here"]
+    UI.puts
+    UI.puts "Remember to add the generated module to the list of `checks`:"
+    UI.puts
+    UI.puts ["    checks: ["]
+    UI.puts ["      {", :green, check_name, :reset, "}, ", :faint, "# <-- add check here"]
+    UI.puts ["    ]"]
+    UI.puts
+    UI.puts ["If you do not have a exec file yet, use `mix credo gen.config`"]
   end
 
   # This module ensures we have access to Macro.camelize in Elixir 1.1

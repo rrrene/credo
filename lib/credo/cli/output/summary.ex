@@ -21,7 +21,7 @@ defmodule Credo.CLI.Output.Summary do
     nil
   end
   def print(source_files, exec, time_load, time_run) do
-    issues = Credo.Execution.get_issues(exec)
+    issues = Execution.get_issues(exec)
 
     shown_issues =
       issues
@@ -67,7 +67,7 @@ defmodule Credo.CLI.Output.Summary do
 
     bar =
       parts
-      |> Enum.map(&(&1/sum))
+      |> Enum.map(&(&1 / sum))
       |> Enum.map(&Float.round(&1, 3))
       |> Enum.with_index
       |> Enum.map(fn({quota, index}) ->
@@ -95,6 +95,7 @@ defmodule Credo.CLI.Output.Summary do
         "1.0" -> "1 second"
         value -> "#{value} seconds"
       end
+
     "Analysis took #{total_in_seconds} (#{format_in_seconds time_load}s to load, #{format_in_seconds time_run}s running checks)"
   end
 

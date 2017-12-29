@@ -5,7 +5,6 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   alias Credo.Execution
   alias Credo.CLI.Command.Suggest.SuggestOutput
-  alias Credo.CLI.Output.UI
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
