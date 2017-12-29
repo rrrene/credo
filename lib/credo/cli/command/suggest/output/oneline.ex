@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.IssuesGroupedByCategory.Oneline do
+defmodule Credo.CLI.Command.Suggest.Output.Oneline do
   alias Credo.CLI.Output.Formatter.Oneline
   alias Credo.Execution
 

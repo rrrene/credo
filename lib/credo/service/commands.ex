@@ -8,7 +8,7 @@ defmodule Credo.Service.Commands do
     "gen.config" => Credo.CLI.Command.GenConfig,
     "help" => Credo.CLI.Command.Help,
     "list" => Credo.CLI.Command.List,
-    "suggest" => Credo.CLI.Command.Suggest,
+    "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
     "version" => Credo.CLI.Command.Version,
   }
 

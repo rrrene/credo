@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.IssuesGroupedByCategory.Default do
+defmodule Credo.CLI.Command.Suggest.Output.Default do
   alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.IssueHelper

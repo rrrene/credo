@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.IssuesGroupedByCategory.Json do
+defmodule Credo.CLI.Command.Suggest.Output.Json do
   alias Credo.CLI.Output.Formatter.JSON
   alias Credo.Execution
 

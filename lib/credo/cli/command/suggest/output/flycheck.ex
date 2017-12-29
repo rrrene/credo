@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.IssuesGroupedByCategory.FlyCheck do
+defmodule Credo.CLI.Command.Suggest.Output.FlyCheck do
   alias Credo.CLI.Output.Formatter.Flycheck
   alias Credo.Execution
 
