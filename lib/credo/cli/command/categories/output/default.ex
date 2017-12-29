@@ -43,9 +43,8 @@ defmodule Credo.CLI.Command.Categories.Output.Default do
     """,
   ]
 
-  def print do
-    @order
-    |> Enum.each(&print_category/1)
+  def print_categories do
+    Enum.each(@order, &print_category/1)
   end
 
   defp print_category(category) do
