@@ -1,26 +1,26 @@
-defmodule Credo.CLI.Command.Suggest.SuggestOutput do
+defmodule Credo.CLI.Command.List.ListOutput do
   use Credo.CLI.Output.Delegator,
-    default: Credo.CLI.Command.Suggest.Output.Default,
-    flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
-    oneline: Credo.CLI.Command.Suggest.Output.Oneline,
-    json: Credo.CLI.Command.Suggest.Output.Json
+    default: Credo.CLI.Command.List.Output.Default,
+    flycheck: Credo.CLI.Command.List.Output.FlyCheck,
+    oneline: Credo.CLI.Command.List.Output.Oneline,
+    json: Credo.CLI.Command.List.Output.Json
 
   alias Credo.CLI.Output.UI
 
   def print_help(exec) do
-    usage = ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
+    usage = ["Usage: ", :olive, "mix credo list [paths] [options]"]
     description =
       """
 
-      Suggests objects from every category that Credo thinks can be improved.
+      Lists objects that Credo thinks can be improved ordered by their priority.
       """
-    example = ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
+    example = ["Example: ", :olive, :faint, "$ mix credo list lib/**/*.ex --format=oneline"]
     options =
       """
 
       Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
-      Suggest options:
+      List options:
         -a, --all             Show all issues
         -A, --all-priorities  Show all issues including low priority ones
         -c, --checks          Only include checks that match the given strings

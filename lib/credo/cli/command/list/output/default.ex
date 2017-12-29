@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.IssuesByScope do
+defmodule Credo.CLI.Command.List.Output.Default do
   alias Credo.Code.Scope
   alias Credo.CLI.Filename
   alias Credo.CLI.Filter
@@ -130,5 +130,4 @@ defmodule Credo.CLI.Output.IssuesByScope do
 
     UI.puts_edge([outer_color, :faint], @indent)
   end
-
 end
