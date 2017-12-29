@@ -1,5 +1,5 @@
 defmodule Credo.CLI.Command.Suggest.SuggestOutput do
-  use Credo.CLI.Output.Delegator,
+  use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.Suggest.Output.Default,
     flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
     oneline: Credo.CLI.Command.Suggest.Output.Oneline,
