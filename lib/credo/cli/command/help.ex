@@ -3,6 +3,8 @@ defmodule Credo.CLI.Command.Help do
 
 
   @shortdoc "Show this help message"
+  @moduledoc @shortdoc
+
   @ljust 12
   @starting_order ~w(suggest explain)
   @ending_order ~w(help)

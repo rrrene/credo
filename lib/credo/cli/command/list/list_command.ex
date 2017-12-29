@@ -2,6 +2,7 @@ defmodule Credo.CLI.Command.List.ListCommand do
   use Credo.CLI.Command
 
   @shortdoc "List all issues grouped by files"
+  @moduledoc @shortdoc
 
   alias Credo.Execution
   alias Credo.CLI.Command.List.ListOutput
