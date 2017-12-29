@@ -264,7 +264,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     [
       UI.edge([outer_color, :faint]), :reset,
-        String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset ,"}"
+        String.duplicate(" ", @indent-2), "  {", :cyan, check_name, :reset, ", ", :cyan, "false", :reset, "}"
     ]
     |> UI.puts
 
@@ -297,7 +297,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     [
       UI.edge([outer_color, :faint]), :reset,
-        String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset ," being ", :cyan, "false", :reset, " or any combination of these keywords:"
+        String.duplicate(" ", @indent-2), "with ", :cyan, :faint, "<params>", :reset , " being ", :cyan, "false", :reset, " or any combination of these keywords:"
     ]
     |> UI.puts
 
