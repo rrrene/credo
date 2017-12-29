@@ -13,7 +13,7 @@ defmodule Credo.CLI do
 
   @doc false
   def main(argv) do
-    Credo.start nil, nil
+    Credo.Application.start nil, nil
 
     TaskRunner.call(%Execution{argv: argv})
   end
