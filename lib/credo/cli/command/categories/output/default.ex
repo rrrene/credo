@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.Categories do
+defmodule Credo.CLI.Command.Categories.Output.Default do
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
 

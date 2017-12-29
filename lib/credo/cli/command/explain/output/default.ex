@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Output.Explain do
+defmodule Credo.CLI.Command.Explain.Output.Default do
   alias Credo.Code.Scope
   alias Credo.CLI.Filter
   alias Credo.CLI.Output
@@ -101,7 +101,7 @@ defmodule Credo.CLI.Output.Explain do
       UI.edge(outer_color),
         inner_color,
         tag_style,
-         "  ",
+          "  ",
         Output.check_tag(check.category),
         :reset, " Category: #{check.category} "
     ]

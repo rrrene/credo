@@ -2,8 +2,8 @@ defmodule Credo.Service.Commands do
   use GenServer
 
   @command_map %{
-    "categories" => Credo.CLI.Command.Categories,
-    "explain" => Credo.CLI.Command.Explain,
+    "categories" => Credo.CLI.Command.Categories.CategoriesCommand,
+    "explain" => Credo.CLI.Command.Explain.ExplainCommand,
     "gen.check" => Credo.CLI.Command.GenCheck,
     "gen.config" => Credo.CLI.Command.GenConfig,
     "help" => Credo.CLI.Command.Help,

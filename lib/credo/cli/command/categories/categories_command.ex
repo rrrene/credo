@@ -1,4 +1,4 @@
-defmodule Credo.CLI.Command.Categories do
+defmodule Credo.CLI.Command.Categories.CategoriesCommand do
   use Credo.CLI.Command
 
   @shortdoc "Show and explain all issue categories"
