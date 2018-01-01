@@ -28,6 +28,7 @@ defmodule Credo.Sample1 do
       &:erlang_module.function_capture/3
       &Elixir.function_capture/3
       &@module.blah/1
+      |> my_func(&Some.Deep.Module.is_something/1)
     end
   end
 end
@@ -75,7 +76,7 @@ end
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{with_space: 18} == result
+    assert %{with_space: 19} == result
   end
 
   test "it should report correct frequencies for operators not surrounded by spaces" do

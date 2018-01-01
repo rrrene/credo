@@ -38,12 +38,20 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   defp skip_function_capture([{:capture_op, _, _} | tokens]) do
     Enum.drop_while(tokens, fn
-      {:atom, _, _} -> true # :erlang_module
-      {:aliases, _, _} -> true # ElixirModule
-      {:identifier, _, _} -> true # function_name
-      {:at_op, _, _} -> true # @module_attribute
-      {:., _} -> true
-      _ -> false
+      {:atom, _, _} -> # :erlang_module
+        true
+      {:alias, _, _} -> # ElixirModule (Elxiir >= 1.6.0)
+        true
+      {:aliases, _, _} -> # ElixirModule
+        true
+      {:identifier, _, _} -> # function_name
+        true
+      {:at_op, _, _} -> # @module_attribute
+        true
+      {:., _} ->
+        true
+      _ ->
+        false
     end)
   end
   defp skip_function_capture(tokens), do: tokens
@@ -86,6 +94,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   defp without_space?(prev, op, next) do
     !usually_no_space_before?(prev, op, next) && no_space_between?(prev, op)
-    || !usually_no_space_after?(prev, op, next) && no_space_between?(op, next) && !(elem(next, 0) == :eol)
+      || !usually_no_space_after?(prev, op, next) && no_space_between?(op, next) && !(elem(next, 0) == :eol)
   end
 end
