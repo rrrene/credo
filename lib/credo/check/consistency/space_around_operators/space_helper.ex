@@ -57,7 +57,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
     line_no == line_no2 && col_end < col_start2
   end
 
-  if Version.match?(System.version, "< 1.6.0") do
+  if Version.match?(System.version, "< 1.6.0-rc") do
     defp position({_, pos, _, _, _, _}), do: pos
     defp position({_, pos, _, _, _}), do: pos
     defp position({_, pos, _, _}), do: pos
