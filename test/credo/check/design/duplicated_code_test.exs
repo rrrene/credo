@@ -252,8 +252,12 @@ else
   p2 + p1
 end
 """ |> Code.string_to_quoted
+    # Elixir <= 1.5.x
     expected = "E9FD5824275A94E20A327BCB1253F6DEA816ECD20AC4A58F2184345F3D422532"
-    assert expected == DuplicatedCode.to_hash(ast)
+    # Elixir >= 1.6.0
+    expected_160 = "100B2E81FB13BEEFDC7E514AC56F10385340A7DC6535144A0FBC8EB74C37AEEB"
+
+    assert expected == DuplicatedCode.to_hash(ast) or expected_160 == DuplicatedCode.to_hash(ast)
   end
 
 end

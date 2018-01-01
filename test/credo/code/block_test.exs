@@ -47,17 +47,17 @@ end
       IO.puts "Yay!"
     end
     """ |> Code.string_to_quoted
-    expected = {:__block__, [],
+
+    assert {:__block__, [],
             [{:some_action, [line: 2], nil},
-             {{:., [line: 3], [{:__aliases__, [counter: 0, line: 3], [:IO]}, :puts]}, [line: 3],
-              ["HA"]}]}
-    assert expected == Block.do_block_for!(ast)
-    expected = {:__block__, [],
-            [{:some_other_action, [line: 5], nil},
-             {{:., [line: 6], [{:__aliases__, [counter: 0, line: 6], [:IO]}, :puts]}, [line: 6],
-              ["Yay!"]}]}
+            {{:., [line: 3], [{:__aliases__, _, [:IO]}, :puts]}, [line: 3],
+              ["HA"]}]} = Block.do_block_for!(ast)
+
     assert Block.else_block?(ast)
-    assert expected == Block.else_block_for!(ast)
+    assert {:__block__, [],
+            [{:some_other_action, [line: 5], nil},
+            {{:., [line: 6], [{:__aliases__, _, [:IO]}, :puts]}, [line: 6],
+              ["Yay!"]}]} = Block.else_block_for!(ast)
   end
 
   test "it should return whether an `ast` has a do and/or else block with just one operation in it" do
