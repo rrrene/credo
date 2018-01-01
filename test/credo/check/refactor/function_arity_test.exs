@@ -36,7 +36,7 @@ end
   test "it should report a violation" do
 """
 defmodule Credo.Sample.Module do
-  def some_function(p1, p2, p3, p4, p5, p6) do
+  def some_function(p1, p2, p3, p4, p5, p6, p7, p8, p9) do
     some_value = parameter1 + parameter2
   end
 end
