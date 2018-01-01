@@ -73,7 +73,7 @@ defmodule Credo.Check.Readability.StringSigils do
     lines = SourceFile.lines(source_file)
     {_, line} = Enum.find(lines, fn {n, _} -> n == line_no end)
 
-    Regex.match?(~r/"""$/, line)
+    Regex.match?(~r/("""|''')$/, line)
   end
 
   defp too_many_quotes?(string, limit) do
