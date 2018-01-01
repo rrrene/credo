@@ -50,10 +50,10 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   for type <- @token_types do
     defp find_issues({unquote(type), {line_no, column, _}, token}, issues, issue_meta) do
       case safe_atom_name(token) do
-        {:ok, atom} ->
-          [issue_for(issue_meta, atom, line_no, column) | issues]
-        :error ->
+        nil ->
           issues
+        atom ->
+          [issue_for(issue_meta, atom, line_no, column) | issues]
       end
     end
   end
@@ -62,30 +62,36 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
     issues
   end
 
+  # "safe atom" here refers to a quoted atom not containing an interpolation
   defp safe_atom_name(token) when is_list(token) do
     if Enum.all?(token, &is_binary/1) do
       token
       |> Enum.join()
       |> safe_atom_name()
-    else
-      :error
     end
   end
   defp safe_atom_name(token) when is_binary(token) do
-    case :elixir_tokenizer.tokenize(':#{token}', 1, []) do
-      {:ok, _, _, [{:atom, _, atom}]} ->
-        if is_atom(atom) and token == Atom.to_string(atom) do
-          {:ok, atom}
-        else
-          :error
-        end
-      _ -> :error
+    :elixir_tokenizer.tokenize(':#{token}', 1, [])
+    |> safe_atom_name(token)
+  end
+  defp safe_atom_name(_), do: nil
+
+  # Elixir >= 1.6.0
+  defp safe_atom_name({:ok, [{:atom, {_, _, _}, atom} | _]}, token) do
+    if token == Atom.to_string(atom) do
+      atom
     end
   end
-  defp safe_atom_name(_), do: :error
+  # Elixir <= 1.5.x
+  defp safe_atom_name({:ok, _, _, [{:atom, _, atom} | _]}, token) do
+    if token == Atom.to_string(atom) do
+      atom
+    end
+  end
 
   defp issue_for(issue_meta, atom, line_no, column) do
     trigger = ~s[:"#{atom}"]
+
     format_issue issue_meta,
       message: "Use unquoted atom `#{inspect atom}` rather than quoted atom `#{trigger}`.",
       trigger: trigger,
