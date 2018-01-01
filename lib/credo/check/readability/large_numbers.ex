@@ -48,6 +48,14 @@ defmodule Credo.Check.Readability.LargeNumbers do
     collect_number_tokens(t, acc, min_number)
   end
 
+  # tuple for Elixir >= 1.6.0
+  defp number_token({:int, {_, _, number}, _} = tuple, min_number) when min_number < number do
+    tuple
+  end
+  defp number_token({:float, {_, _, number}, _} = tuple, min_number) when min_number < number do
+    tuple
+  end
+  # tuple for Elixir <= 1.5.x
   defp number_token({:number, _, number} = tuple, min_number) when min_number < number do
     tuple
   end
@@ -56,21 +64,35 @@ defmodule Credo.Check.Readability.LargeNumbers do
   defp find_issues([], acc, _issue_meta) do
     acc
   end
-  defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
-    source = source_fragment(location, issue_meta)
-    underscored_number = number_with_underscores(number, source)
-    new_issue =
-      if decimal_in_source?(source) && source != underscored_number do
-        [issue_for(
-          issue_meta, line_no, column1, source, underscored_number
-        )]
-      else
-        []
-      end
-
-    acc = acc ++ new_issue
+  # tuple for Elixir >= 1.6.0
+  defp find_issues([{:int, {line_no, column1, number} = location, _} | t], acc, issue_meta) do
+    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
 
     find_issues(t, acc, issue_meta)
+  end
+  defp find_issues([{:float, {line_no, column1, number} = location, _} | t], acc, issue_meta) do
+    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+
+    find_issues(t, acc, issue_meta)
+  end
+  # tuple for Elixir <= 1.5.x
+  defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
+    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+
+    find_issues(t, acc, issue_meta)
+  end
+
+  defp find_issue(line_no, column1, location, number, issue_meta) do
+    source = source_fragment(location, issue_meta)
+    underscored_number = number_with_underscores(number, source)
+
+    if decimal_in_source?(source) && source != underscored_number do
+      [issue_for(
+        issue_meta, line_no, column1, source, underscored_number
+      )]
+    else
+      []
+    end
   end
 
   defp number_with_underscores(number, _) when is_integer(number) do
@@ -107,11 +129,13 @@ defmodule Credo.Check.Readability.LargeNumbers do
       "0b" -> false
       "0o" -> false
       "0x" -> false
+      "" -> false
       _ -> true
     end
   end
 
-  defp source_fragment({line_no, column1, _column2} = tuple, issue_meta) do
+  # `_column_or_number` depends on Elixir version
+  defp source_fragment({line_no, column1, _column_or_number} = tuple, issue_meta) do
     line =
       issue_meta
       |> IssueMeta.source_file
