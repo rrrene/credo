@@ -13,6 +13,7 @@ defmodule Credo.CLI.Options do
     config_name: :string,
     color: :boolean,
     crash_on_error: :boolean,
+    debug: :boolean,
     mute_exit_status: :boolean,
     format: :string,
     help: :boolean,
@@ -30,6 +31,7 @@ defmodule Credo.CLI.Options do
     A: :all_priorities,
     c: :checks,
     C: :config_name,
+    d: :debug,
     h: :help,
     i: :ignore_checks,
     v: :version

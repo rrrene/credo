@@ -33,11 +33,7 @@ defmodule Credo.Execution.TaskChain do
   def builder_call(exec, compiled_groups) do
     groups = compiled_groups
 
-    #IO.inspect({:executing_router_with_groups, __MODULE__, groups})
-
     Enum.reduce(groups, exec, fn(group, exec) ->
-      #IO.puts ""
-      #IO.inspect({:group, group})
       Credo.Execution.TaskGroup.run(exec, group)
     end)
   end

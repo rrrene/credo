@@ -10,6 +10,7 @@ defmodule Credo.Execution do
             # config
             files:              nil,
             color:              true,
+            debug:              false,
             checks:             nil,
             requires:           [],
             strict:             false,

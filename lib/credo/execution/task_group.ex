@@ -3,7 +3,7 @@ defmodule Credo.Execution.TaskGroup do
 
   @callback call(exec :: Credo.Execution.t, opts :: Keyword.t) :: Credo.Execution.t
 
-  import Credo.Execution
+  alias Credo.Execution.TaskMonitor
 
   defmacro __using__(_opts \\ []) do
     quote do
@@ -22,8 +22,6 @@ defmodule Credo.Execution.TaskGroup do
     quote do
       defp task_builder_call(exec, opts) do
         Enum.reduce(all_tasks(), exec, fn(task, exec) ->
-          #IO.inspect({:task, task})
-
           Credo.Execution.Task.run(exec, task, opts)
         end)
       end
@@ -47,12 +45,14 @@ defmodule Credo.Execution.TaskGroup do
   Runs a given `task_group`.
   """
   def run(exec, task_group, opts \\ [])
+  def run(%Credo.Execution{debug: true} = exec, task_group, opts) do
+    TaskMonitor.task_group(exec, task_group, opts, &do_run/3, [exec, task_group, opts])
+  end
   def run(exec, task_group, opts) do
-    {time, exec} =
-      :timer.tc fn ->
-        task_group.call(exec, opts)
-      end
+    do_run(exec, task_group, opts)
+  end
 
-    put_assign(exec, "credo.time.group.#{task_group.name}", time)
+  defp do_run(exec, task_group, opts) do
+    task_group.call(exec, opts)
   end
 end

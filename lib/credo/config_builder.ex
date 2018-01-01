@@ -49,6 +49,7 @@ defmodule Credo.ConfigBuilder do
     exec
     |> add_switch_all(switches)
     |> add_switch_color(switches)
+    |> add_switch_debug(switches)
     |> add_switch_strict(switches)
     |> add_switch_crash_on_error(switches)
     |> add_switch_mute_exit_status(switches)
@@ -72,6 +73,11 @@ defmodule Credo.ConfigBuilder do
     %Execution{exec | color: color}
   end
   defp add_switch_color(exec, _), do: exec
+
+  defp add_switch_debug(exec, %{debug: debug}) do
+    %Execution{exec | debug: debug}
+  end
+  defp add_switch_debug(exec, _), do: exec
 
   defp add_switch_strict(exec, %{all_priorities: true}) do
     add_switch_strict(exec, %{strict: true})
