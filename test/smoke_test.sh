@@ -13,11 +13,11 @@ mix credo.gen.check lib/my_first_credo_check.ex
 mix credo.gen.config
 
 mix credo categories
-mix credo help
 mix credo version
+mix credo help
 
-mix credo -h
 mix credo -v
+mix credo -h
 
 
 echo ""
