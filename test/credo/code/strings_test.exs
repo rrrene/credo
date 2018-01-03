@@ -47,14 +47,18 @@ this is an example " TODO: and this is no actual comment
     refute String.contains?(result, "TODO:")
   end
 
-#  test "it should return the source without string sigils 3" do
-#    source = ~S"""
-#def gen_name(name) when is_binary(name),
-#  do: "#{String.replace_suffix(name, "-test", "")}_name"
-#"""
-#    result = source |> Strings.replace_with_spaces
-#    assert source == result, result
-#  end
+  test "it should return the source without string sigils 3" do
+    source = ~S"""
+    def gen_name(name) when is_binary(name),
+      do: "#{String.replace_suffix(name, "-test", "")}_name"
+    """
+    expected = ~S"""
+    def gen_name(name) when is_binary(name),
+      do: "                                                "
+    """
+
+    assert expected == Strings.replace_with_spaces(source)
+  end
 
   test "it should return the source without string literals 3" do
     source = """
@@ -108,5 +112,4 @@ t = ~s(.
     result = source |> Strings.replace_with_spaces(".")
     assert expected == result
   end
-
 end

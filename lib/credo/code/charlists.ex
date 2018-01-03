@@ -1,6 +1,6 @@
 defmodule Credo.Code.Charlists do
   @moduledoc """
-  This module let's you strip charlists from source code.
+  This module lets you strip charlists from source code.
   """
 
   @doc """

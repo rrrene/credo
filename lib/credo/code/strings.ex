@@ -1,7 +1,9 @@
 defmodule Credo.Code.Strings do
   @moduledoc """
-  This module let's you strip strings from source code.
+  This module lets you strip strings from source code.
   """
+
+  alias Credo.Code.InterpolationHelper
 
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"\"", "\""}, {"'", "'"}]
@@ -17,7 +19,9 @@ defmodule Credo.Code.Strings do
   with the equivalent amount of white-space.
   """
   def replace_with_spaces(source, replacement \\ " ") do
-    parse_code(source, "", replacement)
+    source
+    |> InterpolationHelper.replace_interpolations(replacement)
+    |> parse_code("", replacement)
   end
 
   defp parse_code("", acc, _replacement) do

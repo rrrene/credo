@@ -1,14 +1,18 @@
 defmodule Credo.Code.Heredocs do
   @moduledoc """
-  This module let's you strip heredocs from source code.
+  This module lets you strip heredocs from source code.
   """
+
+  alias Credo.Code.InterpolationHelper
 
   @doc """
   Replaces all characters inside heredocs
   with the equivalent amount of white-space.
   """
   def replace_with_spaces(source, replacement \\ " ") do
-    parse_code(source, "", replacement)
+    source
+    |> InterpolationHelper.replace_interpolations(replacement)
+    |> parse_code("", replacement)
   end
 
   defp parse_code("", acc, _replacement) do

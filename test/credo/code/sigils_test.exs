@@ -90,7 +90,6 @@ defmodule Credo.Code.SigilsTest do
     assert expected == result
   end
 
-  @tag :to_be_implemented
   test "it should remove sigils with interpolation 2" do
     source = ~S"""
     defmodule CredoSampleModule do
@@ -111,7 +110,6 @@ defmodule Credo.Code.SigilsTest do
     assert expected == source |> Sigils.replace_with_spaces("")
   end
 
-  @tag :to_be_implemented
   test "it should remove sigils with interpolation 222" do
     source = ~S"""
     defmodule CredoSampleModule do
@@ -132,7 +130,6 @@ defmodule Credo.Code.SigilsTest do
     assert expected == source |> Sigils.replace_with_spaces("")
   end
 
-  @tag :to_be_implemented
   test "it should remove sigils with interpolation 3" do
     source = ~S"""
     defmodule CredoSampleModule do
