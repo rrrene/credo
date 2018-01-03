@@ -209,5 +209,49 @@ defmodule Credo.Code.TokenTest do
 
       assert @multiple_interpolations_position == position
     end
+
+    @tag :to_be_implemented
+    test "should give correct token position with multiple interpolations in heredoc" do
+      source = @heredoc_interpolations_source
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:identifier, {1, 1, nil}, :def},
+        {:paren_identifier, {1, 5, nil}, :fun},
+        {:"(", {1, 8, nil}},
+        {:")", {1, 9, nil}},
+        {:do, {1, 11, nil}},
+        {:eol, {1, 13, 1}},
+        {:identifier, {2, 3, nil}, :a},
+        {:match_op, {2, 5, nil}, :=},
+        {:bin_heredoc, {2, 7, nil}, [
+          "MyModule.",
+          {{3, 10, 3}, [
+            {:paren_identifier, {3, 12, nil}, :fun},
+            {:"(", {3, 15, nil}},
+            {:alias, {3, 16, nil}, :Module},
+            {:., {3, 22, nil}},
+            {:paren_identifier, {3, 23, nil}, :value},
+            {:"(", {3, 28, nil}},
+            {:")", {3, 29, nil}},
+            {:dual_op, {3, 31, nil}, :+},
+            {:int, {3, 33, 1}, '1'},
+            {:")", {3, 34, nil}}
+          ]},
+          ".SubModule.",
+          {{3, 47, 3}, [{:identifier, {3, 49, nil}, :name}]},
+          "\"\n"
+        ]},
+        {:eol, {4, 1, 1}},
+        {:end, {5, 1, nil}},
+        {:eol, {5, 4, 1}}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> List.last() |> Token.position()
+
+      assert @heredoc_interpolations_position == position
+    end
   end
 end

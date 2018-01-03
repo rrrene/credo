@@ -96,50 +96,47 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  # Elixir >= 1.6.0
-  if Version.match?(System.version(), ">= 1.6.0-rc") do
-    test "should give correct token position" do
-      position = InterpolationHelper.interpolation_positions(@no_interpolations_source)
+  test "should give correct token position" do
+    position = InterpolationHelper.interpolation_positions(@no_interpolations_source)
 
-      assert @no_interpolations_positions == position
-    end
+    assert @no_interpolations_positions == position
+  end
 
-    test "should give correct token position with a single interpolation" do
-      position = InterpolationHelper.interpolation_positions(@single_interpolations_source)
+  test "should give correct token position with a single interpolation" do
+    position = InterpolationHelper.interpolation_positions(@single_interpolations_source)
 
-      assert @single_interpolations_positions == position
-    end
+    assert @single_interpolations_positions == position
+  end
 
-    test "should give correct token position with a single interpolation /2" do
-      source = ~S[a = ~s{ #{"a" <> fun() <>  "b" } }]
-      position = InterpolationHelper.interpolation_positions(source)
+  test "should give correct token position with a single interpolation /2" do
+    source = ~S[a = ~s{ #{"a" <> fun() <>  "b" } }]
+    position = InterpolationHelper.interpolation_positions(source)
 
-      assert [{1, 9, 33}] == position
-    end
+    assert [{1, 9, 33}] == position
+  end
 
-    test "should give correct token position with a single interpolation /3" do
-      source = ~S"""
-      defmodule CredoSampleModule do
-        def some_function(parameter1, parameter2) do
-          values = ~s{ #{ "}" } }
-        end
+  test "should give correct token position with a single interpolation /3" do
+    source = ~S"""
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        values = ~s{ #{ "}" } }
       end
-      """
-      position = InterpolationHelper.interpolation_positions(source)
-
-      assert [{3, 18, 26}] == position
     end
+    """
+    position = InterpolationHelper.interpolation_positions(source)
 
-    test "should give correct token position with multiple interpolations" do
-      position = InterpolationHelper.interpolation_positions(@multiple_interpolations_source)
+    assert [{3, 18, 26}] == position
+  end
 
-      assert @multiple_interpolations_positions == position
-    end
+  test "should give correct token position with multiple interpolations" do
+    position = InterpolationHelper.interpolation_positions(@multiple_interpolations_source)
 
-    test "should give correct token position with multiple interpolations in heredoc" do
-      position = InterpolationHelper.interpolation_positions(@heredoc_interpolations_source)
+    assert @multiple_interpolations_positions == position
+  end
 
-      assert @heredoc_interpolations_positions == position
-    end
+  test "should give correct token position with multiple interpolations in heredoc" do
+    position = InterpolationHelper.interpolation_positions(@heredoc_interpolations_source)
+
+    assert @heredoc_interpolations_positions == position
   end
 end

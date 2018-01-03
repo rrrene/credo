@@ -31,26 +31,56 @@ defmodule Credo.Code.InterpolationHelper do
     |> Enum.reject(&is_nil/1)
   end
 
-  # Elixir >= 1.6.0
-  defp map_interpolations(
-         {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char},
-         source
-       ) do
-    interpolation_positions_for_quoted_string(list, source)
-  end
+  if Version.match?(System.version(), ">= 1.6.0-rc") do
 
-  defp map_interpolations({:bin_string, {_line_no, _col_start, _}, list}, source) do
-    interpolation_positions_for_quoted_string(list, source)
-  end
+    # Elixir >= 1.6.0
+    defp map_interpolations(
+          {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char},
+          source
+        ) do
+      interpolation_positions_for_quoted_string(list, source)
+    end
 
-  defp map_interpolations({:bin_heredoc, {line_no, _col_start, _}, list}, source) do
-    first_line_in_heredoc = get_line(source, line_no + 1)
-    padding_in_first_line =
-      determine_padding_at_start_of_line(first_line_in_heredoc)
+    defp map_interpolations({:bin_heredoc, {line_no, _col_start, _}, list}, source) do
+      first_line_in_heredoc = get_line(source, line_no + 1)
+      padding_in_first_line =
+        determine_padding_at_start_of_line(first_line_in_heredoc)
 
-    interpolation_positions_for_quoted_string(list, source)
-    |> Enum.reject(&is_nil/1)
-    |> add_to_col_start_and_end(padding_in_first_line)
+      interpolation_positions_for_quoted_string(list, source)
+      |> Enum.reject(&is_nil/1)
+      |> add_to_col_start_and_end(padding_in_first_line)
+    end
+
+    defp map_interpolations({:bin_string, {_line_no, _col_start, _}, list}, source) do
+      interpolation_positions_for_quoted_string(list, source)
+    end
+
+  else
+
+    # Elixir <= 1.5.x
+    defp map_interpolations(
+          {:sigil, {_line_no, _col_start, _col_end}, _, list, _},
+          source
+        ) do
+      interpolation_positions_for_quoted_string(list, source)
+    end
+
+    defp map_interpolations({:bin_string, {line_no, _col_start, _}, list}, source) do
+      line_with_heredoc_quotes = get_line(source, line_no)
+
+      if Regex.run(~r/("""|''')/, line_with_heredoc_quotes) do
+        first_line_in_heredoc = get_line(source, line_no + 1)
+        padding_in_first_line =
+          determine_padding_at_start_of_line(first_line_in_heredoc)
+
+        interpolation_positions_for_quoted_string(list, source)
+        |> Enum.reject(&is_nil/1)
+        |> add_to_col_start_and_end(padding_in_first_line)
+      else
+        interpolation_positions_for_quoted_string(list, source)
+      end
+    end
+
   end
 
   defp map_interpolations({:atom_unsafe, {_line_no, _col_start, _}, list}, source) do

@@ -112,12 +112,17 @@ defmodule Credo.Code.Token do
     def to_col_end(col_start, value, add \\ 0) do
       col_start + String.length(to_string(value)) + add
     end
+
   else
+
     # Elixir <= 1.5.x
     def position({_, pos, _, _, _, _}), do: pos
     def position({_, pos, _, _, _}), do: pos
     def position({_, pos, _, _}), do: pos
     def position({_, pos, _}), do: pos
-    def position({_, pos}), do: pos
+    def position({pos, list}) when is_list(list), do: pos
+    def position({pos, list}) when is_list(list), do: pos
+    def position({atom, pos}) when is_atom(atom), do: pos
+
   end
 end
