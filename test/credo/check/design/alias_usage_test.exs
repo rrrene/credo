@@ -152,6 +152,20 @@ end
     |> assert_issue(@described_check)
   end
 
+  test "it should report even when allowing shorter alias" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+
+  def fun1 do
+    something
+    |> Credo.Foo.Bar.Baz.call
+  end
+end
+""" |> to_source_file
+    |> assert_issue(@described_check, allow_shorter_alias: true)
+  end
+
   test "it should report if configured to complain start at a certain depth" do
 """
 defmodule CredoSampleModule do
@@ -223,6 +237,21 @@ defmodule Test do
 end
 """ |> to_source_file
     |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report when allowing shorter alias" do
+"""
+defmodule CredoSampleModule do
+  alias ExUnit.Case
+  alias Credo.Foo
+
+  def fun1 do
+    something
+    |> Foo.Bar.Baz.call
+  end
+end
+""" |> to_source_file
+    |> refute_issues(@described_check, allow_shorter_alias: true)
   end
 
   #
