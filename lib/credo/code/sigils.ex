@@ -3,6 +3,8 @@ defmodule Credo.Code.Sigils do
   This module lets you strip sigils from source code.
   """
 
+  alias Credo.Code.InterpolationHelper
+
   @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
   @sigil_delimiters [{"(", ")"}, {"[", "]"}, {"{", "}"}, {"<", ">"},
                       {"|", "|"}, {"/", "/"}, {"\"\"\"", "\"\"\""}, {"\"", "\""}, {"'", "'"}]
@@ -21,7 +23,9 @@ defmodule Credo.Code.Sigils do
   white-space.
   """
   def replace_with_spaces(source, replacement \\ " ") do
-    parse_code(source, "", replacement)
+    source
+    |> InterpolationHelper.replace_interpolations(replacement)
+    |> parse_code("", replacement)
   end
 
   defp parse_code("", acc, _replacement) do
