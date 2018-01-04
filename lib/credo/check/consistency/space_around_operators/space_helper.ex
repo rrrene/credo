@@ -58,5 +58,4 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
 
     line_no == line_no2 && col_end < col_start2
   end
-
 end

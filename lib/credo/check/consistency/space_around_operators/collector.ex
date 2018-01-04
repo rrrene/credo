@@ -2,58 +2,78 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   use Credo.Check.Consistency.Collector
 
   alias Credo.Code
+
   import Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper,
-    only: [operator?: 1, space_between?: 2, no_space_between?: 2, usually_no_space_before?: 3, usually_no_space_after?: 3]
+    only: [
+      operator?: 1,
+      space_between?: 2,
+      no_space_between?: 2,
+      usually_no_space_before?: 3,
+      usually_no_space_after?: 3
+    ]
 
   def collect_matches(source_file, _params) do
     source_file
-    |> Code.to_tokens
+    |> Code.to_tokens()
     |> traverse_tokens(&record_spaces(&1, &2, &3, &4), %{})
   end
 
   def find_locations_not_matching(expected, source_file) do
     source_file
-    |> Code.to_tokens
+    |> Code.to_tokens()
     |> traverse_tokens(&record_not_matching(expected, &1, &2, &3, &4), [])
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   defp traverse_tokens(tokens, callback, acc) do
     tokens
     |> skip_function_capture
     |> case do
-        [prev | [current | [next | rest]]] ->
-          acc =
-            if operator?(current) do
-              callback.(prev, current, next, acc)
-            else
-              acc
-            end
+      [prev | [current | [next | rest]]] ->
+        acc =
+          if operator?(current) do
+            callback.(prev, current, next, acc)
+          else
+            acc
+          end
 
-          traverse_tokens([current | [next | rest]], callback, acc)
-        _ ->
-          acc
-      end
+        traverse_tokens([current | [next | rest]], callback, acc)
+
+      _ ->
+        acc
+    end
   end
 
   defp skip_function_capture([{:capture_op, _, _} | tokens]) do
     Enum.drop_while(tokens, fn
-      {:atom, _, _} -> # :erlang_module
+      # :erlang_module
+      {:atom, _, _} ->
         true
-      {:alias, _, _} -> # ElixirModule (Elxiir >= 1.6.0)
+
+      # ElixirModule (Elxiir >= 1.6.0)
+      {:alias, _, _} ->
         true
-      {:aliases, _, _} -> # ElixirModule
+
+      # ElixirModule
+      {:aliases, _, _} ->
         true
-      {:identifier, _, _} -> # function_name
+
+      # function_name
+      {:identifier, _, _} ->
         true
-      {:at_op, _, _} -> # @module_attribute
+
+      # @module_attribute
+      {:at_op, _, _} ->
         true
+
       {:., _} ->
         true
+
       _ ->
         false
     end)
   end
+
   defp skip_function_capture(tokens), do: tokens
 
   defp record_spaces(prev, current, next, acc) do
@@ -75,6 +95,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       case expected do
         :with_space ->
           without_space?(prev, current, next)
+
         :without_space ->
           with_space?(prev, current, next)
       end
@@ -93,7 +114,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   end
 
   defp without_space?(prev, op, next) do
-    !usually_no_space_before?(prev, op, next) && no_space_between?(prev, op)
-      || !usually_no_space_after?(prev, op, next) && no_space_between?(op, next) && !(elem(next, 0) == :eol)
+    (!usually_no_space_before?(prev, op, next) && no_space_between?(prev, op)) ||
+      (!usually_no_space_after?(prev, op, next) && no_space_between?(op, next) &&
+         !(elem(next, 0) == :eol))
   end
 end

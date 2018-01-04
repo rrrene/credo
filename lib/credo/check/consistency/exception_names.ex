@@ -39,39 +39,40 @@ defmodule Credo.Check.Consistency.ExceptionNames do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+
     issue_locations =
       @collector.find_locations_not_matching(expected, source_file)
 
-    Enum.map(issue_locations, fn(location) ->
-      format_issue issue_meta,
-        [{:message, message_for(expected, location[:trigger])} | location]
+    Enum.map(issue_locations, fn location ->
+      format_issue(issue_meta, [
+        {:message, message_for(expected, location[:trigger])} | location
+      ])
     end)
   end
 
   defp message_for({:prefix, expected}, trigger) do
-    message =
-      """
-      Exception modules should be named consistently.
-      It seems your strategy is to prefix them with `#{expected}`,
-      but `#{trigger}` does not follow that convention."
-      """
+    message = """
+    Exception modules should be named consistently.
+    It seems your strategy is to prefix them with `#{expected}`,
+    but `#{trigger}` does not follow that convention."
+    """
 
     to_one_line(message)
   end
+
   defp message_for({:suffix, expected}, trigger) do
-    message =
-      """
-      Exception modules should be named consistently.
-      It seems your strategy is to have `#{expected}` as a suffix,
-      but `#{trigger}` does not follow that convention.
-      """
+    message = """
+    Exception modules should be named consistently.
+    It seems your strategy is to have `#{expected}` as a suffix,
+    but `#{trigger}` does not follow that convention.
+    """
 
     to_one_line(message)
   end
 
   def to_one_line(str) do
     str
-    |> String.split
+    |> String.split()
     |> Enum.join(" ")
   end
 end

@@ -14,27 +14,33 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
 
     source_file
     |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
   def actual_for(:before = _expected), do: :after
   def actual_for(:after = _expected), do: :before
 
-  defp traverse(callback, {:def, _, [{_name, _, params}, _]} = ast, acc) when is_list(params) do
+  defp traverse(callback, {:def, _, [{_name, _, params}, _]} = ast, acc)
+       when is_list(params) do
     {ast, traverse_params(callback, params, acc)}
   end
-  defp traverse(callback, {:defp, _, [{_name, _, params}, _]} = ast, acc) when is_list(params) do
+
+  defp traverse(callback, {:defp, _, [{_name, _, params}, _]} = ast, acc)
+       when is_list(params) do
     {ast, traverse_params(callback, params, acc)}
   end
+
   defp traverse(_callback, ast, acc), do: {ast, acc}
 
   defp traverse_params(callback, params, acc) do
     Enum.reduce(params, acc, fn
-      ({:=, _, [{capture_name, meta, nil}, _rhs]}, param_acc) ->
+      {:=, _, [{capture_name, meta, nil}, _rhs]}, param_acc ->
         callback.(:before, capture_name, meta, param_acc)
-      ({:=, _, [_lhs, {capture_name, meta, nil}]}, param_acc) ->
+
+      {:=, _, [_lhs, {capture_name, meta, nil}]}, param_acc ->
         callback.(:after, capture_name, meta, param_acc)
-      (_, param_acc) ->
+
+      _, param_acc ->
         param_acc
     end)
   end

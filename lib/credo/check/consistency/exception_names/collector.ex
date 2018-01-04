@@ -16,20 +16,25 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
 
     source_file
     |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
-    |> Enum.reverse
+    |> Enum.reverse()
   end
 
-  defp traverse(callback, {:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast, acc) do
+  defp traverse(
+         callback,
+         {:defmodule, _meta, [{:__aliases__, _, _name_arr}, _arguments]} = ast,
+         acc
+       ) do
     if Module.exception?(ast) do
       {ast, callback.(ast, acc)}
     else
       {ast, acc}
     end
   end
+
   defp traverse(_callback, ast, acc), do: {ast, acc}
 
   defp record_exception(ast, acc) do
-    {prefix, suffix} = ast |> Module.name |> prefix_and_suffix
+    {prefix, suffix} = ast |> Module.name() |> prefix_and_suffix
 
     acc
     |> Map.update({:prefix, prefix}, 1, &(&1 + 1))
@@ -48,6 +53,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
         else
           acc
         end
+
       {:suffix, expected_suffix} ->
         if suffix != expected_suffix do
           [[line_no: meta[:line], trigger: exception_name] | acc]
@@ -58,7 +64,7 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
   end
 
   defp prefix_and_suffix(exception_name) do
-    name_list = exception_name |> Name.last |> Name.split_pascal_case
+    name_list = exception_name |> Name.last() |> Name.split_pascal_case()
     prefix = List.first(name_list)
     suffix = List.last(name_list)
 

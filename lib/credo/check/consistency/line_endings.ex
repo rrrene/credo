@@ -21,12 +21,13 @@ defmodule Credo.Check.Consistency.LineEndings do
     source_file
     |> IssueMeta.for(params)
     |> format_issue(message: message_for(expected))
-    |> List.wrap
+    |> List.wrap()
   end
 
   defp message_for(:unix = _expected) do
     "File is using windows line endings while most of the files use unix line endings."
   end
+
   defp message_for(:windows = _expected) do
     "File is using unix line endings while most of the files use windows line endings."
   end
