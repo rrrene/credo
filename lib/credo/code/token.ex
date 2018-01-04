@@ -4,6 +4,30 @@ defmodule Credo.Code.Token do
   """
 
   @doc """
+  Returns `true` if the given `token` contains a line break.
+  """
+  def eol?(token)
+
+  def eol?(list) when is_list(list) do
+    Enum.any?(list, &eol?/1)
+  end
+
+  def eol?({_, {_, _, _}, _, list, _, _}) when is_list(list) do
+    Enum.any?(list, &eol?/1)
+  end
+
+  def eol?({_, {_, _, _}, list}) when is_list(list) do
+    Enum.any?(list, &eol?/1)
+  end
+
+  def eol?({{_, _, _}, list}) when is_list(list) do
+    Enum.any?(list, &eol?/1)
+  end
+
+  def eol?({:eol, {_, _, _}}), do: true
+  def eol?(_), do: false
+
+  @doc """
   Returns the position of a token in the form
 
       {line_no_start, col_start, line_no_end, col_end}
@@ -63,6 +87,8 @@ defmodule Credo.Code.Token do
       {line_no, col_start, line_no_end, col_end}
     end
 
+    #
+
     defp position_tuple(list, line_no, col_start) when is_list(list) do
       binary = to_string(list)
       col_end = col_start + String.length(binary)
@@ -88,29 +114,44 @@ defmodule Credo.Code.Token do
 
     defp position_tuple_for_heredoc(list, line_no, col_start) when is_list(list) do
       # add 3 for """ (closing double quote)
-      {line_no_end, col_end} = convert_to_col_end(line_no, col_start, list)
+      {line_no_end, col_end, _terminator} =
+        convert_to_col_end(line_no, col_start, list)
 
       col_end = col_end + 3
 
       {line_no, col_start, line_no_end, col_end}
     end
 
-    defp position_tuple_for_quoted_string(list, line_no, col_start)
-         when is_list(list) do
+    @doc false
+    def position_tuple_for_quoted_string(list, line_no, col_start)
+        when is_list(list) do
       # add 1 for " (closing double quote)
-      {line_no_end, col_end} = convert_to_col_end(line_no, col_start, list)
+      {line_no_end, col_end, terminator} =
+        convert_to_col_end(line_no, col_start, list)
 
-      col_end = col_end + 1
+      {line_no_end, col_end} =
+        case terminator do
+          :eol ->
+            # move to next line
+            {line_no_end + 1, 1}
+
+          _ ->
+            # add 1 for " (closing double quote)
+            {line_no_end, col_end + 1}
+        end
 
       {line_no, col_start, line_no_end, col_end}
     end
 
-    defp convert_to_col_end(line_no, col_start, value) when is_list(value) do
-      Enum.reduce(value, {line_no, col_start}, fn value,
-                                                  {
-                                                    current_line_no,
-                                                    current_col_start
-                                                  } ->
+    #
+
+    defp convert_to_col_end(line_no, col_start, list) when is_list(list) do
+      Enum.reduce(list, {line_no, col_start, nil}, fn value,
+                                                      {
+                                                        current_line_no,
+                                                        current_col_start,
+                                                        _terminator
+                                                      } ->
         convert_to_col_end(current_line_no, current_col_start, value)
       end)
     end
@@ -121,13 +162,17 @@ defmodule Credo.Code.Token do
            _col_start,
            {{line_no, col_start, _}, list}
          ) do
-      # add 1 for " (closing double quote)
-      {line_no2, col_end} = convert_to_col_end(line_no, col_start, list)
+      {line_no_end, col_end, _terminator} =
+        convert_to_col_end(line_no, col_start, list)
 
       # add 1 for } (closing parens of interpolation)
       col_end = col_end + 1
 
-      {line_no2, col_end}
+      {line_no_end, col_end, :interpolation}
+    end
+
+    defp convert_to_col_end(_, _, {:eol, {line_no, col_start, _}}) do
+      {line_no, col_start, :eol}
     end
 
     defp convert_to_col_end(
@@ -135,7 +180,7 @@ defmodule Credo.Code.Token do
            _col_start,
            {value, {line_no, col_start, _}}
          ) do
-      {line_no, to_col_end(col_start, value)}
+      {line_no, to_col_end(col_start, value), nil}
     end
 
     defp convert_to_col_end(
@@ -144,7 +189,7 @@ defmodule Credo.Code.Token do
            {:bin_string, {line_no, col_start, nil}, value}
          ) do
       # add 2 for opening and closing "
-      {line_no, to_col_end(col_start, value, 2)}
+      {line_no, to_col_end(col_start, value, 2), :bin_string}
     end
 
     defp convert_to_col_end(
@@ -152,7 +197,7 @@ defmodule Credo.Code.Token do
            _col_start,
            {_, {line_no, col_start, nil}, value}
          ) do
-      {line_no, to_col_end(col_start, value)}
+      {line_no, to_col_end(col_start, value), nil}
     end
 
     defp convert_to_col_end(
@@ -160,12 +205,14 @@ defmodule Credo.Code.Token do
            _col_start,
            {_, {line_no, col_start, value}, _value}
          ) do
-      {line_no, to_col_end(col_start, value)}
+      {line_no, to_col_end(col_start, value), nil}
     end
 
     defp convert_to_col_end(line_no, col_start, value) do
-      {line_no, to_col_end(col_start, value)}
+      {line_no, to_col_end(col_start, value), nil}
     end
+
+    #
 
     def to_col_end(col_start, value, add \\ 0) do
       col_start + String.length(to_string(value)) + add
@@ -175,8 +222,22 @@ defmodule Credo.Code.Token do
   defmodule ElixirPre1_6_0 do
     @moduledoc false
 
+    alias Credo.Code.Token.Elixir1_6_0
+    alias Credo.Code.Token
+
     @doc false
     def position(token) do
+      position(token, Token.eol?(token))
+    end
+
+    def position(token, true) do
+      {line_no, col_start, col_end_pre_160} = do_position(token)
+      {_line_no, _col_start, line_no_end, col_end} = Elixir1_6_0.position(token)
+
+      {line_no, col_start, line_no_end, max(col_end, col_end_pre_160)}
+    end
+
+    def position(token, false) do
       {line_no, col_start, col_end} = do_position(token)
 
       {line_no, col_start, line_no, col_end}
@@ -186,7 +247,6 @@ defmodule Credo.Code.Token do
     defp do_position({_, pos, _, _, _}), do: pos
     defp do_position({_, pos, _, _}), do: pos
     defp do_position({_, pos, _}), do: pos
-    defp do_position({pos, list}) when is_list(list), do: pos
     defp do_position({pos, list}) when is_list(list), do: pos
     defp do_position({atom, pos}) when is_atom(atom), do: pos
   end

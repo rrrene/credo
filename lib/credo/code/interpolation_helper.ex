@@ -13,12 +13,42 @@ defmodule Credo.Code.InterpolationHelper do
     |> Enum.join("\n")
   end
 
-  defp replace_line({line_no, col_start, _line_no_end, col_end}, lines, char) do
+  defp replace_line({line_no, col_start, line_no, col_end}, lines, char) do
     List.update_at(
       lines,
       line_no - 1,
       &replace_line(&1, col_start, col_end, char)
     )
+  end
+
+  defp replace_line(position, lines, char) do
+    {line_no_start, col_start, line_no_end, col_end} = position
+
+    Enum.reduce(line_no_start..line_no_end, lines, fn
+      line_no, memo
+      when line_no == line_no_start ->
+        List.update_at(
+          memo,
+          line_no - 1,
+          &replace_line(&1, col_start, String.length(&1) + 1, char)
+        )
+
+      line_no, memo
+      when line_no == line_no_end ->
+        List.update_at(
+          memo,
+          line_no - 1,
+          &replace_line(&1, 1, col_end, char)
+        )
+
+      line_no, memo
+      when line_no < line_no_end ->
+        List.update_at(
+          memo,
+          line_no - 1,
+          &replace_line(&1, 1, String.length(&1) + 1, char)
+        )
+    end)
   end
 
   defp replace_line(line, col_start, col_end, char) do
@@ -118,28 +148,47 @@ defmodule Credo.Code.InterpolationHelper do
     |> add_to_col_start_and_end(padding_in_first_line)
   end
 
-  defp find_interpolations(value, source) when is_list(value) do
-    Enum.map(value, &find_interpolations(&1, source))
+  defp find_interpolations(list, source) when is_list(list) do
+    Enum.map(list, &find_interpolations(&1, source))
   end
 
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
-    line = get_line(source, line_no)
+    {line_no, col_start, line_no_end, col_end}
+    # |> IO.inspect()
+
+    col_end =
+      if line_no_end > line_no && col_end == 1 do
+        # This means we encountered :eol and jumped in the next line.
+        # We need to add the closing `}`.
+        col_end + 1
+      else
+        col_end
+      end
+
+    line = get_line(source, line_no_end)
 
     # `col_end - 1` to account for the closing `}`
     rest_of_line = get_rest_of_line(line, col_end - 1)
 
-    padding = determine_padding_at_start_of_line(rest_of_line)
+    # IO.inspect(rest_of_line, label: "rest_of_line")
+
+    padding = determine_padding_at_start_of_line(rest_of_line, ~r/^\s*\}/)
+
+    # -1 to remove the accounted-for `}`
+    padding = max(padding - 1, 0)
+
+    # IO.inspect(padding, label: "padding")
 
     {line_no, col_start, line_no_end, col_end + padding}
   end
 
   defp find_interpolations(_value, _source), do: nil
 
-  defp determine_padding_at_start_of_line(line) do
-    ~r/^\s+/
+  defp determine_padding_at_start_of_line(line, regex \\ ~r/^\s+/) do
+    regex
     |> Regex.run(line)
     |> List.wrap()
     |> Enum.join()
@@ -160,6 +209,8 @@ defmodule Credo.Code.InterpolationHelper do
 
   defp get_rest_of_line(line, col_end) do
     # col-1 to account for col being 1-based
-    String.slice(line, (col_end - 1)..-1)
+    start = max(col_end - 1, 0)
+
+    String.slice(line, start..-1)
   end
 end

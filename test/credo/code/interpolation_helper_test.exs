@@ -194,35 +194,74 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert @heredoc_interpolations_positions == positions
   end
 
-  @tag :token_position
-  @tag :to_be_implemented
+  @tag :token_multi_line_replacement
   test "should replace a single interpolation stretching multiple lines" do
     source = ~S"""
-    "Use unquoted atom `#{inspect(atom)}` rather than quoted atom `#{
-      trigger
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2
     }`."
     """
 
     expected = ~S"""
-    "Use unquoted atom `$$$$$$$$$$$$$$$$` rather than quoted atom `$$
-    $$$$$$$$$
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$
     $`."
     """
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines /2" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2
+      }`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$
+    $$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines /3" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2 <>
+      "  "}`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$$$$
+    $$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
   @tag :token_position
-  @tag :to_be_implemented
   test "should give correct token position with a single interpolation stretching multiple lines" do
     source = ~S"""
     "Use unquoted atom rather than quoted atom `#{
-      trigger
+      trigger <>
+        trigger2
     }`."
     """
 
     positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [] == positions
+    assert [{1, 45, 4, 2}] == positions
   end
 end

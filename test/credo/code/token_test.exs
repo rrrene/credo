@@ -224,35 +224,35 @@ defmodule Credo.Code.TokenTest do
       tokens = Credo.Code.to_tokens(source)
 
       expected = [
-        {:identifier, {1, 1, nil}, :def},
-        {:paren_identifier, {1, 5, nil}, :fun},
-        {:"(", {1, 8, nil}},
-        {:")", {1, 9, nil}},
-        {:do, {1, 11, nil}},
-        {:eol, {1, 13, 1}},
-        {:identifier, {2, 3, nil}, :a},
-        {:match_op, {2, 5, nil}, :=},
-        {:bin_heredoc, {2, 7, nil}, [
+        {:identifier, {1, 1, 4}, :def},
+        {:paren_identifier, {1, 5, 8}, :fun},
+        {:"(", {1, 8, 9}},
+        {:")", {1, 9, 10}},
+        {:do, {1, 11, 13}},
+        {:eol, {1, 13, 14}},
+        {:identifier, {2, 3, 4}, :a},
+        {:match_op, {2, 5, 6}, :=},
+        {:bin_string, {2, 7, 1}, [
           "MyModule.",
-          {{3, 10, 3}, [
-            {:paren_identifier, {3, 12, nil}, :fun},
-            {:"(", {3, 15, nil}},
-            {:alias, {3, 16, nil}, :Module},
-            {:., {3, 22, nil}},
-            {:paren_identifier, {3, 23, nil}, :value},
-            {:"(", {3, 28, nil}},
-            {:")", {3, 29, nil}},
-            {:dual_op, {3, 31, nil}, :+},
-            {:int, {3, 33, 1}, '1'},
-            {:")", {3, 34, nil}}
+          {{3, 10, 36}, [
+            {:paren_identifier, {3, 12, 15}, :fun},
+            {:"(", {3, 15, 16}},
+            {:aliases, {3, 16, 22}, [:Module]},
+            {:., {3, 22, 23}},
+            {:paren_identifier, {3, 23, 28}, :value},
+            {:"(", {3, 28, 29}},
+            {:")", {3, 29, 30}},
+            {:dual_op, {3, 31, 32}, :+},
+            {:number, {3, 33, 34}, 1},
+            {:")", {3, 34, 35}}
           ]},
           ".SubModule.",
-          {{3, 47, 3}, [{:identifier, {3, 49, nil}, :name}]},
+          {{3, 47, 54}, [{:identifier, {3, 49, 53}, :name}]},
           "\"\n"
         ]},
-        {:eol, {4, 1, 1}},
-        {:end, {5, 1, nil}},
-        {:eol, {5, 4, 1}}
+        {:eol, {4, 1, 2}},
+        {:end, {5, 1, 4}},
+        {:eol, {5, 4, 5}}
       ]
 
       assert expected == tokens
