@@ -23,6 +23,7 @@ defmodule Credo.Code.TokenTest do
 
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do
+    @tag :token_position
     test "should give correct token position" do
       source = @no_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -40,6 +41,7 @@ defmodule Credo.Code.TokenTest do
       assert @no_interpolations_position == position
     end
 
+    @tag :token_position
     test "should give correct token position with a single interpolation" do
       source = @single_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -60,6 +62,7 @@ defmodule Credo.Code.TokenTest do
       assert @single_interpolations_position == position
     end
 
+    @tag :token_position
     test "should give correct token position with multiple interpolations" do
       source = @multiple_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -94,6 +97,7 @@ defmodule Credo.Code.TokenTest do
     end
 
     @tag :to_be_implemented
+    @tag :token_position
     test "should give correct token position with multiple interpolations in heredoc" do
       source = @heredoc_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -140,6 +144,7 @@ defmodule Credo.Code.TokenTest do
 
   # Elixir <= 1.5.x
   if Version.match?(System.version(), "< 1.6.0-rc") do
+    @tag :token_position
     test "token position" do
       source = @no_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -157,6 +162,7 @@ defmodule Credo.Code.TokenTest do
       assert @no_interpolations_position == position
     end
 
+    @tag :token_position
     test "should give correct token position with a single interpolation" do
       source = @single_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -177,6 +183,7 @@ defmodule Credo.Code.TokenTest do
       assert @single_interpolations_position == position
     end
 
+    @tag :token_position
     test "should give correct token position with multiple interpolations" do
       source = @multiple_interpolations_source
       tokens = Credo.Code.to_tokens(source)
@@ -211,6 +218,7 @@ defmodule Credo.Code.TokenTest do
     end
 
     @tag :to_be_implemented
+    @tag :token_position
     test "should give correct token position with multiple interpolations in heredoc" do
       source = @heredoc_interpolations_source
       tokens = Credo.Code.to_tokens(source)

@@ -3,8 +3,24 @@ defmodule Credo.Code.Token do
   This module provides helper functions to analyse tokens.
   """
 
+  @doc """
+  Returns the position of a token in the form `{line_no, col_start, col_end}`
+  """
+  def position(token)
+
   if Version.match?(System.version(), ">= 1.6.0-rc") do
     # Elixir >= 1.6.0
+    defdelegate position(token), to: __MODULE__.Elixir1_6_0
+  else
+    # Elixir <= 1.5.x
+    defdelegate position(token), to: __MODULE__.ElixirPre1_6_0
+  end
+
+  defmodule Elixir1_6_0 do
+    @moduledoc false
+
+    # Elixir >= 1.6.0
+    @doc false
     def position({_, {line_no, col_start, _}, atom_or_charlist, _, _, _}) do
       position_tuple(atom_or_charlist, line_no, col_start)
     end
@@ -37,8 +53,8 @@ defmodule Credo.Code.Token do
       position_tuple(atom_or_charlist, line_no, col_start)
     end
 
+    # interpolation
     def position({{line_no, col_start, _}, list}) when is_list(list) do
-      # interpolation
       {line_no, col_start, col_end} = position_tuple_for_quoted_string(list, line_no, col_start)
 
       {line_no, col_start, col_end}
@@ -112,10 +128,12 @@ defmodule Credo.Code.Token do
     def to_col_end(col_start, value, add \\ 0) do
       col_start + String.length(to_string(value)) + add
     end
+  end
 
-  else
+  defmodule ElixirPre1_6_0 do
+    @moduledoc false
 
-    # Elixir <= 1.5.x
+    @doc false
     def position({_, pos, _, _, _, _}), do: pos
     def position({_, pos, _, _, _}), do: pos
     def position({_, pos, _, _}), do: pos
@@ -123,6 +141,5 @@ defmodule Credo.Code.Token do
     def position({pos, list}) when is_list(list), do: pos
     def position({pos, list}) when is_list(list), do: pos
     def position({atom, pos}) when is_atom(atom), do: pos
-
   end
 end

@@ -32,19 +32,17 @@ defmodule Credo.Code.InterpolationHelper do
   end
 
   if Version.match?(System.version(), ">= 1.6.0-rc") do
-
     # Elixir >= 1.6.0
     defp map_interpolations(
-          {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char},
-          source
-        ) do
+           {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char},
+           source
+         ) do
       interpolation_positions_for_quoted_string(list, source)
     end
 
     defp map_interpolations({:bin_heredoc, {line_no, _col_start, _}, list}, source) do
       first_line_in_heredoc = get_line(source, line_no + 1)
-      padding_in_first_line =
-        determine_padding_at_start_of_line(first_line_in_heredoc)
+      padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
 
       interpolation_positions_for_quoted_string(list, source)
       |> Enum.reject(&is_nil/1)
@@ -54,14 +52,12 @@ defmodule Credo.Code.InterpolationHelper do
     defp map_interpolations({:bin_string, {_line_no, _col_start, _}, list}, source) do
       interpolation_positions_for_quoted_string(list, source)
     end
-
   else
-
     # Elixir <= 1.5.x
     defp map_interpolations(
-          {:sigil, {_line_no, _col_start, _col_end}, _, list, _},
-          source
-        ) do
+           {:sigil, {_line_no, _col_start, _col_end}, _, list, _},
+           source
+         ) do
       interpolation_positions_for_quoted_string(list, source)
     end
 
@@ -70,8 +66,7 @@ defmodule Credo.Code.InterpolationHelper do
 
       if Regex.run(~r/("""|''')/, line_with_heredoc_quotes) do
         first_line_in_heredoc = get_line(source, line_no + 1)
-        padding_in_first_line =
-          determine_padding_at_start_of_line(first_line_in_heredoc)
+        padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
 
         interpolation_positions_for_quoted_string(list, source)
         |> Enum.reject(&is_nil/1)
@@ -80,7 +75,6 @@ defmodule Credo.Code.InterpolationHelper do
         interpolation_positions_for_quoted_string(list, source)
       end
     end
-
   end
 
   defp map_interpolations({:atom_unsafe, {_line_no, _col_start, _}, list}, source) do
@@ -103,7 +97,8 @@ defmodule Credo.Code.InterpolationHelper do
     {line_no, col_start, col_end} = Token.position(token)
 
     line = get_line(source, line_no)
-    rest_of_line = String.slice(line, col_end, String.length(line) - col_end)
+    # -1 for the closing }
+    rest_of_line = get_rest_of_line(line, col_end - 1)
     padding = determine_padding_at_start_of_line(rest_of_line)
 
     {line_no, col_start, col_end + padding}
@@ -114,7 +109,7 @@ defmodule Credo.Code.InterpolationHelper do
   defp determine_padding_at_start_of_line(line) do
     ~r/^\s+/
     |> Regex.run(line)
-    |> List.wrap
+    |> List.wrap()
     |> Enum.join()
     |> String.length()
   end
@@ -129,5 +124,10 @@ defmodule Credo.Code.InterpolationHelper do
     source
     |> String.split("\n")
     |> Enum.at(line_no - 1)
+  end
+
+  defp get_rest_of_line(line, col_end) do
+    # col-1 to account for col being 1-based
+    String.slice(line, (col_end - 1)..-1)
   end
 end
