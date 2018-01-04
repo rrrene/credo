@@ -33,11 +33,14 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   defp traverse({:@, _, [{:unless, _, _}]}, issues, _issue_meta) do
     {nil, issues}
   end
-  defp traverse({:unless, meta, arguments} = ast, issues, issue_meta) when is_list(arguments) do
+
+  defp traverse({:unless, meta, arguments} = ast, issues, issue_meta)
+       when is_list(arguments) do
     issue = issue_for_first_condition(List.first(arguments), meta, issue_meta)
 
     {ast, issues ++ List.wrap(issue)}
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -45,13 +48,15 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   defp issue_for_first_condition({:!, meta, _arguments}, meta, issue_meta) do
     issue_for(issue_meta, meta[:line], "!")
   end
+
   defp issue_for_first_condition(_, _, _), do: nil
 
-
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Avoid negated conditions in unless blocks.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

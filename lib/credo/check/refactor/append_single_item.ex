@@ -43,11 +43,13 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
-      message: "Appending a single item to a list is inefficient, use [head | tail]
+    format_issue(
+      issue_meta,
+      message:
+        "Appending a single item to a list is inefficient, use [head | tail]
                 notation (and Enum.reverse/1 when order matters)",
       trigger: trigger,
       line_no: line_no
+    )
   end
-
 end

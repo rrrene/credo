@@ -53,29 +53,34 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
       {ast, issues}
     end
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
   defp negated_condition?(arguments) when is_list(arguments) do
-    arguments |> List.first |> negated_condition?()
+    arguments |> List.first() |> negated_condition?()
   end
+
   defp negated_condition?({:!, _meta, _arguments}) do
     true
   end
+
   # parentheses around the condition wrap it in a __block__
   defp negated_condition?({:__block__, _meta, arguments}) do
     negated_condition?(arguments)
   end
+
   defp negated_condition?(_) do
     false
   end
 
-
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Avoid negated conditions in if-else blocks.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end
