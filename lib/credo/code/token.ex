@@ -55,7 +55,8 @@ defmodule Credo.Code.Token do
 
     # interpolation
     def position({{line_no, col_start, _}, list}) when is_list(list) do
-      {line_no, col_start, col_end} = position_tuple_for_quoted_string(list, line_no, col_start)
+      {line_no, col_start, col_end} =
+        position_tuple_for_quoted_string(list, line_no, col_start)
 
       {line_no, col_start, col_end}
     end
@@ -90,7 +91,8 @@ defmodule Credo.Code.Token do
       {line_no, col_start, col_end}
     end
 
-    defp position_tuple_for_quoted_string(list, line_no, col_start) when is_list(list) do
+    defp position_tuple_for_quoted_string(list, line_no, col_start)
+         when is_list(list) do
       # add 1 for " (closing double quote)
       col_end = convert_to_col_end(col_start, list) + 1
 
@@ -104,24 +106,33 @@ defmodule Credo.Code.Token do
     end
 
     # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
-    defp convert_to_col_end(_col_start, {{_, col_start, _}, list}) do
+    defp convert_to_col_end(_col_start, {{_line_no, col_start, _}, list}) do
       # add 1 for } (closing parens of interpolation)
       convert_to_col_end(col_start, list) + 1
     end
 
-    defp convert_to_col_end(_col_start, {value, {_, col_start, _}}),
-      do: to_col_end(col_start, value)
+    defp convert_to_col_end(_col_start, {value, {_line_no, col_start, _}}) do
+      to_col_end(col_start, value)
+    end
 
-    defp convert_to_col_end(_col_start, {:bin_string, {_, col_start, nil}, value}) do
+    defp convert_to_col_end(
+           _col_start,
+           {:bin_string, {_line_no, col_start, nil}, value}
+         ) do
       # add 2 for opening and closing "
       to_col_end(col_start, value, 2)
     end
 
-    defp convert_to_col_end(_col_start, {_, {_, col_start, nil}, value}),
-      do: to_col_end(col_start, value)
+    defp convert_to_col_end(_col_start, {_, {_line_no, col_start, nil}, value}) do
+      to_col_end(col_start, value)
+    end
 
-    defp convert_to_col_end(_col_start, {_, {_, col_start, value}, _value}),
-      do: to_col_end(col_start, value)
+    defp convert_to_col_end(
+           _col_start,
+           {_, {_line_no, col_start, value}, _value}
+         ) do
+      to_col_end(col_start, value)
+    end
 
     defp convert_to_col_end(col_start, value), do: to_col_end(col_start, value)
 

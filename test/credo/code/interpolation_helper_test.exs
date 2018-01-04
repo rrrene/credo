@@ -118,24 +118,26 @@ defmodule Credo.Code.InterpolationHelperTest do
 
   @tag :token_position
   test "should give correct token position" do
-    position = InterpolationHelper.interpolation_positions(@no_interpolations_source)
+    positions =
+      InterpolationHelper.interpolation_positions(@no_interpolations_source)
 
-    assert @no_interpolations_positions == position
+    assert @no_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with a single interpolation" do
-    position = InterpolationHelper.interpolation_positions(@single_interpolations_source)
+    positions =
+      InterpolationHelper.interpolation_positions(@single_interpolations_source)
 
-    assert @single_interpolations_positions == position
+    assert @single_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with a single interpolation /2" do
     source = ~S[a = ~s{ #{"a" <> fun() <>  "b" } }]
-    position = InterpolationHelper.interpolation_positions(source)
+    positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{1, 9, 33}] == position
+    assert [{1, 9, 33}] == positions
   end
 
   @tag :token_position
@@ -148,9 +150,9 @@ defmodule Credo.Code.InterpolationHelperTest do
     end
     """
 
-    position = InterpolationHelper.interpolation_positions(source)
+    positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{3, 18, 26}] == position
+    assert [{3, 18, 26}] == positions
   end
 
   @tag :token_position
@@ -163,27 +165,34 @@ defmodule Credo.Code.InterpolationHelperTest do
     end
     """
 
-    position = InterpolationHelper.interpolation_positions(source)
+    positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{3, 19, 30}, {4, 17, 21}, {4, 22, 31}] == position
+    assert [{3, 19, 30}, {4, 17, 21}, {4, 22, 31}] == positions
   end
 
   @tag :token_position
   test "should give correct token position with multiple interpolations" do
-    position = InterpolationHelper.interpolation_positions(@multiple_interpolations_source)
+    positions =
+      InterpolationHelper.interpolation_positions(
+        @multiple_interpolations_source
+      )
 
-    assert @multiple_interpolations_positions == position
+    assert @multiple_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with multiple interpolations in heredoc" do
-    position = InterpolationHelper.interpolation_positions(@heredoc_interpolations_source)
+    positions =
+      InterpolationHelper.interpolation_positions(
+        @heredoc_interpolations_source
+      )
 
-    assert @heredoc_interpolations_positions == position
+    assert @heredoc_interpolations_positions == positions
   end
 
   @tag :token_position
-  test "should give correct token position with a single interpolation /5" do
+  @tag :to_be_implemented
+  test "should replace a single interpolation stretching multiple lines" do
     source = ~S"""
     "Use unquoted atom `#{inspect(atom)}` rather than quoted atom `#{
       trigger
@@ -191,11 +200,25 @@ defmodule Credo.Code.InterpolationHelperTest do
     """
 
     expected = ~S"""
-
+    "Use unquoted atom `$$$$$$$$$$$$$$$$` rather than quoted atom `$$
+    $$$$$$$$$
+    $`."
     """
 
-    # not asserting this yet, just testing that there is no error
-    # assert
-    expected == InterpolationHelper.replace_interpolations(source, "$")
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_position
+  @tag :to_be_implemented
+  test "should give correct token position with a single interpolation stretching multiple lines" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger
+    }`."
+    """
+
+    positions = InterpolationHelper.interpolation_positions(source)
+
+    assert [] == positions
   end
 end

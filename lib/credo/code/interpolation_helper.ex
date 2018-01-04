@@ -37,76 +37,85 @@ defmodule Credo.Code.InterpolationHelper do
   end
 
   if Version.match?(System.version(), ">= 1.6.0-rc") do
+    #
     # Elixir >= 1.6.0
+    #
+
     defp map_interpolations(
-           {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char},
+           {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char} =
+             token,
            source
          ) do
-      interpolation_positions_for_quoted_string(list, source)
+      handle_atom_string_or_sigil(token, list, source)
     end
 
     defp map_interpolations(
-           {:bin_heredoc, {line_no, _col_start, _}, list},
+           {:bin_heredoc, {_line_no, _col_start, _}, _list} = token,
            source
          ) do
-      first_line_in_heredoc = get_line(source, line_no + 1)
-
-      padding_in_first_line =
-        determine_padding_at_start_of_line(first_line_in_heredoc)
-
-      interpolation_positions_for_quoted_string(list, source)
-      |> Enum.reject(&is_nil/1)
-      |> add_to_col_start_and_end(padding_in_first_line)
+      handle_heredoc(token, source)
     end
 
     defp map_interpolations(
-           {:bin_string, {_line_no, _col_start, _}, list},
+           {:bin_string, {_line_no, _col_start, _}, list} = token,
            source
          ) do
-      interpolation_positions_for_quoted_string(list, source)
+      handle_atom_string_or_sigil(token, list, source)
     end
   else
+    #
     # Elixir <= 1.5.x
+    #
+
     defp map_interpolations(
-           {:sigil, {_line_no, _col_start, _col_end}, _, list, _},
+           {:sigil, {_line_no, _col_start, _col_end}, _, list, _} = token,
            source
          ) do
-      interpolation_positions_for_quoted_string(list, source)
+      handle_atom_string_or_sigil(token, list, source)
     end
 
     defp map_interpolations(
-           {:bin_string, {line_no, _col_start, _}, list},
+           {:bin_string, {line_no, _col_start, _}, list} = token,
            source
          ) do
+      if is_sigil_in_line(source, line_no) do
+        handle_heredoc(token, source)
+      else
+        handle_atom_string_or_sigil(token, list, source)
+      end
+    end
+
+    defp is_sigil_in_line(source, line_no) do
       line_with_heredoc_quotes = get_line(source, line_no)
 
-      if Regex.run(~r/("""|''')/, line_with_heredoc_quotes) do
-        first_line_in_heredoc = get_line(source, line_no + 1)
-
-        padding_in_first_line =
-          determine_padding_at_start_of_line(first_line_in_heredoc)
-
-        interpolation_positions_for_quoted_string(list, source)
-        |> Enum.reject(&is_nil/1)
-        |> add_to_col_start_and_end(padding_in_first_line)
-      else
-        interpolation_positions_for_quoted_string(list, source)
-      end
+      !!Regex.run(~r/("""|''')/, line_with_heredoc_quotes)
     end
   end
 
   defp map_interpolations(
-         {:atom_unsafe, {_line_no, _col_start, _}, list},
+         {:atom_unsafe, {_line_no, _col_start, _}, list} = token,
          source
        ) do
-    interpolation_positions_for_quoted_string(list, source)
+    handle_atom_string_or_sigil(token, list, source)
   end
 
   defp map_interpolations(_, _source), do: []
 
-  defp interpolation_positions_for_quoted_string(list, source)
-       when is_list(list) do
+  defp handle_atom_string_or_sigil(_token, list, source) do
     find_interpolations(list, source)
+  end
+
+  defp handle_heredoc({_atom, {line_no, _, _}, list}, source) do
+    first_line_in_heredoc = get_line(source, line_no + 1)
+
+    # TODO: this seems to be wrong. the closing """ determines the
+    #       indentation, not the first line of the heredoc.
+    padding_in_first_line =
+      determine_padding_at_start_of_line(first_line_in_heredoc)
+
+    find_interpolations(list, source)
+    |> Enum.reject(&is_nil/1)
+    |> add_to_col_start_and_end(padding_in_first_line)
   end
 
   defp find_interpolations(value, source) when is_list(value) do
@@ -118,8 +127,10 @@ defmodule Credo.Code.InterpolationHelper do
     {line_no, col_start, col_end} = Token.position(token)
 
     line = get_line(source, line_no)
-    # -1 for the closing }
+
+    # `col_end - 1` to account for the closing `}`
     rest_of_line = get_rest_of_line(line, col_end - 1)
+
     padding = determine_padding_at_start_of_line(rest_of_line)
 
     {line_no, col_start, col_end + padding}
