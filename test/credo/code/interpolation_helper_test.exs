@@ -181,4 +181,21 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert @heredoc_interpolations_positions == position
   end
+
+  @tag :token_position
+  test "should give correct token position with a single interpolation /5" do
+    source = ~S"""
+    "Use unquoted atom `#{inspect(atom)}` rather than quoted atom `#{
+      trigger
+    }`."
+    """
+
+    expected = ~S"""
+
+    """
+
+    # not asserting this yet, just testing that there is no error
+    # assert
+    expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
