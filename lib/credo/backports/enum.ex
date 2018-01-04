@@ -16,7 +16,7 @@ defmodule Credo.Backports.Enum do
   """
   def split_with(list, fun)
 
-  if Version.match?(System.version, ">= 1.6.0-rc") do
+  if Version.match?(System.version(), ">= 1.6.0-rc") do
     def split_with(list, fun), do: Enum.split_with(list, fun)
   else
     def split_with(list, fun), do: Enum.partition(list, fun)

@@ -22,12 +22,11 @@ defmodule Credo.Backports.String do
   """
   def trim(string)
 
-  if Version.match?(System.version, "< 1.3.0") do
+  if Version.match?(System.version(), "< 1.3.0") do
     def trim(string), do: String.strip(string)
   else
     def trim(string), do: String.trim(string)
   end
-
 
   @doc """
   Converts the given `string` to a character list.
@@ -38,12 +37,11 @@ defmodule Credo.Backports.String do
   """
   def to_charlist(string)
 
-  if Version.match?(System.version, "< 1.3.0") do
+  if Version.match?(System.version(), "< 1.3.0") do
     def to_charlist(string), do: String.to_char_list(string)
   else
     def to_charlist(string), do: String.to_charlist(string)
   end
-
 
   @doc """
   Returns a new string of length `count` with `string` right justified and
@@ -58,12 +56,11 @@ defmodule Credo.Backports.String do
   """
   def pad_leading(string, count)
 
-  if Version.match?(System.version, "< 1.3.0") do
+  if Version.match?(System.version(), "< 1.3.0") do
     def pad_leading(string, count), do: String.rjust(string, count)
   else
     def pad_leading(string, count), do: String.pad_leading(string, count)
   end
-
 
   @doc """
   Returns a new string of length `count` with `string` left justified and
@@ -75,10 +72,9 @@ defmodule Credo.Backports.String do
   """
   def pad_trailing(string, count)
 
-  if Version.match?(System.version, "< 1.3.0") do
+  if Version.match?(System.version(), "< 1.3.0") do
     def pad_trailing(string, count), do: String.ljust(string, count)
   else
     def pad_trailing(string, count), do: String.pad_trailing(string, count)
   end
-
 end
