@@ -24,7 +24,12 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  @enum_count_pattern quote do: {{:., _, [{:__aliases__, _, [:Enum]}, :count]}, _, _}
+  @enum_count_pattern quote do:
+                              {
+                                {:., _, [{:__aliases__, _, [:Enum]}, :count]},
+                                _,
+                                _
+                              }
   @length_pattern quote do: {:length, _, _}
   @comparisons [
     {@enum_count_pattern, 0},
@@ -34,10 +39,15 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   ]
 
   for {lhs, rhs} <- @comparisons do
-    defp traverse({:==, meta, [unquote(lhs), unquote(rhs)]} = ast, issues, issue_meta) do
+    defp traverse(
+           {:==, meta, [unquote(lhs), unquote(rhs)]} = ast,
+           issues,
+           issue_meta
+         ) do
       {ast, issues_for_call(meta, issues, issue_meta, ast)}
     end
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -47,9 +57,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "#{trigger} is expensive. Prefer Enum.empty?/1 or list == []",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

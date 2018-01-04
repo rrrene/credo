@@ -35,15 +35,20 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
       end
     end
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
-      message: "There are identical sub-expressions to the left and to the right of the '#{trigger}' operator.",
+    format_issue(
+      issue_meta,
+      message:
+        "There are identical sub-expressions to the left and to the right of the '#{
+          trigger
+        }' operator.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

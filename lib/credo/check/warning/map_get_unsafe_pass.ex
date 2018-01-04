@@ -32,11 +32,11 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:|>, _meta , _args} = ast, issues, issue_meta) do
+  defp traverse({:|>, _meta, _args} = ast, issues, issue_meta) do
     pipe_issues =
       ast
-      |> Macro.unpipe
-      |> Enum.with_index
+      |> Macro.unpipe()
+      |> Enum.with_index()
       |> find_pipe_issues(issue_meta)
 
     {ast, issues ++ pipe_issues}
@@ -48,17 +48,19 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
 
   defp find_pipe_issues(pipe, issue_meta) do
     pipe
-    |> Enum.reduce([], fn ({expr, idx}, acc) ->
-         required_length = required_argument_length(idx)
-         {next_expr, _} = Enum.at(pipe, idx + 1, {nil, nil})
+    |> Enum.reduce([], fn {expr, idx}, acc ->
+      required_length = required_argument_length(idx)
+      {next_expr, _} = Enum.at(pipe, idx + 1, {nil, nil})
 
-         case {expr, nil_safe?(next_expr)} do
-           {{{{:., meta, [{_, _, [:Map]}, :get]}, _, args}, _}, false} when length(args) != required_length ->
-             acc ++ [issue_for(issue_meta, meta[:line], @call_string)]
-           _ ->
-             acc
-         end
-       end)
+      case {expr, nil_safe?(next_expr)} do
+        {{{{:., meta, [{_, _, [:Map]}, :get]}, _, args}, _}, false}
+        when length(args) != required_length ->
+          acc ++ [issue_for(issue_meta, meta[:line], @call_string)]
+
+        _ ->
+          acc
+      end
+    end)
   end
 
   defp required_argument_length(idx) when idx == 0, do: 3
@@ -68,16 +70,19 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     case expr do
       {{{:., _, [{_, _, [module]}, _]}, _, _}, _} ->
         !(module in @unsafe_modules)
+
       _ ->
         true
     end
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Map.get with no default return value is potentially unsafe
                 in pipes, use Map.get/3 instead",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end
