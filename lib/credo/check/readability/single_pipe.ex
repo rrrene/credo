@@ -41,7 +41,10 @@ defmodule Credo.Check.Readability.SinglePipe do
   end
 
   defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta) do
-    {ast, {false, issues ++ [issue_for(issue_meta, meta[:line], "single pipe")]}}
+    {
+      ast,
+      {false, issues ++ [issue_for(issue_meta, meta[:line], "single pipe")]}
+    }
   end
 
   defp traverse(ast, {_, issues}, _issue_meta) do
@@ -49,9 +52,11 @@ defmodule Credo.Check.Readability.SinglePipe do
   end
 
   def issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Use a function call when a pipeline is only one function long",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

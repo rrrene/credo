@@ -9,9 +9,11 @@ defmodule Credo.Check.Readability.MaxLineLength do
     check: @moduledoc,
     params: [
       max_length: "The maximum number of characters a line may consist of.",
-      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+      ignore_definitions:
+        "Set to `true` to ignore lines including function definitions.",
       ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs",
+      ignore_strings:
+        "Set to `true` to ignore lines that are strings or in heredocs"
     ]
   ]
   @default_params [
@@ -29,7 +31,10 @@ defmodule Credo.Check.Readability.MaxLineLength do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, @default_params)
-    ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
+
+    ignore_definitions =
+      Params.get(params, :ignore_definitions, @default_params)
+
     ignore_specs = Params.get(params, :ignore_specs, @default_params)
     ignore_strings = Params.get(params, :ignore_strings, @default_params)
     # TODO v1.0: this should be two different params
@@ -39,6 +44,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
     source = SourceFile.source(source_file)
+
     source =
       if ignore_heredocs do
         Credo.Code.Heredocs.replace_with_spaces(source, "")
@@ -48,7 +54,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
     lines = Credo.Code.to_lines(source)
 
-    Enum.reduce(lines, [], fn({line_no, line}, issues) ->
+    Enum.reduce(lines, [], fn {line_no, line}, issues ->
       line_for_comparison =
         if ignore_strings do
           Credo.Code.Strings.replace_with_spaces(line, "")
@@ -57,7 +63,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
         end
 
       if String.length(line_for_comparison) > max_length do
-        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
+        if refute_issue?(
+             line_no,
+             definitions,
+             ignore_definitions,
+             specs,
+             ignore_specs
+           ) do
           issues
         else
           [issue_for(line_no, max_length, line, issue_meta) | issues]
@@ -69,10 +81,12 @@ defmodule Credo.Check.Readability.MaxLineLength do
   end
 
   for op <- @def_ops do
-    defp find_definitions({unquote(op), meta, arguments} = ast, definitions) when is_list(arguments) do
+    defp find_definitions({unquote(op), meta, arguments} = ast, definitions)
+         when is_list(arguments) do
       {ast, [meta[:line] | definitions]}
     end
   end
+
   defp find_definitions(ast, definitions) do
     {ast, definitions}
   end
@@ -80,11 +94,18 @@ defmodule Credo.Check.Readability.MaxLineLength do
   defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end
+
   defp find_specs(ast, specs) do
     {ast, specs}
   end
 
-  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
+  defp refute_issue?(
+         line_no,
+         definitions,
+         ignore_definitions,
+         specs,
+         ignore_specs
+       ) do
     ignore_definitions? =
       if ignore_definitions do
         Enum.member?(definitions, line_no)
@@ -107,10 +128,12 @@ defmodule Credo.Check.Readability.MaxLineLength do
     column = max_length + 1
     trigger = String.slice(line, max_length, line_length - max_length)
 
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Line is too long (max is #{max_length}, was #{line_length}).",
       line_no: line_no,
       column: column,
       trigger: trigger
+    )
   end
 end

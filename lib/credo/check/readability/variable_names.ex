@@ -32,6 +32,7 @@ defmodule Credo.Check.Readability.VariableNames do
   defp traverse({:=, _meta, [lhs, _rhs]} = ast, issues, issue_meta) do
     {ast, issues_for_lhs(lhs, issues, issue_meta)}
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -41,20 +42,29 @@ defmodule Credo.Check.Readability.VariableNames do
       issues_for_lhs(parameters, issues, issue_meta)
     end
   end
+
   defp issues_for_lhs({_name, _meta, nil} = value, issues, issue_meta) do
     case issue_for_name(value, issue_meta) do
       nil ->
         issues
+
       new_issue ->
         [new_issue | issues]
     end
   end
+
   defp issues_for_lhs(list, issues, issue_meta) when is_list(list) do
     Enum.reduce(list, issues, &issues_for_lhs(&1, &2, issue_meta))
   end
+
   defp issues_for_lhs(tuple, issues, issue_meta) when is_tuple(tuple) do
-    Enum.reduce(Tuple.to_list(tuple), issues, &issues_for_lhs(&1, &2, issue_meta))
+    Enum.reduce(
+      Tuple.to_list(tuple),
+      issues,
+      &issues_for_lhs(&1, &2, issue_meta)
+    )
   end
+
   defp issues_for_lhs(_, issues, _issue_meta) do
     issues
   end
@@ -62,6 +72,7 @@ defmodule Credo.Check.Readability.VariableNames do
   for name <- @special_var_names do
     defp issue_for_name({unquote(name), _, nil}, _), do: nil
   end
+
   defp issue_for_name({name, meta, nil}, issue_meta) do
     string_name = to_string(name)
 
@@ -71,9 +82,11 @@ defmodule Credo.Check.Readability.VariableNames do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Variable names should be written in snake_case.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

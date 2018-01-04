@@ -36,7 +36,8 @@ defmodule Credo.Check.Readability.ModuleDoc do
   @explanation [
     check: @moduledoc,
     params: [
-      ignore_names: "All modules matching this regex (or list of regexes) will be ignored.",
+      ignore_names:
+        "All modules matching this regex (or list of regexes) will be ignored."
     ]
   ]
   @default_params [
@@ -57,22 +58,37 @@ defmodule Credo.Check.Readability.ModuleDoc do
       issue_meta = IssueMeta.for(source_file, params)
       ignore_names = Params.get(params, :ignore_names, @default_params)
 
-      {_continue, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, ignore_names), {true, []})
+      {_continue, issues} =
+        Credo.Code.prewalk(
+          source_file,
+          &traverse(&1, &2, issue_meta, ignore_names),
+          {true, []}
+        )
 
       issues
     end
   end
 
-  defp traverse({:defmodule, meta, _arguments} = ast, {true, issues}, issue_meta, ignore_names) do
+  defp traverse(
+         {:defmodule, meta, _arguments} = ast,
+         {true, issues},
+         issue_meta,
+         ignore_names
+       ) do
     mod_name = Module.name(ast)
+
     if CodeHelper.matches?(mod_name, ignore_names) do
       {ast, {false, issues}}
     else
       exception? = Module.exception?(ast)
 
-      case Module.attribute(ast, :moduledoc)  do
+      case Module.attribute(ast, :moduledoc) do
         {:error, _} when not exception? ->
-          {ast, {true, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}}
+          {
+            ast,
+            {true, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}
+          }
+
         _ ->
           {ast, {true, issues}}
       end
@@ -84,9 +100,11 @@ defmodule Credo.Check.Readability.ModuleDoc do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Modules should have a @moduledoc tag.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

@@ -8,7 +8,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @explanation [
     check: @moduledoc,
     params: [
-      ignore_strings: "Set to `false` to check lines that are strings or in heredocs",
+      ignore_strings:
+        "Set to `false` to check lines that are strings or in heredocs"
     ]
   ]
   @default_params [
@@ -31,10 +32,11 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
 
   defp to_lines(source_file, true) do
     source_file
-    |> SourceFile.source
+    |> SourceFile.source()
     |> Strings.replace_with_spaces(".")
-    |> Code.to_lines
+    |> Code.to_lines()
   end
+
   defp to_lines(source_file, false) do
     SourceFile.lines(source_file)
   end
@@ -44,18 +46,23 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
       case Regex.run(~r/\s+$/, line, return: :index) do
         [{column, line_length}] ->
           [issue_for(issue_meta, line_no, column + 1, line_length) | issues]
+
         nil ->
           issues
       end
+
     traverse_line(tail, issues, issue_meta)
   end
+
   defp traverse_line([], issues, _issue_meta), do: issues
 
   def issue_for(issue_meta, line_no, column, line_length) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "There should be no trailing white-space at the end of a line.",
       line_no: line_no,
       column: column,
       trigger: String.duplicate(" ", line_length)
+    )
   end
 end

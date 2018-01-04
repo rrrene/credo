@@ -16,11 +16,11 @@ defmodule Credo.Check.Readability.LargeNumbers do
   @explanation [
     check: @moduledoc,
     params: [
-      only_greater_than: "The check only reports numbers greater than this.",
+      only_greater_than: "The check only reports numbers greater than this."
     ]
   ]
   @default_params [
-    only_greater_than: 9_999,
+    only_greater_than: 9_999
   ]
 
   use Credo.Check, base_priority: :high, elixir_version: ">= 1.3.2"
@@ -31,12 +31,13 @@ defmodule Credo.Check.Readability.LargeNumbers do
     min_number = Params.get(params, :only_greater_than, @default_params)
 
     source_file
-    |> Credo.Code.to_tokens
+    |> Credo.Code.to_tokens()
     |> collect_number_tokens([], min_number)
     |> find_issues([], issue_meta)
   end
 
   defp collect_number_tokens([], acc, _), do: acc
+
   defp collect_number_tokens([head | t], acc, min_number) do
     acc =
       case number_token(head, min_number) do
@@ -49,34 +50,55 @@ defmodule Credo.Check.Readability.LargeNumbers do
   end
 
   # tuple for Elixir >= 1.6.0
-  defp number_token({:int, {_, _, number}, _} = tuple, min_number) when min_number < number do
+  defp number_token({:int, {_, _, number}, _} = tuple, min_number)
+       when min_number < number do
     tuple
   end
-  defp number_token({:float, {_, _, number}, _} = tuple, min_number) when min_number < number do
+
+  defp number_token({:float, {_, _, number}, _} = tuple, min_number)
+       when min_number < number do
     tuple
   end
+
   # tuple for Elixir <= 1.5.x
-  defp number_token({:number, _, number} = tuple, min_number) when min_number < number do
+  defp number_token({:number, _, number} = tuple, min_number)
+       when min_number < number do
     tuple
   end
+
   defp number_token(_, _), do: nil
 
   defp find_issues([], acc, _issue_meta) do
     acc
   end
+
   # tuple for Elixir >= 1.6.0
-  defp find_issues([{:int, {line_no, column1, number} = location, _} | t], acc, issue_meta) do
+  defp find_issues(
+         [{:int, {line_no, column1, number} = location, _} | t],
+         acc,
+         issue_meta
+       ) do
     acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
 
     find_issues(t, acc, issue_meta)
   end
-  defp find_issues([{:float, {line_no, column1, number} = location, _} | t], acc, issue_meta) do
+
+  defp find_issues(
+         [{:float, {line_no, column1, number} = location, _} | t],
+         acc,
+         issue_meta
+       ) do
     acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
 
     find_issues(t, acc, issue_meta)
   end
+
   # tuple for Elixir <= 1.5.x
-  defp find_issues([{:number, {line_no, column1, _column2} = location, number} | t], acc, issue_meta) do
+  defp find_issues(
+         [{:number, {line_no, column1, _column2} = location, number} | t],
+         acc,
+         issue_meta
+       ) do
     acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
 
     find_issues(t, acc, issue_meta)
@@ -87,9 +109,15 @@ defmodule Credo.Check.Readability.LargeNumbers do
     underscored_number = number_with_underscores(number, source)
 
     if decimal_in_source?(source) && source != underscored_number do
-      [issue_for(
-        issue_meta, line_no, column1, source, underscored_number
-      )]
+      [
+        issue_for(
+          issue_meta,
+          line_no,
+          column1,
+          source,
+          underscored_number
+        )
+      ]
     else
       []
     end
@@ -100,10 +128,12 @@ defmodule Credo.Check.Readability.LargeNumbers do
     |> to_string
     |> add_underscores_to_number_string
   end
+
   defp number_with_underscores(number, source_fragment) when is_number(number) do
     case String.split(source_fragment, ".", parts: 2) do
       [num, decimal] ->
         Enum.join([add_underscores_to_number_string(num), decimal], ".")
+
       [num] ->
         add_underscores_to_number_string(num)
     end
@@ -111,17 +141,19 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   defp add_underscores_to_number_string(string) do
     string
-    |> String.reverse
+    |> String.reverse()
     |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
-    |> String.reverse
+    |> String.reverse()
   end
 
   def issue_for(issue_meta, line_no, column, trigger, expected) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Large numbers should be written with underscores: #{expected}",
       line_no: line_no,
       column: column,
       trigger: trigger
+    )
   end
 
   defp decimal_in_source?(source) do
@@ -135,28 +167,31 @@ defmodule Credo.Check.Readability.LargeNumbers do
   end
 
   # `_column_or_number` depends on Elixir version
-  defp source_fragment({line_no, column1, _column_or_number} = tuple, issue_meta) do
+  defp source_fragment(
+         {line_no, column1, _column_or_number} = tuple,
+         issue_meta
+       ) do
     line =
       issue_meta
-      |> IssueMeta.source_file
+      |> IssueMeta.source_file()
       |> SourceFile.line_at(line_no)
 
     beginning_of_number =
       Regex.run(~r/[^0-9_oxb]*([0-9_oxb]+$)/, String.slice(line, 1..column1))
-      |> List.wrap
-      |> List.last
+      |> List.wrap()
+      |> List.last()
       |> to_string()
 
     ending_of_number =
-      Regex.run(~r/^([0-9_\.]+)/, String.slice(line, column1+1..-1))
-      |> List.wrap
-      |> List.last
+      Regex.run(~r/^([0-9_\.]+)/, String.slice(line, (column1 + 1)..-1))
+      |> List.wrap()
+      |> List.last()
       |> to_string()
       |> String.replace(~r/\.\..+/, "")
 
     fragment = beginning_of_number <> ending_of_number
 
-    if Version.match?(System.version, "< 1.3.2-dev") do
+    if Version.match?(System.version(), "< 1.3.2-dev") do
       source_fragment_pre_132(tuple, issue_meta, fragment)
     else
       fragment
@@ -169,15 +204,19 @@ defmodule Credo.Check.Readability.LargeNumbers do
   #
   # Unfortuately this leaves the line and column counts out of sync so this
   # "fix" only works "reliably" for the first number with _ in the line.
-  defp source_fragment_pre_132({line_no, column1, column2}, issue_meta, first_fragment) do
-    underscores = (first_fragment |> String.split("_") |> Enum.count) - 1
+  defp source_fragment_pre_132(
+         {line_no, column1, column2},
+         issue_meta,
+         first_fragment
+       ) do
+    underscores = (first_fragment |> String.split("_") |> Enum.count()) - 1
 
     if underscores > 0 do
       issue_meta
-      |> IssueMeta.source_file
+      |> IssueMeta.source_file()
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 2 + underscores))
-      |> Credo.Backports.String.trim
+      |> Credo.Backports.String.trim()
       |> String.replace(~r/\D$/, "")
     else
       first_fragment
