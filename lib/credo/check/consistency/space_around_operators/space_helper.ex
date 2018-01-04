@@ -46,15 +46,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def operator?(_), do: false
 
   def no_space_between?(arg1, arg2) do
-    {line_no, _col_start, col_end} = Token.position(arg1)
-    {line_no2, col_start2, _col_end} = Token.position(arg2)
+    {line_no, _col_start, _line_no_end, col_end} = Token.position(arg1)
+    {line_no2, col_start2, _line_no_end, _col_end} = Token.position(arg2)
 
     line_no == line_no2 && col_end == col_start2
   end
 
   def space_between?(arg1, arg2) do
-    {line_no, _col_start, col_end} = Token.position(arg1)
-    {line_no2, col_start2, _col_end} = Token.position(arg2)
+    {line_no, _col_start, _line_no_end, col_end} = Token.position(arg1)
+    {line_no2, col_start2, _line_no_end, _col_end} = Token.position(arg2)
 
     line_no == line_no2 && col_end < col_start2
   end

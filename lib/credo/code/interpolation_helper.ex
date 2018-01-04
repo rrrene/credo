@@ -13,7 +13,7 @@ defmodule Credo.Code.InterpolationHelper do
     |> Enum.join("\n")
   end
 
-  defp replace_line({line_no, col_start, col_end}, lines, char) do
+  defp replace_line({line_no, col_start, _line_no_end, col_end}, lines, char) do
     List.update_at(
       lines,
       line_no - 1,
@@ -67,6 +67,12 @@ defmodule Credo.Code.InterpolationHelper do
     # Elixir <= 1.5.x
     #
 
+    defp is_sigil_in_line(source, line_no) do
+      line_with_heredoc_quotes = get_line(source, line_no)
+
+      !!Regex.run(~r/("""|''')/, line_with_heredoc_quotes)
+    end
+
     defp map_interpolations(
            {:sigil, {_line_no, _col_start, _col_end}, _, list, _} = token,
            source
@@ -83,12 +89,6 @@ defmodule Credo.Code.InterpolationHelper do
       else
         handle_atom_string_or_sigil(token, list, source)
       end
-    end
-
-    defp is_sigil_in_line(source, line_no) do
-      line_with_heredoc_quotes = get_line(source, line_no)
-
-      !!Regex.run(~r/("""|''')/, line_with_heredoc_quotes)
     end
   end
 
@@ -124,7 +124,7 @@ defmodule Credo.Code.InterpolationHelper do
 
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
-    {line_no, col_start, col_end} = Token.position(token)
+    {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
     line = get_line(source, line_no)
 
@@ -133,7 +133,7 @@ defmodule Credo.Code.InterpolationHelper do
 
     padding = determine_padding_at_start_of_line(rest_of_line)
 
-    {line_no, col_start, col_end + padding}
+    {line_no, col_start, line_no_end, col_end + padding}
   end
 
   defp find_interpolations(_value, _source), do: nil
@@ -147,8 +147,8 @@ defmodule Credo.Code.InterpolationHelper do
   end
 
   defp add_to_col_start_and_end(positions, padding) do
-    Enum.map(positions, fn {line_no, col_start, col_end} ->
-      {line_no, col_start + padding, col_end + padding}
+    Enum.map(positions, fn {line_no, col_start, line_no_end, col_end} ->
+      {line_no, col_start + padding, line_no_end, col_end + padding}
     end)
   end
 

@@ -10,16 +10,16 @@ defmodule Credo.Code.TokenTest do
     \"\"\"
   end
   """
-  @heredoc_interpolations_position {1, 5, 60}
+  @heredoc_interpolations_position {1, 5, 1, 60}
 
   @multiple_interpolations_source ~S[a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"]
-  @multiple_interpolations_position {1, 5, 60}
+  @multiple_interpolations_position {1, 5, 1, 60}
 
   @single_interpolations_source ~S[a = "MyModule.SubModule.#{name}"]
-  @single_interpolations_position {1, 5, 33}
+  @single_interpolations_position {1, 5, 1, 33}
 
   @no_interpolations_source ~S[134 + 145]
-  @no_interpolations_position {1, 7, 10}
+  @no_interpolations_position {1, 7, 1, 10}
 
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do

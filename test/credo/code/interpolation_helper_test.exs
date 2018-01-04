@@ -11,13 +11,17 @@ defmodule Credo.Code.InterpolationHelperTest do
     """
   end
   '''
-  @heredoc_interpolations_positions [{3, 12, 38}, {3, 49, 56}, {4, 22, 29}]
+  @heredoc_interpolations_positions [
+    {3, 12, 3, 38},
+    {3, 49, 3, 56},
+    {4, 22, 4, 29}
+  ]
 
   @multiple_interpolations_source ~S[a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"]
-  @multiple_interpolations_positions [{1, 15, 41}, {1, 52, 59}]
+  @multiple_interpolations_positions [{1, 15, 1, 41}, {1, 52, 1, 59}]
 
   @single_interpolations_source ~S[a = "MyModule.SubModule.#{name}"]
-  @single_interpolations_positions [{1, 25, 32}]
+  @single_interpolations_positions [{1, 25, 1, 32}]
 
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_positions []
@@ -137,7 +141,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     source = ~S[a = ~s{ #{"a" <> fun() <>  "b" } }]
     positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{1, 9, 33}] == positions
+    assert [{1, 9, 1, 33}] == positions
   end
 
   @tag :token_position
@@ -152,7 +156,7 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{3, 18, 26}] == positions
+    assert [{3, 18, 3, 26}] == positions
   end
 
   @tag :token_position
@@ -167,7 +171,7 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     positions = InterpolationHelper.interpolation_positions(source)
 
-    assert [{3, 19, 30}, {4, 17, 21}, {4, 22, 31}] == positions
+    assert [{3, 19, 3, 30}, {4, 17, 4, 21}, {4, 22, 4, 31}] == positions
   end
 
   @tag :token_position
