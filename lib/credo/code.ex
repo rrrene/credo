@@ -111,7 +111,7 @@ defmodule Credo.Code do
   def to_tokens(source) when is_binary(source) do
     result =
       source
-      |> Credo.Backports.String.to_charlist()
+      |> String.to_charlist()
       |> :elixir_tokenizer.tokenize(1, [])
 
     case result do

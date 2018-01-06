@@ -165,7 +165,7 @@ defmodule Credo.CLI.Output do
     |> Enum.flat_map(fn {string, index} ->
       [
         :reset,
-        Credo.Backports.String.pad_leading("#{index + 1})", 5),
+        String.pad_leading("#{index + 1})", 5),
         :faint,
         " #{string}\n"
       ]

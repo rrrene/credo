@@ -21,7 +21,7 @@ defmodule Credo.CLI.Output.UI do
   end
 
   def edge(color, indent \\ 2) when is_integer(indent) do
-    [:reset, color, @edge |> Credo.Backports.String.pad_trailing(indent)]
+    [:reset, color, @edge |> String.pad_trailing(indent)]
   end
 
   def edge, do: @edge

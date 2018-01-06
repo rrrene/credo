@@ -216,7 +216,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> IssueMeta.source_file()
       |> SourceFile.line_at(line_no)
       |> String.slice((column1 - 1)..(column2 - 2 + underscores))
-      |> Credo.Backports.String.trim()
+      |> String.trim()
       |> String.replace(~r/\D$/, "")
     else
       first_fragment

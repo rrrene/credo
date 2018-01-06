@@ -64,7 +64,7 @@ defmodule Credo.CLI.Command.List.Output.Default do
         " ",
         Output.foreground_color(color),
         :normal,
-        " #{scope_name}" |> Credo.Backports.String.pad_trailing(term_width - 1)
+        " #{scope_name}" |> String.pad_trailing(term_width - 1)
       ]
       |> UI.puts()
 
@@ -129,7 +129,7 @@ defmodule Credo.CLI.Command.List.Output.Default do
 
     if issue.line_no do
       raw_line = SourceFile.line_at(source_file, issue.line_no)
-      line = Credo.Backports.String.trim(raw_line)
+      line = String.trim(raw_line)
 
       UI.puts_edge([outer_color, :faint])
 

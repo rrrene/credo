@@ -124,7 +124,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       " ",
       Output.foreground_color(color),
       :normal,
-      " #{title}" |> Credo.Backports.String.pad_trailing(term_width - 1)
+      " #{title}" |> String.pad_trailing(term_width - 1)
     ]
     |> UI.puts()
 
@@ -290,7 +290,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
          term_width
        ) do
     raw_line = SourceFile.line_at(source_file, issue.line_no)
-    line = Credo.Backports.String.trim(raw_line)
+    line = String.trim(raw_line)
 
     [outer_color, :faint]
     |> UI.edge()
@@ -323,8 +323,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
          inner_color,
          outer_color
        ) do
-    offset =
-      String.length(line) - String.length(Credo.Backports.String.trim(line))
+    offset = String.length(line) - String.length(String.trim(line))
 
     # column is one-based
     x = max(issue.column - offset - 1, 0)

@@ -42,7 +42,7 @@ defmodule Credo.CLI.Command.Help do
       name2 =
         name
         |> to_string
-        |> Credo.Backports.String.pad_trailing(@ljust)
+        |> String.pad_trailing(@ljust)
 
       case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
         {:shortdoc, [shortdesc]} ->
@@ -85,6 +85,6 @@ defmodule Credo.CLI.Command.Help do
     #
     """
 
-    Credo.Backports.String.trim(output)
+    String.trim(output)
   end
 end

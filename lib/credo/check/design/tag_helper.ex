@@ -53,7 +53,7 @@ defmodule Credo.Check.Design.TagHelper do
       regex
       |> Regex.run(line)
       |> List.wrap()
-      |> Enum.map(&Credo.Backports.String.trim/1)
+      |> Enum.map(&String.trim/1)
 
     {index + 1, line, List.first(tag_list)}
   end

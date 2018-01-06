@@ -45,7 +45,6 @@ defmodule Credo.Execution.ProcessDefinition do
 
   defmacro activity(name, do: block) do
     env = __CALLER__
-
     module_name = :"#{env.module}.#{Macro.camelize(to_string(name))}"
 
     quote do
