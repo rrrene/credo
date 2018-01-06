@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0-rc1
+
+- Add JSON support
+- Ensure compatibility with Elixir 1.6
+- Format codebase using Elixir 1.6 Formatter
+- Rework internals in preparation of 1.0 release
+
 ## 0.8.10
 
 - Maintenance release
