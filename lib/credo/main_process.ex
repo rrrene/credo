@@ -48,6 +48,5 @@ defmodule Credo.MainProcess do
 
   activity :halt_execution do
     run Task.AssignExitStatusForIssues
-    run Task.HaltIfExitStatusAssigned
   end
 end
