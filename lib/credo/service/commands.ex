@@ -9,7 +9,7 @@ defmodule Credo.Service.Commands do
     "help" => Credo.CLI.Command.Help,
     "list" => Credo.CLI.Command.List.ListCommand,
     "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
-    "version" => Credo.CLI.Command.Version,
+    "version" => Credo.CLI.Command.Version
   }
 
   def start_link(opts \\ []) do

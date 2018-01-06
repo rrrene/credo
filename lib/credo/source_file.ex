@@ -1,6 +1,6 @@
 defmodule Credo.SourceFile do
   defstruct filename: nil,
-            valid?:   nil
+            valid?: nil
 
   @type t :: module
 
@@ -11,10 +11,12 @@ defmodule Credo.SourceFile do
   def parse(source, filename) do
     filename = Path.relative_to_cwd(filename)
     lines = Credo.Code.to_lines(source)
+
     {valid, ast} =
       case Credo.Code.ast(source) do
         {:ok, ast} ->
           {true, ast}
+
         {:error, _errors} ->
           {false, []}
       end
@@ -25,7 +27,7 @@ defmodule Credo.SourceFile do
 
     %Credo.SourceFile{
       filename: filename,
-      valid?:   valid
+      valid?: valid
     }
   end
 
@@ -33,6 +35,7 @@ defmodule Credo.SourceFile do
     case SourceFileAST.get(filename) do
       {:ok, ast} ->
         ast
+
       _ ->
         raise "Could not get source from ETS: #{filename}"
     end
@@ -42,6 +45,7 @@ defmodule Credo.SourceFile do
     case SourceFileLines.get(filename) do
       {:ok, lines} ->
         lines
+
       _ ->
         raise "Could not get source from ETS: #{filename}"
     end
@@ -51,6 +55,7 @@ defmodule Credo.SourceFile do
     case SourceFileSource.get(filename) do
       {:ok, source} ->
         source
+
       _ ->
         raise "Could not get source from ETS: #{filename}"
     end
@@ -86,21 +91,25 @@ defmodule Credo.SourceFile do
 
   NOTE: Both +line_no+ and the returned index are 1-based.
   """
-  def column(%__MODULE__{} = source_file, line_no, trigger) when is_binary(trigger) or is_atom(trigger) do
+  def column(%__MODULE__{} = source_file, line_no, trigger)
+      when is_binary(trigger) or is_atom(trigger) do
     line = line_at(source_file, line_no)
+
     regexed =
       trigger
       |> to_string
-      |> Regex.escape
+      |> Regex.escape()
 
     case Regex.run(~r/\b#{regexed}\b/, line, return: :index) do
       nil ->
         nil
+
       result ->
         {col, _} = List.first(result)
         col + 1
     end
   end
+
   def column(_, _, _), do: nil
 
   defimpl Inspect, for: __MODULE__ do

@@ -13,7 +13,7 @@ defmodule Credo.CLI do
 
   @doc false
   def main(argv) do
-    Credo.Application.start nil, nil
+    Credo.Application.start(nil, nil)
 
     TaskRunner.call(%Execution{argv: argv})
   end
@@ -25,15 +25,17 @@ defmodule Credo.CLI do
       Credo.CLI.Command.Help
   """
   def command_for(nil), do: nil
+
   def command_for(command_mod) when is_atom(command_mod) do
-    if Enum.member?(Commands.modules, command_mod) do
+    if Enum.member?(Commands.modules(), command_mod) do
       command_mod
     else
       nil
     end
   end
+
   def command_for(command_name) when is_binary(command_name) do
-    if Enum.member?(Commands.names, command_name) do
+    if Enum.member?(Commands.names(), command_name) do
       Commands.get(command_name)
     else
       nil

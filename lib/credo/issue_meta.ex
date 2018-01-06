@@ -16,6 +16,7 @@ defmodule Credo.IssueMeta do
   def source_file({__MODULE__, current_source_file, _params}) do
     current_source_file
   end
+
   def source_file(%SourceFile{} = current_source_file) do
     current_source_file
   end
