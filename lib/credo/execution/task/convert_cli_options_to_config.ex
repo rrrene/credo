@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
 
   def call(exec, _opts) do
     exec
-    |> ConfigBuilder.parse
-    |> Execution.start_servers
+    |> ConfigBuilder.parse()
+    |> Execution.start_servers()
   end
 end

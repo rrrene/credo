@@ -1,5 +1,4 @@
 defmodule Credo.Execution.TaskChain do
-
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
@@ -26,18 +25,16 @@ defmodule Credo.Execution.TaskChain do
     end
   end
 
-
   @doc """
   Called internally by `router_builder_call`.
   """
   def builder_call(exec, compiled_groups) do
     groups = compiled_groups
 
-    Enum.reduce(groups, exec, fn(group, exec) ->
+    Enum.reduce(groups, exec, fn group, exec ->
       Credo.Execution.TaskGroup.run(exec, group)
     end)
   end
-
 
   @doc """
   Creates a TaskGroup with the given `name`, which can be called via `.call/2`.

@@ -1,7 +1,8 @@
 defmodule Credo.Execution.TaskGroup do
   @type t :: module
 
-  @callback call(exec :: Credo.Execution.t, opts :: Keyword.t) :: Credo.Execution.t
+  @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) ::
+              Credo.Execution.t()
 
   alias Credo.Execution.TaskMonitor
 
@@ -21,7 +22,7 @@ defmodule Credo.Execution.TaskGroup do
   defmacro __before_compile__(_env) do
     quote do
       defp task_builder_call(exec, opts) do
-        Enum.reduce(all_tasks(), exec, fn(task, exec) ->
+        Enum.reduce(all_tasks(), exec, fn task, exec ->
           Credo.Execution.Task.run(exec, task, opts)
         end)
       end
@@ -45,9 +46,15 @@ defmodule Credo.Execution.TaskGroup do
   Runs a given `task_group`.
   """
   def run(exec, task_group, opts \\ [])
+
   def run(%Credo.Execution{debug: true} = exec, task_group, opts) do
-    TaskMonitor.task_group(exec, task_group, opts, &do_run/3, [exec, task_group, opts])
+    TaskMonitor.task_group(exec, task_group, opts, &do_run/3, [
+      exec,
+      task_group,
+      opts
+    ])
   end
+
   def run(exec, task_group, opts) do
     do_run(exec, task_group, opts)
   end

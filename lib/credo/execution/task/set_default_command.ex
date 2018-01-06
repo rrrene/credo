@@ -20,16 +20,17 @@ defmodule Credo.Execution.Task.SetDefaultCommand do
       set_command_and_path(exec, options, @default_command_name, options.path)
     end
   end
+
   defp determine_command(exec, _options), do: exec
 
   defp set_command_and_path(exec, options, command, path) do
     %Execution{
-      exec |
-      cli_options: %Options{
-        options |
-        command: command,
-        path: path
-      }
+      exec
+      | cli_options: %Options{
+          options
+          | command: command,
+            path: path
+        }
     }
   end
 end

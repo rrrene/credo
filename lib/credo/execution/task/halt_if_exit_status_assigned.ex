@@ -5,6 +5,7 @@ defmodule Credo.Execution.Task.HaltIfExitStatusAssigned do
     # Skip if exit status is muted
     exec
   end
+
   def call(exec, _opts) do
     exec
     |> get_assign("credo.exit_status", 0)
