@@ -1,6 +1,9 @@
 defmodule Credo.CLI.Task.PrepareChecksToRun do
   use Credo.Execution.Task
 
+  alias Credo.Check.Runner
+  alias Credo.CLI.Output.UI
+
   def call(exec, _opts \\ []) do
     source_files = Execution.get_source_files(exec)
 
@@ -12,27 +15,26 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp set_lint_attributes(exec, source_files) do
-    lint_attribute_map =
-      Credo.Check.Runner.run_linter_attribute_reader(source_files, exec)
+    lint_attribute_map = Runner.run_linter_attribute_reader(source_files, exec)
 
     if Enum.any?(lint_attribute_map, fn {_, value} -> value != [] end) do
-      Credo.CLI.Output.UI.warn("")
+      UI.warn("")
 
-      Credo.CLI.Output.UI.warn([
+      UI.warn([
         :bright,
         :orange,
         "@lint attributes are deprecated since Credo v0.8 because they trigger\n",
         "compiler warnings on Elixir v1.4.\n"
       ])
 
-      Credo.CLI.Output.UI.warn([
+      UI.warn([
         :orange,
         "You can use comments to disable individual lines of code.\n",
         "To see how this works, please refer to Credo's README:\n",
         "https://github.com/rrrene/credo"
       ])
 
-      Credo.CLI.Output.UI.warn("")
+      UI.warn("")
     end
 
     %Execution{exec | lint_attribute_map: lint_attribute_map}

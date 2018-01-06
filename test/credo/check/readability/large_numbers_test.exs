@@ -7,8 +7,6 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   # cases NOT raising issues
   #
 
-  @moduletag needs_elixir: "1.3.2"
-
   test "it should NOT report expected code" do
     """
     @budgets %{

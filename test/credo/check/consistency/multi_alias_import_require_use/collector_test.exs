@@ -35,7 +35,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
   end
   """
 
-  @tag needs_elixir: "1.2.0"
   test "it should report correct frequencies for single imports" do
     result =
       @single
@@ -45,7 +44,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
     assert %{single: 3} == result
   end
 
-  @tag needs_elixir: "1.2.0"
   test "it should report correct frequencies for multi imports" do
     result =
       @multi
@@ -55,7 +53,6 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
     assert %{multi: 4} == result
   end
 
-  @tag needs_elixir: "1.2.0"
   test "it should report correct frequencies for mixed imports" do
     result =
       @mixed

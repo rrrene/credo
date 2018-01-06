@@ -203,7 +203,6 @@ defmodule Credo.Check.Design.AliasUsageTest do
   # cases NOT raising issues
   #
 
-  @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on multi-use alias" do
     """
     defmodule Sample.App do
@@ -223,7 +222,6 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues(@described_check)
   end
 
-  @tag needs_elixir: "1.2.0"
   test "it should NOT report violation on impossible additional alias when using multi alias" do
     """
     defmodule Test do
@@ -243,7 +241,6 @@ defmodule Credo.Check.Design.AliasUsageTest do
   # cases raising issues
   #
 
-  @tag needs_elixir: "1.2.0"
   test "it should report violation on impossible additional alias when using multi alias" do
     """
     defmodule Test do

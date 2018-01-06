@@ -6,6 +6,7 @@
 - Ensure compatibility with Elixir 1.6
 - Format codebase using Elixir 1.6 Formatter
 - Rework internals in preparation of 1.0 release
+- Credo now requires Elixir 1.3.2
 
 ## 0.8.10
 

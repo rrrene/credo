@@ -23,7 +23,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     only_greater_than: 9_999
   ]
 
-  use Credo.Check, base_priority: :high, elixir_version: ">= 1.3.2"
+  use Credo.Check, base_priority: :high
 
   @doc false
   def run(source_file, params \\ []) do
@@ -166,11 +166,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     end
   end
 
-  # `_column_or_number` depends on Elixir version
-  defp source_fragment(
-         {line_no, column1, _column_or_number} = tuple,
-         issue_meta
-       ) do
+  defp source_fragment({line_no, column1, _}, issue_meta) do
     line =
       issue_meta
       |> IssueMeta.source_file()
@@ -189,37 +185,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> to_string()
       |> String.replace(~r/\.\..+/, "")
 
-    fragment = beginning_of_number <> ending_of_number
-
-    if Version.match?(System.version(), "< 1.3.2-dev") do
-      source_fragment_pre_132(tuple, issue_meta, fragment)
-    else
-      fragment
-    end
-  end
-
-  # There's a bug in the :elixir_tokenizer.tokenize/3 in versions prior to
-  # 1.3.2 where the _ in the source code is not included in the token's
-  # length, so that means we have to re-calculate the token if it has _ in it.
-  #
-  # Unfortuately this leaves the line and column counts out of sync so this
-  # "fix" only works "reliably" for the first number with _ in the line.
-  defp source_fragment_pre_132(
-         {line_no, column1, column2},
-         issue_meta,
-         first_fragment
-       ) do
-    underscores = (first_fragment |> String.split("_") |> Enum.count()) - 1
-
-    if underscores > 0 do
-      issue_meta
-      |> IssueMeta.source_file()
-      |> SourceFile.line_at(line_no)
-      |> String.slice((column1 - 1)..(column2 - 2 + underscores))
-      |> String.trim()
-      |> String.replace(~r/\D$/, "")
-    else
-      first_fragment
-    end
+    beginning_of_number <> ending_of_number
   end
 end
