@@ -8,14 +8,14 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
-  alias Credo.Execution.TaskRunner
+  alias Credo.MainProcess
   alias Credo.Service.Commands
 
   @doc false
   def main(argv) do
     Credo.Application.start(nil, nil)
 
-    TaskRunner.call(%Execution{argv: argv})
+    MainProcess.call(%Execution{argv: argv})
   end
 
   @doc """

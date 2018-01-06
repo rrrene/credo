@@ -1,4 +1,4 @@
-defmodule Credo.Execution.TaskRunner do
+defmodule Credo.MainProcess do
   @moduledoc """
   This module defines all Tasks which make up the execution of Credo.
 
