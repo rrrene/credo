@@ -4,7 +4,7 @@ defmodule Credo.Execution.TaskGroup do
   @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) ::
               Credo.Execution.t()
 
-  alias Credo.Execution.TaskMonitor
+  alias Credo.Execution.Monitor
 
   defmacro __using__(_opts \\ []) do
     quote do
@@ -48,7 +48,7 @@ defmodule Credo.Execution.TaskGroup do
   def run(exec, task_group, opts \\ [])
 
   def run(%Credo.Execution{debug: true} = exec, task_group, opts) do
-    TaskMonitor.task_group(exec, task_group, opts, &do_run/3, [
+    Monitor.task_group(exec, task_group, opts, &do_run/3, [
       exec,
       task_group,
       opts

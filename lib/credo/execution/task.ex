@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task do
               Credo.Execution.t()
 
   alias Credo.Execution
-  alias Credo.Execution.TaskMonitor
+  alias Credo.Execution.Monitor
 
   defmacro __using__(_opts \\ []) do
     quote do
@@ -33,7 +33,7 @@ defmodule Credo.Execution.Task do
   def run(exec, task, opts \\ [])
 
   def run(%Credo.Execution{debug: true} = exec, task, opts) do
-    TaskMonitor.task(exec, task, opts, &do_run/3, [exec, task, opts])
+    Monitor.task(exec, task, opts, &do_run/3, [exec, task, opts])
   end
 
   def run(exec, task, opts) do

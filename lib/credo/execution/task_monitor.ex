@@ -1,4 +1,4 @@
-defmodule Credo.Execution.TaskMonitor do
+defmodule Credo.Execution.Monitor do
   require Logger
   import Credo.Execution
 
