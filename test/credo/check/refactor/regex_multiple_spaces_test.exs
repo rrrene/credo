@@ -10,25 +10,26 @@ defmodule Credo.Check.Refactor.RegexMultipleSpacesTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  def my_fun do
-    regex = ~r/foo {3}bar/
-  end
-end
-""" |> to_source_file
+    """
+    defmodule CredoSampleModule do
+      def my_fun do
+        regex = ~r/foo {3}bar/
+      end
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
   test "it should NOT report expected code /2" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    regex = ~r/foo   bar/
-  end
-end
-""" |> to_source_file
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        regex = ~r/foo   bar/
+      end
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
-
 end

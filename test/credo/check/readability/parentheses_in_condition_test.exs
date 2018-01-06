@@ -8,68 +8,71 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    unless allowed? do
-      something
-    end
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        unless allowed? do
+          something
+        end
 
-    if File.exists?(filename) do
-      something
-    else
-      something_else
-    end
-    if !allowed? || (something_in_parentheses == 42) do
-      something
-    end
-    if (something_in_parentheses == 42) || !allowed? do
-      something
-    end
-    if !allowed? == (something_in_parentheses == 42) do
-      something
-    end
-    unless (something_in_parentheses != 42) || allowed? do
-      something
-    end
-    boolean |> if(do: :ok, else: :error)
-    boolean |> unless(do: :ok)
-    if(allowed_keyword?(a) || measured_unit?(a), do: a, else: "")
-    if (thing && other_thing) || better_thing, do: something
-    if !better_thing && (thing || other_thing), do: something_else
-  end
+        if File.exists?(filename) do
+          something
+        else
+          something_else
+        end
+        if !allowed? || (something_in_parentheses == 42) do
+          something
+        end
+        if (something_in_parentheses == 42) || !allowed? do
+          something
+        end
+        if !allowed? == (something_in_parentheses == 42) do
+          something
+        end
+        unless (something_in_parentheses != 42) || allowed? do
+          something
+        end
+        boolean |> if(do: :ok, else: :error)
+        boolean |> unless(do: :ok)
+        if(allowed_keyword?(a) || measured_unit?(a), do: a, else: "")
+        if (thing && other_thing) || better_thing, do: something
+        if !better_thing && (thing || other_thing), do: something_else
+      end
 
-  import Bitwise
+      import Bitwise
 
-	def bar(foo, bar) do
-		if (foo &&& 0b1000) > 0, do: bar, else: nil
-	end
+    	def bar(foo, bar) do
+    		if (foo &&& 0b1000) > 0, do: bar, else: nil
+    	end
 
-	def foobar(foo) do
-		foo
-  end
-end
-""" |> to_source_file
+    	def foobar(foo) do
+    		foo
+      end
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
   test "it should NOT report expected code /2" do
-"""
-props =
-  if(valid?(username), do: [:authorized]) ++
-  unless(admin?(username), do: [:restricted])
-""" |> to_source_file
+    """
+    props =
+      if(valid?(username), do: [:authorized]) ++
+      unless(admin?(username), do: [:restricted])
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
   test "it should NOT report expected code /3" do
-"""
-if (assocs != [] or prepare != []) and
-   Keyword.get(opts, :skip_transaction) != true and
-   function_exported?(adapter, :transaction, 3) do
-  some_fun()
-end
-""" |> to_source_file
+    """
+    if (assocs != [] or prepare != []) and
+       Keyword.get(opts, :skip_transaction) != true and
+       function_exported?(adapter, :transaction, 3) do
+      some_fun()
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -78,63 +81,67 @@ end
   #
 
   test "it should report a violation" do
-"""
-defmodule Mix.Tasks.Credo do
-  def run(argv) do
-    if( allowed? ) do
-      true
-    else
-      false
+    """
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        if( allowed? ) do
+          true
+        else
+          false
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issue(@described_check)
   end
 
   test "it should report violations with oneliners if used with parentheses" do
-"""
-defmodule Mix.Tasks.Credo do
-  def run(argv) do
-    if (allowed?), do: true
-    unless (!allowed?), do: true
-  end
-end
-""" |> to_source_file
+    """
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        if (allowed?), do: true
+        unless (!allowed?), do: true
+      end
+    end
+    """
+    |> to_source_file
     |> assert_issues(@described_check)
   end
 
   test "it should report a violation if used with parentheses" do
-"""
-defmodule Mix.Tasks.Credo do
-  def run(argv) do
-    unless( !allowed? ) do
-      true
-    else
-      false
+    """
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        unless( !allowed? ) do
+          true
+        else
+          false
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issue(@described_check)
   end
 
   test "it should report violations with spaces before the parentheses" do
-"""
-defmodule Mix.Tasks.Credo do
-  def run(argv) do
-    if ( allowed? ) do
-      true
-    else
-      false
-    end
+    """
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        if ( allowed? ) do
+          true
+        else
+          false
+        end
 
-    unless (also_allowed?) do
-      true
+        unless (also_allowed?) do
+          true
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issues(@described_check)
   end
 end

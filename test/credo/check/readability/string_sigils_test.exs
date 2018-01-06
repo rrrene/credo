@@ -106,5 +106,4 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> to_source_file
     |> assert_issue(@described_check, maximum_allowed_quotes: 5)
   end
-
 end

@@ -10,30 +10,32 @@ defmodule Credo.Check.Warning.UnreachableCodeTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    parameter1 + parameter2
-    raise "error!!!"
-  end
-end
-""" |> to_source_file
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        parameter1 + parameter2
+        raise "error!!!"
+      end
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
   test "it should NOT report expected code /2" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    if something? do
-      parameter2
-    else
-      parameter1 + parameter2
-      raise "error!!!"
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        if something? do
+          parameter2
+        else
+          parameter1 + parameter2
+          raise "error!!!"
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -42,18 +44,19 @@ end
   #
 
   test "it should report a violation" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    if something? do
-      parameter2
-    else
-      raise "error!!!"
-      parameter1 + parameter2
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        if something? do
+          parameter2
+        else
+          raise "error!!!"
+          parameter1 + parameter2
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issue(@described_check)
   end
 end

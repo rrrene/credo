@@ -4,36 +4,36 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
   alias Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
 
   @single """
-defmodule Credo.Sample1 do
-  alias Foo.Bar
-  import Foo.Bar
-  alias Foo.Baz # this and the first line counts as 1
-  import Foo.Baz # this and the second line counts as 1
-  require Foo.Bar
-  require Foo.Baz # this and the previous line counts as 1
-  use Foo.Bar
-  use Foo.Baz, with_params: true # use with params does not count
-  use Foo # use with single module alias does not count
-end
-"""
+  defmodule Credo.Sample1 do
+    alias Foo.Bar
+    import Foo.Bar
+    alias Foo.Baz # this and the first line counts as 1
+    import Foo.Baz # this and the second line counts as 1
+    require Foo.Bar
+    require Foo.Baz # this and the previous line counts as 1
+    use Foo.Bar
+    use Foo.Baz, with_params: true # use with params does not count
+    use Foo # use with single module alias does not count
+  end
+  """
 
   @multi """
-defmodule Credo.Sample2 do
-  alias Foo.{Bar, Baz}
-  import Foo.{Bar, Baz}
-  require Foo.{Bar, Baz}
-  use Foo.{Bar, Baz}
-end
-"""
+  defmodule Credo.Sample2 do
+    alias Foo.{Bar, Baz}
+    import Foo.{Bar, Baz}
+    require Foo.{Bar, Baz}
+    use Foo.{Bar, Baz}
+  end
+  """
 
   @mixed """
-defmodule Credo.Sample2 do
-  import Foo.Bar
-  alias Foo.{Bar, Baz}
-  import Foo.Baz
-  import Bar.Baz
-end
-"""
+  defmodule Credo.Sample2 do
+    import Foo.Bar
+    alias Foo.{Bar, Baz}
+    import Foo.Baz
+    import Bar.Baz
+  end
+  """
 
   @tag needs_elixir: "1.2.0"
   test "it should report correct frequencies for single imports" do

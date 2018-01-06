@@ -8,10 +8,11 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-end
-""" |> to_source_file
+    """
+    defmodule CredoSampleModule do
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -20,10 +21,11 @@ end
   #
 
   test "it should report a violation /2" do
-"""
-defmodule Credo_SampleModule do
-end
-""" |> to_source_file
+    """
+    defmodule Credo_SampleModule do
+    end
+    """
+    |> to_source_file
     |> assert_issue(@described_check)
   end
 end

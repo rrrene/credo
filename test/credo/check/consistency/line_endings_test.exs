@@ -4,28 +4,28 @@ defmodule Credo.Check.Readability.LineEndingsTest do
   @described_check Credo.Check.Consistency.LineEndings
 
   @unix_line_endings """
-defmodule Credo.Sample do
-  defmodule InlineModule do
-    def foobar do
-      {:ok} = File.read
+  defmodule Credo.Sample do
+    defmodule InlineModule do
+      def foobar do
+        {:ok} = File.read
+      end
     end
   end
-end
-"""
+  """
   @unix_line_endings2 """
-defmodule OtherModule do
-  defmacro foo do
-    {:ok} = File.read
-  end
+  defmodule OtherModule do
+    defmacro foo do
+      {:ok} = File.read
+    end
 
-  defp bar do
-    :ok
+    defp bar do
+      :ok
+    end
   end
-end
-"""
+  """
   @windows_line_endings """
-defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
-"""
+  defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
+  """
 
   #
   # cases NOT raising issues
@@ -46,5 +46,4 @@ defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
     |> to_source_files
     |> assert_issue(@described_check)
   end
-
 end

@@ -4,20 +4,20 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
   @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
 
   @single """
-defmodule Credo.Sample2 do
-  alias Foo.Bar
-  alias Foo.Quux
-  require Foo.Bar
-end
-"""
+  defmodule Credo.Sample2 do
+    alias Foo.Bar
+    alias Foo.Quux
+    require Foo.Bar
+  end
+  """
   @multi """
-defmodule Credo.Sample3 do
-  alias Foo.{Bar, Quux}
-  alias Bar.{Baz, Bang}
-  alias Foo.Bar
-  require Foo.Quux
-end
-"""
+  defmodule Credo.Sample3 do
+    alias Foo.{Bar, Quux}
+    alias Bar.{Baz, Bang}
+    alias Foo.Bar
+    require Foo.Quux
+  end
+  """
 
   #
   # cases NOT raising issues
