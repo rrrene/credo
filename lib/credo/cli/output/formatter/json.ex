@@ -4,15 +4,23 @@ defmodule Credo.CLI.Output.Formatter.JSON do
 
   def print_issues(issues) do
     json_issues = Enum.map(issues, &to_json/1)
-    result =
-      %{
-        "issues" => json_issues
-      }
 
-    UI.puts Poison.encode!(result, pretty: true)
+    result = %{
+      "issues" => json_issues
+    }
+
+    UI.puts(Poison.encode!(result, pretty: true))
   end
 
-  def to_json(%Issue{check: check, category: category, message: message, filename: filename, priority: priority} = issue) do
+  def to_json(
+        %Issue{
+          check: check,
+          category: category,
+          message: message,
+          filename: filename,
+          priority: priority
+        } = issue
+      ) do
     check_name =
       check
       |> to_string()
@@ -32,7 +40,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
       "column_end" => column_end,
       "trigger" => issue.trigger,
       "message" => message,
-      "priority" => priority,
+      "priority" => priority
     }
   end
 end

@@ -9,29 +9,35 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
 
   def print_help(exec) do
     usage = ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
-    description =
-      """
 
-      Suggests objects from every category that Credo thinks can be improved.
-      """
-    example = ["Example: ", :olive, :faint, "$ mix credo suggest lib/**/*.ex --all -c names"]
-    options =
-      """
+    description = """
 
-      Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
+    Suggests objects from every category that Credo thinks can be improved.
+    """
 
-      Suggest options:
-        -a, --all             Show all issues
-        -A, --all-priorities  Show all issues including low priority ones
-        -c, --checks          Only include checks that match the given strings
-        -C, --config-name     Use the given config instead of "default"
-        -i, --ignore-checks   Ignore checks that match the given strings
-            --format          Display the list in a specific format (oneline,flycheck)
+    example = [
+      "Example: ",
+      :olive,
+      :faint,
+      "$ mix credo suggest lib/**/*.ex --all -c names"
+    ]
 
-      General options:
-        -v, --version         Show version
-        -h, --help            Show this help
-      """
+    options = """
+
+    Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
+
+    Suggest options:
+      -a, --all             Show all issues
+      -A, --all-priorities  Show all issues including low priority ones
+      -c, --checks          Only include checks that match the given strings
+      -C, --config-name     Use the given config instead of "default"
+      -i, --ignore-checks   Ignore checks that match the given strings
+          --format          Display the list in a specific format (oneline,flycheck)
+
+    General options:
+      -v, --version         Show version
+      -h, --help            Show this help
+    """
 
     UI.puts(usage)
     UI.puts(description)

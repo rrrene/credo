@@ -7,7 +7,9 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
   alias Credo.CLI.Command.Suggest.SuggestOutput
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
+  def call(%Execution{help: true} = exec, _opts),
+    do: SuggestOutput.print_help(exec)
+
   def call(exec, _opts) do
     exec
     |> Credo.CLI.Task.LoadAndValidateSourceFiles.call()

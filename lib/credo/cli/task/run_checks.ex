@@ -7,9 +7,9 @@ defmodule Credo.CLI.Task.RunChecks do
     source_files = get_source_files(exec)
 
     {time_run, :ok} =
-      :timer.tc fn ->
+      :timer.tc(fn ->
         Runner.run(source_files, exec)
-      end
+      end)
 
     put_assign(exec, "credo.time.run_checks", time_run)
   end

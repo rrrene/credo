@@ -14,20 +14,30 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
   defp output_mod(_exec), do: Default
 
   def print_help(exec) do
-    usage = ["Usage: ", :olive, "mix credo explain path_line_no_column [options]"]
-    description =
-      """
+    usage = [
+      "Usage: ",
+      :olive,
+      "mix credo explain path_line_no_column [options]"
+    ]
 
-      Explain the given issue.
-      """
-    example = ["Example: ", :olive, :faint, "$ mix credo explain lib/foo/bar.ex:13:6"]
-    options =
-      """
+    description = """
 
-      General options:
-        -v, --version       Show version
-        -h, --help          Show this help
-      """
+    Explain the given issue.
+    """
+
+    example = [
+      "Example: ",
+      :olive,
+      :faint,
+      "$ mix credo explain lib/foo/bar.ex:13:6"
+    ]
+
+    options = """
+
+    General options:
+      -v, --version       Show version
+      -h, --help          Show this help
+    """
 
     UI.puts(usage)
     UI.puts(description)

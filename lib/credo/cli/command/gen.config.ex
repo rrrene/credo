@@ -18,19 +18,18 @@ defmodule Credo.CLI.Command.GenConfig do
 
   defp create_config_file(filename) do
     if File.exists?(filename) do
-      UI.puts [:red, :bright, "File exists: #{filename}, aborted."]
+      UI.puts([:red, :bright, "File exists: #{filename}, aborted."])
     else
-      UI.puts [:green, "* creating ", :reset, "#{filename}"]
+      UI.puts([:green, "* creating ", :reset, "#{filename}"])
       write_config_file(filename)
     end
   end
 
   defp write_config_file(filename) do
     filename
-    |> Path.dirname
-    |> File.mkdir_p!
+    |> Path.dirname()
+    |> File.mkdir_p!()
 
     File.write!(filename, @default_config_file)
   end
-
 end

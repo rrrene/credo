@@ -6,11 +6,11 @@ defmodule Credo.CLI.Task.LoadAndValidateSourceFiles do
 
   def call(exec, _opts \\ []) do
     {time_load, {valid_source_files, invalid_source_files}} =
-      :timer.tc fn ->
+      :timer.tc(fn ->
         exec
-        |> Sources.find
-        |> Credo.Backports.Enum.split_with(&(&1.valid?))
-      end
+        |> Sources.find()
+        |> Credo.Backports.Enum.split_with(& &1.valid?)
+      end)
 
     Output.complain_about_invalid_source_files(invalid_source_files)
 

@@ -11,6 +11,7 @@ defmodule Credo.CLI.Output.Shell do
   def puts do
     puts("")
   end
+
   def puts(value) do
     GenServer.call(__MODULE__, {:puts, value})
   end
@@ -41,6 +42,7 @@ defmodule Credo.CLI.Output.Shell do
 
     {:reply, nil, current_state}
   end
+
   def handle_call({:puts, value}, _from, %{use_colors: false} = current_state) do
     value
     |> remove_colors()
@@ -54,6 +56,7 @@ defmodule Credo.CLI.Output.Shell do
 
     {:reply, nil, current_state}
   end
+
   def handle_call({:warn, value}, _from, %{use_colors: false} = current_state) do
     value
     |> remove_colors()
@@ -64,8 +67,8 @@ defmodule Credo.CLI.Output.Shell do
 
   defp remove_colors(value) do
     value
-    |> List.wrap
-    |> List.flatten
+    |> List.wrap()
+    |> List.flatten()
     |> Enum.reject(&is_atom/1)
   end
 

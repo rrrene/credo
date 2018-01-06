@@ -8,7 +8,7 @@ defmodule Credo.CLI.Command.Version do
 
   @doc false
   def call(exec, _opts) do
-    UI.puts Credo.version
+    UI.puts(Credo.version())
 
     exec
   end

@@ -10,6 +10,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: Output.print_help(exec)
+
   def call(exec, _opts) do
     filename = get_filename_from_args(exec)
 
@@ -40,9 +41,11 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   def print_result([filename], source_files, exec) do
     print_result([filename, nil, nil], source_files, exec)
   end
+
   def print_result([filename, line_no], source_files, exec) do
     print_result([filename, line_no, nil], source_files, exec)
   end
+
   def print_result([filename, line_no, column], source_files, exec) do
     source_files
     |> Enum.find(&(&1.filename == filename))
@@ -57,7 +60,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
   defp get_filename_from_args(exec) do
     exec.cli_options.args
-    |> List.wrap
-    |> List.first
+    |> List.wrap()
+    |> List.first()
   end
 end

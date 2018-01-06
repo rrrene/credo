@@ -8,14 +8,14 @@ defmodule Credo.CLI.Command.Categories.Output.Default do
     readability: :blue,
     refactor: :yellow,
     warning: :red,
-    consistency: :cyan,
+    consistency: :cyan
   ]
   @category_titles [
     design: "Software Design",
     readability: "Code Readability",
     refactor: "Refactoring opportunities",
     warning: "Warnings - please take a look",
-    consistency: "Consistency",
+    consistency: "Consistency"
   ]
   @category_texts [
     consistency: """
@@ -40,7 +40,7 @@ defmodule Credo.CLI.Command.Categories.Output.Default do
     These checks warn you about things that are potentially dangerous, like a
     missed call to `IEx.pry` you put in during a debugging session or a call
     to String.downcase without using the result.
-    """,
+    """
   ]
 
   def print_categories do
@@ -48,21 +48,26 @@ defmodule Credo.CLI.Command.Categories.Output.Default do
   end
 
   defp print_category(category) do
-    term_width = Output.term_columns
+    term_width = Output.term_columns()
     color = @category_colors[category]
     title = @category_titles[category]
 
-    UI.puts
+    UI.puts()
+
     [
-      :bright, "#{color}_background" |> String.to_atom, color, " ",
-        Output.foreground_color(color), :normal,
-      " #{title}" |> Credo.Backports.String.pad_trailing(term_width - 1),
+      :bright,
+      "#{color}_background" |> String.to_atom(),
+      color,
+      " ",
+      Output.foreground_color(color),
+      :normal,
+      " #{title}" |> Credo.Backports.String.pad_trailing(term_width - 1)
     ]
-    |> UI.puts
+    |> UI.puts()
 
     color
-    |> UI.edge
-    |> UI.puts
+    |> UI.edge()
+    |> UI.puts()
 
     @category_texts[category]
     |> String.split("\n")
@@ -71,7 +76,6 @@ defmodule Credo.CLI.Command.Categories.Output.Default do
 
   defp print_line(line, color) do
     [UI.edge(color), " ", :reset, line]
-    |> UI.puts
+    |> UI.puts()
   end
-
 end
