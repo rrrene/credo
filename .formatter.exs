@@ -1,9 +1,9 @@
 # Used by "mix format" and to export configuration.
 export_locals_without_parens = [
-  task: 1,
-  task: 2,
-  group: 1,
-  group: 2,
+  run: 1,
+  run: 2,
+  activity: 1,
+  activity: 2
 ]
 
 [

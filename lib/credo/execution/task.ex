@@ -10,7 +10,9 @@ defmodule Credo.Execution.Task do
   defmacro __using__(_opts \\ []) do
     quote do
       @behaviour Credo.Execution.Task
+
       import Credo.Execution
+
       alias Credo.Execution
 
       def call(%Execution{halted: false} = exec, opts) do
@@ -30,17 +32,17 @@ defmodule Credo.Execution.Task do
   Runs a given `task` if the `Execution` wasn't halted and ensures that the
   result is also an `Execution` struct.
   """
-  def run(exec, task, opts \\ [])
+  def run(task, exec, opts \\ [])
 
-  def run(%Credo.Execution{debug: true} = exec, task, opts) do
-    Monitor.task(exec, task, opts, &do_run/3, [exec, task, opts])
+  def run(task, %Credo.Execution{debug: true} = exec, opts) do
+    Monitor.task(exec, task, opts, &do_run/3, [task, exec, opts])
   end
 
-  def run(exec, task, opts) do
-    do_run(exec, task, opts)
+  def run(task, exec, opts) do
+    do_run(task, exec, opts)
   end
 
-  defp do_run(%Credo.Execution{halted: false} = exec, task, opts) do
+  defp do_run(task, %Credo.Execution{halted: false} = exec, opts) do
     case task.call(exec, opts) do
       %Execution{halted: false} = exec ->
         exec
@@ -58,15 +60,14 @@ defmodule Credo.Execution.Task do
     end
   end
 
-  defp do_run(%Execution{} = exec, _task, _opts) do
+  defp do_run(_task, %Execution{} = exec, _opts) do
     exec
   end
 
-  defp do_run(exec, _task, _opts) do
+  defp do_run(_task, exec, _opts) do
     IO.warn(
-      "Expected first parameter of Task.run/3 to match %Credo.Execution{}, got: #{
-        inspect(exec)
-      }"
+      "Expected second parameter of Task.run/3 to match %Credo.Execution{}, " <>
+        "got: #{inspect(exec)}"
     )
 
     exec

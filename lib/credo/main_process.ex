@@ -6,46 +6,48 @@ defmodule Credo.MainProcess do
   Any Task can mark the Execution as "halted" to stop Credo's execution.
   Subsequent Tasks won't be run.
 
-  Tasks are organized in named groups.
+  Tasks are organized in named activities.
   """
 
-  use Credo.Execution.TaskChain
+  use Credo.Execution.ProcessDefinition
 
-  group :parse_cli_options do
-    task Credo.Execution.Task.ParseOptions
+  alias Credo.Execution.Task
+
+  activity :parse_cli_options do
+    run Task.ParseOptions
   end
 
-  group :validate_cli_options do
-    task Credo.Execution.Task.ValidateOptions
+  activity :validate_cli_options do
+    run Task.ValidateOptions
   end
 
-  group :convert_cli_options_to_config do
-    task Credo.Execution.Task.ConvertCLIOptionsToConfig
+  activity :convert_cli_options_to_config do
+    run Task.ConvertCLIOptionsToConfig
   end
 
-  group :determine_command do
-    task Credo.Execution.Task.DetermineCommand
+  activity :determine_command do
+    run Task.DetermineCommand
   end
 
-  group :set_default_command do
-    task Credo.Execution.Task.SetDefaultCommand
+  activity :set_default_command do
+    run Task.SetDefaultCommand
   end
 
-  group :validate_config do
-    task Credo.Execution.Task.ValidateConfig
+  activity :validate_config do
+    run Task.ValidateConfig
   end
 
-  group :resolve_config do
-    task Credo.Execution.Task.UseColors
-    task Credo.Execution.Task.RequireRequires
+  activity :resolve_config do
+    run Task.UseColors
+    run Task.RequireRequires
   end
 
-  group :run_command do
-    task Credo.Execution.Task.RunCommand
+  activity :run_command do
+    run Task.RunCommand
   end
 
-  group :halt_execution do
-    task Credo.Execution.Task.AssignExitStatusForIssues
-    task Credo.Execution.Task.HaltIfExitStatusAssigned
+  activity :halt_execution do
+    run Task.AssignExitStatusForIssues
+    run Task.HaltIfExitStatusAssigned
   end
 end
