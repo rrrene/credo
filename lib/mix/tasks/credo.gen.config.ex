@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Credo.Gen.Config do
   use Mix.Task
 
-  @shortdoc  "Generate a new config for Credo"
+  @shortdoc "Generate a new config for Credo"
   @moduledoc @shortdoc
 
   @doc false

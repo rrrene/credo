@@ -7,23 +7,30 @@ defmodule Credo.Mixfile do
       version: "0.8.10",
       elixir: "~> 1.1",
       escript: [main_module: Credo.CLI],
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
-      description: "A static code analysis tool with a focus on code consistency and teaching.",
+      description:
+        "A static code analysis tool with a focus on code consistency and teaching.",
       package: package()
     ]
   end
 
   defp package do
     [
-      files: [".credo.exs", ".template.check.ex", "lib", "mix.exs",
-              "README.md", "LICENSE"],
+      files: [
+        ".credo.exs",
+        ".template.check.ex",
+        "lib",
+        "mix.exs",
+        "README.md",
+        "LICENSE"
+      ],
       maintainers: ["René Föhring"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/rrrene/credo"},
+      links: %{"GitHub" => "https://github.com/rrrene/credo"}
     ]
   end
 
@@ -34,7 +41,7 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.2.0"},
-      {:poison, ">= 0.0.0"},
+      {:poison, ">= 0.0.0"}
     ]
   end
 end
