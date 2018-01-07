@@ -181,7 +181,7 @@ defmodule Credo.CLI.Output.Summary do
     |> Enum.reduce(&(&1 + &2))
   end
 
-  @def_ops [:defmodule, :def, :defp, :defmacro, :defmacro]
+  @def_ops [:defmodule, :def, :defp, :defmacro]
   for op <- @def_ops do
     defp scope_count_traverse({unquote(op), _, _} = ast, count) do
       {ast, count + 1}
