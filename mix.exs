@@ -5,7 +5,7 @@ defmodule Credo.Mixfile do
     [
       app: :credo,
       version: "0.9.0-rc1",
-      elixir: "~> 1.1",
+      elixir: ">= 1.3.2",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
