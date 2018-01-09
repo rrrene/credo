@@ -264,4 +264,80 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert [{1, 45, 4, 2}] == positions
   end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a charlist" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2 <>
+      '  ' }`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$$$$
+    $$$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a binary number" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2 <>
+        0b1010 }`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$$$$
+    $$$$$$$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a octal number" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2 <>
+        0o777 }`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$$$$
+    $$$$$$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a hexadecimal number" do
+    source = ~S"""
+    "Use unquoted atom rather than quoted atom `#{
+      trigger <>
+        trigger2 <>
+        0x1F }`."
+    """
+
+    expected = ~S"""
+    "Use unquoted atom rather than quoted atom `$$
+    $$$$$$$$$$$$
+    $$$$$$$$$$$$$$$
+    $$$$$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end

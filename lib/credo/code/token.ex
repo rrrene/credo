@@ -195,6 +195,22 @@ defmodule Credo.Code.Token do
     defp convert_to_col_end(
            _line_no,
            _col_start,
+           {_, {line_no, col_start, nil}, list}
+         )
+         when is_list(list) do
+      Enum.reduce(list, {line_no, col_start, nil}, fn value,
+                                                      {
+                                                        current_line_no,
+                                                        current_col_start,
+                                                        _terminator
+                                                      } ->
+        convert_to_col_end(current_line_no, current_col_start, value)
+      end)
+    end
+
+    defp convert_to_col_end(
+           _line_no,
+           _col_start,
            {_, {line_no, col_start, nil}, value}
          ) do
       {line_no, to_col_end(col_start, value), nil}
@@ -203,7 +219,7 @@ defmodule Credo.Code.Token do
     defp convert_to_col_end(
            _line_no,
            _col_start,
-           {_, {line_no, col_start, value}, _value}
+           {_, {line_no, col_start, _value}, value}
          ) do
       {line_no, to_col_end(col_start, value), nil}
     end
