@@ -28,9 +28,10 @@ defmodule Credo.Code.Module do
 
   # Multi alias
   defp find_aliases(
-         {:alias, _, [
-           {{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}
-         ]} = ast,
+         {:alias, _,
+          [
+            {{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}
+          ]} = ast,
          aliases
        ) do
     module_names =
@@ -214,9 +215,10 @@ defmodule Credo.Code.Module do
 
   # multi alias
   defp find_dependent_modules(
-         {:alias, _, [
-           {{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}
-         ]} = ast,
+         {:alias, _,
+          [
+            {{:., _, [{:__aliases__, _, mod_list}, :{}]}, _, multi_mod_list}
+          ]} = ast,
          modules
        ) do
     module_names =

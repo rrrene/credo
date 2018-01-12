@@ -245,32 +245,38 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
     assert 18 == DuplicatedCode.mass(ast)
 
     ast =
-      {:defmodule, [line: 1], [
-        {:__aliases__, [counter: 0, line: 1], [:SampleModule]},
-        [
-          do:
-            {:def, [line: 2], [
-              {:myfun, [line: 2], [{:p1, [line: 2], nil}, {:p2, [line: 2], nil}]},
+      {:defmodule, [line: 1],
+       [
+         {:__aliases__, [counter: 0, line: 1], [:SampleModule]},
+         [
+           do:
+             {:def, [line: 2],
               [
-                do:
-                  {:if, [line: 3], [
-                    {:==, [line: 3], [
-                      {:p1, [line: 3], nil},
-                      {:p2, [line: 3], nil}
-                    ]},
-                    [
-                      do: {:p1, [line: 4], nil},
-                      else:
-                        {:+, [line: 6], [
-                          {:p2, [line: 6], nil},
-                          {:p1, [line: 6], nil}
-                        ]}
-                    ]
-                  ]}
-              ]
-            ]}
-        ]
-      ]}
+                {:myfun, [line: 2],
+                 [{:p1, [line: 2], nil}, {:p2, [line: 2], nil}]},
+                [
+                  do:
+                    {:if, [line: 3],
+                     [
+                       {:==, [line: 3],
+                        [
+                          {:p1, [line: 3], nil},
+                          {:p2, [line: 3], nil}
+                        ]},
+                       [
+                         do: {:p1, [line: 4], nil},
+                         else:
+                           {:+, [line: 6],
+                            [
+                              {:p2, [line: 6], nil},
+                              {:p1, [line: 6], nil}
+                            ]}
+                       ]
+                     ]}
+                ]
+              ]}
+         ]
+       ]}
 
     assert 18 == DuplicatedCode.mass(ast)
   end

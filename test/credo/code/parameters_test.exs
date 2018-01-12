@@ -150,25 +150,29 @@ defmodule Credo.Code.ParametersTest do
 
   test "returns the correct parameter counts for ASTs" do
     ast =
-      {:def, [line: 2], [
-        {:some_function, [line: 2], [
-          {:p1, [line: 2], nil},
-          {:p2, [line: 2], nil},
-          {:p3, [line: 2], nil},
-          {:p4, [line: 2], nil},
-          {:p5, [line: 2], nil}
-        ]},
-        [
-          do:
-            {:=, [line: 3], [
-              {:some_value, [line: 3], nil},
-              {:+, [line: 3], [
-                {:parameter1, [line: 3], nil},
-                {:parameter2, [line: 3], nil}
+      {:def, [line: 2],
+       [
+         {:some_function, [line: 2],
+          [
+            {:p1, [line: 2], nil},
+            {:p2, [line: 2], nil},
+            {:p3, [line: 2], nil},
+            {:p4, [line: 2], nil},
+            {:p5, [line: 2], nil}
+          ]},
+         [
+           do:
+             {:=, [line: 3],
+              [
+                {:some_value, [line: 3], nil},
+                {:+, [line: 3],
+                 [
+                   {:parameter1, [line: 3], nil},
+                   {:parameter2, [line: 3], nil}
+                 ]}
               ]}
-            ]}
-        ]
-      ]}
+         ]
+       ]}
 
     assert 5 == Parameters.count(ast)
   end

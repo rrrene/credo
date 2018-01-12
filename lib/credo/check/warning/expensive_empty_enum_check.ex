@@ -24,12 +24,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  @enum_count_pattern quote do:
-                              {
-                                {:., _, [{:__aliases__, _, [:Enum]}, :count]},
-                                _,
-                                _
-                              }
+  @enum_count_pattern quote do: {
+                              {:., _, [{:__aliases__, _, [:Enum]}, :count]},
+                              _,
+                              _
+                            }
   @length_pattern quote do: {:length, _, _}
   @comparisons [
     {@enum_count_pattern, 0},

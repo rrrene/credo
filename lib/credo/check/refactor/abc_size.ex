@@ -56,10 +56,11 @@ defmodule Credo.Check.Refactor.ABCSize do
       if abc_size > max_abc_size do
         fun_name = CodeHelper.def_name(ast)
 
-        {ast, [
-          issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size)
-          | issues
-        ]}
+        {ast,
+         [
+           issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size)
+           | issues
+         ]}
       else
         {ast, issues}
       end

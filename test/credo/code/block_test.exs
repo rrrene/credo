@@ -29,26 +29,30 @@ defmodule Credo.Code.BlockTest do
       [
         do: [
           {:->, [line: 5], [[0], nil]},
-          {:->, [line: 6], [
-            [1],
-            {:if, [line: 7], [
-              {:parameter2, [line: 7], nil},
-              [do: {:do_something, [line: 7], nil}]
-            ]}
-          ]}
+          {:->, [line: 6],
+           [
+             [1],
+             {:if, [line: 7],
+              [
+                {:parameter2, [line: 7], nil},
+                [do: {:do_something, [line: 7], nil}]
+              ]}
+           ]}
         ]
       ]
     ]
 
     expected = [
       {:->, [line: 5], [[0], nil]},
-      {:->, [line: 6], [
-        [1],
-        {:if, [line: 7], [
-          {:parameter2, [line: 7], nil},
-          [do: {:do_something, [line: 7], nil}]
-        ]}
-      ]}
+      {:->, [line: 6],
+       [
+         [1],
+         {:if, [line: 7],
+          [
+            {:parameter2, [line: 7], nil},
+            [do: {:do_something, [line: 7], nil}]
+          ]}
+       ]}
     ]
 
     assert expected == Block.do_block_for!(arguments)
@@ -67,21 +71,25 @@ defmodule Credo.Code.BlockTest do
       """
       |> Code.string_to_quoted()
 
-    assert {:__block__, [], [
-             {:some_action, [line: 2], nil},
-             {{:., [line: 3], [{:__aliases__, _, [:IO]}, :puts]}, [line: 3], [
-               "HA"
-             ]}
-           ]} = Block.do_block_for!(ast)
+    assert {:__block__, [],
+            [
+              {:some_action, [line: 2], nil},
+              {{:., [line: 3], [{:__aliases__, _, [:IO]}, :puts]}, [line: 3],
+               [
+                 "HA"
+               ]}
+            ]} = Block.do_block_for!(ast)
 
     assert Block.else_block?(ast)
 
-    assert {:__block__, [], [
-             {:some_other_action, [line: 5], nil},
-             {{:., [line: 6], [{:__aliases__, _, [:IO]}, :puts]}, [line: 6], [
-               "Yay!"
-             ]}
-           ]} = Block.else_block_for!(ast)
+    assert {:__block__, [],
+            [
+              {:some_other_action, [line: 5], nil},
+              {{:., [line: 6], [{:__aliases__, _, [:IO]}, :puts]}, [line: 6],
+               [
+                 "Yay!"
+               ]}
+            ]} = Block.else_block_for!(ast)
   end
 
   test "it should return whether an `ast` has a do and/or else block with just one operation in it" do
