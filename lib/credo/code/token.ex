@@ -195,6 +195,15 @@ defmodule Credo.Code.Token do
     defp convert_to_col_end(
            _line_no,
            _col_start,
+           {:list_string, {line_no, col_start, nil}, value}
+         ) do
+      # add 2 for opening and closing '
+      {line_no, to_col_end(col_start, value, 2), :bin_string}
+    end
+
+    defp convert_to_col_end(
+           _line_no,
+           _col_start,
            {_, {line_no, col_start, nil}, list}
          )
          when is_list(list) do
