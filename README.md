@@ -23,7 +23,7 @@ Add `:credo` as a dependency to your project's `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
+    {:credo, "~> 0.9", only: [:dev, :test], runtime: false}
   ]
 end
 ```
