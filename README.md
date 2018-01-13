@@ -243,7 +243,7 @@ Example usage:
 
     $ mix credo                         # display standard report
     $ mix credo suggest                 # same thing, since it's the default command
-    $ mix credo --all --format=oneline  # include low priority issues, one issue per line
+    $ mix credo --all --format=json     # include low priority issues, output as JSON
 
     $ mix credo suggest --help          # more options
 
@@ -285,6 +285,14 @@ There are no additional options.
 
 
 ## Command line options
+
+
+### Output Formats
+
+Use `--format` to format the output in one of the following formats:
+
+- `--format=flycheck` for [Flycheck](http://www.flycheck.org/) output
+- `--format=json` for [JSON](https://www.json.org/) output
 
 
 ### Only run some checks
@@ -377,11 +385,6 @@ You will now be able to invoke credo as usual through Mix with `mix credo`. This
 ### Show code snippets in the output
 
 Use the `--verbose` switch to include the code snippets in question in the output.
-
-
-### Show compact list
-
-Use `--format=oneline` to format the output to represent each issue by a single line.
 
 
 ### Show all issues including low priority ones
