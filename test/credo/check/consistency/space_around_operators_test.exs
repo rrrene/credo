@@ -61,6 +61,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         %{ filetype: :gif,
           width: width,
           height: height }
+
+        map_fn = &(enum.__struct__).map/2
       end
 
       def foo do

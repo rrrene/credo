@@ -87,6 +87,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     !arrow_in_typespec?(line, column)
   end
 
+  defp create_issue?(line, column, trigger) when trigger == :/ do
+    !number_in_fun?(line, column)
+  end
+
   defp create_issue?(_, _, _), do: true
 
   defp arrow_in_typespec?(line, column) do
@@ -109,6 +113,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     line
     |> String.slice(column..-1)
     |> String.match?(~r/^\d+\.\./)
+  end
+
+  defp number_in_fun?(line, column) do
+    line
+    |> String.slice(0..(column - 2))
+    |> String.match?(~r/[\.\&][a-z0-9_]+$/)
   end
 
   # TODO: this implementation is a bit naive. improve it.
