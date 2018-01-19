@@ -13,6 +13,9 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
       def some_function(parameter1, parameter2) do
         a = 1
         b = 2
+        seq = 1
+
+        %{seq: ^seq} = %{seq: 1}
       end
     end
     """

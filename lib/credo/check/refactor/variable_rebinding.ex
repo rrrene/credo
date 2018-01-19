@@ -89,6 +89,10 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     {variable_name, meta[:line]}
   end
 
+  defp find_variables({:^, _, _}) do
+    []
+  end
+
   defp find_variables(tuple) when is_tuple(tuple) do
     tuple
     |> Tuple.to_list()
