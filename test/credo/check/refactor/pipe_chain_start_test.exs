@@ -181,6 +181,16 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     )
   end
 
+  test "it should NOT report a violation for an excluded function call /23" do
+    """
+    Namespace.Module.table2("users", %{name: "Bob Jones"}, {123}, true, ~r/regex/)
+    |> insert(%{name: "Bob Jones"})
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report a violation for an excluded function call /3" do
     """
     put_in(users["john"][:age], 28)

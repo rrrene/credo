@@ -110,9 +110,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   # function_call(with, args) and sigils
   defp valid_chain_start?({atom, _, arguments} = ast, excluded_functions)
        when is_atom(atom) and is_list(arguments) do
-    function_name = to_function_call_name(ast)
-
-    sigil?(atom) || Enum.member?(excluded_functions, function_name)
+    sigil?(atom) || valid_chain_start_function_call?(ast, excluded_functions)
   end
 
   # map[:access]
@@ -124,12 +122,21 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   defp valid_chain_start?({{:., _, _}, _, []}, _excluded_functions), do: true
   # Module.function_call(with, parameters)
   defp valid_chain_start?({{:., _, _}, _, _} = ast, excluded_functions) do
-    function_name = to_function_call_name(ast)
-
-    Enum.member?(excluded_functions, function_name)
+    valid_chain_start_function_call?(ast, excluded_functions)
   end
 
   defp valid_chain_start?(_, _excluded_functions), do: true
+
+  defp valid_chain_start_function_call?(
+         {_atom, _, arguments} = ast,
+         excluded_functions
+       ) do
+    function_name = to_function_call_name(ast)
+
+    IO.inspect(ast, label: "lhs")
+
+    Enum.member?(excluded_functions, function_name)
+  end
 
   defp sigil?(atom) do
     atom
@@ -142,6 +149,21 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     |> Macro.to_string()
     |> String.replace(~r/\.?\(.*\)$/s, "")
   end
+
+  defp parameter_types(list) do
+    Enum.map(&parameter_type/1)
+  end
+
+  defp parameter_types(v) when is_atom(v), do: :atom
+  defp parameter_types(v) when is_binary(v), do: :binary
+  defp parameter_types(v) when is_bitstring(v), do: :bitstring
+  defp parameter_types(v) when is_boolean(v), do: :boolean
+  defp parameter_types(v) when is_list(v), do: :list
+  defp parameter_types(v) when is_number(v), do: :number
+  defp parameter_types({:%{}, _, _}), do: :map
+  defp parameter_types({:{}, _, _}), do: :tuple
+  defp parameter_types(nil), do: nil
+  defp parameter_types(_), do: :credo_error
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
