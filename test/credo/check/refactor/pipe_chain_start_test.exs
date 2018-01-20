@@ -181,16 +181,6 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     )
   end
 
-  test "it should NOT report a violation for an excluded function call /23" do
-    """
-    Namespace.Module.table2("users", %{name: "Bob Jones"}, {123}, true, ~r/regex/)
-    |> insert(%{name: "Bob Jones"})
-    |> DB.run
-    """
-    |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
   test "it should NOT report a violation for an excluded function call /3" do
     """
     put_in(users["john"][:age], 28)
@@ -222,10 +212,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
       end
     """
     |> to_source_file
-    |> refute_issues(
-      @described_check,
-      excluded_functions: ~w(String.trim table put_in)
-    )
+    |> refute_issues(@described_check)
   end
 
   test "it should NOT report a violation for --" do
@@ -266,10 +253,52 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     end
     """
     |> to_source_file
-    |> refute_issues(
-      @described_check,
-      excluded_functions: ~w(String.trim table put_in)
-    )
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for an excluded argument type" do
+    """
+    table(~r/regex/)
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:regex])
+  end
+
+  test "it should NOT report a violation for an excluded argument type /2" do
+    """
+    table(~R/regex/)
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:sigil_R])
+  end
+
+  test "it should NOT report a violation for an excluded argument type /3" do
+    """
+    Namespace.Module.table2("users", %{name: "Bob Jones"}, {123}, true, ~r/regex/)
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:binary])
+  end
+
+  test "it should NOT report a violation for an excluded argument type /4" do
+    """
+    table(~f(special sigil))
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:sigil_f])
+  end
+
+  test "it should NOT report a violation for an excluded argument type /5" do
+    """
+    table(fn -> :stuff end)
+    |> DB.run
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:fn])
   end
 
   #
