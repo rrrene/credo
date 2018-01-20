@@ -184,7 +184,6 @@ defmodule Credo.Check.Refactor.PipeChainStart do
       arguments
       |> List.first()
       |> argument_type()
-      |> IO.inspect(label: "argument type")
 
     Enum.member?(excluded_functions, function_name) ||
       Enum.any?(
