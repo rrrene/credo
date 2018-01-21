@@ -14,6 +14,9 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
 
       def some_fun do
         assert x && y
+
+        if decimal !== 0.0 && decimal !== 0 do
+        end
       end
     end
     """
