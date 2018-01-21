@@ -1,12 +1,18 @@
 # Changelog
 
-## 0.9.0-rc1
+## 0.9.0-rc2
 
 - Add JSON support
 - Ensure compatibility with Elixir 1.6
 - Format codebase using Elixir 1.6 Formatter
 - Rework internals in preparation of 1.0 release
 - Credo now requires Elixir 1.3.2
+- Include `test` directory in default config
+- Add `excluded_argument_types` to PipeChainStart
+- Emit warnings for non-existing checks, which are referenced in config
+- Fix false positive in VariableRebinding
+- Fix false positive in SpaceAroundOperators
+- Fix false positive on BoolOperationOnSameValues
 
 ## 0.8.10
 
