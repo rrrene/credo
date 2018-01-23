@@ -358,16 +358,16 @@ Do note with the passed option as filename is a stub that is just used to prefix
 If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [bunt](https://github.com/rrrene/bunt):
 
 ```bash
-$ git clone git@github.com:rrrene/bunt.git
-$ cd bunt
-$ mix archive.build
-$ mix archive.install
-$ cd -
-$ git clone git@github.com:rrrene/credo.git
-$ cd credo
-$ mix deps.get
-$ mix archive.build
-$ mix archive.install
+git clone git@github.com:rrrene/bunt.git
+cd bunt
+mix archive.build
+mix archive.install
+cd -
+git clone git@github.com:rrrene/credo.git
+cd credo
+mix deps.get
+mix archive.build
+mix archive.install
 ```
 
 **Important:** You have to install `bunt` as well:
