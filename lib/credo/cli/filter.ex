@@ -11,6 +11,7 @@ defmodule Credo.CLI.Filter do
   def important?(%Issue{} = issue, exec) do
     issue.priority >= exec.min_priority
   end
+
   def important?(%SourceFile{filename: filename}, exec) do
     exec
     |> Credo.Execution.get_issues(filename)
@@ -18,7 +19,7 @@ defmodule Credo.CLI.Filter do
   end
 
   def valid_issues(list, exec) when is_list(list) do
-    Enum.reject(list, fn(issue) ->
+    Enum.reject(list, fn issue ->
       ignored_by_lint_attribute?(issue, exec) ||
         ignored_by_config_comment?(issue, exec)
     end)
@@ -27,7 +28,8 @@ defmodule Credo.CLI.Filter do
   def ignored_by_lint_attribute?(%Issue{} = issue, exec) do
     case exec.lint_attribute_map[issue.filename] do
       list when is_list(list) ->
-        Enum.any?(list, &(LintAttribute.ignores_issue?(&1, issue)))
+        Enum.any?(list, &LintAttribute.ignores_issue?(&1, issue))
+
       _ ->
         false
     end
@@ -36,7 +38,8 @@ defmodule Credo.CLI.Filter do
   def ignored_by_config_comment?(%Issue{} = issue, exec) do
     case exec.config_comment_map[issue.filename] do
       list when is_list(list) ->
-        Enum.any?(list, &(ConfigComment.ignores_issue?(&1, issue)))
+        Enum.any?(list, &ConfigComment.ignores_issue?(&1, issue))
+
       _ ->
         false
     end

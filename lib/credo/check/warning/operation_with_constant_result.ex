@@ -14,9 +14,9 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
 
   @explanation [check: @moduledoc]
   @ops_and_constant_results [
-      {:*, "zero", 0},
-      {:*, "the left side of the expression", 1}
-    ]
+    {:*, "zero", 0},
+    {:*, "the left side of the expression", 1}
+  ]
 
   use Credo.Check, base_priority: :high
 
@@ -31,22 +31,35 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
   defp traverse({:&, _, _}, issues, _) do
     {nil, issues}
   end
+
   for {op, constant_result, operand} <- @ops_and_constant_results do
-    defp traverse({unquote(op), meta, [_lhs, unquote(operand)]} = ast, issues, issue_meta) do
-      new_issue = issue_for(issue_meta, meta[:line], unquote(op), unquote(constant_result))
+    defp traverse(
+           {unquote(op), meta, [_lhs, unquote(operand)]} = ast,
+           issues,
+           issue_meta
+         ) do
+      new_issue =
+        issue_for(
+          issue_meta,
+          meta[:line],
+          unquote(op),
+          unquote(constant_result)
+        )
 
       {ast, issues ++ [new_issue]}
     end
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-
   defp issue_for(issue_meta, line_no, trigger, constant_result) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Operation will always return #{constant_result}.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

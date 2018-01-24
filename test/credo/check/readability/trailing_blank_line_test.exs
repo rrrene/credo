@@ -8,10 +8,11 @@ defmodule Credo.Check.Readability.TrailingBlankLineTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-end
-""" |> to_source_file
+    """
+    defmodule CredoSampleModule do
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 

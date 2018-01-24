@@ -13,7 +13,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @explanation [
     check: @moduledoc,
     params: [
-      max_size: "The maximum ABC size a function should have.",
+      max_size: "The maximum ABC size a function should have."
     ]
   ]
   @default_params [
@@ -39,8 +39,15 @@ defmodule Credo.Check.Refactor.ABCSize do
   defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
     {ast, issues}
   end
+
   for op <- @def_ops do
-    defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_abc_size) when is_list(arguments) do
+    defp traverse(
+           {unquote(op), meta, arguments} = ast,
+           issues,
+           issue_meta,
+           max_abc_size
+         )
+         when is_list(arguments) do
       abc_size =
         ast
         |> abc_size_for
@@ -49,12 +56,17 @@ defmodule Credo.Check.Refactor.ABCSize do
       if abc_size > max_abc_size do
         fun_name = CodeHelper.def_name(ast)
 
-        {ast, [issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size) | issues]}
+        {ast,
+         [
+           issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size)
+           | issues
+         ]}
       else
         {ast, issues}
       end
     end
   end
+
   defp traverse(ast, issues, _issue_meta, _max_abc_size) do
     {ast, issues}
   end
@@ -73,17 +85,18 @@ defmodule Credo.Check.Refactor.ABCSize do
   """
   def abc_size_for({_def_op, _meta, arguments}) when is_list(arguments) do
     arguments
-    |> CodeHelper.do_block_for!
+    |> CodeHelper.do_block_for!()
     |> abc_size_for(arguments)
   end
 
   @doc false
   def abc_size_for(nil, _arguments), do: 0
+
   def abc_size_for(ast, arguments) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2,
-                                              initial_acc)
+    [a: a, b: b, c: c, var_names: _] =
+      Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
 
     :math.sqrt(a * a + b * b + c * c)
   end
@@ -92,13 +105,15 @@ defmodule Credo.Check.Refactor.ABCSize do
     case Enum.at(arguments, 0) do
       {_name, _meta, nil} ->
         []
+
       {_name, _meta, parameters} ->
         Enum.map(parameters, &var_name/1)
     end
   end
 
   for op <- @def_ops do
-    defp traverse_abc({unquote(op), _, arguments} = ast, abc) when is_list(arguments) do
+    defp traverse_abc({unquote(op), _, arguments} = ast, abc)
+         when is_list(arguments) do
       {ast, abc}
     end
   end
@@ -109,33 +124,71 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
 
   # A - assignments
-  defp traverse_abc({:=, _meta, [lhs | rhs]}, [a: a, b: b, c: c, var_names: var_names]) do
+  defp traverse_abc(
+         {:=, _meta, [lhs | rhs]},
+         a: a,
+         b: b,
+         c: c,
+         var_names: var_names
+       ) do
     var_names =
       case var_name(lhs) do
         nil ->
           var_names
+
         false ->
           var_names
+
         name ->
-          Enum.into var_names, [name]
+          Enum.into(var_names, [name])
       end
+
     {rhs, [a: a + 1, b: b, c: c, var_names: var_names]}
   end
 
   # B - branch
-  defp traverse_abc({:->, _meta, arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) do
-    var_names = Enum.into var_names, fn_parameters(arguments)
+  defp traverse_abc(
+         {:->, _meta, arguments} = ast,
+         a: a,
+         b: b,
+         c: c,
+         var_names: var_names
+       ) do
+    var_names = Enum.into(var_names, fn_parameters(arguments))
     {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
   end
+
   for op <- @branch_ops do
-    defp traverse_abc({unquote(op), _meta, [{_, _, nil}, _] = arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) when is_list(arguments) do
+    defp traverse_abc(
+           {unquote(op), _meta, [{_, _, nil}, _] = arguments} = ast,
+           a: a,
+           b: b,
+           c: c,
+           var_names: var_names
+         )
+         when is_list(arguments) do
       {ast, [a: a, b: b, c: c, var_names: var_names]}
     end
-    defp traverse_abc({unquote(op), _meta, arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) when is_list(arguments) do
+
+    defp traverse_abc(
+           {unquote(op), _meta, arguments} = ast,
+           a: a,
+           b: b,
+           c: c,
+           var_names: var_names
+         )
+         when is_list(arguments) do
       {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
     end
   end
-  defp traverse_abc({fun_or_var_name, _meta, nil} = ast, [a: a, b: b, c: c, var_names: var_names]) do
+
+  defp traverse_abc(
+         {fun_or_var_name, _meta, nil} = ast,
+         a: a,
+         b: b,
+         c: c,
+         var_names: var_names
+       ) do
     is_variable = Enum.member?(var_names, fun_or_var_name)
 
     if is_variable do
@@ -147,7 +200,14 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   # C - conditions
   for op <- @condition_ops do
-    defp traverse_abc({unquote(op), _meta, arguments} = ast, [a: a, b: b, c: c, var_names: var_names]) when is_list(arguments) do
+    defp traverse_abc(
+           {unquote(op), _meta, arguments} = ast,
+           a: a,
+           b: b,
+           c: c,
+           var_names: var_names
+         )
+         when is_list(arguments) do
       {ast, [a: a, b: b, c: c + 1, var_names: var_names]}
     end
   end
@@ -162,21 +222,27 @@ defmodule Credo.Check.Refactor.ABCSize do
   def fn_parameters([params, tuple]) when is_list(params) and is_tuple(tuple) do
     fn_parameters(params)
   end
+
   def fn_parameters([[{:when, _, params}], _]) when is_list(params) do
     fn_parameters(params)
   end
+
   def fn_parameters(params) when is_list(params) do
     params
     |> Enum.map(&var_name/1)
     |> Enum.reject(&is_nil/1)
   end
 
-
   def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
-    format_issue issue_meta,
-      message: "Function is too complex (ABC size is #{actual_value}, max is #{max_value}).",
+    format_issue(
+      issue_meta,
+      message:
+        "Function is too complex (ABC size is #{actual_value}, max is #{
+          max_value
+        }).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)
+    )
   end
 end

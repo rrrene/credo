@@ -14,11 +14,12 @@ defmodule Credo.CLI.Filename do
       false
   """
   def contains_line_no?(nil), do: false
+
   def contains_line_no?(filename) do
     count =
       filename
       |> String.split(":")
-      |> Enum.count
+      |> Enum.count()
 
     if windows_path?(filename) do
       count == 3 || count == 4
@@ -57,6 +58,7 @@ defmodule Credo.CLI.Filename do
   defp remove_line_no_and_column(parts, true) do
     Enum.at(parts, 0) <> ":" <> Enum.at(parts, 1)
   end
+
   defp remove_line_no_and_column(parts, false) do
     List.first(parts)
   end
@@ -74,5 +76,4 @@ defmodule Credo.CLI.Filename do
   def with(filename, params) do
     filename <> pos_suffix(params[:line_no], params[:column])
   end
-
 end

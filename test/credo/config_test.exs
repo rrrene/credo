@@ -1,6 +1,5 @@
 defmodule Credo.ConfigTest do
   use ExUnit.Case
 
-  #alias Credo.Execution
-
+  # alias Credo.Execution
 end

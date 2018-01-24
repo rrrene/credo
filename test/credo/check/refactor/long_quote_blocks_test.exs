@@ -8,17 +8,18 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  defmacro __using__(opts) do
-    quote do
-      def some_fun do
-        some_stuff()
+    """
+    defmodule CredoSampleModule do
+      defmacro __using__(opts) do
+        quote do
+          def some_fun do
+            some_stuff()
+          end
+        end
       end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -27,22 +28,22 @@ end
   #
 
   test "it should report a violation" do
-"""
-defmodule CredoSampleModule do
-  defmacro __using__(opts) do
-    quote do
-      def some_fun do
-        some_stuff()
-      end
+    """
+    defmodule CredoSampleModule do
+      defmacro __using__(opts) do
+        quote do
+          def some_fun do
+            some_stuff()
+          end
 
-      def some_fun do
-        some_stuff()
+          def some_fun do
+            some_stuff()
+          end
+        end
       end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issue(@described_check, max_line_count: 2)
   end
-
 end

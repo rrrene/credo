@@ -5,10 +5,10 @@ Credo.Test.Application.start([], [])
 ExUnit.start()
 
 check_version =
-  ~w(1.2.0 1.3.2)
-  |> Enum.reduce([], fn(version, acc) ->
+  ~w()
+  |> Enum.reduce([], fn version, acc ->
     # allow -dev versions so we can test before the Elixir release.
-    if System.version |> Version.match?("< #{version}-dev") do
+    if System.version() |> Version.match?("< #{version}-dev") do
       acc ++ [needs_elixir: version]
     else
       acc
@@ -33,12 +33,14 @@ defmodule CredoSourceFileCase do
   alias Credo.Test.FilenameGenerator
 
   def to_source_file(source) do
-    to_source_file(source, FilenameGenerator.next)
+    to_source_file(source, FilenameGenerator.next())
   end
+
   def to_source_file(source, filename) do
     case Credo.SourceFile.parse(source, filename) do
       %{valid?: true} = source_file ->
         source_file
+
       _ ->
         raise "Source could not be parsed!"
     end
@@ -58,7 +60,10 @@ defmodule CredoCheckCase do
   def refute_issues(source_file, check \\ nil, params \\ []) do
     issues = issues_for(source_file, check, create_config(), params)
 
-    assert [] == issues, "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
+    assert [] == issues,
+           "There should be no issues, got #{Enum.count(issues)}: #{
+             to_inspected(issues)
+           }"
 
     issues
   end
@@ -66,6 +71,7 @@ defmodule CredoCheckCase do
   def assert_issue(source_file, callback) when is_function(callback) do
     assert_issue(source_file, nil, [], callback)
   end
+
   def assert_issue(source_file, check, callback) when is_function(callback) do
     assert_issue(source_file, check, [], callback)
   end
@@ -74,10 +80,14 @@ defmodule CredoCheckCase do
     issues = issues_for(source_file, check, create_config(), params)
 
     refute Enum.count(issues) == 0, "There should be one issue, got none."
-    assert Enum.count(issues) == 1, "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
+
+    assert Enum.count(issues) == 1,
+           "There should be only 1 issue, got #{Enum.count(issues)}: #{
+             to_inspected(issues)
+           }"
 
     if callback do
-      issues |> List.first |> callback.()
+      issues |> List.first() |> callback.()
     end
 
     issues
@@ -86,14 +96,18 @@ defmodule CredoCheckCase do
   def assert_issues(source_file, callback) when is_function(callback) do
     assert_issues(source_file, nil, [], callback)
   end
+
   def assert_issues(source_file, check, callback) when is_function(callback) do
     assert_issues(source_file, check, [], callback)
   end
+
   def assert_issues(source_file, check \\ nil, params \\ [], callback \\ nil) do
     issues = issues_for(source_file, check, create_config(), params)
 
     assert Enum.count(issues) > 0, "There should be multiple issues, got none."
-    assert Enum.count(issues) > 1, "There should be more than one issue, got: #{to_inspected(issues)}"
+
+    assert Enum.count(issues) > 1,
+           "There should be more than one issue, got: #{to_inspected(issues)}"
 
     if callback, do: callback.(issues)
 
@@ -103,6 +117,7 @@ defmodule CredoCheckCase do
   defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
     Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(exec)))
   end
+
   defp issues_for(source_files, check, _exec, params) when is_list(source_files) do
     exec = create_config()
 
@@ -117,14 +132,17 @@ defmodule CredoCheckCase do
       |> Enum.flat_map(&(&1 |> get_issues_from_source_file(exec)))
     end
   end
+
   defp issues_for(%SourceFile{} = source_file, nil, exec, _) do
     source_file |> get_issues_from_source_file(exec)
   end
+
   defp issues_for(%SourceFile{} = source_file, check, _exec, params) do
     _issues = check.run(source_file, params)
   end
 
   def assert_trigger([issue], trigger), do: [assert_trigger(issue, trigger)]
+
   def assert_trigger(issue, trigger) do
     assert trigger == issue.trigger
 
@@ -140,8 +158,8 @@ defmodule CredoCheckCase do
 
   defp create_config do
     %Credo.Execution{}
-    |> Credo.Execution.SourceFiles.start_server
-    |> Credo.Execution.Issues.start_server
+    |> Credo.Execution.SourceFiles.start_server()
+    |> Credo.Execution.Issues.start_server()
   end
 
   defp get_issues_from_source_file(source_file, exec) do

@@ -19,9 +19,14 @@ defmodule Credo.Check.Warning.IoInspect do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({{:., _, [{:__aliases__, _, [:IO]}, :inspect]}, meta, _arguments} = ast, issues, issue_meta) do
+  defp traverse(
+         {{:., _, [{:__aliases__, _, [:IO]}, :inspect]}, meta, _arguments} = ast,
+         issues,
+         issue_meta
+       ) do
     {ast, issues_for_call(meta, issues, issue_meta)}
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -31,9 +36,11 @@ defmodule Credo.Check.Warning.IoInspect do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "There should be no calls to IO.inspect/1.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

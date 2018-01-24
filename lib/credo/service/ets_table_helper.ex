@@ -29,6 +29,7 @@ defmodule Credo.Service.ETSTableHelper do
         case :ets.lookup(@table_name, filename) do
           [{^filename, value}] ->
             {:reply, {:ok, value}, current_state}
+
           [] ->
             {:reply, :notfound, current_state}
         end

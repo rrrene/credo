@@ -10,7 +10,11 @@ defmodule Credo.Execution.Issues do
     %Execution{exec | issues_pid: pid}
   end
 
-  def append(%Execution{issues_pid: pid}, %SourceFile{filename: filename}, issue) do
+  def append(
+        %Execution{issues_pid: pid},
+        %SourceFile{filename: filename},
+        issue
+      ) do
     GenServer.call(pid, {:append, filename, issue})
   end
 

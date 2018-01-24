@@ -38,5 +38,4 @@ defmodule Credo.CLI.SorterTest do
     expected = [:a, :b, 4, 5, 6, 3, 2, 1]
     assert expected == list |> Sorter.ensure(starting_order, ending_order)
   end
-
 end

@@ -20,10 +20,10 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
 
     {line_no, last_line} =
       source_file
-      |> SourceFile.lines
-      |> List.last
+      |> SourceFile.lines()
+      |> List.last()
 
-    if Credo.Backports.String.trim(last_line) == "" do
+    if String.trim(last_line) == "" do
       []
     else
       [issue_for(issue_meta, line_no)]
@@ -31,8 +31,10 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
   end
 
   def issue_for(issue_meta, line_no) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "There should be a final \\n at the end of each file.",
       line_no: line_no
+    )
   end
 end

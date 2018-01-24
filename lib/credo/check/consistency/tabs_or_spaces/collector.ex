@@ -3,22 +3,22 @@ defmodule Credo.Check.Consistency.TabsOrSpaces.Collector do
 
   def collect_matches(source_file, _params) do
     source_file
-    |> SourceFile.lines
-    |> Enum.reduce(%{}, fn(line, stats) ->
-        match = indentation(line)
+    |> SourceFile.lines()
+    |> Enum.reduce(%{}, fn line, stats ->
+      match = indentation(line)
 
-        if match do
-          Map.update(stats, match, 1, &(&1 + 1))
-        else
-          stats
-        end
-      end)
+      if match do
+        Map.update(stats, match, 1, &(&1 + 1))
+      else
+        stats
+      end
+    end)
   end
 
   def find_locations_not_matching(expected, source_file) do
     source_file
-    |> SourceFile.lines
-    |> List.foldr([], fn({line_no, _} = line, line_nos) ->
+    |> SourceFile.lines()
+    |> List.foldr([], fn {line_no, _} = line, line_nos ->
       if indentation(line) && indentation(line) != expected do
         [line_no | line_nos]
       else

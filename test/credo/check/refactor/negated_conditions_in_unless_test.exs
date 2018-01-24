@@ -8,32 +8,34 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
   #
 
   test "it should NOT report expected code" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    unless allowed? do
-      something
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        unless allowed? do
+          something
+        end
+        if !allowed? do
+          something
+        end
+      end
     end
-    if !allowed? do
-      something
-    end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
   test "it should NOT report expected code /2" do
-"""
-defmodule CredoSampleModule do
-  @unless !allowed?
+    """
+    defmodule CredoSampleModule do
+      @unless !allowed?
 
-  def some_fun do
-    unless = 123
-    :unless
-  end
-end
-""" |> to_source_file
+      def some_fun do
+        unless = 123
+        :unless
+      end
+    end
+    """
+    |> to_source_file
     |> refute_issues(@described_check)
   end
 
@@ -42,15 +44,16 @@ end
   #
 
   test "it should report a violation" do
-"""
-defmodule CredoSampleModule do
-  def some_function(parameter1, parameter2) do
-    unless !allowed? do
-      something
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        unless !allowed? do
+          something
+        end
+      end
     end
-  end
-end
-""" |> to_source_file
+    """
+    |> to_source_file
     |> assert_issue(@described_check)
   end
 end

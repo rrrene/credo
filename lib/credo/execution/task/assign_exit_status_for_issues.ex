@@ -13,9 +13,10 @@ defmodule Credo.Execution.Task.AssignExitStatusForIssues do
 
   # Converts the return value of a Command.run() call into an exit_status
   defp to_exit_status([]), do: 0
+
   defp to_exit_status(issues) do
     issues
-    |> Enum.map(&(&1.exit_status))
+    |> Enum.map(& &1.exit_status)
     |> Enum.reduce(0, &(&1 ||| &2))
   end
 end

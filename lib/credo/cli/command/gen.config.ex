@@ -1,13 +1,16 @@
 defmodule Credo.CLI.Command.GenConfig do
   use Credo.CLI.Command
 
+  alias Credo.CLI.Output.UI
+
   @shortdoc "Initialize a new .credo.exs exec file in the current directory"
+  @moduledoc @shortdoc
 
   @config_filename ".credo.exs"
   @default_config_file File.read!(@config_filename)
 
   @doc false
-  def run(exec) do
+  def call(exec, _opts) do
     create_config_file(@config_filename)
 
     exec
@@ -15,19 +18,18 @@ defmodule Credo.CLI.Command.GenConfig do
 
   defp create_config_file(filename) do
     if File.exists?(filename) do
-      Bunt.puts [:red, :bright, "File exists: #{filename}, aborted."]
+      UI.puts([:red, :bright, "File exists: #{filename}, aborted."])
     else
-      Bunt.puts [:green, "* creating ", :reset, "#{filename}"]
+      UI.puts([:green, "* creating ", :reset, "#{filename}"])
       write_config_file(filename)
     end
   end
 
   defp write_config_file(filename) do
     filename
-    |> Path.dirname
-    |> File.mkdir_p!
+    |> Path.dirname()
+    |> File.mkdir_p!()
 
     File.write!(filename, @default_config_file)
   end
-
 end

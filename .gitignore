@@ -6,3 +6,5 @@
 *.iml
 erl_crash.dump
 *.ez
+lib/my_first_credo_check.ex
+.tool-versions-e

@@ -47,17 +47,16 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
-      |> List.flatten
+      |> List.flatten()
       |> Enum.filter(&(&1 != nil))
       |> Enum.filter(&only_variables/1)
-
 
     duplicates =
       variables
       |> Enum.filter(fn {key, _} ->
-          Enum.count(variables, fn({other, _}) -> key == other end) >= 2
-        end)
-      |> Enum.reverse
+        Enum.count(variables, fn {other, _} -> key == other end) >= 2
+      end)
+      |> Enum.reverse()
       |> Enum.uniq_by(&get_variable_name/1)
 
     new_issues =
@@ -71,6 +70,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       {ast, issues}
     end
   end
+
   def traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -78,40 +78,52 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   defp find_assignments({:=, _, [lhs, _rhs]}) do
     find_variables(lhs)
   end
+
   defp find_assignments(_), do: nil
 
   defp find_variables({:=, _, args}) do
     Enum.map(args, &find_variables/1)
   end
+
   defp find_variables({variable_name, meta, nil}) when is_list(meta) do
     {variable_name, meta[:line]}
   end
+
+  defp find_variables({:^, _, _}) do
+    []
+  end
+
   defp find_variables(tuple) when is_tuple(tuple) do
     tuple
-    |> Tuple.to_list
+    |> Tuple.to_list()
     |> find_variables
   end
+
   defp find_variables(list) when is_list(list) do
     list
     |> Enum.map(&find_variables/1)
-    |> List.flatten
+    |> List.flatten()
     |> Enum.uniq_by(&get_variable_name/1)
   end
+
   defp find_variables(map) when is_map(map) do
     map
     |> Enum.into([])
     |> Enum.map(fn {_, value} -> value end)
     |> Enum.map(&find_variables/1)
-    |> List.flatten
+    |> List.flatten()
     |> Enum.uniq_by(&get_variable_name/1)
   end
+
   defp find_variables(_), do: nil
 
   defp issue_for(issue_meta, trigger, line) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Variable \"#{trigger}\" was declared more than once.",
       trigger: trigger,
       line_no: line
+    )
   end
 
   defp get_variable_name({name, _line}), do: name
@@ -119,8 +131,8 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp only_variables({name, _}) do
     name
-    |> Atom.to_string
+    |> Atom.to_string()
     |> String.starts_with?("_")
-    |> Kernel.not
+    |> Kernel.not()
   end
 end

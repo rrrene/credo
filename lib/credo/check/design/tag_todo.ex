@@ -40,10 +40,11 @@ defmodule Credo.Check.Design.TagTODO do
   end
 
   defp issue_for(issue_meta, {line_no, _line, trigger}) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Found a #{@tag_name} tag in a comment: #{trigger}",
       line_no: line_no,
       trigger: trigger
+    )
   end
-
 end

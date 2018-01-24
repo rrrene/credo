@@ -8,15 +8,32 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
-  alias Credo.Execution.TaskRunner
+  alias Credo.MainProcess
   alias Credo.Service.Commands
 
-  @doc false
+  @doc """
+  Runs Credo's main process.
+  """
   def main(argv) do
-    Credo.start nil, nil
+    Credo.Application.start(nil, nil)
 
-    TaskRunner.call(%Execution{argv: argv})
+    %Execution{argv: argv}
+    |> MainProcess.call()
+    |> halt_if_exit_status_assigned()
   end
+
+  defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do
+    # Skip if exit status is muted
+  end
+
+  defp halt_if_exit_status_assigned(exec) do
+    exec
+    |> Execution.get_assign("credo.exit_status", 0)
+    |> halt_if_failed()
+  end
+
+  defp halt_if_failed(0), do: nil
+  defp halt_if_failed(x), do: System.halt(x)
 
   @doc """
   Returns the module of a given `command`.
@@ -25,15 +42,17 @@ defmodule Credo.CLI do
       Credo.CLI.Command.Help
   """
   def command_for(nil), do: nil
+
   def command_for(command_mod) when is_atom(command_mod) do
-    if Enum.member?(Commands.modules, command_mod) do
+    if Enum.member?(Commands.modules(), command_mod) do
       command_mod
     else
       nil
     end
   end
+
   def command_for(command_name) when is_binary(command_name) do
-    if Enum.member?(Commands.names, command_name) do
+    if Enum.member?(Commands.names(), command_name) do
       Commands.get(command_name)
     else
       nil

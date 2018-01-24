@@ -29,15 +29,15 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+
     lines_with_issues =
       @collector.find_locations_not_matching(expected, source_file)
 
     lines_with_issues
     |> Enum.filter(&create_issue?(expected, &1[:trigger]))
-    |> Enum.map(fn(location) ->
-        format_issue issue_meta,
-          [{:message, message_for(expected)} | location]
-      end)
+    |> Enum.map(fn location ->
+      format_issue(issue_meta, [{:message, message_for(expected)} | location])
+    end)
   end
 
   # Don't create issues for `&Mod.fun/4`
@@ -47,6 +47,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   defp message_for(:without_space = _expected) do
     "There is no whitespace around parentheses/brackets most of the time, but here there is."
   end
+
   defp message_for(:with_space = _expected) do
     "There is whitespace around parentheses/brackets most of the time, but here there is not."
   end

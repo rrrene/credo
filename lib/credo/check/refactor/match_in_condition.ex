@@ -53,19 +53,36 @@ defmodule Credo.Check.Refactor.MatchInCondition do
 
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
-      condition_arguments = Enum.reject(arguments, &Keyword.keyword?/1) # remove do/else blocks
+      # remove do/else blocks
+      condition_arguments = Enum.reject(arguments, &Keyword.keyword?/1)
 
       new_issues =
-        Credo.Code.prewalk(condition_arguments, &traverse_condition(&1, &2, unquote(op), condition_arguments, issue_meta))
+        Credo.Code.prewalk(
+          condition_arguments,
+          &traverse_condition(
+            &1,
+            &2,
+            unquote(op),
+            condition_arguments,
+            issue_meta
+          )
+        )
 
       {ast, issues ++ new_issues}
     end
   end
+
   defp traverse(ast, issues, _source_file) do
     {ast, issues}
   end
 
-  defp traverse_condition({:=, meta, arguments} = ast, issues, op, op_arguments, issue_meta) do
+  defp traverse_condition(
+         {:=, meta, arguments} = ast,
+         issues,
+         op,
+         op_arguments,
+         issue_meta
+       ) do
     case arguments do
       [{atom, _, nil}, _right] when is_atom(atom) ->
         # this means that the current ast is part of the `if/unless`
@@ -75,20 +92,23 @@ defmodule Credo.Check.Refactor.MatchInCondition do
           new_issue = issue_for(op, meta[:line], "=", issue_meta)
           {ast, issues ++ [new_issue]}
         end
+
       _ ->
         new_issue = issue_for(op, meta[:line], "=", issue_meta)
         {ast, issues ++ [new_issue]}
     end
   end
+
   defp traverse_condition(ast, issues, _op, _op_arguments, _issue_meta) do
     {ast, issues}
   end
 
-
   defp issue_for(op, line_no, trigger, issue_meta) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "There should be no matches in `#{op}` conditions.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

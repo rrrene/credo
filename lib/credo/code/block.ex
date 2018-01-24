@@ -12,7 +12,7 @@ defmodule Credo.Code.Block do
       do_block_for!(ast),
       else_block_for!(ast),
       rescue_block_for!(ast),
-      after_block_for!(ast),
+      after_block_for!(ast)
     ]
   end
 
@@ -23,6 +23,7 @@ defmodule Credo.Code.Block do
     case do_block_for(ast) do
       {:ok, _block} ->
         true
+
       nil ->
         false
     end
@@ -35,6 +36,7 @@ defmodule Credo.Code.Block do
     case do_block_for(ast) do
       {:ok, block} ->
         block
+
       nil ->
         nil
     end
@@ -46,17 +48,18 @@ defmodule Credo.Code.Block do
   def do_block_for({_atom, _meta, arguments}) when is_list(arguments) do
     do_block_for(arguments)
   end
-  def do_block_for([do: block]) do
+
+  def do_block_for(do: block) do
     {:ok, block}
   end
+
   def do_block_for(arguments) when is_list(arguments) do
     Enum.find_value(arguments, &find_keyword(&1, :do))
   end
+
   def do_block_for(_) do
     nil
   end
-
-
 
   @doc """
   Returns true if the given `ast` has an else block.
@@ -65,6 +68,7 @@ defmodule Credo.Code.Block do
     case else_block_for(ast) do
       {:ok, _block} ->
         true
+
       nil ->
         false
     end
@@ -77,6 +81,7 @@ defmodule Credo.Code.Block do
     case else_block_for(ast) do
       {:ok, block} ->
         block
+
       nil ->
         nil
     end
@@ -88,18 +93,18 @@ defmodule Credo.Code.Block do
   def else_block_for({_atom, _meta, arguments}) when is_list(arguments) do
     else_block_for(arguments)
   end
-  def else_block_for([do: _do_block, else: else_block]) do
+
+  def else_block_for(do: _do_block, else: else_block) do
     {:ok, else_block}
   end
+
   def else_block_for(arguments) when is_list(arguments) do
     Enum.find_value(arguments, &find_keyword(&1, :else))
   end
+
   def else_block_for(_) do
     nil
   end
-
-
-
 
   @doc """
   Returns true if the given `ast` has an rescue block.
@@ -108,6 +113,7 @@ defmodule Credo.Code.Block do
     case rescue_block_for(ast) do
       {:ok, _block} ->
         true
+
       nil ->
         false
     end
@@ -120,6 +126,7 @@ defmodule Credo.Code.Block do
     case rescue_block_for(ast) do
       {:ok, block} ->
         block
+
       nil ->
         nil
     end
@@ -131,18 +138,18 @@ defmodule Credo.Code.Block do
   def rescue_block_for({_atom, _meta, arguments}) when is_list(arguments) do
     rescue_block_for(arguments)
   end
-  def rescue_block_for([do: _do_block, rescue: rescue_block]) do
+
+  def rescue_block_for(do: _do_block, rescue: rescue_block) do
     {:ok, rescue_block}
   end
+
   def rescue_block_for(arguments) when is_list(arguments) do
     Enum.find_value(arguments, &find_keyword(&1, :rescue))
   end
+
   def rescue_block_for(_) do
     nil
   end
-
-
-
 
   @doc """
   Returns true if the given `ast` has an after block.
@@ -151,6 +158,7 @@ defmodule Credo.Code.Block do
     case after_block_for(ast) do
       {:ok, _block} ->
         true
+
       nil ->
         false
     end
@@ -163,6 +171,7 @@ defmodule Credo.Code.Block do
     case after_block_for(ast) do
       {:ok, block} ->
         block
+
       nil ->
         nil
     end
@@ -174,12 +183,15 @@ defmodule Credo.Code.Block do
   def after_block_for({_atom, _meta, arguments}) when is_list(arguments) do
     after_block_for(arguments)
   end
-  def after_block_for([do: _do_block, after: after_block]) do
+
+  def after_block_for(do: _do_block, after: after_block) do
     {:ok, after_block}
   end
+
   def after_block_for(arguments) when is_list(arguments) do
     Enum.find_value(arguments, &find_keyword(&1, :after))
   end
+
   def after_block_for(_) do
     nil
   end
@@ -191,10 +203,8 @@ defmodule Credo.Code.Block do
       nil
     end
   end
+
   defp find_keyword(_, _), do: nil
-
-
-
 
   @doc """
   Returns the children of the given AST node.
@@ -204,6 +214,7 @@ defmodule Credo.Code.Block do
     |> do_block_for!
     |> instructions_for
   end
+
   def calls_in_do_block(arg) do
     arg
     |> do_block_for!
@@ -211,10 +222,11 @@ defmodule Credo.Code.Block do
   end
 
   defp instructions_for({:__block__, _meta, calls}), do: calls
-  defp instructions_for(v) when is_atom(v)
-                      or is_tuple(v)
-                      or is_binary(v)
-                      or is_float(v)
-                      or is_integer(v), do: List.wrap(v)
+
+  defp instructions_for(v)
+       when is_atom(v) or is_tuple(v) or is_binary(v) or is_float(v) or
+              is_integer(v),
+       do: List.wrap(v)
+
   defp instructions_for(v) when is_list(v), do: [v]
 end

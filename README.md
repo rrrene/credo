@@ -23,7 +23,7 @@ Add `:credo` as a dependency to your project's `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
+    {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false}
   ]
 end
 ```
@@ -243,7 +243,7 @@ Example usage:
 
     $ mix credo                         # display standard report
     $ mix credo suggest                 # same thing, since it's the default command
-    $ mix credo --all --format=oneline  # include low priority issues, one issue per line
+    $ mix credo --all --format=json     # include low priority issues, output as JSON
 
     $ mix credo suggest --help          # more options
 
@@ -285,6 +285,14 @@ There are no additional options.
 
 
 ## Command line options
+
+
+### Output Formats
+
+Use `--format` to format the output in one of the following formats:
+
+- `--format=flycheck` for [Flycheck](http://www.flycheck.org/) output
+- `--format=json` for [JSON](https://www.json.org/) output
 
 
 ### Only run some checks
@@ -347,7 +355,7 @@ Do note with the passed option as filename is a stub that is just used to prefix
 
 ### Using Credo as stand alone
 
-If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [https://github.com/rrrene/bunt](bunt):
+If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [bunt](https://github.com/rrrene/bunt):
 
 ```bash
 $ git clone git@github.com:rrrene/bunt.git
@@ -377,11 +385,6 @@ You will now be able to invoke credo as usual through Mix with `mix credo`. This
 ### Show code snippets in the output
 
 Use the `--verbose` switch to include the code snippets in question in the output.
-
-
-### Show compact list
-
-Use `--format=oneline` to format the output to represent each issue by a single line.
 
 
 ### Show all issues including low priority ones

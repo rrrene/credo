@@ -4,70 +4,71 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
   alias Credo.Check.Consistency.SpaceAroundOperators.Collector
 
   @with_space """
-defmodule Credo.Sample1 do
-  defmodule InlineModule do
-    def foobar do
-      4 + 3
-      4 - 3
-      4 * 3
-      a = 3
-      4 && 3
-      "4" <> "3"
-      4 == 3
-      [4] ++ [3]
-      4 == 3
-      4 > 3
-      4 >= 3
-      4 <= 3
-      range = -999..-1
-      for op <- [:{}, :%{}, :^, :|, :<>] do
+  defmodule Credo.Sample1 do
+    defmodule InlineModule do
+      def foobar do
+        4 + 3
+        4 - 3
+        4 * 3
+        a = 3
+        4 && 3
+        "4" <> "3"
+        4 == 3
+        [4] ++ [3]
+        4 == 3
+        4 > 3
+        4 >= 3
+        4 <= 3
+        range = -999..-1
+        for op <- [:{}, :%{}, :^, :|, :<>] do
+        end
+        something = removed != []
+        Enum.map(dep.deps, &(&1.app)) ++ current_breadths
+        &function_capture/1
+        &:erlang_module.function_capture/3
+        &Elixir.function_capture/3
+        &@module.blah/1
+        |> my_func(&Some.Deep.Module.is_something/1)
       end
-      something = removed != []
-      Enum.map(dep.deps, &(&1.app)) ++ current_breadths
-      &function_capture/1
-      &:erlang_module.function_capture/3
-      &Elixir.function_capture/3
-      &@module.blah/1
     end
   end
-end
-"""
+  """
   @without_space """
-defmodule Credo.Sample2 do
-  def foobar do
-    1+2
-  end
-end
-"""
-  @mixed """
-defmodule Credo.Sample3 do
-  def foobar do
-    1+ 2
-    3 *4
-  end
-end
-"""
-  @with_spaces_special_cases ~S"""
-defmodule Credo.Sample2 do
-  defmodule InlineModule do
+  defmodule Credo.Sample2 do
     def foobar do
-      child_sources = Enum.drop(child_sources, -1)
-      TestRepo.all(from p in Post, where: field(p, ^field) = datetime_add(^inserted_at, ^-3, ^"week"))
-      {literal(-number, type, vars), params}
-      {time2, _} = :timer.tc(&flush/0, [])
-      {{:{}, [], [:==, [], [to_escaped_field(field), value]]}, params}
-      <<_, unquoted::binary-size(size), _>> = quoted
-      args = Enum.map_join ix+1..ix+length, ",", &"$#{&1}"
-    end
-
-    defp do_underscore(<<?-, t :: binary>>, _) do
-    end
-
-    def escape({:-, _, [number]}, type, params, vars, _env) when is_number(number) do
+      1+2
     end
   end
-end
-"""
+  """
+  @mixed """
+  defmodule Credo.Sample3 do
+    def foobar do
+      1+ 2
+      3 *4
+    end
+  end
+  """
+  @with_spaces_special_cases ~S"""
+  defmodule Credo.Sample2 do
+    defmodule InlineModule do
+      def foobar do
+        child_sources = Enum.drop(child_sources, -1)
+        TestRepo.all(from p in Post, where: field(p, ^field) = datetime_add(^inserted_at, ^-3, ^"week"))
+        {literal(-number, type, vars), params}
+        {time2, _} = :timer.tc(&flush/0, [])
+        {{:{}, [], [:==, [], [to_escaped_field(field), value]]}, params}
+        <<_, unquoted::binary-size(size), _>> = quoted
+        args = Enum.map_join ix+1..ix+length, ",", &"$#{&1}"
+      end
+
+      defp do_underscore(<<?-, t :: binary>>, _) do
+      end
+
+      def escape({:-, _, [number]}, type, params, vars, _env) when is_number(number) do
+      end
+    end
+  end
+  """
 
   test "it should report correct frequencies for operators surrounded by spaces" do
     result =
@@ -75,7 +76,7 @@ end
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{with_space: 18} == result
+    assert %{with_space: 19} == result
   end
 
   test "it should report correct frequencies for operators not surrounded by spaces" do

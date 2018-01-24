@@ -36,22 +36,28 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+
     issue_locations =
       expected
       |> @collector.find_locations_not_matching(source_file)
       |> Enum.reject(&ignored?(&1[:trigger], params))
       |> Enum.filter(&create_issue?(&1, issue_meta))
 
-    Enum.map(issue_locations, fn(location) ->
-      format_issue issue_meta,
-        message: message_for(expected), line_no: location[:line_no],
-        column: location[:column], trigger: location[:trigger]
+    Enum.map(issue_locations, fn location ->
+      format_issue(
+        issue_meta,
+        message: message_for(expected),
+        line_no: location[:line_no],
+        column: location[:column],
+        trigger: location[:trigger]
+      )
     end)
   end
 
   defp message_for(:with_space = _expected) do
     "There are spaces around operators most of the time, but not here."
   end
+
   defp message_for(:without_space = _expected) do
     "There are no spaces around operators most of the time, but here there are."
   end
@@ -73,25 +79,34 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   # Don't create issues for `c = -1`
   # TODO: Consider moving these checks inside the Collector.
   defp create_issue?(line, column, trigger) when trigger in [:+, :-] do
-    !number_with_sign?(line, column) &&
-      !number_in_range?(line, column) &&
+    !number_with_sign?(line, column) && !number_in_range?(line, column) &&
       !(trigger == :- && minus_in_binary_size?(line, column))
   end
+
   defp create_issue?(line, column, trigger) when trigger == :-> do
     !arrow_in_typespec?(line, column)
   end
+
+  defp create_issue?(line, column, trigger) when trigger == :/ do
+    !number_in_fun?(line, column)
+  end
+
   defp create_issue?(_, _, _), do: true
 
   defp arrow_in_typespec?(line, column) do
+    # -2 because we need to subtract the operator
     line
-    |> String.slice(0..column - 2) # -2 because we need to subtract the operator
+    |> String.slice(0..(column - 2))
     |> String.match?(~r/\(\s*$/)
   end
 
   defp number_with_sign?(line, column) do
+    # -2 because we need to subtract the operator
     line
-    |> String.slice(0..column - 2) # -2 because we need to subtract the operator
-    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
+    |> String.slice(0..(column - 2))
+    |> String.match?(
+      ~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/
+    )
   end
 
   defp number_in_range?(line, column) do
@@ -100,32 +115,47 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     |> String.match?(~r/^\d+\.\./)
   end
 
+  defp number_in_fun?(line, column) do
+    line
+    |> String.slice(0..(column - 2))
+    |> String.match?(~r/[\.\&][a-z0-9_]+$/)
+  end
+
   # TODO: this implementation is a bit naive. improve it.
   defp minus_in_binary_size?(line, column) do
+    # -2 because we need to subtract the operator
     binary_pattern_start_before? =
       line
-      |> String.slice(0..column - 2) # -2 because we need to subtract the operator
+      |> String.slice(0..(column - 2))
       |> String.match?(~r/\<\</)
 
+    # -2 because we need to subtract the operator
     double_colon_before? =
       line
-      |> String.slice(0..column - 2) # -2 because we need to subtract the operator
+      |> String.slice(0..(column - 2))
       |> String.match?(~r/\:\:/)
 
+    # -1 because we need to subtract the operator
     binary_pattern_end_after? =
       line
-      |> String.slice(column..-1) # -1 because we need to subtract the operator
+      |> String.slice(column..-1)
       |> String.match?(~r/\>\>/)
 
+    # -1 because we need to subtract the operator
     typed_after? =
       line
-      |> String.slice(column..-1) # -1 because we need to subtract the operator
-      |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/)
+      |> String.slice(column..-1)
+      |> String.match?(
+        ~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/
+      )
 
+    # -2 because we need to subtract the operator
     typed_before? =
       line
-      |> String.slice(0..column - 2) # -2 because we need to subtract the operator
-      |> String.match?(~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/)
+      |> String.slice(0..(column - 2))
+      |> String.match?(
+        ~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/
+      )
 
     heuristics_met_count =
       [
@@ -135,8 +165,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         typed_after?,
         typed_before?
       ]
-      |> Enum.filter(&(&1))
-      |> Enum.count
+      |> Enum.filter(& &1)
+      |> Enum.count()
 
     heuristics_met_count >= 2
   end

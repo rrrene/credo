@@ -4,36 +4,36 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
   alias Credo.Check.Consistency.SpaceInParentheses.Collector
 
   @without_spaces """
-defmodule Credo.Sample1 do
-  defmodule InlineModule do
-    def foobar do
-      {:ok} = File.read(filename)
-      {
-        :multi_line_tuple,
-        File.read(filename) # completely fine
-      }
+  defmodule Credo.Sample1 do
+    defmodule InlineModule do
+      def foobar do
+        {:ok} = File.read(filename)
+        {
+          :multi_line_tuple,
+          File.read(filename) # completely fine
+        }
+      end
     end
   end
-end
-"""
+  """
   @with_spaces """
-defmodule Credo.Sample2 do
-  defmodule InlineModule do
-    def foobar do
-      { :ok } = File.read( filename )
+  defmodule Credo.Sample2 do
+    defmodule InlineModule do
+      def foobar do
+        { :ok } = File.read( filename )
+      end
     end
   end
-end
-"""
+  """
 
   @heredoc_example """
-string = ~s\"\"\"
+  string = ~s\"\"\"
   "[]"
-\"\"\"
+  \"\"\"
 
-another_string = ~s\"\"\"
+  another_string = ~s\"\"\"
   "[ ]"
-\"\"\"
+  \"\"\"
   """
 
   test "it should report correct frequencies" do
@@ -60,5 +60,4 @@ another_string = ~s\"\"\"
 
     assert %{} == values
   end
-
 end

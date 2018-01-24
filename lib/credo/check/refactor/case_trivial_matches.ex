@@ -19,10 +19,10 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   defp traverse({:case, meta, arguments} = ast, issues, issue_meta) do
     cases =
       arguments
-      |> CodeHelper.do_block_for!
-      |> List.wrap
+      |> CodeHelper.do_block_for!()
+      |> List.wrap()
       |> Enum.map(&case_statement_for/1)
-      |> Enum.sort
+      |> Enum.sort()
 
     if cases == [false, true] do
       {ast, issues ++ [issue_for(issue_meta, meta[:line], :cond)]}
@@ -30,6 +30,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
       {ast, issues}
     end
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -39,9 +40,11 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   defp case_statement_for(_), do: nil
 
   def issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Case statements should not only contain `true` and `false`.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

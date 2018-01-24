@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task.RequireRequires do
 
   def call(%Execution{requires: requires} = exec, _opts) do
     requires
-    |> Sources.find
+    |> Sources.find()
     |> Enum.each(&Code.require_file/1)
 
     exec

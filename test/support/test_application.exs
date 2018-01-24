@@ -17,7 +17,7 @@ defmodule Credo.Test.FilenameGenerator do
   end
 
   def handle_call({:next}, _from, current_state) do
-    {:reply, current_state+1, current_state+1}
+    {:reply, current_state + 1, current_state + 1}
   end
 end
 
@@ -28,7 +28,7 @@ defmodule Credo.Test.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Credo.Test.FilenameGenerator, []),
+      worker(Credo.Test.FilenameGenerator, [])
     ]
 
     opts = [strategy: :one_for_one, name: Credo.Test.Application.Supervisor]

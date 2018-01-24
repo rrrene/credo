@@ -30,18 +30,19 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+
     issue_locations =
       @collector.find_locations_not_matching(expected, source_file)
 
-    Enum.map(issue_locations, fn(line_no) ->
-      format_issue issue_meta,
-        message: message_for(expected), line_no: line_no
+    Enum.map(issue_locations, fn line_no ->
+      format_issue(issue_meta, message: message_for(expected), line_no: line_no)
     end)
   end
 
   defp message_for(:multi = _expected) do
     "Most of the time you are using the multi-alias/require/import/use syntax, but here you are using multiple single directives"
   end
+
   defp message_for(:single = _expected) do
     "Most of the time you are using the multiple single line alias/require/import/use directives but here you are using the multi-alias/require/import/use syntax"
   end

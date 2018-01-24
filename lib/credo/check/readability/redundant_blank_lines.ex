@@ -10,7 +10,8 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   @explanation [
     check: @moduledoc,
     params: [
-      max_blank_lines: "The maximum number of tolerated consecutive blank lines.",
+      max_blank_lines:
+        "The maximum number of tolerated consecutive blank lines."
     ]
   ]
   @default_params [
@@ -26,16 +27,19 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
 
     source_file
-    |> SourceFile.lines
+    |> SourceFile.lines()
     |> blank_lines
     |> consecutive_lines(max_blank_lines)
     |> Enum.map(fn line -> issue_for(issue_meta, line, max_blank_lines) end)
   end
 
   defp issue_for(issue_meta, line, max_blank_lines) do
-    format_issue issue_meta,
-      message: "There should be no more than #{max_blank_lines} consecutive blank lines.",
+    format_issue(
+      issue_meta,
+      message:
+        "There should be no more than #{max_blank_lines} consecutive blank lines.",
       line_no: line
+    )
   end
 
   defp blank_lines(lines) do
@@ -46,7 +50,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
 
   defp consecutive_lines([], _), do: []
 
-  defp consecutive_lines([first_line|other_lines], max_blank_lines) do
+  defp consecutive_lines([first_line | other_lines], max_blank_lines) do
     reducer = consecutive_lines_reducer(max_blank_lines)
 
     other_lines

@@ -7,13 +7,17 @@ defmodule Credo.CLI.Output.UITest do
 
   test "it should break up a long line into two elements" do
     lines =
-"""
-These checks take a look at your code and ensure a consistent coding style. Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you.
-""" |> Credo.Backports.String.trim |> UI.wrap_at(80)
+      """
+      These checks take a look at your code and ensure a consistent coding style. Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you.
+      """
+      |> String.trim()
+      |> UI.wrap_at(80)
+
     expected = [
       "These checks take a look at your code and ensure a consistent coding style. ",
       "Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you."
     ]
+
     assert expected == lines
   end
 
@@ -21,21 +25,26 @@ These checks take a look at your code and ensure a consistent coding style. Usin
     lines =
       "These checks take a look at your code and ensure a consistent coding style."
       |> UI.wrap_at(80)
+
     expected = [
-      "These checks take a look at your code and ensure a consistent coding style.",
+      "These checks take a look at your code and ensure a consistent coding style."
     ]
+
     assert expected == lines
   end
 
-test "it should be able to break up a line including unicode characters" do
+  test "it should be able to break up a line including unicode characters" do
     lines =
-       "あいうえ"
-       |> UI.wrap_at(2)
-     expected = [
-         "あい", "うえ"
-       ]
-     assert expected == lines
-   end
+      "あいうえ"
+      |> UI.wrap_at(2)
+
+    expected = [
+      "あい",
+      "うえ"
+    ]
+
+    assert expected == lines
+  end
 
   test "truncate when max_length > ellipsis length and truncation required" do
     # Even if the ellipsis is longer than the max lenght we should not

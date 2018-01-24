@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Credo.Gen.Check do
   use Mix.Task
 
-  @shortdoc  "Generate a new custom check for Credo"
+  @shortdoc "Generate a new custom check for Credo"
   @moduledoc @shortdoc
 
   @doc false

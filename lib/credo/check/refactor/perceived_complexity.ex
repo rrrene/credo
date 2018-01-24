@@ -12,7 +12,8 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   @explanation [
     check: @moduledoc,
     params: [
-      max_complexity: "The maximum cyclomatic complexity a function should have."
+      max_complexity:
+        "The maximum cyclomatic complexity a function should have."
     ]
   ]
   @default_params [max_complexity: 9]
@@ -35,9 +36,8 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     &&: 1,
     ||: 1,
     case: 0.3,
-    cond: 1,
+    cond: 1
   ]
-
 
   alias Credo.Check.CodeHelper
   alias Credo.SourceFile
@@ -49,15 +49,25 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = Params.get(params, :max_complexity, @default_params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_complexity))
+    Credo.Code.prewalk(
+      source_file,
+      &traverse(&1, &2, issue_meta, max_complexity)
+    )
   end
 
   # exception for `__using__` macros
   defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
     {ast, issues}
   end
+
   for op <- @def_ops do
-    defp traverse({unquote(op), meta, arguments} = ast, issues, issue_meta, max_complexity) when is_list(arguments) do
+    defp traverse(
+           {unquote(op), meta, arguments} = ast,
+           issues,
+           issue_meta,
+           max_complexity
+         )
+         when is_list(arguments) do
       complexity =
         ast
         |> complexity_for
@@ -66,12 +76,25 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
       if complexity > max_complexity do
         fun_name = CodeHelper.def_name(ast)
 
-        {ast, issues ++ [issue_for(issue_meta, meta[:line], fun_name, max_complexity, complexity)]}
+        {
+          ast,
+          issues ++
+            [
+              issue_for(
+                issue_meta,
+                meta[:line],
+                fun_name,
+                max_complexity,
+                complexity
+              )
+            ]
+        }
       else
         {ast, issues}
       end
     end
   end
+
   defp traverse(ast, issues, _source_file, _max_complexity) do
     {ast, issues}
   end
@@ -93,13 +116,21 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   end
 
   for op <- @def_ops do
-    defp traverse_complexity({unquote(op) = op, _meta, arguments} = ast, complexity) when is_list(arguments) do
+    defp traverse_complexity(
+           {unquote(op) = op, _meta, arguments} = ast,
+           complexity
+         )
+         when is_list(arguments) do
       {ast, complexity + @op_complexity_map[op]}
     end
   end
 
   for op <- @double_condition_ops do
-    defp traverse_complexity({unquote(op) = op, _meta, arguments} = ast, complexity) when is_list(arguments) do
+    defp traverse_complexity(
+           {unquote(op) = op, _meta, arguments} = ast,
+           complexity
+         )
+         when is_list(arguments) do
       {ast, complexity + @op_complexity_map[op]}
     end
   end
@@ -108,34 +139,44 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     defp traverse_complexity({unquote(op), _meta, nil} = ast, complexity) do
       {ast, complexity}
     end
-    defp traverse_complexity({unquote(op) = op, _meta, arguments} = ast, complexity) when is_list(arguments) do
+
+    defp traverse_complexity(
+           {unquote(op) = op, _meta, arguments} = ast,
+           complexity
+         )
+         when is_list(arguments) do
       block_cc =
         arguments
-        |> CodeHelper.do_block_for!
+        |> CodeHelper.do_block_for!()
         |> do_block_complexity(op)
 
       {ast, complexity + block_cc}
     end
   end
+
   defp traverse_complexity(ast, complexity) do
     {ast, complexity}
   end
 
   defp do_block_complexity(nil, _), do: 0
+
   defp do_block_complexity(block, op) do
     count =
       block
-      |> List.wrap
-      |> Enum.count
+      |> List.wrap()
+      |> Enum.count()
 
     count * @op_complexity_map[op]
   end
 
   def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
-    format_issue issue_meta,
-      message: "Function is too complex (CC is #{actual_value}, max is #{max_value}).",
+    format_issue(
+      issue_meta,
+      message:
+        "Function is too complex (CC is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)
+    )
   end
 end

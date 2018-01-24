@@ -3,13 +3,19 @@ defmodule Credo.Check do
   `Check` modules represent the checks which are run during the code analysis.
   """
 
-  @base_priority_map  %{ignore: -100, low: -10, normal: 1, high: +10, higher: +20}
+  @base_priority_map %{
+    ignore: -100,
+    low: -10,
+    normal: 1,
+    high: +10,
+    higher: +20
+  }
   @base_category_exit_status_map %{
     consistency: 1,
     design: 2,
     readability: 4,
     refactor: 8,
-    warning: 16,
+    warning: 16
   }
 
   @type t :: module
@@ -54,7 +60,13 @@ defmodule Credo.Check do
       end
 
       def format_issue(issue_meta, opts) do
-        Check.format_issue(issue_meta, opts, category(), base_priority(), __MODULE__)
+        Check.format_issue(
+          issue_meta,
+          opts,
+          category(),
+          base_priority(),
+          __MODULE__
+        )
       end
     end
   end
@@ -100,15 +112,16 @@ defmodule Credo.Check do
   """
   @callback category() :: atom
 
-  #@callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
 
   @callback run_on_all?() :: boolean
 
-  @callback explanation() :: String.t
+  @callback explanation() :: String.t()
 
-  @callback explanation_for_params() :: Keyword.t
+  @callback explanation_for_params() :: Keyword.t()
 
-  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t) :: Issue.t
+  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) ::
+              Issue.t()
 
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]
@@ -145,7 +158,7 @@ defmodule Credo.Check do
     line_no = opts[:line_no]
     trigger = opts[:trigger]
     column = opts[:column]
-    severity = opts[:severity] || Severity.default_value
+    severity = opts[:severity] || Severity.default_value()
 
     %Issue{
       priority: priority,
@@ -164,17 +177,17 @@ defmodule Credo.Check do
 
   defp add_check_and_category(issue, check, issue_category) do
     %Issue{
-      issue |
-      check: check,
-      category: issue_category
+      issue
+      | check: check,
+        category: issue_category
     }
   end
 
   defp add_column_if_missing(issue, trigger, line_no, column, source_file) do
     if trigger && line_no && !column do
       %Issue{
-        issue |
-        column: SourceFile.column(source_file, line_no, trigger)
+        issue
+        | column: SourceFile.column(source_file, line_no, trigger)
       }
     else
       issue
@@ -186,9 +199,9 @@ defmodule Credo.Check do
       {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
 
       %Issue{
-        issue |
-        priority: issue.priority + priority_for(source_file, scope),
-        scope: scope
+        issue
+        | priority: issue.priority + priority_for(source_file, scope),
+          scope: scope
       }
     else
       issue
@@ -205,31 +218,36 @@ defmodule Credo.Check do
     quote do
       name =
         __MODULE__
-        |> Module.split
+        |> Module.split()
         |> Enum.at(2)
 
       safe_name = name || :unknown
 
       safe_name
       |> to_string
-      |> String.downcase
-      |> String.to_atom
+      |> String.downcase()
+      |> String.to_atom()
     end
   end
+
   defp category_body(value), do: value
 
   @doc "Converts a given category to a priority"
   def to_priority(nil), do: 0
+
   def to_priority(atom) when is_atom(atom) do
     @base_priority_map[atom]
   end
+
   def to_priority(value), do: value
 
   @doc "Converts a given category to an exit status"
   def to_exit_status(nil), do: 0
+
   def to_exit_status(atom) when is_atom(atom) do
     to_exit_status(@base_category_exit_status_map[atom])
   end
+
   def to_exit_status(value), do: value
 
   defp run_on_all_body(true), do: true

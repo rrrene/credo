@@ -39,7 +39,11 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
   end
 
   for op <- @def_ops do
-    defp traverse({unquote(op), _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast, issues, issue_meta) do
+    defp traverse(
+           {unquote(op), _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast,
+           issues,
+           issue_meta
+         ) do
       {ast, issues ++ [issue_for(issue_meta, line_no)]}
     end
   end
@@ -49,9 +53,11 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
   end
 
   defp issue_for(issue_meta, line_no) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Prefer using an implicit `try` rather than explicit `try`.",
       trigger: "try",
       line_no: line_no
+    )
   end
 end

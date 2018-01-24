@@ -27,11 +27,13 @@ defmodule Credo.Code do
   Technically this is just a wrapper around `Macro.prewalk/3`.
   """
   def prewalk(ast_or_source_file, fun, accumulator \\ [])
+
   def prewalk(%SourceFile{} = source_file, fun, accumulator) do
     source_file
-    |> SourceFile.ast
+    |> SourceFile.ast()
     |> prewalk(fun, accumulator)
   end
+
   def prewalk(source_ast, fun, accumulator) do
     {_, accumulated} = Macro.prewalk(source_ast, accumulator, fun)
 
@@ -44,11 +46,13 @@ defmodule Credo.Code do
   Technically this is just a wrapper around `Macro.postwalk/3`.
   """
   def postwalk(ast_or_source_file, fun, accumulator \\ [])
+
   def postwalk(%SourceFile{} = source_file, fun, accumulator) do
     source_file
-    |> SourceFile.ast
+    |> SourceFile.ast()
     |> postwalk(fun, accumulator)
   end
+
   def postwalk(source_ast, fun, accumulator) do
     {_, accumulated} = Macro.postwalk(source_ast, accumulator, fun)
 
@@ -60,14 +64,16 @@ defmodule Credo.Code do
   """
   def ast(%SourceFile{filename: filename} = source_file) do
     source_file
-    |> SourceFile.source
+    |> SourceFile.source()
     |> ast(filename)
   end
+
   def ast(source, filename \\ "nofilename") when is_binary(source) do
     try do
       case Code.string_to_quoted(source, line: 1) do
         {:ok, value} ->
           {:ok, value}
+
         {:error, error} ->
           {:error, [issue_for(error, filename)]}
       end
@@ -82,14 +88,15 @@ defmodule Credo.Code do
   """
   def to_lines(%SourceFile{} = source_file) do
     source_file
-    |> SourceFile.source
+    |> SourceFile.source()
     |> to_lines()
   end
+
   def to_lines(source) when is_binary(source) do
     source
     |> String.split("\n")
-    |> Enum.with_index
-    |> Enum.map(fn({line, i}) -> {i + 1, line} end)
+    |> Enum.with_index()
+    |> Enum.map(fn {line, i} -> {i + 1, line} end)
   end
 
   @doc """
@@ -97,19 +104,21 @@ defmodule Credo.Code do
   """
   def to_tokens(%SourceFile{} = source_file) do
     source_file
-    |> SourceFile.source
+    |> SourceFile.source()
     |> to_tokens()
   end
+
   def to_tokens(source) when is_binary(source) do
     result =
       source
-      |> Credo.Backports.String.to_charlist
+      |> String.to_charlist()
       |> :elixir_tokenizer.tokenize(1, [])
 
     case result do
       # Elixir < 1.6
       {_, _, _, tokens} ->
         tokens
+
       # Elixir >= 1.6
       {:ok, tokens} ->
         tokens
@@ -118,11 +127,11 @@ defmodule Credo.Code do
 
   defp issue_for({line_no, error_message, _}, filename) do
     %Credo.Issue{
-      check:    ParserError,
+      check: ParserError,
       category: :error,
       filename: filename,
-      message:  error_message,
-      line_no:  line_no
+      message: error_message,
+      line_no: line_no
     }
   end
 end

@@ -35,6 +35,7 @@ defmodule Credo.Check.Readability.ModuleNames do
   defp traverse({:defmodule, _meta, arguments} = ast, issues, issue_meta) do
     {ast, issues_for_def(arguments, issues, issue_meta)}
   end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
@@ -43,6 +44,7 @@ defmodule Credo.Check.Readability.ModuleNames do
     case Enum.at(body, 0) do
       {:__aliases__, meta, names} ->
         names |> Enum.join(".") |> issues_for_name(meta, issues, issue_meta)
+
       _ ->
         issues
     end
@@ -57,9 +59,11 @@ defmodule Credo.Check.Readability.ModuleNames do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
-    format_issue issue_meta,
+    format_issue(
+      issue_meta,
       message: "Module names should be written in PascalCase.",
       trigger: trigger,
       line_no: line_no
+    )
   end
 end

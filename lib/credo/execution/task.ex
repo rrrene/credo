@@ -1,14 +1,18 @@
 defmodule Credo.Execution.Task do
   @type t :: module
 
-  @callback call(exec :: Credo.Execution.t, opts :: Keyword.t) :: Credo.Execution.t
+  @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) ::
+              Credo.Execution.t()
 
   alias Credo.Execution
+  alias Credo.Execution.Monitor
 
   defmacro __using__(_opts \\ []) do
     quote do
       @behaviour Credo.Execution.Task
+
       import Credo.Execution
+
       alias Credo.Execution
 
       def call(%Execution{halted: false} = exec, opts) do
@@ -16,7 +20,7 @@ defmodule Credo.Execution.Task do
       end
 
       def error(exec, _opts) do
-        IO.warn "Execution halted during #{__MODULE__}!"
+        IO.warn("Execution halted during #{__MODULE__}!")
       end
 
       defoverridable call: 2
@@ -28,30 +32,43 @@ defmodule Credo.Execution.Task do
   Runs a given `task` if the `Execution` wasn't halted and ensures that the
   result is also an `Execution` struct.
   """
-  def run(exec, task, opts \\ [])
-  def run(%Credo.Execution{halted: false} = exec, task, opts) do
-    #require Logger
-    #Logger.debug "Calling #{task} ..."
+  def run(task, exec, opts \\ [])
 
+  def run(task, %Credo.Execution{debug: true} = exec, opts) do
+    Monitor.task(exec, task, opts, &do_run/3, [task, exec, opts])
+  end
+
+  def run(task, exec, opts) do
+    do_run(task, exec, opts)
+  end
+
+  defp do_run(task, %Credo.Execution{halted: false} = exec, opts) do
     case task.call(exec, opts) do
       %Execution{halted: false} = exec ->
         exec
+
       %Execution{halted: true} = exec ->
         task.error(exec, opts)
+
       value ->
         # TODO: improve message
-        IO.warn "Expected task to return %Credo.Execution{}, got:"
-        # credo:disable-for-next-line
-        IO.inspect value
+        IO.warn(
+          "Expected task to return %Credo.Execution{}, got: #{inspect(exec)}"
+        )
 
         value
     end
   end
-  def run(%Execution{} = exec, _task, _opts) do
+
+  defp do_run(_task, %Execution{} = exec, _opts) do
     exec
   end
-  def run(exec, _task, _opts) do
-    IO.warn "Expected first parameter of Task.run/3 to match %Credo.Execution{}, got: #{inspect(exec)}"
+
+  defp do_run(_task, exec, _opts) do
+    IO.warn(
+      "Expected second parameter of Task.run/3 to match %Credo.Execution{}, " <>
+        "got: #{inspect(exec)}"
+    )
 
     exec
   end

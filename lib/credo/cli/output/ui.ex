@@ -3,7 +3,7 @@ defmodule Credo.CLI.Output.UI do
   @ellipsis "…"
   @shell_service Credo.CLI.Output.Shell
 
-  if Mix.env == :test do
+  if Mix.env() == :test do
     def puts, do: nil
     def puts(_), do: nil
     def puts(_, color) when is_atom(color), do: nil
@@ -12,6 +12,7 @@ defmodule Credo.CLI.Output.UI do
   else
     defdelegate puts, to: @shell_service
     defdelegate puts(v), to: @shell_service
+
     def puts(v, color) when is_atom(color) do
       @shell_service.puts([color, v])
     end
@@ -20,8 +21,9 @@ defmodule Credo.CLI.Output.UI do
   end
 
   def edge(color, indent \\ 2) when is_integer(indent) do
-    [:reset, color, @edge |> Credo.Backports.String.pad_trailing(indent)]
+    [:reset, color, @edge |> String.pad_trailing(indent)]
   end
+
   def edge, do: @edge
 
   def use_colors(exec) do
@@ -37,7 +39,9 @@ defmodule Credo.CLI.Output.UI do
   end
 
   def wrap_at(text, number) do
-    "(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{number}})(?:\\r?\\n)?|(?:\\r?\\n|$))"
+    "(?:((?>.{1,#{number}}(?:(?<=[^\\S\\r\\n])[^\\S\\r\\n]?|(?=\\r?\\n)|$|[^\\S\\r\\n]))|.{1,#{
+      number
+    }})(?:\\r?\\n)?|(?:\\r?\\n|$))"
     |> Regex.compile!("u")
     |> Regex.scan(text)
     |> Enum.map(&List.first/1)
@@ -57,16 +61,21 @@ defmodule Credo.CLI.Output.UI do
       "  m ..."
   """
   def truncate(_line, max_length) when max_length <= 0, do: ""
+
   def truncate(line, max_length) when max_length > 0 do
     truncate(line, max_length, @ellipsis)
   end
+
   def truncate(_line, max_length, _ellipsis) when max_length <= 0, do: ""
+
   def truncate(line, max_length, ellipsis) when max_length > 0 do
     cond do
       String.length(line) <= max_length ->
         line
+
       String.length(ellipsis) >= max_length ->
         ellipsis
+
       true ->
         chars_to_display = max_length - String.length(ellipsis)
         String.slice(line, 0, chars_to_display) <> ellipsis
