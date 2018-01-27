@@ -2,21 +2,31 @@ defmodule Credo.ConfigBuilder do
   alias Credo.Execution
   alias Credo.ConfigFile
   alias Credo.CLI.Filename
+  alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
   def parse(exec) do
     options = exec.cli_options
-    config_name = options.switches[:config_name]
-
-    config_file =
-      options.path
-      |> Filename.remove_line_no_and_column()
-      |> ConfigFile.read_or_default(config_name)
+    config_file = get_config_file(options)
 
     exec
     |> add_config_file_to_exec(config_file)
     |> add_strict_to_exec(config_file, options)
     |> add_switches_to_exec(options.switches)
+  end
+
+  defp get_config_file(%Options{} = options) do
+    config_name = options.switches[:config_name]
+    config_file_path = options.switches[:config_file_path]
+    dir = options.path
+      |> Filename.remove_line_no_and_column()
+
+    cond do
+      is_binary(config_file_path) ->
+        ConfigFile.read_from_file_path(dir, config_file_path, config_name)
+      true ->
+        ConfigFile.read_or_default(dir, config_name)
+    end
   end
 
   defp add_config_file_to_exec(exec, %ConfigFile{} = config_file) do
