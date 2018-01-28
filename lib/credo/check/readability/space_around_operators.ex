@@ -1,4 +1,4 @@
-  defmodule Credo.Check.Consistency.SpaceAroundOperators do
+  defmodule Credo.Check.Readability.SpaceAroundOperators do
   @moduledoc """
   Use spaces around operators like `+`, `-`, `*` and `/`. This is the
   **preferred** way, although other styles are possible, as long as it is
@@ -8,40 +8,41 @@
 
       1 + 2 * 4
 
-      # also okay
-
-      1+2*4
-
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
 
   @explanation [check: @moduledoc]
 
-  @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 
   @default_params [ignore: []]
 
-  use Credo.Check, run_on_all: true, base_priority: :high
+  use Credo.Check
+
+  alias Credo.Code
+
+  import Credo.Check.Readability.SpaceHelper,
+         only: [
+           expected_spaces: 1,
+           space_between?: 2,
+           no_space_between?: 2
+         ]
 
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
-    @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
-  end
-
-  defp issues_for(expected, source_file, params) do
+  def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     issue_locations =
-      expected
-      |> @collector.find_locations_not_matching(source_file)
+      source_file
+      |> Code.to_tokens()
+      |> traverse_tokens()
       |> Enum.reject(&ignored?(&1[:trigger], params))
       |> Enum.filter(&create_issue?(&1, issue_meta))
 
     Enum.map(issue_locations, fn location ->
       format_issue(
         issue_meta,
-        message: message_for(expected),
+        message: message_for(location[:mismatch]),
         line_no: location[:line_no],
         column: location[:column],
         trigger: location[:trigger]
@@ -49,12 +50,85 @@
     end)
   end
 
+  defp traverse_tokens(tokens, acc \\ []) do
+    tokens
+    |> skip_function_capture
+    |> case do
+         [prev | [current | [next | rest]]] ->
+           expected_spaces = expected_spaces(current)
+           acc = record_not_matching(expected_spaces, prev, current, next, acc)
+           traverse_tokens([current | [next | rest]], acc)
+         _ ->
+           acc
+       end
+  end
+
+  defp skip_function_capture([{:capture_op, _, _} | tokens]) do
+    Enum.drop_while(tokens, fn
+      # :erlang_module
+      {:atom, _, _} ->
+        true
+
+      # ElixirModule (Elxiir >= 1.6.0)
+      {:alias, _, _} ->
+        true
+
+      # ElixirModule
+      {:aliases, _, _} ->
+        true
+
+      # function_name
+      {:identifier, _, _} ->
+        true
+
+      # @module_attribute
+      {:at_op, _, _} ->
+        true
+
+      {:., _} ->
+        true
+
+      _ ->
+        false
+    end)
+  end
+
+  defp skip_function_capture(tokens), do: tokens
+
+  defp record_not_matching(expected, prev, current, next, acc) do
+    match_found =
+      case expected do
+        :ignore ->
+          false
+        :with_space ->
+          without_space?(prev, current, next)
+        :without_space ->
+          with_space?(prev, current, next)
+      end
+
+    if match_found do
+      {_, {line_no, column, _}, trigger} = current
+
+      [[line_no: line_no, column: column, trigger: trigger, mismatch: expected] | acc]
+    else
+      acc
+    end
+  end
+
+  defp with_space?(prev, op, next) do
+    space_between?(prev, op) || space_between?(op, next)
+  end
+
+  defp without_space?(prev, op, next) do
+    no_space_between?(prev, op) || no_space_between?(op, next)
+  end
+
   defp message_for(:with_space = _expected) do
-    "There are spaces around operators most of the time, but not here."
+    "There should be spaces around the operator."
   end
 
   defp message_for(:without_space = _expected) do
-    "There are no spaces around operators most of the time, but here there are."
+    "There should be no spaces around the operator."
   end
 
   defp ignored?(trigger, params) do
@@ -72,7 +146,6 @@
   end
 
   # Don't create issues for `c = -1`
-  # TODO: Consider moving these checks inside the Collector.
   defp create_issue?(line, column, trigger) when trigger in [:+, :-] do
     !number_with_sign?(line, column) && !number_in_range?(line, column) &&
       !(trigger == :- && minus_in_binary_size?(line, column))

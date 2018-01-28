@@ -29,6 +29,24 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def usually_no_space_after?(_, {_, _, :..}, _), do: true
   def usually_no_space_after?(_, _, _), do: false
 
+  @doc """
+  Returns true if there is space before the operator (usually).
+
+  Examples:
+  [head | tail]   # | is the operator here and there is usually space before that
+  """
+  def usually_space_before?(_, {_, _, :|}, _), do: true
+  def usually_space_before?(_, _, _), do: false
+
+  @doc """
+  Returns true if there is space after the operator (usually).
+
+  Examples:
+  [head | tail]   # | is the operator here and there is usually space after that
+  """
+  def usually_space_after?(_, {_, _, :|}, _), do: true
+  def usually_space_after?(_, _, _), do: false
+
   def operator?({:comp_op, _, _}), do: true
   def operator?({:comp_op2, _, _}), do: true
   def operator?({:dual_op, _, _}), do: true
@@ -42,7 +60,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def operator?({:match_op, _, _}), do: true
   def operator?({:in_match_op, _, _}), do: true
   def operator?({:stab_op, _, _}), do: true
-  def operator?({:pipe_op, _, _}), do: true
+  def operator?({:pipe_op, _, _}), do: false
   def operator?(_), do: false
 
   def no_space_between?(arg1, arg2) do
