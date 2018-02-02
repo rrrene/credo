@@ -27,6 +27,9 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
   use Credo.Check, base_priority: :low
 
+  alias Credo.Code.Heredocs
+  alias Credo.Code.Strings
+
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
@@ -47,20 +50,24 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
     source =
       if ignore_heredocs do
-        Credo.Code.Heredocs.replace_with_spaces(source, "")
+        Heredocs.replace_with_spaces(source, "")
       else
         source
       end
 
     lines = Credo.Code.to_lines(source)
 
+    lines_for_comparison =
+      if ignore_strings do
+        source
+        |> Strings.replace_with_spaces("")
+        |> Credo.Code.to_lines()
+      else
+        lines
+      end
+
     Enum.reduce(lines, [], fn {line_no, line}, issues ->
-      line_for_comparison =
-        if ignore_strings do
-          Credo.Code.Strings.replace_with_spaces(line, "")
-        else
-          line
-        end
+      {_, line_for_comparison} = Enum.at(lines_for_comparison, line_no - 1)
 
       if String.length(line_for_comparison) > max_length do
         if refute_issue?(

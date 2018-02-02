@@ -21,6 +21,25 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /2" do
+    """
+    defmacro some_macro(type) do
+      quote do
+        fragment("CASE
+          WHEN
+            (? = 'some_text'
+            OR ? = 'some_text_2'
+            OR ? = 'some_text_3')
+          THEN '1'
+          ELSE '2'
+        END", unquote(type), unquote(type), unquote(type))
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report expected code if function defintions are excluded" do
     """
     defmodule CredoSampleModule do
