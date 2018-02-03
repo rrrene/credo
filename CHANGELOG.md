@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.0-rc2
+## 0.9.0-rc3
 
 - Add JSON support
 - Ensure compatibility with Elixir 1.6
@@ -13,6 +13,8 @@
 - Fix false positive in VariableRebinding
 - Fix false positive in SpaceAroundOperators
 - Fix false positive on BoolOperationOnSameValues
+- Fix false positive on SpaceAfterCommas
+- Fix false positive on MaxLineLength
 
 ## 0.8.10
 
