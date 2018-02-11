@@ -12,7 +12,7 @@ otp_release:
 script:
   - mix test
   - ./test/smoke_test.sh
-  - mix format --check-formatted
+  - ./test/check_formatted.sh
 after_script:
   - MIX_ENV=test mix inch.report
 matrix:
