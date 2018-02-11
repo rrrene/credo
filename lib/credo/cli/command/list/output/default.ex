@@ -28,7 +28,6 @@ defmodule Credo.CLI.Command.List.Output.Default do
     term_width = Output.term_columns()
 
     source_files
-    |> Filter.important(exec)
     |> Enum.sort_by(& &1.filename)
     |> Enum.each(&print_issues(&1, exec, term_width))
 
@@ -44,8 +43,6 @@ defmodule Credo.CLI.Command.List.Output.Default do
     issues = Credo.Execution.get_issues(exec, filename)
 
     issues
-    |> Filter.important(exec)
-    |> Filter.valid_issues(exec)
     |> print_issues(filename, source_file, exec, term_width)
   end
 

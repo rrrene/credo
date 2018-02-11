@@ -30,22 +30,17 @@ defmodule Credo.CLI.Output.Summary do
   def print(source_files, exec, time_load, time_run) do
     issues = Execution.get_issues(exec)
 
-    shown_issues =
-      issues
-      |> Filter.important(exec)
-      |> Filter.valid_issues(exec)
-
     UI.puts()
     UI.puts([:faint, @cry_for_help])
     UI.puts()
     UI.puts([:faint, format_time_spent(time_load, time_run)])
 
-    UI.puts(summary_parts(source_files, shown_issues))
+    UI.puts(summary_parts(source_files, issues))
 
     # print_badge(source_files, issues)
     UI.puts()
 
-    shown_issues |> print_priority_hint(exec)
+    print_priority_hint(issues, exec)
   end
 
   def print_priority_hint([], %Execution{min_priority: min_priority})

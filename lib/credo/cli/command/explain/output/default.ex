@@ -43,8 +43,6 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     issues = Credo.Execution.get_issues(exec, filename)
 
     issues
-    |> Filter.important(exec)
-    |> Filter.valid_issues(exec)
     |> Enum.sort_by(& &1.line_no)
     |> filter_issues(line_no, column)
     |> print_issues(filename, source_file, exec, term_width, line_no, column)
