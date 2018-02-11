@@ -19,6 +19,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
         4 > 3
         4 >= 3
         4 <= 3
+        [[1] | 2]
         range = -999..-1
         for op <- [:{}, :%{}, :^, :|, :<>] do
         end
@@ -37,6 +38,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
   defmodule Credo.Sample2 do
     def foobar do
       1+2
+    end
+  end
+  """
+  @not_listed_operators """
+  defmodule Credo.Sample2 do
+    def foobar do
+      [head | list]
+      [head| list]
+      [head |list]
     end
   end
   """
@@ -86,6 +96,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
       |> Collector.collect_matches([])
 
     assert %{without_space: 1} == result
+  end
+
+  test "it should ignore counting spaces for not listed operators" do
+    result =
+      @not_listed_operators
+      |> to_source_file()
+      |> Collector.collect_matches([])
+
+    assert %{} == result
   end
 
   test "it should report correct frequencies for mixed cases" do

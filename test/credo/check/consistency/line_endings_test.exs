@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.LineEndingsTest do
+defmodule Credo.Check.Consistency.LineEndingsTest do
   use Credo.TestHelper
 
   @described_check Credo.Check.Consistency.LineEndings

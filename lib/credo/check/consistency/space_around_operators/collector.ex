@@ -9,7 +9,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       space_between?: 2,
       no_space_between?: 2,
       usually_no_space_before?: 3,
-      usually_no_space_after?: 3
+      usually_no_space_after?: 3,
+      usually_space_before?: 3,
+      usually_space_after?: 3
     ]
 
   def collect_matches(source_file, _params) do
@@ -110,7 +112,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   end
 
   defp with_space?(prev, op, next) do
-    space_between?(prev, op) || space_between?(op, next)
+    (!usually_space_before?(prev, op, next) && space_between?(prev, op)) ||
+      (!usually_space_after?(prev, op, next) && space_between?(op, next))
   end
 
   defp without_space?(prev, op, next) do

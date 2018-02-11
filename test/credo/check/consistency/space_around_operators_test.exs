@@ -117,6 +117,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         c = n / -1
         c = n - -1
 
+        [1 | 2]
+
         [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
         [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
         [(3 * 4) + (2 / 2) - (-1 * 4) / 1 - 4]
@@ -223,6 +225,23 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   test "it should not report issues if spaces are used everywhere in a single file" do
     [
       @with_spaces5
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
+
+  @pipe_op_mixed """
+  defmodule CredoTest do
+    def test do
+      [[3] | 3]
+      [[3]|3]
+    end
+  end
+  """
+
+  test "it should not report an issue a according to the pipe_op" do
+    [
+      @pipe_op_mixed
     ]
     |> to_source_files()
     |> refute_issues(@described_check)
