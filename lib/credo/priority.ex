@@ -99,7 +99,8 @@ defmodule Credo.Priority do
   end
 
   for op <- @def_ops do
-    defp priority_for({unquote(op), _, arguments} = ast) when is_list(arguments) do
+    defp priority_for({unquote(op), _, arguments} = ast)
+         when is_list(arguments) do
       count = Parameters.count(ast)
 
       cond do

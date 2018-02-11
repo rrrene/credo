@@ -112,7 +112,8 @@ defmodule Credo.Code.Token do
 
     defp position_tuple(_, _line_no, _col_start), do: nil
 
-    defp position_tuple_for_heredoc(list, line_no, col_start) when is_list(list) do
+    defp position_tuple_for_heredoc(list, line_no, col_start)
+         when is_list(list) do
       # add 3 for """ (closing double quote)
       {line_no_end, col_end, _terminator} =
         convert_to_col_end(line_no, col_start, list)

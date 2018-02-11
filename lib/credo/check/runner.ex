@@ -88,7 +88,8 @@ defmodule Credo.Check.Runner do
     run_check({check, []}, source_file, exec)
   end
 
-  defp run_check({check, params}, source_files, exec) when is_list(source_files) do
+  defp run_check({check, params}, source_files, exec)
+       when is_list(source_files) do
     try do
       check.run(source_files, exec, params)
     rescue

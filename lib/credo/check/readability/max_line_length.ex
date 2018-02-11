@@ -98,7 +98,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
+  defp find_specs({:spec, meta, arguments} = ast, specs)
+       when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end
 

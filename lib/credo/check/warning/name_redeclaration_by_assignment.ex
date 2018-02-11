@@ -149,7 +149,8 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
     end
   end
 
-  def find_issue(list, issue_meta, def_names, excluded_names) when is_list(list) do
+  def find_issue(list, issue_meta, def_names, excluded_names)
+      when is_list(list) do
     Enum.map(list, &find_issue(&1, issue_meta, def_names, excluded_names))
   end
 
