@@ -6,7 +6,7 @@
 - Ensure compatibility with Elixir 1.6
 - Format codebase using Elixir 1.6 Formatter
 - Rework internals in preparation of 1.0 release
-- Credo now requires Elixir 1.3.2
+- Credo now requires Elixir 1.4
 - Include `test` directory in default config
 - Add `excluded_argument_types` to PipeChainStart
 - Emit warnings for non-existing checks, which are referenced in config
@@ -17,6 +17,8 @@
 - Fix false positive on BoolOperationOnSameValues
 - Fix false positive on SpaceAfterCommas
 - Fix false positive on MaxLineLength
+- Remove `NameRedeclarationBy*` checks
+- Remove support for @lint attributes
 
 ## 0.8.10
 
