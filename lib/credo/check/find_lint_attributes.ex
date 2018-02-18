@@ -21,6 +21,7 @@ defmodule Credo.Check.FindLintAttributes do
   end
 
   @lint false
+  _ = @lint
   defp traverse(
          {:defmodule, _meta, _arguments} = ast,
          attribute_list,
