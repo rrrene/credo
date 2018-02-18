@@ -38,13 +38,6 @@ defmodule Credo.Check.Runner do
     :ok
   end
 
-  @doc "TODO: deprecated"
-  def run_linter_attribute_reader(source_files, exec) do
-    {Credo.Check.FindLintAttributes}
-    |> run_check(source_files, exec)
-    |> Enum.into(%{})
-  end
-
   @doc "Runs the ConfigCommentFinder"
   def run_config_comment_finder(source_files, exec) do
     {Credo.Check.ConfigCommentFinder}
