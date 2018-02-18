@@ -1,5 +1,4 @@
 defmodule Credo.CLI.Output.Summary do
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.Execution

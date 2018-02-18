@@ -1,6 +1,5 @@
 defmodule Credo.CLI.Command.Explain.Output.Default do
   alias Credo.Code.Scope
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.SourceFile
