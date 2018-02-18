@@ -7,6 +7,7 @@ defmodule Credo.Check.FindLintAttributes do
 
   alias Credo.Check.CodeHelper
   alias Credo.Check.LintAttribute
+  alias Credo.CLI.Output.UI
 
   @doc false
   def run(source_files, _exec, _params) when is_list(source_files) do
@@ -34,7 +35,7 @@ defmodule Credo.Check.FindLintAttributes do
       |> CodeHelper.calls_in_do_block()
       |> process_calls(nil, [])
       |> Enum.map(fn lint ->
-        Credo.CLI.Output.UI.warn([
+        UI.warn([
           :orange,
           "#{source_file.filename}:#{lint.line} - @lint is deprecated."
         ])
