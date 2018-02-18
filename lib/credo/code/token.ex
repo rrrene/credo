@@ -36,16 +36,15 @@ defmodule Credo.Code.Token do
 
   if Version.match?(System.version(), ">= 1.6.0-rc") do
     # Elixir >= 1.6.0
-    defdelegate position(token), to: __MODULE__.Elixir1_6_0
+    defdelegate position(token), to: __MODULE__.PositionHelper
   else
     # Elixir <= 1.5.x
     defdelegate position(token), to: __MODULE__.ElixirPre1_6_0
   end
 
-  defmodule Elixir1_6_0 do
+  defmodule PositionHelper do
     @moduledoc false
 
-    # Elixir >= 1.6.0
     @doc false
     def position({_, {line_no, col_start, _}, atom_or_charlist, _, _, _}) do
       position_tuple(atom_or_charlist, line_no, col_start)
@@ -176,17 +175,23 @@ defmodule Credo.Code.Token do
       {line_no, col_start, :eol}
     end
 
-    defp convert_to_col_end(
-           _line_no,
-           _col_start,
-           {value, {line_no, col_start, _}}
-         ) do
+    defp convert_to_col_end(_, _, {value, {line_no, col_start, _}}) do
       {line_no, to_col_end(col_start, value), nil}
     end
 
     defp convert_to_col_end(
-           _line_no,
-           _col_start,
+           _,
+           _,
+           {:bin_string, {line_no, col_start, nil}, list}
+         )
+         when is_list(list) do
+      # add 2 for opening and closing "
+      Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
+    end
+
+    defp convert_to_col_end(
+           _,
+           _,
            {:bin_string, {line_no, col_start, nil}, value}
          ) do
       # add 2 for opening and closing "
@@ -202,20 +207,9 @@ defmodule Credo.Code.Token do
       {line_no, to_col_end(col_start, value, 2), :bin_string}
     end
 
-    defp convert_to_col_end(
-           _line_no,
-           _col_start,
-           {_, {line_no, col_start, nil}, list}
-         )
+    defp convert_to_col_end(_, _, {_, {line_no, col_start, nil}, list})
          when is_list(list) do
-      Enum.reduce(list, {line_no, col_start, nil}, fn value,
-                                                      {
-                                                        current_line_no,
-                                                        current_col_start,
-                                                        _terminator
-                                                      } ->
-        convert_to_col_end(current_line_no, current_col_start, value)
-      end)
+      Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
     end
 
     defp convert_to_col_end(
@@ -234,8 +228,22 @@ defmodule Credo.Code.Token do
       {line_no, to_col_end(col_start, value), nil}
     end
 
+    defp convert_to_col_end(
+           _line_no,
+           _col_start,
+           {:sigil, {line_no, col_start, nil}, _, value, _, _}
+         ) do
+      {line_no, to_col_end(col_start, value), nil}
+    end
+
     defp convert_to_col_end(line_no, col_start, value) do
       {line_no, to_col_end(col_start, value), nil}
+    end
+
+    #
+
+    defp reduce_to_col_end(value, {current_line_no, current_col_start, _}) do
+      convert_to_col_end(current_line_no, current_col_start, value)
     end
 
     #
@@ -248,8 +256,8 @@ defmodule Credo.Code.Token do
   defmodule ElixirPre1_6_0 do
     @moduledoc false
 
-    alias Credo.Code.Token.Elixir1_6_0
     alias Credo.Code.Token
+    alias Credo.Code.Token.PositionHelper
 
     @doc false
     def position(token) do
@@ -258,7 +266,9 @@ defmodule Credo.Code.Token do
 
     def position(token, true) do
       {line_no, col_start, col_end_pre_160} = do_position(token)
-      {_line_no, _col_start, line_no_end, col_end} = Elixir1_6_0.position(token)
+
+      {_line_no, _col_start, line_no_end, col_end} =
+        PositionHelper.position(token)
 
       {line_no, col_start, line_no_end, max(col_end, col_end_pre_160)}
     end
