@@ -51,7 +51,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore_definitions: true)
+    |> refute_issues(@described_check, max_length: 80, ignore_definitions: true)
   end
 
   test "it should NOT report expected code if @spec's are excluded" do
@@ -66,7 +66,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore_specs: true)
+    |> refute_issues(@described_check, max_length: 80, ignore_specs: true)
   end
 
   test "it should NOT report a violation if strings are excluded" do
@@ -82,7 +82,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore_strings: true)
+    |> refute_issues(@described_check, max_length: 80, ignore_strings: true)
   end
 
   test "it should NOT report a violation if strings are excluded for heredocs" do
@@ -100,7 +100,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore_strings: true)
+    |> refute_issues(@described_check, max_length: 80, ignore_strings: true)
   end
 
   test "it should NOT report a violation with exec" do
@@ -132,7 +132,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> assert_issue(@described_check, [max_length: 80], fn issue ->
       assert 81 == issue.column
       assert "2" == issue.trigger
     end)
@@ -149,7 +149,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> assert_issue(@described_check, [max_length: 80], fn issue ->
       assert 81 == issue.column
       assert issue.message =~ ~r/max is 80, was 112/
     end)
