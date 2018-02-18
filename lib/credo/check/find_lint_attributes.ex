@@ -21,7 +21,9 @@ defmodule Credo.Check.FindLintAttributes do
   end
 
   @lint false
+  # Hack to avoid compiler warnings
   _ = @lint
+
   defp traverse(
          {:defmodule, _meta, _arguments} = ast,
          attribute_list,
