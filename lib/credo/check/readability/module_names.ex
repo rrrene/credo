@@ -43,7 +43,10 @@ defmodule Credo.Check.Readability.ModuleNames do
   defp issues_for_def(body, issues, issue_meta) do
     case Enum.at(body, 0) do
       {:__aliases__, meta, names} ->
-        names |> Enum.join(".") |> issues_for_name(meta, issues, issue_meta)
+        names
+        |> Enum.filter(&String.Chars.impl_for/1)
+        |> Enum.join(".")
+        |> issues_for_name(meta, issues, issue_meta)
 
       _ ->
         issues
