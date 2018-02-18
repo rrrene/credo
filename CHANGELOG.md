@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.0-rc3
+## 0.9.0-rc4
 
 - Add JSON support
 - Ensure compatibility with Elixir 1.6
@@ -10,6 +10,8 @@
 - Include `test` directory in default config
 - Add `excluded_argument_types` to PipeChainStart
 - Emit warnings for non-existing checks, which are referenced in config
+- Improve VariableNames
+- Fix bug on ModuleNames
 - Fix false positive in VariableRebinding
 - Fix false positive in SpaceAroundOperators
 - Fix false positive on BoolOperationOnSameValues
