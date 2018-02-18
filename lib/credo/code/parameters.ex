@@ -65,9 +65,7 @@ defmodule Credo.Code.Parameters do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp get_param_name(
-         {:%, _, [{:__aliases__, _meta, _mod_list}, {:%{}, _meta2, arguments}]}
-       ) do
+  defp get_param_name({:%, _, [{:__aliases__, _meta, _mod_list}, {:%{}, _meta2, arguments}]}) do
     get_param_name(arguments)
   end
 

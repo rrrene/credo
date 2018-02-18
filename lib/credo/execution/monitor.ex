@@ -45,9 +45,7 @@ defmodule Credo.Execution.Monitor do
   end
 
   defp log(:call_end, context_tuple, time) do
-    Logger.info(
-      "Finished #{inspect(context_tuple)} in #{format_time(time)} ..."
-    )
+    Logger.info("Finished #{inspect(context_tuple)} in #{format_time(time)} ...")
   end
 
   defp format_time(time) do

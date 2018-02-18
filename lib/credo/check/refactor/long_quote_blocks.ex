@@ -65,8 +65,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
   @explanation [
     check: @moduledoc,
     params: [
-      max_line_count:
-        "The maximum number of lines a quote block should be allowed to have."
+      max_line_count: "The maximum number of lines a quote block should be allowed to have."
     ]
   ]
   @default_params [max_line_count: 150]

@@ -41,8 +41,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp set_config_comments(exec, source_files) do
-    config_comment_map =
-      Credo.Check.Runner.run_config_comment_finder(source_files, exec)
+    config_comment_map = Credo.Check.Runner.run_config_comment_finder(source_files, exec)
 
     %Execution{exec | config_comment_map: config_comment_map}
   end
@@ -66,8 +65,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   defp exclude_checks_based_on_elixir_version(exec) do
     version = System.version()
 
-    skipped_checks =
-      Enum.reject(exec.checks, &matches_requirement?(&1, version))
+    skipped_checks = Enum.reject(exec.checks, &matches_requirement?(&1, version))
 
     checks = Enum.filter(exec.checks, &matches_requirement?(&1, version))
 

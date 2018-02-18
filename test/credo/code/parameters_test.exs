@@ -75,8 +75,7 @@ defmodule Credo.Code.ParametersTest do
 
     assert 2 == Parameters.count(ast)
 
-    assert [[[], :source_file], [[:line, :column], :issue]] ==
-             Parameters.names(ast)
+    assert [[[], :source_file], [[:line, :column], :issue]] == Parameters.names(ast)
   end
 
   test "returns the correct parameter names for pattern matches with structs 2" do
@@ -90,8 +89,7 @@ defmodule Credo.Code.ParametersTest do
 
     assert 2 == Parameters.count(ast)
 
-    assert [[[:my_ast], :source_file], [[:line, :column], :issue]] ==
-             Parameters.names(ast)
+    assert [[[:my_ast], :source_file], [[:line, :column], :issue]] == Parameters.names(ast)
   end
 
   #

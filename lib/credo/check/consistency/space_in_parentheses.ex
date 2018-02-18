@@ -30,8 +30,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    lines_with_issues =
-      @collector.find_locations_not_matching(expected, source_file)
+    lines_with_issues = @collector.find_locations_not_matching(expected, source_file)
 
     lines_with_issues
     |> Enum.filter(&create_issue?(expected, &1[:trigger]))

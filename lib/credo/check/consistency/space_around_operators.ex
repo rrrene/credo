@@ -104,9 +104,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     # -2 because we need to subtract the operator
     line
     |> String.slice(0..(column - 2))
-    |> String.match?(
-      ~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/
-    )
+    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
   defp number_in_range?(line, column) do
@@ -145,17 +143,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     typed_after? =
       line
       |> String.slice(column..-1)
-      |> String.match?(
-        ~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/
-      )
+      |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/)
 
     # -2 because we need to subtract the operator
     typed_before? =
       line
       |> String.slice(0..(column - 2))
-      |> String.match?(
-        ~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/
-      )
+      |> String.match?(~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/)
 
     heuristics_met_count =
       [

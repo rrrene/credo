@@ -9,11 +9,9 @@ defmodule Credo.Check.Readability.MaxLineLength do
     check: @moduledoc,
     params: [
       max_length: "The maximum number of characters a line may consist of.",
-      ignore_definitions:
-        "Set to `true` to ignore lines including function definitions.",
+      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
       ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings:
-        "Set to `true` to ignore lines that are strings or in heredocs"
+      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs"
     ]
   ]
   @default_params [
@@ -35,8 +33,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, @default_params)
 
-    ignore_definitions =
-      Params.get(params, :ignore_definitions, @default_params)
+    ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
 
     ignore_specs = Params.get(params, :ignore_specs, @default_params)
     ignore_strings = Params.get(params, :ignore_strings, @default_params)

@@ -352,8 +352,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
             call_to_string
           )
 
-      containing_call_to_string? =
-        CodeHelper.contains_child?(arguments, call_to_string)
+      containing_call_to_string? = CodeHelper.contains_child?(arguments, call_to_string)
 
       # IO.inspect CodeHelper.contains_child?(arguments, call_to_string)
       # IO.puts ""

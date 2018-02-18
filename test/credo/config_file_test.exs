@@ -3,10 +3,10 @@ defmodule Credo.ConfigFileTest do
 
   alias Credo.ConfigFile
 
-  def assert_sorted_equality(
-        %ConfigFile{files: files1, checks: checks1},
-        %ConfigFile{files: files2, checks: checks2}
-      ) do
+  def assert_sorted_equality(%ConfigFile{files: files1, checks: checks1}, %ConfigFile{
+        files: files2,
+        checks: checks2
+      }) do
     assert files1 == files2
     assert_sorted_equality(checks1, checks2)
   end

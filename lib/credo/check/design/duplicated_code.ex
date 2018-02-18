@@ -23,8 +23,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     params: [
       mass_threshold:
         "The minimum mass which a part of code has to have to qualify for this check.",
-      nodes_threshold:
-        "The number of nodes that need to be found to raise an issue."
+      nodes_threshold: "The number of nodes that need to be found to raise an issue."
     ]
   ]
   @default_params [

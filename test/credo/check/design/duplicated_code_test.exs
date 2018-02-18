@@ -186,8 +186,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
     mass_threshold = 16
     hashes = DuplicatedCode.calculate_hashes(ast1, %{}, "m1.ex", mass_threshold)
 
-    hashes =
-      DuplicatedCode.calculate_hashes(ast2, hashes, "m2.ex", mass_threshold)
+    hashes = DuplicatedCode.calculate_hashes(ast2, hashes, "m2.ex", mass_threshold)
 
     pruned = DuplicatedCode.prune_hashes(hashes, mass_threshold)
     assert 1 == Enum.count(pruned)
@@ -252,8 +251,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
            do:
              {:def, [line: 2],
               [
-                {:myfun, [line: 2],
-                 [{:p1, [line: 2], nil}, {:p2, [line: 2], nil}]},
+                {:myfun, [line: 2], [{:p1, [line: 2], nil}, {:p2, [line: 2], nil}]},
                 [
                   do:
                     {:if, [line: 3],
@@ -293,14 +291,11 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
       |> Code.string_to_quoted()
 
     # Elixir <= 1.5.x
-    expected =
-      "E9FD5824275A94E20A327BCB1253F6DEA816ECD20AC4A58F2184345F3D422532"
+    expected = "E9FD5824275A94E20A327BCB1253F6DEA816ECD20AC4A58F2184345F3D422532"
 
     # Elixir >= 1.6.0
-    expected_160 =
-      "100B2E81FB13BEEFDC7E514AC56F10385340A7DC6535144A0FBC8EB74C37AEEB"
+    expected_160 = "100B2E81FB13BEEFDC7E514AC56F10385340A7DC6535144A0FBC8EB74C37AEEB"
 
-    assert expected == DuplicatedCode.to_hash(ast) or
-             expected_160 == DuplicatedCode.to_hash(ast)
+    assert expected == DuplicatedCode.to_hash(ast) or expected_160 == DuplicatedCode.to_hash(ast)
   end
 end

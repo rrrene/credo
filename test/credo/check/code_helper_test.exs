@@ -109,8 +109,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> to_source_file
 
-    assert expected ==
-             CodeHelper.clean_charlists_strings_sigils_and_comments(source_file)
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source_file)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
@@ -136,8 +135,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> to_source_file
 
-    assert expected ==
-             CodeHelper.clean_charlists_strings_and_sigils(source_file)
+    assert expected == CodeHelper.clean_charlists_strings_and_sigils(source_file)
   end
 
   test "returns ast without metadata" do

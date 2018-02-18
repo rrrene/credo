@@ -162,11 +162,9 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
     children
   end
 
-  defp collect_paren_child({:"(", _}, {nest_level, tokens}),
-    do: {nest_level + 1, tokens}
+  defp collect_paren_child({:"(", _}, {nest_level, tokens}), do: {nest_level + 1, tokens}
 
-  defp collect_paren_child({:")", _}, {nest_level, tokens}),
-    do: {nest_level - 1, tokens}
+  defp collect_paren_child({:")", _}, {nest_level, tokens}), do: {nest_level - 1, tokens}
 
   defp collect_paren_child(token, {0, tokens}), do: {0, tokens ++ [token]}
   defp collect_paren_child(_, {_, _} = state), do: state
@@ -186,8 +184,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message:
-        "The condition of `#{trigger}` should not be wrapped in parentheses.",
+      message: "The condition of `#{trigger}` should not be wrapped in parentheses.",
       trigger: trigger,
       line_no: line_no
     )

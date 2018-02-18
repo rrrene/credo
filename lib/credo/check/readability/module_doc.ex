@@ -36,8 +36,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   @explanation [
     check: @moduledoc,
     params: [
-      ignore_names:
-        "All modules matching this regex (or list of regexes) will be ignored."
+      ignore_names: "All modules matching this regex (or list of regexes) will be ignored."
     ]
   ]
   @default_params [

@@ -6,8 +6,7 @@ defmodule Credo.Execution.Task.ParseOptions do
   alias Credo.CLI.Output.UI
 
   def call(exec, _opts) do
-    cli_options =
-      Options.parse(exec.argv, File.cwd!(), Commands.names(), [UI.edge()])
+    cli_options = Options.parse(exec.argv, File.cwd!(), Commands.names(), [UI.edge()])
 
     %Execution{exec | cli_options: cli_options}
   end

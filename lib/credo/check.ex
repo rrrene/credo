@@ -120,8 +120,7 @@ defmodule Credo.Check do
 
   @callback explanation_for_params() :: Keyword.t()
 
-  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) ::
-              Issue.t()
+  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
 
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]

@@ -15,8 +15,7 @@ defmodule Credo.Check.FindLintAttributes do
   end
 
   def find_lint_attributes(source_file) do
-    lint_attributes =
-      Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
+    lint_attributes = Credo.Code.prewalk(source_file, &traverse(&1, &2, source_file))
 
     {source_file.filename, lint_attributes}
   end

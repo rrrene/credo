@@ -20,8 +20,7 @@ defmodule Credo.Priority do
 
     empty_priorities = Enum.map(1..line_count, fn _ -> [] end)
 
-    priority_list =
-      Credo.Code.prewalk(source_file, &traverse/2, empty_priorities)
+    priority_list = Credo.Code.prewalk(source_file, &traverse/2, empty_priorities)
 
     base_map = make_base_map(priority_list, source_file)
 

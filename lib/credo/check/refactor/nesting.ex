@@ -126,9 +126,7 @@ defmodule Credo.Check.Refactor.Nesting do
     format_issue(
       issue_meta,
       message:
-        "Function body is nested too deep (max depth is #{max_value}, was #{
-          actual_value
-        }).",
+        "Function body is nested too deep (max depth is #{max_value}, was #{actual_value}).",
       line_no: line_no,
       trigger: trigger,
       severity: Severity.compute(actual_value, max_value)

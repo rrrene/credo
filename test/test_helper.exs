@@ -61,9 +61,7 @@ defmodule CredoCheckCase do
     issues = issues_for(source_file, check, create_config(), params)
 
     assert [] == issues,
-           "There should be no issues, got #{Enum.count(issues)}: #{
-             to_inspected(issues)
-           }"
+           "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
 
     issues
   end
@@ -82,9 +80,7 @@ defmodule CredoCheckCase do
     refute Enum.count(issues) == 0, "There should be one issue, got none."
 
     assert Enum.count(issues) == 1,
-           "There should be only 1 issue, got #{Enum.count(issues)}: #{
-             to_inspected(issues)
-           }"
+           "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
 
     if callback do
       issues |> List.first() |> callback.()

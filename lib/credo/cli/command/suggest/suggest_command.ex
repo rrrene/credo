@@ -8,8 +8,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
   alias Credo.CLI.Task
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts),
-    do: SuggestOutput.print_help(exec)
+  def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
 
   def call(exec, _opts) do
     exec

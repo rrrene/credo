@@ -12,8 +12,7 @@ defmodule Credo.Mixfile do
       deps: deps(),
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
-      description:
-        "A static code analysis tool with a focus on code consistency and teaching.",
+      description: "A static code analysis tool with a focus on code consistency and teaching.",
       package: package()
     ]
   end

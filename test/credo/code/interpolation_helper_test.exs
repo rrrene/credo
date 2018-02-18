@@ -122,16 +122,14 @@ defmodule Credo.Code.InterpolationHelperTest do
 
   @tag :token_position
   test "should give correct token position" do
-    positions =
-      InterpolationHelper.interpolation_positions(@no_interpolations_source)
+    positions = InterpolationHelper.interpolation_positions(@no_interpolations_source)
 
     assert @no_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with a single interpolation" do
-    positions =
-      InterpolationHelper.interpolation_positions(@single_interpolations_source)
+    positions = InterpolationHelper.interpolation_positions(@single_interpolations_source)
 
     assert @single_interpolations_positions == positions
   end
@@ -176,20 +174,14 @@ defmodule Credo.Code.InterpolationHelperTest do
 
   @tag :token_position
   test "should give correct token position with multiple interpolations" do
-    positions =
-      InterpolationHelper.interpolation_positions(
-        @multiple_interpolations_source
-      )
+    positions = InterpolationHelper.interpolation_positions(@multiple_interpolations_source)
 
     assert @multiple_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with multiple interpolations in heredoc" do
-    positions =
-      InterpolationHelper.interpolation_positions(
-        @heredoc_interpolations_source
-      )
+    positions = InterpolationHelper.interpolation_positions(@heredoc_interpolations_source)
 
     assert @heredoc_interpolations_positions == positions
   end

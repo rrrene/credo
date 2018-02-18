@@ -20,8 +20,7 @@ defmodule Credo.CLI.Filter do
 
   def valid_issues(list, exec) when is_list(list) do
     Enum.reject(list, fn issue ->
-      ignored_by_lint_attribute?(issue, exec) ||
-        ignored_by_config_comment?(issue, exec)
+      ignored_by_lint_attribute?(issue, exec) || ignored_by_config_comment?(issue, exec)
     end)
   end
 

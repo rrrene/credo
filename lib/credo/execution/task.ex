@@ -1,8 +1,7 @@
 defmodule Credo.Execution.Task do
   @type t :: module
 
-  @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) ::
-              Credo.Execution.t()
+  @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) :: Credo.Execution.t()
 
   alias Credo.Execution
   alias Credo.Execution.Monitor
@@ -52,9 +51,7 @@ defmodule Credo.Execution.Task do
 
       value ->
         # TODO: improve message
-        IO.warn(
-          "Expected task to return %Credo.Execution{}, got: #{inspect(exec)}"
-        )
+        IO.warn("Expected task to return %Credo.Execution{}, got: #{inspect(exec)}")
 
         value
     end

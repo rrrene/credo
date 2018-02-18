@@ -132,8 +132,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByFn do
 
   def find_issue({name, meta, _}, issue_meta, def_names, excluded_names)
       when is_atom(name) do
-    def_name_with_op =
-      Enum.find(def_names, fn {def_name, _op} -> def_name == name end)
+    def_name_with_op = Enum.find(def_names, fn {def_name, _op} -> def_name == name end)
 
     cond do
       Enum.member?(excluded_names, name) ->
