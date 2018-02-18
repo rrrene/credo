@@ -15,7 +15,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ]
   ]
   @default_params [
-    max_length: 80,
+    max_length: 120,
     ignore_definitions: true,
     ignore_specs: false,
     ignore_strings: true
