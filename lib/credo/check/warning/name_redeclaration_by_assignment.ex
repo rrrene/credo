@@ -40,7 +40,7 @@ defmodule Credo.Check.Warning.NameRedeclarationByAssignment do
   alias Credo.Code
   alias Credo.Code.Module
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, base_priority: :high, elixir_version: "< 1.4"
 
   @doc false
   def run(source_file, params \\ []) do
