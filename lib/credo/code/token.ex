@@ -168,7 +168,10 @@ defmodule Credo.Code.Token do
     defp convert_to_col_end(_, _, {:bin_string, {line_no, col_start, nil}, list})
          when is_list(list) do
       # add 2 for opening and closing "
-      Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
+      {line_no, col_end, terminator} =
+        Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
+
+      {line_no, col_end + 2, terminator}
     end
 
     defp convert_to_col_end(_, _, {:bin_string, {line_no, col_start, nil}, value}) do
