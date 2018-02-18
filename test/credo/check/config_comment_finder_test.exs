@@ -9,7 +9,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
     source_file =
       """
       defmodule OtherModule do
-        # credo:disable-next-line
+        # credo:disable-for-next-line
         defmacro fooBarCool do
           {:ok} = File.read
         end

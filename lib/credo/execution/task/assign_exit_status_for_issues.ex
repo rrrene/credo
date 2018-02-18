@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task.AssignExitStatusForIssues do
   def call(exec, _opts) do
     exit_status =
       exec
-      |> get_result("credo.issues", [])
+      |> get_issues()
       |> to_exit_status()
 
     put_assign(exec, "credo.exit_status", exit_status)
