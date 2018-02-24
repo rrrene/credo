@@ -62,6 +62,10 @@ defmodule Credo.Code.Token do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
     end
 
+    def position({:list_string, {line_no, col_start, _}, atom_or_charlist}) do
+      position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+    end
+
     def position({:bin_heredoc, {line_no, col_start, _}, atom_or_charlist}) do
       position_tuple_for_heredoc(atom_or_charlist, line_no, col_start)
     end
