@@ -1,9 +1,6 @@
 defmodule Credo.CLI.Task.PrepareChecksToRun do
   use Credo.Execution.Task
 
-  alias Credo.Check.Runner
-  alias Credo.CLI.Output.UI
-
   def call(exec, _opts \\ []) do
     source_files = Execution.get_source_files(exec)
 
