@@ -197,7 +197,13 @@ defmodule Credo.Code.Token do
       {line_no, to_col_end(col_start, value), nil}
     end
 
-    defp convert_to_col_end(_, _, {_, {line_no, col_start, _value}, value}) do
+    defp convert_to_col_end(_, _, {:aliases, {line_no, col_start, _}, list}) do
+      value = Enum.map(list, &to_string/1)
+
+      {line_no, to_col_end(col_start, value), nil}
+    end
+
+    defp convert_to_col_end(_, _, {_, {line_no, col_start, _}, value}) do
       {line_no, to_col_end(col_start, value), nil}
     end
 

@@ -332,4 +332,21 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a hexadecimal number 1" do
+    source = ~S"""
+    "foobar#{quote do
+      System
+    end}"
+    """
+
+    expected = ~S"""
+    "foobar$$$$$$$$$$
+    $$$$$$$$
+    $$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
