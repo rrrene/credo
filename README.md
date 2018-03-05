@@ -435,7 +435,7 @@ Some IDEs and editors are able to run `mix credo` in the background and mark and
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 
-## Contributing
+## Contributing [![Open Source Helpers](https://www.codetriage.com/rrrene/credo/badges/users.svg)](https://www.codetriage.com/rrrene/credo)
 
 1. [Fork it!](http://github.com/rrrene/credo/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
@@ -443,7 +443,7 @@ Some IDEs and editors are able to run `mix credo` in the background and mark and
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-
+In addition to contributing code you can also triage issues which may include reproducing bug reports or asking for vital information, such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to credo on CodeTriage](https://www.codetriage.com/rrrene/credo).
 
 ## Author
 
