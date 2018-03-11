@@ -17,6 +17,10 @@ rm $GENEREATE_CREDO_CHECK
 mix credo.gen.config
 
 mix credo categories
+mix credo info
+mix credo info --verbose
+mix credo info --format=json
+mix credo info --verbose --format=json
 mix credo version
 mix credo help
 
