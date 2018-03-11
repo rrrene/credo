@@ -21,6 +21,15 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       defp count([?) | t], acc), do: count(t, acc - 1)
     end
 
+    defmodule Foo do
+      def bar(a, b) do
+        # The next line is the one the error is incorrectly reported against
+        if (a + b) / 100 > threshold(), do: :high, else: :low
+      end
+
+      def threshold, do: 50
+    end
+
     def credo_test do
       sh_snip = 'if [ ! -d /somedir ] ...'
       foo = 'and here are some ( parenthesis )'
