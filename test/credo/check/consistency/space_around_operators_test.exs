@@ -44,6 +44,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
       # Fine
       defp format_value("NPC_", "NPDT", <<skills::binary-27>>) do
+        assert -12 == MyApp.fun_that_should_return_a_negative
       end
 
       # Gives warning
