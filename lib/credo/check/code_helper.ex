@@ -163,49 +163,49 @@ defmodule Credo.Check.CodeHelper do
   Returns an AST without its metadata.
   """
   def remove_metadata(ast) when is_tuple(ast) do
-    clean_node(ast)
+    update_metadata(ast, fn _ast -> [] end)
   end
 
   def remove_metadata(ast) do
     ast
     |> List.wrap()
-    |> Enum.map(&clean_node/1)
+    |> Enum.map(&update_metadata(&1, fn _ast -> [] end))
   end
 
-  defp clean_node({atom, _meta, list}) when is_list(list) do
-    {atom, [], Enum.map(list, &clean_node/1)}
+  defp update_metadata({atom, _meta, list} = ast, fun) when is_list(list) do
+    {atom, fun.(ast), Enum.map(list, &update_metadata(&1, fun))}
   end
 
-  defp clean_node(do: tuple) when is_tuple(tuple) do
-    [do: clean_node(tuple)]
+  defp update_metadata([do: tuple], fun) when is_tuple(tuple) do
+    [do: update_metadata(tuple, fun)]
   end
 
-  defp clean_node(do: tuple, else: tuple2) when is_tuple(tuple) do
-    [do: clean_node(tuple), else: clean_node(tuple2)]
+  defp update_metadata([do: tuple, else: tuple2], fun) when is_tuple(tuple) do
+    [do: update_metadata(tuple, fun), else: update_metadata(tuple2, fun)]
   end
 
-  defp clean_node({:do, tuple}) when is_tuple(tuple) do
-    {:do, clean_node(tuple)}
+  defp update_metadata({:do, tuple}, fun) when is_tuple(tuple) do
+    {:do, update_metadata(tuple, fun)}
   end
 
-  defp clean_node({:else, tuple}) when is_tuple(tuple) do
-    {:else, clean_node(tuple)}
+  defp update_metadata({:else, tuple}, fun) when is_tuple(tuple) do
+    {:else, update_metadata(tuple, fun)}
   end
 
-  defp clean_node({atom, _meta, arguments}) do
-    {atom, [], arguments}
+  defp update_metadata({atom, _meta, arguments} = ast, fun) do
+    {atom, fun.(ast), arguments}
   end
 
-  defp clean_node(v) when is_list(v), do: Enum.map(v, &clean_node/1)
+  defp update_metadata(v, fun) when is_list(v), do: Enum.map(v, &update_metadata(&1, fun))
 
-  defp clean_node(tuple) when is_tuple(tuple) do
+  defp update_metadata(tuple, fun) when is_tuple(tuple) do
     tuple
     |> Tuple.to_list()
-    |> Enum.map(&clean_node/1)
+    |> Enum.map(&update_metadata(&1, fun))
     |> List.to_tuple()
   end
 
-  defp clean_node(v)
+  defp update_metadata(v, _fun)
        when is_atom(v) or is_binary(v) or is_float(v) or is_integer(v),
        do: v
 end
