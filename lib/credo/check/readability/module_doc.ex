@@ -85,8 +85,34 @@ defmodule Credo.Check.Readability.ModuleDoc do
         {:error, _} when not exception? ->
           {
             ast,
-            {true, [issue_for(issue_meta, meta[:line], mod_name)] ++ issues}
+            {true,
+             [
+               issue_for(
+                 "Modules should have a @moduledoc tag.",
+                 issue_meta,
+                 meta[:line],
+                 mod_name
+               )
+             ] ++ issues}
           }
+
+        string when is_binary(string) ->
+          if String.trim(string) == "" do
+            {
+              ast,
+              {true,
+               [
+                 issue_for(
+                   "Use `@moduledoc false` if a module will not be documented.",
+                   issue_meta,
+                   meta[:line],
+                   mod_name
+                 )
+               ] ++ issues}
+            }
+          else
+            {ast, {true, issues}}
+          end
 
         _ ->
           {ast, {true, issues}}
@@ -98,10 +124,10 @@ defmodule Credo.Check.Readability.ModuleDoc do
     {ast, {continue, issues}}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(message, issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Modules should have a @moduledoc tag.",
+      message: message,
       trigger: trigger,
       line_no: line_no
     )
