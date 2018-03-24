@@ -11,12 +11,14 @@
 - Add `excluded_argument_types` to PipeChainStart
 - Emit warnings for non-existing checks, which are referenced in config
 - Improve VariableNames
+- ModuleDoc now raises an issue for empty strings in @moduledoc tags
 - Fix bug on ModuleNames
 - Fix false positive in VariableRebinding
 - Fix false positive in SpaceAroundOperators
 - Fix false positive on BoolOperationOnSameValues
 - Fix false positive on SpaceAfterCommas
 - Fix false positive on MaxLineLength
+- Fix false positive in ParenthesesInCondition
 - Remove `NameRedeclarationBy*` checks
 - Remove support for @lint attributes
 
