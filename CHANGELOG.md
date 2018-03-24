@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.0-rc8
+## 0.9.0
 
 - Add JSON support
 - Ensure compatibility with Elixir 1.6
