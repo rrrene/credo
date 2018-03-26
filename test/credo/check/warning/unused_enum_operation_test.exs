@@ -477,6 +477,24 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for Enum.reduce inside Agent.update" do
+    """
+    defmodule CredoSampleModule do
+      def test_function(urls) do
+        Agent.update(__MODULE__, fn _ ->
+          Enum.reduce(urls, &expire_url/2)
+        end)
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  #
+  #
+  #
+
   test "it should report a violation" do
     """
     defmodule CredoSampleModule do
