@@ -29,12 +29,12 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   end
 
   # [a] ++ b is OK
-  defp traverse(ast = {:++, _, [[_], _]}, issues, _issue_meta) do
+  defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
     {ast, issues}
   end
 
   # a ++ [b] is not
-  defp traverse(ast = {:++, meta, [_, [_]]}, issues, issue_meta) do
+  defp traverse({:++, meta, [_, [_]]} = ast, issues, issue_meta) do
     {ast, [issue_for(issue_meta, meta[:line], :++) | issues]}
   end
 
