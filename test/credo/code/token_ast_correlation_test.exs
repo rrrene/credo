@@ -155,8 +155,9 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                                 {:=, [line: 10],
                                  [
                                    {:{}, [line: 10], [:ok]},
-                                   {{:., [line: 10], [{:__aliases__, [line: 10], [:File]}, :read]},
-                                    [line: 10], []}
+                                   {{:., [line: 10],
+                                     [{:__aliases__, [line: 10], [:File]}, :read]}, [line: 10],
+                                    []}
                                  ]}
                             ]
                           ]}
@@ -241,55 +242,56 @@ defmodule Credo.Code.TokenAstCorrelationTest do
 
     test "should give correct ast for source_example2" do
       source = @source_example2
-      {:ok, ast} = Credo.Code.ast(source)
+      ast = TokenAstCorrelation.ast(source)
 
       expected =
-        {:defmodule, [line: 1, column: 1],
+        {:defmodule, [line: 1, __column__: 1],
          [
-           {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
+           {:__aliases__, [line: 1, __column__: 11], [:Credo, :Sample]},
            [
              do:
-               {:defmodule, [line: 2, column: 3],
+               {:defmodule, [line: 2, __column__: 3],
                 [
-                  {:__aliases__, [line: 2, column: 13], [:InlineModule]},
+                  {:__aliases__, [line: 2, __column__: 13], [:InlineModule]},
                   [
                     do:
-                      {:def, [line: 3, column: 5],
+                      {:def, [line: 3, __column__: 5],
                        [
-                         {:foobar, [line: 3, column: 9], [{:x, [line: 3, column: 16], nil}]},
+                         {:foobar, [line: 3, __column__: 9],
+                          [{:x, [line: 3, __column__: 16], nil}]},
                          [
                            do:
-                             {:=, [line: 4, column: 9],
+                             {:=, [line: 4, __column__: 9],
                               [
-                                {:x, [line: 4, column: 7], nil},
-                                {:f, [line: 4, column: 11],
+                                {:x, [line: 4, __column__: 7], nil},
+                                {:f, [line: 4, __column__: 11],
                                  [
-                                   {:g, [line: 4, column: 13],
+                                   {:g, [line: 4, __column__: 13],
                                     [
-                                      {:h, [line: 4, column: 15],
-                                       [{:a, [line: 4, column: 17], nil}]},
-                                      {:b, [line: 4, column: 21], nil}
+                                      {:h, [line: 4, __column__: 15],
+                                       [{:a, [line: 4, __column__: 17], nil}]},
+                                      {:b, [line: 4, __column__: 21], nil}
                                     ]},
-                                   {:*, [line: 4, column: 44],
+                                   {:*, [line: 4, __column__: 44],
                                     [
-                                      {:k, [line: 4, column: 25],
+                                      {:k, [line: 4, __column__: 25],
                                        [
-                                         {:+, [line: 4, column: 34],
+                                         {:+, [line: 4, __column__: 34],
                                           [
-                                            {:i, [line: 4, column: 27],
+                                            {:i, [line: 4, __column__: 27],
                                              [
-                                               {:-, [line: 4, column: 30],
-                                                [{:c, [line: 4, column: 29], nil}, 1]}
+                                               {:-, [line: 4, __column__: 30],
+                                                [{:c, [line: 4, __column__: 29], nil}, 1]}
                                              ]},
-                                            {:j, [line: 4, column: 36],
+                                            {:j, [line: 4, __column__: 36],
                                              [
-                                               {:-, [line: 4, column: 39],
-                                                [{:d, [line: 4, column: 38], nil}, 2]}
+                                               {:-, [line: 4, __column__: 39],
+                                                [{:d, [line: 4, __column__: 38], nil}, 2]}
                                              ]}
                                           ]}
                                        ]},
-                                      {:l, [line: 4, column: 46],
-                                       [{:e, [line: 4, column: 48], nil}]}
+                                      {:l, [line: 4, __column__: 46],
+                                       [{:e, [line: 4, __column__: 48], nil}]}
                                     ]}
                                  ]}
                               ]}
