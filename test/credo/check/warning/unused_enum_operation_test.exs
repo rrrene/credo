@@ -197,7 +197,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           case check do
             true -> false
             _ ->
-              Enum.reduce(arr, fn(w) ->
+              Enum.map(arr, fn(w) ->
                 [:this_might_return, Enum.join(w, ",")]
               end)
           end
@@ -338,7 +338,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
             true -> false
             _ ->
               list =
-                Enum.reduce(arr, fn(w) ->
+                Enum.map(arr, fn(w) ->
                   [:this_goes_nowhere, Enum.join(w, ",")]
                 end)
           end
@@ -468,6 +468,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           {:error, "No exec"}
         else
           anything
+
           {:ok, Enum.flat_map(configs, fn x -> x end)}
         end
       end
@@ -477,14 +478,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report a violation for Enum.reduce inside Agent.update" do
+  test "it should NOT report a violation for Enum.map inside Agent.update" do
     """
     defmodule CredoTest do
       def agent_update do
         Agent.start_link(fn -> 0 end, name: __MODULE__)
 
         Agent.update(__MODULE__, fn _ ->
-          Enum.reduce([1, 2, 3], fn a, b -> a + b end)
+          Enum.map([1, 2, 3], fn a -> a end)
         end)
 
         Agent.get(__MODULE__, fn val -> val end)
@@ -498,6 +499,26 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   #
   #
   #
+
+  test "it should report a violation for Enum.map inside Agent.update" do
+    """
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
+        Agent.update(__MODULE__, fn _ ->
+          Enum.map([1, 2, 3], fn a -> a + 5 end)
+
+          something_else
+        end)
+
+        Agent.get(__MODULE__, fn val -> val end)
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 
   test "it should report a violation" do
     """
@@ -537,6 +558,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         for x <- [1, 2, 3] do
           # this goes nowhere!
           Enum.join(w, ",")
+
           x
         end
       end
@@ -555,6 +577,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
             :this_goes_nowhere,
             Enum.join(w, ",") # THIS is not the last_call!
           ]
+
           IO.puts "."
         else
           IO.puts "x"
@@ -593,7 +616,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           case check do
             true -> false
             _ ->
-              Enum.reduce(arr, fn(w) ->
+              Enum.map(arr, fn(w) ->
                 [:this_goes_nowhere, Enum.join(w, ",")]
               end)
           end
@@ -652,11 +675,11 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1
       end
       def some_function2(parameter1, parameter2) do
-       Enum.reduce(parameter1, parameter2)
+       Enum.map(parameter1, parameter2)
        parameter1
        end
        def some_function3(parameter1, parameter2) do
-         Enum.reduce(parameter1, parameter2)
+         Enum.map(parameter1, parameter2)
          parameter1
        end
     end

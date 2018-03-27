@@ -309,12 +309,11 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          last_call_in_def,
          calls_in_block_above
        ) do
-    if fn_in_arguments?(ast) &&
-         Enum.any?(
-           fn_in_arguments(ast),
-           &CodeHelper.contains_child?(&1, call_to_mod)
-         ) do
+    fns = fn_in_arguments(ast)
+
+    if Enum.any?(fns) && Enum.any?(fns, &CodeHelper.contains_child?(&1, call_to_mod)) do
       # IO.puts(IO.ANSI.format([:red, "Last fn"]))
+      # IO.inspect(ast)
 
       ast
       |> fn_in_arguments()
