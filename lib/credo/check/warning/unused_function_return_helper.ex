@@ -26,28 +26,28 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
            restrict_fun_names
          )
          when is_list(arguments) do
-      # should complain when a call to mod is found inside the method body
+      # should complain when a call to mod is found inside the function body
       #
       # - that is not part of :=
       # - that is not piped into another function
       # - that is not the return value
       #
       # In turn this means
-      # - the last call in the method can contain a mod call
-      # - any := can contain a mod calls_in_method
+      # - the last call in the function can contain a mod call
+      # - any := can contain a mod calls_in_function
       # - any pipe chain can contain a mod call, as long as it is not the
       #   last call in the chain
-      calls_in_method = CodeHelper.calls_in_do_block(ast)
-      last_call_in_def = List.last(calls_in_method)
+      calls_in_function = CodeHelper.calls_in_do_block(ast)
+      last_call_in_def = List.last(calls_in_function)
 
       all_unused_calls =
         all_unused_calls ++
           Enum.flat_map(
-            calls_in_method,
+            calls_in_function,
             &invalid_calls(
               &1,
               last_call_in_def,
-              calls_in_method,
+              calls_in_function,
               required_mod_list,
               restrict_fun_names
             )
@@ -55,7 +55,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
       # IO.puts(IO.ANSI.format([:yellow, "OP:", unquote(op) |> to_string]))
       # IO.inspect(ast |> CodeHelper.do_block_for())
-      # IO.inspect(calls_in_method)
+      # IO.inspect(calls_in_function)
       # IO.inspect(last_call_in_def)
       # IO.puts("")
 
@@ -279,7 +279,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          _calls_in_block_above
        ) do
     # IO.puts(IO.ANSI.format([:yellow, ":|>"]))
-    # We are in a pipe chain that is NOT the last call in the method
+    # We are in a pipe chain that is NOT the last call in the function
     # and that is NOT part of an assignment.
     # This is fine, as long as the call to mod is not the last element
     # in the pipe chain.
