@@ -479,11 +479,15 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
 
   test "it should NOT report a violation for Enum.reduce inside Agent.update" do
     """
-    defmodule CredoSampleModule do
-      def test_function(urls) do
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
         Agent.update(__MODULE__, fn _ ->
-          Enum.reduce(urls, &expire_url/2)
+          Enum.reduce([1, 2, 3], fn a, b -> a + b end)
         end)
+
+        Agent.get(__MODULE__, fn val -> val end)
       end
     end
     """
