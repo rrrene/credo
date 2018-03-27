@@ -1,6 +1,7 @@
 /_build
 /deps
 /docs
+/doc
 /.idea
 /.vscode
 *.iml

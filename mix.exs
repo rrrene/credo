@@ -13,7 +13,10 @@ defmodule Credo.Mixfile do
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
       description: "A static code analysis tool with a focus on code consistency and teaching.",
-      package: package()
+      package: package(),
+      source_url: "https://github.com/rrrene/credo",
+      # The main page in the docs
+      docs: [main: "readme", logo: "assets/logo.png", extras: ["README.md"]]
     ]
   end
 
@@ -40,7 +43,8 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.2.0"},
-      {:poison, ">= 0.0.0"}
+      {:poison, ">= 0.0.0"},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
 end
