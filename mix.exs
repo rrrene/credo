@@ -16,7 +16,7 @@ defmodule Credo.Mixfile do
       package: package(),
       source_url: "https://github.com/rrrene/credo",
       # The main page in the docs
-      docs: [main: "readme", logo: "assets/logo.png", extras: ["README.md"]]
+      docs: [main: "Credo", logo: "assets/logo.png", extras: ["README.md"]]
     ]
   end
 
