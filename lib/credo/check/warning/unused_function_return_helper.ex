@@ -1,4 +1,30 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
+  @moduledoc """
+  TODO v1.0:
+  should complain about calls in blocks, where the call ...
+
+  * is NOT assigned to a variable
+  * is NOT the last call in the block (i.e. the return value)
+  * is NOT piped into another function
+  * is NOT an argument to another function call
+
+  safe cases (no issue):
+
+  the call ...
+  * is directly assigned to a variable
+  * is the last call in a function
+  * is piped into another function
+  * is an argument to another function call
+
+  trickier cases:
+
+  the call ...
+  * is the last call in a block, but that block is part of an :if which is
+    * not the last call in its function and also
+    * not assigned to a variable and
+    * not piped into another function
+  """
+
   @def_ops [:def, :defp, :defmacro]
   @block_ops [:if, :unless, :case, :quote, :try, :after, :rescue]
 
@@ -246,17 +272,19 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          calls_in_block_above
        ) do
     # IO.puts(IO.ANSI.format([:yellow, ":->"]))
+    # IO.inspect(arguments, label: "arguments")
+    # IO.inspect(call_to_mod, label: "call_to_mod")
     # IO.inspect(CodeHelper.contains_child?(params, call_to_mod))
-    # IO.inspect(arguments)
     # IO.puts("")
 
     if CodeHelper.contains_child?(params, call_to_mod) do
       true
     else
       calls_in_this_block = List.wrap(arguments)
+      block_is_last_call_in_def? = CodeHelper.contains_child?(last_call_in_def, ast)
+      call_to_mod_is_last_call_in_this_block? = call_to_mod == List.last(calls_in_this_block)
 
-      if CodeHelper.contains_child?(last_call_in_def, ast) &&
-           call_to_mod == List.last(calls_in_this_block) do
+      if block_is_last_call_in_def? && call_to_mod_is_last_call_in_this_block? do
         true
       else
         Enum.any?(
@@ -315,9 +343,8 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       # IO.puts(IO.ANSI.format([:red, "Last fn"]))
       # IO.inspect(ast)
 
-      ast
-      |> fn_in_arguments()
-      |> Enum.any?(
+      Enum.any?(
+        fns,
         &valid_call_to_fun_mod?(
           &1,
           call_to_mod,
@@ -505,15 +532,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     {ast, accumulated}
   end
 
-  # TODO: move to AST helper?
-
-  def fn_in_arguments?(ast) do
-    ast
-    |> fn_in_arguments
-    |> Enum.any?()
-  end
-
-  def fn_in_arguments({_atom, _meta, arguments}) do
+  defp fn_in_arguments({_atom, _meta, arguments}) do
     arguments
     |> List.wrap()
     |> Enum.filter(fn arg ->

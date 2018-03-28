@@ -438,6 +438,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
           IO.puts "."
         else
           [:this_goes_nowhere, String.duplicate("^", w)] # THIS is not the last_call!
+
           IO.puts " "
         end
       end
@@ -478,6 +479,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
       defp something(bin) do
         for segment <- String.split(bin, "/"), segment != "" do
           String.upcase(segment)
+
           segment
         end
       end

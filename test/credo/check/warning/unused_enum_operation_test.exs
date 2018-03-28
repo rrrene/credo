@@ -520,6 +520,30 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> assert_issue(@described_check)
   end
 
+  test "it should report a violation for Enum.map inside assigned :if" do
+    """
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
+        x =
+          case x do
+            nil ->
+              x
+            _ ->
+              Enum.map([1, 2, 3], fn a -> a + 5 end)
+
+              something_else
+          end
+
+        Agent.get(__MODULE__, fn val -> val end)
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report a violation" do
     """
     defmodule CredoSampleModule do
@@ -616,6 +640,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           case check do
             true -> false
             _ ->
+              # this goes nowhere!
               Enum.map(arr, fn(w) ->
                 [:this_goes_nowhere, Enum.join(w, ",")]
               end)
@@ -656,6 +681,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           IO.puts "."
         else
           [:this_goes_nowhere, Enum.join(w, ",")] # THIS is not the last_call!
+
           IO.puts " "
         end
       end
@@ -695,7 +721,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     defmodule CredoSampleModule do
       defp something(bin) do
         for segment <- Enum.flat_map(segment, &(&1.blob)), segment != "" do
+          # this goes nowhere!
           Enum.map(segment, &IO.inspect/1)
+
           segment
         end
       end
