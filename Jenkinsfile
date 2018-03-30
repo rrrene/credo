@@ -10,7 +10,7 @@ mix compile
     }
     stage('Test') {
       steps {
-        sh './tests/smoke_test.sh'
+        sh './test/smoke_test.sh'
       }
     }
   }
