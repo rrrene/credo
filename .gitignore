@@ -3,6 +3,7 @@
 /docs
 /doc
 /.idea
+/tmp
 /.vscode
 *.iml
 erl_crash.dump
