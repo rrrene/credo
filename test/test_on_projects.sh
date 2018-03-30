@@ -19,7 +19,7 @@ clone_and_test() {
   GIT_REPO=$1
   PROJECT_NAME=$2
   DIRNAME=tmp/$PROJECT_NAME
-  METRIC=
+  METRIC=$PROJECT_NAME
   CMD="mix credo $DIRNAME --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
 
   echo ""
@@ -31,7 +31,7 @@ clone_and_test() {
   echo "--> Analysing $PROJECT_NAME ..."
   echo ""
 
-  benchmark $CMD "" "" $METRIC
+  benchmark "$CMD" "" "" "$METRIC"
 }
 
 benchmark() {
