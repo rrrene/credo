@@ -1,9 +1,16 @@
 pipeline {
   agent any
   stages {
-    stage('Smoke testing') {
+    stage('Build') {
       steps {
-        sh './test/smoke_test.sh'
+        sh '''mix deps.get
+mix compile
+'''
+      }
+    }
+    stage('Test') {
+      steps {
+        sh './tests/smoke_test.sh'
       }
     }
   }
