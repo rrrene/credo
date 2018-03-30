@@ -13,5 +13,10 @@ mix compile
         sh './test/smoke_test.sh'
       }
     }
+    stage('Test On Projects') {
+      steps {
+        sh './test/test_on_projects.sh'
+      }
+    }
   }
 }
