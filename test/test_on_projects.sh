@@ -9,17 +9,18 @@ PROJECT_ROOT=$( cd "$DIRNAME/.." && pwd )
 
 # script specific sources, variables and function definitions
 
-CREDO_ARG1=$1
-CREDO_ARG2=$2
-CREDO_ARG3=$3
-CREDO_ARG4=$4
-CREDO_ARG5=$5
+METRIC_BASE=${1:-full}
+CREDO_ARG1=$2
+CREDO_ARG2=$3
+CREDO_ARG3=$4
+CREDO_ARG4=$5
+CREDO_ARG5=$6
 
 clone_and_test() {
   GIT_REPO=$1
   PROJECT_NAME=$2
   DIRNAME=tmp/$PROJECT_NAME
-  METRIC=$PROJECT_NAME
+  METRIC="$METRIC_BASE,project=$PROJECT_NAME,branch=$GIT_BRANCH"
   CMD="mix credo $DIRNAME --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
 
   echo ""
@@ -31,14 +32,12 @@ clone_and_test() {
   echo "--> Analysing $PROJECT_NAME ..."
   echo ""
 
-  benchmark "$CMD" "" "" "$METRIC"
+  benchmark "$CMD" "$METRIC"
 }
 
 benchmark() {
   COMMAND=$1 # command to be timed/benchmarked
-  HOST=$2 # hostname of statsd listener
-  PORT=$3 # port of statsd listener
-  METRIC=$4 # metric to be collected
+  METRIC=$2 # metric to be collected
 
   # The '%N' option does not seem to work on macOS
   t1=$(date +%s%N)
@@ -47,7 +46,7 @@ benchmark() {
   TIME=`expr $t2 - $t1`
   TIME=`expr $TIME / 1000000`
 
-  echo "$METRIC:$TIME|ms" #| nc -C -w 1 -u $HOST $PORT
+  echo "$METRIC:$TIME|ms" | nc -C -w 1 -u $STATSD_HOST $STATSD_PORT
 }
 
 # setup
