@@ -1,24 +1,19 @@
 pipeline {
   agent any
   stages {
-    stage('Build') {
-      parallel {
-        stage('Get dependencies') {
-          steps {
-            sh '''mix deps.get
-'''
-          }
-        }
-        stage('Compile dependencies') {
-          steps {
-            sh 'mix deps.compile'
-          }
-        }
-        stage('Compile app') {
-          steps {
-            sh 'mix compile'
-          }
-        }
+    stage('Get dependencies') {
+      steps {
+        sh 'mix deps.get'
+      }
+    }
+    stage('Compile dependencies') {
+      steps {
+        sh 'mix deps.compile'
+      }
+    }
+    stage('Compile app') {
+      steps {
+        sh 'mix compile'
       }
     }
     stage('Test') {
