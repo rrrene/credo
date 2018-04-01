@@ -80,6 +80,7 @@ clone_and_test https://github.com/elixir-lang/flow.git flow
 clone_and_test https://github.com/elixir-lang/gettext.git gettext
 clone_and_test https://github.com/elixir-lang/gen_stage.git gen_stage
 clone_and_test https://github.com/elixir-ecto/ecto.git ecto
+clone_and_test https://github.com/elixir-plug/plug.git plug
 
 # Phoenix
 clone_and_test https://github.com/phoenixframework/phoenix.git phoenix
