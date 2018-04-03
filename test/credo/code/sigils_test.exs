@@ -151,4 +151,24 @@ defmodule Credo.Code.SigilsTest do
 
     assert expected == source |> Sigils.replace_with_spaces("")
   end
+
+  test "it should remove sigils with interpolation 4" do
+    source = ~S"""
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        assert xpath(feed, ~x"/rss/channel/title/text()"s) == "#{some.thing} on MyApp"
+      end
+    end
+    """
+
+    expected = ~S"""
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        assert xpath(feed, ~x""s) == "#{some.thing} on MyApp"
+      end
+    end
+    """
+
+    assert expected == source |> Sigils.replace_with_spaces("")
+  end
 end
