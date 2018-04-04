@@ -5,7 +5,7 @@ Credo.Test.Application.start([], [])
 ExUnit.start()
 
 check_version =
-  ~w()
+  ~w(1.6.5)
   |> Enum.reduce([], fn version, acc ->
     # allow -dev versions so we can test before the Elixir release.
     if System.version() |> Version.match?("< #{version}-dev") do

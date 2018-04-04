@@ -349,4 +349,43 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/ modifier" do
+    source = ~S"""
+    ~x"sigil content"s == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content"s == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/ multiple modifiers" do
+    source = ~S"""
+    ~x"sigil content"si == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content"si == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/o modifier" do
+    source = ~S"""
+    ~x"sigil content" == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content" == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
