@@ -9,6 +9,7 @@ defmodule Credo.Code.InterpolationHelper do
     lines = String.split(source, "\n")
 
     positions
+    |> Enum.reverse()
     |> Enum.reduce(lines, &replace_line(&1, &2, char))
     |> Enum.join("\n")
   end
