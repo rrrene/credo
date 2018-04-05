@@ -36,7 +36,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       wanted_token = {:identifier, {4, 14, nil}, :parameter}
       wanted_tokens = wanted_token
 
-      expected = {:parameter, [line: 5], nil}
+      expected = [{:parameter, [line: 4, column: 14], nil}]
 
       tokens = Credo.Code.to_tokens(source)
       {:ok, ast} = Credo.Code.ast(source)

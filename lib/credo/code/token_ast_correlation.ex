@@ -21,40 +21,34 @@ defmodule Credo.Code.TokenAstCorrelation do
   end
 
   #
-  #
-  #
 
   def find_tokens_in_ast(wanted_token, tokens, ast) do
     {prev, current, next} = find_current_prev_next_token(tokens, wanted_token)
     position = Credo.Code.Token.position(current)
 
-    {line_no_start, _col_start, line_no_end, _col_end} = position
+    {line_no_start, col_start, line_no_end, _col_end} = position
 
-    line_ast =
-      Credo.Code.prewalk(ast, &traverse_ast(&1, &2, line_no_start, line_no_end))
-      |> IO.inspect(label: "prewalk")
-
-    Credo.Code.postwalk(line_ast, &traverse_line(&1, &2))
-    |> IO.inspect(label: "postwalk")
+    Credo.Code.prewalk(ast, &traverse_ast_for_token(&1, &2, wanted_token))
+    |> IO.inspect(label: "prewalk")
   end
 
-  defp traverse_ast({_, meta, _} = ast, acc, line_no_start, line_no_end) do
-    if meta[:line] >= line_no_start and meta[:line] <= line_no_end do
+  #
+
+  defp traverse_ast_for_token({_name, meta, _arguments} = ast, acc, token) do
+    {line_no_start, col_start, _line_no_end, _col_end} = Credo.Code.Token.position(token)
+
+    if meta[:line] == line_no_start && meta[:column] == col_start do
       {nil, acc ++ [ast]}
     else
       {ast, acc}
     end
   end
 
-  defp traverse_ast(ast, acc, _line_no_start, _line_no_end) do
+  defp traverse_ast_for_token(ast, acc, _token) do
     {ast, acc}
   end
 
   #
-
-  defp traverse_line(ast, acc) do
-    {ast, acc}
-  end
 
   defp find_current_prev_next_token(tokens, token) do
     [result] = traverse_prev_current_next(tokens, &matching_location(token, &1, &2, &3, &4), [])
