@@ -49,44 +49,101 @@ defmodule Credo.Check.CodeHelperTest do
   end
 
   test "it should NOT report expected code" do
+    source = """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        parameter1 + " this is a string" # WARNING: NÃO ESTÁ A FUNCIONAR
+      end
+    end
+    """
+
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \" \n  end\nend\n"
 
-    source_file =
-      """
-      defmodule CredoSampleModule do
-        def some_function(parameter1, parameter2) do
-          parameter1 + " this is a string" # WARNING: NÃO ESTÁ A FUNCIONAR
-        end
-      end
-      """
-      |> to_source_file
-
-    assert expected ==
-             source_file
-             |> CodeHelper.clean_charlists_strings_sigils_and_comments()
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code 2" do
+    source = """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        parameter1 + " this is a string"# tell the most browser´s to open
+      end
+    end
+    """
+
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \"\n  end\nend\n"
 
-    source_file =
-      """
-      defmodule CredoSampleModule do
-        def some_function(parameter1, parameter2) do
-          parameter1 + " this is a string"# tell the most browser´s to open
-        end
-      end
-      """
-      |> to_source_file
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+  end
 
-    assert expected ==
-             source_file
-             |> CodeHelper.clean_charlists_strings_sigils_and_comments()
+  test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
+    source = ~S"""
+    defmodule Foo do
+      def foo(a) do
+        "#{a} #{a}"
+      end
+
+      def bar do
+        " )"
+      end
+    end
+    """
+
+    expected = ~S"""
+    defmodule Foo do
+      def foo(a) do
+        "         "
+      end
+
+      def bar do
+        "  "
+      end
+    end
+    """
+
+    assert expected == CodeHelper.clean_charlists_strings_and_sigils(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments" do
+    source = ~S"""
+    defmodule Foo do
+      def foo(a) do
+        "#{a} #{a}"
+      end
+
+      def bar do
+        " )"
+      end
+    end
+    """
+
+    expected = ~S"""
+    defmodule Foo do
+      def foo(a) do
+        "         "
+      end
+
+      def bar do
+        "  "
+      end
+    end
+    """
+
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+  end
+
+  test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments /2" do
+    source = """
+    defmodule CredoSampleModule do
+      def fun do
+        # '
+        ','
+      end
+    end
+    """
+
     expected =
       """
       defmodule CredoSampleModule do
@@ -98,21 +155,10 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> String.replace("*", "")
 
-    source_file =
-      """
-      defmodule CredoSampleModule do
-        def fun do
-          # '
-          ','
-        end
-      end
-      """
-      |> to_source_file
-
-    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source_file)
+    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
   end
 
-  test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
+  test "it should NOT report expected code on clean_charlists_strings_and_sigils /2" do
     expected =
       """
       defmodule CredoSampleModule do

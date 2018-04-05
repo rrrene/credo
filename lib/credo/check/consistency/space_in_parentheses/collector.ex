@@ -11,7 +11,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
 
   def collect_matches(source_file, _params) do
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments()
+    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
     |> Code.to_lines()
     |> Enum.reduce(%{}, &spaces/2)
   end
@@ -24,7 +24,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
       end
 
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments()
+    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
     |> Code.to_lines()
     |> List.foldr([], &locate(actual, &1, &2))
   end

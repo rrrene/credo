@@ -42,6 +42,22 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  test "should replace string interpolations with given non-character" do
+    source = ~S"""
+    def fun() do
+      a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
+    end
+    """
+
+    expected = ~S"""
+    def fun() do
+      a = "MyModule..SubModule."
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "")
+  end
+
   test "should replace string interpolations with given character /3" do
     source = ~S"""
     case category_count(issues, category) do
@@ -348,6 +364,30 @@ defmodule Credo.Code.InterpolationHelperTest do
     """
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  test "it should replace interpols" do
+    source = ~S"""
+    def foo(a) do
+      "#{a} #{a}"
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    expected = ~S"""
+    def foo(a) do
+      " "
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "")
   end
 
   @tag needs_elixir: "1.6.5"
