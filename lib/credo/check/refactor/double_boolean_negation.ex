@@ -43,26 +43,26 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
   end
 
   # Checking for `!!`
-  defp traverse({:!, [line: line_no], [{:!, _, ast}]}, issues, issue_meta) do
+  defp traverse({:!, meta, [{:!, _, ast}]}, issues, issue_meta) do
     issue =
       format_issue(
         issue_meta,
         message: "Double boolean negation found.",
         trigger: "!!",
-        line_no: line_no
+        line_no: meta[:line]
       )
 
     {ast, [issue | issues]}
   end
 
   # Checking for `not not`
-  defp traverse({:not, [line: line_no], [{:not, _, ast}]}, issues, issue_meta) do
+  defp traverse({:not, meta, [{:not, _, ast}]}, issues, issue_meta) do
     issue =
       format_issue(
         issue_meta,
         message: "Double boolean negation found.",
         trigger: "not not",
-        line_no: line_no
+        line_no: meta[:line]
       )
 
     {ast, [issue | issues]}

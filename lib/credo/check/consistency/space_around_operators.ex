@@ -173,12 +173,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp create_issue_really?(location, tokens, ast, issue_meta) do
-    result =
-      find_current_prev_next_token(tokens, location)
-      |> IO.inspect(label: "tokens")
+    result = find_current_prev_next_token(tokens, location)
+    # |> IO.inspect(label: "tokens")
 
     find_ast_elements(ast, result)
-    |> IO.inspect(label: "ast")
+    # |> IO.inspect(label: "ast")
 
     # analyse_ast_and_tokens_together
 
@@ -190,7 +189,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp find_current_prev_next_token(tokens, location) do
     location_tuple = {location[:line_no], location[:column], location[:trigger]}
 
-    IO.inspect(location_tuple, label: "location_tuple")
+    # IO.inspect(location_tuple, label: "location_tuple")
 
     [result] =
       tokens

@@ -45,11 +45,13 @@ defmodule Credo.Check.Readability.StringSigils do
   end
 
   def traverse(
-        {maybe_sigil, [line: line_no], [str | rest_ast]} = ast,
+        {maybe_sigil, meta, [str | rest_ast]} = ast,
         issues,
         issue_meta,
         maximum_allowed_quotes
       ) do
+    line_no = meta[:line]
+
     cond do
       is_sigil(maybe_sigil) ->
         {rest_ast, issues}

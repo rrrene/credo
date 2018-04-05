@@ -70,7 +70,7 @@ defmodule Credo.Code do
 
   def ast(source, filename \\ "nofilename") when is_binary(source) do
     try do
-      case Code.string_to_quoted(source, line: 1) do
+      case Code.string_to_quoted(source, line: 1, columns: true) do
         {:ok, value} ->
           {:ok, value}
 

@@ -40,10 +40,12 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
 
   for op <- @def_ops do
     defp traverse(
-           {unquote(op), _, [{_, _, _}, [do: {:try, [line: line_no], _}]]} = ast,
+           {unquote(op), _, [{_, _, _}, [do: {:try, meta, _}]]} = ast,
            issues,
            issue_meta
          ) do
+      line_no = meta[:line]
+
       {ast, issues ++ [issue_for(issue_meta, line_no)]}
     end
   end

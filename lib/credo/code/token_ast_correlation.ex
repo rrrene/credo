@@ -7,62 +7,17 @@ defmodule Credo.Code.TokenAstCorrelation do
   def ast(source) do
     {:ok, ast} = Credo.Code.ast(source)
 
-    tokens =
-      Credo.Code.to_tokens(source)
-      |> Enum.group_by(fn token ->
-        {line_no, _, _, _} = Token.position(token)
+    #    tokens =
+    #      Credo.Code.to_tokens(source)
+    #      |> Enum.group_by(fn token ->
+    #        {line_no, _, _, _} = Token.position(token)
+    #
+    #        line_no
+    #      end)
+    #
+    #    lines = Credo.Code.to_lines(source) |> Enum.into(%{})
 
-        line_no
-      end)
-
-    lines = Credo.Code.to_lines(source) |> Enum.into(%{})
-
-    {ast, _acc} = Macro.postwalk(ast, {[], 0}, &traverse_post(&1, &2, tokens, lines))
     ast
-  end
-
-  defp traverse_post({_, meta, _} = ast, {acc, counter}, token_map, source_map) do
-    counter |> IO.inspect(label: "counter")
-    ast |> IO.inspect(label: "ast")
-
-    tokens = token_map[meta[:line]]
-
-    IO.inspect(tokens, label: "tokens")
-
-    line = source_map[meta[:line]]
-
-    IO.inspect(line, label: "line")
-
-    string = Macro.to_string(ast)
-
-    string_matches =
-      Regex.run(~r/\b#{string}\b/, line, return: :index)
-      |> IO.inspect()
-
-    column = nil
-
-    column =
-      case string_matches do
-        [{col, _}] ->
-          col + 1
-
-        _ ->
-          column
-      end
-
-    ast2 = Macro.update_meta(ast, &(&1 ++ [__column__: column]))
-
-    IO.puts("")
-
-    {ast2, {acc, counter + 1}}
-  end
-
-  defp traverse_post(ast, {acc, counter}, _tokens, _source_map) do
-    # ast |> IO.inspect()
-
-    # IO.puts("")
-
-    {ast, {acc, counter + 1}}
   end
 
   #

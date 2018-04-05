@@ -117,47 +117,50 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       {:ok, ast} = Credo.Code.ast(source)
 
       expected =
-        {:defmodule, [line: 1],
+        {:defmodule, [line: 1, column: 1],
          [
-           {:__aliases__, [line: 1], [:Credo, :Sample]},
+           {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
            [
              do:
                {:__block__, [],
                 [
-                  {:@, [line: 2], [{:test_attribute, [line: 2], [:foo]}]},
-                  {:def, [line: 4],
+                  {:@, [line: 2, column: 3], [{:test_attribute, [line: 2, column: 4], [:foo]}]},
+                  {:def, [line: 4, column: 3],
                    [
-                     {:foobar, [line: 4], [{:parameter, [line: 4], nil}]},
+                     {:foobar, [line: 4, column: 7], [{:parameter, [line: 4, column: 14], nil}]},
                      [
                        do:
-                         {:+, [line: 5],
+                         {:+, [line: 5, column: 29],
                           [
-                            {{:., [line: 5], [{:__aliases__, [line: 5], [:String]}, :split]},
-                             [line: 5], [{:parameter, [line: 5], nil}]},
-                            {:parameter, [line: 5], nil}
+                            {{:., [line: 5, column: 11],
+                              [{:__aliases__, [line: 5, column: 5], [:String]}, :split]},
+                             [line: 5, column: 11], [{:parameter, [line: 5, column: 18], nil}]},
+                            {:parameter, [line: 5, column: 31], nil}
                           ]}
                      ]
                    ]},
-                  {:defmodule, [line: 8],
+                  {:defmodule, [line: 8, column: 3],
                    [
-                     {:__aliases__, [line: 8], [:InlineModule]},
+                     {:__aliases__, [line: 8, column: 13], [:InlineModule]},
                      [
                        do:
-                         {:def, [line: 9],
+                         {:def, [line: 9, column: 5],
                           [
-                            {:when, [line: 9],
+                            {:when, [line: 9, column: 19],
                              [
-                               {:foobar, [line: 9], [{:v, [line: 9], nil}]},
-                               {:is_atom, [line: 9], [{:v, [line: 9], nil}]}
+                               {:foobar, [line: 9, column: 9],
+                                [{:v, [line: 9, column: 16], nil}]},
+                               {:is_atom, [line: 9, column: 24],
+                                [{:v, [line: 9, column: 32], nil}]}
                              ]},
                             [
                               do:
-                                {:=, [line: 10],
+                                {:=, [line: 10, column: 13],
                                  [
-                                   {:{}, [line: 10], [:ok]},
-                                   {{:., [line: 10],
-                                     [{:__aliases__, [line: 10], [:File]}, :read]}, [line: 10],
-                                    []}
+                                   {:{}, [line: 10, column: 7], [:ok]},
+                                   {{:., [line: 10, column: 19],
+                                     [{:__aliases__, [line: 10, column: 15], [:File]}, :read]},
+                                    [line: 10, column: 19], []}
                                  ]}
                             ]
                           ]}
@@ -245,53 +248,52 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       ast = TokenAstCorrelation.ast(source)
 
       expected =
-        {:defmodule, [line: 1, __column__: 1],
+        {:defmodule, [line: 1, column: 1],
          [
-           {:__aliases__, [line: 1, __column__: 11], [:Credo, :Sample]},
+           {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
            [
              do:
-               {:defmodule, [line: 2, __column__: 3],
+               {:defmodule, [line: 2, column: 3],
                 [
-                  {:__aliases__, [line: 2, __column__: 13], [:InlineModule]},
+                  {:__aliases__, [line: 2, column: 13], [:InlineModule]},
                   [
                     do:
-                      {:def, [line: 3, __column__: 5],
+                      {:def, [line: 3, column: 5],
                        [
-                         {:foobar, [line: 3, __column__: 9],
-                          [{:x, [line: 3, __column__: 16], nil}]},
+                         {:foobar, [line: 3, column: 9], [{:x, [line: 3, column: 16], nil}]},
                          [
                            do:
-                             {:=, [line: 4, __column__: 9],
+                             {:=, [line: 4, column: 9],
                               [
-                                {:x, [line: 4, __column__: 7], nil},
-                                {:f, [line: 4, __column__: 11],
+                                {:x, [line: 4, column: 7], nil},
+                                {:f, [line: 4, column: 11],
                                  [
-                                   {:g, [line: 4, __column__: 13],
+                                   {:g, [line: 4, column: 13],
                                     [
-                                      {:h, [line: 4, __column__: 15],
-                                       [{:a, [line: 4, __column__: 17], nil}]},
-                                      {:b, [line: 4, __column__: 21], nil}
+                                      {:h, [line: 4, column: 15],
+                                       [{:a, [line: 4, column: 17], nil}]},
+                                      {:b, [line: 4, column: 21], nil}
                                     ]},
-                                   {:*, [line: 4, __column__: 44],
+                                   {:*, [line: 4, column: 44],
                                     [
-                                      {:k, [line: 4, __column__: 25],
+                                      {:k, [line: 4, column: 25],
                                        [
-                                         {:+, [line: 4, __column__: 34],
+                                         {:+, [line: 4, column: 34],
                                           [
-                                            {:i, [line: 4, __column__: 27],
+                                            {:i, [line: 4, column: 27],
                                              [
-                                               {:-, [line: 4, __column__: 30],
-                                                [{:c, [line: 4, __column__: 29], nil}, 1]}
+                                               {:-, [line: 4, column: 30],
+                                                [{:c, [line: 4, column: 29], nil}, 1]}
                                              ]},
-                                            {:j, [line: 4, __column__: 36],
+                                            {:j, [line: 4, column: 36],
                                              [
-                                               {:-, [line: 4, __column__: 39],
-                                                [{:d, [line: 4, __column__: 38], nil}, 2]}
+                                               {:-, [line: 4, column: 39],
+                                                [{:d, [line: 4, column: 38], nil}, 2]}
                                              ]}
                                           ]}
                                        ]},
-                                      {:l, [line: 4, __column__: 46],
-                                       [{:e, [line: 4, __column__: 48], nil}]}
+                                      {:l, [line: 4, column: 46],
+                                       [{:e, [line: 4, column: 48], nil}]}
                                     ]}
                                  ]}
                               ]}
