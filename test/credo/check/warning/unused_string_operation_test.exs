@@ -398,9 +398,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
           case check do
             true -> false
             _ ->
-              Enum.reduce(arr, fn(w) ->
-                [:this_goes_nowhere, String.duplicate("^", w)]
-              end)
+              [:this_goes_nowhere, String.duplicate("^", w)]
           end
         end
 

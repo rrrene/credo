@@ -20,7 +20,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.join(parameter1)
-        |>  some_where
+        |> some_where
 
         parameter1
       end
@@ -76,26 +76,26 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   test "it should NOT report a violation when inside a condition" do
     """
     defmodule CredoSampleModule do
-    def some_function(parameter1, parameter2) do
-      if Enum.count(x1) > Enum.count(x2) do
-        cond do
-          Enum.count(x3) == "" -> IO.puts("1")
-          Enum.count(x) == 15 -> IO.puts("2")
-          Enum.at(x3, 1) == "b" -> IO.puts("2")
+      def some_function(parameter1, parameter2) do
+        if Enum.count(x1) > Enum.count(x2) do
+          cond do
+            Enum.count(x3) == "" -> IO.puts("1")
+            Enum.count(x) == 15 -> IO.puts("2")
+            Enum.at(x3, 1) == "b" -> IO.puts("2")
+          end
+        else
+          case Enum.count(x3) do
+            0 -> true
+            1 -> false
+            _ -> something
+          end
         end
-      else
-        case Enum.count(x3) do
-          0 -> true
-          1 -> false
-          _ -> something
+        unless Enum.count(x4) == "" do
+          IO.puts "empty"
         end
-      end
-      unless Enum.count(x4) == "" do
-        IO.puts "empty"
-      end
 
-      parameter1 + parameter2 + offset
-    end
+        parameter1 + parameter2 + offset
+      end
     end
     """
     |> to_source_file
@@ -105,13 +105,13 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   test "it should NOT report a violation when inside a quote" do
     """
     defmodule CredoSampleModule do
-    defp category_body(nil) do
-      quote do
-        __MODULE__
-        |> Module.split
-        |> Enum.at(2)
+      defp category_body(nil) do
+        quote do
+          __MODULE__
+          |> Module.split
+          |> Enum.at(2)
+        end
       end
-    end
     end
     """
     |> to_source_file
@@ -496,9 +496,60 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for last statement before rescue" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        Enum.empty?(configs)
+      rescue
+        _ ->
+          raise "whatever"
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for last statement before rescue /2" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        try do
+          Enum.empty?(configs)
+        rescue
+          _ ->
+            raise "whatever"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   #
   #
+
+  test "it should report a violation when NOT the last statement in rescue block" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        try do
+          configs
+        rescue
+          _ ->
+            Enum.empty?(configs)
+
+            raise "whatever"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 
   test "it should report a violation for Enum.map inside Agent.update" do
     """
@@ -638,11 +689,12 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           IO.puts "."
         else
           case check do
-            true -> false
+            true ->
+              false
             _ ->
               # this goes nowhere!
               Enum.map(arr, fn(w) ->
-                [:this_goes_nowhere, Enum.join(w, ",")]
+                [:this_goes_nowhere, Enum.join(w, ",")] # <-- this one is not counted
               end)
           end
         end
@@ -652,7 +704,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do

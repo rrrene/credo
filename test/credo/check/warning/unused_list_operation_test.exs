@@ -435,7 +435,7 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
             true -> false
             _ ->
               List.foldr(arr, [], fn(w) ->
-                [:this_goes_nowhere, List.to_tuple(w, ",")]
+                [:this_goes_nowhere, x]
               end)
           end
         end
@@ -445,7 +445,7 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do

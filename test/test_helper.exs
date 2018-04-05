@@ -111,7 +111,15 @@ defmodule CredoCheckCase do
   end
 
   defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
-    Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(exec)))
+    source_files
+    |> Enum.flat_map(&get_issues_from_source_file(&1, exec))
+    |> Enum.map(fn
+      %Credo.Issue{} = issue ->
+        issue
+
+      value ->
+        raise "Expected %Issue{}, got: #{inspect(value)}"
+    end)
   end
 
   defp issues_for(source_files, check, _exec, params)

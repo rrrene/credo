@@ -571,8 +571,9 @@ defmodule Credo.Check.Warning.UnusedPathOperationTest do
           case check do
             true -> false
             _ ->
+              # this goes nowhere!
               Path.reduce(arr, fn(w) ->
-                [:this_goes_nowhere, Path.join(w, ",")]
+                [w, x]
               end)
           end
         end
@@ -582,7 +583,7 @@ defmodule Credo.Check.Warning.UnusedPathOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
