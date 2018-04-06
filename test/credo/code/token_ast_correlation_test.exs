@@ -34,14 +34,12 @@ defmodule Credo.Code.TokenAstCorrelationTest do
     test "should give correct result for source_example1" do
       source = @source_example1
       wanted_token = {:identifier, {4, 14, nil}, :parameter}
-      wanted_tokens = wanted_token
 
       expected = [{:parameter, [line: 4, column: 14], nil}]
 
-      tokens = Credo.Code.to_tokens(source)
       {:ok, ast} = Credo.Code.ast(source)
 
-      assert expected == TokenAstCorrelation.find_tokens_in_ast(wanted_token, tokens, ast)
+      assert expected == TokenAstCorrelation.find_tokens_in_ast(wanted_token, ast)
     end
 
     test "should give correct tokens for source_example1" do
