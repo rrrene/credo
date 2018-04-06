@@ -1,7 +1,5 @@
 defmodule Credo.Code.TokenAstCorrelation do
   if Version.match?(System.version(), ">= 1.6.0-rc") do
-    alias Credo.Code.Token
-
     # Elixir >= 1.6.0
     def find_tokens_in_ast(wanted_token, ast) do
       Credo.Code.prewalk(ast, &traverse_ast_for_token(&1, &2, wanted_token))
@@ -9,7 +7,7 @@ defmodule Credo.Code.TokenAstCorrelation do
 
     defp traverse_ast_for_token({:., meta, arguments} = ast, acc, token)
          when is_list(arguments) do
-      {line_no_start, col_start, _line_no_end, _col_end} = Token.position(token)
+      {line_no_start, col_start, _line_no_end, _col_end} = Credo.Code.Token.position(token)
 
       if meta[:line] == line_no_start && meta[:column] == col_start - 1 do
         {nil, acc ++ [ast]}
@@ -19,7 +17,7 @@ defmodule Credo.Code.TokenAstCorrelation do
     end
 
     defp traverse_ast_for_token({_name, meta, _arguments} = ast, acc, token) do
-      {line_no_start, col_start, _line_no_end, _col_end} = Token.position(token)
+      {line_no_start, col_start, _line_no_end, _col_end} = Credo.Code.Token.position(token)
 
       if meta[:line] == line_no_start && meta[:column] == col_start do
         {nil, acc ++ [ast]}
