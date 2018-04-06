@@ -243,7 +243,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
 
     test "should give correct ast for source_example2" do
       source = @source_example2
-      ast = TokenAstCorrelation.ast(source)
+      {:ok, ast} = Credo.Code.ast(source)
 
       expected =
         {:defmodule, [line: 1, column: 1],

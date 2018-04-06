@@ -1,26 +1,6 @@
 defmodule Credo.Code.TokenAstCorrelation do
-  #
-  #
-  #
   alias Credo.Code.Token
 
-  def ast(source) do
-    {:ok, ast} = Credo.Code.ast(source)
-
-    #    tokens =
-    #      Credo.Code.to_tokens(source)
-    #      |> Enum.group_by(fn token ->
-    #        {line_no, _, _, _} = Token.position(token)
-    #
-    #        line_no
-    #      end)
-    #
-    #    lines = Credo.Code.to_lines(source) |> Enum.into(%{})
-
-    ast
-  end
-
-  #
   def find_tokens_in_ast(wanted_token, ast)
 
   if Version.match?(System.version(), ">= 1.6.0-rc") do
@@ -40,6 +20,16 @@ defmodule Credo.Code.TokenAstCorrelation do
   end
 
   #
+
+  defp traverse_ast_for_token({:., meta, arguments} = ast, acc, token) when is_list(arguments) do
+    {line_no_start, col_start, _line_no_end, _col_end} = Token.position(token)
+
+    if meta[:line] == line_no_start && meta[:column] == col_start - 1 do
+      {nil, acc ++ [ast]}
+    else
+      {ast, acc}
+    end
+  end
 
   defp traverse_ast_for_token({_name, meta, _arguments} = ast, acc, token) do
     {line_no_start, col_start, _line_no_end, _col_end} = Token.position(token)
