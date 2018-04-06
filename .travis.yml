@@ -9,6 +9,8 @@ otp_release:
   - 19.3
   - 20.3
 script:
+  - mix deps.compile
+  - mix compile --warnings-as-errors
   - mix test
   - ./test/smoke_test.sh
   - ./test/check_formatted.sh
