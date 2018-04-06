@@ -6,17 +6,13 @@ defmodule Credo.Code.TokenAstCorrelation do
   if Version.match?(System.version(), ">= 1.6.0-rc") do
     # Elixir >= 1.6.0
     def find_tokens_in_ast(wanted_token, ast) do
-      do_find_tokens_in_ast(wanted_token, ast)
+      Credo.Code.prewalk(ast, &traverse_ast_for_token(&1, &2, wanted_token))
     end
   else
     # Elixir <= 1.5.x
-    def find_tokens_in_ast(wanted_token, ast) do
+    def find_tokens_in_ast(_wanted_token, _ast) do
       nil
     end
-  end
-
-  defp do_find_tokens_in_ast(wanted_token, ast) do
-    Credo.Code.prewalk(ast, &traverse_ast_for_token(&1, &2, wanted_token))
   end
 
   #

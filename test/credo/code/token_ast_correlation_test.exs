@@ -1,36 +1,34 @@
 defmodule Credo.Code.TokenAstCorrelationTest do
   use Credo.TestHelper
 
-  alias Credo.Code.TokenAstCorrelation
-
-  @source_example1 """
-  defmodule Credo.Sample do
-    @test_attribute :foo
-
-    def foobar(parameter) do
-      String.split(parameter) + parameter
-    end
-
-    defmodule InlineModule do
-      def foobar(v) when is_atom(v) do
-        {:ok} = File.read
-      end
-    end
-  end
-  """
-
-  @source_example2 """
-  defmodule Credo.Sample do
-    defmodule InlineModule do
-      def foobar(x) do
-        x = f(g(h(a), b), k(i(c-1) + j(d-2)) * l(e))
-      end
-    end
-  end
-  """
-
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do
+    @source_example1 """
+    defmodule Credo.Sample do
+      @test_attribute :foo
+
+      def foobar(parameter) do
+        String.split(parameter) + parameter
+      end
+
+      defmodule InlineModule do
+        def foobar(v) when is_atom(v) do
+          {:ok} = File.read
+        end
+      end
+    end
+    """
+
+    @source_example2 """
+    defmodule Credo.Sample do
+      defmodule InlineModule do
+        def foobar(x) do
+          x = f(g(h(a), b), k(i(c-1) + j(d-2)) * l(e))
+        end
+      end
+    end
+    """
+
     test "should give correct result for source_example1" do
       source = @source_example1
       wanted_token = {:identifier, {4, 14, nil}, :parameter}
@@ -39,7 +37,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
 
       {:ok, ast} = Credo.Code.ast(source)
 
-      assert expected == TokenAstCorrelation.find_tokens_in_ast(wanted_token, ast)
+      assert expected == Credo.Code.TokenAstCorrelation.find_tokens_in_ast(wanted_token, ast)
     end
 
     test "should give correct tokens for source_example1" do

@@ -18,14 +18,14 @@ defmodule Credo.Code.TokenTest do
   @single_interpolations_bin_string_source ~S[a = "MyModule.SubModule.#{name}"]
   @single_interpolations_bin_string_position {1, 5, 1, 33}
 
-  @single_interpolations_list_string_source ~S[a = 'MyModule.SubModule.#{name}']
-  @single_interpolations_list_string_position {1, 5, 1, 33}
-
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_position {1, 7, 1, 10}
 
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do
+    @single_interpolations_list_string_source ~S[a = 'MyModule.SubModule.#{name}']
+    @single_interpolations_list_string_position {1, 5, 1, 33}
+
     @tag :token_position
     test "should give correct token position" do
       source = @no_interpolations_source
