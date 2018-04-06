@@ -185,6 +185,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     case find_prev_current_next_token(tokens, location_tuple) do
       {prev, _current, _next} ->
         Credo.Code.TokenAstCorrelation.find_tokens_in_ast(prev, ast)
+        |> List.wrap()
         |> List.first()
         |> is_parameter_in_function_call()
 

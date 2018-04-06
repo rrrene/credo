@@ -54,8 +54,13 @@ defmodule Credo.Check.Readability.ModuleNames do
   end
 
   def issues_for_name(name, meta, issues, issue_meta) do
-    if name |> to_string |> String.split(".")
-       |> Enum.all?(&Name.pascal_case?/1) do
+    all_pascal_case? =
+      name
+      |> to_string
+      |> String.split(".")
+      |> Enum.all?(&Name.pascal_case?/1)
+
+    if all_pascal_case? do
       issues
     else
       [issue_for(issue_meta, meta[:line], name) | issues]
