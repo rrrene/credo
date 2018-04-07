@@ -50,7 +50,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       {:atom, _, _} ->
         true
 
-      # ElixirModule (Elxiir >= 1.6.0)
+      # ElixirModule (Elixir >= 1.6.0)
       {:alias, _, _} ->
         true
 
@@ -62,11 +62,21 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       {:identifier, _, _} ->
         true
 
+      # unquote
+      {:paren_identifier, _, :unquote} ->
+        true
+
       # @module_attribute
       {:at_op, _, _} ->
         true
 
       {:., _} ->
+        true
+
+      {:"(", _} ->
+        true
+
+      {:")", _} ->
         true
 
       _ ->

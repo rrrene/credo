@@ -44,6 +44,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
       # Fine
       defp format_value("NPC_", "NPDT", <<skills::binary-27>>) do
+        {time, r} = :timer.tc(&unquote(module).unquote(part)/0)
       end
 
       # Gives warning
