@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1
+
+- Fix false positive in SpaceAroundOperators
+- Fix false positive in UnusedEnumOperation
+
 ## 0.9.0
 
 - Add JSON support
