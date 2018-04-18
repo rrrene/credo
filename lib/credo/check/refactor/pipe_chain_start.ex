@@ -21,7 +21,10 @@ defmodule Credo.Check.Refactor.PipeChainStart do
 
   @explanation [
     check: @moduledoc,
-    excluded_functions: "All functions listed will be ignored."
+    params: [
+      excluded_functions: "All functions listed will be ignored.",
+      excluded_argument_types: "All pipes with argument types listed will be ignored."
+    ]
   ]
   @default_params [excluded_argument_types: [], excluded_functions: []]
 
