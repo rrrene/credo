@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2
+
+- Add `:ignore_comments` param to LongQuoteBlocks
+- Fix false positive in UnusedPathOperation
+
 ## 0.9.1
 
 - Fix false positive in SpaceAroundOperators
