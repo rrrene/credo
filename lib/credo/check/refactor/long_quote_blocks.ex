@@ -72,15 +72,14 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
 
   use Credo.Check, base_priority: :high
 
+  alias Credo.IssueMeta
+
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_line_count = Params.get(params, :max_line_count, @default_params)
 
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, max_line_count)
-    )
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_line_count))
   end
 
   defp traverse(
@@ -94,7 +93,18 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
 
     issue =
       if line_count > max_line_count do
-        issue_for(issue_meta, meta[:line])
+        source_file = IssueMeta.source_file(issue_meta)
+
+        lines =
+          Credo.Code.to_lines(source_file)
+          |> Enum.slice(meta[:line] - 1, line_count)
+          |> Enum.reject(fn {_line_no, line} ->
+            Regex.run(~r/^\s*#/, line)
+          end)
+
+        if Enum.count(lines) > max_line_count do
+          issue_for(issue_meta, meta[:line])
+        end
       end
 
     {ast, issues ++ List.wrap(issue)}

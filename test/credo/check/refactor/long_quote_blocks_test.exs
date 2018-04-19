@@ -23,6 +23,34 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should report a violation 2" do
+    """
+    defmodule CredoSampleModule do
+      defmacro __using__(opts) do
+        quote do
+          def some_fun do
+            # This
+            # is
+            # a
+            # rather
+            # long
+            # comment
+            # block
+            # ...
+            some_stuff()
+          end
+
+          def some_fun do
+            some_stuff()
+          end
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, max_line_count: 7)
+  end
+
   #
   # cases raising issues
   #
