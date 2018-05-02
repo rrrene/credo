@@ -143,7 +143,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> assert_issue(@described_check)
   end
   
-  test "it should report a violation for :unless with nested match" do
+  test "it should not crash with ecto query" do
 """
 defmodule CredoSampleModule do
 
