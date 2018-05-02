@@ -51,6 +51,11 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # Skip if arguments is not enumerable
+  defp traverse({_op, _meta, nil} = ast, issues, _source_file) do
+    {ast, issues}
+  end
+
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
       # remove do/else blocks
