@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.3
+
+- Fix false positive in MatchInConditionTest
+- Fix bug in Scope
+
 ## 0.9.2
 
 - Add `:ignore_comments` param to LongQuoteBlocks
