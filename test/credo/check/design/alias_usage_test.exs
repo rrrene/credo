@@ -241,6 +241,11 @@ defmodule Credo.Check.Design.AliasUsageTest do
             alias unquote(module).Socket.test2
             alias unquote(module)
           end
+          defmodule unquote(module).Thing.Foo do
+            alias Socket.unquote(module).test1
+            alias unquote(module).Socket.test2
+            alias unquote(module)
+          end
         end
       end
     end

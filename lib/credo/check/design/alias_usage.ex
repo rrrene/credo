@@ -136,6 +136,20 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, issues}
   end
 
+  # Ignore alias containg an `unquote` call
+  defp find_issues(
+         {:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast,
+         issues,
+         _,
+         _,
+         _,
+         _,
+         _
+       )
+       when is_list(mod_list) do
+    {ast, issues}
+  end
+
   defp find_issues(
          {:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast,
          issues,
@@ -148,6 +162,9 @@ defmodule Credo.Check.Design.AliasUsage do
        when is_list(mod_list) and is_atom(fun_atom) do
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
+        {ast, issues}
+
+      Enum.any?(mod_list, &unquote?/1) ->
         {ast, issues}
 
       excluded_lastname_or_namespace?(
@@ -173,6 +190,9 @@ defmodule Credo.Check.Design.AliasUsage do
   defp find_issues(ast, issues, _, _, _, _, _) do
     {ast, issues}
   end
+
+  defp unquote?({:unquote, _, arguments}) when is_list(arguments), do: true
+  defp unquote?(_), do: false
 
   defp excluded_lastname_or_namespace?(
          mod_list,
