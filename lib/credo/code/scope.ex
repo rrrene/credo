@@ -39,12 +39,23 @@ defmodule Credo.Code.Scope do
   def name(ast, line: line) do
     result =
       case find_scope(ast, line, [], nil) do
-        nil -> name(ast, line: line - 1)
-        {op, list} -> {op, Enum.join(list, ".")}
+        nil ->
+          name(ast, line: line - 1)
+
+        {op, list} ->
+          name =
+            list
+            |> Enum.map(&name_to_string/1)
+            |> Enum.join(".")
+
+          {op, name}
       end
 
     result || {nil, ""}
   end
+
+  defp name_to_string(atom) when is_atom(atom), do: to_string(atom)
+  defp name_to_string(term), do: Macro.to_string(term)
 
   # Returns a List for the scope name
   defp find_scope({:__block__, _meta, arguments}, line, name_list, last_op) do
