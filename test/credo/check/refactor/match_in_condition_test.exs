@@ -39,6 +39,26 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should not crash with ecto query" do
+    """
+    defmodule CredoSampleModule do
+
+      def some_function(parameter1) do
+        query = from if in FooInterface,
+                 join: is in assoc(if, :instance),
+                 join: d in assoc(if, :device),
+                 where: fragment("upper(?->>'foo_id') = ?", if.opts, ^parameter1) and is.driver == ^"FooBar",
+                 preload: [device: d, instance: is]
+
+        Repo.all(query)
+      end
+
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
@@ -142,24 +162,4 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
-  
-  test "it should not crash with ecto query" do
-"""
-defmodule CredoSampleModule do
-
-  def some_function(parameter1) do
-    query = from if in FooInterface,
-             join: is in assoc(if, :instance),
-             join: d in assoc(if, :device),
-             where: fragment("upper(?->>'foo_id') = ?", if.opts, ^parameter1) and is.driver == ^"FooBar",
-             preload: [device: d, instance: is]
-
-    Repo.all(query)
-  end
-
-end
-""" |> to_source_file
-    |> assert_issue(@described_check)
-end
-  
 end
