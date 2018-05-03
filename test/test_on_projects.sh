@@ -19,20 +19,39 @@ CREDO_ARG5=$6
 clone_and_test() {
   GIT_REPO=$1
   PROJECT_NAME=$2
-  DIRNAME=tmp/$PROJECT_NAME
+  PROJECT_DIRNAME=tmp/$PROJECT_NAME
   METRIC="$METRIC_BASE,project=$PROJECT_NAME,branch=$GIT_BRANCH"
-  CMD="mix credo $DIRNAME --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
+  CMD="mix credo $PROJECT_DIRNAME --mute-exit-status --format json --strict $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5"
 
   echo ""
   echo "--> Cloning $PROJECT_NAME ..."
 
-  rm -fr $DIRNAME || true
-  git clone $GIT_REPO $DIRNAME --depth=1 --quiet
+  rm -fr $PROJECT_DIRNAME || true
+  git clone $GIT_REPO $PROJECT_DIRNAME --depth=1 --quiet
 
   echo "--> Analysing $PROJECT_NAME ..."
   echo ""
 
   benchmark "$CMD" "$METRIC"
+  #check_compatibility_with_formatter "$PROJECT_DIRNAME"
+}
+
+check_compatibility_with_formatter() {
+  PROJECT_DIRNAME=$1
+
+  cd $PROJECT_DIRNAME
+  rm .tool-versions || true
+
+  # format code
+  mix format {src,lib}/**/*.{ex,exs} || true
+
+  # there should not be any readbility or consistency issues after using the formatter
+  cd $PROJECT_ROOT
+  mix credo $PROJECT_DIRNAME \
+    --mute-exit-status \
+    --format json \
+    --only Readability,Consistency \
+    --ignore ModuleDoc,MultiAliasImportRequireUse,Specs,ParenthesesOnZeroArityDefs,PreferImplicitTry
 }
 
 benchmark() {
