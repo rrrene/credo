@@ -19,7 +19,7 @@ defmodule Credo.CLI.Options do
     help: :boolean,
     ignore_checks: :string,
     ignore: :string,
-    min_priority: :integer,
+    min_priority: :string,
     only: :string,
     read_from_stdin: :boolean,
     strict: :boolean,
@@ -52,14 +52,37 @@ defmodule Credo.CLI.Options do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
     {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
+    {switches_keywords, extra_unknown_switches} = patch_switches(switches_keywords)
+
     %__MODULE__{
       command: command,
       path: path,
       args: unknown_args,
       switches: Enum.into(switches_keywords, %{}),
-      unknown_switches: unknown_switches_keywords
+      unknown_switches: unknown_switches_keywords ++ extra_unknown_switches
     }
   end
+
+  defp patch_switches(switches_keywords) do
+    {switches, unknowns} = Enum.map_reduce(switches_keywords, [], &patch_switch/2)
+    switches = Enum.reject(switches, &(&1 == nil))
+    {switches, unknowns}
+  end
+
+  defp patch_switch({:min_priority, "high"}, unknowns), do: {{:min_priority, 20}, unknowns}
+  defp patch_switch({:min_priority, "medium"}, unknowns), do: {{:min_priority, 10}, unknowns}
+  defp patch_switch({:min_priority, "normal"}, unknowns), do: {{:min_priority, 0}, unknowns}
+  defp patch_switch({:min_priority, "low"}, unknowns), do: {{:min_priority, -2}, unknowns}
+  defp patch_switch({:min_priority, "lower"}, unknowns), do: {{:min_priority, -999}, unknowns}
+
+  defp patch_switch({:min_priority, str}, unknowns) do
+    case Integer.parse(str) do
+      {int, ""} -> {{:min_priority, int}, unknowns}
+      _ -> {nil, [{"--min-priority", str} | unknowns]}
+    end
+  end
+
+  defp patch_switch(switch, unknowns), do: {switch, unknowns}
 
   defp split_args([], current_dir, _) do
     {path, unknown_args} = extract_path([], current_dir)
