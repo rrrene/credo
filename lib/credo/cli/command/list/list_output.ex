@@ -29,6 +29,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
     List options:
       -a, --all             Show all issues
       -A, --all-priorities  Show all issues including low priority ones
+          --min-priority    Minimum priority to show issues (higher,high,normal,low,ignore or number)
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
