@@ -69,22 +69,19 @@ defmodule Credo.CLI.Options do
     {switches, unknowns}
   end
 
-  defp patch_switch({:min_priority, "high"}, unknowns),
-    do: {{:min_priority, 20}, unknowns}
-  defp patch_switch({:min_priority, "medium"}, unknowns),
-    do: {{:min_priority, 10}, unknowns}
-  defp patch_switch({:min_priority, "normal"}, unknowns),
-    do: {{:min_priority, 0}, unknowns}
-  defp patch_switch({:min_priority, "low"}, unknowns),
-    do: {{:min_priority, -2}, unknowns}
-  defp patch_switch({:min_priority, "lower"}, unknowns),
-    do: {{:min_priority, -999}, unknowns}
+  defp patch_switch({:min_priority, "high"}, unknowns), do: {{:min_priority, 20}, unknowns}
+  defp patch_switch({:min_priority, "medium"}, unknowns), do: {{:min_priority, 10}, unknowns}
+  defp patch_switch({:min_priority, "normal"}, unknowns), do: {{:min_priority, 0}, unknowns}
+  defp patch_switch({:min_priority, "low"}, unknowns), do: {{:min_priority, -2}, unknowns}
+  defp patch_switch({:min_priority, "lower"}, unknowns), do: {{:min_priority, -999}, unknowns}
+
   defp patch_switch({:min_priority, str}, unknowns) do
     case Integer.parse(str) do
       {int, ""} -> {{:min_priority, int}, unknowns}
       _ -> {nil, [{"--min-priority", str} | unknowns]}
     end
   end
+
   defp patch_switch(switch, unknowns), do: {switch, unknowns}
 
   defp split_args([], current_dir, _) do
