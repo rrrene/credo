@@ -66,47 +66,26 @@ defmodule Credo.CLI.Options do
   end
 
   defp parse_min_priority({[min_priority: "higher"] = switches, unknown_switches}) do
-    {
-      Keyword.put(switches, :min_priority, 20),
-      unknown_switches
-    }
+    {Keyword.put(switches, :min_priority, 20), unknown_switches}
   end
   defp parse_min_priority({[min_priority: "high"] = switches, unknown_switches}) do
-    {
-      Keyword.put(switches, :min_priority, 10),
-      unknown_switches
-    }
+    {Keyword.put(switches, :min_priority, 10), unknown_switches}
   end
   defp parse_min_priority({[min_priority: "normal"] = switches, unknown_switches}) do
-    {
-      Keyword.put(switches, :min_priority, 1),
-      unknown_switches
-    }
+    {Keyword.put(switches, :min_priority, 1), unknown_switches}
   end
   defp parse_min_priority({[min_priority: "low"] = switches, unknown_switches}) do
-    {
-      Keyword.put(switches, :min_priority, -10),
-      unknown_switches
-    }
+    {Keyword.put(switches, :min_priority, -10), unknown_switches}
   end
   defp parse_min_priority({[min_priority: "ignore"] = switches, unknown_switches}) do
-    {
-      Keyword.put(switches, :min_priority, -100),
-      unknown_switches
-    }
+    {Keyword.put(switches, :min_priority, -100), unknown_switches}
   end
   defp parse_min_priority({[min_priority: min_priority] = switches, unknown_switches}) do
     case Integer.parse(min_priority) do
       {n, ""} ->
-        {
-          Keyword.put(switches, :min_priority, n),
-          unknown_switches
-        }
+        {Keyword.put(switches, :min_priority, n), unknown_switches}
       _ ->
-        {
-          switches,
-          Keyword.put(unknown_switches, "--min-priority", min_priority)
-        }
+        {switches, Keyword.put(unknown_switches, "--min-priority", min_priority)}
     end
   end
   defp parse_min_priority(x), do: x
