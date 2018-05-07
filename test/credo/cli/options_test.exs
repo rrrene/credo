@@ -38,33 +38,33 @@ defmodule Credo.CLI.OptionsTest do
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority higher to 20" do
-    args = String.split("--min-priority=higher --version")
+  test "switches: it should convert min_priority high to 20" do
+    args = String.split("--min-priority=high --version")
     expected = %{version: true, min_priority: 20}
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority high to 10" do
-    args = String.split("--min-priority=high --version")
+  test "switches: it should convert min_priority medium to 10" do
+    args = String.split("--min-priority=medium --version")
     expected = %{version: true, min_priority: 10}
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority normal to 1" do
+  test "switches: it should convert min_priority normal to 0" do
     args = String.split("--min-priority=normal --version")
-    expected = %{version: true, min_priority: 1}
+    expected = %{version: true, min_priority: 0}
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority low to -10" do
+  test "switches: it should convert min_priority low to -2" do
     args = String.split("--min-priority=low --version")
-    expected = %{version: true, min_priority: -10}
+    expected = %{version: true, min_priority: -2}
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority ignore to -100" do
-    args = String.split("--min-priority=ignore --version")
-    expected = %{version: true, min_priority: -100}
+  test "switches: it should convert min_priority lower to -999" do
+    args = String.split("--min-priority=lower --version")
+    expected = %{version: true, min_priority: -999}
     assert expected == switches(args)
   end
 
