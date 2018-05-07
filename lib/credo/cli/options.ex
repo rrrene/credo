@@ -19,7 +19,7 @@ defmodule Credo.CLI.Options do
     help: :boolean,
     ignore_checks: :string,
     ignore: :string,
-    min_priority: :integer,
+    min_priority: :string,
     only: :string,
     read_from_stdin: :boolean,
     strict: :boolean,
@@ -52,6 +52,10 @@ defmodule Credo.CLI.Options do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
     {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
+    {switches_keywords, unknown_switches_keywords} =
+      {switches_keywords, unknown_switches_keywords}
+      |> parse_min_priority()
+
     %__MODULE__{
       command: command,
       path: path,
@@ -60,6 +64,52 @@ defmodule Credo.CLI.Options do
       unknown_switches: unknown_switches_keywords
     }
   end
+
+  defp parse_min_priority({[min_priority: "higher"] = switches, unknown_switches}) do
+    {
+      Keyword.put(switches, :min_priority, 20),
+      unknown_switches
+    }
+  end
+  defp parse_min_priority({[min_priority: "high"] = switches, unknown_switches}) do
+    {
+      Keyword.put(switches, :min_priority, 10),
+      unknown_switches
+    }
+  end
+  defp parse_min_priority({[min_priority: "normal"] = switches, unknown_switches}) do
+    {
+      Keyword.put(switches, :min_priority, 1),
+      unknown_switches
+    }
+  end
+  defp parse_min_priority({[min_priority: "low"] = switches, unknown_switches}) do
+    {
+      Keyword.put(switches, :min_priority, -10),
+      unknown_switches
+    }
+  end
+  defp parse_min_priority({[min_priority: "ignore"] = switches, unknown_switches}) do
+    {
+      Keyword.put(switches, :min_priority, -100),
+      unknown_switches
+    }
+  end
+  defp parse_min_priority({[min_priority: min_priority] = switches, unknown_switches}) do
+    case Integer.parse(min_priority) do
+      {n, ""} ->
+        {
+          Keyword.put(switches, :min_priority, n),
+          unknown_switches
+        }
+      _ ->
+        {
+          switches,
+          Keyword.put(unknown_switches, "--min-priority", min_priority)
+        }
+    end
+  end
+  defp parse_min_priority(x), do: x
 
   defp split_args([], current_dir, _) do
     {path, unknown_args} = extract_path([], current_dir)
