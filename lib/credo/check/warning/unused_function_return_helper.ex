@@ -211,6 +211,22 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     end
   end
 
+  # :erlang_module.my_fun()
+  defp verify_candidate(
+         {{:., _, [module, fun_name]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_atom(module) and is_list(arguments) do
+    # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
+
+    if CodeHelper.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
   # MyModule.my_fun()
   defp verify_candidate(
          {{:., _, [{:__aliases__, _, mods}, fun_name]}, _, arguments} = ast,
