@@ -15,6 +15,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
 
         parse_code(t, {:some_tuple, 1})
         parse_code(t, acc <> ~s(\"\"\"))
+
+        %{"some-atom-with-quotes": "#{filename} world"}
       end
       defp count([], acc), do: acc
       defp count([?( | t], acc), do: count(t, acc + 1)
