@@ -33,13 +33,13 @@ defmodule Credo.MainProcess do
     run Task.SetDefaultCommand
   end
 
-  activity :validate_config do
-    run Task.ValidateConfig
-  end
-
   activity :resolve_config do
     run Task.UseColors
     run Task.RequireRequires
+  end
+
+  activity :validate_config do
+    run Task.ValidateConfig
   end
 
   activity :run_command do
