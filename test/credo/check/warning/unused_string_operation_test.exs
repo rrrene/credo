@@ -317,6 +317,21 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation when in rescue" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        String.to_integer(str)
+      rescue
+        ArgumentError -> String.to_float(str)
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   ##############################################################################
   ##############################################################################
 
@@ -486,6 +501,26 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> to_source_file
     |> assert_issue(@described_check, fn issue ->
       assert "String.upcase" == issue.trigger
+    end)
+  end
+
+  test "it should report a violation when not last call in rescue" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        String.to_integer(str)
+      rescue
+        ArgumentError ->
+          String.to_float(str)
+
+          :error
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, fn issue ->
+      assert "String.to_float" == issue.trigger
     end)
   end
 end

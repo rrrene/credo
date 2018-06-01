@@ -170,6 +170,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
   defp verify_candidate({:->, _, arguments} = ast, :not_verified = acc, _candidate)
        when is_list(arguments) do
+    # IO.inspect(ast, label: ":-> (#{Macro.to_string(ast)} #{acc})")
     {ast, acc}
   end
 
