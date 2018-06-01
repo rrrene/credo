@@ -528,6 +528,20 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for function calls to erlang modules" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        :ets.insert(table, Enum.map([1, 2, 3, 4], fn i -> i + 1 end))
+
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   #
   #
