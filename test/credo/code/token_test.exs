@@ -171,6 +171,7 @@ defmodule Credo.Code.TokenTest do
       assert @heredoc_interpolations_position == position
     end
 
+    @tag needs_elixir: "1.7.0"
     test "should give correct token position for map" do
       source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
       tokens = Credo.Code.to_tokens(source)
