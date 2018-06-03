@@ -170,6 +170,46 @@ defmodule Credo.Code.TokenTest do
 
       assert @heredoc_interpolations_position == position
     end
+
+    test "should give correct token position for map" do
+      source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:%{}, {1, 1, nil}},
+        {:"{", {1, 2, nil}},
+        {:kw_identifier_unsafe, {1, 3, nil}, ["some-atom-with-quotes"]},
+        {:bin_string, {1, 28, nil},
+         [{{1, 29, 1}, [{:identifier, {1, 31, nil}, :filename}]}, " world"]},
+        {:"}", {1, 47, nil}}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> Enum.take(4) |> List.last() |> Token.position()
+
+      assert {1, 28, 1, 47} == position
+    end
+
+    test "should give correct token position for map /2" do
+      source = ~S(%{some_atom_with_quotes: "#{filename} world"})
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:%{}, {1, 1, nil}},
+        {:"{", {1, 2, nil}},
+        {:kw_identifier, {1, 3, nil}, :some_atom_with_quotes},
+        {:bin_string, {1, 26, nil},
+         [{{1, 27, 1}, [{:identifier, {1, 29, nil}, :filename}]}, " world"]},
+        {:"}", {1, 45, nil}}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> Enum.take(4) |> List.last() |> Token.position()
+
+      assert {1, 26, 1, 45} == position
+    end
   end
 
   # Elixir <= 1.5.x
