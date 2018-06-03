@@ -155,7 +155,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
             params = IssueMeta.params(issue_meta)
             priority =
               if params[:priority] do
-                params[:priority] |> Check.to_priority
+                params[:priority] |> Check.some_fun
               else
                 base_priority
               end

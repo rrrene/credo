@@ -56,6 +56,7 @@ defmodule Credo.CLI.Output do
     |> check_color
   end
 
+  # TODO: these need to correspond to the priorities in Credo.Priority
   def issue_color(issue) do
     priority = issue.priority
 
@@ -69,6 +70,7 @@ defmodule Credo.CLI.Output do
     end
   end
 
+  # TODO: these need to correspond to the priorities in Credo.Priority
   def priority_arrow(priority) do
     cond do
       priority in 20..999 -> "\u2191"
@@ -80,6 +82,7 @@ defmodule Credo.CLI.Output do
     end
   end
 
+  # TODO: these need to correspond to the priorities in Credo.Priority
   def priority_name(priority) do
     cond do
       priority in 20..999 -> "high"

@@ -37,6 +37,8 @@ defmodule Credo.CLI.Options do
     v: :version
   ]
 
+  alias Credo.Priority
+
   def parse(argv, current_dir, command_names, ignored_args) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)
@@ -69,20 +71,25 @@ defmodule Credo.CLI.Options do
     {switches, unknowns}
   end
 
-  defp patch_switch({:min_priority, "high"}, unknowns), do: {{:min_priority, 20}, unknowns}
-  defp patch_switch({:min_priority, "medium"}, unknowns), do: {{:min_priority, 10}, unknowns}
-  defp patch_switch({:min_priority, "normal"}, unknowns), do: {{:min_priority, 0}, unknowns}
-  defp patch_switch({:min_priority, "low"}, unknowns), do: {{:min_priority, -2}, unknowns}
-  defp patch_switch({:min_priority, "lower"}, unknowns), do: {{:min_priority, -999}, unknowns}
-
   defp patch_switch({:min_priority, str}, unknowns) do
-    case Integer.parse(str) do
-      {int, ""} -> {{:min_priority, int}, unknowns}
-      _ -> {nil, [{"--min-priority", str} | unknowns]}
+    priority = priority_as_name(str) || priority_as_number(str)
+
+    case priority do
+      nil -> {nil, [{"--min-priority", str} | unknowns]} |> IO.inspect()
+      int -> {{:min_priority, int}, unknowns}
     end
   end
 
   defp patch_switch(switch, unknowns), do: {switch, unknowns}
+
+  defp priority_as_name(str), do: Priority.to_integer(str)
+
+  defp priority_as_number(str) do
+    case Integer.parse(str) do
+      {int, ""} -> int
+      _ -> nil
+    end
+  end
 
   defp split_args([], current_dir, _) do
     {path, unknown_args} = extract_path([], current_dir)

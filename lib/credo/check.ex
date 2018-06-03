@@ -3,13 +3,8 @@ defmodule Credo.Check do
   `Check` modules represent the checks which are run during the code analysis.
   """
 
-  @base_priority_map %{
-    ignore: -100,
-    low: -10,
-    normal: 1,
-    high: +10,
-    higher: +20
-  }
+  alias Credo.Priority
+
   @base_category_exit_status_map %{
     consistency: 1,
     design: 2,
@@ -36,7 +31,7 @@ defmodule Credo.Check do
       alias Credo.CLI.ExitStatus
 
       def base_priority do
-        unquote(to_priority(opts[:base_priority]))
+        unquote(Priority.to_integer(opts[:base_priority]))
       end
 
       def category do
@@ -145,7 +140,7 @@ defmodule Credo.Check do
     priority =
       case params[:priority] do
         nil -> issue_base_priority
-        val -> Check.to_priority(val)
+        val -> Priority.to_integer(val)
       end
 
     exit_status =
@@ -230,15 +225,6 @@ defmodule Credo.Check do
   end
 
   defp category_body(value), do: value
-
-  @doc "Converts a given category to a priority"
-  def to_priority(nil), do: 0
-
-  def to_priority(atom) when is_atom(atom) do
-    @base_priority_map[atom]
-  end
-
-  def to_priority(value), do: value
 
   @doc "Converts a given category to an exit status"
   def to_exit_status(nil), do: 0

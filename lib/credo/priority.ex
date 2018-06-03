@@ -12,6 +12,21 @@ defmodule Credo.Priority do
   @def_ops [:def, :defp, :defmacro]
   @many_functions_count 5
 
+  @priority_names_map %{
+    "ignore" => -100,
+    "low" => -10,
+    "normal" => 1,
+    "high" => +10,
+    "higher" => +20
+  }
+
+  @doc "Converts a given priority name to a numerical priority"
+  def to_integer(nil), do: 0
+
+  def to_integer(key) do
+    @priority_names_map[to_string(key)]
+  end
+
   def scope_priorities(%SourceFile{} = source_file) do
     line_count =
       source_file
