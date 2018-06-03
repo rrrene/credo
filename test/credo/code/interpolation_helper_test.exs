@@ -428,4 +428,34 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation in a value of a map" do
+    source = ~S"""
+    %{"some-atom-with-quotes": "#{filename} world"}
+    """
+
+    expected = ~S"""
+    %{"some-atom-with-quotes": "$$$$$$$$$$$ world"}
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation in a value of a map /2" do
+    source = ~S"""
+    %{
+      "some-atom-with-quotes": "#{filename} world"
+    }
+    """
+
+    expected = ~S"""
+    %{
+      "some-atom-with-quotes": "$$$$$$$$$$$ world"
+    }
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
