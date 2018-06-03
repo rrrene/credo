@@ -332,6 +332,54 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation when in rescue /2" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        :bar
+
+        try do
+          String.to_integer(str)
+        rescue
+          ArgumentError -> String.to_float(str)
+        else
+          y when y < 1 and y > -1 ->
+            :small
+          _ ->
+            :large
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation when in rescue /3" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        :bar
+
+        try do
+          :something
+        rescue
+          ArgumentError -> :error
+        else
+          y when y < 1 and y > -1 ->
+            String.to_float(str)
+          _ ->
+            :large
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   ##############################################################################
   ##############################################################################
 
@@ -515,6 +563,85 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
           String.to_float(str)
 
           :error
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, fn issue ->
+      assert "String.to_float" == issue.trigger
+    end)
+  end
+
+  test "it should report a violation when in rescue /2" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        :bar
+
+        try do
+          :something
+        rescue
+          ArgumentError -> String.to_float(str)
+        else
+          y when y < 1 and y > -1 ->
+            :small
+          _ ->
+            :large
+        end
+
+        :actual_return
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, fn issue ->
+      assert "String.to_float" == issue.trigger
+    end)
+  end
+
+  test "it should report a violation when in rescue /3" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        :bar
+
+        try do
+          :something
+        rescue
+          ArgumentError -> :error
+        else
+          y when y < 1 and y > -1 ->
+            String.to_float(str)
+
+            :small
+          _ ->
+            :large
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, fn issue ->
+      assert "String.to_float" == issue.trigger
+    end)
+  end
+
+  test "it should report a violation when in rescue /4" do
+    """
+    defmodule Buggy do
+      @moduledoc false
+      def parse(str) do
+        :bar
+
+        try do
+          :something
+        rescue
+          ArgumentError -> :error
+        after
+          String.to_float(str)
+        end
       end
     end
     """
