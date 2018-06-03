@@ -23,60 +23,56 @@ defmodule Credo.CLI.OptionsTest do
   test "switches: it should work" do
     args = String.split("cmd1 --strict --version")
     expected = %{strict: true, version: true}
+
     assert expected == switches(args)
   end
 
   test "switches: it should not work w/ a funny typo: cash/crash" do
     args = String.split("--cash-on-error --version")
     expected = %{version: true}
+
     assert expected == switches(args)
   end
 
   test "switches: it should not work w/ a string given for a number" do
     args = String.split("--min-priority=abc --version")
     expected = %{version: true}
+
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority high to 20" do
+  test "switches: it should convert min_priority high to 10" do
     args = String.split("--min-priority=high --version")
-    expected = %{version: true, min_priority: 20}
-    assert expected == switches(args)
-  end
-
-  test "switches: it should convert min_priority medium to 10" do
-    args = String.split("--min-priority=medium --version")
     expected = %{version: true, min_priority: 10}
+
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority normal to 0" do
+  test "switches: it should convert min_priority normal to 1" do
     args = String.split("--min-priority=normal --version")
-    expected = %{version: true, min_priority: 0}
+    expected = %{version: true, min_priority: 1}
+
     assert expected == switches(args)
   end
 
-  test "switches: it should convert min_priority low to -2" do
+  test "switches: it should convert min_priority low to -10" do
     args = String.split("--min-priority=low --version")
-    expected = %{version: true, min_priority: -2}
-    assert expected == switches(args)
-  end
+    expected = %{version: true, min_priority: -10}
 
-  test "switches: it should convert min_priority lower to -999" do
-    args = String.split("--min-priority=lower --version")
-    expected = %{version: true, min_priority: -999}
     assert expected == switches(args)
   end
 
   test "switches: it should convert min_priority to integer" do
     args = String.split("--min-priority=-1234 --version")
     expected = %{version: true, min_priority: -1234}
+
     assert expected == switches(args)
   end
 
   test "switches: it should reject float min_priority" do
     args = String.split("--min-priority=-1234.12 --version")
     expected = %{version: true}
+
     assert expected == switches(args)
   end
 

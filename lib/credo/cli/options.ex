@@ -75,7 +75,7 @@ defmodule Credo.CLI.Options do
     priority = priority_as_name(str) || priority_as_number(str)
 
     case priority do
-      nil -> {nil, [{"--min-priority", str} | unknowns]} |> IO.inspect()
+      nil -> {nil, [{"--min-priority", str} | unknowns]}
       int -> {{:min_priority, int}, unknowns}
     end
   end

@@ -76,8 +76,8 @@ defmodule Credo.CLI.Output do
       priority in 20..999 -> "\u2191"
       priority in 10..19 -> "\u2197"
       priority in 0..9 -> "\u2192"
-      priority in -2..-1 -> "\u2198"
-      priority in -999..-1 -> "\u2193"
+      priority in -10..-1 -> "\u2198"
+      priority in -999..-11 -> "\u2193"
       true -> "?"
     end
   end
@@ -85,11 +85,11 @@ defmodule Credo.CLI.Output do
   # TODO: these need to correspond to the priorities in Credo.Priority
   def priority_name(priority) do
     cond do
-      priority in 20..999 -> "high"
-      priority in 10..19 -> "medium"
+      priority in 20..999 -> "higher"
+      priority in 10..19 -> "high"
       priority in 0..9 -> "normal"
-      priority in -2..-1 -> "low"
-      priority in -999..-1 -> "lower"
+      priority in -10..-1 -> "low"
+      priority in -999..-11 -> "lower"
       true -> "?"
     end
   end
