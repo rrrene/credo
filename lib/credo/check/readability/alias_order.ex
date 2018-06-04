@@ -4,33 +4,33 @@ defmodule Credo.Check.Readability.AliasOrder do
 
       # preferred
 
-      alias Module1
-      alias Module2
-      alias Module3
+      alias ModuleA
+      alias ModuleB
+      alias ModuleC
 
       # NOT preferred
 
-      alias Module1
-      alias Module3
-      alias Module2
+      alias ModuleA
+      alias ModuleC
+      alias ModuleB
 
   Alias should be alphabetically ordered among their group:
 
       # preferred
 
-      alias Module3
-      alias Module4
+      alias ModuleC
+      alias ModuleD
 
-      alias Module1
-      alias Module2
+      alias ModuleA
+      alias ModuleB
 
       # NOT preferred
 
-      alias Module3
-      alias Module4
+      alias ModuleC
+      alias ModuleD
 
-      alias Module2
-      alias Module1
+      alias ModuleB
+      alias ModuleA
 
   Like all `Readability` issues, this one is not a technical concern.
   But you can improve the odds of others reading and liking your code by making
@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   alias Credo.Code
   alias Credo.Code.Name
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check, base_priority: :low
 
   @doc false
   def run(source_file, params \\ []) do

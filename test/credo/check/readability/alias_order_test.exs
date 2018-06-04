@@ -120,4 +120,22 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation with multi-alias /2" do
+    """
+    defmodule CredoSampleModule do
+      alias App.CLI.{Bar,Baz}
+      alias App.Foo.{Sorter,Command,Filename}
+
+      alias Credo.CLI.Command
+      alias Credo.CLI.Filename
+      alias Credo.CLI.Sorter
+
+      alias App.Module1
+      alias App.Module2
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
