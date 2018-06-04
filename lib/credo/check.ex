@@ -21,14 +21,14 @@ defmodule Credo.Check do
       @before_compile Credo.Check
 
       alias Credo.Check
+      alias Credo.Check.CodeHelper
+      alias Credo.Check.Params
+      alias Credo.CLI.ExitStatus
       alias Credo.Issue
       alias Credo.IssueMeta
       alias Credo.Priority
       alias Credo.Severity
       alias Credo.SourceFile
-      alias Credo.Check.CodeHelper
-      alias Credo.Check.Params
-      alias Credo.CLI.ExitStatus
 
       def base_priority do
         unquote(Priority.to_integer(opts[:base_priority]))
@@ -90,12 +90,12 @@ defmodule Credo.Check do
   end
 
   alias Credo.Check
+  alias Credo.Check.CodeHelper
   alias Credo.Issue
   alias Credo.IssueMeta
   alias Credo.Priority
   alias Credo.Severity
   alias Credo.SourceFile
-  alias Credo.Check.CodeHelper
 
   @doc """
   Returns the base priority for the check.

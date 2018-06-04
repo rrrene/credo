@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Output.Formatter.JSON do
-  alias Credo.Issue
   alias Credo.CLI.Output.UI
+  alias Credo.Issue
 
   def print_issues(issues) do
     %{

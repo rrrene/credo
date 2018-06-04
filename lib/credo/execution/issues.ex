@@ -1,8 +1,8 @@
 defmodule Credo.Execution.Issues do
   use GenServer
 
-  alias Credo.SourceFile
   alias Credo.Execution
+  alias Credo.SourceFile
 
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])

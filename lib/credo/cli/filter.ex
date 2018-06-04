@@ -1,8 +1,8 @@
 defmodule Credo.CLI.Filter do
-  alias Credo.Issue
-  alias Credo.SourceFile
   alias Credo.Check.ConfigComment
   alias Credo.Execution
+  alias Credo.Issue
+  alias Credo.SourceFile
 
   def important(list, exec) when is_list(list) do
     Enum.filter(list, &important?(&1, exec))

@@ -23,8 +23,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
 
-  alias Credo.SourceFile
   alias Credo.Check.CodeHelper
+  alias Credo.SourceFile
 
   use Credo.Check
 

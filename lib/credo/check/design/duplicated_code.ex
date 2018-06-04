@@ -32,9 +32,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
     excluded_macros: []
   ]
 
-  alias Credo.SourceFile
-  alias Credo.Issue
   alias Credo.Check.CodeHelper
+  alias Credo.Issue
+  alias Credo.SourceFile
 
   use Credo.Check, run_on_all: true, base_priority: :higher
 

@@ -1,8 +1,8 @@
 defmodule Credo.Check.Runner do
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.SourceFile
   alias Credo.Execution.Issues
+  alias Credo.SourceFile
 
   @doc false
   def run(source_files, exec) when is_list(source_files) do

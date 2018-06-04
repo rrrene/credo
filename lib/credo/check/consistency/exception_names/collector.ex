@@ -1,9 +1,9 @@
 defmodule Credo.Check.Consistency.ExceptionNames.Collector do
   use Credo.Check.Consistency.Collector
 
+  alias Credo.Code
   alias Credo.Code.Module
   alias Credo.Code.Name
-  alias Credo.Code
 
   def collect_matches(source_file, _params) do
     exception_recorder = &record_exception/2

@@ -6,9 +6,9 @@ defmodule Credo.Check.ConfigCommentFinder do
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
-  alias Credo.SourceFile
   alias Credo.Check.CodeHelper
   alias Credo.Check.ConfigComment
+  alias Credo.SourceFile
 
   @doc false
   def run(source_files, _exec, _params) when is_list(source_files) do

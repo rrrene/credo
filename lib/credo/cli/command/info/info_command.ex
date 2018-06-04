@@ -1,12 +1,12 @@
 defmodule Credo.CLI.Command.Info.InfoCommand do
   use Credo.CLI.Command
 
-  alias Credo.Execution
   alias Credo.CLI.Command.Info.InfoOutput
+  alias Credo.CLI.Task
+  alias Credo.Execution
 
   @shortdoc "Show useful debug information"
   @moduledoc @shortdoc
-  alias Credo.CLI.Task
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: InfoOutput.print_help(exec)

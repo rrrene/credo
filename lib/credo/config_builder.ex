@@ -1,8 +1,8 @@
 defmodule Credo.ConfigBuilder do
-  alias Credo.Execution
-  alias Credo.ConfigFile
   alias Credo.CLI.Filename
   alias Credo.CLI.Output.UI
+  alias Credo.ConfigFile
+  alias Credo.Execution
 
   def parse(exec) do
     options = exec.cli_options

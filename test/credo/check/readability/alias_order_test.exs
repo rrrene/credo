@@ -15,6 +15,12 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
       alias Credo.CLI.Sorter
+
+      alias Credo.Check
+      alias Credo.Check.CodeHelper
+      alias Credo.Check.Params
+      alias Credo.CLI.ExitStatus
+      alias Credo.Issue
     end
     """
     |> to_source_file

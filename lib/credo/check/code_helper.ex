@@ -5,10 +5,10 @@ defmodule Credo.Check.CodeHelper do
   """
 
   alias Credo.Code.Block
-  alias Credo.Code.Parameters
-  alias Credo.Code.Module
-  alias Credo.Code.Scope
   alias Credo.Code.Charlists
+  alias Credo.Code.Module
+  alias Credo.Code.Parameters
+  alias Credo.Code.Scope
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
   alias Credo.Service.SourceFileScopes
