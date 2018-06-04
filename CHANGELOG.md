@@ -2,8 +2,15 @@
 
 ## 0.9.3
 
-- Fix false positive in MatchInConditionTest
 - Fix bug in Scope
+- Fix false positive in MatchInConditionTest
+- Fix false positive in UnusedEnumOperation
+- Fix custom tasks by resolving config before validating it
+- Add text support to `--min-priority` CLI switch (you can now set it to low/normal/high)
+
+### New checks
+
+- Credo.Check.Readability.AliasOrder
 
 ## 0.9.2
 
