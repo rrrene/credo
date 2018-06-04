@@ -1,9 +1,9 @@
 defmodule Credo.CLI.Command.Explain.Output.Default do
-  alias Credo.Code.Scope
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
-  alias Credo.SourceFile
+  alias Credo.Code.Scope
   alias Credo.Issue
+  alias Credo.SourceFile
 
   @indent 8
   @params_min_indent 20

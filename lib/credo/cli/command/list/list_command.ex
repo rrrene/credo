@@ -4,10 +4,10 @@ defmodule Credo.CLI.Command.List.ListCommand do
   @shortdoc "List all issues grouped by files"
   @moduledoc @shortdoc
 
-  alias Credo.Execution
-  alias Credo.CLI.Filter
   alias Credo.CLI.Command.List.ListOutput
+  alias Credo.CLI.Filter
   alias Credo.CLI.Task
+  alias Credo.Execution
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: ListOutput.print_help(exec)

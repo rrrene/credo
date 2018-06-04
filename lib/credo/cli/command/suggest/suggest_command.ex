@@ -3,9 +3,9 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   @shortdoc "Suggest code objects to look at next (default)"
 
-  alias Credo.Execution
   alias Credo.CLI.Command.Suggest.SuggestOutput
   alias Credo.CLI.Task
+  alias Credo.Execution
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)

@@ -1,11 +1,11 @@
 defmodule Credo.CLI.Command.List.Output.Default do
-  alias Credo.Code.Scope
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
-  alias Credo.CLI.Output.UI
   alias Credo.CLI.Output.Summary
-  alias Credo.SourceFile
+  alias Credo.CLI.Output.UI
+  alias Credo.Code.Scope
   alias Credo.Issue
+  alias Credo.SourceFile
 
   @indent 8
 

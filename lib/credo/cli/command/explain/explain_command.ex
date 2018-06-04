@@ -5,8 +5,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   @moduledoc @shortdoc
 
   alias Credo.Execution
-  alias Credo.CLI.Filename
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
+  alias Credo.CLI.Filename
   alias Credo.CLI.Task
 
   @doc false

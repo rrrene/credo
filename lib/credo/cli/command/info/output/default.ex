@@ -1,6 +1,6 @@
 defmodule Credo.CLI.Command.Info.Output.Default do
-  alias Credo.Execution
   alias Credo.CLI.Output.UI
+  alias Credo.Execution
 
   def print(%Execution{verbose: true}, info) do
     info
