@@ -1,0 +1,60 @@
+<html>
+
+<head>
+
+  <title>Credo Debug Log</title>
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
+</head>
+
+<body>
+
+  <h1>Credo Debug Log</h1>
+
+  <h2>Check Timings</h2>
+
+  <table id="timing-data">
+    <thead>
+      <th>Started at</th>
+      <th>Tags</th>
+      <th>Duration (ms)</th>
+    </thead>
+    <tbody>
+      <%= for {tags, started_at, time} <- @timings do %>
+        <tr>
+          <td>
+            <%= started_at %>
+          </td>
+          <td>
+            <code>
+              <%= inspect(tags, pretty: true) %>
+            </code>
+          </td>
+          <td>
+            <%= div(time, 1000) %>
+          </td>
+        </tr>
+        <% end %>
+    </tbody>
+  </table>
+
+  <script>
+    $(document).ready(function () {
+      $('#timing-data').DataTable({});
+    });
+  </script>
+
+<!--
+  <h2>Token</h2>
+
+  <pre><%= inspect(@exec, pretty: true) %></pre>
+-->
+
+</body>
+
+</html>

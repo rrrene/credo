@@ -4,11 +4,6 @@ defmodule Credo.Execution do
   manipulated via the `Credo.Execution` module.
   """
 
-  @type t :: module
-
-  alias Credo.Execution.Issues
-  alias Credo.Execution.SourceFiles
-
   defstruct argv: [],
             cli_options: nil,
 
@@ -39,10 +34,17 @@ defmodule Credo.Execution do
             halted: false,
             source_files_pid: nil,
             issues_pid: nil,
+            timing_pid: nil,
             skipped_checks: nil,
             assigns: %{},
             results: %{},
             config_comment_map: %{}
+
+  @type t :: module
+
+  alias Credo.Execution.Issues
+  alias Credo.Execution.SourceFiles
+  alias Credo.Execution.Timing
 
   @doc """
   Returns the checks that should be run for a given `exec` struct.
@@ -176,5 +178,6 @@ defmodule Credo.Execution do
     exec
     |> SourceFiles.start_server()
     |> Issues.start_server()
+    |> Timing.start_server()
   end
 end

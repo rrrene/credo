@@ -8,6 +8,7 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
+  alias Credo.Execution.Task.WriteDebugReport
   alias Credo.MainProcess
   alias Credo.Service.Commands
 
@@ -19,6 +20,7 @@ defmodule Credo.CLI do
 
     %Execution{argv: argv}
     |> MainProcess.call()
+    |> WriteDebugReport.call([])
     |> halt_if_exit_status_assigned()
   end
 
