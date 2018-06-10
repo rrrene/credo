@@ -55,6 +55,20 @@ defmodule Credo.Check.Refactor.MapInto do
 
   defp traverse(
          ast =
+           {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
+            [
+              {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
+              _
+            ]},
+         issues,
+         issue_meta
+       ) do
+    new_issue = issue_for(issue_meta, meta[:line], "map_into")
+    {ast, issues ++ List.wrap(new_issue)}
+  end
+
+  defp traverse(
+         ast =
            {:|>, meta,
             [
               {:|>, _,

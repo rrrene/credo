@@ -91,4 +91,16 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation 6" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        Enum.into([:apple, :banana, :carrot] |> Enum.map(&({&1, to_string(&1)})), %{})
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
