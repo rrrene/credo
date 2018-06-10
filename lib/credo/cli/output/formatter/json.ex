@@ -10,7 +10,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
   end
 
   def print_map(map) do
-    UI.puts(Poison.encode!(map, pretty: true))
+    UI.puts(Jason.encode!(map, pretty: true))
   end
 
   def to_json(
