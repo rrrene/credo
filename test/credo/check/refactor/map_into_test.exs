@@ -63,4 +63,32 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation 4" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        [:apple, :banana, :carrot]
+        |> Enum.map(&({&1, to_string(&1)}))
+        |> Enum.into(%{})
+        |> Map.keys()
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation 5" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        Enum.map([:apple, :banana, :carrot], &({&1, to_string(&1)}))
+        |> Enum.into(%{})
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
