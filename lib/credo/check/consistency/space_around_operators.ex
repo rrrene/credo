@@ -19,8 +19,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   @explanation [
     check: @moduledoc,
     params: [
-      ignore:
-        "List of operators to be ignored for this check."
+      ignore: "List of operators to be ignored for this check."
     ]
   ]
 
