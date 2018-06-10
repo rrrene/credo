@@ -43,6 +43,20 @@ defmodule Credo.Check.Refactor.MapJoin do
          ast =
            {:|>, meta,
             [
+              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
+              {{:., _, [{:__aliases__, _, [:Enum]}, :join]}, _, _}
+            ]},
+         issues,
+         issue_meta
+       ) do
+    new_issue = issue_for(issue_meta, meta[:line], "map_join")
+    {ast, issues ++ List.wrap(new_issue)}
+  end
+
+  defp traverse(
+         ast =
+           {:|>, meta,
+            [
               {:|>, _,
                [
                  _,
