@@ -92,4 +92,16 @@ defmodule Credo.Check.Refactor.MapJoinTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation 6" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        Enum.join([:a, :b, :c] |> Enum.map(&inspect/1), ", ")
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
