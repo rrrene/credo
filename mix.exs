@@ -43,7 +43,7 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.2.0"},
-      {:jason, ">= 0.0.0"},
+      {:jason, "~> 1.0"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
