@@ -29,76 +29,12 @@ defmodule Credo.Check.Refactor.MapMap do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
-  end
+    message = "One `Enum.map/2` is more efficient than `Enum.map/2 |> Enum.map/2`"
+    trigger = "map_map"
 
-  defp traverse(
-         ast =
-           {{:., _, [{:__aliases__, meta, [:Enum]}, :map]}, _,
-            [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]},
-         issues,
-         issue_meta
-       ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_map")
-    {ast, issues ++ List.wrap(new_issue)}
-  end
-
-  defp traverse(
-         ast =
-           {:|>, meta,
-            [
-              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
-              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
-            ]},
-         issues,
-         issue_meta
-       ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_map")
-    {ast, issues ++ List.wrap(new_issue)}
-  end
-
-  defp traverse(
-         ast =
-           {{:., meta, [{:__aliases__, _, [:Enum]}, :map]}, _,
-            [
-              {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
-              _
-            ]},
-         issues,
-         issue_meta
-       ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_map")
-    {ast, issues ++ List.wrap(new_issue)}
-  end
-
-  defp traverse(
-         ast =
-           {:|>, meta,
-            [
-              {:|>, _,
-               [
-                 _,
-                 {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
-               ]},
-              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
-            ]},
-         issues,
-         issue_meta
-       ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_map")
-    {ast, issues ++ List.wrap(new_issue)}
-  end
-
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
-  end
-
-  defp issue_for(issue_meta, line_no, trigger) do
-    format_issue(
-      issue_meta,
-      message: "One `Enum.map/2` is more efficient than `Enum.map/2 |> Enum.map/2`",
-      trigger: trigger,
-      line_no: line_no
+    Credo.Code.prewalk(
+      source_file,
+      &EnumHelpers.traverse(&1, &2, issue_meta, message, trigger, :map, :map, __MODULE__)
     )
   end
 end
