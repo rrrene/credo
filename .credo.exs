@@ -104,21 +104,21 @@
         #
         ## Refactoring Opportunities
         #
-        {Credo.Check.Refactor.DoubleBooleanNegation},
         {Credo.Check.Refactor.CondStatements},
         {Credo.Check.Refactor.CyclomaticComplexity},
-        {Credo.Check.Refactor.MapMap},
-        {Credo.Check.Refactor.FilterReject},
-        {Credo.Check.Refactor.RejectFilter},
+        {Credo.Check.Refactor.DoubleBooleanNegation},
         {Credo.Check.Refactor.FilterFilter},
-        {Credo.Check.Refactor.RejectReject},
+        {Credo.Check.Refactor.FilterReject},
         {Credo.Check.Refactor.FunctionArity},
         {Credo.Check.Refactor.LongQuoteBlocks},
+        {Credo.Check.Refactor.MapMap},
         {Credo.Check.Refactor.MatchInCondition},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
         {Credo.Check.Refactor.NegatedConditionsWithElse},
         {Credo.Check.Refactor.Nesting},
         {Credo.Check.Refactor.PipeChainStart,
+        {Credo.Check.Refactor.RejectFilter},
+        {Credo.Check.Refactor.RejectReject},
          excluded_argument_types: [:atom, :binary, :fn, :keyword], excluded_functions: []},
         {Credo.Check.Refactor.UnlessWithElse},
 
