@@ -75,13 +75,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
     Enum.reduce(lines_for_comparison, [], fn {line_no, line_for_comparison}, issues ->
       if String.length(line_for_comparison) > max_length do
-        if refute_issue?(
-             line_no,
-             definitions,
-             ignore_definitions,
-             specs,
-             ignore_specs
-           ) do
+        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
           issues
         else
           {_, line} = Enum.at(lines, line_no - 1)
@@ -105,8 +99,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  defp find_specs({:spec, meta, arguments} = ast, specs)
-       when is_list(arguments) do
+  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end
 
@@ -114,13 +107,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, specs}
   end
 
-  defp refute_issue?(
-         line_no,
-         definitions,
-         ignore_definitions,
-         specs,
-         ignore_specs
-       ) do
+  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
     ignore_definitions? =
       if ignore_definitions do
         Enum.member?(definitions, line_no)

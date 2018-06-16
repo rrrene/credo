@@ -10,13 +10,16 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()
 
-    assigns = [exec: exec, timings: Timing.by_tag(exec, :check)]
+    timings =
+      Timing.by_tag(exec, :check)
+      |> Enum.sort_by(fn {_tags, _, time} -> time end)
+      |> IO.inspect()
+
+    assigns = [exec: exec, timings: timings]
 
     content = EEx.eval_file(@debug_template_filename, assigns: assigns)
 
     File.write!(@debug_output_filename, content)
-
-    IO.puts(content)
 
     UI.puts([:green, "Debug log written to ", :reset, @debug_output_filename])
 
