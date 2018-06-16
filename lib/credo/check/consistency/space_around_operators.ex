@@ -16,7 +16,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   you should use a consistent style throughout your codebase.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore: "List of operators to be ignored for this check."
+    ]
+  ]
 
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 

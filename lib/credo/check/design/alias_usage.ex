@@ -32,6 +32,8 @@ defmodule Credo.Check.Design.AliasUsage do
   @explanation [
     check: @moduledoc,
     params: [
+      excluded_namespaces: "List of namespaces to be excluded for this check.",
+      excluded_lastnames: "List of lastnames to be excluded for this check.",
       if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
       if_called_more_often_than: "Only raise an issue if a module is called more often than this."
     ]
