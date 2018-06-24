@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 (pre)
+
+- Fix false positive on `LargeNumbers`
+- Fix `NegatedConditionWithElse` for `not/2` as well
+- Switch `poison` for `jason`
+
+### New checks
+
+- Credo.Check.Refactor.MapInto
+
 ## 0.9.3
 
 - Fix bug in Scope
