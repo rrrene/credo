@@ -16,16 +16,43 @@
 
   <h1>Credo Debug Log</h1>
 
-  <h2>Check Timings</h2>
+  <h2>Task Timings</h2>
 
-  <table id="timing-data">
+  <table class="timing-data">
     <thead>
       <th>Started at</th>
       <th>Tags</th>
       <th>Duration (ms)</th>
     </thead>
     <tbody>
-      <%= for {tags, started_at, time} <- @timings do %>
+      <%= for {tags, started_at, time} <- @task_timings do %>
+        <tr>
+          <td>
+            <%= started_at %>
+          </td>
+          <td>
+            <code>
+              <%= inspect(tags, pretty: true) %>
+            </code>
+          </td>
+          <td>
+            <%= div(time, 1000) %>
+          </td>
+        </tr>
+        <% end %>
+    </tbody>
+  </table>
+
+  <h2>Check Timings</h2>
+
+  <table class="timing-data">
+    <thead>
+      <th>Started at</th>
+      <th>Tags</th>
+      <th>Duration (ms)</th>
+    </thead>
+    <tbody>
+      <%= for {tags, started_at, time} <- @check_timings do %>
         <tr>
           <td>
             <%= started_at %>
@@ -45,7 +72,7 @@
 
   <script>
     $(document).ready(function () {
-      $('#timing-data').DataTable({});
+      $('.timing-data').DataTable({});
     });
   </script>
 

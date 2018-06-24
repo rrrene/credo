@@ -27,7 +27,7 @@ defmodule Credo.Execution.Timing do
     GenServer.call(pid, :all)
   end
 
-  def by_tag(exec, tag_name) do
+  def grouped_by_tag(exec, tag_name) do
     map =
       all(exec)
       |> Enum.filter(fn {tags, _started_at, _time} -> tags[tag_name] end)
@@ -39,6 +39,20 @@ defmodule Credo.Execution.Timing do
       sum = Enum.reduce(map[map_key], 0, fn {_tags, _, time}, acc -> time + acc end)
 
       {[{tag_name, map_key}, {:accumulated, true}], nil, sum}
+    end)
+  end
+
+  def by_tag(exec, tag_name) do
+    exec
+    |> all()
+    |> Enum.filter(fn {tags, _started_at, _time} -> tags[tag_name] end)
+  end
+
+  def by_tag(exec, tag_name, regex) do
+    exec
+    |> all()
+    |> Enum.filter(fn {tags, _started_at, _time} ->
+      tags[tag_name] && to_string(tags[tag_name]) =~ regex
     end)
   end
 

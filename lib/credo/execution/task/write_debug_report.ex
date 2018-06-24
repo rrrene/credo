@@ -10,12 +10,14 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()
 
-    timings =
-      Timing.by_tag(exec, :check)
-      |> Enum.sort_by(fn {_tags, _, time} -> time end)
-      |> IO.inspect()
+    task_timings = Timing.by_tag(exec, :task, ~r/\.MainProcess\./)
 
-    assigns = [exec: exec, timings: timings]
+    check_timings =
+      exec
+      |> Timing.grouped_by_tag(:check)
+      |> Enum.sort_by(fn {_tags, _, time} -> time end)
+
+    assigns = [exec: exec, task_timings: task_timings, check_timings: check_timings]
 
     content = EEx.eval_file(@debug_template_filename, assigns: assigns)
 
