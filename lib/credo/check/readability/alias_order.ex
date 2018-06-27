@@ -105,7 +105,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   end
 
   defp find_alias_groups(
-         {:alias, _, [{:__aliases__, meta, mod_list}]} = ast,
+         {:alias, _, [{:__aliases__, meta, mod_list} | _]} = ast,
          aliases
        ) do
     modules = [{meta[:line], mod_list, mod_list |> Name.full() |> String.downcase()}]
