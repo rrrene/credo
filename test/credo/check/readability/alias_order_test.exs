@@ -90,6 +90,17 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> assert_issue(@described_check)
   end
 
+  test "it should report a violation with “as” option" do
+    """
+    defmodule CredoSampleModule do
+      alias App.Module2
+      alias App.Module1, as: Module3
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
   test "it should report a violation with alias groups" do
     """
     defmodule CredoSampleModule do
