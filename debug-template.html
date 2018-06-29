@@ -4,12 +4,57 @@
 
   <title>Credo Debug Log</title>
 
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
-
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    .timeline {
+      position: relative;
+      margin-bottom: 20px;
+
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .timeline__row {
+      padding: 3px;
+      border-bottom: 1px solid #e5e5e5;
+
+      display: flex;
+    }
+
+    .timeline__col {
+      position: relative;
+      flex: 1;
+      border-right: 1px solid #e5e5e5;
+    }
+
+    .timeline__col--graph {
+      flex: 5;
+    }
+
+    .timeline__span {
+      position: absolute;
+      height: 6px;
+      background-color: deepskyblue;
+      border-radius: 2px;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -23,6 +68,8 @@
     </code> took
     <%= @time_total %> ms (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
   </p>
+
+  <div id="root"></div>
 
   <h2>Task Timings</h2>
   <p>
@@ -110,6 +157,38 @@
         ]
       });
     });
+
+  </script>
+
+  <script type="text/babel">
+    class App extends React.Component {
+      round(val) {
+        return Math.round(val * 1000) / 1000;
+      }
+
+      render() {
+        console.log(this.props)
+        let {started_at, ended_at, duration, timings} = this.props.state;
+
+        timings = timings.filter((x) => x.tags.task && x.tags.task.match(/MainProcess/));
+
+        return <div className="timeline">
+          {timings.map((timing) =>
+            <div className="timeline__row">
+              <div className="timeline__col timeline__col--graph">
+                <div className="timeline__span" title={JSON.stringify(timing.tags)} style={{left: this.round((timing.started_at - started_at) / duration * 100) + '%', width: this.round(timing.duration / duration * 100) + '%'}}>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>;
+      }
+    }
+
+    ReactDOM.render(
+      <App state={state}/>,
+      document.getElementById('root')
+    );
 
   </script>
 

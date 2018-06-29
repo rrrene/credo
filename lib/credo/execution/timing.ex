@@ -62,7 +62,7 @@ defmodule Credo.Execution.Timing do
     {_, started_at, _} =
       exec
       |> all()
-      |> List.last()
+      |> List.first()
 
     started_at
   end
@@ -71,7 +71,7 @@ defmodule Credo.Execution.Timing do
     {_, started_at, duration} =
       exec
       |> all()
-      |> List.first()
+      |> List.last()
 
     started_at + duration
   end
@@ -95,6 +95,8 @@ defmodule Credo.Execution.Timing do
   end
 
   def handle_call(:all, _from, current_state) do
-    {:reply, current_state, current_state}
+    list = Enum.sort_by(current_state, fn {_, started_at, _} -> started_at end)
+
+    {:reply, list, current_state}
   end
 end
