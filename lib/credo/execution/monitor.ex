@@ -1,8 +1,6 @@
 defmodule Credo.Execution.Monitor do
   require Logger
 
-  import Credo.Execution
-
   alias Credo.Execution.Timing
 
   def task(exec, task, opts, fun, args) do
@@ -13,20 +11,7 @@ defmodule Credo.Execution.Monitor do
 
     log(:call_end, context_tuple, time)
 
-    Timing.append(exec, [task: task], started_at, time)
-
-    exec
-  end
-
-  def task_group(exec, task_group, opts, fun, args) do
-    context_tuple = {:task_group, exec, task_group, opts}
-    log(:call_start, context_tuple)
-
-    {started_at, time, exec} = Timing.run(fun, args)
-
-    log(:call_end, context_tuple, time)
-
-    Timing.append(exec, [task_group: task_group], started_at, time)
+    Timing.append(exec, [task: task, parent_task: exec.parent_task], started_at, time)
 
     exec
   end

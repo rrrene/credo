@@ -96,7 +96,9 @@ defmodule Credo.Check.Runner do
   end
 
   defp run_check_on_source_files({check, params}, source_files, exec) do
-    do_run_check_on_source_files({check, params}, source_files, exec)
+    issues = do_run_check_on_source_files({check, params}, source_files, exec)
+
+    {issues, nil}
   end
 
   defp do_run_check_on_source_files({check, params}, source_files, exec) do
@@ -133,8 +135,6 @@ defmodule Credo.Check.Runner do
          source_file,
          %Credo.Execution{debug: true} = exec
        ) do
-    started_at = Timing.now()
-
     {started_at, time, issues} =
       Timing.run(fn ->
         do_run_check_on_single_source_file({check, params}, source_file, exec)

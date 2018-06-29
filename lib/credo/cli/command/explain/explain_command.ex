@@ -17,10 +17,10 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
     if Filename.contains_line_no?(filename) do
       exec
-      |> Task.LoadAndValidateSourceFiles.call()
-      |> Task.PrepareChecksToRun.call()
-      |> Task.RunChecks.call()
-      |> Task.SetRelevantIssues.call()
+      |> run_task(Task.LoadAndValidateSourceFiles)
+      |> run_task(Task.PrepareChecksToRun)
+      |> run_task(Task.RunChecks)
+      |> run_task(Task.SetRelevantIssues)
       |> print_results_and_summary()
     else
       Output.print_help(exec)

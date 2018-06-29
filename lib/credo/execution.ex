@@ -31,6 +31,8 @@ defmodule Credo.Execution do
             read_from_stdin: false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            current_task: nil,
+            parent_task: nil,
             halted: false,
             source_files_pid: nil,
             issues_pid: nil,
@@ -179,5 +181,11 @@ defmodule Credo.Execution do
     |> SourceFiles.start_server()
     |> Issues.start_server()
     |> Timing.start_server()
+  end
+
+  # Task tracking
+
+  def set_parent_and_current_task(exec, parent_task, current_task) do
+    %__MODULE__{exec | parent_task: parent_task, current_task: current_task}
   end
 end

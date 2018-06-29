@@ -16,71 +16,102 @@
 
   <h1>Credo Debug Log</h1>
 
-  <h2>Task Timings</h2>
+  <p>
+    Analysis in
+    <code>
+      <%= File.cwd! %>
+    </code> took
+    <%= @time_total %> ms (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
+  </p>
 
-  <table class="timing-data">
+  <h2>Task Timings</h2>
+  <p>
+    This shows the timings for individual tasks (which are the building blocks of Credo's execution).
+  </p>
+
+  <table class="timing-data js-timing-data-tasks">
     <thead>
-      <th>Started at</th>
+      <th>Time (ms)</th>
       <th>Tags</th>
       <th>Duration (ms)</th>
     </thead>
-    <tbody>
-      <%= for {tags, started_at, time} <- @task_timings do %>
-        <tr>
-          <td>
-            <%= started_at %>
-          </td>
-          <td>
-            <code>
-              <%= inspect(tags, pretty: true) %>
-            </code>
-          </td>
-          <td>
-            <%= div(time, 1000) %>
-          </td>
-        </tr>
-        <% end %>
-    </tbody>
   </table>
 
   <h2>Check Timings</h2>
 
-  <table class="timing-data">
+  <p>
+    This shows the accumulated timings for individual checks.
+  </p>
+
+  <table class="timing-data js-timing-data-checks-accumulated">
     <thead>
-      <th>Started at</th>
+      <th>Time (ms)</th>
       <th>Tags</th>
       <th>Duration (ms)</th>
     </thead>
-    <tbody>
-      <%= for {tags, started_at, time} <- @check_timings do %>
-        <tr>
-          <td>
-            <%= started_at %>
-          </td>
-          <td>
-            <code>
-              <%= inspect(tags, pretty: true) %>
-            </code>
-          </td>
-          <td>
-            <%= div(time, 1000) %>
-          </td>
-        </tr>
-        <% end %>
-    </tbody>
   </table>
 
   <script>
+    let state;
+    /*  */
+    state = {
+      started_at: <%= @started_at %>,
+      ended_at: <%= @ended_at %>,
+      duration: <%= @duration %>,
+      timings: <%= Jason.encode!(@all_timings, pretty: true) %>
+    };
+
+    const datasetTasks =
+      state.timings
+      .filter((x) => x.tags.task) // && x.tags.task.match(/MainProcess/))
+      .map(({
+        tags,
+        started_at,
+        duration
+      }) => [Math.floor((started_at - state.started_at) / 1000), JSON.stringify(tags), Math.floor(duration / 1000)]);
+
+    const checkTimingsAsObject =
+      state.timings
+      .filter((x) => x.tags.check)
+      .reduce((acc, val) => {
+        const tag_name = "check"
+        const key = val.tags[tag_name];
+        if (!acc[key]) {
+          acc[key] = {
+            tags: {
+              accumulated: true
+            },
+            started_at: null,
+            duration: 0
+          };
+          acc[key]["tags"][tag_name] = val.tags[tag_name];
+        }
+        acc[key].duration += val.duration;
+
+        return acc;
+      }, Object.create(null));
+
+    const datasetChecks =
+      Object.values(checkTimingsAsObject)
+      .map(({
+        tags,
+        started_at,
+        duration
+      }) => ["", JSON.stringify(tags), Math.floor(duration / 1000)]);
+
     $(document).ready(function () {
-      $('.timing-data').DataTable({});
+      $('.js-timing-data-tasks').DataTable({
+        data: datasetTasks
+      });
+      $('.js-timing-data-checks-accumulated').DataTable({
+        data: datasetChecks,
+        "order": [
+          [2, "desc"]
+        ]
+      });
     });
+
   </script>
-
-<!--
-  <h2>Token</h2>
-
-  <pre><%= inspect(@exec, pretty: true) %></pre>
--->
 
 </body>
 

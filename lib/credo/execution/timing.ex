@@ -3,7 +3,7 @@ defmodule Credo.Execution.Timing do
 
   alias Credo.Execution
 
-  def now(), do: :os.system_time()
+  def now(), do: :os.system_time(:microsecond)
 
   def run(fun) do
     started_at = now()
@@ -20,7 +20,9 @@ defmodule Credo.Execution.Timing do
   end
 
   def append(%Execution{timing_pid: pid}, tags, started_at, duration) do
-    GenServer.call(pid, {:append, tags, started_at, duration})
+    spawn(fn ->
+      GenServer.call(pid, {:append, tags, started_at, duration})
+    end)
   end
 
   def all(%Execution{timing_pid: pid}) do
@@ -56,6 +58,24 @@ defmodule Credo.Execution.Timing do
     end)
   end
 
+  def started_at(exec) do
+    {_, started_at, _} =
+      exec
+      |> all()
+      |> List.last()
+
+    started_at
+  end
+
+  def ended_at(exec) do
+    {_, started_at, duration} =
+      exec
+      |> all()
+      |> List.first()
+
+    started_at + duration
+  end
+
   # callbacks
 
   def start_server(exec) do
@@ -69,9 +89,9 @@ defmodule Credo.Execution.Timing do
   end
 
   def handle_call({:append, tags, started_at, time}, _from, current_state) do
-    new_current_state = current_state ++ [{tags, started_at, time}]
+    new_current_state = [{tags, started_at, time} | current_state]
 
-    {:reply, new_current_state, new_current_state}
+    {:reply, :ok, new_current_state}
   end
 
   def handle_call(:all, _from, current_state) do

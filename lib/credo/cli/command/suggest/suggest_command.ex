@@ -12,11 +12,11 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   def call(exec, _opts) do
     exec
-    |> Task.LoadAndValidateSourceFiles.call()
-    |> Task.PrepareChecksToRun.call()
+    |> run_task(Task.LoadAndValidateSourceFiles)
+    |> run_task(Task.PrepareChecksToRun)
     |> print_before_info()
-    |> Task.RunChecks.call()
-    |> Task.SetRelevantIssues.call()
+    |> run_task(Task.RunChecks)
+    |> run_task(Task.SetRelevantIssues)
     |> print_results_and_summary()
   end
 

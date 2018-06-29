@@ -13,8 +13,8 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
 
   def call(exec, _opts) do
     exec
-    |> Task.LoadAndValidateSourceFiles.call()
-    |> Task.PrepareChecksToRun.call()
+    |> run_task(Task.LoadAndValidateSourceFiles)
+    |> run_task(Task.PrepareChecksToRun)
     |> print_info()
   end
 

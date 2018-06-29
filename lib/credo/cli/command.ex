@@ -7,6 +7,8 @@ defmodule Credo.CLI.Command do
       @behaviour Credo.CLI.Command
 
       Module.register_attribute(__MODULE__, :shortdoc, persist: true)
+
+      defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
     end
   end
 

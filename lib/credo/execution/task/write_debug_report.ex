@@ -10,14 +10,24 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()
 
-    task_timings = Timing.by_tag(exec, :task, ~r/\.MainProcess\./)
+    time_load = exec |> get_assign("credo.time.source_files") |> div(1000)
+    time_run = exec |> get_assign("credo.time.run_checks") |> div(1000)
+    time_total = time_load + time_run
 
-    check_timings =
-      exec
-      |> Timing.grouped_by_tag(:check)
-      |> Enum.sort_by(fn {_tags, _, time} -> time end)
+    all_timings = Timing.all(exec)
+    started_at = Timing.started_at(exec)
+    ended_at = Timing.ended_at(exec)
 
-    assigns = [exec: exec, task_timings: task_timings, check_timings: check_timings]
+    assigns = [
+      exec: exec,
+      started_at: started_at,
+      ended_at: ended_at,
+      duration: ended_at - started_at,
+      all_timings: timings_to_map(all_timings),
+      time_total: time_total,
+      time_load: time_load,
+      time_run: time_run
+    ]
 
     content = EEx.eval_file(@debug_template_filename, assigns: assigns)
 
@@ -30,5 +40,11 @@ defmodule Credo.Execution.Task.WriteDebugReport do
 
   def call(exec, _opts) do
     exec
+  end
+
+  def timings_to_map(list) do
+    Enum.map(list, fn {tags, started_at, duration} ->
+      %{tags: Enum.into(tags, %{}), started_at: started_at, duration: duration}
+    end)
   end
 end

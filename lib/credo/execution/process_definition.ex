@@ -1,4 +1,6 @@
 defmodule Credo.Execution.ProcessDefinition do
+  alias Credo.Execution
+
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
@@ -20,7 +22,7 @@ defmodule Credo.Execution.ProcessDefinition do
   defmacro __before_compile__(_env) do
     quote do
       defp process_definition_call(exec) do
-        Credo.Execution.ProcessDefinition.builder_call(exec, all_tasks())
+        Credo.Execution.ProcessDefinition.builder_call(exec, all_tasks(), __MODULE__)
       end
 
       defp all_tasks do
@@ -30,12 +32,18 @@ defmodule Credo.Execution.ProcessDefinition do
   end
 
   @doc false
-  def builder_call(exec, compiled_tasks) do
+  def builder_call(exec, compiled_tasks, current_task) do
+    old_parent_task = exec.parent_task
+    old_current_task = exec.current_task
+
+    exec = Execution.set_parent_and_current_task(exec, exec.current_task, current_task)
+
     tasks = compiled_tasks
 
     Enum.reduce(tasks, exec, fn task, exec ->
       Credo.Execution.Task.run(task, exec)
     end)
+    |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
   end
 
   @doc """

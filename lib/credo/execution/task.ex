@@ -42,12 +42,19 @@ defmodule Credo.Execution.Task do
   end
 
   defp do_run(task, %Credo.Execution{halted: false} = exec, opts) do
+    old_parent_task = exec.parent_task
+    old_current_task = exec.current_task
+
+    exec = Execution.set_parent_and_current_task(exec, exec.current_task, task)
+
     case task.call(exec, opts) do
       %Execution{halted: false} = exec ->
         exec
+        |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
 
       %Execution{halted: true} = exec ->
         task.error(exec, opts)
+        |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
 
       value ->
         # TODO: improve message

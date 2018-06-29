@@ -15,10 +15,7 @@ defmodule Credo.Sources do
 
   iex> Sources.find(%Credo.Execution{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
   """
-  def find(%Credo.Execution{
-        read_from_stdin: true,
-        files: %{included: [filename]}
-      }) do
+  def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename
     |> source_file_from_stdin()
     |> List.wrap()
