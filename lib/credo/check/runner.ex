@@ -50,13 +50,18 @@ defmodule Credo.Check.Runner do
   defp append_issues_and_timings(exec, source_file, {issues, {check, filename, started_at, time}}) do
     Issues.append(exec, source_file, issues)
 
-    Timing.append(exec, [check: check, source_file: filename], started_at, time)
+    Timing.append(
+      exec,
+      [task: exec.current_task, check: check, source_file: filename],
+      started_at,
+      time
+    )
   end
 
   defp append_issues_and_timings(exec, source_file, {issues, {check, started_at, time}}) do
     Issues.append(exec, source_file, issues)
 
-    Timing.append(exec, [check: check], started_at, time)
+    Timing.append(exec, [task: exec.current_task, check: check], started_at, time)
   end
 
   @doc false
@@ -66,7 +71,12 @@ defmodule Credo.Check.Runner do
         Enum.into(issues, %{})
 
       {issues, {check, started_at, time}} ->
-        Timing.append(exec, [check: check, alias: "ConfigCommentFinder"], started_at, time)
+        Timing.append(
+          exec,
+          [task: exec.current_task, check: check, alias: "ConfigCommentFinder"],
+          started_at,
+          time
+        )
 
         Enum.into(issues, %{})
     end
