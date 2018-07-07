@@ -171,7 +171,8 @@ defmodule Credo.CLI.Output.Summary do
 
   defp scope_count(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&scope_count/1)
+    |> Enum.map(&Task.async(fn -> scope_count(&1) end))
+    |> Enum.map(&Task.await/1)
     |> Enum.reduce(&(&1 + &2))
   end
 
