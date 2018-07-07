@@ -3,6 +3,16 @@ defmodule Credo.Execution.Timing do
 
   alias Credo.Execution
 
+  def inspect(label, fun) do
+    {time, result} = :timer.tc(fun)
+
+    time
+    |> format_time()
+    |> IO.inspect(label: label)
+
+    result
+  end
+
   def now(), do: :os.system_time(:microsecond)
 
   def run(fun) do
@@ -74,6 +84,19 @@ defmodule Credo.Execution.Timing do
       |> List.last()
 
     started_at + duration
+  end
+
+  defp format_time(time) do
+    cond do
+      time > 1_000_000 ->
+        "#{div(time, 1_000_000)}s"
+
+      time > 1_000 ->
+        "#{div(time, 1_000)}ms"
+
+      true ->
+        "#{time}μs"
+    end
   end
 
   # callbacks
