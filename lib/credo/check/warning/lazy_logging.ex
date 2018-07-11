@@ -38,15 +38,13 @@ defmodule Credo.Check.Warning.LazyLogging do
     # {<Logger import seen?>, <list of issues>}
     state = {false, []}
 
-    {_, issues} =
-      Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
 
     issues
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} =
-           ast,
+         {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
          state,
          issue_meta
        )

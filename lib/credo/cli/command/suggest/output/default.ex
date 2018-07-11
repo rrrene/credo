@@ -1,9 +1,8 @@
 defmodule Credo.CLI.Command.Suggest.Output.Default do
   alias Credo.CLI.Filename
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output
-  alias Credo.CLI.Output.UI
   alias Credo.CLI.Output.Summary
+  alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
   alias Credo.Execution
   alias Credo.Issue
@@ -57,20 +56,15 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
 
     issues = Execution.get_issues(exec)
 
-    shown_issues =
-      issues
-      |> Filter.important(exec)
-      |> Filter.valid_issues(exec)
-
     categories =
-      shown_issues
+      issues
       |> Enum.map(& &1.category)
       |> Enum.uniq()
 
     issue_map =
       categories
       |> Enum.map(fn category ->
-        {category, shown_issues |> Enum.filter(&(&1.category == category))}
+        {category, issues |> Enum.filter(&(&1.category == category))}
       end)
       |> Enum.into(%{})
 

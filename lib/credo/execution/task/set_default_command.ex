@@ -1,8 +1,8 @@
 defmodule Credo.Execution.Task.SetDefaultCommand do
   use Credo.Execution.Task
 
-  alias Credo.CLI.Options
   alias Credo.CLI.Filename
+  alias Credo.CLI.Options
 
   @default_command_name "suggest"
   @explain_command_name "explain"

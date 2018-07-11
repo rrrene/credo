@@ -7,6 +7,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
     |> validate_checks()
     |> remove_missing_checks()
+    |> inspect_config_if_debug()
   end
 
   defp validate_checks(%Execution{checks: checks} = exec) do
@@ -14,6 +15,22 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
     exec
   end
+
+  defp inspect_config_if_debug(%Execution{debug: true} = exec) do
+    require Logger
+
+    Logger.debug(fn ->
+      """
+      Execution struct after #{__MODULE__}:
+
+      #{inspect(exec, pretty: true)}
+      """
+    end)
+
+    exec
+  end
+
+  defp inspect_config_if_debug(exec), do: exec
 
   defp remove_missing_checks(%Execution{checks: checks} = exec) do
     checks = Enum.filter(checks, &check_defined?/1)

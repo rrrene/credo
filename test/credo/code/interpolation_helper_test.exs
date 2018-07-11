@@ -42,6 +42,22 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  test "should replace string interpolations with given non-character" do
+    source = ~S"""
+    def fun() do
+      a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
+    end
+    """
+
+    expected = ~S"""
+    def fun() do
+      a = "MyModule..SubModule."
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "")
+  end
+
   test "should replace string interpolations with given character /3" do
     source = ~S"""
     case category_count(issues, category) do
@@ -122,16 +138,14 @@ defmodule Credo.Code.InterpolationHelperTest do
 
   @tag :token_position
   test "should give correct token position" do
-    positions =
-      InterpolationHelper.interpolation_positions(@no_interpolations_source)
+    positions = InterpolationHelper.interpolation_positions(@no_interpolations_source)
 
     assert @no_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with a single interpolation" do
-    positions =
-      InterpolationHelper.interpolation_positions(@single_interpolations_source)
+    positions = InterpolationHelper.interpolation_positions(@single_interpolations_source)
 
     assert @single_interpolations_positions == positions
   end
@@ -176,20 +190,14 @@ defmodule Credo.Code.InterpolationHelperTest do
 
   @tag :token_position
   test "should give correct token position with multiple interpolations" do
-    positions =
-      InterpolationHelper.interpolation_positions(
-        @multiple_interpolations_source
-      )
+    positions = InterpolationHelper.interpolation_positions(@multiple_interpolations_source)
 
     assert @multiple_interpolations_positions == positions
   end
 
   @tag :token_position
   test "should give correct token position with multiple interpolations in heredoc" do
-    positions =
-      InterpolationHelper.interpolation_positions(
-        @heredoc_interpolations_source
-      )
+    positions = InterpolationHelper.interpolation_positions(@heredoc_interpolations_source)
 
     assert @heredoc_interpolations_positions == positions
   end
@@ -336,6 +344,112 @@ defmodule Credo.Code.InterpolationHelperTest do
     $$$$$$$$$$$$
     $$$$$$$$$$$$$$$
     $$$$$$$$$$`."
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag :token_multi_line_replacement
+  test "should replace a single interpolation stretching multiple lines including a hexadecimal number 1" do
+    source = ~S"""
+    "foobar#{quote do
+      System
+    end}"
+    """
+
+    expected = ~S"""
+    "foobar$$$$$$$$$$
+    $$$$$$$$
+    $$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  test "it should replace interpols" do
+    source = ~S"""
+    def foo(a) do
+      "#{a} #{a}"
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    expected = ~S"""
+    def foo(a) do
+      " "
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/ modifier" do
+    source = ~S"""
+    ~x"sigil content"s == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content"s == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/ multiple modifiers" do
+    source = ~S"""
+    ~x"sigil content"si == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content"si == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation after a sigil w/o modifier" do
+    source = ~S"""
+    ~x"sigil content" == "#{foo}"
+    """
+
+    expected = ~S"""
+    ~x"sigil content" == "$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation in a value of a map" do
+    source = ~S"""
+    %{"some-atom-with-quotes": "#{filename} world"}
+    """
+
+    expected = ~S"""
+    %{"some-atom-with-quotes": "$$$$$$$$$$$ world"}
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.6.5"
+  test "it should replace a single interpolation in a value of a map /2" do
+    source = ~S"""
+    %{some_atom_wo_quotes: "#{filename} world"}
+    """
+
+    expected = ~S"""
+    %{some_atom_wo_quotes: "$$$$$$$$$$$ world"}
     """
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")

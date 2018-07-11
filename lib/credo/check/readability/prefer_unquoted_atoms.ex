@@ -102,10 +102,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
 
     format_issue(
       issue_meta,
-      message:
-        "Use unquoted atom `#{inspect(atom)}` rather than quoted atom `#{
-          trigger
-        }`.",
+      message: "Use unquoted atom `#{inspect(atom)}` rather than quoted atom `#{trigger}`.",
       trigger: trigger,
       line_no: line_no,
       column: column

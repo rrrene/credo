@@ -10,6 +10,6 @@ defmodule Credo.CLI.Task.SetRelevantIssues do
       |> Filter.important(exec)
       |> Filter.valid_issues(exec)
 
-    put_result(exec, "credo.issues", issues)
+    set_issues(exec, issues)
   end
 end

@@ -15,14 +15,17 @@ defmodule Credo.Code.TokenTest do
   @multiple_interpolations_source ~S[a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"]
   @multiple_interpolations_position {1, 5, 1, 60}
 
-  @single_interpolations_source ~S[a = "MyModule.SubModule.#{name}"]
-  @single_interpolations_position {1, 5, 1, 33}
+  @single_interpolations_bin_string_source ~S[a = "MyModule.SubModule.#{name}"]
+  @single_interpolations_bin_string_position {1, 5, 1, 33}
 
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_position {1, 7, 1, 10}
 
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do
+    @single_interpolations_list_string_source ~S[a = 'MyModule.SubModule.#{name}']
+    @single_interpolations_list_string_position {1, 5, 1, 33}
+
     @tag :token_position
     test "should give correct token position" do
       source = @no_interpolations_source
@@ -43,7 +46,7 @@ defmodule Credo.Code.TokenTest do
 
     @tag :token_position
     test "should give correct token position with a single interpolation" do
-      source = @single_interpolations_source
+      source = @single_interpolations_bin_string_source
       tokens = Credo.Code.to_tokens(source)
 
       expected = [
@@ -60,7 +63,29 @@ defmodule Credo.Code.TokenTest do
 
       position = expected |> List.last() |> Token.position()
 
-      assert @single_interpolations_position == position
+      assert @single_interpolations_bin_string_position == position
+    end
+
+    @tag :token_position
+    test "should give correct token position with a single interpolation with list string" do
+      source = @single_interpolations_list_string_source
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:identifier, {1, 1, nil}, :a},
+        {:match_op, {1, 3, nil}, :=},
+        {:list_string, {1, 5, nil},
+         [
+           "MyModule.SubModule.",
+           {{1, 25, 1}, [{:identifier, {1, 27, nil}, :name}]}
+         ]}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> List.last() |> Token.position()
+
+      assert @single_interpolations_list_string_position == position
     end
 
     @tag :token_position
@@ -145,6 +170,47 @@ defmodule Credo.Code.TokenTest do
 
       assert @heredoc_interpolations_position == position
     end
+
+    @tag needs_elixir: "1.7.0"
+    test "should give correct token position for map" do
+      source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:%{}, {1, 1, nil}},
+        {:"{", {1, 2, nil}},
+        {:kw_identifier_unsafe, {1, 3, nil}, ["some-atom-with-quotes"]},
+        {:bin_string, {1, 28, nil},
+         [{{1, 29, 1}, [{:identifier, {1, 31, nil}, :filename}]}, " world"]},
+        {:"}", {1, 47, nil}}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> Enum.take(4) |> List.last() |> Token.position()
+
+      assert {1, 28, 1, 47} == position
+    end
+
+    test "should give correct token position for map /2" do
+      source = ~S(%{some_atom_with_quotes: "#{filename} world"})
+      tokens = Credo.Code.to_tokens(source)
+
+      expected = [
+        {:%{}, {1, 1, nil}},
+        {:"{", {1, 2, nil}},
+        {:kw_identifier, {1, 3, nil}, :some_atom_with_quotes},
+        {:bin_string, {1, 26, nil},
+         [{{1, 27, 1}, [{:identifier, {1, 29, nil}, :filename}]}, " world"]},
+        {:"}", {1, 45, nil}}
+      ]
+
+      assert expected == tokens
+
+      position = expected |> Enum.take(4) |> List.last() |> Token.position()
+
+      assert {1, 26, 1, 45} == position
+    end
   end
 
   # Elixir <= 1.5.x
@@ -169,7 +235,7 @@ defmodule Credo.Code.TokenTest do
 
     @tag :token_position
     test "should give correct token position with a single interpolation" do
-      source = @single_interpolations_source
+      source = @single_interpolations_bin_string_source
       tokens = Credo.Code.to_tokens(source)
 
       expected = [
@@ -186,7 +252,7 @@ defmodule Credo.Code.TokenTest do
 
       position = expected |> List.last() |> Token.position()
 
-      assert @single_interpolations_position == position
+      assert @single_interpolations_bin_string_position == position
     end
 
     @tag :token_position

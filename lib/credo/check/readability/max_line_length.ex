@@ -9,15 +9,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
     check: @moduledoc,
     params: [
       max_length: "The maximum number of characters a line may consist of.",
-      ignore_definitions:
-        "Set to `true` to ignore lines including function definitions.",
+      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
       ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings:
-        "Set to `true` to ignore lines that are strings or in heredocs"
+      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs"
     ]
   ]
   @default_params [
-    max_length: 80,
+    max_length: 120,
     ignore_definitions: true,
     ignore_specs: false,
     ignore_strings: true
@@ -27,13 +25,15 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
   use Credo.Check, base_priority: :low
 
+  alias Credo.Code.Heredocs
+  alias Credo.Code.Strings
+
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, @default_params)
 
-    ignore_definitions =
-      Params.get(params, :ignore_definitions, @default_params)
+    ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
 
     ignore_specs = Params.get(params, :ignore_specs, @default_params)
     ignore_strings = Params.get(params, :ignore_strings, @default_params)
@@ -47,20 +47,24 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
     source =
       if ignore_heredocs do
-        Credo.Code.Heredocs.replace_with_spaces(source, "")
+        Heredocs.replace_with_spaces(source, "")
       else
         source
       end
 
     lines = Credo.Code.to_lines(source)
 
+    lines_for_comparison =
+      if ignore_strings do
+        source
+        |> Strings.replace_with_spaces("")
+        |> Credo.Code.to_lines()
+      else
+        lines
+      end
+
     Enum.reduce(lines, [], fn {line_no, line}, issues ->
-      line_for_comparison =
-        if ignore_strings do
-          Credo.Code.Strings.replace_with_spaces(line, "")
-        else
-          line
-        end
+      {_, line_for_comparison} = Enum.at(lines_for_comparison, line_no - 1)
 
       if String.length(line_for_comparison) > max_length do
         if refute_issue?(
@@ -91,7 +95,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
+  defp find_specs({:spec, meta, arguments} = ast, specs)
+       when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end
 

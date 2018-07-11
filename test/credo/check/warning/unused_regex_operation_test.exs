@@ -422,7 +422,7 @@ defmodule Credo.Check.Warning.UnusedRegexOperationTest do
             true -> false
             _ ->
               Regex.insert_at(arr, [], fn(w) ->
-                [:this_goes_nowhere, Regex.compile!(w, ",")]
+                [:this_goes_nowhere, x]
               end)
           end
         end
@@ -432,7 +432,7 @@ defmodule Credo.Check.Warning.UnusedRegexOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do

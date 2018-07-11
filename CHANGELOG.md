@@ -1,18 +1,58 @@
 # Changelog
 
-## 0.9.0-rc2
+## 0.10.0 (pre)
+
+- Fix false positive on `LargeNumbers`
+- Fix `NegatedConditionWithElse` for `not/2` as well
+- Switch `poison` for `jason`
+
+### New checks
+
+- Credo.Check.Refactor.MapInto
+
+## 0.9.3
+
+- Fix bug in Scope
+- Fix false positive in MatchInConditionTest
+- Fix false positive in UnusedEnumOperation
+- Fix custom tasks by resolving config before validating it
+- Add text support to `--min-priority` CLI switch (you can now set it to low/normal/high)
+
+### New checks
+
+- Credo.Check.Readability.AliasOrder
+
+## 0.9.2
+
+- Add `:ignore_comments` param to LongQuoteBlocks
+- Fix false positive in UnusedPathOperation
+
+## 0.9.1
+
+- Fix false positive in SpaceAroundOperators
+- Fix false positive in UnusedEnumOperation
+
+## 0.9.0
 
 - Add JSON support
 - Ensure compatibility with Elixir 1.6
 - Format codebase using Elixir 1.6 Formatter
 - Rework internals in preparation of 1.0 release
-- Credo now requires Elixir 1.3.2
+- Credo now requires Elixir 1.4
 - Include `test` directory in default config
 - Add `excluded_argument_types` to PipeChainStart
 - Emit warnings for non-existing checks, which are referenced in config
+- Improve VariableNames
+- ModuleDoc now raises an issue for empty strings in @moduledoc tags
+- Fix bug on ModuleNames
 - Fix false positive in VariableRebinding
 - Fix false positive in SpaceAroundOperators
 - Fix false positive on BoolOperationOnSameValues
+- Fix false positive on SpaceAfterCommas
+- Fix false positive on MaxLineLength
+- Fix false positive in ParenthesesInCondition
+- Remove `NameRedeclarationBy*` checks
+- Remove support for @lint attributes
 
 ## 0.8.10
 

@@ -1,10 +1,9 @@
 defmodule Credo.CLI.Command.Explain.Output.Default do
-  alias Credo.Code.Scope
-  alias Credo.CLI.Filter
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
-  alias Credo.SourceFile
+  alias Credo.Code.Scope
   alias Credo.Issue
+  alias Credo.SourceFile
 
   @indent 8
   @params_min_indent 20
@@ -43,8 +42,6 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     issues = Credo.Execution.get_issues(exec, filename)
 
     issues
-    |> Filter.important(exec)
-    |> Filter.valid_issues(exec)
     |> Enum.sort_by(& &1.line_no)
     |> filter_issues(line_no, column)
     |> print_issues(filename, source_file, exec, term_width, line_no, column)

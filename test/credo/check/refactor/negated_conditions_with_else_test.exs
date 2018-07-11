@@ -59,4 +59,20 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation with not/2 as well" do
+    """
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        if not allowed? do
+          true
+        else
+          false
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end

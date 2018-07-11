@@ -20,7 +20,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.join(parameter1)
-        |>  some_where
+        |> some_where
 
         parameter1
       end
@@ -76,26 +76,26 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   test "it should NOT report a violation when inside a condition" do
     """
     defmodule CredoSampleModule do
-    def some_function(parameter1, parameter2) do
-      if Enum.count(x1) > Enum.count(x2) do
-        cond do
-          Enum.count(x3) == "" -> IO.puts("1")
-          Enum.count(x) == 15 -> IO.puts("2")
-          Enum.at(x3, 1) == "b" -> IO.puts("2")
+      def some_function(parameter1, parameter2) do
+        if Enum.count(x1) > Enum.count(x2) do
+          cond do
+            Enum.count(x3) == "" -> IO.puts("1")
+            Enum.count(x) == 15 -> IO.puts("2")
+            Enum.at(x3, 1) == "b" -> IO.puts("2")
+          end
+        else
+          case Enum.count(x3) do
+            0 -> true
+            1 -> false
+            _ -> something
+          end
         end
-      else
-        case Enum.count(x3) do
-          0 -> true
-          1 -> false
-          _ -> something
+        unless Enum.count(x4) == "" do
+          IO.puts "empty"
         end
-      end
-      unless Enum.count(x4) == "" do
-        IO.puts "empty"
-      end
 
-      parameter1 + parameter2 + offset
-    end
+        parameter1 + parameter2 + offset
+      end
     end
     """
     |> to_source_file
@@ -105,13 +105,13 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   test "it should NOT report a violation when inside a quote" do
     """
     defmodule CredoSampleModule do
-    defp category_body(nil) do
-      quote do
-        __MODULE__
-        |> Module.split
-        |> Enum.at(2)
+      defp category_body(nil) do
+        quote do
+          __MODULE__
+          |> Module.split
+          |> Enum.at(2)
+        end
       end
-    end
     end
     """
     |> to_source_file
@@ -197,7 +197,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           case check do
             true -> false
             _ ->
-              Enum.reduce(arr, fn(w) ->
+              Enum.map(arr, fn(w) ->
                 [:this_might_return, Enum.join(w, ",")]
               end)
           end
@@ -338,7 +338,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
             true -> false
             _ ->
               list =
-                Enum.reduce(arr, fn(w) ->
+                Enum.map(arr, fn(w) ->
                   [:this_goes_nowhere, Enum.join(w, ",")]
                 end)
           end
@@ -468,6 +468,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           {:error, "No exec"}
         else
           anything
+
           {:ok, Enum.flat_map(configs, fn x -> x end)}
         end
       end
@@ -475,6 +476,137 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     """
     |> to_source_file
     |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for Enum.map inside Agent.update" do
+    """
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
+        Agent.update(__MODULE__, fn _ ->
+          Enum.map([1, 2, 3], fn a -> a end)
+        end)
+
+        Agent.get(__MODULE__, fn val -> val end)
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for last statement before rescue" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        Enum.empty?(configs)
+      rescue
+        _ ->
+          raise "whatever"
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for last statement before rescue /2" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        try do
+          Enum.empty?(configs)
+        rescue
+          _ ->
+            raise "whatever"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report a violation for function calls to erlang modules" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        :ets.insert(table, Enum.map([1, 2, 3, 4], fn i -> i + 1 end))
+
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  #
+  #
+  #
+
+  test "it should report a violation when NOT the last statement in rescue block" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        try do
+          configs
+        rescue
+          _ ->
+            Enum.empty?(configs)
+
+            raise "whatever"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation for Enum.map inside Agent.update" do
+    """
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
+        Agent.update(__MODULE__, fn _ ->
+          Enum.map([1, 2, 3], fn a -> a + 5 end)
+
+          something_else
+        end)
+
+        Agent.get(__MODULE__, fn val -> val end)
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation for Enum.map inside assigned :if" do
+    """
+    defmodule CredoTest do
+      def agent_update do
+        Agent.start_link(fn -> 0 end, name: __MODULE__)
+
+        x =
+          case x do
+            nil ->
+              x
+            _ ->
+              Enum.map([1, 2, 3], fn a -> a + 5 end)
+
+              something_else
+          end
+
+        Agent.get(__MODULE__, fn val -> val end)
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation" do
@@ -515,6 +647,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         for x <- [1, 2, 3] do
           # this goes nowhere!
           Enum.join(w, ",")
+
           x
         end
       end
@@ -533,6 +666,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
             :this_goes_nowhere,
             Enum.join(w, ",") # THIS is not the last_call!
           ]
+
           IO.puts "."
         else
           IO.puts "x"
@@ -569,10 +703,12 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           IO.puts "."
         else
           case check do
-            true -> false
+            true ->
+              false
             _ ->
-              Enum.reduce(arr, fn(w) ->
-                [:this_goes_nowhere, Enum.join(w, ",")]
+              # this goes nowhere!
+              Enum.map(arr, fn(w) ->
+                [:this_goes_nowhere, Enum.join(w, ",")] # <-- this one is not counted
               end)
           end
         end
@@ -582,7 +718,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> assert_issue(@described_check)
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
@@ -611,6 +747,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           IO.puts "."
         else
           [:this_goes_nowhere, Enum.join(w, ",")] # THIS is not the last_call!
+
           IO.puts " "
         end
       end
@@ -630,11 +767,11 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1
       end
       def some_function2(parameter1, parameter2) do
-       Enum.reduce(parameter1, parameter2)
+       Enum.map(parameter1, parameter2)
        parameter1
        end
        def some_function3(parameter1, parameter2) do
-         Enum.reduce(parameter1, parameter2)
+         Enum.map(parameter1, parameter2)
          parameter1
        end
     end
@@ -650,7 +787,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     defmodule CredoSampleModule do
       defp something(bin) do
         for segment <- Enum.flat_map(segment, &(&1.blob)), segment != "" do
+          # this goes nowhere!
           Enum.map(segment, &IO.inspect/1)
+
           segment
         end
       end

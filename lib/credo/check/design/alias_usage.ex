@@ -32,10 +32,10 @@ defmodule Credo.Check.Design.AliasUsage do
   @explanation [
     check: @moduledoc,
     params: [
-      if_nested_deeper_than:
-        "Only raise an issue if a module is nested deeper than this.",
-      if_called_more_often_than:
-        "Only raise an issue if a module is called more often than this."
+      excluded_namespaces: "List of namespaces to be excluded for this check.",
+      excluded_lastnames: "List of lastnames to be excluded for this check.",
+      if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
+      if_called_more_often_than: "Only raise an issue if a module is called more often than this."
     ]
   ]
   @default_params [
@@ -69,22 +69,16 @@ defmodule Credo.Check.Design.AliasUsage do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    excluded_namespaces =
-      Params.get(params, :excluded_namespaces, @default_params)
+    excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
 
-    excluded_lastnames =
-      Params.get(params, :excluded_lastnames, @default_params)
+    excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
 
-    if_nested_deeper_than =
-      Params.get(params, :if_nested_deeper_than, @default_params)
+    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
 
-    if_called_more_often_than =
-      Params.get(params, :if_called_more_often_than, @default_params)
+    if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
 
     source_file
-    |> Credo.Code.prewalk(
-      &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames)
-    )
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end
@@ -144,6 +138,20 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, issues}
   end
 
+  # Ignore alias containg an `unquote` call
+  defp find_issues(
+         {:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast,
+         issues,
+         _,
+         _,
+         _,
+         _,
+         _
+       )
+       when is_list(mod_list) do
+    {ast, issues}
+  end
+
   defp find_issues(
          {:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast,
          issues,
@@ -156,6 +164,9 @@ defmodule Credo.Check.Design.AliasUsage do
        when is_list(mod_list) and is_atom(fun_atom) do
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
+        {ast, issues}
+
+      Enum.any?(mod_list, &unquote?/1) ->
         {ast, issues}
 
       excluded_lastname_or_namespace?(
@@ -182,6 +193,9 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, issues}
   end
 
+  defp unquote?({:unquote, _, arguments}) when is_list(arguments), do: true
+  defp unquote?(_), do: false
+
   defp excluded_lastname_or_namespace?(
          mod_list,
          excluded_namespaces,
@@ -190,8 +204,7 @@ defmodule Credo.Check.Design.AliasUsage do
     first_name = Credo.Code.Name.first(mod_list)
     last_name = Credo.Code.Name.last(mod_list)
 
-    Enum.member?(excluded_namespaces, first_name) ||
-      Enum.member?(excluded_lastnames, last_name)
+    Enum.member?(excluded_namespaces, first_name) || Enum.member?(excluded_lastnames, last_name)
   end
 
   # Returns true if mod_list and alias_name would result in the same alias
@@ -249,8 +262,7 @@ defmodule Credo.Check.Design.AliasUsage do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message:
-        "Nested modules could be aliased at the top of the invoking module.",
+      message: "Nested modules could be aliased at the top of the invoking module.",
       trigger: trigger,
       line_no: line_no
     )

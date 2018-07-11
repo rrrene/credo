@@ -37,9 +37,7 @@ defmodule Credo.Execution do
             skipped_checks: nil,
             assigns: %{},
             results: %{},
-            config_comment_map: %{},
-            # maps filenames to @lint attributes
-            lint_attribute_map: %{}
+            config_comment_map: %{}
 
   @type t :: module
 
@@ -150,6 +148,12 @@ defmodule Credo.Execution do
     exec
     |> Issues.to_map()
     |> Map.get(filename, [])
+  end
+
+  def set_issues(exec, issues) do
+    Issues.set(exec, issues)
+
+    exec
   end
 
   # Results

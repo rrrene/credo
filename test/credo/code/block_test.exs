@@ -19,7 +19,9 @@ defmodule Credo.Code.BlockTest do
       |> Code.string_to_quoted()
 
     assert 4 ==
-             ast |> Block.all_blocks_for!() |> Enum.reject(&is_nil/1)
+             ast
+             |> Block.all_blocks_for!()
+             |> Enum.reject(&is_nil/1)
              |> Enum.count()
   end
 

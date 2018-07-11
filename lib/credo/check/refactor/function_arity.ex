@@ -9,8 +9,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
   @explanation [
     check: @moduledoc,
     params: [
-      max_arity:
-        "The maximum number of parameters which a function should take.",
+      max_arity: "The maximum number of parameters which a function should take.",
       ignore_defp: "Set to `true` to ignore private functions."
     ]
   ]
@@ -49,8 +48,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
 
         {
           ast,
-          issues ++
-            [issue_for(issue_meta, meta[:line], fun_name, max_arity, arity)]
+          issues ++ [issue_for(issue_meta, meta[:line], fun_name, max_arity, arity)]
         }
       else
         {ast, issues}
@@ -70,9 +68,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
     format_issue(
       issue_meta,
       message:
-        "Function takes too many parameters (arity is #{actual_value}, max is #{
-          max_value
-        }).",
+        "Function takes too many parameters (arity is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)

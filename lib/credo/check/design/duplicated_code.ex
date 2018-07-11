@@ -23,8 +23,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
     params: [
       mass_threshold:
         "The minimum mass which a part of code has to have to qualify for this check.",
-      nodes_threshold:
-        "The number of nodes that need to be found to raise an issue."
+      nodes_threshold: "The number of nodes that need to be found to raise an issue.",
+      excluded_macros: "List of macros to be excluded for this check."
     ]
   ]
   @default_params [
@@ -33,9 +33,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
     excluded_macros: []
   ]
 
-  alias Credo.SourceFile
-  alias Credo.Issue
   alias Credo.Check.CodeHelper
+  alias Credo.Issue
+  alias Credo.SourceFile
 
   use Credo.Check, run_on_all: true, base_priority: :higher
 

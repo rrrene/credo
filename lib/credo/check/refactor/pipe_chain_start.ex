@@ -21,7 +21,10 @@ defmodule Credo.Check.Refactor.PipeChainStart do
 
   @explanation [
     check: @moduledoc,
-    excluded_functions: "All functions listed will be ignored."
+    params: [
+      excluded_functions: "All functions listed will be ignored.",
+      excluded_argument_types: "All pipes with argument types listed will be ignored."
+    ]
   ]
   @default_params [excluded_argument_types: [], excluded_functions: []]
 
@@ -31,11 +34,9 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    excluded_functions =
-      Params.get(params, :excluded_functions, @default_params)
+    excluded_functions = Params.get(params, :excluded_functions, @default_params)
 
-    excluded_argument_types =
-      Params.get(params, :excluded_argument_types, @default_params)
+    excluded_argument_types = Params.get(params, :excluded_argument_types, @default_params)
 
     Credo.Code.prewalk(
       source_file,
@@ -170,8 +171,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     )
   end
 
-  defp valid_chain_start?(_, _excluded_functions, _excluded_argument_types),
-    do: true
+  defp valid_chain_start?(_, _excluded_functions, _excluded_argument_types), do: true
 
   defp valid_chain_start_function_call?(
          {_atom, _, arguments} = ast,

@@ -20,7 +20,7 @@ defmodule Credo.CLI.Options do
     help: :boolean,
     ignore_checks: :string,
     ignore: :string,
-    min_priority: :integer,
+    min_priority: :string,
     only: :string,
     read_from_stdin: :boolean,
     strict: :boolean,
@@ -38,6 +38,8 @@ defmodule Credo.CLI.Options do
     v: :version
   ]
 
+  alias Credo.Priority
+
   def parse(argv, current_dir, command_names, ignored_args) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)
@@ -53,13 +55,41 @@ defmodule Credo.CLI.Options do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
     {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
+    {switches_keywords, extra_unknown_switches} = patch_switches(switches_keywords)
+
     %__MODULE__{
       command: command,
       path: path,
       args: unknown_args,
       switches: Enum.into(switches_keywords, %{}),
-      unknown_switches: unknown_switches_keywords
+      unknown_switches: unknown_switches_keywords ++ extra_unknown_switches
     }
+  end
+
+  defp patch_switches(switches_keywords) do
+    {switches, unknowns} = Enum.map_reduce(switches_keywords, [], &patch_switch/2)
+    switches = Enum.reject(switches, &(&1 == nil))
+    {switches, unknowns}
+  end
+
+  defp patch_switch({:min_priority, str}, unknowns) do
+    priority = priority_as_name(str) || priority_as_number(str)
+
+    case priority do
+      nil -> {nil, [{"--min-priority", str} | unknowns]}
+      int -> {{:min_priority, int}, unknowns}
+    end
+  end
+
+  defp patch_switch(switch, unknowns), do: {switch, unknowns}
+
+  defp priority_as_name(str), do: Priority.to_integer(str)
+
+  defp priority_as_number(str) do
+    case Integer.parse(str) do
+      {int, ""} -> int
+      _ -> nil
+    end
   end
 
   defp split_args([], current_dir, _) do

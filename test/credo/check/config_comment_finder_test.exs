@@ -9,7 +9,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
     source_file =
       """
       defmodule OtherModule do
-        # credo:disable-next-line
+        # credo:disable-for-next-line
         defmacro fooBarCool do
           {:ok} = File.read
         end
@@ -33,8 +33,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
       """
       |> to_source_file
 
-    {_, config_comments} =
-      ConfigCommentFinder.find_and_set_in_source_file(source_file)
+    {_, config_comments} = ConfigCommentFinder.find_and_set_in_source_file(source_file)
 
     assert config_comments |> Enum.find(&(&1.line_no == 2))
     assert config_comments |> Enum.find(&(&1.line_no == 7))

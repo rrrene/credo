@@ -37,8 +37,7 @@ defmodule Credo.SourceFileTest do
       """
       |> to_source_file
 
-    assert "    some_value = parameter1 + parameter2" ==
-             Credo.SourceFile.line_at(source_file, 3)
+    assert "    some_value = parameter1 + parameter2" == Credo.SourceFile.line_at(source_file, 3)
 
     assert 18 == Credo.SourceFile.column(source_file, 3, :parameter1)
     assert 1 == Credo.SourceFile.column(source_file, 1, :defmodule)

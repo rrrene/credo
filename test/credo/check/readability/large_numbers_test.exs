@@ -92,6 +92,16 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues(@described_check)
   end
 
+  test "check old false positive is fixed /3" do
+    """
+    check all integer <- integer(-10_000..-1) do
+      assert is_integer(integer)
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #

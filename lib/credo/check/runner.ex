@@ -1,8 +1,8 @@
 defmodule Credo.Check.Runner do
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.SourceFile
   alias Credo.Execution.Issues
+  alias Credo.SourceFile
 
   @doc false
   def run(source_files, exec) when is_list(source_files) do
@@ -36,13 +36,6 @@ defmodule Credo.Check.Runner do
     end
 
     :ok
-  end
-
-  @doc "TODO: deprecated"
-  def run_linter_attribute_reader(source_files, exec) do
-    {Credo.Check.FindLintAttributes}
-    |> run_check(source_files, exec)
-    |> Enum.into(%{})
   end
 
   @doc "Runs the ConfigCommentFinder"
@@ -88,7 +81,8 @@ defmodule Credo.Check.Runner do
     run_check({check, []}, source_file, exec)
   end
 
-  defp run_check({check, params}, source_files, exec) when is_list(source_files) do
+  defp run_check({check, params}, source_files, exec)
+       when is_list(source_files) do
     try do
       check.run(source_files, exec, params)
     rescue

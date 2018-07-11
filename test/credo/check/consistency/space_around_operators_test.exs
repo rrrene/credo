@@ -44,6 +44,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
       # Fine
       defp format_value("NPC_", "NPDT", <<skills::binary-27>>) do
+        {time, r} = :timer.tc(&unquote(module).unquote(part)/0)
       end
 
       # Gives warning
@@ -177,6 +178,17 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
+  if Version.match?(System.version(), ">= 1.6.0-rc") do
+    @with_spaces6 """
+    assert -24 == MyModule.fun
+    assert MyModule.fun !=  -24
+    ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
+    """
+  else
+    @with_spaces6 """
+    """
+  end
+
   @with_and_without_spaces """
   defmodule OtherModule3 do
     defmacro foo do
@@ -223,6 +235,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   test "it should not report issues if spaces are used everywhere in a single file" do
     [
       @with_spaces5
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
+
+  test "it should not report issues if spaces are used everywhere in two files" do
+    [
+      @with_spaces5,
+      @with_spaces6
     ]
     |> to_source_files()
     |> refute_issues(@described_check)

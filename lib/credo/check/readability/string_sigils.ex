@@ -22,8 +22,7 @@ defmodule Credo.Check.Readability.StringSigils do
   @explanation [
     check: @moduledoc,
     params: [
-      maximum_allowed_quotes:
-        "The maximum amount of escaped quotes you want to tolerate."
+      maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
     ]
   ]
   @default_params [
@@ -37,8 +36,7 @@ defmodule Credo.Check.Readability.StringSigils do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    maximum_allowed_quotes =
-      Params.get(params, :maximum_allowed_quotes, @default_params)
+    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
 
     Credo.Code.prewalk(
       source_file,
@@ -47,11 +45,13 @@ defmodule Credo.Check.Readability.StringSigils do
   end
 
   def traverse(
-        {maybe_sigil, [line: line_no], [str | rest_ast]} = ast,
+        {maybe_sigil, meta, [str | rest_ast]} = ast,
         issues,
         issue_meta,
         maximum_allowed_quotes
       ) do
+    line_no = meta[:line]
+
     cond do
       is_sigil(maybe_sigil) ->
         {rest_ast, issues}
@@ -92,8 +92,7 @@ defmodule Credo.Check.Readability.StringSigils do
          issue_meta,
          line_no
        ) do
-    if !is_heredoc(issue_meta, line_no) &&
-         too_many_quotes?(string, maximum_allowed_quotes) do
+    if !is_heredoc(issue_meta, line_no) && too_many_quotes?(string, maximum_allowed_quotes) do
       [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
     else
       issues

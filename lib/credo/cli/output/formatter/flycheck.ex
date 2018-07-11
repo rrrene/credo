@@ -1,8 +1,8 @@
 defmodule Credo.CLI.Output.Formatter.Flycheck do
   alias Credo.CLI.Filename
-  alias Credo.Issue
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
+  alias Credo.Issue
 
   def print_issues(issues) do
     Enum.each(issues, fn issue ->

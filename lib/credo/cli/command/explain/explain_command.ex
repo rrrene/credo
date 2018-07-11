@@ -5,8 +5,9 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   @moduledoc @shortdoc
 
   alias Credo.Execution
-  alias Credo.CLI.Filename
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
+  alias Credo.CLI.Filename
+  alias Credo.CLI.Task
 
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: Output.print_help(exec)
@@ -16,11 +17,11 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
     if Filename.contains_line_no?(filename) do
       exec
-      |> Credo.CLI.Task.LoadAndValidateSourceFiles.call()
-      |> Credo.CLI.Task.PrepareChecksToRun.call()
-      |> Credo.CLI.Task.RunChecks.call()
+      |> Task.LoadAndValidateSourceFiles.call()
+      |> Task.PrepareChecksToRun.call()
+      |> Task.RunChecks.call()
+      |> Task.SetRelevantIssues.call()
       |> print_results_and_summary()
-      |> Credo.CLI.Task.SetRelevantIssues.call()
     else
       Output.print_help(exec)
     end

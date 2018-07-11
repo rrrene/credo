@@ -23,8 +23,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
 
-  alias Credo.SourceFile
   alias Credo.Check.CodeHelper
+  alias Credo.SourceFile
 
   use Credo.Check
 
@@ -95,8 +95,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   def abc_size_for(ast, arguments) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] =
-      Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
+    [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
 
     :math.sqrt(a * a + b * b + c * c)
   end
@@ -236,10 +235,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
-      message:
-        "Function is too complex (ABC size is #{actual_value}, max is #{
-          max_value
-        }).",
+      message: "Function is too complex (ABC size is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)

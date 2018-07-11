@@ -138,7 +138,6 @@ defmodule Credo.Code.NameTest do
   #
 
   test "returns the parts of a PascalCased name as list" do
-    assert ["Pascal", "Case", "Test"] ==
-             Name.split_pascal_case("PascalCaseTest")
+    assert ["Pascal", "Case", "Test"] == Name.split_pascal_case("PascalCaseTest")
   end
 end

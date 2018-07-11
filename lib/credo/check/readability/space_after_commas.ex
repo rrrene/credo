@@ -33,8 +33,9 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   @unspaced_commas ~r/(?<!\W\?)(\,\S)/
 
   use Credo.Check
-  alias Credo.Check.CodeHelper
-  alias Credo.Code
+  alias Credo.Code.Charlists
+  alias Credo.Code.Sigils
+  alias Credo.Code.Strings
 
   @doc false
   def run(source_file, params \\ []) do
@@ -42,8 +43,11 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
 
     source_file
     |> SourceFile.source()
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments()
-    |> Code.to_lines()
+    |> Sigils.replace_with_spaces()
+    |> Strings.replace_with_spaces()
+    |> Charlists.replace_with_spaces()
+    |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
+    |> Credo.Code.to_lines()
     |> Enum.flat_map(&find_issues(issue_meta, &1))
   end
 

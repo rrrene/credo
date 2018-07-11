@@ -222,14 +222,31 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report violation on impossible additional alias when using multi alias" do
+  test "it should NOT report violation in quotes" do
     """
-    defmodule Test do
+    defmodule Foo.unquote(module).Test do
       alias Exzmq.{Socket, Tcp}
+      alias Socket.unquote(stuff).test1
+      alias unquote(stuff).Socket.test2
 
       def just_an_example do
         Socket.test1  # Exzmq.Socket.test
         Tcp.Socket.test2 # Exzmq.Tcp.Socket.test – how can this be further aliased?
+      end
+
+      defmacro just_an_example_as_well do
+        quote do
+          defmodule Thing.Foo.unquote(module) do
+            alias Socket.unquote(module).test1
+            alias unquote(module).Socket.test2
+            alias unquote(module)
+          end
+          defmodule unquote(module).Thing.Foo do
+            alias Socket.unquote(module).test1
+            alias unquote(module).Socket.test2
+            alias unquote(module)
+          end
+        end
       end
     end
     """

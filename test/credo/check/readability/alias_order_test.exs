@@ -3,8 +3,6 @@ defmodule Credo.Check.Readability.AliasOrderTest do
 
   @described_check Credo.Check.Readability.AliasOrder
 
-  @moduletag :to_be_implemented
-
   #
   # cases NOT raising issues
   #
@@ -17,6 +15,12 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
       alias Credo.CLI.Sorter
+
+      alias Credo.Check
+      alias Credo.Check.CodeHelper
+      alias Credo.Check.Params
+      alias Credo.CLI.ExitStatus
+      alias Credo.Issue
     end
     """
     |> to_source_file
@@ -26,6 +30,24 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   test "it should NOT report violation for independent blocks of alpha-ordered aliases" do
     """
     defmodule Test do
+      alias Credo.CLI.Command
+      alias Credo.CLI.Filename
+      alias Credo.CLI.Sorter
+
+      alias App.Module1
+      alias App.Module2
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report violation for multi-aliases when they are alpha-ordered" do
+    """
+    defmodule Test do
+      alias App.CLI.{Filename,Sorter}
+      alias App.Foo.{Bar,Baz}
+
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
       alias Credo.CLI.Sorter
@@ -68,7 +90,18 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> assert_issue(@described_check)
   end
 
-  test "it should report a violation /2" do
+  test "it should report a violation with as option" do
+    """
+    defmodule CredoSampleModule do
+      alias App.Module2
+      alias App.Module1, as: Module3
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with alias groups" do
     """
     defmodule CredoSampleModule do
       alias Credo.CLI.Command
@@ -77,6 +110,46 @@ defmodule Credo.Check.Readability.AliasOrderTest do
 
       alias App.Module2
       alias App.Module1
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with multi-alias" do
+    """
+    defmodule CredoSampleModule do
+      alias App.CLI.{Bar,Baz}
+      alias App.Foo.{
+        Sorter,
+        Command,
+        Filename
+      }
+
+      alias Credo.CLI.Command
+      alias Credo.CLI.Filename
+      alias Credo.CLI.Sorter
+
+      alias App.Module1
+      alias App.Module2
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with multi-alias /2" do
+    """
+    defmodule CredoSampleModule do
+      alias App.CLI.{Bar,Baz}
+      alias App.Foo.{Sorter,Command,Filename}
+
+      alias Credo.CLI.Command
+      alias Credo.CLI.Filename
+      alias Credo.CLI.Sorter
+
+      alias App.Module1
+      alias App.Module2
     end
     """
     |> to_source_file

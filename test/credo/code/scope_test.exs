@@ -41,8 +41,7 @@ defmodule Credo.Code.ScopeTest do
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 3)
     assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 5)
 
-    assert {:def, "Credo.Sample.InlineModule.foobar"} ==
-             Scope.name(ast, line: 10)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 10)
 
     assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 17)
     assert {:defmodule, "OtherModule"} == Scope.name(ast, line: 22)
@@ -86,8 +85,7 @@ defmodule Credo.Code.ScopeTest do
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 4)
     assert {:def, "Credo.Sample.foobar"} == Scope.name(ast, line: 6)
 
-    assert {:def, "Credo.Sample.InlineModule.foobar"} ==
-             Scope.name(ast, line: 11)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 11)
 
     assert {:defmacro, "OtherModule.foo"} == Scope.name(ast, line: 18)
     assert {:defp, "OtherModule.bar"} == Scope.name(ast, line: 22)
@@ -132,17 +130,13 @@ defmodule Credo.Code.ScopeTest do
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 7)
     assert {:defmodule, "Credo.Sample.InlineModule"} == Scope.name(ast, line: 8)
 
-    assert {:def, "Credo.Sample.InlineModule.foobar"} ==
-             Scope.name(ast, line: 9)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 9)
 
-    assert {:def, "Credo.Sample.InlineModule.foobar"} ==
-             Scope.name(ast, line: 10)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 10)
 
-    assert {:def, "Credo.Sample.InlineModule.foobar"} ==
-             Scope.name(ast, line: 11)
+    assert {:def, "Credo.Sample.InlineModule.foobar"} == Scope.name(ast, line: 11)
 
-    assert {:defmodule, "Credo.Sample.InlineModule"} ==
-             Scope.name(ast, line: 12)
+    assert {:defmodule, "Credo.Sample.InlineModule"} == Scope.name(ast, line: 12)
 
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 13)
     assert {nil, ""} == Scope.name(ast, line: 14)

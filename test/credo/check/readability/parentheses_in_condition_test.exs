@@ -76,6 +76,23 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /4" do
+    """
+    defmodule Foo do
+      def bar(a, b) do
+        if (a + b) / 100 > threshold(), do: :high, else: :low
+        if (a + b) * 100 > threshold(), do: :high, else: :low
+        if (a + b) + 100 > threshold(), do: :high, else: :low
+        if (a + b) - 100 > threshold(), do: :high, else: :low
+        if (a + b) &&& 100 > threshold(), do: :high, else: :low
+      end
+      def threshold, do: 50
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
