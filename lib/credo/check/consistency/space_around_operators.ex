@@ -16,7 +16,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   you should use a consistent style throughout your codebase.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [
+    check: @moduledoc,
+    params: [
+      ignore: "List of operators to be ignored for this check."
+    ]
+  ]
 
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 
@@ -35,13 +40,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp issues_for(expected, source_file, params) do
+    tokens = Credo.Code.to_tokens(source_file)
+    ast = SourceFile.ast(source_file)
     issue_meta = IssueMeta.for(source_file, params)
 
     issue_locations =
       expected
       |> @collector.find_locations_not_matching(source_file)
-      |> Enum.reject(&ignored?(&1[:trigger], params))
-      |> Enum.filter(&create_issue?(&1, issue_meta))
+      |> Enum.reject(&ignored?(&1, params))
+      |> Enum.filter(&create_issue?(&1, tokens, ast, issue_meta))
 
     Enum.map(issue_locations, fn location ->
       format_issue(
@@ -62,18 +69,32 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     "There are no spaces around operators most of the time, but here there are."
   end
 
-  defp ignored?(trigger, params) do
+  defp ignored?(location, params) do
     ignored_triggers = Params.get(params, :ignore, @default_params)
-    Enum.member?(ignored_triggers, trigger)
+
+    Enum.member?(ignored_triggers, location[:trigger])
   end
 
-  defp create_issue?(location, issue_meta) do
+  defp create_issue?(location, tokens, ast, issue_meta) do
+    line_no = location[:line_no]
+    trigger = location[:trigger]
+    column = location[:column]
+
     line =
       issue_meta
       |> IssueMeta.source_file()
-      |> SourceFile.line_at(location[:line_no])
+      |> SourceFile.line_at(line_no)
 
-    create_issue?(line, location[:column], location[:trigger])
+    create_issue?(trigger, line_no, column, line, tokens, ast)
+  end
+
+  defp create_issue?(trigger, line_no, column, line, tokens, ast) when trigger in [:+, :-] do
+    create_issue?(line, column, trigger) &&
+      !parameter_in_function_call?({line_no, column, trigger}, tokens, ast)
+  end
+
+  defp create_issue?(trigger, _line_no, column, line, _tokens, _ast) do
+    create_issue?(line, column, trigger)
   end
 
   # Don't create issues for `c = -1`
@@ -104,9 +125,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     # -2 because we need to subtract the operator
     line
     |> String.slice(0..(column - 2))
-    |> String.match?(
-      ~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/
-    )
+    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
   defp number_in_range?(line, column) do
@@ -145,17 +164,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     typed_after? =
       line
       |> String.slice(column..-1)
-      |> String.match?(
-        ~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/
-      )
+      |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/)
 
     # -2 because we need to subtract the operator
     typed_before? =
       line
       |> String.slice(0..(column - 2))
-      |> String.match?(
-        ~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/
-      )
+      |> String.match?(~r/(integer|native|signed|unsigned|binary|size|little|float)\s*$/)
 
     heuristics_met_count =
       [
@@ -169,5 +184,69 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
       |> Enum.count()
 
     heuristics_met_count >= 2
+  end
+
+  defp parameter_in_function_call?(location_tuple, tokens, ast) do
+    case find_prev_current_next_token(tokens, location_tuple) do
+      {prev, _current, _next} ->
+        Credo.Code.TokenAstCorrelation.find_tokens_in_ast(prev, ast)
+        |> List.wrap()
+        |> List.first()
+        |> is_parameter_in_function_call()
+
+      _ ->
+        false
+    end
+  end
+
+  defp is_parameter_in_function_call({atom, _, arguments})
+       when is_atom(atom) and is_list(arguments) do
+    true
+  end
+
+  defp is_parameter_in_function_call(
+         {{:., _, [{:__aliases__, _, _mods}, fun_name]}, _, arguments}
+       )
+       when is_atom(fun_name) and is_list(arguments) do
+    true
+  end
+
+  defp is_parameter_in_function_call(_) do
+    false
+  end
+
+  # TOKENS
+
+  defp find_prev_current_next_token(tokens, location_tuple) do
+    tokens
+    |> traverse_prev_current_next(&matching_location(location_tuple, &1, &2, &3, &4), [])
+    |> List.first()
+  end
+
+  defp traverse_prev_current_next(tokens, callback, acc) do
+    tokens
+    |> case do
+      [prev | [current | [next | rest]]] ->
+        acc = callback.(prev, current, next, acc)
+
+        traverse_prev_current_next([current | [next | rest]], callback, acc)
+
+      _ ->
+        acc
+    end
+  end
+
+  defp matching_location(
+         {line_no, column, trigger},
+         prev,
+         {_, {line_no, column, _}, trigger} = current,
+         next,
+         acc
+       ) do
+    acc ++ [{prev, current, next}]
+  end
+
+  defp matching_location(_, _prev, _current, _next, acc) do
+    acc
   end
 end

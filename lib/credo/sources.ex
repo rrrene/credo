@@ -34,6 +34,7 @@ defmodule Credo.Sources do
     MapSet.new()
     |> include(files.included)
     |> exclude(files.excluded)
+    |> Enum.sort()
     |> Enum.take(max_file_count())
     |> Enum.map(&Task.async(fn -> to_source_file(&1) end))
     |> Enum.map(&Task.await/1)

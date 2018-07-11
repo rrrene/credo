@@ -64,4 +64,26 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report empty strings" do
+    """
+    defmodule CredoSampleModule do
+      @moduledoc ""
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report empty multi line strings" do
+    """
+    defmodule CredoSampleModule do
+      @moduledoc \"\"\"
+
+      \"\"\"
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end

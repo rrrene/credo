@@ -4,17 +4,19 @@ defmodule Credo.Mixfile do
   def project do
     [
       app: :credo,
-      version: "0.9.0-rc2",
-      elixir: ">= 1.3.2",
+      version: "0.9.3",
+      elixir: ">= 1.4.0",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: Coverex.Task],
       name: "Credo",
-      description:
-        "A static code analysis tool with a focus on code consistency and teaching.",
-      package: package()
+      description: "A static code analysis tool with a focus on code consistency and teaching.",
+      package: package(),
+      source_url: "https://github.com/rrrene/credo",
+      # The main page in the docs
+      docs: [main: "Credo", logo: "assets/logo.png", extras: ["README.md"]]
     ]
   end
 
@@ -41,7 +43,8 @@ defmodule Credo.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.2.0"},
-      {:poison, ">= 0.0.0"}
+      {:jason, "~> 1.0"},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
 end

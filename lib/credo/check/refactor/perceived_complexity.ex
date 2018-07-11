@@ -12,8 +12,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   @explanation [
     check: @moduledoc,
     params: [
-      max_complexity:
-        "The maximum cyclomatic complexity a function should have."
+      max_complexity: "The maximum cyclomatic complexity a function should have."
     ]
   ]
   @default_params [max_complexity: 9]
@@ -172,8 +171,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
-      message:
-        "Function is too complex (CC is #{actual_value}, max is #{max_value}).",
+      message: "Function is too complex (CC is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)

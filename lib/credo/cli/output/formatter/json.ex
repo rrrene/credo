@@ -1,15 +1,16 @@
 defmodule Credo.CLI.Output.Formatter.JSON do
-  alias Credo.Issue
   alias Credo.CLI.Output.UI
+  alias Credo.Issue
 
   def print_issues(issues) do
-    json_issues = Enum.map(issues, &to_json/1)
-
-    result = %{
-      "issues" => json_issues
+    %{
+      "issues" => Enum.map(issues, &to_json/1)
     }
+    |> print_map()
+  end
 
-    UI.puts(Poison.encode!(result, pretty: true))
+  def print_map(map) do
+    UI.puts(Jason.encode!(map, pretty: true))
   end
 
   def to_json(

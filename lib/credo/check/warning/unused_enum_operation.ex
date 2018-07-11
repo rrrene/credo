@@ -29,8 +29,8 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
   @explanation [check: @moduledoc]
   @checked_module :Enum
   @funs_with_return_value ~w(
-    all any at chunk chunk chunk_by concat concat count count dedup
-    dedup_by drop drop_while empty fetch fetch filter filter_map
+    all? any? at chunk chunk chunk_by concat concat count count dedup
+    dedup_by drop drop_while empty? fetch fetch! filter filter_map
     find find_index find_value flat_map flat_map_reduce group_by
     intersperse into into join map map_join map_reduce max max_by
     member min min_by min_max min_max_by partition random reduce

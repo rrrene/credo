@@ -10,8 +10,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   @explanation [
     check: @moduledoc,
     params: [
-      max_blank_lines:
-        "The maximum number of tolerated consecutive blank lines."
+      max_blank_lines: "The maximum number of tolerated consecutive blank lines."
     ]
   ]
   @default_params [
@@ -36,8 +35,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   defp issue_for(issue_meta, line, max_blank_lines) do
     format_issue(
       issue_meta,
-      message:
-        "There should be no more than #{max_blank_lines} consecutive blank lines.",
+      message: "There should be no more than #{max_blank_lines} consecutive blank lines.",
       line_no: line
     )
   end

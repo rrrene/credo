@@ -50,19 +50,16 @@ defmodule Credo.Check.Readability.LargeNumbers do
   end
 
   # tuple for Elixir >= 1.6.0
-  defp number_token({:int, {_, _, number}, _} = tuple, min_number)
-       when min_number < number do
+  defp number_token({:int, {_, _, number}, _} = tuple, min_number) when min_number < number do
     tuple
   end
 
-  defp number_token({:float, {_, _, number}, _} = tuple, min_number)
-       when min_number < number do
+  defp number_token({:float, {_, _, number}, _} = tuple, min_number) when min_number < number do
     tuple
   end
 
   # tuple for Elixir <= 1.5.x
-  defp number_token({:number, _, number} = tuple, min_number)
-       when min_number < number do
+  defp number_token({:number, _, number} = tuple, min_number) when min_number < number do
     tuple
   end
 
@@ -183,7 +180,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> List.wrap()
       |> List.last()
       |> to_string()
-      |> String.replace(~r/\.\..+/, "")
+      |> String.replace(~r/\.\..*/, "")
 
     beginning_of_number <> ending_of_number
   end

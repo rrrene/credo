@@ -65,22 +65,25 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
   @explanation [
     check: @moduledoc,
     params: [
-      max_line_count:
-        "The maximum number of lines a quote block should be allowed to have."
+      max_line_count: "The maximum number of lines a quote block should be allowed to have.",
+      ignore_comments: "Ignores comments when counting the lines of a `quote` block."
     ]
   ]
-  @default_params [max_line_count: 150]
+  @default_params [max_line_count: 150, ignore_comments: false]
 
   use Credo.Check, base_priority: :high
+
+  alias Credo.IssueMeta
 
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_line_count = Params.get(params, :max_line_count, @default_params)
+    ignore_comments = Params.get(params, :ignore_comments, @default_params)
 
     Credo.Code.prewalk(
       source_file,
-      &traverse(&1, &2, issue_meta, max_line_count)
+      &traverse(&1, &2, issue_meta, max_line_count, ignore_comments)
     )
   end
 
@@ -88,20 +91,38 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
          {:quote, meta, arguments} = ast,
          issues,
          issue_meta,
-         max_line_count
+         max_line_count,
+         ignore_comments
        ) do
     max_line_no = Credo.Code.prewalk(arguments, &find_max_line_no(&1, &2), 0)
     line_count = max_line_no - meta[:line]
 
     issue =
       if line_count > max_line_count do
-        issue_for(issue_meta, meta[:line])
+        source_file = IssueMeta.source_file(issue_meta)
+
+        lines =
+          Credo.Code.to_lines(source_file)
+          |> Enum.slice(meta[:line] - 1, line_count)
+
+        lines =
+          if ignore_comments do
+            Enum.reject(lines, fn {_line_no, line} ->
+              Regex.run(~r/^\s*#/, line)
+            end)
+          else
+            lines
+          end
+
+        if Enum.count(lines) > max_line_count do
+          issue_for(issue_meta, meta[:line])
+        end
       end
 
     {ast, issues ++ List.wrap(issue)}
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_line_count) do
+  defp traverse(ast, issues, _issue_meta, _max_line_count, _ignore_comments) do
     {ast, issues}
   end
 

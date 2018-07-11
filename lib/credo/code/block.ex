@@ -207,7 +207,7 @@ defmodule Credo.Code.Block do
   defp find_keyword(_, _), do: nil
 
   @doc """
-  Returns the children of the given AST node.
+  Returns the children of the `do` block of the given AST node.
   """
   def calls_in_do_block({_op, _meta, arguments}) do
     arguments
@@ -221,11 +221,25 @@ defmodule Credo.Code.Block do
     |> instructions_for
   end
 
+  @doc """
+  Returns the children of the `rescue` block of the given AST node.
+  """
+  def calls_in_rescue_block({_op, _meta, arguments}) do
+    arguments
+    |> rescue_block_for!
+    |> instructions_for
+  end
+
+  def calls_in_rescue_block(arg) do
+    arg
+    |> rescue_block_for!
+    |> instructions_for
+  end
+
   defp instructions_for({:__block__, _meta, calls}), do: calls
 
   defp instructions_for(v)
-       when is_atom(v) or is_tuple(v) or is_binary(v) or is_float(v) or
-              is_integer(v),
+       when is_atom(v) or is_tuple(v) or is_binary(v) or is_float(v) or is_integer(v),
        do: List.wrap(v)
 
   defp instructions_for(v) when is_list(v), do: [v]

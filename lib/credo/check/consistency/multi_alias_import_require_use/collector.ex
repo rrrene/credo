@@ -61,8 +61,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     |> Enum.into(%{})
   end
 
-  defp drop_locations({_, single}, :multi),
-    do: multiple_single_locations(single)
+  defp drop_locations({_, single}, :multi), do: multiple_single_locations(single)
 
   defp drop_locations({multi, _}, :single), do: multi_locations(multi)
 

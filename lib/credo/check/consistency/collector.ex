@@ -47,9 +47,9 @@ defmodule Credo.Check.Consistency.Collector do
   `find_locations_not_matching/2`, and `issue_formatter`.
   """
 
+  alias Credo.Execution.Issues
   alias Credo.Issue
   alias Credo.SourceFile
-  alias Credo.Execution.Issues
 
   @doc """
   When you call `@collector.find_and_append_issues/4` inside the check module,
@@ -112,10 +112,10 @@ defmodule Credo.Check.Consistency.Collector do
     quote do
       @behaviour Credo.Check.Consistency.Collector
 
+      alias Credo.Check.Consistency.Collector
+      alias Credo.Execution
       alias Credo.Issue
       alias Credo.SourceFile
-      alias Credo.Execution
-      alias Credo.Check.Consistency.Collector
 
       @spec find_and_append_issues(
               [SourceFile.t()],

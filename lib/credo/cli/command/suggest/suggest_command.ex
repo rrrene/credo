@@ -3,21 +3,21 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   @shortdoc "Suggest code objects to look at next (default)"
 
-  alias Credo.Execution
   alias Credo.CLI.Command.Suggest.SuggestOutput
+  alias Credo.CLI.Task
+  alias Credo.Execution
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts),
-    do: SuggestOutput.print_help(exec)
+  def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
 
   def call(exec, _opts) do
     exec
-    |> Credo.CLI.Task.LoadAndValidateSourceFiles.call()
-    |> Credo.CLI.Task.PrepareChecksToRun.call()
+    |> Task.LoadAndValidateSourceFiles.call()
+    |> Task.PrepareChecksToRun.call()
     |> print_before_info()
-    |> Credo.CLI.Task.RunChecks.call()
+    |> Task.RunChecks.call()
+    |> Task.SetRelevantIssues.call()
     |> print_results_and_summary()
-    |> Credo.CLI.Task.SetRelevantIssues.call()
   end
 
   defp print_before_info(exec) do

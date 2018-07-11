@@ -5,7 +5,7 @@ Credo.Test.Application.start([], [])
 ExUnit.start()
 
 check_version =
-  ~w()
+  ~w(1.6.5 1.7.0)
   |> Enum.reduce([], fn version, acc ->
     # allow -dev versions so we can test before the Elixir release.
     if System.version() |> Version.match?("< #{version}-dev") do
@@ -61,9 +61,7 @@ defmodule CredoCheckCase do
     issues = issues_for(source_file, check, create_config(), params)
 
     assert [] == issues,
-           "There should be no issues, got #{Enum.count(issues)}: #{
-             to_inspected(issues)
-           }"
+           "There should be no issues, got #{Enum.count(issues)}: #{to_inspected(issues)}"
 
     issues
   end
@@ -82,9 +80,7 @@ defmodule CredoCheckCase do
     refute Enum.count(issues) == 0, "There should be one issue, got none."
 
     assert Enum.count(issues) == 1,
-           "There should be only 1 issue, got #{Enum.count(issues)}: #{
-             to_inspected(issues)
-           }"
+           "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
 
     if callback do
       issues |> List.first() |> callback.()
@@ -115,10 +111,19 @@ defmodule CredoCheckCase do
   end
 
   defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
-    Enum.flat_map(source_files, &(&1 |> get_issues_from_source_file(exec)))
+    source_files
+    |> Enum.flat_map(&get_issues_from_source_file(&1, exec))
+    |> Enum.map(fn
+      %Credo.Issue{} = issue ->
+        issue
+
+      value ->
+        raise "Expected %Issue{}, got: #{inspect(value)}"
+    end)
   end
 
-  defp issues_for(source_files, check, _exec, params) when is_list(source_files) do
+  defp issues_for(source_files, check, _exec, params)
+       when is_list(source_files) do
     exec = create_config()
 
     if check.run_on_all? do

@@ -80,8 +80,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message:
-        "Do not use parentheses when defining a function which has no arguments.",
+      message: "Do not use parentheses when defining a function which has no arguments.",
       line_no: line_no
     )
   end

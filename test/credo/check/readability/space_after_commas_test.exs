@@ -18,6 +18,25 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report when commas are in interpolations" do
+    ~S"""
+    defmodule SpaceMissing1 do
+      @moduledoc false
+
+      @doc false
+      def test_credo do
+        foo = 1
+        bar = 2
+        _ = "#{foo} #{bar}"
+        _ = Enum.join([1, 2, 3], ",") # comma in the second argument is reported
+        _ = ~r"," # comma is reported
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report when commas have newlines" do
     """
     defmodule CredoSampleModule do

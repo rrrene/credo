@@ -30,8 +30,7 @@ defmodule Credo.Check.Readability.Semicolons do
     collect_issues(rest, acc, issue_meta)
   end
 
-  defp collect_issues([_ | rest], acc, issue_meta),
-    do: collect_issues(rest, acc, issue_meta)
+  defp collect_issues([_ | rest], acc, issue_meta), do: collect_issues(rest, acc, issue_meta)
 
   def issue_for(issue_meta, line_no, column) do
     format_issue(

@@ -7,6 +7,7 @@ defmodule Credo.Service.Commands do
     "gen.check" => Credo.CLI.Command.GenCheck,
     "gen.config" => Credo.CLI.Command.GenConfig,
     "help" => Credo.CLI.Command.Help,
+    "info" => Credo.CLI.Command.Info.InfoCommand,
     "list" => Credo.CLI.Command.List.ListCommand,
     "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
     "version" => Credo.CLI.Command.Version

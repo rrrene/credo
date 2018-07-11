@@ -1,523 +1,279 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
+  @moduledoc """
+  Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
+  the candidates (the acc is used to keep state).
+  """
+
   @def_ops [:def, :defp, :defmacro]
-  @block_ops [:if, :unless, :case, :quote, :try, :after, :rescue]
+  @block_ops_with_head_expr [:if, :unless, :case, :for, :quote]
 
   alias Credo.Check.CodeHelper
+  alias Credo.Code.Block
   alias Credo.SourceFile
 
-  def find_unused_calls(
-        %SourceFile{} = source_file,
-        _params,
-        required_mod_list,
-        restrict_fun_names
-      ) do
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, source_file, required_mod_list, restrict_fun_names)
-    )
+  def find_unused_calls(%SourceFile{} = source_file, _params, required_mod_list, fun_names) do
+    Credo.Code.prewalk(source_file, &traverse_defs(&1, &2, required_mod_list, fun_names))
   end
 
   for op <- @def_ops do
-    defp traverse(
-           {unquote(op), _meta, arguments} = ast,
-           all_unused_calls,
-           _source_file,
-           required_mod_list,
-           restrict_fun_names
-         )
+    defp traverse_defs({unquote(op), _meta, arguments} = ast, acc, mod_list, fun_names)
          when is_list(arguments) do
-      # should complain when a call to string is found inside the method body
-      #
-      # - that is not part of :=
-      # - that is not piped into another function
-      # - that is not the return value
-      #
-      # In turn this means
-      # - the last call in the method can contain a string call
-      # - any := can contain a string calls_in_method
-      # - any pipe chain can contain a string call, as long as it is not the
-      #   last call in the chain
-      calls_in_method = CodeHelper.calls_in_do_block(ast)
-      last_call_in_def = List.last(calls_in_method)
+      candidates = Credo.Code.prewalk(ast, &find_candidates(&1, &2, mod_list, fun_names))
 
-      all_unused_calls =
-        all_unused_calls ++
-          Enum.flat_map(
-            calls_in_method,
-            &invalid_calls(
-              &1,
-              last_call_in_def,
-              calls_in_method,
-              required_mod_list,
-              restrict_fun_names
-            )
-          )
-
-      # IO.puts IO.ANSI.format [:yellow, "OP:", unquote(op) |> to_string]
-      # IO.inspect ast |> CodeHelper.do_block_for
-      # IO.inspect calls_in_method
-      # IO.inspect last_call_in_def
-      # IO.puts ""
-
-      {ast, all_unused_calls}
+      if Enum.any?(candidates) do
+        {nil, acc ++ filter_unused_calls(ast, candidates)}
+      else
+        {ast, acc}
+      end
     end
   end
 
-  defp traverse(
-         ast,
-         all_unused_calls,
-         _source_file,
-         _required_mod_list,
-         _restrict_fun_names
-       ) do
-    {ast, all_unused_calls}
+  defp traverse_defs(ast, acc, _, _) do
+    {ast, acc}
   end
 
-  defp invalid_calls(
-         call,
-         last_call_in_def,
-         calls_in_block_above,
+  #
+
+  defp find_candidates(
+         {{:., _, [{:__aliases__, _, mods}, _fun_name]}, _, _} = ast,
+         acc,
+         required_mod_list,
+         nil
+       ) do
+    if mods == required_mod_list do
+      {ast, acc ++ [ast]}
+    else
+      {ast, acc}
+    end
+  end
+
+  defp find_candidates(
+         {{:., _, [{:__aliases__, _, mods}, fun_name]}, _, _} = ast,
+         acc,
          required_mod_list,
          restrict_fun_names
        ) do
-    if CodeHelper.do_block?(call) do
-      # IO.inspect "do block"
-      # |> IO.inspect
-      call
-      |> calls_to_mod_fun(required_mod_list, restrict_fun_names)
-      |> Enum.reject(
-        &valid_call_to_string_mod?(
-          call,
-          &1,
-          last_call_in_def,
-          calls_in_block_above
-        )
-      )
+    if mods == required_mod_list and fun_name in restrict_fun_names do
+      {ast, acc ++ [ast]}
     else
-      # IO.inspect "no do block"
-      # IO.inspect call
-      if call == last_call_in_def do
-        []
-      else
-        call
-        |> calls_to_mod_fun(required_mod_list, restrict_fun_names)
-        |> Enum.reject(
-          &valid_call_to_string_mod?(
-            call,
-            &1,
-            last_call_in_def,
-            calls_in_block_above
-          )
-        )
-      end
+      {ast, acc}
     end
   end
 
-  defp valid_call_to_string_mod?(
-         {:=, _, _} = ast,
-         call_to_string,
-         _last_call_in_def,
-         _calls_in_block_above
-       ) do
-    CodeHelper.contains_child?(ast, call_to_string)
+  defp find_candidates(ast, acc, _, _) do
+    {ast, acc}
   end
 
-  for op <- @block_ops do
-    defp valid_call_to_string_mod?(
-           {unquote(op), _meta, arguments} = ast,
-           call_to_string,
-           last_call_in_def,
-           calls_in_block_above
-         )
+  #
+
+  defp filter_unused_calls(ast, candidates) do
+    candidates
+    |> Enum.map(&detect_unused_call(&1, ast))
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp detect_unused_call(candidate, ast) do
+    ast
+    |> Credo.Code.postwalk(&traverse_verify_candidate(&1, &2, candidate), :not_verified)
+    |> verified_or_unused_call(candidate)
+  end
+
+  defp verified_or_unused_call(:VERIFIED, _), do: nil
+  defp verified_or_unused_call(_, candidate), do: candidate
+
+  #
+
+  defp traverse_verify_candidate(ast, acc, candidate) do
+    if CodeHelper.contains_child?(ast, candidate) do
+      verify_candidate(ast, acc, candidate)
+    else
+      {ast, acc}
+    end
+  end
+
+  # we know that `candidate` is part of `ast`
+
+  for op <- @def_ops do
+    defp verify_candidate({unquote(op), _, arguments} = ast, :not_verified = _acc, candidate)
          when is_list(arguments) do
-      condition = List.first(arguments)
+      # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
 
-      if CodeHelper.contains_child?(condition, call_to_string) do
-        true
+      if last_call_in_do_block?(ast, candidate) || last_call_in_rescue_block?(ast, candidate) do
+        {nil, :VERIFIED}
       else
-        [
-          CodeHelper.do_block_for!(arguments),
-          CodeHelper.else_block_for!(arguments)
-        ]
-        |> Enum.reject(&is_nil/1)
-        |> Enum.any?(
-          &valid_call_to_string_mod_in_block?(
-            &1,
-            ast,
-            call_to_string,
-            last_call_in_def,
-            calls_in_block_above
-          )
-        )
+        {nil, :FALSIFIED}
       end
     end
   end
 
-  defp valid_call_to_string_mod?(
-         {:for, _meta, arguments} = ast,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
+  defp last_call_in_do_block?(ast, candidate) do
+    ast
+    |> Block.calls_in_do_block()
+    |> List.last()
+    |> CodeHelper.contains_child?(candidate)
+  end
+
+  defp last_call_in_rescue_block?(ast, candidate) do
+    ast
+    |> Block.calls_in_rescue_block()
+    |> List.last()
+    |> CodeHelper.contains_child?(candidate)
+  end
+
+  for op <- @block_ops_with_head_expr do
+    defp verify_candidate({unquote(op), _, arguments} = ast, :not_verified = acc, candidate)
+         when is_list(arguments) do
+      # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
+
+      head_expression = Enum.slice(arguments, 0..-2)
+
+      if CodeHelper.contains_child?(head_expression, candidate) do
+        {nil, :VERIFIED}
+      else
+        {ast, acc}
+      end
+    end
+  end
+
+  defp verify_candidate({:=, _, _} = ast, :not_verified = acc, candidate) do
+    # IO.inspect(ast, label: ":= (#{Macro.to_string(candidate)} #{acc})")
+
+    if CodeHelper.contains_child?(ast, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
+  defp verify_candidate(
+         {:__block__, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
        )
        when is_list(arguments) do
-    arguments_without_do_block = Enum.slice(arguments, 0..-2)
+    # IO.inspect(ast, label: ":__block__ (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(arguments_without_do_block, call_to_string) do
-      true
+    last_call = List.last(arguments)
+
+    if CodeHelper.contains_child?(last_call, candidate) do
+      {ast, acc}
     else
-      [
-        CodeHelper.do_block_for!(arguments),
-        CodeHelper.else_block_for!(arguments)
-      ]
-      |> Enum.reject(&is_nil/1)
-      |> Enum.any?(
-        &valid_call_to_string_mod_in_block?(
-          &1,
-          ast,
-          call_to_string,
-          last_call_in_def,
-          calls_in_block_above
-        )
-      )
+      {nil, :FALSIFIED}
     end
   end
 
-  defp valid_call_to_string_mod?(
-         {:cond, _meta, arguments} = ast,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       ) do
-    [
-      CodeHelper.do_block_for!(arguments),
-      CodeHelper.else_block_for!(arguments)
-    ]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.any?(
-      &valid_call_to_string_mod_in_block?(
-        &1,
-        ast,
-        call_to_string,
-        last_call_in_def,
-        calls_in_block_above
-      )
-    )
-  end
-
-  defp valid_call_to_string_mod?(
-         {:__block__, _meta, arguments},
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:yellow, ":__block__"]
-    arguments
-    |> List.wrap()
-    |> Enum.any?(
-      &valid_call_to_string_mod?(
-        &1,
-        call_to_string,
-        last_call_in_def,
-        calls_in_block_above
-      )
-    )
-  end
-
-  defp valid_call_to_string_mod?(
-         {:fn, _meta, arguments},
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:yellow, ":fn"]
-    arguments
-    |> List.wrap()
-    |> Enum.any?(
-      &valid_call_to_string_mod?(
-        &1,
-        call_to_string,
-        last_call_in_def,
-        calls_in_block_above
-      )
-    )
-  end
-
-  defp valid_call_to_string_mod?(
-         {:->, _meta, [params, arguments]} = ast,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:yellow, ":->"]
-    # IO.inspect CodeHelper.contains_child?(params, call_to_string)
-    # IO.inspect arguments
-    # IO.puts ""
-
-    if CodeHelper.contains_child?(params, call_to_string) do
-      true
-    else
-      calls_in_this_block = List.wrap(arguments)
-
-      if CodeHelper.contains_child?(last_call_in_def, ast) &&
-           call_to_string == List.last(calls_in_this_block) do
-        true
-      else
-        Enum.any?(
-          calls_in_this_block,
-          &valid_call_to_string_mod?(
-            &1,
-            call_to_string,
-            last_call_in_def,
-            calls_in_block_above
-          )
-        )
-      end
-    end
-  end
-
-  defp valid_call_to_string_mod?(
+  defp verify_candidate(
          {:|>, _, arguments} = ast,
-         call_to_string,
-         last_call_in_def,
-         _calls_in_block_above
+         :not_verified = acc,
+         candidate
        ) do
-    # IO.puts IO.ANSI.format [:yellow, ":|>"]
-    # We are in a pipe chain that is NOT the last call in the method
-    # and that is NOT part of an assignment.
-    # This is fine, as long as the call to String is not the last element
-    # in the pipe chain.
-    if CodeHelper.contains_child?(last_call_in_def, ast) &&
-         CodeHelper.contains_child?(ast, call_to_string) do
-      true
+    # IO.inspect(ast, label: ":__block__ (#{Macro.to_string(candidate)} #{acc})")
+
+    last_call = List.last(arguments)
+
+    if CodeHelper.contains_child?(last_call, candidate) do
+      {ast, acc}
     else
-      List.last(arguments) != call_to_string
+      {nil, :VERIFIED}
     end
   end
 
-  defp valid_call_to_string_mod?(
-         {:++, _, _arguments} = ast,
-         call_to_string,
-         last_call_in_def,
-         _calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:yellow, ":++"]
-    CodeHelper.contains_child?(last_call_in_def, ast) &&
-      CodeHelper.contains_child?(ast, call_to_string)
+  defp verify_candidate({:->, _, arguments} = ast, :not_verified = acc, _candidate)
+       when is_list(arguments) do
+    # IO.inspect(ast, label: ":-> (#{Macro.to_string(ast)} #{acc})")
+
+    {ast, acc}
   end
 
-  defp valid_call_to_string_mod?(
-         {_atom, _meta, arguments} = ast,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       ) do
-    if fn_in_arguments?(ast) &&
-         Enum.any?(
-           fn_in_arguments(ast),
-           &CodeHelper.contains_child?(&1, call_to_string)
-         ) do
-      # IO.puts IO.ANSI.format [:red, "Last fn"]
-      ast
-      |> fn_in_arguments
-      |> Enum.any?(
-        &valid_call_to_string_mod?(
-          &1,
-          call_to_string,
-          last_call_in_def,
-          calls_in_block_above
-        )
-      )
-    else
-      # IO.puts IO.ANSI.format [:red, "Last"]
-      # IO.puts IO.ANSI.format [:cyan, Macro.to_string(call_to_string)]
-      # IO.inspect ast
-      # IO.inspect calls_in_block_above
-      # IO.puts ""
-
-      # result =
-      #  CodeHelper.contains_child?(last_call_in_def, ast) &&
-      #    CodeHelper.contains_child?(ast, call_to_string) &&
-      #      call_to_string == calls_in_block_above |> List.last
-
-      # IO.inspect {:result, CodeHelper.contains_child?(last_call_in_def, ast),
-      #                      CodeHelper.contains_child?(call_to_string, ast),
-      #                      CodeHelper.contains_child?(calls_in_block_above |> List.last, call_to_string),
-      #            }
-
-      in_call_to_string_and_last_call? =
-        CodeHelper.contains_child?(last_call_in_def, ast) &&
-          CodeHelper.contains_child?(call_to_string, ast) &&
-          CodeHelper.contains_child?(
-            List.last(calls_in_block_above),
-            call_to_string
-          )
-
-      containing_call_to_string? =
-        CodeHelper.contains_child?(arguments, call_to_string)
-
-      # IO.inspect CodeHelper.contains_child?(arguments, call_to_string)
-      # IO.puts ""
-
-      in_call_to_string_and_last_call? || containing_call_to_string?
-    end
+  defp verify_candidate({:fn, _, arguments} = ast, :not_verified = acc, _candidate)
+       when is_list(arguments) do
+    {ast, acc}
   end
 
-  defp valid_call_to_string_mod?(
-         tuple,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
+  defp verify_candidate(
+         {:try, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
        )
-       when is_tuple(tuple) do
-    tuple
-    |> Tuple.to_list()
-    |> Enum.any?(
-      &valid_call_to_string_mod?(
-        &1,
-        call_to_string,
-        last_call_in_def,
-        calls_in_block_above
-      )
-    )
-  end
+       when is_list(arguments) do
+    # IO.inspect(ast, label: "try (#{Macro.to_string(candidate)} #{acc})")
 
-  defp valid_call_to_string_mod?(
-         list,
-         call_to_string,
-         last_call_in_def,
-         calls_in_block_above
-       )
-       when is_list(list) do
-    Enum.any?(
-      list,
-      &valid_call_to_string_mod?(
-        &1,
-        call_to_string,
-        last_call_in_def,
-        calls_in_block_above
-      )
-    )
-  end
+    after_block = Block.after_block_for!(ast)
 
-  defp valid_call_to_string_mod?(
-         _ast,
-         _call_to_string,
-         _last_call_in_def,
-         _calls_in_block_above
-       ) do
-    # IO.inspect "fall-thru"
-    # IO.inspect ast
-    # IO.inspect CodeHelper.contains_child?(last_call_in_def, ast) && CodeHelper.contains_child?(ast, call_to_string)
-    # IO.puts ""
-    false
-  end
-
-  defp valid_call_to_string_mod_in_block?(
-         {:__block__, _meta, calls_in_this_block},
-         _ast,
-         call_to_string,
-         last_call_in_def,
-         _calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:green, "Block separation (__block__)!"]
-    # IO.inspect CodeHelper.contains_child?(last_call_in_def, ast)
-    # IO.puts ""
-
-    Enum.any?(
-      calls_in_this_block,
-      &valid_call_to_string_mod?(
-        &1,
-        call_to_string,
-        last_call_in_def,
-        calls_in_this_block
-      )
-    )
-  end
-
-  defp valid_call_to_string_mod_in_block?(
-         any_value,
-         ast,
-         call_to_string,
-         last_call_in_def,
-         _calls_in_block_above
-       ) do
-    # IO.puts IO.ANSI.format [:green, "Block separation (any_value)!"]
-    # IO.inspect any_value
-    # IO.puts ""
-
-    if CodeHelper.contains_child?(last_call_in_def, ast) &&
-         CodeHelper.contains_child?(any_value, call_to_string) do
-      true
+    if after_block && CodeHelper.contains_child?(after_block, candidate) do
+      {nil, :FALSIFIED}
     else
-      calls_in_this_block = List.wrap(any_value)
-
-      Enum.any?(
-        calls_in_this_block,
-        &valid_call_to_string_mod?(
-          &1,
-          call_to_string,
-          last_call_in_def,
-          calls_in_this_block
-        )
-      )
+      {ast, acc}
     end
   end
 
-  defp calls_to_mod_fun(ast, required_mod_list, restrict_fun_names) do
-    {_, calls_to_string} =
-      Macro.postwalk(
-        ast,
-        [],
-        &find_calls_to_mod_fun(&1, &2, required_mod_list, restrict_fun_names)
-      )
-
-    calls_to_string
-  end
-
-  defp find_calls_to_mod_fun(
-         {{:., _, [{:__aliases__, _, mod_list}, fun_atom]}, _, params} = ast,
-         accumulated,
-         required_mod_list,
-         restrict_fun_names
+  # my_fun()
+  defp verify_candidate(
+         {fun_name, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
        )
-       when is_atom(fun_atom) and is_list(params) do
-    if mod_list == required_mod_list do
-      fun_names = List.wrap(restrict_fun_names)
+       when is_atom(fun_name) and is_list(arguments) do
+    # IO.inspect(ast, label: "my_fun() (#{Macro.to_string(candidate)} #{acc})")
 
-      if Enum.empty?(fun_names) do
-        {ast, accumulated ++ [ast]}
-      else
-        if Enum.member?(fun_names, fun_atom) do
-          {ast, accumulated ++ [ast]}
-        else
-          {ast, accumulated}
-        end
-      end
+    if CodeHelper.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
     else
-      {ast, accumulated}
+      {ast, acc}
     end
   end
 
-  defp find_calls_to_mod_fun(ast, accumulated, _, _) do
-    {ast, accumulated}
+  # module.my_fun()
+  defp verify_candidate(
+         {{:., _, [{module, _, []}, fun_name]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_atom(module) and is_list(arguments) do
+    # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
+
+    if CodeHelper.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
   end
 
-  # TODO: move to AST helper?
+  # :erlang_module.my_fun()
+  defp verify_candidate(
+         {{:., _, [module, fun_name]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_atom(module) and is_list(arguments) do
+    # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
 
-  def fn_in_arguments?(ast) do
-    ast
-    |> fn_in_arguments
-    |> Enum.any?()
+    if CodeHelper.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
   end
 
-  def fn_in_arguments({_atom, _meta, arguments}) do
-    arguments
-    |> List.wrap()
-    |> Enum.filter(fn arg ->
-      case arg do
-        {:fn, _, _} -> true
-        _ -> false
-      end
-    end)
+  # MyModule.my_fun()
+  defp verify_candidate(
+         {{:., _, [{:__aliases__, _, mods}, fun_name]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_list(mods) and is_list(arguments) do
+    # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
+
+    if CodeHelper.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
+  defp verify_candidate(ast, acc, _candidate) do
+    # IO.inspect(ast, label: "_ (#{Macro.to_string(candidate)} #{acc})")
+
+    {ast, acc}
   end
 end

@@ -85,12 +85,22 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     Enum.map(args, &find_variables/1)
   end
 
-  defp find_variables({variable_name, meta, nil}) when is_list(meta) do
-    {variable_name, meta[:line]}
+  # ignore pinned variables
+  defp find_variables({:::, _, [{:^, _, _} | _]}) do
+    []
   end
 
+  defp find_variables({:::, _, [lhs | _rhs]}) do
+    find_variables(lhs)
+  end
+
+  # ignore pinned variables
   defp find_variables({:^, _, _}) do
     []
+  end
+
+  defp find_variables({variable_name, meta, nil}) when is_list(meta) do
+    {variable_name, meta[:line]}
   end
 
   defp find_variables(tuple) when is_tuple(tuple) do

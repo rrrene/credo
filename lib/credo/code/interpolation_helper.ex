@@ -9,6 +9,7 @@ defmodule Credo.Code.InterpolationHelper do
     lines = String.split(source, "\n")
 
     positions
+    |> Enum.reverse()
     |> Enum.reduce(lines, &replace_line(&1, &2, char))
     |> Enum.join("\n")
   end
@@ -72,8 +73,7 @@ defmodule Credo.Code.InterpolationHelper do
     #
 
     defp map_interpolations(
-           {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char} =
-             token,
+           {:sigil, {_line_no, _col_start, nil}, _, list, _, _sigil_start_char} = token,
            source
          ) do
       handle_atom_string_or_sigil(token, list, source)
@@ -140,8 +140,7 @@ defmodule Credo.Code.InterpolationHelper do
 
     # TODO: this seems to be wrong. the closing """ determines the
     #       indentation, not the first line of the heredoc.
-    padding_in_first_line =
-      determine_padding_at_start_of_line(first_line_in_heredoc)
+    padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
 
     find_interpolations(list, source)
     |> Enum.reject(&is_nil/1)

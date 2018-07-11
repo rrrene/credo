@@ -5,23 +5,25 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
 
   Example:
 
-      # Prefer
+      # preferred
 
       try do
         raise "oops"
       rescue
         error ->
           Logger.warn("An exception has occurred")
+
           reraise error, System.stacktrace
       end
 
-      # to
+      # NOT preferred
 
       try do
         raise "oops"
       rescue
         error ->
           Logger.warn("An exception has occurred")
+
           raise error
       end
   """
@@ -57,8 +59,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
          issue_meta
        )
        when op in @def_ops do
-    issues_found =
-      Credo.Code.prewalk(rescue_block, &find_issues(&1, &2, issue_meta))
+    issues_found = Credo.Code.prewalk(rescue_block, &find_issues(&1, &2, issue_meta))
 
     {rescue_block, issues ++ issues_found}
   end
@@ -76,8 +77,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message:
-        "Use `reraise` inside a rescue block to preserve the original stacktrace.",
+      message: "Use `reraise` inside a rescue block to preserve the original stacktrace.",
       trigger: "raise",
       line_no: line_no
     )

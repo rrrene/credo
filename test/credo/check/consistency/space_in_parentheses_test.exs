@@ -3,7 +3,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
 
   @described_check Credo.Check.Consistency.SpaceInParentheses
 
-  @without_spaces """
+  @without_spaces ~S"""
   defmodule Credo.Sample1 do
     @default_sources_glob ~w(** *.{ex,exs})
     @username_regex ~r/^[A-z0-9 ]+$/
@@ -19,6 +19,23 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       defp count([], acc), do: acc
       defp count([?( | t], acc), do: count(t, acc + 1)
       defp count([?) | t], acc), do: count(t, acc - 1)
+
+      def foo(a) do
+        "#{a} #{a}"
+      end
+
+      def bar do
+        " )"
+      end
+    end
+
+    defmodule Foo do
+      def bar(a, b) do
+        # The next line is the one the error is incorrectly reported against
+        if (a + b) / 100 > threshold(), do: :high, else: :low
+      end
+
+      def threshold, do: 50
     end
 
     def credo_test do

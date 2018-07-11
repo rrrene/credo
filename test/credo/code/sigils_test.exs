@@ -151,4 +151,29 @@ defmodule Credo.Code.SigilsTest do
 
     assert expected == source |> Sigils.replace_with_spaces("")
   end
+
+  @tag :to_be_implemented
+  test "it should NOT replace interpolations in strings" do
+    source = ~S"""
+    def foo(a) do
+      "#{a} #{a}"
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    expected = ~S"""
+    def foo(a) do
+      "#{a} #{a}"
+    end
+
+    def bar do
+      " )"
+    end
+    """
+
+    assert expected == Sigils.replace_with_spaces(source, "")
+  end
 end

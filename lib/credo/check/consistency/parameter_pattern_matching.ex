@@ -27,8 +27,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    issue_locations =
-      @collector.find_locations_not_matching(expected, source_file)
+    issue_locations = @collector.find_locations_not_matching(expected, source_file)
 
     Enum.map(issue_locations, fn location ->
       format_issue(issue_meta, [{:message, message_for(expected)} | location])

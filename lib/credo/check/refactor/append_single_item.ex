@@ -29,12 +29,12 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   end
 
   # [a] ++ b is OK
-  defp traverse(ast = {:++, _, [[_], _]}, issues, _issue_meta) do
+  defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
     {ast, issues}
   end
 
   # a ++ [b] is not
-  defp traverse(ast = {:++, meta, [_, [_]]}, issues, issue_meta) do
+  defp traverse({:++, meta, [_, [_]]} = ast, issues, issue_meta) do
     {ast, [issue_for(issue_meta, meta[:line], :++) | issues]}
   end
 
@@ -45,8 +45,7 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message:
-        "Appending a single item to a list is inefficient, use [head | tail]
+      message: "Appending a single item to a list is inefficient, use [head | tail]
                 notation (and Enum.reverse/1 when order matters)",
       trigger: trigger,
       line_no: line_no

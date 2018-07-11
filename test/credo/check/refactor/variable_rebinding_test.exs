@@ -17,6 +17,19 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
 
         %{seq: ^seq} = %{seq: 1}
       end
+
+      def recode(data = %struct{}, from, to) when is_binary(from) and is_binary(to) do
+        from_size = byte_size(from)
+
+        # `from` is pinned, `from_size` is used as a parameter
+        <<^from::binary-size(from_size), subname::binary>> = something
+
+        # `from_size` is used as a parameter
+        <<other::binary-size(from_size), subname2::binary>> = something
+
+        # `subname` is pinned
+        <<from::binary-size(xxx), ^subname::binary>> = something
+      end
     end
     """
     |> to_source_file

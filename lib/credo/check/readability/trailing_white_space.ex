@@ -8,8 +8,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @explanation [
     check: @moduledoc,
     params: [
-      ignore_strings:
-        "Set to `false` to check lines that are strings or in heredocs"
+      ignore_strings: "Set to `false` to check lines that are strings or in heredocs"
     ]
   ]
   @default_params [
