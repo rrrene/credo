@@ -17,15 +17,13 @@ defmodule Credo.ConfigBuilder do
 
   defp get_config_file(%Options{} = options) do
     config_name = options.switches[:config_name]
-    config_file_path = options.switches[:config_file_path]
-    dir = options.path
-      |> Filename.remove_line_no_and_column()
+    config_file = options.switches[:config_file]
+    dir = Filename.remove_line_no_and_column(options.path)
 
-    cond do
-      is_binary(config_file_path) ->
-        ConfigFile.read_from_file_path(dir, config_file_path, config_name)
-      true ->
-        ConfigFile.read_or_default(dir, config_name)
+    if is_binary(config_file) do
+      ConfigFile.read_from_file_path(dir, config_file, config_name)
+    else
+      ConfigFile.read_or_default(dir, config_name)
     end
   end
 

@@ -11,7 +11,7 @@ defmodule Credo.CLI.Options do
     all: :boolean,
     checks: :string,
     config_name: :string,
-    config_file_path: :string,
+    config_file: :string,
     color: :boolean,
     crash_on_error: :boolean,
     debug: :boolean,

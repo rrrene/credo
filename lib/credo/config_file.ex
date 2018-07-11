@@ -35,16 +35,15 @@ defmodule Credo.ConfigFile do
 
   @doc """
   Returns Execution struct representing a consolidated Execution for
-  the provided config_file_path merged into the default configuration.
+  the provided config_file merged into the default configuration.
 
-  - `config_file_path`: full path to the custom configuration file
+  - `config_file`: full path to the custom configuration file
   - `config_name`: name of the configuration to load
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_from_file_path(dir, config_file_path, config_name \\ nil, safe \\ false) do
-    [config_file_path]
-    |> combine_configs(dir, config_name, safe)
+  def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ false) do
+    combine_configs([config_file], dir, config_name, safe)
   end
 
   defp combine_configs(files, dir, config_name, safe) do
