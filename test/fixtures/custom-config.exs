@@ -7,7 +7,7 @@
         excluded: []
       },
       checks: [
-        {Credo.Check.Readability.ModuleDoc, false},
+        {Credo.Check.Readability.ModuleDoc, false}
       ]
     }
   ]
