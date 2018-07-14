@@ -4,11 +4,13 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   This is helpful because a quoted atom can be easily mistaken for a string.
 
       # prefered
+
       :x
       [x: 1]
       %{x: 1}
 
       # NOT preferred
+
       :"x"
       ["x": 1]
       %{"x": 1}
