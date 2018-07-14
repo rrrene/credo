@@ -1,6 +1,7 @@
 defmodule Credo.SourceFile do
-  defstruct filename: nil,
-            valid?: nil
+  @moduledoc """
+  `SourceFile` structs represent a source file in the codebase.
+  """
 
   @type t :: module
 
@@ -8,6 +9,18 @@ defmodule Credo.SourceFile do
   alias Credo.Service.SourceFileLines
   alias Credo.Service.SourceFileSource
 
+  defstruct filename: nil,
+            valid?: nil
+
+  defimpl Inspect, for: __MODULE__ do
+    def inspect(source_file, _opts) do
+      "%SourceFile<#{source_file.filename}>"
+    end
+  end
+
+  @doc """
+  Retuns a `SourceFile` struct for the given `source` code and `filename`.
+  """
   def parse(source, filename) do
     filename = Path.relative_to_cwd(filename)
     lines = Credo.Code.to_lines(source)
@@ -31,6 +44,9 @@ defmodule Credo.SourceFile do
     }
   end
 
+  @doc "Retuns the AST for the given `source_file`."
+  def ast(source_file)
+
   def ast(%__MODULE__{filename: filename}) do
     case SourceFileAST.get(filename) do
       {:ok, ast} ->
@@ -41,6 +57,9 @@ defmodule Credo.SourceFile do
     end
   end
 
+  @doc "Retuns the lines of source code for the given `source_file`."
+  def lines(source_file)
+
   def lines(%__MODULE__{filename: filename}) do
     case SourceFileLines.get(filename) do
       {:ok, lines} ->
@@ -50,6 +69,9 @@ defmodule Credo.SourceFile do
         raise "Could not get source from ETS: #{filename}"
     end
   end
+
+  @doc "Retuns the source code for the given `source_file`."
+  def source(source_file)
 
   def source(%__MODULE__{filename: filename}) do
     case SourceFileSource.get(filename) do
@@ -91,6 +113,8 @@ defmodule Credo.SourceFile do
 
   NOTE: Both +line_no+ and the returned index are 1-based.
   """
+  def column(source_file, line_no, trigger)
+
   def column(%__MODULE__{} = source_file, line_no, trigger)
       when is_binary(trigger) or is_atom(trigger) do
     line = line_at(source_file, line_no)
@@ -111,10 +135,4 @@ defmodule Credo.SourceFile do
   end
 
   def column(_, _, _), do: nil
-
-  defimpl Inspect, for: __MODULE__ do
-    def inspect(source_file, _opts) do
-      "%SourceFile<#{source_file.filename}>"
-    end
-  end
 end

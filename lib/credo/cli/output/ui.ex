@@ -1,4 +1,8 @@
 defmodule Credo.CLI.Output.UI do
+  @moduledoc """
+  This module provides functions used to create the UI.
+  """
+
   @edge "┃"
   @ellipsis "…"
   @shell_service Credo.CLI.Output.Shell

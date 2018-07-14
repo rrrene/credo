@@ -32,9 +32,9 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     check: @moduledoc
   ]
 
-  alias Credo.Check.CodeHelper
-
   use Credo.Check
+
+  alias Credo.Check.CodeHelper
 
   @doc false
   def run(source_file, params \\ []) do

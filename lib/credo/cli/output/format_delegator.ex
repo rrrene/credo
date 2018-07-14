@@ -1,9 +1,19 @@
 defmodule Credo.CLI.Output.FormatDelegator do
   @moduledoc """
-  The FormatDelegator module can be used to easily delegate print-statements
-  for different formats to different modules.
+  This module can be used to easily delegate print-statements for different
+  formats to different modules.
+
+  Example:
+
+      use Credo.CLI.Output.FormatDelegator,
+        default: Credo.CLI.Command.Suggest.Output.Default,
+        flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
+        oneline: Credo.CLI.Command.Suggest.Output.Oneline,
+        json: Credo.CLI.Command.Suggest.Output.Json
+
   """
 
+  @doc false
   defmacro __using__(format_list) do
     format_mods =
       Enum.map(format_list, fn {format, output_mod} ->

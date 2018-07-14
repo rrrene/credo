@@ -1,8 +1,12 @@
 defmodule Credo.CLI.Output do
-  alias Credo.CLI.Output.UI
-  alias Credo.Execution
+  @moduledoc """
+  This module provides helper functions regarding command line output.
+  """
 
   @category_tag_map %{"refactor" => "F"}
+
+  alias Credo.CLI.Output.UI
+  alias Credo.Execution
 
   def check_tag(category, in_parens \\ true)
 

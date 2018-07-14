@@ -5,6 +5,8 @@ defmodule Credo.CLI.OptionsTest do
   @command_names ["cmd1", "cmd2", "cmd3"]
   @fixture_name "options"
 
+  doctest Credo.CLI.Options
+
   defp fixture_path(name) do
     Path.join([File.cwd!(), "test", "fixtures", name])
   end

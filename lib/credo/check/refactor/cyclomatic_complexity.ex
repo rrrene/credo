@@ -38,10 +38,10 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     cond: 1
   ]
 
+  use Credo.Check
+
   alias Credo.Check.CodeHelper
   alias Credo.SourceFile
-
-  use Credo.Check
 
   @doc false
   def run(source_file, params \\ []) do

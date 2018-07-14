@@ -16,9 +16,9 @@ defmodule Credo.Check.Refactor.FunctionArity do
   @default_params [max_arity: 8, ignore_defp: false]
   @def_ops [:def, :defp, :defmacro]
 
-  alias Credo.Code.Parameters
-
   use Credo.Check
+
+  alias Credo.Code.Parameters
 
   @doc false
   def run(source_file, params \\ []) do

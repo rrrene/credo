@@ -32,9 +32,9 @@ defmodule Credo.Check.Refactor.Nesting do
   @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn]
 
-  alias Credo.Check.CodeHelper
-
   use Credo.Check
+
+  alias Credo.Check.CodeHelper
 
   @doc false
   def run(source_file, params \\ []) do

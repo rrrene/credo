@@ -44,7 +44,8 @@ defmodule Credo.Mixfile do
     [
       {:bunt, "~> 0.2.0"},
       {:jason, "~> 1.0"},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:inch_ex, "~> 0.1", only: [:dev, :test], runtime: false}
     ]
   end
 end

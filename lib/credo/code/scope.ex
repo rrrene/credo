@@ -31,8 +31,8 @@ defmodule Credo.Code.Scope do
 
   Examples:
 
-    {:defmodule, "Foo.Bar"}
-    {:def, "Foo.Bar.baz"}
+      {:defmodule, "Foo.Bar"}
+      {:def, "Foo.Bar.baz"}
   """
   def name(_ast, line: 0), do: nil
 

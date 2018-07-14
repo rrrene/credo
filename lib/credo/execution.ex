@@ -4,6 +4,11 @@ defmodule Credo.Execution do
   manipulated via the `Credo.Execution` module.
   """
 
+  @type t :: module
+
+  alias Credo.Execution.Issues
+  alias Credo.Execution.SourceFiles
+
   defstruct argv: [],
             cli_options: nil,
 
@@ -38,11 +43,6 @@ defmodule Credo.Execution do
             assigns: %{},
             results: %{},
             config_comment_map: %{}
-
-  @type t :: module
-
-  alias Credo.Execution.Issues
-  alias Credo.Execution.SourceFiles
 
   @doc """
   Returns the checks that should be run for a given `exec` struct.

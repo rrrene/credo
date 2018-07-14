@@ -50,6 +50,8 @@ defmodule Credo.Check.CodeHelper do
       true
 
   """
+  def matches?(name, value)
+
   def matches?(name, list) when is_list(list) do
     Enum.any?(list, &matches?(name, &1))
   end
@@ -69,8 +71,8 @@ defmodule Credo.Check.CodeHelper do
 
   Examples:
 
-    {:defmodule, "Foo.Bar"}
-    {:def, "Foo.Bar.baz"}
+      {:defmodule, "Foo.Bar"}
+      {:def, "Foo.Bar.baz"}
   """
   def scope_for(source_file, line: line_no) do
     source_file

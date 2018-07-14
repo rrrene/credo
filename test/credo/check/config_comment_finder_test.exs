@@ -1,8 +1,6 @@
 defmodule Credo.Check.ConfigCommentFinderTest do
   use Credo.TestHelper
 
-  use Credo.TestHelper
-
   alias Credo.Check.ConfigCommentFinder
 
   test "it should report the correct scope" do

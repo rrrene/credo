@@ -3,14 +3,6 @@ defmodule Credo.ConfigFile do
   `ConfigFile` structs represent all loaded and merged config files in a run.
   """
 
-  defstruct files: nil,
-            color: true,
-            checks: nil,
-            requires: [],
-            strict: false,
-            # checks if there is a new version of Credo
-            check_for_updates: true
-
   @config_filename ".credo.exs"
   @default_config_name "default"
   @default_config_file File.read!(@config_filename)
@@ -18,6 +10,14 @@ defmodule Credo.ConfigFile do
   @default_glob "**/*.{ex,exs}"
   @default_files_included [@default_glob]
   @default_files_excluded []
+
+  defstruct files: nil,
+            color: true,
+            checks: nil,
+            requires: [],
+            strict: false,
+            # checks if there is a new version of Credo
+            check_for_updates: true
 
   @doc """
   Returns Execution struct representing a consolidated Execution for all `.credo.exs`

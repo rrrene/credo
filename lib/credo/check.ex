@@ -1,9 +1,15 @@
 defmodule Credo.Check do
-  @doc """
+  @moduledoc """
   `Check` modules represent the checks which are run during the code analysis.
+
+  Example:
+
+      defmodule MyCheck do
+        use Credo.Check, category: :warning, base_priority: :high, elixir_version: ">= 1.3"
+      end
   """
 
-  alias Credo.Priority
+  @type t :: module
 
   @base_category_exit_status_map %{
     consistency: 1,
@@ -13,8 +19,9 @@ defmodule Credo.Check do
     warning: 16
   }
 
-  @type t :: module
+  alias Credo.Priority
 
+  @doc false
   defmacro __using__(opts) do
     quote do
       @behaviour Credo.Check

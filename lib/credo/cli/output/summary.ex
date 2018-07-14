@@ -1,8 +1,7 @@
 defmodule Credo.CLI.Output.Summary do
-  alias Credo.CLI.Output
-  alias Credo.CLI.Output.UI
-  alias Credo.Execution
-  alias Credo.SourceFile
+  @moduledoc """
+  This module is responsible for printing the summary at the end of the analysis.
+  """
 
   @category_wording [
     {:consistency, "consistency issue", "consistency issues"},
@@ -12,6 +11,11 @@ defmodule Credo.CLI.Output.Summary do
     {:design, "software design suggestion", "software design suggestions"}
   ]
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
+
+  alias Credo.CLI.Output
+  alias Credo.CLI.Output.UI
+  alias Credo.Execution
+  alias Credo.SourceFile
 
   def print(
         _source_files,

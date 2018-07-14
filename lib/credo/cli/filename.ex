@@ -1,5 +1,7 @@
 defmodule Credo.CLI.Filename do
-  @moduledoc false
+  @moduledoc """
+  This module can be used to handle filenames given at the command line.
+  """
 
   @doc """
   Returns `true` if a given `filename` contains a pos_suffix.

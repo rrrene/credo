@@ -1,10 +1,7 @@
 defmodule Credo.CLI.Options do
-  defstruct command: nil,
-            path: nil,
-            args: [],
-            switches: nil,
-            unknown_switches: [],
-            unknown_args: []
+  @moduledoc """
+  The `Options` struct represents the options given on the command line.
+  """
 
   @switches [
     all_priorities: :boolean,
@@ -39,6 +36,20 @@ defmodule Credo.CLI.Options do
 
   alias Credo.Priority
 
+  defstruct command: nil,
+            path: nil,
+            args: [],
+            switches: nil,
+            unknown_switches: [],
+            unknown_args: []
+
+  @doc """
+  Returns a `Options` struct for the given parameters.
+
+      iex> Credo.CLI.Options.parse(["alice", "--debug"], ".", ["alice", "bob", "eve"], [])
+      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{debug: true}, unknown_args: [], unknown_switches: []}
+
+  """
   def parse(argv, current_dir, command_names, ignored_args) do
     argv
     |> OptionParser.parse(strict: @switches, aliases: @aliases)

@@ -1,4 +1,9 @@
 defmodule Credo.Check.Runner do
+  @moduledoc """
+  This module is responsible for running checks based on the context represented
+  by the current `Credo.Execution`.
+  """
+
   alias Credo.CLI.Output.UI
   alias Credo.Execution
   alias Credo.Execution.Issues
@@ -38,7 +43,7 @@ defmodule Credo.Check.Runner do
     :ok
   end
 
-  @doc "Runs the ConfigCommentFinder"
+  @doc "Runs the ConfigCommentFinder."
   def run_config_comment_finder(source_files, exec) do
     {Credo.Check.ConfigCommentFinder}
     |> run_check(source_files, exec)

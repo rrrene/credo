@@ -1,6 +1,6 @@
 defmodule Credo.CLI do
   @moduledoc """
-  Credo.CLI is the entrypoint for both the Mix task and the escript.
+  `Credo.CLI` is the entrypoint for both the Mix task and the escript.
 
   It takes the parameters passed from the command line and translates them into
   a Command module (see the `Credo.CLI.Command` namespace), the work directory

@@ -1,15 +1,30 @@
 defmodule Credo.Check.ConfigComment do
-  defstruct line_no: nil,
-            line_no_end: nil,
-            instruction: nil,
-            params: nil
+  @moduledoc """
+  `ConfigComment` structs represent comments which follow control Credo's behaviour.
 
-  alias Credo.Issue
+  The following comments are supported:
+
+      # credo:disable-for-this-file
+      # credo:disable-for-next-line
+      # credo:disable-for-previous-line
+      # credo:disable-for-lines:<number>
+
+  """
 
   @instruction_disable_file "disable-for-this-file"
   @instruction_disable_next_line "disable-for-next-line"
   @instruction_disable_previous_line "disable-for-previous-line"
   @instruction_disable_lines "disable-for-lines"
+
+  alias Credo.Issue
+
+  defstruct line_no: nil,
+            line_no_end: nil,
+            instruction: nil,
+            params: nil
+
+  @doc "Returns a `ConfigComment` struct based on the given parameters."
+  def new(instruction, param_string, line_no)
 
   def new("#{@instruction_disable_lines}:" <> line_count, param_string, line_no) do
     line_count = String.to_integer(line_count)
@@ -43,6 +58,9 @@ defmodule Credo.Check.ConfigComment do
       params: param_string |> value_for() |> List.wrap()
     }
   end
+
+  @doc "Returns `true` if the given `issue` should be ignored based on the given `config_comment`"
+  def ignores_issue?(config_comment, issue)
 
   def ignores_issue?(
         %__MODULE__{instruction: @instruction_disable_file, params: params},
@@ -91,6 +109,8 @@ defmodule Credo.Check.ConfigComment do
   def ignores_issue?(_, _) do
     false
   end
+
+  #
 
   defp params_ignore_issue?([], _issue) do
     true
