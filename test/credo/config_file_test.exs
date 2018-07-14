@@ -168,4 +168,15 @@ defmodule Credo.ConfigFileTest do
 
     assert config_subdir_count > 1
   end
+
+  test "loads custom config file and merges with default" do
+    config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs"])
+
+    configs = ConfigFile.read_from_file_path(".", config_file)
+    # from default
+    assert(Enum.member?(configs.checks, {Credo.Check.Readability.ModuleNames, []}))
+
+    # from custom file
+    assert(Enum.member?(configs.checks, {Credo.Check.Readability.ModuleDoc, false}))
+  end
 end
