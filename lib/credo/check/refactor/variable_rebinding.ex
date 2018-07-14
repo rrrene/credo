@@ -34,8 +34,6 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   use Credo.Check
 
-  alias Credo.Check.CodeHelper
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)

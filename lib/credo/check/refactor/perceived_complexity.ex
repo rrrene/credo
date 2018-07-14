@@ -41,7 +41,6 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   use Credo.Check
 
   alias Credo.Check.CodeHelper
-  alias Credo.SourceFile
 
   @doc false
   def run(source_file, params \\ []) do
