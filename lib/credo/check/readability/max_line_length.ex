@@ -18,10 +18,12 @@ defmodule Credo.Check.Readability.MaxLineLength do
     max_length: 120,
     ignore_definitions: true,
     ignore_specs: false,
-    ignore_strings: true
+    ignore_strings: true,
+    ignore_urls: true
   ]
 
   @def_ops [:def, :defp, :defmacro]
+  @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
 
   use Credo.Check, base_priority: :low
 
@@ -39,6 +41,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_strings = Params.get(params, :ignore_strings, @default_params)
     # TODO v1.0: this should be two different params
     ignore_heredocs = ignore_strings
+    ignore_urls = Params.get(params, :ignore_urls, @default_params)
 
     definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
@@ -61,6 +64,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
         |> Credo.Code.to_lines()
       else
         lines
+      end
+
+    lines_for_comparison =
+      if ignore_urls do
+        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ @url_regex end)
+      else
+        lines_for_comparison
       end
 
     Enum.reduce(lines_for_comparison, [], fn {line_no, line_for_comparison}, issues ->

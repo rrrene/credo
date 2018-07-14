@@ -21,6 +21,17 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report a violation for URLs" do
+    """
+    def fun do
+      # Based on https://github.com/rrrene/credo/blob/7dec9aecdd21ef33fdc20cc4ac6c94efb4bcddc3/lib/credo.ex#L4
+      nil
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, max_length: 80)
+  end
+
   test "it should NOT report expected code /2" do
     """
     defmacro some_macro(type) do
@@ -153,5 +164,16 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
       assert 81 == issue.column
       assert issue.message =~ ~r/max is 80, was 112/
     end)
+  end
+
+  test "it should report a violation /3" do
+    """
+    def fun do
+      # Based on https://github.com/rrrene/credo/blob/7dec9aecdd21ef33fdc20cc4ac6c94efb4bcddc3/lib/credo.ex#L4
+      nil
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, max_length: 80, ignore_urls: false)
   end
 end
