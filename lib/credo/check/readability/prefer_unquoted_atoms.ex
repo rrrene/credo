@@ -37,7 +37,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
 
   @token_types [:atom_unsafe, :kw_identifier_unsafe]
 
-  use Credo.Check, run_on_all: true, base_priority: :high
+  use Credo.Check, run_on_all: true, base_priority: :high, elixir_version: "< 1.7.0-dev"
 
   @doc false
   def run(source_file, params \\ []) do
