@@ -63,9 +63,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
         lines
       end
 
-    Enum.reduce(lines, [], fn {line_no, line}, issues ->
-      {_, line_for_comparison} = Enum.at(lines_for_comparison, line_no - 1)
-
+    Enum.reduce(lines_for_comparison, [], fn {line_no, line_for_comparison}, issues ->
       if String.length(line_for_comparison) > max_length do
         if refute_issue?(
              line_no,
@@ -76,6 +74,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
            ) do
           issues
         else
+          {_, line} = Enum.at(lines, line_no - 1)
+
           [issue_for(line_no, max_length, line, issue_meta) | issues]
         end
       else
