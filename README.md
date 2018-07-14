@@ -358,6 +358,13 @@ Do note with the passed option as filename is a stub that is just used to prefix
 If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [bunt](https://github.com/rrrene/bunt):
 
 ```bash
+mix archive.install hex bunt
+mix archive.install hex credo
+```
+
+**Important**: if you're using an older version of Elixir, you'll have to resort to building from source:
+
+```bash
 git clone git@github.com:rrrene/bunt.git
 cd bunt
 mix archive.build
@@ -366,15 +373,6 @@ cd -
 git clone git@github.com:rrrene/credo.git
 cd credo
 mix deps.get
-mix archive.build
-mix archive.install
-```
-
-**Important:** You have to install `bunt` as well:
-
-```bash
-git clone https://github.com/rrrene/bunt
-cd bunt
 mix archive.build
 mix archive.install
 ```
