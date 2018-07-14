@@ -29,9 +29,8 @@ defmodule Credo.Check.Refactor.MapInto do
   end
 
   defp traverse(
-         ast =
-           {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _,
-            [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]},
+         {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _,
+          [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} = ast,
          issues,
          issue_meta
        ) do
@@ -40,12 +39,11 @@ defmodule Credo.Check.Refactor.MapInto do
   end
 
   defp traverse(
-         ast =
-           {:|>, meta,
-            [
-              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
-              {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
-            ]},
+         {:|>, meta,
+          [
+            {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
+            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
+          ]} = ast,
          issues,
          issue_meta
        ) do
@@ -54,12 +52,11 @@ defmodule Credo.Check.Refactor.MapInto do
   end
 
   defp traverse(
-         ast =
-           {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
-            [
-              {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
-              _
-            ]},
+         {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
+          [
+            {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
+            _
+          ]} = ast,
          issues,
          issue_meta
        ) do
@@ -68,16 +65,15 @@ defmodule Credo.Check.Refactor.MapInto do
   end
 
   defp traverse(
-         ast =
-           {:|>, meta,
-            [
-              {:|>, _,
-               [
-                 _,
-                 {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
-               ]},
-              {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
-            ]},
+         {:|>, meta,
+          [
+            {:|>, _,
+             [
+               _,
+               {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
+             ]},
+            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
+          ]} = ast,
          issues,
          issue_meta
        ) do
