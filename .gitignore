@@ -2,6 +2,7 @@
 /deps
 /docs
 /doc
+/.elixir_ls/
 /.idea
 /tmp
 /.vscode
