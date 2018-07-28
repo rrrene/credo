@@ -4,6 +4,7 @@
 
 - Switch `poison` for `jason`
 - Add command-line switch to load a custom configuration file (`--config-file`)
+- Add a debug report in HTML format when running Credo using `--debug`
 - Add `node_modules/` to default file excludes
 - Add `:ignore_urls` param for MaxLineLength
 - Report violation for `not` as well as `!` in Refactor.NegatedConditionWithElse
