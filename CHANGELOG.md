@@ -2,9 +2,14 @@
 
 ## 0.10.0 (pre)
 
-- Fix false positive on `LargeNumbers`
-- Fix `NegatedConditionWithElse` for `not/2` as well
 - Switch `poison` for `jason`
+- Add command-line switch to load a custom configuration file (`--config-file`)
+- Add `node_modules/` to default file excludes
+- Add `:ignore_urls` param for MaxLineLength
+- Report violation for `not` as well as `!` in Refactor.NegatedConditionWithElse
+- Fix false positive on LargeNumbers
+- Fix NegatedConditionWithElse for `not/2` as well
+- Disable PreferUnquotedAtoms for Elixir >= 1.7.0
 
 ### New checks
 
