@@ -47,7 +47,6 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
   #
 
   if Version.match?(System.version(), "< 1.7.0-dev") do
-
     #
 
     test "it should report cases where a quoted atom is used and could be unquoted" do
@@ -68,6 +67,5 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
     end
 
     #
-
   end
 end
