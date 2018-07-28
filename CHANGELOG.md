@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.10.0 (pre)
+## 0.10.0
 
 - Switch `poison` for `jason`
 - Add command-line switch to load a custom configuration file (`--config-file`)
