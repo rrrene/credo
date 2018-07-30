@@ -128,6 +128,7 @@
         {Credo.Check.Warning.LazyLogging},
         {Credo.Check.Warning.OperationOnSameValues},
         {Credo.Check.Warning.OperationWithConstantResult},
+        {Credo.Check.Warning.UnsafeToAtom},
         {Credo.Check.Warning.UnusedEnumOperation},
         {Credo.Check.Warning.UnusedFileOperation},
         {Credo.Check.Warning.UnusedKeywordOperation},
