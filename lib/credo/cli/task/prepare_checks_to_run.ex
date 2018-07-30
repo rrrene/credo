@@ -33,20 +33,20 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp exclude_checks_based_on_elixir_version(exec) do
-    version = System.version()
+    elixir_version = System.version()
 
-    skipped_checks = Enum.reject(exec.checks, &matches_requirement?(&1, version))
+    skipped_checks = Enum.reject(exec.checks, &matches_requirement?(&1, elixir_version))
 
-    checks = Enum.filter(exec.checks, &matches_requirement?(&1, version))
+    checks = Enum.filter(exec.checks, &matches_requirement?(&1, elixir_version))
 
     %Execution{exec | checks: checks, skipped_checks: skipped_checks}
   end
 
-  defp matches_requirement?({check, _}, version) do
-    matches_requirement?({check}, version)
+  defp matches_requirement?({check, _}, elixir_version) do
+    matches_requirement?({check}, elixir_version)
   end
 
-  defp matches_requirement?({check}, version) do
-    Version.match?(version, check.elixir_version)
+  defp matches_requirement?({check}, elixir_version) do
+    Version.match?(elixir_version, check.elixir_version)
   end
 end
