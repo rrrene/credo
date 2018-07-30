@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1
+
+- Fixed "unnecessary atom quotes" compiler warning during analysis
+
 ## 0.10.0
 
 - Switch `poison` for `jason`
