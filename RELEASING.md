@@ -4,6 +4,7 @@
 
 * Ensure `CHANGELOG.md` is up-to-date
 * Ensure working dir is clean
+* Update version requirement in `README.md`
 * Update version in `mix.exs`
 * Create a commit:
 
