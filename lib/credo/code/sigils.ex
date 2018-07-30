@@ -32,9 +32,9 @@ defmodule Credo.Code.Sigils do
   Replaces all characters inside all sigils with the equivalent amount of
   white-space.
   """
-  def replace_with_spaces(source, replacement \\ " ") do
+  def replace_with_spaces(source, replacement \\ " ", interpolation_replacement \\ " ") do
     source
-    |> InterpolationHelper.replace_interpolations(replacement)
+    |> InterpolationHelper.replace_interpolations(interpolation_replacement)
     |> parse_code("", replacement)
   end
 
