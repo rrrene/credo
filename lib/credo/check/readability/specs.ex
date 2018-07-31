@@ -2,9 +2,8 @@ defmodule Credo.Check.Readability.Specs do
   @moduledoc """
   Functions, callbacks and macros need typespecs.
 
-  Adding typespecs allows tools like dialyzer to perform success typing on
-  functions. Without a spec functions and macros are ignored by the type
-  checker.
+  Adding typespecs gives tools like Dialyzer more information when performing
+  checks for type errors in function calls and definitions.
 
       @spec add(integer, integer) :: integer
       def add(a, b), do: a + b
