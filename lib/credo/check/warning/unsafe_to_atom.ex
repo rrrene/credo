@@ -5,19 +5,19 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
 
   Creating an atom from a string or charlist should be done by using
 
-    String.to_existing_atom(string)
+      String.to_existing_atom(string)
 
   or
 
-    List.to_existing_atom(charlist)
+      List.to_existing_atom(charlist)
 
   Module aliases should be constructed using
 
-    Module.safe_concat(prefix, suffix)
+      Module.safe_concat(prefix, suffix)
 
   or
 
-    Module.safe_concat([prefix, infix, suffix])
+      Module.safe_concat([prefix, infix, suffix])
 
   """
 
