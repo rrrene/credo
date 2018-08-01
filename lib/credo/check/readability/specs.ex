@@ -43,6 +43,14 @@ defmodule Credo.Check.Readability.Specs do
     {ast, [{name, length(args)} | specs]}
   end
 
+  defp find_specs({:impl, _, [true]} = ast, specs) do
+    {ast, [:impl | specs]}
+  end
+
+  defp find_specs({:def, _, [{name, _, args}, _]} = ast, [:impl | specs]) do
+    {ast, [{name, length(args)} | specs]}
+  end
+
   defp find_specs(ast, issues) do
     {ast, issues}
   end
