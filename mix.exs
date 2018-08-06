@@ -32,7 +32,10 @@ defmodule Credo.Mixfile do
       ],
       maintainers: ["René Föhring"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/rrrene/credo"}
+      links: %{
+        "GitHub" => "https://github.com/rrrene/credo",
+        "Changelog" => "https://github.com/rrrene/credo/blob/master/CHANGELOG.md"
+      }
     ]
   end
 
