@@ -434,6 +434,7 @@ These checks warn you about things that are potentially dangerous, like a missed
 Some IDEs and editors are able to run `mix credo` in the background and mark and issues directly in the editor view.
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
+* [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
 
 ## Contributing
 
