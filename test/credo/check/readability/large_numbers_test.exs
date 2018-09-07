@@ -10,12 +10,12 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   test "it should NOT report expected code" do
     """
     @budgets %{
-      "budget1": 100_000,
-      "budget2": 200_000,
-      "budget3": 300_000,
-      "budget4": 500_000,
-      "budget5": 1_000_000,
-      "budget6": 2_000_000
+      budget1: 100_000,
+      budget2: 200_000,
+      budget3: 300_000,
+      budget4: 500_000,
+      budget5: 1_000_000,
+      budget6: 2_000_000
     }
 
     @int32_min -2_147_483_648
