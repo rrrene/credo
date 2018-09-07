@@ -13,7 +13,7 @@ defmodule Credo.CLI.Task.LoadAndValidateSourceFiles do
       end)
 
     Output.complain_about_invalid_source_files(Map.get(source_files, :invalid, []))
-    Output.complain_about_large_source_files(Map.get(source_files, :timed_out, []))
+    Output.complain_about_timed_out_source_files(Map.get(source_files, :timed_out, []))
 
     exec
     |> put_source_files(Map.get(source_files, :valid, []))

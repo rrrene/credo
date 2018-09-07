@@ -120,7 +120,7 @@ defmodule Credo.Sources do
       |> Enum.zip(filenames)
       |> Enum.into(%{})
 
-    tasks_with_results = Task.yield_many(tasks, 5000)
+    tasks_with_results = Task.yield_many(tasks)
 
     results =
       Enum.map(tasks_with_results, fn {task, res} ->
@@ -128,13 +128,10 @@ defmodule Credo.Sources do
         {task, res || Task.shutdown(task, :brutal_kill)}
       end)
 
-    completed =
-      Enum.map(results, fn
-        {_task, {:ok, value}} -> value
-        {task, nil} -> SourceFile.timed_out(task_dictionary[task])
-      end)
-
-    completed
+    Enum.map(results, fn
+      {_task, {:ok, value}} -> value
+      {task, nil} -> SourceFile.timed_out(task_dictionary[task])
+    end)
   end
 
   defp to_source_file(filename) do

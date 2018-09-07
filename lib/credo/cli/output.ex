@@ -131,9 +131,9 @@ defmodule Credo.CLI.Output do
     print_numbered_list(invalid_source_filenames)
   end
 
-  def complain_about_large_source_files([]), do: nil
+  def complain_about_timed_out_source_files([]), do: nil
 
-  def complain_about_large_source_files(large_source_files) do
+  def complain_about_timed_out_source_files(large_source_files) do
     large_source_filenames = Enum.map(large_source_files, & &1.filename)
 
     output = [
