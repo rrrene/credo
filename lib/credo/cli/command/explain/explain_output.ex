@@ -35,8 +35,9 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
     options = """
 
     General options:
-      -v, --version       Show version
-      -h, --help          Show this help
+          --[no-]color        Toggle colored output
+      -v, --version           Show version
+      -h, --help              Show this help
     """
 
     UI.puts(usage)

@@ -27,17 +27,20 @@ defmodule Credo.CLI.Command.List.ListOutput do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
     List options:
-      -a, --all             Show all issues
-      -A, --all-priorities  Show all issues including low priority ones
-          --min-priority    Minimum priority to show issues (high,medium,normal,low,lower or number)
-      -c, --checks          Only include checks that match the given strings
-      -C, --config-name     Use the given config instead of "default"
-      -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+      -a, --all               Show all issues
+      -A, --all-priorities    Show all issues including low priority ones
+          --min-priority      Minimum priority to show issues (high,medium,normal,low,lower or number)
+      -c, --checks            Only include checks that match the given strings
+          --config-file       Use the given config file
+      -C, --config-name       Use the given config instead of "default"
+      -i, --ignore-checks     Ignore checks that match the given strings
+          --format            Display the list in a specific format (oneline,flycheck)
+          --mute-exit-status  Exit with status zero even if there are issues
 
     General options:
-      -v, --version         Show version
-      -h, --help            Show this help
+          --[no-]color        Toggle colored output
+      -v, --version           Show version
+      -h, --help              Show this help
     """
 
     UI.puts(usage)
