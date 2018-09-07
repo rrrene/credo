@@ -14,6 +14,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         1+2
       end
     end
+    defmodule F do
+      def f(), do: 1 + 2
+      def g(), do: 3 + 1
+      def l(), do: [&+/2, &-/2, &*/2, &//2]
+     end
   end
   """
   @without_spaces2 """
