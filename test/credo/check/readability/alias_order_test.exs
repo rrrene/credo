@@ -74,6 +74,18 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should work with multi-alias" do
+    """
+    defmodule Test do
+      alias Detroit.Learnables.Learnable
+      alias DetroitWeb.{ContainerCell, WizardNavigationCell}
+      alias DetroitWeb.Course.Subject.{CompletionCell, HeaderCell}
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
