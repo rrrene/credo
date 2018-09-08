@@ -49,4 +49,39 @@ defmodule Credo.ExsLoaderTest do
     assert expected == Credo.ExsLoader.parse(exs_string, true)
     assert expected == Credo.ExsLoader.parse(exs_string, false)
   end
+
+  test "Credo.Execution.parse_exs should handle executable code only in unsafe mode" do
+    exs_string = """
+      %{
+        configs: [
+          %{
+            name: "default",
+            dirs: ~w(LIB SRC TEST) |> Enum.map(&String.downcase/1),
+            checks: [
+              {Style.MaxLineLength, priority: :low, max_length: 100},
+              {Style.TrailingBlankLine},
+            ]
+          }
+        ]
+      }
+    """
+
+    expected = %{
+      configs: [
+        %{
+          name: "default",
+          dirs: ["lib", "src", "test"],
+          checks: [
+            {Style.MaxLineLength, priority: :low, max_length: 100},
+            {Style.TrailingBlankLine}
+          ]
+        }
+      ]
+    }
+
+    assert_raise ArgumentError, fn ->
+      Credo.ExsLoader.parse(exs_string)
+    end
+    assert expected == Credo.ExsLoader.parse(exs_string, false)
+  end
 end

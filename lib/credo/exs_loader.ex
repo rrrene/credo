@@ -63,6 +63,12 @@ defmodule Credo.ExsLoader do
     {process_exs(key), process_exs(value)}
   end
 
+  defp process_exs(_) do
+    raise ArgumentError,
+      "Executable code in .credo.exs is disabled by default. " <>
+      "Use --eval-config-file to evaluate config files as code"
+  end
+
   defp process_tuple([], acc), do: acc
 
   defp process_tuple([head | tail], acc) do
