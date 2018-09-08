@@ -353,6 +353,17 @@ $ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin
 Do note with the passed option as filename is a stub that is just used to prefix the error and so certain editors can annotate the original file.
 
 
+### Custom handling of configuration files
+
+Though `.credo.exs` is an executable source file, Credo will parse the configuration _without evaluating it as code_ by default. If your configuration includes code statements that need to be evaluated, you can pass the `--eval-config-file` option.
+
+To supply a configuration file other than the usual `.credo.exs` locations, you can use the `--config-file` option as follows:
+
+```bash
+$ mix credo --config-file=/path/to/credo_config.exs
+```
+
+
 ### Using Credo as stand alone
 
 If you do not want or are not allowed to include Credo in the current project you can also install it as an archive. For this, you also need to install [bunt](https://github.com/rrrene/bunt):
