@@ -1,5 +1,5 @@
 defmodule Credo.ExsLoader do
-  def parse(exs_string, safe \\ false)
+  def parse(exs_string, safe \\ true)
 
   def parse(exs_string, true) do
     case Code.string_to_quoted(exs_string) do

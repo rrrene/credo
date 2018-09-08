@@ -27,7 +27,7 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_or_default(dir, config_name \\ nil, safe \\ false) do
+  def read_or_default(dir, config_name \\ nil, safe \\ true) do
     dir
     |> relevant_config_files
     |> combine_configs(dir, config_name, safe)
@@ -42,7 +42,7 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ false) do
+  def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ true) do
     combine_configs([config_file], dir, config_name, safe)
   end
 
