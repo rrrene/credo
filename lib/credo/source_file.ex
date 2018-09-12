@@ -3,14 +3,17 @@ defmodule Credo.SourceFile do
   `SourceFile` structs represent a source file in the codebase.
   """
 
-  @type t :: module
+  @type t :: %__MODULE__{
+          filename: nil | String.t(),
+          status: :valid | :invalid | :timed_out
+        }
 
   alias Credo.Service.SourceFileAST
   alias Credo.Service.SourceFileLines
   alias Credo.Service.SourceFileSource
 
   defstruct filename: nil,
-            valid?: nil
+            status: nil
 
   defimpl Inspect, for: __MODULE__ do
     def inspect(source_file, _opts) do
@@ -40,7 +43,17 @@ defmodule Credo.SourceFile do
 
     %Credo.SourceFile{
       filename: filename,
-      valid?: valid
+      status: if(valid, do: :valid, else: :invalid)
+    }
+  end
+
+  @spec timed_out(String.t()) :: t
+  def timed_out(filename) do
+    filename = Path.relative_to_cwd(filename)
+
+    %Credo.SourceFile{
+      filename: filename,
+      status: :timed_out
     }
   end
 

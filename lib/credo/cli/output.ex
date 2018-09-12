@@ -131,6 +131,25 @@ defmodule Credo.CLI.Output do
     print_numbered_list(invalid_source_filenames)
   end
 
+  def complain_about_timed_out_source_files([]), do: nil
+
+  def complain_about_timed_out_source_files(large_source_files) do
+    large_source_filenames = Enum.map(large_source_files, & &1.filename)
+
+    output = [
+      :reset,
+      :bright,
+      :orange,
+      "info: ",
+      :red,
+      "Some source files were not parsed in the time allotted:\n"
+    ]
+
+    UI.puts(output)
+
+    print_numbered_list(large_source_filenames)
+  end
+
   def print_skipped_checks(%Execution{skipped_checks: []}), do: nil
 
   def print_skipped_checks(%Execution{skipped_checks: skipped_checks}) do

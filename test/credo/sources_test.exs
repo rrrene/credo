@@ -78,7 +78,7 @@ defmodule Credo.SourcesTest do
       files: %{excluded: [], included: ["lib/mix/tasks/credo.ex"]}
     }
 
-    [%Credo.SourceFile{valid?: true}] = Credo.Sources.find(exec)
+    [%Credo.SourceFile{status: :valid}] = Credo.Sources.find(exec)
   end
 
   test "it excludes paths that match the `excluded` patterns" do
