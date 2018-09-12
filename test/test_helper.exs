@@ -38,7 +38,7 @@ defmodule CredoSourceFileCase do
 
   def to_source_file(source, filename) do
     case Credo.SourceFile.parse(source, filename) do
-      %{valid?: true} = source_file ->
+      %{status: :valid} = source_file ->
         source_file
 
       _ ->
