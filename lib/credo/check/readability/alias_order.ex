@@ -129,7 +129,8 @@ defmodule Credo.Check.Readability.AliasOrder do
       end)
       |> Enum.reverse()
 
-    accumulate_alias_into_group(ast, modules, meta[:line], aliases)
+    nested_mod_line = meta[:line] + 1
+    accumulate_alias_into_group(ast, modules, nested_mod_line, aliases)
   end
 
   defp find_alias_groups(ast, aliases), do: {ast, aliases}
