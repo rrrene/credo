@@ -78,8 +78,10 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     defmodule Test do
       alias Detroit.Learnables.Learnable
-      alias DetroitWeb.{ContainerCell, WizardNavigationCell}
-      alias DetroitWeb.Course.Subject.{CompletionCell, HeaderCell}
+      alias DetroitWeb.{ContainerCell, WizardNavigationCell, Zzzzz}
+      alias DetroitWeb.Course.Subject.{CompletionCell, HeaderCell, TableCell}
+
+      alias Detroit.Abc
     end
     """
     |> to_source_file
