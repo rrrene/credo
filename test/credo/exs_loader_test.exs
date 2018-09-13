@@ -17,8 +17,8 @@ defmodule Credo.ExsLoaderTest do
             dirs_sigil: ~w(lib src test),
             dirs_regex: ~r(lib src test),
             checks: [
-              {Style.MaxLineLength, priority: :low, max_length: 100},
-              {Style.TrailingBlankLine},
+              {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+              {Credo.Check.Style.TrailingBlankLine},
             ]
           }
         ]
@@ -39,8 +39,8 @@ defmodule Credo.ExsLoaderTest do
           dirs_sigil: ~w(lib src test),
           dirs_regex: ~r(lib src test),
           checks: [
-            {Style.MaxLineLength, priority: :low, max_length: 100},
-            {Style.TrailingBlankLine}
+            {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+            {Credo.Check.Style.TrailingBlankLine}
           ]
         }
       ]
@@ -58,8 +58,8 @@ defmodule Credo.ExsLoaderTest do
             name: "default",
             dirs: ~w(LIB SRC TEST) |> Enum.map(&String.downcase/1),
             checks: [
-              {Style.MaxLineLength, priority: :low, max_length: 100},
-              {Style.TrailingBlankLine},
+              {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+              {Credo.Check.Style.TrailingBlankLine},
             ]
           }
         ]
@@ -72,8 +72,8 @@ defmodule Credo.ExsLoaderTest do
           name: "default",
           dirs: ["lib", "src", "test"],
           checks: [
-            {Style.MaxLineLength, priority: :low, max_length: 100},
-            {Style.TrailingBlankLine}
+            {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+            {Credo.Check.Style.TrailingBlankLine}
           ]
         }
       ]
