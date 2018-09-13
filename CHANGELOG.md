@@ -3,6 +3,7 @@
 ## 0.10.1
 
 - Fixed "unnecessary atom quotes" compiler warning during analysis
+- Handle timeouts when reading source files
 
 ## 0.10.0
 
