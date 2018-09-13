@@ -82,6 +82,7 @@ defmodule Credo.ExsLoaderTest do
     assert_raise ArgumentError, fn ->
       Credo.ExsLoader.parse(exs_string)
     end
+
     assert expected == Credo.ExsLoader.parse(exs_string, false)
   end
 end
