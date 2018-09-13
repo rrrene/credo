@@ -75,17 +75,60 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group([{_, mod_list_first, a}, {line_no, mod_list_second, b}], _) when a > b do
-    line = [
+  defp process_group([{_, mod_list_first, a}, {line_no, mod_list_second, b}], _)
+       when a > b do
+    {base, _} = mod_list_second
+
+    issue_opts = [
       line_no: line_no,
-      trigger: Name.full(mod_list_second -- mod_list_first),
-      module: mod_list_second
+      trigger: base,
+      module: base
     ]
 
-    {:halt, line}
+    {:halt, issue_opts}
+  end
+
+  defp process_group([{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}], _) do
+    issue_opts =
+      cond do
+        inner_group_order_issue(mod_list_first) ->
+          {base, _} = mod_list_first
+
+          [
+            line_no: line_no1,
+            trigger: base,
+            module: base
+          ]
+
+        inner_group_order_issue(mod_list_second) ->
+          {base, _} = mod_list_second
+
+          [
+            line_no: line_no2,
+            trigger: base,
+            module: base
+          ]
+
+        true ->
+          nil
+      end
+
+    if issue_opts do
+      {:halt, issue_opts}
+    else
+      {:cont, nil}
+    end
   end
 
   defp process_group(_, _), do: {:cont, nil}
+
+  defp inner_group_order_issue({_base, []}), do: nil
+
+  defp inner_group_order_issue({_base, mod_list}) do
+    mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
+
+    mod_list != Enum.sort(mod_list)
+  end
 
   defp extract_alias_groups({:defmodule, _, _} = ast) do
     ast
@@ -108,7 +151,8 @@ defmodule Credo.Check.Readability.AliasOrder do
          {:alias, _, [{:__aliases__, meta, mod_list} | _]} = ast,
          aliases
        ) do
-    modules = [{meta[:line], mod_list, mod_list |> Name.full() |> String.downcase()}]
+    compare_name = compare_name(ast)
+    modules = [{meta[:line], {Name.full(mod_list), []}, compare_name}]
 
     accumulate_alias_into_group(ast, modules, meta[:line], aliases)
   end
@@ -120,19 +164,25 @@ defmodule Credo.Check.Readability.AliasOrder do
           ]} = ast,
          aliases
        ) do
-    modules =
+    multi_mod_list =
       multi_mod_list
-      |> Enum.map(fn {:__aliases__, meta2, mod} ->
-        modules = mod_list ++ mod
+      |> Enum.flat_map(fn {:__aliases__, _, mod} -> mod end)
 
-        {meta2[:line], modules, modules |> Name.full() |> String.downcase()}
-      end)
-      |> Enum.reverse()
+    compare_name = compare_name(ast)
+    modules = [{meta[:line], {Name.full(mod_list), multi_mod_list}, compare_name}]
 
     accumulate_alias_into_group(ast, modules, meta[:line], aliases)
   end
 
   defp find_alias_groups(ast, aliases), do: {ast, aliases}
+
+  defp compare_name(value) do
+    value
+    |> Macro.to_string()
+    |> String.downcase()
+    |> String.replace(~r/[\{\}]/, "")
+    |> String.replace(~r/,.+/, "")
+  end
 
   defp accumulate_alias_into_group(ast, modules, line, [{line_no, _, _} | _] = aliases)
        when line_no != 0 and line_no != line - 1 do
