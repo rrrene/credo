@@ -171,7 +171,8 @@ defmodule Credo.Check.Readability.AliasOrder do
     compare_name = compare_name(ast)
     modules = [{meta[:line], {Name.full(mod_list), multi_mod_list}, compare_name}]
 
-    accumulate_alias_into_group(ast, modules, meta[:line], aliases)
+    nested_mod_line = meta[:line] + 1
+    accumulate_alias_into_group(ast, modules, nested_mod_line, aliases)
   end
 
   defp find_alias_groups(ast, aliases), do: {ast, aliases}
