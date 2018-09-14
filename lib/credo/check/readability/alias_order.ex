@@ -77,13 +77,7 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp process_group([{_, mod_list_first, a}, {line_no, mod_list_second, b}], _)
        when a > b do
-    {base, _} = mod_list_second
-
-    issue_opts = [
-      line_no: line_no,
-      trigger: base,
-      module: base
-    ]
+    issue_opts = issue_opts(line_no, mod_list_second)
 
     {:halt, issue_opts}
   end
@@ -92,22 +86,27 @@ defmodule Credo.Check.Readability.AliasOrder do
     issue_opts =
       cond do
         inner_group_order_issue(mod_list_first) ->
-          {base, _} = mod_list_first
-
-          [
-            line_no: line_no1,
-            trigger: base,
-            module: base
-          ]
+          issue_opts(line_no2, mod_list_second)
 
         inner_group_order_issue(mod_list_second) ->
-          {base, _} = mod_list_second
+          issue_opts(line_no2, mod_list_second)
 
-          [
-            line_no: line_no2,
-            trigger: base,
-            module: base
-          ]
+        true ->
+          nil
+      end
+
+    if issue_opts do
+      {:halt, issue_opts}
+    else
+      {:cont, nil}
+    end
+  end
+
+  defp process_group([{line_no1, mod_list_first, _}], _) do
+    issue_opts =
+      cond do
+        inner_group_order_issue(mod_list_first) ->
+          issue_opts(line_no1, mod_list_first)
 
         true ->
           nil
@@ -128,6 +127,16 @@ defmodule Credo.Check.Readability.AliasOrder do
     mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
 
     mod_list != Enum.sort(mod_list)
+  end
+
+  defp issue_opts(line_no, mod_list) do
+    {base, _} = mod_list
+
+    %{
+      line_no: line_no,
+      trigger: base,
+      module: base
+    }
   end
 
   defp extract_alias_groups({:defmodule, _, _} = ast) do
@@ -194,7 +203,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     {ast, modules ++ aliases}
   end
 
-  defp issue_for(issue_meta, line_no: line_no, trigger: trigger, module: module) do
+  defp issue_for(issue_meta, %{line_no: line_no, trigger: trigger, module: module}) do
     format_issue(
       issue_meta,
       message: "The alias `#{Name.full(module)}` is not alphabetically ordered among its group.",
