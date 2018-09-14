@@ -15,13 +15,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         1+2
       end
     end
-    defmodule F do
-      def f(), do: 1 + 2
-      def g(), do: 3 + 1
-      def l(), do: [&+/2, &-/2, &*/2, &//2]
      end
-  end
   """
+
   @without_spaces2 """
   defmodule OtherModule3 do
     defmacro foo do
@@ -45,6 +41,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   """
   @with_spaces """
   defmodule Credo.Sample2 do
+    defmodule F do
+      def f(), do: 1 + 2
+      def g(), do: 3 + 1
+      def l(), do: [&+/2, &-/2, &*/2, &//2]
+    end
     defmodule InlineModule do
       @type config_or_func :: Config.t() | (-> Config.t())
 
