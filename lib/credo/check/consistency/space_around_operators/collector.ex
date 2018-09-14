@@ -44,6 +44,21 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     end
   end
 
+  defp skip_function_capture([{:at_op, {line, _, _}, :@} | tokens]) do
+    case tokens do
+      # @spec - drop whole line
+      [{:identifier, _, :spec} | tokens] ->
+        drop_while_on_line(tokens, line)
+
+      # @type - drop whole line
+      [{:identifier, _, :type} | tokens] ->
+        drop_while_on_line(tokens, line)
+
+      tokens ->
+        tokens
+    end
+  end
+
   defp skip_function_capture([{:capture_op, _, _} | tokens]) do
     Enum.drop_while(tokens, fn
       # :erlang_module
@@ -85,6 +100,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
   end
 
   defp skip_function_capture(tokens), do: tokens
+
+  defp drop_while_on_line(tokens, line) do
+    Enum.drop_while(tokens, fn
+      {_, {^line, _, _}} -> true
+      {_, {^line, _, _}, _} -> true
+      _ -> false
+    end)
+  end
 
   defp record_spaces(prev, current, next, acc) do
     acc
