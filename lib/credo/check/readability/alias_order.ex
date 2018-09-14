@@ -75,7 +75,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group([{_, mod_list_first, a}, {line_no, mod_list_second, b}], _)
+  defp process_group([{_, _mod_list_first, a}, {line_no, mod_list_second, b}], _)
        when a > b do
     issue_opts = issue_opts(line_no, mod_list_second)
 
@@ -86,7 +86,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     issue_opts =
       cond do
         inner_group_order_issue(mod_list_first) ->
-          issue_opts(line_no2, mod_list_second)
+          issue_opts(line_no1, mod_list_second)
 
         inner_group_order_issue(mod_list_second) ->
           issue_opts(line_no2, mod_list_second)
