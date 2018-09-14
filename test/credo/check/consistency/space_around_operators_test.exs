@@ -5,6 +5,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
   @without_spaces """
   defmodule Credo.Sample1 do
+    @spec f(<<_::16, _::_*8>>) :: binary
     defmodule InlineModule do
       @min -1
       @max +1
