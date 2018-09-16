@@ -13,6 +13,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
       def foobar do
         1+2
+        |> test1()
+        |> test2()
+        |> test3()
+        |> test4()
       end
     end
      end
