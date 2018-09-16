@@ -4,6 +4,11 @@
 
 - Fixed "unnecessary atom quotes" compiler warning during analysis
 - Handle timeouts when reading source files
+- Ignore function calls for OperationOnSameValues
+- Do not treat `|>` as an operator in SpaceAroundOperators
+- Fix AliasOrder bug for multi alias statements
+- Fix multiple false positives for SpaceAroundOperators
+- ... and lots of important little fixes to issue messages, docs and the like!
 
 ## 0.10.0
 
