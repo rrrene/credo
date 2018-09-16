@@ -35,6 +35,19 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report for function calls" do
+    """
+    defmodule Red do
+      def my_fun do
+        a() - a()
+        Float.round(((:rand.uniform - :rand.uniform) / 100), 13)
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
