@@ -88,6 +88,19 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should work with an intersecting `require`" do
+    """
+    defmodule Test do
+      alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
+      alias OMG.API.Utxo
+      require Utxo
+      alias OMG.Watcher.Repo
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #

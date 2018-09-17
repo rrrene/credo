@@ -175,7 +175,7 @@ defmodule Credo.Check.Readability.AliasOrder do
        ) do
     multi_mod_list =
       multi_mod_list
-      |> Enum.flat_map(fn {:__aliases__, _, mod} -> mod end)
+      |> Enum.map(fn {:__aliases__, _, mod_list} -> mod_name(mod_list) end)
 
     compare_name = compare_name(ast)
     modules = [{meta[:line], {Name.full(mod_list), multi_mod_list}, compare_name}]
@@ -185,6 +185,12 @@ defmodule Credo.Check.Readability.AliasOrder do
   end
 
   defp find_alias_groups(ast, aliases), do: {ast, aliases}
+
+  defp mod_name(mod_list) do
+    mod_list
+    |> Enum.map(&to_string/1)
+    |> Enum.join(".")
+  end
 
   defp compare_name(value) do
     value
