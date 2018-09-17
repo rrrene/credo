@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2
+
+- Fix bug in AliasOrder
+
 ## 0.10.1
 
 - Fixed "unnecessary atom quotes" compiler warning during analysis
