@@ -12,7 +12,7 @@ defmodule Credo.CLI.Options do
     color: :boolean,
     crash_on_error: :boolean,
     debug: :boolean,
-    eval_config_file: :boolean,
+    safe_mode: :boolean,
     mute_exit_status: :boolean,
     format: :string,
     help: :boolean,

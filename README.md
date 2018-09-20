@@ -355,7 +355,7 @@ Do note with the passed option as filename is a stub that is just used to prefix
 
 ### Custom handling of configuration files
 
-Though `.credo.exs` is an executable source file, Credo will parse the configuration _without evaluating it as code_ by default. If your configuration includes code statements that need to be evaluated, you can pass the `--eval-config-file` option.
+Since `.credo.exs` and custom checks are executable code, Credo provides a `--safe-mode` option to prevent remote code execution. In safe mode, Credo parses the configuration file _without evaluating it as code_, ignores the `requires` configuration option, and disallows custom checks.
 
 To supply a configuration file other than the usual `.credo.exs` locations, you can use the `--config-file` option as follows:
 

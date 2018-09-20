@@ -50,7 +50,7 @@ defmodule Credo.ExsLoaderTest do
     assert expected == Credo.ExsLoader.parse(exs_string, false)
   end
 
-  test "Credo.Execution.parse_exs should handle executable code only in unsafe mode" do
+  test "Should execute config code only w/o safe mode" do
     exs_string = """
       %{
         configs: [
@@ -80,9 +80,78 @@ defmodule Credo.ExsLoaderTest do
     }
 
     assert_raise ArgumentError, fn ->
-      Credo.ExsLoader.parse(exs_string)
+      Credo.ExsLoader.parse(exs_string, true)
     end
 
-    assert expected == Credo.ExsLoader.parse(exs_string, false)
+    assert expected == Credo.ExsLoader.parse(exs_string)
   end
+
+  test "Should parse the requires field only w/o safe mode" do
+    exs_string = """
+      %{
+        configs: [
+          %{
+            name: "default",
+            requires: ["code.ex", "othercode.ex"]
+          }
+        ]
+      }
+    """
+
+    expected_unsafe = %{
+      configs: [
+        %{
+          name: "default",
+          requires: ["code.ex", "othercode.ex"]
+        }
+      ]
+    }
+
+    expected_safe = %{
+      configs: [
+        %{
+          name: "default",
+          requires: []
+        }
+      ]
+    }
+
+    assert expected_unsafe == Credo.ExsLoader.parse(exs_string)
+    assert expected_safe == Credo.ExsLoader.parse(exs_string, true)
+  end
+
+  test "Should allow custom checks only w/o safe mode" do
+    exs_string = """
+      %{
+        configs: [
+          %{
+            name: "default",
+            checks: [
+              {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+              {MyModule.MyCheck.Style.TrailingBlankLine},
+            ]
+          }
+        ]
+      }
+    """
+
+    expected = %{
+      configs: [
+        %{
+          name: "default",
+          checks: [
+            {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
+            {MyModule.MyCheck.Style.TrailingBlankLine},
+          ]
+        }
+      ]
+    }
+
+    assert_raise ArgumentError, fn ->
+      Credo.ExsLoader.parse(exs_string, true)
+    end
+
+    assert expected == Credo.ExsLoader.parse(exs_string)
+  end
+
 end

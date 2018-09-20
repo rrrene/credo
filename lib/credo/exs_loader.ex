@@ -1,5 +1,5 @@
 defmodule Credo.ExsLoader do
-  def parse(exs_string, safe \\ true)
+  def parse(exs_string, safe \\ false)
 
   def parse(exs_string, true) do
     case Code.string_to_quoted(exs_string) do
@@ -55,6 +55,11 @@ defmodule Credo.ExsLoader do
     Module.concat(name_list)
   end
 
+  defp process_exs({:__aliases__, _meta, _name_list}) do
+    raise ArgumentError,
+          "Custom checks and executable configuration are disabled in safe mode."
+  end
+
   defp process_exs({{:__aliases__, _meta, name_list = [:Credo, :Check | _]}, options}) do
     {Module.concat(name_list), process_exs(options)}
   end
@@ -65,8 +70,7 @@ defmodule Credo.ExsLoader do
 
   defp process_exs(_) do
     raise ArgumentError,
-          "Executable code in .credo.exs is disabled by default. " <>
-            "Use --eval-config-file to evaluate config files as code"
+          "Executable code in .credo.exs is disabled in safe mode."
   end
 
   defp process_tuple([], acc), do: acc
@@ -85,6 +89,11 @@ defmodule Credo.ExsLoader do
   defp process_map([head | tail], acc) do
     acc = process_map_item(head, acc)
     process_map(tail, acc)
+  end
+
+  # Safe mode processing ignores 'requires'
+  defp process_map_item({:requires, _value}, acc) do
+    Map.put(acc, :requires, [])
   end
 
   defp process_map_item({key, value}, acc)
