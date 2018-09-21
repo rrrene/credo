@@ -93,7 +93,7 @@ defmodule Credo.ExsLoader do
 
   # Safe mode processing ignores 'requires'
   defp process_map_item({:requires, _value}, acc) do
-    Map.put(acc, :requires, [])
+    acc
   end
 
   defp process_map_item({key, value}, acc)

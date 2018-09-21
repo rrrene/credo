@@ -111,7 +111,6 @@ defmodule Credo.ExsLoaderTest do
       configs: [
         %{
           name: "default",
-          requires: []
         }
       ]
     }
