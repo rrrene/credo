@@ -1,15 +1,42 @@
 defmodule Credo.Check do
   @moduledoc """
-  `Check` modules represent the checks which are run during the code analysis.
+  `Check` modules represent the checks which are run during Credo's analysis.
 
   Example:
 
       defmodule MyCheck do
-        use Credo.Check, category: :warning, base_priority: :high, elixir_version: ">= 1.3"
+        use Credo.Check, category: :warning, base_priority: :high
+
+        def run(source_file, params) do
+          #
+        end
       end
+
+  The `run/2` function takes two parameters: a source file and a list of parameters for the check.
+  It has to return a list of found issues.
   """
 
   @type t :: module
+
+  @doc """
+  Returns the base priority for the check.
+  """
+  @callback base_priority() :: integer
+
+  @doc """
+  Returns the category for the check.
+  """
+  @callback category() :: atom
+
+  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+
+  @callback run_on_all?() :: boolean
+
+  @callback explanation() :: String.t()
+
+  @callback explanation_for_params() :: Keyword.t()
+
+  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
 
   @base_category_exit_status_map %{
     consistency: 1,
@@ -19,7 +46,13 @@ defmodule Credo.Check do
     warning: 16
   }
 
+  alias Credo.Check
+  alias Credo.Check.CodeHelper
+  alias Credo.Issue
+  alias Credo.IssueMeta
   alias Credo.Priority
+  alias Credo.Severity
+  alias Credo.SourceFile
 
   @doc false
   defmacro __using__(opts) do
@@ -95,34 +128,6 @@ defmodule Credo.Check do
       end
     end
   end
-
-  alias Credo.Check
-  alias Credo.Check.CodeHelper
-  alias Credo.Issue
-  alias Credo.IssueMeta
-  alias Credo.Priority
-  alias Credo.Severity
-  alias Credo.SourceFile
-
-  @doc """
-  Returns the base priority for the check.
-  """
-  @callback base_priority() :: integer
-
-  @doc """
-  Returns the category for the check.
-  """
-  @callback category() :: atom
-
-  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
-
-  @callback run_on_all?() :: boolean
-
-  @callback explanation() :: String.t()
-
-  @callback explanation_for_params() :: Keyword.t()
-
-  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
 
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]
