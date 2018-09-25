@@ -438,16 +438,16 @@ While refactor checks show you possible problems, these checks try to highlight 
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
 
-## Automated Code Review Integrations
-
-* [Codacy](https://www.codacy.com/) - Codacy checks your code from style to security, duplication, complexity, and also integrates with coverage. Codacy is free for open source, and it provides credo analysis out-of-the-box.
-
 ## IDE/Editor Integrations
 
 Some IDEs and editors are able to run `mix credo` in the background and mark and issues directly in the editor view.
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
+
+## Automated Code Review Integrations
+
+* [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
 
 ## Contributing
 
