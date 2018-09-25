@@ -445,6 +445,10 @@ Some IDEs and editors are able to run `mix credo` in the background and mark and
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
 
+## Automated Code Review Integrations
+
+* [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
+
 ## Contributing
 
 1. [Fork it!](http://github.com/rrrene/credo/fork)
