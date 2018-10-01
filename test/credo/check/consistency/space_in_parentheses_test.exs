@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.SpaceInParenthesesTest do
+defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
   use Credo.TestHelper
 
   @described_check Credo.Check.Consistency.SpaceInParentheses

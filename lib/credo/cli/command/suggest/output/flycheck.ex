@@ -1,6 +1,5 @@
-defmodule Credo.CLI.Command.Suggest.Output.FlyCheck do
+defmodule Credo.CLI.Command.Suggest.Output.Flycheck do
   @moduledoc false
-
   alias Credo.CLI.Output.Formatter.Flycheck
   alias Credo.Execution
 

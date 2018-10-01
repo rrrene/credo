@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Consistency.ModuleFilenames
 Code.require_file("support/test_application.exs", __DIR__)
 
 Credo.Test.Application.start([], [])

@@ -1,3 +1,3 @@
-defmodule Credo.MainProcessTest do
+defmodule Credo.TaskGroupTest do
   use ExUnit.Case
 end

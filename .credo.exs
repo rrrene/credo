@@ -57,6 +57,7 @@
         {Credo.Check.Consistency.SpaceAroundOperators, []},
         {Credo.Check.Consistency.SpaceInParentheses, []},
         {Credo.Check.Consistency.TabsOrSpaces, []},
+        {Credo.Check.Consistency.ModuleFilenames, []},
 
         #
         ## Design Checks

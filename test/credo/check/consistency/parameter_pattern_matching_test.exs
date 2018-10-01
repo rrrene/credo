@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
+defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
   use Credo.TestHelper
 
   @described_check Credo.Check.Consistency.ParameterPatternMatching

@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Consistency.ModuleFilenames
 defmodule Credo.Test.FilenameGenerator do
   use GenServer
 
