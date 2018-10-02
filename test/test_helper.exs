@@ -77,7 +77,7 @@ defmodule CredoCheckCase do
   def assert_issue(source_file, check \\ nil, params \\ [], callback \\ nil) do
     issues = issues_for(source_file, check, create_config(), params)
 
-    refute Enum.count(issues) == 0, "There should be one issue, got none."
+    refute Enum.empty?(issues), "There should be one issue, got none."
 
     assert Enum.count(issues) == 1,
            "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
