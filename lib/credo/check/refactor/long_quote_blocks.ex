@@ -102,7 +102,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
         source_file = IssueMeta.source_file(issue_meta)
 
         lines =
-          Credo.Code.to_lines(source_file)
+          source_file
+          |> Credo.Code.to_lines()
           |> Enum.slice(meta[:line] - 1, line_count)
 
         lines =

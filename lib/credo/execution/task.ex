@@ -53,7 +53,8 @@ defmodule Credo.Execution.Task do
         |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
 
       %Execution{halted: true} = exec ->
-        task.error(exec, opts)
+        exec
+        |> task.error(opts)
         |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
 
       value ->

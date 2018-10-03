@@ -103,9 +103,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   end
 
   def add_masses(found_hashes) do
-    found_hashes
-    |> Enum.map(&add_mass_to_subnode/1)
-    |> Enum.into(%{})
+    Enum.into(found_hashes, %{}, &add_mass_to_subnode/1)
   end
 
   defp add_mass_to_subnode({hash, node_items}) do

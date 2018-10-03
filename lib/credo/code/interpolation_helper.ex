@@ -142,7 +142,8 @@ defmodule Credo.Code.InterpolationHelper do
     #       indentation, not the first line of the heredoc.
     padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
 
-    find_interpolations(list, source)
+    list
+    |> find_interpolations(source)
     |> Enum.reject(&is_nil/1)
     |> add_to_col_start_and_end(padding_in_first_line)
   end

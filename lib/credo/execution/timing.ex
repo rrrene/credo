@@ -41,7 +41,8 @@ defmodule Credo.Execution.Timing do
 
   def grouped_by_tag(exec, tag_name) do
     map =
-      all(exec)
+      exec
+      |> all()
       |> Enum.filter(fn {tags, _started_at, _time} -> tags[tag_name] end)
       |> Enum.group_by(fn {tags, _started_at, _time} -> tags[tag_name] end)
 
