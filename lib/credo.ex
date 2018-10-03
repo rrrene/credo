@@ -10,5 +10,6 @@ defmodule Credo do
 
   @version Mix.Project.config()[:version]
 
+  @spec version() :: String.t()
   def version, do: @version
 end
