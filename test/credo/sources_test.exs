@@ -10,7 +10,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -25,7 +28,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -39,7 +45,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -48,7 +57,10 @@ defmodule Credo.SourcesTest do
     full_paths = ["lib/credo.ex", "lib/mix/tasks/credo.ex"]
     exec = %Credo.Execution{files: %{excluded: [], included: full_paths}}
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert full_paths == files
   end
@@ -68,7 +80,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -88,7 +103,10 @@ defmodule Credo.SourcesTest do
 
     expected = ["lib/mix/tasks/credo.ex"]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -105,7 +123,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -117,7 +138,10 @@ defmodule Credo.SourcesTest do
 
     expected = ["lib/mix/tasks/credo.ex"]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -134,7 +158,10 @@ defmodule Credo.SourcesTest do
       "lib/mix/tasks/credo.gen.config.ex"
     ]
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert expected == files
   end
@@ -185,7 +212,10 @@ defmodule Credo.SourcesTest do
       }
     }
 
-    files = Credo.Sources.find(exec) |> Enum.map(& &1.filename)
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
 
     assert files |> Enum.count() > 0
   end

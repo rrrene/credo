@@ -41,8 +41,7 @@ defmodule Credo.Priority do
 
     lookup = Enum.into(base_map, %{})
 
-    base_map
-    |> Enum.map(fn {scope_name, prio} ->
+    Enum.into(base_map, %{}, fn {scope_name, prio} ->
       names = String.split(scope_name, ".")
 
       if names |> List.last() |> String.match?(~r/^[a-z]/) do
@@ -58,7 +57,6 @@ defmodule Credo.Priority do
         {scope_name, prio}
       end
     end)
-    |> Enum.into(%{})
   end
 
   defp make_base_map(priority_list, %SourceFile{} = source_file) do

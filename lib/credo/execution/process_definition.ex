@@ -38,9 +38,8 @@ defmodule Credo.Execution.ProcessDefinition do
 
     exec = Execution.set_parent_and_current_task(exec, exec.current_task, current_task)
 
-    tasks = compiled_tasks
-
-    Enum.reduce(tasks, exec, fn task, exec ->
+    compiled_tasks
+    |> Enum.reduce(exec, fn task, exec ->
       Credo.Execution.Task.run(task, exec)
     end)
     |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
