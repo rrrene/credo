@@ -13,11 +13,13 @@ defmodule Credo.Check.Refactor.ABCSize do
   @explanation [
     check: @moduledoc,
     params: [
-      max_size: "The maximum ABC size a function should have."
+      max_size: "The maximum ABC size a function should have.",
+      excluded_functions: "All functions listed will be ignored."
     ]
   ]
   @default_params [
-    max_size: 30
+    max_size: 30,
+    excluded_functions: []
   ]
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
@@ -31,11 +33,21 @@ defmodule Credo.Check.Refactor.ABCSize do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = Params.get(params, :max_size, @default_params)
+    excluded_functions = Params.get(params, :excluded_functions, @default_params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_abc_size))
+    Credo.Code.prewalk(
+      source_file,
+      &traverse(&1, &2, issue_meta, max_abc_size, excluded_functions)
+    )
   end
 
-  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
+  defp traverse(
+         {:defmacro, _, [{:__using__, _, _}, _]} = ast,
+         issues,
+         _issue_meta,
+         _max_abc_size,
+         _excluded_functions
+       ) do
     {ast, issues}
   end
 
@@ -44,12 +56,13 @@ defmodule Credo.Check.Refactor.ABCSize do
            {unquote(op), meta, arguments} = ast,
            issues,
            issue_meta,
-           max_abc_size
+           max_abc_size,
+           excluded_functions
          )
          when is_list(arguments) do
       abc_size =
         ast
-        |> abc_size_for
+        |> abc_size_for(excluded_functions)
         |> round
 
       if abc_size > max_abc_size do
@@ -66,7 +79,7 @@ defmodule Credo.Check.Refactor.ABCSize do
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_abc_size) do
+  defp traverse(ast, issues, _issue_meta, _max_abc_size, _excluded_functions) do
     {ast, issues}
   end
 
@@ -82,19 +95,20 @@ defmodule Credo.Check.Refactor.ABCSize do
       ...> } |> Credo.Check.Refactor.ABCSize.abc_size
       1.0
   """
-  def abc_size_for({_def_op, _meta, arguments}) when is_list(arguments) do
+  def abc_size_for({_def_op, _meta, arguments}, excluded_functions) when is_list(arguments) do
     arguments
     |> CodeHelper.do_block_for!()
-    |> abc_size_for(arguments)
+    |> abc_size_for(arguments, excluded_functions)
   end
 
   @doc false
-  def abc_size_for(nil, _arguments), do: 0
+  def abc_size_for(nil, _arguments, _excluded_functions), do: 0
 
-  def abc_size_for(ast, arguments) do
+  def abc_size_for(ast, arguments, excluded_functions) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
+    [a: a, b: b, c: c, var_names: _] =
+      Credo.Code.prewalk(ast, &traverse_abc(&1, &2, excluded_functions), initial_acc)
 
     :math.sqrt(a * a + b * b + c * c)
   end
@@ -110,14 +124,14 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
 
   for op <- @def_ops do
-    defp traverse_abc({unquote(op), _, arguments} = ast, abc)
+    defp traverse_abc({unquote(op), _, arguments} = ast, abc, _excluded_functions)
          when is_list(arguments) do
       {ast, abc}
     end
   end
 
   # Ignore string interpolation
-  defp traverse_abc({:<<>>, _, _}, acc) do
+  defp traverse_abc({:<<>>, _, _}, acc, _excluded_functions) do
     {nil, acc}
   end
 
@@ -147,10 +161,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   # B - branch
   defp traverse_abc(
          {:->, _meta, arguments} = ast,
-         a: a,
-         b: b,
-         c: c,
-         var_names: var_names
+         [a: a, b: b, c: c, var_names: var_names],
+         _excluded_functions
        ) do
     var_names = Enum.into(var_names, fn_parameters(arguments))
     {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
@@ -159,10 +171,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   for op <- @branch_ops do
     defp traverse_abc(
            {unquote(op), _meta, [{_, _, nil}, _] = arguments} = ast,
-           a: a,
-           b: b,
-           c: c,
-           var_names: var_names
+           [a: a, b: b, c: c, var_names: var_names],
+           _excluded_functions
          )
          when is_list(arguments) do
       {ast, [a: a, b: b, c: c, var_names: var_names]}
@@ -170,10 +180,8 @@ defmodule Credo.Check.Refactor.ABCSize do
 
     defp traverse_abc(
            {unquote(op), _meta, arguments} = ast,
-           a: a,
-           b: b,
-           c: c,
-           var_names: var_names
+           [a: a, b: b, c: c, var_names: var_names],
+           _excluded_functions
          )
          when is_list(arguments) do
       {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
@@ -182,10 +190,8 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   defp traverse_abc(
          {fun_or_var_name, _meta, nil} = ast,
-         a: a,
-         b: b,
-         c: c,
-         var_names: var_names
+         [a: a, b: b, c: c, var_names: var_names],
+         _excluded_functions
        ) do
     is_variable = Enum.member?(var_names, fun_or_var_name)
 
@@ -200,17 +206,27 @@ defmodule Credo.Check.Refactor.ABCSize do
   for op <- @condition_ops do
     defp traverse_abc(
            {unquote(op), _meta, arguments} = ast,
-           a: a,
-           b: b,
-           c: c,
-           var_names: var_names
+           [a: a, b: b, c: c, var_names: var_names],
+           _excluded_functions
          )
          when is_list(arguments) do
       {ast, [a: a, b: b, c: c + 1, var_names: var_names]}
     end
   end
 
-  defp traverse_abc(ast, abc) do
+  defp traverse_abc({fun_name, _meta, arguments} = ast, abc, excluded_functions)
+       when is_atom(fun_name) and is_list(arguments) do
+    IO.inspect(ast)
+    IO.inspect({excluded_functions, to_string(fun_name)})
+
+    if Enum.member?(excluded_functions, to_string(fun_name)) do
+      {nil, abc}
+    else
+      {ast, abc}
+    end
+  end
+
+  defp traverse_abc(ast, abc, _excluded_functions) do
     {ast, abc}
   end
 
