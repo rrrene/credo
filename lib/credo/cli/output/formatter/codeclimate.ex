@@ -41,7 +41,8 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
       categories: categories(check),
       check_name: check_name(check),
       description: message,
-      remediation_points: remediation_points(priority),
+      remediation_points: 50_000,
+      severity: severity(priority),
       content: %{
         body: check.explanation
       },
@@ -73,7 +74,13 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     |> Macro.underscore()
   end
 
-  defp remediation_points(_priority) do
-    50_000
+  defp severity(priority) do
+    case priority do
+      priority when priority > 20 -> "blocker"
+      priority when priority in 10..19 -> "critical"
+      priority when priority in 0..9 -> "major"
+      priority when priority in -10..-1 -> "minor"
+      priority when priority < - 10 -> "info"
+    end
   end
 end
