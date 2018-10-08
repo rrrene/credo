@@ -80,7 +80,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
       priority when priority in 10..19 -> "critical"
       priority when priority in 0..9 -> "major"
       priority when priority in -10..-1 -> "minor"
-      priority when priority < - 10 -> "info"
+      priority when priority < -10 -> "info"
     end
   end
 end
