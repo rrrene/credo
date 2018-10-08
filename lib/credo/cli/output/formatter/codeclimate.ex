@@ -35,7 +35,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
         priority: priority
       }) do
     %{
-      type: "Issue",
+      type: "issue",
       categories: categories(check),
       check_name: check_name(check),
       description: message,
@@ -70,6 +70,8 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     |> Module.split()
     |> List.last()
     |> Macro.underscore()
+    |> String.replace("_", " ")
+    |> String.capitalize
   end
 
   defp severity(priority) do
