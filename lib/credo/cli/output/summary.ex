@@ -19,14 +19,11 @@ defmodule Credo.CLI.Output.Summary do
 
   def print(
         _source_files,
-        %Execution{format: "flycheck"},
+        %Execution{format: format},
         _time_load,
         _time_run
-      ) do
-    nil
-  end
-
-  def print(_source_files, %Execution{format: "oneline"}, _time_load, _time_run) do
+      )
+      when format in ["oneline", "flycheck", "codeclimate"] do
     nil
   end
 
