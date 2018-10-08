@@ -49,7 +49,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
         lines: %{
           begin: %{
             line: line || 1,
-            columnt: column || 1
+            column: column || 1
           },
           end: %{
             line: line || 1,
