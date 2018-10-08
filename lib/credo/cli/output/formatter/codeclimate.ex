@@ -71,7 +71,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     |> List.last()
     |> Macro.underscore()
     |> String.replace("_", " ")
-    |> String.capitalize
+    |> String.capitalize()
   end
 
   defp severity(priority) do
