@@ -133,7 +133,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, only_greater_than: 50000)
+    |> assert_issue(@described_check, only_greater_than: 50_000)
   end
 
   test "it should report only one violation for ranges /1" do
