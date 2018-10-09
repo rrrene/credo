@@ -46,49 +46,30 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
     source_files
     |> duplicate_nodes(mass_threshold)
-    |> append_issues_via_issue_service(
-      source_files,
-      nodes_threshold,
-      params,
-      exec
-    )
+    |> append_issues_via_issue_service(source_files, nodes_threshold, params, exec)
 
     :ok
   end
 
-  defp append_issues_via_issue_service(
-         found_hashes,
-         source_files,
-         nodes_threshold,
-         params,
-         exec
-       )
-       when is_map(found_hashes) do
+  defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec)
+    when is_map(found_hashes) do
     Enum.each(found_hashes, fn {_hash, nodes} ->
       filenames = Enum.map(nodes, & &1.filename)
-
-      Enum.each(source_files, fn source_file ->
-        if Enum.member?(filenames, source_file.filename) do
-          this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
-          other_nodes = List.delete(nodes, this_node)
-
-          issue_meta = IssueMeta.for(source_file, params)
-
-          issue =
-            issue_for(
-              issue_meta,
-              this_node,
-              other_nodes,
-              nodes_threshold,
-              params
-            )
-
-          if issue do
-            Credo.Execution.Issues.append(exec, source_file, issue)
-          end
-        end
-      end)
+      Enum.each(source_files, &new_issue_for_members(filenames, &1, nodes_threshold, nodes, params, exec))
     end)
+  end
+
+  defp new_issue_for_members(filenames, source_file, nodes_threshold, nodes, params, exec) do
+    if Enum.member?(filenames, source_file.filename) do
+      this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
+      other_nodes = List.delete(nodes, this_node)
+      issue_meta = IssueMeta.for(source_file, params)
+      issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
+
+      if issue do
+        Credo.Execution.Issues.append(exec, source_file, issue)
+      end
+    end
   end
 
   defp duplicate_nodes(source_files, mass_threshold) do
