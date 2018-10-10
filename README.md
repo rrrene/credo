@@ -302,6 +302,7 @@ Use `--format` to format the output in one of the following formats:
 
 - `--format=flycheck` for [Flycheck](http://www.flycheck.org/) output
 - `--format=json` for [JSON](https://www.json.org/) output
+- `--format=codeclimate` for [Codeclimate](https://github.com/codeclimate/spec/blob/master/SPEC.md) output
 
 
 ### Only run some checks
