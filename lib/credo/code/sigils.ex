@@ -23,10 +23,10 @@ defmodule Credo.Code.Sigils do
   @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
   @removable_sigils @sigil_delimiters
                     |> Enum.flat_map(fn {b, e} ->
-                         Enum.flat_map(@all_sigil_starts, fn start ->
-                           [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
-                         end)
-                       end)
+                      Enum.flat_map(@all_sigil_starts, fn start ->
+                        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
+                      end)
+                    end)
                     |> Enum.uniq()
 
   @doc """

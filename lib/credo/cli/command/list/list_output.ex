@@ -36,6 +36,8 @@ defmodule Credo.CLI.Command.List.ListOutput do
       -i, --ignore-checks     Ignore checks that match the given strings
           --format            Display the list in a specific format (oneline,flycheck)
           --mute-exit-status  Exit with status zero even if there are issues
+          --include           Include files that match the given strings
+          --exclude           Exclude files that match the given strings
 
     General options:
           --[no-]color        Toggle colored output
