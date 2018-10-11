@@ -190,7 +190,7 @@ defmodule Credo.ConfigBuilder do
 
   # DEPRECATED command line switches
   defp add_switch_deprecated_switches(exec, %{one_line: true}) do
-    UI.puts([
+    UI.warn([
       :yellow,
       "[DEPRECATED] ",
       :faint,
