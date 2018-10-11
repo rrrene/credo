@@ -46,7 +46,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
       },
       location: %{
         path: filename,
-        lines: %{
+        positions: %{
           begin: %{
             line: line || 1,
             column: column || 1
