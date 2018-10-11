@@ -72,6 +72,8 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_read_from_stdin(switches)
     |> add_switch_verbose(switches)
     |> add_switch_version(switches)
+    |> add_switch_included(switches)
+    |> add_switch_excluded(switches)
   end
 
   defp add_switch_all(exec, %{all: true}) do
@@ -188,7 +190,7 @@ defmodule Credo.ConfigBuilder do
 
   # DEPRECATED command line switches
   defp add_switch_deprecated_switches(exec, %{one_line: true}) do
-    UI.puts([
+    UI.warn([
       :yellow,
       "[DEPRECATED] ",
       :faint,
@@ -199,4 +201,16 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_deprecated_switches(exec, _), do: exec
+
+  defp add_switch_included(exec, %{include: include}) do
+    %Execution{exec | files: %{exec.files | included: List.wrap(include)}}
+  end
+
+  defp add_switch_included(exec, _), do: exec
+
+  defp add_switch_excluded(exec, %{exclude: exclude}) do
+    %Execution{exec | files: %{exec.files | excluded: List.wrap(exclude)}}
+  end
+
+  defp add_switch_excluded(exec, _), do: exec
 end

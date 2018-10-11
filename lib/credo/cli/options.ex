@@ -22,7 +22,9 @@ defmodule Credo.CLI.Options do
     read_from_stdin: :boolean,
     strict: :boolean,
     verbose: :boolean,
-    version: :boolean
+    version: :boolean,
+    include: :keep,
+    exclude: :keep
   ]
   @aliases [
     a: :all,
@@ -72,9 +74,19 @@ defmodule Credo.CLI.Options do
       command: command,
       path: path,
       args: unknown_args,
-      switches: Enum.into(switches_keywords, %{}),
+      switches: Enum.reduce(switches_keywords, %{}, &convert_switches/2),
       unknown_switches: unknown_switches_keywords ++ extra_unknown_switches
     }
+  end
+
+  defp convert_switches(switch, acc) do
+    {key, value} = switch
+
+    if old = Map.get(acc, key) do
+      Map.put(acc, key, List.wrap(old) ++ [value])
+    else
+      Map.put(acc, key, value)
+    end
   end
 
   defp patch_switches(switches_keywords) do

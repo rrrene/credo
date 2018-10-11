@@ -32,8 +32,10 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
       -c, --checks          Only include checks that match the given strings
       -C, --config-name     Use the given config instead of "default"
       -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+          --format          Display the list in a specific format (oneline,flycheck,codeclimate)
           --verbose         Display more information (e.g. checked files)
+          --include         Include files that match the given strings
+          --exclude         Exclude files that match the given strings
 
     General options:
       -v, --version         Show version
