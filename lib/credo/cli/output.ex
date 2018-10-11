@@ -196,6 +196,6 @@ defmodule Credo.CLI.Output do
         " #{string}\n"
       ]
     end)
-    |> UI.puts()
+    |> UI.warn()
   end
 end
