@@ -26,14 +26,17 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     |> UI.puts()
   end
 
-  def to_json(%Issue{
-        check: check,
-        message: message,
-        line_no: line,
-        column: column,
-        filename: filename,
-        priority: priority
-      }, path) do
+  def to_json(
+        %Issue{
+          check: check,
+          message: message,
+          line_no: line,
+          column: column,
+          filename: filename,
+          priority: priority
+        },
+        path
+      ) do
     %{
       type: "issue",
       categories: categories(check),
