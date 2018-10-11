@@ -19,21 +19,24 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     Credo.Check.Warning.OperationWithConstantResult => ["Bug Risk"]
   }
 
-  def print_issues(issues) do
+  def print_issues(issues, path) do
     issues
-    |> Enum.map(&to_json/1)
+    |> Enum.map(&to_json(&1, path))
     |> Enum.join("\0")
     |> UI.puts()
   end
 
-  def to_json(%Issue{
-        check: check,
-        message: message,
-        line_no: line,
-        column: column,
-        filename: filename,
-        priority: priority
-      }) do
+  def to_json(
+        %Issue{
+          check: check,
+          message: message,
+          line_no: line,
+          column: column,
+          filename: filename,
+          priority: priority
+        },
+        path
+      ) do
     %{
       type: "issue",
       categories: categories(check),
@@ -45,7 +48,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
         body: check.explanation
       },
       location: %{
-        path: filename,
+        path: Path.relative_to(filename, path),
         positions: %{
           begin: %{
             line: line || 1,
