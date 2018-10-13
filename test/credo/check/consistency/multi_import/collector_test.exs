@@ -1,37 +1,39 @@
-defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
+defmodule Credo.Check.Consistency.MultiImport.CollectorTest do
   use Credo.TestHelper
 
-  alias Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
+  alias Credo.Check.Consistency.MultiImport.Collector
 
   @single """
   defmodule Credo.Sample1 do
     alias Foo.Bar
     import Foo.Bar
-    alias Foo.Baz # this and the first line counts as 1
-    import Foo.Baz # this and the second line counts as 1
+    import Foo.Baz # this and the first line counts as 1
+    import Bar.Foo
+    import Bar.Baz # this and the first line counts as 1
+    import Bar # use with single module alias does not count
     require Foo.Bar
-    require Foo.Baz # this and the previous line counts as 1
     use Foo.Bar
-    use Foo.Baz, with_params: true # use with params does not count
-    use Foo # use with single module alias does not count
   end
   """
 
   @multi """
   defmodule Credo.Sample2 do
-    alias Foo.{Bar, Baz}
     import Foo.{Bar, Baz}
-    require Foo.{Bar, Baz}
-    use Foo.{Bar, Baz}
+    import Foo
+    import Bar.Baz
+    alias Foo.Bar
+    require Foo.Bar
+    use Foo.Bar
   end
   """
 
   @mixed """
   defmodule Credo.Sample2 do
-    import Foo.Bar
-    alias Foo.{Bar, Baz}
-    import Foo.Baz
-    import Bar.Baz
+    import Foo.{Bar, Baz}
+    import Foo.Quux
+    alias Foo.Baz
+    require Foo.Bar
+    use Foo.Bar
   end
   """
 
@@ -41,7 +43,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{single: 3} == result
+    assert %{single: 2} == result
   end
 
   test "it should report correct frequencies for multi imports" do
@@ -50,7 +52,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{multi: 4} == result
+    assert %{multi: 1} == result
   end
 
   test "it should report correct frequencies for mixed imports" do

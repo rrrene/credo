@@ -145,7 +145,10 @@
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
-        {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
+        {Credo.Check.Consistency.MultiAlias, false},
+        {Credo.Check.Consistency.MultiImport, false},
+        {Credo.Check.Consistency.MultiUse, false},
+        {Credo.Check.Consistency.MultiRequire, false},
 
         #
         # Deprecated checks (these will be deleted after a grace period)

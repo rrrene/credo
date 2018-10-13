@@ -1,17 +1,17 @@
-defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
+defmodule Credo.Check.Consistency.MultiUse do
   @moduledoc """
   When using alias, import, require or use for multiple names from the same
   namespace, you have two options:
 
   Use single instructions per name:
 
-    alias Ecto.Query
-    alias Ecto.Schema
-    alias Ecto.Multi
+    use Ecto.Query
+    use Ecto.Schema
+    use Ecto.Multi
 
   or use one multi instruction per namespace:
 
-    alias Ecto.{Query, Schema, Multi}
+    use Ecto.{Query, Schema, Multi}
 
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
@@ -19,7 +19,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
 
   @explanation [check: @moduledoc]
 
-  @collector Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
+  @collector Credo.Check.Consistency.MultiUse.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
@@ -39,10 +39,10 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   end
 
   defp message_for(:multi = _expected) do
-    "Most of the time you are using the multi-alias/require/import/use syntax, but here you are using multiple single directives"
+    "Most of the time you are using the multi-use, but here you are using multiple single directives"
   end
 
   defp message_for(:single = _expected) do
-    "Most of the time you are using the multiple single line alias/require/import/use directives but here you are using the multi-alias/require/import/use syntax"
+    "Most of the time you are using the multiple single line use but here you are using the multi-use syntax"
   end
 end

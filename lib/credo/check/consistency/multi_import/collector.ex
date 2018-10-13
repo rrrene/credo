@@ -1,9 +1,9 @@
-defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
+defmodule Credo.Check.Consistency.MultiImport.Collector do
   use Credo.Check.Consistency.Collector
 
   alias Credo.Code
 
-  @directives [:alias, :import, :require, :use]
+  @directives [:import]
 
   def collect_matches(source_file, _params) do
     source_file
@@ -27,8 +27,8 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
           base_name = Enum.slice(nested_modules, 0..-2)
           {:single, base_name}
 
-        [{{:., _, [{:__aliases__, _, _namespaces}, :{}]}, _, _nested_aliases}] ->
-          :multi
+        [{{:., _, [{:__aliases__, _, base_name}, :{}]}, _, _nested_aliases}] ->
+          {:multi, base_name}
 
         _ ->
           nil
@@ -45,7 +45,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
 
   defp group_usages(usages) do
     split_with(usages, fn
-      {_directive, :multi, _line_no} -> true
+      {_directive, {:multi, _}, _line_no} -> true
       _ -> false
     end)
   end
@@ -53,7 +53,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
   defp count_occurrences({multi, single}) do
     stats = [
       multi: Enum.count(multi),
-      single: single |> multiple_single_locations |> Enum.count()
+      single: single |> multiple_single_locations(multi) |> Enum.count()
     ]
 
     stats
@@ -61,7 +61,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     |> Enum.into(%{})
   end
 
-  defp drop_locations({_, single}, :multi), do: multiple_single_locations(single)
+  defp drop_locations({multi, single}, :multi), do: multiple_single_locations(single, multi)
 
   defp drop_locations({multi, _}, :single), do: multi_locations(multi)
 
@@ -69,13 +69,18 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     Enum.map(multi_usages, fn {_directive, :multi, line_no} -> line_no end)
   end
 
-  defp multiple_single_locations(single_usages) do
+  defp multiple_single_locations(single_usages, multi_usages) do
+    multi_occurrences =
+      Enum.group_by(multi_usages, fn {directive, {_, base_name}, _line_no} ->
+        {directive, base_name}
+      end)
+
     single_usages
-    |> Enum.group_by(fn {directive, base_name, _line_no} ->
+    |> Enum.group_by(fn {directive, {_, base_name}, _line_no} ->
       {directive, base_name}
     end)
-    |> Enum.filter(fn {_grouped_by, occurrences} ->
-      Enum.count(occurrences) > 1
+    |> Enum.filter(fn {grouped_by, occurrences} ->
+      Enum.count(occurrences ++ Map.get(multi_occurrences, grouped_by, [])) > 1
     end)
     |> Enum.map(fn {_grouped_by, [{_, _, line_no} | _]} -> line_no end)
   end

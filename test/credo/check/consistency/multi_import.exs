@@ -1,21 +1,20 @@
-defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
+defmodule Credo.Check.Consistency.MultiImportTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
-
+  @described_check Credo.Check.Consistency.MultiImport
   @single """
   defmodule Credo.Sample2 do
-    alias Foo.Bar
-    alias Foo.Quux
+    import Foo.Bar
+    import Foo.Quux
     require Foo.Bar
   end
   """
   @multi """
   defmodule Credo.Sample3 do
-    alias Foo.{Bar, Quux}
-    alias Bar.{Baz, Bang}
-    alias Foo.Bar
+    import Foo.{Bar, Quux}
+    import Bar.{Baz, Bang}
     require Foo.Quux
+    require Foo.Bar
   end
   """
 
