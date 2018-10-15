@@ -169,7 +169,7 @@ defmodule Credo.CLI.Output do
       "get the most out of Credo!\n"
     ]
 
-    UI.warn()
+    UI.warn("")
     UI.warn(msg)
 
     skipped_checks
