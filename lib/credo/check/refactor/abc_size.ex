@@ -23,6 +23,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
 
+  @ecto_whitelisted_functions [:join, :where, :select]
+
   use Credo.Check
 
   alias Credo.Check.CodeHelper
@@ -106,6 +108,13 @@ defmodule Credo.Check.Refactor.ABCSize do
 
       {_name, _meta, parameters} ->
         Enum.map(parameters, &var_name/1)
+    end
+  end
+
+
+  for fun <- @ecto_whitelisted_functions do
+    defp traverse_abc({unquote(fun), meta, _args}, abc) do
+      {{unquote(fun), meta, []}, abc}
     end
   end
 
