@@ -11,7 +11,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
       max_length: "The maximum number of characters a line may consist of.",
       ignore_definitions: "Set to `true` to ignore lines including function definitions.",
       ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs"
+      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
+      ignore_urls: "Set to `true` to ignore lines that contain urls."
     ]
   ]
   @default_params [
