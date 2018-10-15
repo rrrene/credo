@@ -18,11 +18,10 @@ defmodule Credo.Execution.ExecutionTiming do
   def inspect(label, fun) do
     {time, result} = :timer.tc(fun)
 
+    # credo:disable-for-lines:3 Credo.Check.Warning.IoInspect
     time
     |> format_time()
     |> IO.inspect(label: label)
-
-    # credo:disable-for-previous-line Credo.Check.Warning.IoInspect
 
     result
   end
