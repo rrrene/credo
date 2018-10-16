@@ -448,6 +448,7 @@ Some IDEs and editors are able to run `mix credo` in the background and mark and
 ## Automated Code Review Integrations
 
 * [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
+* [Stickler CI](https://stickler-ci.com/) - checks your code for style and best practices across your entire stack.
 
 ## Contributing
 
