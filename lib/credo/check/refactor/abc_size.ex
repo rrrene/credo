@@ -216,9 +216,6 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   defp traverse_abc({fun_name, _meta, arguments} = ast, abc, excluded_functions)
        when is_atom(fun_name) and is_list(arguments) do
-    IO.inspect(ast)
-    IO.inspect({excluded_functions, to_string(fun_name)})
-
     if Enum.member?(excluded_functions, to_string(fun_name)) do
       {nil, abc}
     else
