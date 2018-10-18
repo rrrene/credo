@@ -17,6 +17,9 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 
         do_something() |> then_something_else() |> and_last_step()
 
+        ':#{token}'
+        |> :elixir_tokenizer.tokenize(1, [])
+
         something
         |> String.downcase
         |> String.trim

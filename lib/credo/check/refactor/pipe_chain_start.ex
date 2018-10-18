@@ -158,6 +158,15 @@ defmodule Credo.Check.Refactor.PipeChainStart do
        ),
        do: true
 
+  # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
+  # we want to consider these charlists a valid pipe chain start
+  defp valid_chain_start?(
+         {{:., _, [String, :to_charlist]}, _, [{:<<>>, _, _}]},
+         _excluded_functions,
+         _excluded_argument_types
+       ),
+       do: true
+
   # Module.function_call(with, parameters)
   defp valid_chain_start?(
          {{:., _, _}, _, _} = ast,
