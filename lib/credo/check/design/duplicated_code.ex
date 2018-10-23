@@ -52,10 +52,14 @@ defmodule Credo.Check.Design.DuplicatedCode do
   end
 
   defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec)
-    when is_map(found_hashes) do
+       when is_map(found_hashes) do
     Enum.each(found_hashes, fn {_hash, nodes} ->
       filenames = Enum.map(nodes, & &1.filename)
-      Enum.each(source_files, &new_issue_for_members(filenames, &1, nodes_threshold, nodes, params, exec))
+
+      Enum.each(
+        source_files,
+        &new_issue_for_members(filenames, &1, nodes_threshold, nodes, params, exec)
+      )
     end)
   end
 

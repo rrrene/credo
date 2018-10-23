@@ -9,6 +9,7 @@ defmodule Credo.Execution.Timing do
     time
     |> format_time()
     |> IO.inspect(label: label)
+
     # credo:disable-for-previous-line Credo.Check.Warning.IoInspect
 
     result

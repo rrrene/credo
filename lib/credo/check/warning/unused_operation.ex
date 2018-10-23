@@ -27,7 +27,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
         |> String.split("(")
         |> List.first()
 
-        issues ++ [issue_for(format_issue_fun, issue_meta, meta[:line], trigger, checked_module)]
+      issues ++ [issue_for(format_issue_fun, issue_meta, meta[:line], trigger, checked_module)]
     end)
   end
 

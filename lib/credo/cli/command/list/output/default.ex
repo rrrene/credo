@@ -123,7 +123,9 @@ defmodule Credo.CLI.Command.List.Output.Default do
     ]
     |> UI.puts()
 
-    if issue.line_no, do: print_issue_line_no(source_file, term_width, issue, outer_color, inner_color)
+    if issue.line_no do
+      print_issue_line_no(source_file, term_width, issue, outer_color, inner_color)
+    end
 
     UI.puts_edge([outer_color, :faint], @indent)
   end

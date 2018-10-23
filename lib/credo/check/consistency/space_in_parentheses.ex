@@ -19,8 +19,9 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   @explanation [
     check: @moduledoc,
     params: [
-      allow_empty_enums: "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase."
-    ]    
+      allow_empty_enums:
+        "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase."
+    ]
   ]
   @default_params [
     allow_empty_enums: false
