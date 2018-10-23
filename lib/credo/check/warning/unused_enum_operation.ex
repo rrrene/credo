@@ -45,6 +45,12 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
   alias Credo.Check.Warning.UnusedOperation
 
   def run(source_file, params \\ []) do
-    UnusedOperation.run(source_file, params, @checked_module, @funs_with_return_value, &format_issue/2)
+    UnusedOperation.run(
+      source_file,
+      params,
+      @checked_module,
+      @funs_with_return_value,
+      &format_issue/2
+    )
   end
 end

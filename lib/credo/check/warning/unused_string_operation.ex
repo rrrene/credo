@@ -26,12 +26,19 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
 
   @explanation [check: @moduledoc]
   @checked_module :String
+  @funs_with_return_value nil
 
   use Credo.Check, base_priority: :high
 
   alias Credo.Check.Warning.UnusedOperation
 
   def run(source_file, params \\ []) do
-    UnusedOperation.run(source_file, params, @checked_module, [], &format_issue/2)
+    UnusedOperation.run(
+      source_file,
+      params,
+      @checked_module,
+      @funs_with_return_value,
+      &format_issue/2
+    )
   end
 end
