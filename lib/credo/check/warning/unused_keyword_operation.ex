@@ -8,12 +8,12 @@ defmodule Credo.Check.Warning.UnusedKeywordOperation do
   variable which has to be used somehow.
   """
 
+  @explanation [check: @moduledoc]
+  @checked_module :Keyword
+
   use Credo.Check, base_priority: :high
 
   alias Credo.Check.Warning.UnusedOperation
-
-  @explanation [check: @moduledoc]
-  @checked_module :Keyword
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(source_file, params, @checked_module, [], &format_issue/2)

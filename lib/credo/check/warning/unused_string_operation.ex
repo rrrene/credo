@@ -24,12 +24,12 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
   variable you pass in, but return a new variable which has to be used somehow.
   """
 
+  @explanation [check: @moduledoc]
+  @checked_module :String
+
   use Credo.Check, base_priority: :high
 
   alias Credo.Check.Warning.UnusedOperation
-
-  @explanation [check: @moduledoc]
-  @checked_module :String
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(source_file, params, @checked_module, [], &format_issue/2)

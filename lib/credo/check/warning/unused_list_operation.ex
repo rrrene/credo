@@ -8,12 +8,12 @@ defmodule Credo.Check.Warning.UnusedListOperation do
   variable which has to be used somehow.
   """
 
+  @explanation [check: @moduledoc]
+  @checked_module :List
+
   use Credo.Check, base_priority: :high
 
   alias Credo.Check.Warning.UnusedOperation
-
-  @explanation [check: @moduledoc]
-  @checked_module :List
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(source_file, params, @checked_module, [], &format_issue/2)

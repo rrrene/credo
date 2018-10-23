@@ -26,10 +26,6 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
   (the exception being `Enum.each/2` which iterates a list and returns `:ok`).
   """
 
-  use Credo.Check, base_priority: :high
-
-  alias Credo.Check.Warning.UnusedOperation
-
   @explanation [check: @moduledoc]
   @checked_module :Enum
   @funs_with_return_value ~w(
@@ -43,6 +39,10 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
       sum take take_every take_random take_while to_list uniq uniq_by
       unzip with_index zip
     )a
+
+  use Credo.Check, base_priority: :high
+
+  alias Credo.Check.Warning.UnusedOperation
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(source_file, params, @checked_module, @funs_with_return_value, &format_issue/2)
