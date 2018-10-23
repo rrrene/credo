@@ -138,10 +138,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   # A - assignments
   defp traverse_abc(
          {:=, _meta, [lhs | rhs]},
-         a: a,
-         b: b,
-         c: c,
-         var_names: var_names
+         [a: a, b: b, c: c, var_names: var_names],
+         _excluded_functions
        ) do
     var_names =
       case var_name(lhs) do
