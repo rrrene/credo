@@ -11,9 +11,9 @@ defmodule Credo.Sources do
   patterns. For `included`, patterns can be file paths, directory paths and globs.
   For `excluded`, patterns can also be specified as regular expressions.
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: [~r/messy/], included: ["lib/mix", "root.ex"]}})
   """
   def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename

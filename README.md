@@ -438,14 +438,16 @@ While refactor checks show you possible problems, these checks try to highlight 
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
 
-## IDE/Editor Integrations
+## Integrations
 
-Some IDEs and editors are able to run `mix credo` in the background and mark and issues directly in the editor view.
+### IDE/Editor
+
+Some IDEs and editors are able to run Credo in the background and mark issues inline.
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
 
-## Automated Code Review Integrations
+### Automated Code Review
 
 * [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
 * [Stickler CI](https://stickler-ci.com/) - checks your code for style and best practices across your entire stack.
