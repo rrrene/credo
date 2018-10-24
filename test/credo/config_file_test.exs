@@ -184,7 +184,7 @@ defmodule Credo.ConfigFileTest do
   end
 
   test "loads broken config file and return error tuple" do
-    config_file = Path.join([File.cwd!(), "test", "fixtures", "error-config.exs"])
+    config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs.malformed"])
 
     result = ConfigFile.read_from_file_path(".", config_file)
 
