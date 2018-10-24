@@ -27,7 +27,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
 
   for op <- @ops do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
-      if CodeHelper.remove_metadata(lhs) === CodeHelper.remove_metadata(rhs) do
+      if Credo.Code.remove_metadata(lhs) === Credo.Code.remove_metadata(rhs) do
         new_issue = issue_for(issue_meta, meta[:line], unquote(op))
         {ast, issues ++ [new_issue]}
       else

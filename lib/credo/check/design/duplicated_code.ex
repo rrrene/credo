@@ -134,7 +134,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp collect_subhashes({_hash, node_items}, mass_threshold) do
     %{node: first_node, filename: filename} = Enum.at(node_items, 0)
 
-    my_hash = first_node |> CodeHelper.remove_metadata() |> to_hash
+    my_hash = first_node |> Credo.Code.remove_metadata() |> to_hash
     # don't count self
     subhashes =
       first_node
@@ -168,7 +168,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     if mass(ast) < mass_threshold do
       {ast, acc}
     else
-      hash = ast |> CodeHelper.remove_metadata() |> to_hash
+      hash = ast |> Credo.Code.remove_metadata() |> to_hash
       node_item = %{node: ast, filename: filename, mass: nil}
       node_items = Map.get(acc, hash, [])
       acc = Map.put(acc, hash, node_items ++ [node_item])

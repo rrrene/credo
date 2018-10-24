@@ -56,7 +56,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   for {op, operation_name, constant_result} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
       if variable_or_mod_attribute?(lhs) &&
-           CodeHelper.remove_metadata(lhs) == CodeHelper.remove_metadata(rhs) do
+           Credo.Code.remove_metadata(lhs) == Credo.Code.remove_metadata(rhs) do
         new_issue =
           issue_for(
             issue_meta,

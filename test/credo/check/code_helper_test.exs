@@ -317,6 +317,6 @@ defmodule Credo.Check.CodeHelperTest do
           ]}
        ]}
 
-    assert expected == CodeHelper.remove_metadata(ast)
+    assert expected == Credo.Code.remove_metadata(ast)
   end
 end
