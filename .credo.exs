@@ -108,7 +108,7 @@
         {Credo.Check.Refactor.NegatedConditionsWithElse, []},
         {Credo.Check.Refactor.Nesting, []},
         {Credo.Check.Refactor.PipeChainStart,
-          [excluded_argument_types: [:atom, :binary, :fn, :keyword], excluded_functions: []]},
+         [excluded_argument_types: [:atom, :binary, :fn, :keyword], excluded_functions: []]},
         {Credo.Check.Refactor.UnlessWithElse, []},
 
         #
@@ -136,12 +136,12 @@
         #
         {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Design.DuplicatedCode, false},
-        {Credo.Check.Readability.Specs, false}
+        {Credo.Check.Readability.Specs, false},
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.DoubleBooleanNegation, false},
         {Credo.Check.Refactor.VariableRebinding, false},
-        {Credo.Check.Warning.MapGetUnsafePass, false},
+        {Credo.Check.Warning.MapGetUnsafePass, false}
 
         #
         # Custom checks can be created using `mix credo.gen.check`.
