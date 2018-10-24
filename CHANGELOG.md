@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-rc1
+
+### BREAKING CHANGES
+
+These changes concern people writing their own checks for Credo.
+
+- `Credo.Check.CodeHelper` was removed. Please use the corresponding functions inside the `Credo.Code` namespace.
+
 ## 0.10.2
 
 - Fix bug in AliasOrder
