@@ -104,7 +104,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   test "it should work with multi alias syntax" do
     """
     defmodule Test do
-      alias MyApp.Accounts.{Organization, UserOrganization, User}
+      alias MyApp.Accounts.{Organization, User, UserOrganization}
       alias MyApp.Repo
     end
     """

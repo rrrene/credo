@@ -86,7 +86,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     issue_opts =
       cond do
         inner_group_order_issue(mod_list_first) ->
-          issue_opts(line_no1, mod_list_second)
+          issue_opts(line_no1, mod_list_first)
 
         inner_group_order_issue(mod_list_second) ->
           issue_opts(line_no2, mod_list_second)
