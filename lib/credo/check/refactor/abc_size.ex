@@ -27,8 +27,6 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   use Credo.Check
 
-  alias Credo.Check.CodeHelper
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
@@ -66,7 +64,7 @@ defmodule Credo.Check.Refactor.ABCSize do
         |> round
 
       if abc_size > max_abc_size do
-        fun_name = CodeHelper.def_name(ast)
+        fun_name = Credo.Code.Module.def_name(ast)
 
         {ast,
          [
@@ -97,7 +95,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   """
   def abc_size_for({_def_op, _meta, arguments}, excluded_functions) when is_list(arguments) do
     arguments
-    |> CodeHelper.do_block_for!()
+    |> Credo.Code.Block.do_block_for!()
     |> abc_size_for(arguments, excluded_functions)
   end
 

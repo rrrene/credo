@@ -19,7 +19,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   defp traverse({:case, meta, arguments} = ast, issues, issue_meta) do
     cases =
       arguments
-      |> CodeHelper.do_block_for!()
+      |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
       |> Enum.map(&case_statement_for/1)
       |> Enum.sort()

@@ -1,8 +1,6 @@
 defmodule Credo.Check.CodeHelperTest do
   use Credo.TestHelper
 
-  alias Credo.Check.CodeHelper
-
   test "it should return true" do
     parent = {
       {:., [line: 5],
@@ -29,7 +27,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> Code.string_to_quoted!()
 
-    assert :foobar == CodeHelper.def_name(ast)
+    assert :foobar == Credo.Code.Module.def_name(ast)
 
     ast =
       """
@@ -37,7 +35,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> Code.string_to_quoted!()
 
-    assert :foobar == CodeHelper.def_name(ast)
+    assert :foobar == Credo.Code.Module.def_name(ast)
 
     ast =
       """
@@ -45,7 +43,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> Code.string_to_quoted!()
 
-    assert :foobar == CodeHelper.def_name(ast)
+    assert :foobar == Credo.Code.Module.def_name(ast)
   end
 
   test "it should NOT report expected code" do

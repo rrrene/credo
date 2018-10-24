@@ -35,7 +35,7 @@ defmodule Credo.Check.Refactor.CondStatements do
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
     count =
       arguments
-      |> CodeHelper.do_block_for!()
+      |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
       |> Enum.count()
 

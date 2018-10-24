@@ -34,8 +34,6 @@ defmodule Credo.Check.Refactor.Nesting do
 
   use Credo.Check
 
-  alias Credo.Check.CodeHelper
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
@@ -88,7 +86,7 @@ defmodule Credo.Check.Refactor.Nesting do
   defp find_depth(arguments, nest_list, line_no, trigger)
        when is_list(arguments) do
     arguments
-    |> CodeHelper.do_block_for!()
+    |> Credo.Code.Block.do_block_for!()
     |> List.wrap()
     |> Enum.map(&find_depth(&1, nest_list, line_no, trigger))
     |> Enum.sort()

@@ -44,7 +44,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
       arity = Parameters.count(ast)
 
       if issue?(op, ignore_defp, arity, max_arity) do
-        fun_name = CodeHelper.def_name(ast)
+        fun_name = Credo.Code.Module.def_name(ast)
 
         {
           ast,

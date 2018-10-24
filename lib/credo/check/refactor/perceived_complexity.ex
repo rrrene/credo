@@ -40,8 +40,6 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
 
   use Credo.Check
 
-  alias Credo.Check.CodeHelper
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
@@ -72,7 +70,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
         |> round
 
       if complexity > max_complexity do
-        fun_name = CodeHelper.def_name(ast)
+        fun_name = Credo.Code.Module.def_name(ast)
 
         {
           ast,
@@ -145,7 +143,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
          when is_list(arguments) do
       block_cc =
         arguments
-        |> CodeHelper.do_block_for!()
+        |> Credo.Code.Block.do_block_for!()
         |> do_block_complexity(op)
 
       {ast, complexity + block_cc}

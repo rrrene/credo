@@ -45,7 +45,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   end
 
   defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
-    new_issue = issue_for_else_block(CodeHelper.else_block_for!(ast), meta, issue_meta)
+    new_issue = issue_for_else_block(Credo.Code.Block.else_block_for!(ast), meta, issue_meta)
 
     {ast, issues ++ List.wrap(new_issue)}
   end

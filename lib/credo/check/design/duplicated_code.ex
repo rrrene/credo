@@ -267,7 +267,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   def line_no_for(block) do
     block
-    |> CodeHelper.do_block_for!()
+    |> Credo.Code.Block.do_block_for!()
     |> line_no_for
   end
 end

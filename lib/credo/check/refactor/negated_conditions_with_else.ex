@@ -47,7 +47,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
 
   defp traverse({:if, meta, arguments} = ast, issues, issue_meta) do
-    if negated_condition?(arguments) && CodeHelper.else_block?(ast) do
+    if negated_condition?(arguments) && Credo.Code.Block.else_block?(ast) do
       new_issue = issue_for(issue_meta, meta[:line], "!")
 
       {ast, issues ++ [new_issue]}
