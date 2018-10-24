@@ -156,6 +156,23 @@ defmodule Credo.Code do
   defp find_child(parent, acc, child), do: {parent, acc || parent == child}
 
   @doc """
+  Takes a SourceFile and returns its source code stripped of all Strings and
+  Sigils.
+  """
+  def clean_charlists_strings_and_sigils(%SourceFile{} = source_file) do
+    source_file
+    |> SourceFile.source()
+    |> clean_charlists_strings_and_sigils
+  end
+
+  def clean_charlists_strings_and_sigils(source) do
+    source
+    |> Sigils.replace_with_spaces()
+    |> Strings.replace_with_spaces()
+    |> Charlists.replace_with_spaces()
+  end
+
+  @doc """
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """

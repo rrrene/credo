@@ -82,23 +82,6 @@ defmodule Credo.Check.CodeHelper do
   end
 
   @doc """
-  Takes a SourceFile and returns its source code stripped of all Strings and
-  Sigils.
-  """
-  def clean_charlists_strings_and_sigils(%SourceFile{} = source_file) do
-    source_file
-    |> SourceFile.source()
-    |> clean_charlists_strings_and_sigils
-  end
-
-  def clean_charlists_strings_and_sigils(source) do
-    source
-    |> Sigils.replace_with_spaces()
-    |> Strings.replace_with_spaces()
-    |> Charlists.replace_with_spaces()
-  end
-
-  @doc """
   Returns an AST without its metadata.
   """
   def remove_metadata(ast) when is_tuple(ast) do

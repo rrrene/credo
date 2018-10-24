@@ -11,7 +11,6 @@ defmodule Credo.Check.ConfigCommentFinder do
 
   use Credo.Check, run_on_all: true, base_priority: :high
 
-  alias Credo.Check.CodeHelper
   alias Credo.Check.ConfigComment
   alias Credo.SourceFile
 
@@ -37,7 +36,7 @@ defmodule Credo.Check.ConfigCommentFinder do
 
     if source =~ @config_comment_format do
       source
-      |> CodeHelper.clean_charlists_strings_and_sigils()
+      |> Credo.Code.clean_charlists_strings_and_sigils()
       |> Credo.Code.to_lines()
       |> Enum.reduce([], &find_config_comment/2)
     else

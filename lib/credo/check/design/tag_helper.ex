@@ -1,5 +1,4 @@
 defmodule Credo.Check.Design.TagHelper do
-  alias Credo.Check.CodeHelper
   alias Credo.SourceFile
 
   @doc_attribute_names [:doc, :moduledoc, :shortdoc]
@@ -25,7 +24,7 @@ defmodule Credo.Check.Design.TagHelper do
 
     if source =~ regex do
       source
-      |> CodeHelper.clean_charlists_strings_and_sigils()
+      |> Credo.Code.clean_charlists_strings_and_sigils()
       |> String.split("\n")
       |> Enum.with_index()
       |> Enum.map(&find_tag_in_line(&1, regex))
