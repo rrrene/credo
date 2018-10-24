@@ -92,7 +92,7 @@ defmodule Credo.CodeTest do
     assert :foobar == Credo.Code.Module.def_name(ast)
   end
 
-  test "it should NOT report expected code" do
+  test "it should NOT report expected code 0" do
     source = """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
