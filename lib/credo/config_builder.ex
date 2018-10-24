@@ -1,7 +1,6 @@
 defmodule Credo.ConfigBuilder do
   alias Credo.CLI.Filename
   alias Credo.CLI.Options
-  alias Credo.CLI.Output.UI
   alias Credo.ConfigFile
   alias Credo.Execution
 
@@ -68,7 +67,6 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_strict(switches)
     |> add_switch_crash_on_error(switches)
     |> add_switch_mute_exit_status(switches)
-    |> add_switch_deprecated_switches(switches)
     |> add_switch_format(switches)
     |> add_switch_help(switches)
     |> add_switch_ignore(switches)
@@ -190,18 +188,4 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_ignore(exec, _), do: exec
-
-  # DEPRECATED command line switches
-  defp add_switch_deprecated_switches(exec, %{one_line: true}) do
-    UI.warn([
-      :yellow,
-      "[DEPRECATED] ",
-      :faint,
-      "--one-line is deprecated in favor of --format=oneline"
-    ])
-
-    %Execution{exec | format: "oneline"}
-  end
-
-  defp add_switch_deprecated_switches(exec, _), do: exec
 end
