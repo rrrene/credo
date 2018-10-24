@@ -86,6 +86,16 @@ defmodule Credo.Code do
     end
   end
 
+  defp issue_for({line_no, error_message, _}, filename) do
+    %Credo.Issue{
+      check: ParserError,
+      category: :error,
+      filename: filename,
+      message: error_message,
+      line_no: line_no
+    }
+  end
+
   @doc """
   Converts a String or `Credo.SourceFile` into a List of tuples of `{line_no, line}`.
   """
@@ -132,13 +142,13 @@ defmodule Credo.Code do
     end
   end
 
-  defp issue_for({line_no, error_message, _}, filename) do
-    %Credo.Issue{
-      check: ParserError,
-      category: :error,
-      filename: filename,
-      message: error_message,
-      line_no: line_no
-    }
+  @doc """
+  Returns true if the given `child` AST node is part of the larger
+  `parent` AST node.
+  """
+  def contains_child?(parent, child) do
+    Credo.Code.prewalk(parent, &find_child(&1, &2, child), false)
   end
+
+  defp find_child(parent, acc, child), do: {parent, acc || parent == child}
 end

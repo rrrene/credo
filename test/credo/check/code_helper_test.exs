@@ -16,7 +16,7 @@ defmodule Credo.Check.CodeHelperTest do
 
     child = {:parameter1, [line: 5], nil}
 
-    assert CodeHelper.contains_child?(parent, child)
+    assert Credo.Code.contains_child?(parent, child)
   end
 
   test "it should return the function name" do

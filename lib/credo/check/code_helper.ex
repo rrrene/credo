@@ -82,16 +82,6 @@ defmodule Credo.Check.CodeHelper do
   end
 
   @doc """
-  Returns true if the given `child` AST node is part of the larger
-  `parent` AST node.
-  """
-  def contains_child?(parent, child) do
-    Credo.Code.prewalk(parent, &find_child(&1, &2, child), false)
-  end
-
-  defp find_child(parent, acc, child), do: {parent, acc || parent == child}
-
-  @doc """
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """
