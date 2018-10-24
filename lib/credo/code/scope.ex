@@ -9,6 +9,16 @@ defmodule Credo.Code.Scope do
 
   @def_ops [:def, :defp, :defmacro]
 
+  @doc """
+  Returns the module part of a scope.
+
+      iex> Credo.Code.Scope.mod_name("Credo.Code")
+      "Credo.Code"
+
+      iex> Credo.Code.Scope.mod_name("Credo.Code.ast")
+      "Credo.Code"
+
+  """
   def mod_name(nil), do: nil
 
   def mod_name(scope_name) do
