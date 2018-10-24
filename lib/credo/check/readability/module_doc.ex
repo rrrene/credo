@@ -76,7 +76,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
        ) do
     mod_name = Module.name(ast)
 
-    if CodeHelper.matches?(mod_name, ignore_names) do
+    if matches_any?(mod_name, ignore_names) do
       {ast, {false, issues}}
     else
       exception? = Module.exception?(ast)
@@ -122,6 +122,18 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   defp traverse(ast, {continue, issues}, _issue_meta, _ignore_names) do
     {ast, {continue, issues}}
+  end
+
+  def matches_any?(name, list) when is_list(list) do
+    Enum.any?(list, &matches_any?(name, &1))
+  end
+
+  def matches_any?(name, string) when is_binary(string) do
+    String.contains?(name, string)
+  end
+
+  def matches_any?(name, regex) do
+    String.match?(name, regex)
   end
 
   defp issue_for(message, issue_meta, line_no, trigger) do
