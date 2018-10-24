@@ -2,10 +2,25 @@ defmodule Credo.Check.Warning.UnusedFileOperation do
   @moduledoc """
   The result of a call to the File module's functions has to be used.
 
-  # TODO: write example
+  While this is correct ...
 
-  File operations never work on the variable you pass in, but return a new
-  variable which has to be used somehow.
+      def read_from_cwd(filename) do
+        # TODO: use Path.join/2
+        filename = File.cwd!() <> "/" <> filename
+
+        File.read(filename)
+      end
+
+  ... we forgot to save the result in this example:
+
+      def read_from_cwd(filename) do
+        File.cwd!() <> "/" <> filename
+
+        File.read(filename)
+      end
+
+  Since Elixir variables are immutable, many File operations don't work on the
+  variable you pass in, but return a new variable which has to be used somehow.
   """
 
   @explanation [check: @moduledoc]
