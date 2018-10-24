@@ -11,7 +11,8 @@ otp_release:
   - 20.3
   - 21.0
 script:
-  - mix deps.update ex_doc # necessary for Elixir 1.4.x
+  - mix deps.unlock ex_doc  # necessary for Elixir 1.4.x
+  - mix deps.get            # necessary for Elixir 1.4.x
   - mix deps.compile
   - mix compile --warnings-as-errors
   - mix test
