@@ -22,7 +22,7 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Prewalks a given SourceFile's AST or a given AST.
+  Prewalks a given `Credo.SourceFile`'s AST or a given AST.
 
   Technically this is just a wrapper around `Macro.prewalk/3`.
   """
@@ -41,7 +41,7 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Postwalks a given SourceFile's AST or a given AST.
+  Postwalks a given `Credo.SourceFile`'s AST or a given AST.
 
   Technically this is just a wrapper around `Macro.postwalk/3`.
   """
@@ -60,14 +60,17 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Takes a SourceFile or String and returns an AST.
+  Returns an AST for a given `String` or `Credo.SourceFile`.
   """
+  def ast(string_or_source_file)
+
   def ast(%SourceFile{filename: filename} = source_file) do
     source_file
     |> SourceFile.source()
     |> ast(filename)
   end
 
+  @doc false
   def ast(source, filename \\ "nofilename") when is_binary(source) do
     try do
       case Code.string_to_quoted(source, line: 1, columns: true) do
@@ -84,8 +87,10 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Converts a String into a List of tuples of `{line_no, line}`.
+  Converts a String or `Credo.SourceFile` into a List of tuples of `{line_no, line}`.
   """
+  def to_lines(string_or_source_file)
+
   def to_lines(%SourceFile{} = source_file) do
     source_file
     |> SourceFile.source()
@@ -100,8 +105,10 @@ defmodule Credo.Code do
   end
 
   @doc """
-  Converts a String into a List of tokens using the `:elixir_tokenizer`.
+  Converts a String or `Credo.SourceFile` into a List of tokens using the `:elixir_tokenizer`.
   """
+  def to_tokens(string_or_source_file)
+
   def to_tokens(%SourceFile{} = source_file) do
     source_file
     |> SourceFile.source()

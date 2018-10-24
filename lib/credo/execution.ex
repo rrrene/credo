@@ -1,9 +1,12 @@
 defmodule Credo.Execution do
-  @doc """
+  @moduledoc """
   Every run of Credo is configured via a `Execution` struct, which is created and
   manipulated via the `Credo.Execution` module.
   """
 
+  @doc """
+  The `Execution` struct is created and manipulated via the `Credo.Execution` module.
+  """
   defstruct argv: [],
             cli_options: nil,
 
@@ -48,12 +51,19 @@ defmodule Credo.Execution do
   alias Credo.Execution.SourceFiles
   alias Credo.Execution.Timing
 
+  @doc "Builds an Execution struct for the the given `argv`."
+  def build(argv) when is_list(argv) do
+    %__MODULE__{argv: argv}
+  end
+
   @doc """
   Returns the checks that should be run for a given `exec` struct.
 
   Takes all checks from the `checks:` field of the exec, matches those against
   any patterns to include or exclude certain checks given via the command line.
   """
+  def checks(exec)
+
   def checks(%__MODULE__{
         checks: checks,
         only_checks: only_checks,
@@ -96,6 +106,8 @@ defmodule Credo.Execution do
   @doc """
   Sets the exec values which `strict` implies (if applicable).
   """
+  def set_strict(exec)
+
   def set_strict(%__MODULE__{strict: true} = exec) do
     %__MODULE__{exec | all: true, min_priority: -99}
   end
@@ -106,33 +118,36 @@ defmodule Credo.Execution do
 
   def set_strict(exec), do: exec
 
-  @doc """
-  Returns the name of the command, which should be run by the given execution.
-  """
+  @doc "Returns the name of the command, which should be run by the given execution."
   def get_command_name(exec) do
     exec.cli_options.command
   end
 
+  @doc false
   def get_path(exec) do
     exec.cli_options.path
   end
 
   # Assigns
 
+  @doc "Returns the assign with the given `name` for the given `exec` struct (or return the given `default` value)."
   def get_assign(exec, name, default \\ nil) do
     Map.get(exec.assigns, name, default)
   end
 
+  @doc "Puts the given `value` with the given `name` as assign into the given `exec` struct."
   def put_assign(exec, name, value) do
     %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
   # Source Files
 
+  @doc "Returns all source files for the given `exec` struct."
   def get_source_files(exec) do
     Credo.Execution.SourceFiles.get(exec)
   end
 
+  @doc "Puts the given `source_files` into the given `exec` struct."
   def put_source_files(exec, source_files) do
     SourceFiles.put(exec, source_files)
 
@@ -141,6 +156,7 @@ defmodule Credo.Execution do
 
   # Issues
 
+  @doc "Returns all issues for the given `exec` struct."
   def get_issues(exec) do
     exec
     |> Issues.to_map()
@@ -148,12 +164,14 @@ defmodule Credo.Execution do
     |> List.flatten()
   end
 
+  @doc "Returns issues for the given `exec` struct that relate to the given `filename`."
   def get_issues(exec, filename) do
     exec
     |> Issues.to_map()
     |> Map.get(filename, [])
   end
 
+  @doc "Sets the issues in the given `exec` struct."
   def set_issues(exec, issues) do
     Issues.set(exec, issues)
 
@@ -162,20 +180,24 @@ defmodule Credo.Execution do
 
   # Results
 
+  @doc "Returns the result with the given `name` for the given `exec` struct (or return the given `default` value)."
   def get_result(exec, name, default \\ nil) do
     Map.get(exec.results, name, default)
   end
 
+  @doc "Puts the given `value` with the given `name` as result into the given `exec` struct."
   def put_result(exec, name, value) do
     %__MODULE__{exec | results: Map.put(exec.results, name, value)}
   end
 
   # Halt
 
+  @doc "Halts further execution of the process."
   def halt(exec) do
     %__MODULE__{exec | halted: true}
   end
 
+  @doc false
   def start_servers(%__MODULE__{} = exec) do
     exec
     |> SourceFiles.start_server()
@@ -185,6 +207,7 @@ defmodule Credo.Execution do
 
   # Task tracking
 
+  @doc false
   def set_parent_and_current_task(exec, parent_task, current_task) do
     %__MODULE__{exec | parent_task: parent_task, current_task: current_task}
   end
