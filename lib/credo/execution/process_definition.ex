@@ -61,6 +61,9 @@ defmodule Credo.Execution.ProcessDefinition do
         use Credo.Execution.ProcessDefinition
 
         unquote(block)
+
+        # Tasks declared via the `activity` macro are not handling errors by default
+        def error(exec, _opts), do: exec
       end
     end
   end

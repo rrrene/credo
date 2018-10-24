@@ -27,6 +27,30 @@ defmodule Credo.ExsLoaderTest do
       ]
     }
 
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, true)
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, false)
+  end
+
+  test "Credo.Execution.parse_exs should return error tuple" do
+    exs_string = """
+    %{
+      configs: [
+        %{
+          name: "default",
+          files: %{
+            included: ["lib/", "src/", "web/", "apps/"],
+            excluded: []
+          }
+          checks: [
+            {Credo.Check.Readability.ModuleDoc, false}
+          ]
+        }
+      ]
+    }
+    """
+
+    expected = {:error, {9, "syntax error before: ", "checks"}}
+
     assert expected == Credo.ExsLoader.parse(exs_string, true)
     assert expected == Credo.ExsLoader.parse(exs_string, false)
   end

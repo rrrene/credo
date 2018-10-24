@@ -7,12 +7,17 @@ defmodule Credo.ConfigBuilder do
 
   def parse(exec) do
     options = exec.cli_options
-    config_file = get_config_file(options)
 
-    exec
-    |> add_config_file_to_exec(config_file)
-    |> add_strict_to_exec(config_file, options)
-    |> add_switches_to_exec(options.switches)
+    case get_config_file(options) do
+      {:ok, config_file} ->
+        exec
+        |> add_config_file_to_exec(config_file)
+        |> add_strict_to_exec(config_file, options)
+        |> add_switches_to_exec(options.switches)
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   defp get_config_file(%Options{} = options) do

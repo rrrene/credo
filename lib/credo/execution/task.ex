@@ -20,6 +20,8 @@ defmodule Credo.Execution.Task do
 
       def error(exec, _opts) do
         IO.warn("Execution halted during #{__MODULE__}!")
+
+        exec
       end
 
       defoverridable call: 2

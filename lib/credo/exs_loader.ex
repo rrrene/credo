@@ -4,16 +4,26 @@ defmodule Credo.ExsLoader do
   def parse(exs_string, true) do
     case Code.string_to_quoted(exs_string) do
       {:ok, ast} ->
-        process_exs(ast)
+        {:ok, process_exs(ast)}
 
-      _ ->
-        %{}
+      {:error, value} ->
+        {:error, value}
     end
   end
 
   def parse(exs_string, false) do
     {result, _binding} = Code.eval_string(exs_string)
-    result
+
+    {:ok, result}
+  rescue
+    error ->
+      case error do
+        %SyntaxError{description: "syntax error before: " <> trigger, line: line_no} ->
+          {:error, {line_no, "syntax error before: ", trigger}}
+
+        error ->
+          {:error, error}
+      end
   end
 
   def parse_safe(exs_string) do
