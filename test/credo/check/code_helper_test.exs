@@ -60,7 +60,7 @@ defmodule Credo.Check.CodeHelperTest do
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \" \n  end\nend\n"
 
-    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code 2" do
@@ -75,7 +75,7 @@ defmodule Credo.Check.CodeHelperTest do
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \"\n  end\nend\n"
 
-    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
@@ -131,7 +131,7 @@ defmodule Credo.Check.CodeHelperTest do
     end
     """
 
-    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments /2" do
@@ -155,7 +155,7 @@ defmodule Credo.Check.CodeHelperTest do
       """
       |> String.replace("*", "")
 
-    assert expected == CodeHelper.clean_charlists_strings_sigils_and_comments(source)
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_and_sigils /2" do

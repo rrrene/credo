@@ -13,6 +13,9 @@ defmodule Credo.Code do
   """
 
   alias Credo.SourceFile
+  alias Credo.Code.Charlists
+  alias Credo.Code.Sigils
+  alias Credo.Code.Strings
 
   defmodule ParserError do
     @moduledoc """
@@ -151,4 +154,24 @@ defmodule Credo.Code do
   end
 
   defp find_child(parent, acc, child), do: {parent, acc || parent == child}
+
+  @doc """
+  Takes a SourceFile and returns its source code stripped of all Strings, Sigils
+  and code comments.
+  """
+  def clean_charlists_strings_sigils_and_comments(source, sigil_replacement \\ " ")
+
+  def clean_charlists_strings_sigils_and_comments(%SourceFile{} = source_file, sigil_replacement) do
+    source_file
+    |> SourceFile.source()
+    |> clean_charlists_strings_sigils_and_comments(sigil_replacement)
+  end
+
+  def clean_charlists_strings_sigils_and_comments(source, sigil_replacement) do
+    source
+    |> Sigils.replace_with_spaces(sigil_replacement)
+    |> Strings.replace_with_spaces()
+    |> Charlists.replace_with_spaces()
+    |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
+  end
 end
