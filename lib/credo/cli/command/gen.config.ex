@@ -1,13 +1,13 @@
 defmodule Credo.CLI.Command.GenConfig do
-  use Credo.CLI.Command
-
-  alias Credo.CLI.Output.UI
-
+  @moduledoc false
   @shortdoc "Initialize a new .credo.exs exec file in the current directory"
-  @moduledoc @shortdoc
 
   @config_filename ".credo.exs"
   @default_config_file File.read!(@config_filename)
+
+  use Credo.CLI.Command
+
+  alias Credo.CLI.Output.UI
 
   @doc false
   def call(exec, _opts) do

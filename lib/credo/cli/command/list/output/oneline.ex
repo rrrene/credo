@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.List.Output.Oneline do
+  @moduledoc false
+
   alias Credo.CLI.Output.Formatter.Oneline
   alias Credo.Execution
 

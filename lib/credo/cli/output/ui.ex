@@ -1,6 +1,17 @@
 defmodule Credo.CLI.Output.UI do
   @moduledoc """
   This module provides functions used to create the UI.
+
+      iex> alias Credo.CLI.Output.UI
+      ...> UI.puts "This is a test."
+      This is a test.
+      nil
+
+      iex> alias Credo.CLI.Output.UI
+      ...> UI.warn "This is a warning."
+      This is a warning.
+      nil
+
   """
 
   @edge "┃"
@@ -28,6 +39,7 @@ defmodule Credo.CLI.Output.UI do
     [:reset, color, @edge |> String.pad_trailing(indent)]
   end
 
+  @doc "Returns the edge (`┃`) which is used in much of Credo's output as a binary."
   def edge, do: @edge
 
   def use_colors(exec) do

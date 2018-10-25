@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.Formatter.Oneline do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI

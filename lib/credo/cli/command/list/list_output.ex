@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.List.ListOutput do
+  @moduledoc false
+
   use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.List.Output.Default,
     flycheck: Credo.CLI.Command.List.Output.FlyCheck,

@@ -1,12 +1,13 @@
 defmodule Credo.CLI.Command.Help do
-  use Credo.CLI.Command
+  @moduledoc false
 
   @shortdoc "Show this help message"
-  @moduledoc @shortdoc
 
   @ljust 12
   @starting_order ~w(suggest explain)
   @ending_order ~w(help)
+
+  use Credo.CLI.Command
 
   alias Credo.CLI
   alias Credo.CLI.Output.UI

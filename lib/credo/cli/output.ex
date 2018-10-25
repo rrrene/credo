@@ -98,6 +98,18 @@ defmodule Credo.CLI.Output do
     end
   end
 
+  @doc """
+  Returns a suitable foreground color for a given `background_color`.
+
+      iex> Credo.CLI.Output.foreground_color(:yellow)
+      :black
+
+      iex> Credo.CLI.Output.foreground_color(:blue)
+      :white
+
+  """
+  def foreground_color(background_color)
+
   def foreground_color(:cyan), do: :black
   def foreground_color(:yellow), do: :black
   def foreground_color(_), do: :white
