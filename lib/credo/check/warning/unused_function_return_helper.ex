@@ -1,8 +1,8 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
-  @checkdoc """
-  Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
-  the candidates (the acc is used to keep state).
-  """
+  @moduledoc false
+
+  # Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
+  # the candidates (the acc is used to keep state).
 
   @def_ops [:def, :defp, :defmacro]
   @block_ops_with_head_expr [:if, :unless, :case, :for, :quote]

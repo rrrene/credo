@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.PreferUnquotedAtoms do
+  @moduledoc false
+
   @checkdoc """
   Prefer unquoted atoms unless quotes are necessary.
   This is helpful because a quoted atom can be easily mistaken for a string.
@@ -32,9 +34,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   Like all `Readability` issues, this one is not a technical concern.
   The code will behave identical in both ways.
   """
-
   @explanation [check: @checkdoc]
-
   @token_types [:atom_unsafe, :kw_identifier_unsafe]
 
   use Credo.Check, run_on_all: true, base_priority: :high, elixir_version: "< 1.7.0-dev"

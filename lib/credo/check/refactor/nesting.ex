@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.Nesting do
+  @moduledoc false
+
   @checkdoc """
   Code should not be nested more than once inside a function.
 
@@ -20,15 +22,13 @@ defmodule Credo.Check.Refactor.Nesting do
   At this point it might be a good idea to refactor the code to separate the
   different loops and conditions.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_nesting: "The maximum number of levels code should be nested."
     ]
   ]
   @default_params [max_nesting: 2]
-
   @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn]
 

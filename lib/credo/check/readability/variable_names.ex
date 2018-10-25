@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.VariableNames do
+  @moduledoc false
+
   @checkdoc """
   Variable names are always written in snake_case in Elixir.
 
@@ -14,13 +16,12 @@ defmodule Credo.Check.Readability.VariableNames do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [check: @checkdoc]
   @special_var_names [:__CALLER__, :__DIR__, :__ENV__, :__MODULE__]
 
-  alias Credo.Code.Name
-
   use Credo.Check, base_priority: :high
+
+  alias Credo.Code.Name
 
   @doc false
   def run(source_file, params \\ []) do

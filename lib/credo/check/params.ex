@@ -1,5 +1,5 @@
 defmodule Credo.Check.Params do
-  @checkdoc """
+  @moduledoc """
   This module provides functions for handling parameters ("params") given to
   checks through `.credo.exs` (i.e. the `Credo.ConfigFile`).
   """

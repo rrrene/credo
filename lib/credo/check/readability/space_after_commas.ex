@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.SpaceAfterCommas do
+  @moduledoc false
+
   @checkdoc """
   You can use white-space after commas to make items of lists,
   tuples and other enumerations easier to separate from one another.
@@ -25,14 +27,13 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [check: @checkdoc]
-
   # Matches commas followed by non-whitespace unless preceded by
   # a question mark that is not part of a variable or function name
   @unspaced_commas ~r/(?<!\W\?)(\,\S)/
 
   use Credo.Check
+
   alias Credo.Code.Charlists
   alias Credo.Code.Sigils
   alias Credo.Code.Strings

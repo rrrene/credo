@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.ModuleDoc do
+  @moduledoc false
+
   @checkdoc """
   Every module should contain comprehensive documentation.
 
@@ -32,9 +34,8 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   to make it clear that there is no intention in documenting it.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore_names: "All modules matching this regex (or list of regexes) will be ignored."
     ]
@@ -45,9 +46,9 @@ defmodule Credo.Check.Readability.ModuleDoc do
     ]
   ]
 
-  alias Credo.Code.Module
-
   use Credo.Check
+
+  alias Credo.Code.Module
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do

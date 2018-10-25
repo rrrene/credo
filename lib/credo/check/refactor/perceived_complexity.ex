@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.PerceivedComplexity do
+  @moduledoc false
+
   @checkdoc """
   Cyclomatic complexity is a software complexity metric closely correlated with
   coding errors.
@@ -8,15 +10,13 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   and bosses of a need to refactor parts of the code based on "objective"
   metrics.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_complexity: "The maximum cyclomatic complexity a function should have."
     ]
   ]
   @default_params [max_complexity: 9]
-
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
   @double_condition_ops [:if, :unless, :for, :try, :and, :or, :&&, :||]

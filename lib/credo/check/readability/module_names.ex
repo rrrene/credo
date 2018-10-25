@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.ModuleNames do
+  @moduledoc false
+
   @checkdoc """
   Module names are always written in PascalCase in Elixir.
 
@@ -18,12 +20,11 @@ defmodule Credo.Check.Readability.ModuleNames do
   But you can improve the odds of other reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [check: @checkdoc]
 
-  alias Credo.Code.Name
-
   use Credo.Check, base_priority: :high
+
+  alias Credo.Code.Name
 
   @doc false
   def run(source_file, params \\ []) do

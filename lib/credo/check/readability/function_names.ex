@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.FunctionNames do
+  @moduledoc false
+
   @checkdoc """
   Function and macro names are always written in snake_case in Elixir.
 
@@ -16,13 +18,12 @@ defmodule Credo.Check.Readability.FunctionNames do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
 
-  alias Credo.Code.Name
-
   use Credo.Check, base_priority: :high
+
+  alias Credo.Code.Name
 
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do

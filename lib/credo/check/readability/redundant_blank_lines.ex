@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.RedundantBlankLines do
+  @moduledoc false
+
   @checkdoc """
   Files should not have two or more consecutive blank lines.
 
@@ -6,9 +8,8 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_blank_lines: "The maximum number of tolerated consecutive blank lines."
     ]

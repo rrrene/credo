@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
+  @moduledoc false
+
   @checkdoc """
   Pipes (`|>`) can become more readable by starting with a "raw" value.
 
@@ -18,9 +20,8 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   As always: This is just a suggestion. Check the configuration options for
   tweaking or disabling this check.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       excluded_functions: "All functions listed will be ignored.",
       excluded_argument_types: "All pipes with argument types listed will be ignored."

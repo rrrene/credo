@@ -1,7 +1,9 @@
 defmodule Credo.Check.Design.TagHelper do
-  alias Credo.SourceFile
+  @moduledoc false
 
   @doc_attribute_names [:doc, :moduledoc, :shortdoc]
+
+  alias Credo.SourceFile
 
   def tags(source_file, tag_name, include_doc?) do
     tags_from_module_attributes(source_file, tag_name, include_doc?) ++

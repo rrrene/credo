@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.LongQuoteBlocks do
+  @moduledoc false
+
   @checkdoc """
   Long `quote` blocks are generally an indication that too much is done inside
   them.
@@ -61,9 +63,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
   This way it is easier to reason about what is actually happening. And to debug
   it.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_line_count: "The maximum number of lines a quote block should be allowed to have.",
       ignore_comments: "Ignores comments when counting the lines of a `quote` block."

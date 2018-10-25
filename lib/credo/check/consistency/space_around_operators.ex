@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
+  @moduledoc false
+
   @checkdoc """
   Use spaces around operators like `+`, `-`, `*` and `/`. This is the
   **preferred** way, although other styles are possible, as long as it is
@@ -15,16 +17,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore: "List of operators to be ignored for this check."
     ]
   ]
-
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
-
   @default_params [ignore: [:|]]
 
   use Credo.Check, run_on_all: true, base_priority: :high

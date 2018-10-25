@@ -1,4 +1,6 @@
 defmodule Credo.Check.Warning.LazyLogging do
+  @moduledoc false
+
   @checkdoc """
   Ensures laziness of Logger calls.
 
@@ -18,9 +20,8 @@ defmodule Credo.Check.Warning.LazyLogging do
 
       Logger.debug "This happened: \#{expensive_calculation(arg1, arg2)}"
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore: "Do not raise an issue for these Logger calls."
     ]

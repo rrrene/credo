@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
   @regex [

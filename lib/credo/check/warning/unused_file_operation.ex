@@ -1,4 +1,6 @@
 defmodule Credo.Check.Warning.UnusedFileOperation do
+  @moduledoc false
+
   @checkdoc """
   The result of a call to the File module's functions has to be used.
 
@@ -22,7 +24,6 @@ defmodule Credo.Check.Warning.UnusedFileOperation do
   Since Elixir variables are immutable, many File operations don't work on the
   variable you pass in, but return a new variable which has to be used somehow.
   """
-
   @explanation [check: @checkdoc]
   @checked_module :File
   @funs_with_return_value ~w(cwd cwd! dir? exists? read read! regular? stat stat!)a

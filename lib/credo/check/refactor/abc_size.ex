@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.ABCSize do
+  @moduledoc false
+
   @checkdoc """
   The ABC size describes a metric based on assignments, branches and conditions.
 
@@ -9,9 +11,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   introduced for C, C++ and Java, we still have to see whether or not this can
   be a useful metric in a declarative language like Elixir.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_size: "The maximum ABC size a function should have.",
       excluded_functions: "All functions listed will be ignored."

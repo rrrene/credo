@@ -1,10 +1,11 @@
 defmodule Credo.Check.Refactor.CaseTrivialMatches do
+  @moduledoc false
+
   @checkdoc """
   PLEASE NOTE: This check is deprecated as it might do more harm than good.
 
   Related discussion: https://github.com/rrrene/credo/issues/65
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check

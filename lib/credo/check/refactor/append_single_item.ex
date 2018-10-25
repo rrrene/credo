@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.AppendSingleItem do
+  @moduledoc false
+
   @checkdoc """
   When building up large lists, it is faster to prepend than
   append. Therefore: It is sometimes best to prepend to the list
@@ -16,7 +18,6 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
       Enum.reverse(list)
 
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :low

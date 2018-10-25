@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.TrailingBlankLine do
+  @moduledoc false
+
   @checkdoc """
   Files should end in a trailing blank line.
 
@@ -9,7 +11,6 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
 
   Most text editors ensure this "final newline" automatically.
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :low

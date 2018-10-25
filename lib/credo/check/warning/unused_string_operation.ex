@@ -1,4 +1,6 @@
 defmodule Credo.Check.Warning.UnusedStringOperation do
+  @moduledoc false
+
   @checkdoc """
   The result of a call to the String module's functions has to be used.
 
@@ -23,7 +25,6 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
   Since Elixir variables are immutable, String operations never work on the
   variable you pass in, but return a new variable which has to be used somehow.
   """
-
   @explanation [check: @checkdoc]
   @checked_module :String
   @funs_with_return_value nil

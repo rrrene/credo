@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.UnlessWithElse do
+  @moduledoc false
+
   @checkdoc """
   An `unless` block should not contain an else block.
 
@@ -28,7 +30,6 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   case will be executed when the condition is met, which is the opposite of
   what the wording seems to apply.
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high

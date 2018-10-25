@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.MatchInCondition do
+  @moduledoc false
+
   @checkdoc """
   Pattern matching should only ever be used for simple assignments
   inside `if` and `unless` clauses.
@@ -37,9 +39,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
       end
 
   """
-
   @explanation [check: @checkdoc]
-
   @condition_ops [:if, :unless]
 
   use Credo.Check

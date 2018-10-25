@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
+  @moduledoc false
+
   @checkdoc """
   Unless blocks should not contain a negated condition.
 
@@ -18,7 +20,6 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   to wrap your head around a block of code that is executed if a negated
   condition is NOT met. See what I mean?
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high

@@ -1,8 +1,8 @@
 defmodule Credo.Check.Runner do
-  @checkdoc """
-  This module is responsible for running checks based on the context represented
-  by the current `Credo.Execution`.
-  """
+  @moduledoc false
+
+  # This module is responsible for running checks based on the context represented
+  # by the current `Credo.Execution`.
 
   alias Credo.CLI.Output.UI
   alias Credo.Execution

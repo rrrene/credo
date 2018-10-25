@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
+  @moduledoc false
+
   @checkdoc """
   An `if` block with a negated condition should not contain an else block.
 
@@ -34,7 +36,6 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   while later or have to introduce a colleague to it, you might be surprised
   how much clearer things get when the "happy path" comes first.
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high

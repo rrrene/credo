@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses do
+  @moduledoc false
+
   @checkdoc """
   Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is
   the **preferred** way, although other styles are possible, as long as it is
@@ -15,9 +17,8 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       allow_empty_enums:
         "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase."
@@ -26,7 +27,6 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   @default_params [
     allow_empty_enums: false
   ]
-
   @collector Credo.Check.Consistency.SpaceInParentheses.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high

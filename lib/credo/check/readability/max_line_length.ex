@@ -1,12 +1,13 @@
 defmodule Credo.Check.Readability.MaxLineLength do
+  @moduledoc false
+
   @checkdoc """
   Checks for the length of lines.
 
   Ignores function definitions and (multi-)line strings by default.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_length: "The maximum number of characters a line may consist of.",
       ignore_definitions: "Set to `true` to ignore lines including function definitions.",
@@ -22,7 +23,6 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_strings: true,
     ignore_urls: true
   ]
-
   @def_ops [:def, :defp, :defmacro]
   @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.Collector do
-  @checkdoc """
+  @moduledoc """
   A behavior for modules that walk through source files and
   identify consistency issues.
 

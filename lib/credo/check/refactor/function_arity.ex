@@ -1,13 +1,14 @@
 defmodule Credo.Check.Refactor.FunctionArity do
+  @moduledoc false
+
   @checkdoc """
   A function can take as many parameters as needed, but even in a functional
   language there can be too many parameters.
 
   Can optionally ignore private functions (check configuration options).
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_arity: "The maximum number of parameters which a function should take.",
       ignore_defp: "Set to `true` to ignore private functions."

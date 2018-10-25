@@ -1,4 +1,6 @@
 defmodule Credo.Check.Design.TagTODO do
+  @moduledoc false
+
   @checkdoc """
   TODO comments are used to remind yourself of source code related things.
 
@@ -15,9 +17,8 @@ defmodule Credo.Check.Design.TagTODO do
   Like all `Software Design` issues, this is just advice and might not be
   applicable to your project/situation.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       include_doc: "Set to `true` to also include tags from @doc attributes."
     ]
@@ -25,9 +26,9 @@ defmodule Credo.Check.Design.TagTODO do
   @default_params [include_doc: true]
   @tag_name "TODO"
 
-  alias Credo.Check.Design.TagHelper
-
   use Credo.Check
+
+  alias Credo.Check.Design.TagHelper
 
   @doc false
   def run(source_file, params \\ []) do

@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
+  @moduledoc false
+
   @checkdoc """
   You might want to refrain from rebinding variables.
 
@@ -27,7 +29,6 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       end
 
   """
-
   @explanation [
     check: @moduledoc
   ]

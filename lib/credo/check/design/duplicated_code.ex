@@ -1,4 +1,6 @@
 defmodule Credo.Check.Design.DuplicatedCode do
+  @moduledoc false
+
   @checkdoc """
   Code should not be copy-pasted in a codebase when there is room to abstract
   the copied functionality in a meaningful way.
@@ -17,9 +19,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
   Like all `Software Design` issues, this is just advice and might not be
   applicable to your project/situation.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       mass_threshold:
         "The minimum mass which a part of code has to have to qualify for this check.",
@@ -33,11 +34,11 @@ defmodule Credo.Check.Design.DuplicatedCode do
     excluded_macros: []
   ]
 
+  use Credo.Check, run_on_all: true, base_priority: :higher
+
   alias Credo.Check.CodeHelper
   alias Credo.Issue
   alias Credo.SourceFile
-
-  use Credo.Check, run_on_all: true, base_priority: :higher
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do

@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
+  @moduledoc false
+
   alias Credo.Code.Token
 
   @doc """

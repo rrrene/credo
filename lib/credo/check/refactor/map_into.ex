@@ -1,4 +1,6 @@
 defmodule Credo.Check.Refactor.MapInto do
+  @moduledoc false
+
   @checkdoc """
   `Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`.
 
@@ -16,7 +18,6 @@ defmodule Credo.Check.Refactor.MapInto do
   `Enum.map/2` and `Enum.into/2` require two iterations whereas
   `Enum.into/3` only requires one.
   """
-
   @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high

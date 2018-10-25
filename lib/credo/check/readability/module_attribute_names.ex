@@ -1,4 +1,6 @@
 defmodule Credo.Check.Readability.ModuleAttributeNames do
+  @moduledoc false
+
   @checkdoc """
   Module attribute names are always written in snake_case in Elixir.
 
@@ -14,12 +16,11 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [check: @checkdoc]
 
-  alias Credo.Code.Name
-
   use Credo.Check, base_priority: :high
+
+  alias Credo.Code.Name
 
   @doc false
   def run(source_file, params \\ []) do
