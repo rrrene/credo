@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.Semicolons do
-  @moduledoc """
+  @checkdoc """
   Don't use ; to separate statements and expressions.
   Statements and expressions should be separated by lines.
 

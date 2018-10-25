@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
-  @moduledoc """
+  @checkdoc """
   Use spaces around operators like `+`, `-`, `*` and `/`. This is the
   **preferred** way, although other styles are possible, as long as it is
   applied consistently.

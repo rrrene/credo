@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.OperationOnSameValues do
-  @moduledoc """
+  @checkdoc """
   Operations on the same values always yield the same result and therefore make
   little sense in production code.
 
@@ -17,7 +17,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   mistake.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   @def_ops [:def, :defp, :defmacro]
   @ops ~w(== >= <= != > < / -)a

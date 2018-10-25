@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.IExPry do
-  @moduledoc """
+  @checkdoc """
   While calls to IEx.pry might appear in some parts of production code,
   most calls to this function are added during debugging sessions.
 
@@ -7,7 +7,7 @@ defmodule Credo.Check.Warning.IExPry do
   in error.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @call_string "IEx.pry"
 
   use Credo.Check, base_priority: :high

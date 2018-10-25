@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.RedundantBlankLines do
-  @moduledoc """
+  @checkdoc """
   Files should not have two or more consecutive blank lines.
 
   Like all `Readability` issues, this one is not a technical concern.

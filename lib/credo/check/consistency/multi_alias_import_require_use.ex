@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
-  @moduledoc """
+  @checkdoc """
   When using alias, import, require or use for multiple names from the same
   namespace, you have two options:
 
@@ -17,7 +17,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   you should use a consistent style throughout your codebase.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   @collector Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
 

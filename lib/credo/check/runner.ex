@@ -1,5 +1,5 @@
 defmodule Credo.Check.Runner do
-  @moduledoc """
+  @checkdoc """
   This module is responsible for running checks based on the context represented
   by the current `Credo.Execution`.
   """

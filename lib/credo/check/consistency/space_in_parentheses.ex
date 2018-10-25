@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses do
-  @moduledoc """
+  @checkdoc """
   Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is
   the **preferred** way, although other styles are possible, as long as it is
   applied consistently.

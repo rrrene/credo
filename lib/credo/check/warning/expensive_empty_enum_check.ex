@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
-  @moduledoc """
+  @checkdoc """
   Checking if the size of the enum is `0` can be very expensive, since you are
   determining the exact count of elements.
 
@@ -13,7 +13,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 

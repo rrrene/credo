@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedOperation do
-  @moduledoc """
+  @checkdoc """
   The result of a call to the provided module's functions has to be used.
   """
 

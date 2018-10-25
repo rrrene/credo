@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.FunctionArity do
-  @moduledoc """
+  @checkdoc """
   A function can take as many parameters as needed, but even in a functional
   language there can be too many parameters.
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.CondStatements do
-  @moduledoc """
+  @checkdoc """
   Each cond statement should have 3 or more statements including the
   "always true" statement. Otherwise an `if` and `else` construct might be more
   appropriate.
@@ -21,7 +21,7 @@ defmodule Credo.Check.Refactor.CondStatements do
 
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check
 

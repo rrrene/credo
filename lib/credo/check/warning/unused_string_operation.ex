@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedStringOperation do
-  @moduledoc """
+  @checkdoc """
   The result of a call to the String module's functions has to be used.
 
   While this is correct ...
@@ -24,7 +24,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
   variable you pass in, but return a new variable which has to be used somehow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @checked_module :String
   @funs_with_return_value nil
 

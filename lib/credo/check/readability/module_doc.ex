@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ModuleDoc do
-  @moduledoc """
+  @checkdoc """
   Every module should contain comprehensive documentation.
 
       # preferred

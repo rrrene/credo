@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
-  @moduledoc """
+  @checkdoc """
   You might want to refrain from rebinding variables.
 
   Although technically fine, rebinding to the same name can lead to less

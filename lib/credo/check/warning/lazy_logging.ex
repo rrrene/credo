@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.LazyLogging do
-  @moduledoc """
+  @checkdoc """
   Ensures laziness of Logger calls.
 
   You will want to wrap expensive logger calls into a zero argument

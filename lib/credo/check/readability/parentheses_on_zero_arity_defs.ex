@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
-  @moduledoc """
+  @checkdoc """
   Do not use parentheses when defining a function which has no arguments.
 
   The code in this example ...
@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   it easier to follow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   use Credo.Check, base_priority: :low

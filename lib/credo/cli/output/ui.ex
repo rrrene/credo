@@ -2,13 +2,13 @@ defmodule Credo.CLI.Output.UI do
   @moduledoc """
   This module provides functions used to create the UI.
 
-      iex> alias Credo.CLI.Output.UI
-      ...> UI.puts "This is a test."
+      >>> alias Credo.CLI.Output.UI
+      >>> UI.puts "This is a test."
       This is a test.
       nil
 
-      iex> alias Credo.CLI.Output.UI
-      ...> UI.warn "This is a warning."
+      >>> alias Credo.CLI.Output.UI
+      >>> UI.warn "This is a warning."
       This is a warning.
       nil
 

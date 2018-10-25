@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.UnlessWithElse do
-  @moduledoc """
+  @checkdoc """
   An `unless` block should not contain an else block.
 
   So while this is fine:
@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   what the wording seems to apply.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 

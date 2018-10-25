@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.LargeNumbers do
-  @moduledoc """
+  @checkdoc """
   Numbers can contain underscores for readability purposes.
   These do not affect the value of the number, but can help read large numbers
   more easily.

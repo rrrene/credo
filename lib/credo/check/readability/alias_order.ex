@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.AliasOrder do
-  @moduledoc """
+  @checkdoc """
   Alphabetically ordered lists are more easily scannable by the read.
 
       # preferred
@@ -37,7 +37,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   it easier to follow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   alias Credo.Code
   alias Credo.Code.Name

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.AliasUsage do
-  @moduledoc """
+  @checkdoc """
   Functions from other modules should be used via an alias if the module's
   namespace is not top-level.
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexity do
-  @moduledoc """
+  @checkdoc """
   Cyclomatic complexity is a software complexity metric closely correlated with
   coding errors.
 

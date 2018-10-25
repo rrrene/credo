@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedPathOperation do
-  @moduledoc """
+  @checkdoc """
   The result of a call to the Path module's functions has to be used.
 
   While this is correct ...
@@ -22,7 +22,7 @@ defmodule Credo.Check.Warning.UnusedPathOperation do
   variable which has to be used somehow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @checked_module :Path
   @funs_with_return_value nil
 

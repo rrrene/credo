@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.IoInspect do
-  @moduledoc """
+  @checkdoc """
   While calls to IO.inspect might appear in some parts of production code,
   most calls to this function are added during debugging sessions.
 
@@ -7,7 +7,7 @@ defmodule Credo.Check.Warning.IoInspect do
   in error.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @call_string "IO.inspect"
 
   use Credo.Check, base_priority: :high

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
-  @moduledoc """
+  @checkdoc """
   Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
   the candidates (the acc is used to keep state).
   """

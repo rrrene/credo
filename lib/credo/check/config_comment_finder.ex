@@ -1,5 +1,5 @@
 defmodule Credo.Check.ConfigCommentFinder do
-  @moduledoc """
+  @checkdoc """
   This check is used internally by Credo.
 
   It traverses the given codebase to find `Credo.Check.ConfigComment`

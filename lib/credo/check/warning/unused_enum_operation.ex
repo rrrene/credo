@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedEnumOperation do
-  @moduledoc """
+  @checkdoc """
   With the exception of `Enum.each/2`, the result of a call to the
   Enum module's functions has to be used.
 
@@ -26,7 +26,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
   (the exception being `Enum.each/2` which iterates a list and returns `:ok`).
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @checked_module :Enum
   @funs_with_return_value ~w(
       all? any? at chunk chunk chunk_by concat concat count count dedup

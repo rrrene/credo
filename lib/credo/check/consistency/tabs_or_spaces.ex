@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.TabsOrSpaces do
-  @moduledoc """
+  @checkdoc """
   Tabs should be used consistently.
 
   NOTE: This check does not verify the indentation depth, but checks whether
@@ -12,7 +12,7 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
   you should use a consistent style throughout your codebase.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   @collector Credo.Check.Consistency.TabsOrSpaces.Collector
 

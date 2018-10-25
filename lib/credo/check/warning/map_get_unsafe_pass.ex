@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.MapGetUnsafePass do
-  @moduledoc """
+  @checkdoc """
   `Map.get/2` can lead into runtime errors if the result is passed into a pipe
   without a proper default value. This happens when the next function in the
   pipe cannot handle `nil` values correctly.
@@ -19,7 +19,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   If you are not sure, `Map.get/3` can help you provide a safe default value.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @call_string "Map.get"
   @unsafe_modules [:Enum]
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.ABCSize do
-  @moduledoc """
+  @checkdoc """
   The ABC size describes a metric based on assignments, branches and conditions.
 
   A high ABC size is a hint that a function might be doing "more" than it

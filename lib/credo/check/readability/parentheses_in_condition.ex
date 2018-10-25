@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ParenthesesInCondition do
-  @moduledoc """
+  @checkdoc """
   Because `if` and `unless` are macros, the preferred style is to not use
   parentheses around conditions.
 
@@ -20,7 +20,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   it easier to follow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 

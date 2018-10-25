@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.Nesting do
-  @moduledoc """
+  @checkdoc """
   Code should not be nested more than once inside a function.
 
       defmodule CredoSampleModule do

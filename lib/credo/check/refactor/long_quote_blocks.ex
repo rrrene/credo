@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.LongQuoteBlocks do
-  @moduledoc """
+  @checkdoc """
   Long `quote` blocks are generally an indication that too much is done inside
   them.
 

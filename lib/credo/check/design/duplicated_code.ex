@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.DuplicatedCode do
-  @moduledoc """
+  @checkdoc """
   Code should not be copy-pasted in a codebase when there is room to abstract
   the copied functionality in a meaningful way.
 

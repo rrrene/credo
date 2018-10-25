@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.RaiseInsideRescue do
-  @moduledoc """
+  @checkdoc """
   Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace,
   which obscures the cause of the original error.
 
@@ -28,7 +28,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
       end
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   use Credo.Check

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.PreferImplicitTry do
-  @moduledoc """
+  @checkdoc """
   Prefer using an implicit `try` rather than explicit `try` if you try to rescue
   anything the function does.
 
@@ -25,7 +25,7 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
   The code will behave identical in both ways.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   @def_ops [:def, :defp, :defmacro]
 

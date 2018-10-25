@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.TrailingBlankLine do
-  @moduledoc """
+  @checkdoc """
   Files should end in a trailing blank line.
 
   This is mostly for historical reasons: every text file should end with a \\n,
@@ -10,7 +10,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
   Most text editors ensure this "final newline" automatically.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :low
 

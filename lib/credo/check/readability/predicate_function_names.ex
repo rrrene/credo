@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.PredicateFunctionNames do
-  @moduledoc """
+  @checkdoc """
   Predicate functions/macros should be named accordingly:
 
   * For functions, they should end in a question mark.
@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   it easier to follow.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
 
   use Credo.Check, base_priority: :high

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagFIXME do
-  @moduledoc """
+  @checkdoc """
   FIXME comments are used to indicate places where source code needs fixing.
 
   Example:

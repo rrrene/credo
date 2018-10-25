@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValues do
-  @moduledoc """
+  @checkdoc """
   Boolean operations with identical values on the left and right side are
   most probably a logical fallacy or a copy-and-paste error.
 
@@ -13,7 +13,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
   Each of these cases behaves the same as if you were just writing `x`.
   """
 
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @ops [:and, :or, :&&, :||]
 
   use Credo.Check, base_priority: :high

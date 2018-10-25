@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagTODO do
-  @moduledoc """
+  @checkdoc """
   TODO comments are used to remind yourself of source code related things.
 
   Example:
