@@ -36,8 +36,6 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   use Credo.Check, run_on_all: true, base_priority: :higher
 
-  alias Credo.Check.CodeHelper
-  alias Credo.Issue
   alias Credo.SourceFile
 
   @doc false

@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.Semicolons do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 

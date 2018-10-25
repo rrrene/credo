@@ -58,6 +58,8 @@ defmodule Credo.Execution.ProcessDefinition do
       @tasks unquote(module_name)
 
       defmodule unquote(module_name) do
+        @moduledoc false
+
         use Credo.Execution.ProcessDefinition
 
         unquote(block)

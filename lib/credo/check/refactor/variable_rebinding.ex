@@ -29,9 +29,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       end
 
   """
-  @explanation [
-    check: @moduledoc
-  ]
+  @explanation [check: @checkdoc]
 
   use Credo.Check
 

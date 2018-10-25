@@ -97,9 +97,9 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
-  Returns the line at the given +line_no+.
+  Returns the line at the given `line_no`.
 
-  NOTE: +line_no+ is a 1-based index.
+  NOTE: `line_no` is a 1-based index.
   """
   def line_at(%__MODULE__{} = source_file, line_no) do
     source_file
@@ -111,9 +111,9 @@ defmodule Credo.SourceFile do
   defp find_line_at(_, _), do: nil
 
   @doc """
-  Returns the snippet at the given +line_no+ between +column1+ and +column2+.
+  Returns the snippet at the given `line_no` between `column1` and `column2`.
 
-  NOTE: +line_no+ is a 1-based index.
+  NOTE: `line_no` is a 1-based index.
   """
   def line_at(%__MODULE__{} = source_file, line_no, column1, column2) do
     source_file
@@ -122,9 +122,9 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
-  Returns the column of the given +trigger+ inside the given line.
+  Returns the column of the given `trigger` inside the given line.
 
-  NOTE: Both +line_no+ and the returned index are 1-based.
+  NOTE: Both `line_no` and the returned index are 1-based.
   """
   def column(source_file, line_no, trigger)
 
