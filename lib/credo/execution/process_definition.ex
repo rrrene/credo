@@ -1,4 +1,41 @@
 defmodule Credo.Execution.ProcessDefinition do
+  @moduledoc """
+  A `ProcessDefinition` can be used to define a process which can be called with a `Credo.Execution` struct.
+
+      defmodule Credo.ExampleProcess do
+        use Credo.Execution.ProcessDefinition
+
+        run Credo.Task.ParseOptions
+        run Credo.Task.ValidateOptions
+        run Credo.Task.RunCommand
+        run Credo.Task.AssignExitStatus
+      end
+
+  All modules registered with `run/1` will be executed in order when the process is called (a bit like a Plug pipeline):
+
+      argv = ["command", "line", "--arguments"]
+      exec = Credo.Execution.build(argv)
+
+      Credo.ExampleProcess.call(exec)
+
+  For convenience, tasks belonging together semantically can be grouped using `actvity/2`:
+
+      defmodule Credo.ExampleProcess do
+        use Credo.Execution.ProcessDefinition
+
+        activity :prepare_analysis do
+          run Credo.Task.ParseOptions
+          run Credo.Task.ValidateOptions
+        end
+
+        activity :run_analysis do
+          run Credo.Task.RunCommand
+          run Credo.Task.AssignExitStatus
+        end
+      end
+
+  """
+
   alias Credo.Execution
 
   @doc false
@@ -46,7 +83,9 @@ defmodule Credo.Execution.ProcessDefinition do
   end
 
   @doc """
-  Creates a TaskGroup with the given `name`, which can be called via `.call/2`.
+  Creates a group of tasks (an "activity") with the given `name`.
+
+  Activities are called in order when the surrounding process is called.
   """
   defmacro activity(name, do_block)
 
@@ -71,7 +110,9 @@ defmodule Credo.Execution.ProcessDefinition do
   end
 
   @doc """
-  Registers a Task module with the current task group.
+  Registers a Task module with the current process.
+
+  Tasks are called in order when the surrounding process or activity is called.
   """
   defmacro run(module)
 
