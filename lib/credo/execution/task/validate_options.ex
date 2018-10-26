@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.ValidateOptions do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Options

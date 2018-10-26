@@ -1,11 +1,13 @@
 defmodule Credo.Execution.Task.SetDefaultCommand do
+  @moduledoc false
+
+  @default_command_name "suggest"
+  @explain_command_name "explain"
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Filename
   alias Credo.CLI.Options
-
-  @default_command_name "suggest"
-  @explain_command_name "explain"
 
   def call(exec, _opts) do
     determine_command(exec, exec.cli_options)

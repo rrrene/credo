@@ -1,11 +1,13 @@
 defmodule Credo.Execution.Task.WriteDebugReport do
+  @moduledoc false
+
+  @debug_template_filename "debug-template.html"
+  @debug_output_filename "credo-debug-log.html"
+
   use Credo.Execution.Task
 
   alias Credo.Execution.Timing
   alias Credo.CLI.Output.UI
-
-  @debug_template_filename "debug-template.html"
-  @debug_output_filename "credo-debug-log.html"
 
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()

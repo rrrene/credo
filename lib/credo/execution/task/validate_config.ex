@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.ValidateConfig do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Output.UI

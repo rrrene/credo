@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.ConfigBuilder
