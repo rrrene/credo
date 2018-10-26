@@ -7,7 +7,7 @@ defmodule Credo.Check.Runner do
   alias Credo.CLI.Output.UI
   alias Credo.Execution
   alias Credo.Execution.ExecutionIssues
-  alias Credo.Execution.Timing
+  alias Credo.Execution.ExecutionTiming
   alias Credo.SourceFile
 
   @doc """
@@ -50,7 +50,7 @@ defmodule Credo.Check.Runner do
   defp append_issues_and_timings(exec, source_file, {issues, {check, filename, started_at, time}}) do
     ExecutionIssues.append(exec, source_file, issues)
 
-    Timing.append(
+    ExecutionTiming.append(
       exec,
       [task: exec.current_task, check: check, source_file: filename],
       started_at,
@@ -61,7 +61,7 @@ defmodule Credo.Check.Runner do
   defp append_issues_and_timings(exec, source_file, {issues, {check, started_at, time}}) do
     ExecutionIssues.append(exec, source_file, issues)
 
-    Timing.append(exec, [task: exec.current_task, check: check], started_at, time)
+    ExecutionTiming.append(exec, [task: exec.current_task, check: check], started_at, time)
   end
 
   @doc false
@@ -71,7 +71,7 @@ defmodule Credo.Check.Runner do
         Enum.into(issues, %{})
 
       {issues, {check, started_at, time}} ->
-        Timing.append(
+        ExecutionTiming.append(
           exec,
           [task: exec.current_task, check: check, alias: "ConfigCommentFinder"],
           started_at,
@@ -98,7 +98,7 @@ defmodule Credo.Check.Runner do
          %Credo.Execution{debug: true} = exec
        ) do
     {started_at, time, issues} =
-      Timing.run(fn ->
+      ExecutionTiming.run(fn ->
         do_run_check_on_source_files({check, params}, source_files, exec)
       end)
 
@@ -146,7 +146,7 @@ defmodule Credo.Check.Runner do
          %Credo.Execution{debug: true} = exec
        ) do
     {started_at, time, issues} =
-      Timing.run(fn ->
+      ExecutionTiming.run(fn ->
         do_run_check_on_single_source_file({check, params}, source_file, exec)
       end)
 

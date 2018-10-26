@@ -48,8 +48,8 @@ defmodule Credo.Execution do
   @type t :: module
 
   alias Credo.Execution.ExecutionIssues
-  alias Credo.Execution.SourceFiles
-  alias Credo.Execution.Timing
+  alias Credo.Execution.ExecutionSourceFiles
+  alias Credo.Execution.ExecutionTiming
 
   @doc "Builds an Execution struct for the the given `argv`."
   def build(argv) when is_list(argv) do
@@ -144,12 +144,12 @@ defmodule Credo.Execution do
 
   @doc "Returns all source files for the given `exec` struct."
   def get_source_files(exec) do
-    Credo.Execution.SourceFiles.get(exec)
+    Credo.Execution.ExecutionSourceFiles.get(exec)
   end
 
   @doc "Puts the given `source_files` into the given `exec` struct."
   def put_source_files(exec, source_files) do
-    SourceFiles.put(exec, source_files)
+    ExecutionSourceFiles.put(exec, source_files)
 
     exec
   end
@@ -200,9 +200,9 @@ defmodule Credo.Execution do
   @doc false
   def start_servers(%__MODULE__{} = exec) do
     exec
-    |> SourceFiles.start_server()
+    |> ExecutionSourceFiles.start_server()
     |> ExecutionIssues.start_server()
-    |> Timing.start_server()
+    |> ExecutionTiming.start_server()
   end
 
   # Task tracking

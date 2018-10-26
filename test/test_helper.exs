@@ -163,9 +163,9 @@ defmodule CredoCheckCase do
 
   defp create_config do
     %Credo.Execution{}
-    |> Credo.Execution.SourceFiles.start_server()
+    |> Credo.Execution.ExecutionSourceFiles.start_server()
     |> Credo.Execution.ExecutionIssues.start_server()
-    |> Credo.Execution.Timing.start_server()
+    |> Credo.Execution.ExecutionTiming.start_server()
   end
 
   defp get_issues_from_source_file(source_file, exec) do

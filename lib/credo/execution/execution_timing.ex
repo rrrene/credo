@@ -1,7 +1,7 @@
-defmodule Credo.Execution.Timing do
+defmodule Credo.Execution.ExecutionTiming do
   @moduledoc """
-  The `Timing` module can help in timing the execution of code parts and storing
-  those timing inside the `Credo.Execution` struct.
+  The `ExecutionTiming` module can help in timing the execution of code parts and
+  storing those timing inside the `Credo.Execution` struct.
   """
 
   use GenServer
@@ -11,7 +11,7 @@ defmodule Credo.Execution.Timing do
   @doc """
   Runs the given `fun` and prints the time it took with the given `label`.
 
-      iex> Credo.Execution.Timing.inspect("foo", fn -> some_complicated_stuff() end)
+      iex> Credo.Execution.ExecutionTiming.inspect("foo", fn -> some_complicated_stuff() end)
       foo: 51284
 
   """
@@ -35,7 +35,7 @@ defmodule Credo.Execution.Timing do
   @doc """
   Runs the given `fun` and returns a tuple of `{started_at, time, result}`.
 
-      iex> Credo.Execution.Timing.run(fn -> some_complicated_stuff() end)
+      iex> Credo.Execution.ExecutionTiming.run(fn -> some_complicated_stuff() end)
       {1540540119448181, 51284, [:whatever, :fun, :returned]}
 
   """

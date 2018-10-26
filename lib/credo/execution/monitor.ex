@@ -1,17 +1,17 @@
 defmodule Credo.Execution.Monitor do
   require Logger
 
-  alias Credo.Execution.Timing
+  alias Credo.Execution.ExecutionTiming
 
   def task(exec, task, opts, fun, args) do
     context_tuple = {:task, exec, task, opts}
     log(:call_start, context_tuple)
 
-    {started_at, time, exec} = Timing.run(fun, args)
+    {started_at, time, exec} = ExecutionTiming.run(fun, args)
 
     log(:call_end, context_tuple, time)
 
-    Timing.append(exec, [task: task, parent_task: exec.parent_task], started_at, time)
+    ExecutionTiming.append(exec, [task: task, parent_task: exec.parent_task], started_at, time)
 
     exec
   end
