@@ -1,4 +1,6 @@
 defmodule Credo.ExsLoader do
+  @moduledoc false
+
   def parse(exs_string, safe \\ false)
 
   def parse(exs_string, true) do
@@ -26,6 +28,7 @@ defmodule Credo.ExsLoader do
       end
   end
 
+  @doc false
   def parse_safe(exs_string) do
     case Code.string_to_quoted(exs_string) do
       {:ok, ast} ->

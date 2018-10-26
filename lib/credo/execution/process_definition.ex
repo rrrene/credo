@@ -1,6 +1,7 @@
 defmodule Credo.Execution.ProcessDefinition do
   @moduledoc """
-  A `ProcessDefinition` can be used to define a process which can be called with a `Credo.Execution` struct.
+  A `ProcessDefinition` can be used to define a process which consists of
+  several tasks and can be called with a `Credo.Execution` struct.
 
       defmodule Credo.ExampleProcess do
         use Credo.Execution.ProcessDefinition
@@ -33,6 +34,10 @@ defmodule Credo.Execution.ProcessDefinition do
           run Credo.Task.AssignExitStatus
         end
       end
+
+  Each task receives an Execution struct and returns an Execution struct upon completion.
+  Any Task can mark the Execution as "halted" to stop Credo's execution.
+  Subsequent Tasks won't be run in this case.
 
   """
 
