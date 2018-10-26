@@ -54,7 +54,7 @@ end
 defmodule CredoCheckCase do
   use ExUnit.Case
 
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.SourceFile
 
   def refute_issues(source_file, check \\ nil, params \\ []) do
@@ -164,11 +164,11 @@ defmodule CredoCheckCase do
   defp create_config do
     %Credo.Execution{}
     |> Credo.Execution.SourceFiles.start_server()
-    |> Credo.Execution.Issues.start_server()
+    |> Credo.Execution.ExecutionIssues.start_server()
     |> Credo.Execution.Timing.start_server()
   end
 
   defp get_issues_from_source_file(source_file, exec) do
-    Issues.get(exec, source_file)
+    ExecutionIssues.get(exec, source_file)
   end
 end

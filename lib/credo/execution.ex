@@ -47,7 +47,7 @@ defmodule Credo.Execution do
 
   @type t :: module
 
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.Execution.SourceFiles
   alias Credo.Execution.Timing
 
@@ -159,7 +159,7 @@ defmodule Credo.Execution do
   @doc "Returns all issues for the given `exec` struct."
   def get_issues(exec) do
     exec
-    |> Issues.to_map()
+    |> ExecutionIssues.to_map()
     |> Map.values()
     |> List.flatten()
   end
@@ -167,13 +167,13 @@ defmodule Credo.Execution do
   @doc "Returns issues for the given `exec` struct that relate to the given `filename`."
   def get_issues(exec, filename) do
     exec
-    |> Issues.to_map()
+    |> ExecutionIssues.to_map()
     |> Map.get(filename, [])
   end
 
   @doc "Sets the issues in the given `exec` struct."
   def set_issues(exec, issues) do
-    Issues.set(exec, issues)
+    ExecutionIssues.set(exec, issues)
 
     exec
   end
@@ -201,7 +201,7 @@ defmodule Credo.Execution do
   def start_servers(%__MODULE__{} = exec) do
     exec
     |> SourceFiles.start_server()
-    |> Issues.start_server()
+    |> ExecutionIssues.start_server()
     |> Timing.start_server()
   end
 

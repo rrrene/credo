@@ -6,7 +6,7 @@ defmodule Credo.Check.Runner do
 
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.Execution.Timing
   alias Credo.SourceFile
 
@@ -44,11 +44,11 @@ defmodule Credo.Check.Runner do
   end
 
   defp append_issues_and_timings(exec, source_file, {issues, nil}) do
-    Issues.append(exec, source_file, issues)
+    ExecutionIssues.append(exec, source_file, issues)
   end
 
   defp append_issues_and_timings(exec, source_file, {issues, {check, filename, started_at, time}}) do
-    Issues.append(exec, source_file, issues)
+    ExecutionIssues.append(exec, source_file, issues)
 
     Timing.append(
       exec,
@@ -59,7 +59,7 @@ defmodule Credo.Check.Runner do
   end
 
   defp append_issues_and_timings(exec, source_file, {issues, {check, started_at, time}}) do
-    Issues.append(exec, source_file, issues)
+    ExecutionIssues.append(exec, source_file, issues)
 
     Timing.append(exec, [task: exec.current_task, check: check], started_at, time)
   end

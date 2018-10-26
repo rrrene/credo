@@ -70,7 +70,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
       issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
 
       if issue do
-        Credo.Execution.Issues.append(exec, source_file, issue)
+        Credo.Execution.ExecutionIssues.append(exec, source_file, issue)
       end
     end
   end
