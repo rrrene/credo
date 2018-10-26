@@ -2,6 +2,14 @@
 
 ## 1.0.0-rc1
 
+- Improve documentation
+- Add error handling for malformed config files
+- Write all warnings to `:stderr`
+- Fix false positive for charlists in PipeChainStart
+- Remove deprecated --one-line switch
+- Deactivate checks `DuplicatedCode` and `DoubleBooleanNegation` by default
+
+
 ### BREAKING CHANGES
 
 These changes concern people writing their own checks for Credo.
