@@ -74,6 +74,44 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should work with multi-alias" do
+    """
+    defmodule Test do
+      alias Detroit.Learnables.Learnable
+      alias DetroitWeb.{ContainerCell, WizardNavigationCell, Zzzzz}
+      alias DetroitWeb.Course.Subject.{CompletionCell, HeaderCell, TableCell}
+
+      alias Detroit.Abc
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should work with an intersecting `require`" do
+    """
+    defmodule Test do
+      alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
+      alias OMG.API.Utxo
+      require Utxo
+      alias OMG.Watcher.Repo
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should work with multi alias syntax" do
+    """
+    defmodule Test do
+      alias MyApp.Accounts.{Organization, User, UserOrganization}
+      alias MyApp.Repo
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #

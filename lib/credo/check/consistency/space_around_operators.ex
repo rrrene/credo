@@ -1,5 +1,7 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Use spaces around operators like `+`, `-`, `*` and `/`. This is the
   **preferred** way, although other styles are possible, as long as it is
   applied consistently.
@@ -15,16 +17,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore: "List of operators to be ignored for this check."
     ]
   ]
-
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
-
   @default_params [ignore: [:|]]
 
   use Credo.Check, run_on_all: true, base_priority: :high
@@ -189,7 +188,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp parameter_in_function_call?(location_tuple, tokens, ast) do
     case find_prev_current_next_token(tokens, location_tuple) do
       {prev, _current, _next} ->
-        Credo.Code.TokenAstCorrelation.find_tokens_in_ast(prev, ast)
+        prev
+        |> Credo.Code.TokenAstCorrelation.find_tokens_in_ast(ast)
         |> List.wrap()
         |> List.first()
         |> is_parameter_in_function_call()

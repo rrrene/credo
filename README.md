@@ -1,4 +1,4 @@
-# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Deps Status](https://beta.hexfaktor.org/badge/all/github/rrrene/credo.svg?branch=master)](https://beta.hexfaktor.org/github/rrrene/credo) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo) [![Hex Version](https://img.shields.io/hexpm/v/credo.svg)](https://hex.pm/packages/credo) [![ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-a054ff.svg)](https://elixirweekly.net)
+# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo) [![Hex Version](https://img.shields.io/hexpm/v/credo.svg)](https://hex.pm/packages/credo) [![ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-a054ff.svg)](https://elixirweekly.net)
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
@@ -6,7 +6,7 @@ It implements [its own style guide](https://github.com/rrrene/elixir-style-guide
 
 ## What can it do?
 
-`credo` can show you refactoring opportunities in your code, complex and duplicated code fragments, warn you about common mistakes, show inconsistencies in your naming scheme and - if needed - help you enforce a desired coding style.
+`credo` can show you refactoring opportunities in your code, complex code fragments, warn you about common mistakes, show inconsistencies in your naming scheme and - if needed - help you enforce a desired coding style.
 
 If you are a Rubyist it is best described as an opinionated mix between [Inch](https://github.com/rrrene/inch) and [Rubocop](https://github.com/bbatsov/rubocop).
 
@@ -283,6 +283,15 @@ There are no additional options.
 There are no additional options.
 
 
+### info
+
+`info` shows you information relevant to investigating errors and submitting bug reports.
+
+Example usage:
+
+    $ mix credo info
+    $ mix credo info --verbose
+    $ mix credo info --verbose --format=json
 
 ## Command line options
 
@@ -429,11 +438,19 @@ While refactor checks show you possible problems, these checks try to highlight 
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
 
-## IDE/Editor Integrations
+## Integrations
 
-Some IDEs and editors are able to run `mix credo` in the background and mark and issues directly in the editor view.
+### IDE/Editor
+
+Some IDEs and editors are able to run Credo in the background and mark issues inline.
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
+* [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
+
+### Automated Code Review
+
+* [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
+* [Stickler CI](https://stickler-ci.com/) - checks your code for style and best practices across your entire stack.
 
 ## Contributing
 

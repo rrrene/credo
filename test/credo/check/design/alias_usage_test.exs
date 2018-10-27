@@ -228,6 +228,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
       alias Exzmq.{Socket, Tcp}
       alias Socket.unquote(stuff).test1
       alias unquote(stuff).Socket.test2
+      alias Socket.unquote(stuff)
+      alias Exzmq.{Socket, unquote(stuff)}
 
       def just_an_example do
         Socket.test1  # Exzmq.Socket.test
@@ -240,11 +242,13 @@ defmodule Credo.Check.Design.AliasUsageTest do
             alias Socket.unquote(module).test1
             alias unquote(module).Socket.test2
             alias unquote(module)
+            alias Exzmq.{Socket, unquote(stuff)}
           end
           defmodule unquote(module).Thing.Foo do
             alias Socket.unquote(module).test1
             alias unquote(module).Socket.test2
             alias unquote(module)
+            alias Exzmq.{Socket, unquote(stuff)}
           end
         end
       end

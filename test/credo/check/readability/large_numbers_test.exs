@@ -10,12 +10,12 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   test "it should NOT report expected code" do
     """
     @budgets %{
-      "budget1": 100_000,
-      "budget2": 200_000,
-      "budget3": 300_000,
-      "budget4": 500_000,
-      "budget5": 1_000_000,
-      "budget6": 2_000_000
+      budget1: 100_000,
+      budget2: 200_000,
+      budget3: 300_000,
+      budget4: 500_000,
+      budget5: 1_000_000,
+      budget6: 2_000_000
     }
 
     @int32_min -2_147_483_648
@@ -133,7 +133,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, only_greater_than: 50000)
+    |> assert_issue(@described_check, only_greater_than: 50_000)
   end
 
   test "it should report only one violation for ranges /1" do
@@ -204,7 +204,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     """
     |> to_source_file
     |> assert_issue(@described_check, fn %Credo.Issue{message: message} ->
-      assert Regex.run(~r/[\d\._]+/, message) |> hd == "10_000.00001"
+      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.00001"
     end)
   end
 
@@ -216,7 +216,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     """
     |> to_source_file
     |> assert_issue(@described_check, fn %Credo.Issue{message: message} ->
-      assert Regex.run(~r/[\d\._]+/, message) |> hd == "10_000.000010"
+      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.000010"
     end)
   end
 

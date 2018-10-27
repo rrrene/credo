@@ -3,14 +3,17 @@ defmodule Credo.SourceFile do
   `SourceFile` structs represent a source file in the codebase.
   """
 
-  @type t :: module
+  @type t :: %__MODULE__{
+          filename: nil | String.t(),
+          status: :valid | :invalid | :timed_out
+        }
 
   alias Credo.Service.SourceFileAST
   alias Credo.Service.SourceFileLines
   alias Credo.Service.SourceFileSource
 
   defstruct filename: nil,
-            valid?: nil
+            status: nil
 
   defimpl Inspect, for: __MODULE__ do
     def inspect(source_file, _opts) do
@@ -40,7 +43,17 @@ defmodule Credo.SourceFile do
 
     %Credo.SourceFile{
       filename: filename,
-      valid?: valid
+      status: if(valid, do: :valid, else: :invalid)
+    }
+  end
+
+  @spec timed_out(String.t()) :: t
+  def timed_out(filename) do
+    filename = Path.relative_to_cwd(filename)
+
+    %Credo.SourceFile{
+      filename: filename,
+      status: :timed_out
     }
   end
 
@@ -84,9 +97,9 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
-  Returns the line at the given +line_no+.
+  Returns the line at the given `line_no`.
 
-  NOTE: +line_no+ is a 1-based index.
+  NOTE: `line_no` is a 1-based index.
   """
   def line_at(%__MODULE__{} = source_file, line_no) do
     source_file
@@ -98,9 +111,9 @@ defmodule Credo.SourceFile do
   defp find_line_at(_, _), do: nil
 
   @doc """
-  Returns the snippet at the given +line_no+ between +column1+ and +column2+.
+  Returns the snippet at the given `line_no` between `column1` and `column2`.
 
-  NOTE: +line_no+ is a 1-based index.
+  NOTE: `line_no` is a 1-based index.
   """
   def line_at(%__MODULE__{} = source_file, line_no, column1, column2) do
     source_file
@@ -109,9 +122,9 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
-  Returns the column of the given +trigger+ inside the given line.
+  Returns the column of the given `trigger` inside the given line.
 
-  NOTE: Both +line_no+ and the returned index are 1-based.
+  NOTE: Both `line_no` and the returned index are 1-based.
   """
   def column(source_file, line_no, trigger)
 

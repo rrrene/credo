@@ -1,5 +1,7 @@
 defmodule Credo.Check.Warning.OperationWithConstantResult do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Operations on the same values always yield the same result and therefore make
   little sense in production code.
 
@@ -11,8 +13,7 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
   In practice they are likely the result of a debugging session or were made by
   mistake.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @ops_and_constant_results [
     {:*, "zero", 0},
     {:*, "the left side of the expression", 1}

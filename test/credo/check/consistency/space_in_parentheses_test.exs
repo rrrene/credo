@@ -22,6 +22,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
 
       def foo(a) do
         "#{a} #{a}"
+        :"b_#{a}_"
       end
 
       def bar do

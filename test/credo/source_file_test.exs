@@ -23,7 +23,7 @@ defmodule Credo.SourceFileTest do
 
     source_file = Credo.SourceFile.parse(s1, "example.ex")
 
-    refute source_file.valid?
+    assert source_file.status == :invalid
   end
 
   test "it should return line and column correctly" do

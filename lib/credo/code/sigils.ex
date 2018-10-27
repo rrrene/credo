@@ -21,7 +21,8 @@ defmodule Credo.Code.Sigils do
                      [a, String.upcase(a)]
                    end)
   @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
-  @removable_sigils Enum.flat_map(@sigil_delimiters, fn {b, e} ->
+  @removable_sigils @sigil_delimiters
+                    |> Enum.flat_map(fn {b, e} ->
                       Enum.flat_map(@all_sigil_starts, fn start ->
                         [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
                       end)
@@ -32,9 +33,9 @@ defmodule Credo.Code.Sigils do
   Replaces all characters inside all sigils with the equivalent amount of
   white-space.
   """
-  def replace_with_spaces(source, replacement \\ " ") do
+  def replace_with_spaces(source, replacement \\ " ", interpolation_replacement \\ " ") do
     source
-    |> InterpolationHelper.replace_interpolations(replacement)
+    |> InterpolationHelper.replace_interpolations(interpolation_replacement)
     |> parse_code("", replacement)
   end
 

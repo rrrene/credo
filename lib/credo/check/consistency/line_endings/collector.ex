@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.LineEndings.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
   def collect_matches(source_file, _params) do

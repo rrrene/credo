@@ -1,5 +1,7 @@
 defmodule Credo.Check.Design.AliasUsage do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Functions from other modules should be used via an alias if the module's
   namespace is not top-level.
 
@@ -28,9 +30,8 @@ defmodule Credo.Check.Design.AliasUsage do
   As always: This is just a suggestion. Check the configuration options for
   tweaking or disabling this check.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       excluded_namespaces: "List of namespaces to be excluded for this check.",
       excluded_lastnames: "List of lastnames to be excluded for this check.",

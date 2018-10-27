@@ -1,8 +1,7 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
-  use Credo.Check.Consistency.Collector
+  @moduledoc false
 
-  alias Credo.Check.CodeHelper
-  alias Credo.Code
+  use Credo.Check.Consistency.Collector
 
   @regex [
     with_space: ~r/[^\?]([\{\[\(]\s+\S|\S\s+[\)\]\}]])/,
@@ -12,8 +11,8 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
 
   def collect_matches(source_file, _params) do
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
-    |> Code.to_lines()
+    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
+    |> Credo.Code.to_lines()
     |> Enum.reduce(%{}, &spaces/2)
   end
 
@@ -26,8 +25,8 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
       end
 
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
-    |> Code.to_lines()
+    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
+    |> Credo.Code.to_lines()
     |> List.foldr([], &locate(actual, &1, &2))
   end
 

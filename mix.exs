@@ -4,7 +4,7 @@ defmodule Credo.Mixfile do
   def project do
     [
       app: :credo,
-      version: "0.10.0",
+      version: "1.0.0-rc1",
       elixir: ">= 1.4.0",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env() == :prod,
@@ -32,7 +32,10 @@ defmodule Credo.Mixfile do
       ],
       maintainers: ["René Föhring"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/rrrene/credo"}
+      links: %{
+        "GitHub" => "https://github.com/rrrene/credo",
+        "Changelog" => "https://github.com/rrrene/credo/blob/master/CHANGELOG.md"
+      }
     ]
   end
 

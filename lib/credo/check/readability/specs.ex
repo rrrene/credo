@@ -1,10 +1,11 @@
 defmodule Credo.Check.Readability.Specs do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Functions, callbacks and macros need typespecs.
 
-  Adding typespecs allows tools like dialyzer to perform success typing on
-  functions. Without a spec functions and macros are ignored by the type
-  checker.
+  Adding typespecs gives tools like Dialyzer more information when performing
+  checks for type errors in function calls and definitions.
 
       @spec add(integer, integer) :: integer
       def add(a, b), do: a + b
@@ -19,8 +20,7 @@ defmodule Credo.Check.Readability.Specs do
   The check only considers whether the specification is present, it doesn't
   perform any actual type checking.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check
 
@@ -41,6 +41,22 @@ defmodule Credo.Check.Readability.Specs do
 
   defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs)
        when is_list(args) do
+    {ast, [{name, length(args)} | specs]}
+  end
+
+  defp find_specs({:impl, _, [true]} = ast, specs) do
+    {ast, [:impl | specs]}
+  end
+
+  defp find_specs({:def, meta, [{:when, _, def_ast} | _]}, [:impl | specs]) do
+    find_specs({:def, meta, def_ast}, [:impl | specs])
+  end
+
+  defp find_specs({:def, _, [{name, _, nil}, _]} = ast, [:impl | specs]) do
+    {ast, [{name, 0} | specs]}
+  end
+
+  defp find_specs({:def, _, [{name, _, args}, _]} = ast, [:impl | specs]) do
     {ast, [{name, length(args)} | specs]}
   end
 

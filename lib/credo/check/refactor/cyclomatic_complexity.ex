@@ -1,5 +1,7 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexity do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Cyclomatic complexity is a software complexity metric closely correlated with
   coding errors.
 
@@ -8,15 +10,13 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   and bosses of a need to refactor parts of the code based on "objective"
   metrics.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_complexity: "The maximum cyclomatic complexity a function should have."
     ]
   ]
   @default_params [max_complexity: 9]
-
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
   @double_condition_ops [:if, :unless, :for, :try, :and, :or, :&&, :||]
@@ -39,8 +39,6 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   ]
 
   use Credo.Check
-
-  alias Credo.Check.CodeHelper
 
   @doc false
   def run(source_file, params \\ []) do
@@ -72,7 +70,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
         |> round
 
       if complexity > max_complexity do
-        fun_name = CodeHelper.def_name(ast)
+        fun_name = Credo.Code.Module.def_name(ast)
 
         {
           ast,
@@ -145,7 +143,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
          when is_list(arguments) do
       block_cc =
         arguments
-        |> CodeHelper.do_block_for!()
+        |> Credo.Code.Block.do_block_for!()
         |> do_block_complexity(op)
 
       {ast, complexity + block_cc}

@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Task.SetRelevantIssues do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Filter

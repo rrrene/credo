@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.StringSigils do
-  @moduledoc ~S"""
+  @moduledoc false
+
+  @checkdoc ~S"""
   If you used quoted strings that contain quotes, you might want to consider
   switching to the use of sigils instead.
 
@@ -18,9 +20,8 @@ defmodule Credo.Check.Readability.StringSigils do
   This allows us to remove the noise which results from the need to escape
   quotes within quotes.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
     ]

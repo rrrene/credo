@@ -76,7 +76,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{with_space: 19} == result
+    assert %{with_space: 18} == result
   end
 
   test "it should report correct frequencies for operators not surrounded by spaces" do
