@@ -3,14 +3,15 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
 
   @described_check Credo.Check.Refactor.ABCSize
 
-  def abc_size(source) do
+  def abc_size(source, excluded_functions \\ []) do
     {:ok, ast} = Credo.Code.ast(source)
-    @described_check.abc_size_for(ast)
+
+    @described_check.abc_size_for(ast, excluded_functions)
   end
 
-  def rounded_abc_size(source) do
+  def rounded_abc_size(source, excluded_functions \\ []) do
     source
-    |> abc_size
+    |> abc_size(excluded_functions)
     |> Float.round(2)
   end
 
@@ -158,7 +159,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
               severity: severity
             }
             if line_no do
-              {_def, scope} = CodeHelper.scope_for(source_file.ast, line: line_no)
+              {_def, scope} = Credo.Code.scope_for(source_file.ast, line: line_no)
               issue =
                 %Issue{
                   issue |
@@ -224,5 +225,23 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     """
 
     assert rounded_abc_size(source) == 3
+  end
+
+  test "it should NOT count functions given to ignore for abc size" do
+    source = """
+    def fun() do
+      Favorite
+      |> where(user_id: ^user.id)
+      |> join(:left, [f], t in Template, f.entity_id == t.id and f.entity_type == "template")
+      |> join(:left, [f, t], d in Document, f.entity_id == d.id and f.entity_type == "document")
+      |> join(:left, [f, t, d], dt in Template, dt.id == d.template_id)
+      |> join(:left, [f, t, d, dt], c in Category, c.id == t.category_id or c.id == dt.category_id)
+      |> select([f, t, d, dt, c], c)
+      |> distinct(true)
+      |> Repo.all()
+    end
+    """
+
+    assert rounded_abc_size(source, ["where", "join", "select", "distinct"]) == 1
   end
 end

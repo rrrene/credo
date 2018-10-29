@@ -1,11 +1,13 @@
 defmodule Credo.Execution.Task.WriteDebugReport do
-  use Credo.Execution.Task
-
-  alias Credo.Execution.Timing
-  alias Credo.CLI.Output.UI
+  @moduledoc false
 
   @debug_template_filename "debug-template.html"
   @debug_output_filename "credo-debug-log.html"
+
+  use Credo.Execution.Task
+
+  alias Credo.Execution.ExecutionTiming
+  alias Credo.CLI.Output.UI
 
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()
@@ -14,9 +16,9 @@ defmodule Credo.Execution.Task.WriteDebugReport do
     time_run = exec |> get_assign("credo.time.run_checks") |> div(1000)
     time_total = time_load + time_run
 
-    all_timings = Timing.all(exec)
-    started_at = Timing.started_at(exec)
-    ended_at = Timing.ended_at(exec)
+    all_timings = ExecutionTiming.all(exec)
+    started_at = ExecutionTiming.started_at(exec)
+    ended_at = ExecutionTiming.ended_at(exec)
 
     assigns = [
       exec: exec,

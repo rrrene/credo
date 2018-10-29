@@ -3,10 +3,12 @@ defmodule Credo.ConfigFileTest do
 
   alias Credo.ConfigFile
 
-  def assert_sorted_equality(%ConfigFile{files: files1, checks: checks1}, %ConfigFile{
-        files: files2,
-        checks: checks2
-      }) do
+  def assert_sorted_equality(
+        %ConfigFile{files: files1, checks: checks1},
+        {:ok, config_file2}
+      ) do
+    %ConfigFile{files: files2, checks: checks2} = config_file2
+
     assert files1 == files2
     assert_sorted_equality(checks1, checks2)
   end
@@ -64,7 +66,7 @@ defmodule Credo.ConfigFileTest do
 
     assert_sorted_equality(
       expected,
-      ConfigFile.merge(@default_config, @example_config)
+      ConfigFile.merge({:ok, @default_config}, {:ok, @example_config})
     )
   end
 
@@ -83,7 +85,7 @@ defmodule Credo.ConfigFileTest do
 
     assert_sorted_equality(
       expected,
-      ConfigFile.merge(@default_config, @example_config2)
+      ConfigFile.merge({:ok, @default_config}, {:ok, @example_config2})
     )
   end
 
@@ -102,7 +104,7 @@ defmodule Credo.ConfigFileTest do
 
     assert_sorted_equality(
       expected,
-      ConfigFile.merge(@example_config2, @default_config)
+      ConfigFile.merge({:ok, @example_config2}, {:ok, @default_config})
     )
   end
 
@@ -124,7 +126,7 @@ defmodule Credo.ConfigFileTest do
 
     assert_sorted_equality(
       expected,
-      ConfigFile.merge([@default_config, @example_config2, @example_config])
+      ConfigFile.merge([{:ok, @default_config}, {:ok, @example_config2}, {:ok, @example_config}])
     )
   end
 
@@ -170,13 +172,24 @@ defmodule Credo.ConfigFileTest do
   end
 
   test "loads custom config file and merges with default" do
-    config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs"])
+    config_file_path = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs"])
 
-    configs = ConfigFile.read_from_file_path(".", config_file)
+    {:ok, config_file} = ConfigFile.read_from_file_path(".", config_file_path)
+
     # from default
-    assert(Enum.member?(configs.checks, {Credo.Check.Readability.ModuleNames, []}))
+    assert(Enum.member?(config_file.checks, {Credo.Check.Readability.ModuleNames, []}))
 
     # from custom file
-    assert(Enum.member?(configs.checks, {Credo.Check.Readability.ModuleDoc, false}))
+    assert(Enum.member?(config_file.checks, {Credo.Check.Readability.ModuleDoc, false}))
+  end
+
+  test "loads broken config file and return error tuple" do
+    config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs.malformed"])
+
+    result = ConfigFile.read_from_file_path(".", config_file)
+
+    expected = {:error, {:badconfig, config_file, 9, "syntax error before: ", "checks"}}
+
+    assert expected == result
   end
 end

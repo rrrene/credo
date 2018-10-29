@@ -1,12 +1,13 @@
 defmodule Credo.Check.Readability.TrailingWhiteSpace do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   There should be no white-space (i.e. tabs, spaces) at the end of a line.
 
   Most text editors provide a way to remove them automatically.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore_strings: "Set to `false` to check lines that are strings or in heredocs"
     ]
@@ -16,6 +17,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   ]
 
   use Credo.Check, base_priority: :low
+
   alias Credo.Code
   alias Credo.Code.Strings
 

@@ -1,5 +1,7 @@
 defmodule Credo.Check.Refactor.Nesting do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Code should not be nested more than once inside a function.
 
       defmodule CredoSampleModule do
@@ -20,21 +22,17 @@ defmodule Credo.Check.Refactor.Nesting do
   At this point it might be a good idea to refactor the code to separate the
   different loops and conditions.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       max_nesting: "The maximum number of levels code should be nested."
     ]
   ]
   @default_params [max_nesting: 2]
-
   @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn]
 
   use Credo.Check
-
-  alias Credo.Check.CodeHelper
 
   @doc false
   def run(source_file, params \\ []) do
@@ -88,7 +86,7 @@ defmodule Credo.Check.Refactor.Nesting do
   defp find_depth(arguments, nest_list, line_no, trigger)
        when is_list(arguments) do
     arguments
-    |> CodeHelper.do_block_for!()
+    |> Credo.Code.Block.do_block_for!()
     |> List.wrap()
     |> Enum.map(&find_depth(&1, nest_list, line_no, trigger))
     |> Enum.sort()

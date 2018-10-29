@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.UseColors do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Output.UI

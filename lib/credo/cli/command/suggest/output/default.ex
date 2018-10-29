@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Suggest.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.Summary

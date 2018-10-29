@@ -1,4 +1,8 @@
 defmodule Credo.CLI.Filter do
+  @moduledoc false
+
+  # TODO: is this the right place for this module?
+
   alias Credo.Check.ConfigComment
   alias Credo.Execution
   alias Credo.Issue

@@ -1,6 +1,6 @@
 defmodule Credo.Code.Token do
   @moduledoc """
-  This module provides helper functions to analyse tokens.
+  This module provides helper functions to analyse tokens returned by `Credo.Code.to_tokens/1`.
   """
 
   @doc """

@@ -1,5 +1,7 @@
 defmodule Credo.Check.Refactor.UnlessWithElse do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   An `unless` block should not contain an else block.
 
   So while this is fine:
@@ -28,8 +30,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   case will be executed when the condition is met, which is the opposite of
   what the wording seems to apply.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 
@@ -45,7 +46,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   end
 
   defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
-    new_issue = issue_for_else_block(CodeHelper.else_block_for!(ast), meta, issue_meta)
+    new_issue = issue_for_else_block(Credo.Code.Block.else_block_for!(ast), meta, issue_meta)
 
     {ast, issues ++ List.wrap(new_issue)}
   end

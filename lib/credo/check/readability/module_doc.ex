@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.ModuleDoc do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Every module should contain comprehensive documentation.
 
       # preferred
@@ -32,9 +34,8 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   to make it clear that there is no intention in documenting it.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       ignore_names: "All modules matching this regex (or list of regexes) will be ignored."
     ]
@@ -45,9 +46,9 @@ defmodule Credo.Check.Readability.ModuleDoc do
     ]
   ]
 
-  alias Credo.Code.Module
-
   use Credo.Check
+
+  alias Credo.Code.Module
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
@@ -76,7 +77,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
        ) do
     mod_name = Module.name(ast)
 
-    if CodeHelper.matches?(mod_name, ignore_names) do
+    if matches_any?(mod_name, ignore_names) do
       {ast, {false, issues}}
     else
       exception? = Module.exception?(ast)
@@ -122,6 +123,18 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   defp traverse(ast, {continue, issues}, _issue_meta, _ignore_names) do
     {ast, {continue, issues}}
+  end
+
+  def matches_any?(name, list) when is_list(list) do
+    Enum.any?(list, &matches_any?(name, &1))
+  end
+
+  def matches_any?(name, string) when is_binary(string) do
+    String.contains?(name, string)
+  end
+
+  def matches_any?(name, regex) do
+    String.match?(name, regex)
   end
 
   defp issue_for(message, issue_meta, line_no, trigger) do

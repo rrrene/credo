@@ -3,8 +3,10 @@ defmodule Credo.Execution.Task do
 
   @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) :: Credo.Execution.t()
 
+  require Logger
+
   alias Credo.Execution
-  alias Credo.Execution.Monitor
+  alias Credo.Execution.ExecutionTiming
 
   defmacro __using__(_opts \\ []) do
     quote do
@@ -20,6 +22,8 @@ defmodule Credo.Execution.Task do
 
       def error(exec, _opts) do
         IO.warn("Execution halted during #{__MODULE__}!")
+
+        exec
       end
 
       defoverridable call: 2
@@ -34,7 +38,7 @@ defmodule Credo.Execution.Task do
   def run(task, exec, opts \\ [])
 
   def run(task, %Credo.Execution{debug: true} = exec, opts) do
-    Monitor.task(exec, task, opts, &do_run/3, [task, exec, opts])
+    run_with_timing(task, exec, opts)
   end
 
   def run(task, exec, opts) do
@@ -76,5 +80,57 @@ defmodule Credo.Execution.Task do
     )
 
     exec
+  end
+
+  #
+
+  defp run_with_timing(task, exec, opts) do
+    context_tuple = {:task, exec, task, opts}
+    log(:call_start, context_tuple)
+
+    {started_at, time, exec} = ExecutionTiming.run(&do_run/3, [task, exec, opts])
+
+    log(:call_end, context_tuple, time)
+
+    ExecutionTiming.append(exec, [task: task, parent_task: exec.parent_task], started_at, time)
+
+    exec
+  end
+
+  defp log(:call_start, {:task_group, _exec, task_group, _opts}) do
+    Logger.info("Calling #{task_group} ...")
+  end
+
+  defp log(:call_start, {:task, _exec, task, _opts}) do
+    Logger.info("Calling #{task} ...")
+  end
+
+  defp log(:call_start, context_tuple) do
+    Logger.info("Calling #{inspect(context_tuple)} ...")
+  end
+
+  defp log(:call_end, {:task_group, _exec, task_group, _opts}, time) do
+    Logger.info("Finished #{task_group} in #{format_time(time)} ...")
+  end
+
+  defp log(:call_end, {:task, _exec, task, _opts}, time) do
+    Logger.info("Finished #{task} in #{format_time(time)} ...")
+  end
+
+  defp log(:call_end, context_tuple, time) do
+    Logger.info("Finished #{inspect(context_tuple)} in #{format_time(time)} ...")
+  end
+
+  defp format_time(time) do
+    cond do
+      time > 1_000_000 ->
+        "#{div(time, 1_000_000)}s"
+
+      time > 1_000 ->
+        "#{div(time, 1_000)}ms"
+
+      true ->
+        "#{time}μs"
+    end
   end
 end

@@ -1,8 +1,8 @@
 defmodule Credo.Priority do
-  @moduledoc """
-  In Credo each Issue is given a priority to differentiate issues by a second
-  dimension next to their Category.
-  """
+  @moduledoc false
+
+  # In Credo each Issue is given a priority to differentiate issues by a second
+  # dimension next to their Category.
 
   alias Credo.Code.Module
   alias Credo.Code.Parameters

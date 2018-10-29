@@ -1,5 +1,7 @@
 defmodule Credo.Check.Consistency.ParameterPatternMatching do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   When capturing a parameter using pattern matching you can either put the name before or after the value
   i.e.
 
@@ -12,9 +14,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
-
-  @explanation [check: @moduledoc]
-
+  @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.ParameterPatternMatching.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high

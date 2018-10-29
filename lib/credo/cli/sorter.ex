@@ -1,4 +1,8 @@
 defmodule Credo.CLI.Sorter do
+  @moduledoc false
+
+  # TODO: is this the right place for this module?
+
   def ensure(list, list_start, list_end \\ []) do
     list
     |> to_start(list_start)

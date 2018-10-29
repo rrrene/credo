@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.LargeNumbers do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Numbers can contain underscores for readability purposes.
   These do not affect the value of the number, but can help read large numbers
   more easily.
@@ -12,9 +14,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       only_greater_than: "The check only reports numbers greater than this."
     ]

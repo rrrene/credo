@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Info.InfoOutput do
+  @moduledoc false
+
   use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.Info.Output.Default,
     json: Credo.CLI.Command.Info.Output.Json

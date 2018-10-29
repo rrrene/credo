@@ -98,6 +98,18 @@ defmodule Credo.CLI.Output do
     end
   end
 
+  @doc """
+  Returns a suitable foreground color for a given `background_color`.
+
+      iex> Credo.CLI.Output.foreground_color(:yellow)
+      :black
+
+      iex> Credo.CLI.Output.foreground_color(:blue)
+      :white
+
+  """
+  def foreground_color(background_color)
+
   def foreground_color(:cyan), do: :black
   def foreground_color(:yellow), do: :black
   def foreground_color(_), do: :white
@@ -126,7 +138,7 @@ defmodule Credo.CLI.Output do
       "Some source files could not be parsed correctly and are excluded:\n"
     ]
 
-    UI.puts(output)
+    UI.warn(output)
 
     print_numbered_list(invalid_source_filenames)
   end
@@ -145,7 +157,7 @@ defmodule Credo.CLI.Output do
       "Some source files were not parsed in the time allotted:\n"
     ]
 
-    UI.puts(output)
+    UI.warn(output)
 
     print_numbered_list(large_source_filenames)
   end
@@ -169,8 +181,8 @@ defmodule Credo.CLI.Output do
       "get the most out of Credo!\n"
     ]
 
-    UI.puts()
-    UI.puts(msg)
+    UI.warn("")
+    UI.warn(msg)
 
     skipped_checks
     |> Enum.map(&check_name/1)
@@ -196,6 +208,6 @@ defmodule Credo.CLI.Output do
         " #{string}\n"
       ]
     end)
-    |> UI.puts()
+    |> UI.warn()
   end
 end

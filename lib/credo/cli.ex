@@ -18,7 +18,8 @@ defmodule Credo.CLI do
   def main(argv) do
     Credo.Application.start(nil, nil)
 
-    %Execution{argv: argv}
+    argv
+    |> Execution.build()
     |> MainProcess.call()
     |> WriteDebugReport.call([])
     |> halt_if_exit_status_assigned()
