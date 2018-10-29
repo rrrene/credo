@@ -33,7 +33,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     """
 
     assert rounded_abc_size(source) == 1.0
-  end  
+  end
 
   test "it should return the correct ABC size for value assignment" do
     source = """
