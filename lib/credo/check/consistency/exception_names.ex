@@ -1,5 +1,7 @@
 defmodule Credo.Check.Consistency.ExceptionNames do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Exception names should end with a common suffix like "Error".
 
   Try to name your exception modules consistently:
@@ -25,9 +27,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   While this is not necessarily a concern for the correctness of your code,
   you should use a consistent style throughout your codebase.
   """
-
-  @explanation [check: @moduledoc]
-
+  @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.ExceptionNames.Collector
 
   use Credo.Check, run_on_all: true, base_priority: :high

@@ -1,7 +1,7 @@
 defmodule Credo.Backports.Enum do
   @moduledoc """
-  This module provides Enum functions which are not supported in all Elixir
-  versions supported by Credo.
+  This module provides functions from the `Enum` module which are not supported
+  in all Elixir versions supported by Credo.
   """
 
   @doc """

@@ -1,5 +1,7 @@
 defmodule Credo.Check.Design.DuplicatedCode do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Code should not be copy-pasted in a codebase when there is room to abstract
   the copied functionality in a meaningful way.
 
@@ -17,9 +19,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
   Like all `Software Design` issues, this is just advice and might not be
   applicable to your project/situation.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       mass_threshold:
         "The minimum mass which a part of code has to have to qualify for this check.",
@@ -33,11 +34,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
     excluded_macros: []
   ]
 
-  alias Credo.Check.CodeHelper
-  alias Credo.Issue
-  alias Credo.SourceFile
-
   use Credo.Check, run_on_all: true, base_priority: :higher
+
+  alias Credo.SourceFile
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
@@ -46,49 +45,34 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
     source_files
     |> duplicate_nodes(mass_threshold)
-    |> append_issues_via_issue_service(
-      source_files,
-      nodes_threshold,
-      params,
-      exec
-    )
+    |> append_issues_via_issue_service(source_files, nodes_threshold, params, exec)
 
     :ok
   end
 
-  defp append_issues_via_issue_service(
-         found_hashes,
-         source_files,
-         nodes_threshold,
-         params,
-         exec
-       )
+  defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec)
        when is_map(found_hashes) do
     Enum.each(found_hashes, fn {_hash, nodes} ->
       filenames = Enum.map(nodes, & &1.filename)
 
-      Enum.each(source_files, fn source_file ->
-        if Enum.member?(filenames, source_file.filename) do
-          this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
-          other_nodes = List.delete(nodes, this_node)
-
-          issue_meta = IssueMeta.for(source_file, params)
-
-          issue =
-            issue_for(
-              issue_meta,
-              this_node,
-              other_nodes,
-              nodes_threshold,
-              params
-            )
-
-          if issue do
-            Credo.Execution.Issues.append(exec, source_file, issue)
-          end
-        end
-      end)
+      Enum.each(
+        source_files,
+        &new_issue_for_members(filenames, &1, nodes_threshold, nodes, params, exec)
+      )
     end)
+  end
+
+  defp new_issue_for_members(filenames, source_file, nodes_threshold, nodes, params, exec) do
+    if Enum.member?(filenames, source_file.filename) do
+      this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
+      other_nodes = List.delete(nodes, this_node)
+      issue_meta = IssueMeta.for(source_file, params)
+      issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
+
+      if issue do
+        Credo.Execution.ExecutionIssues.append(exec, source_file, issue)
+      end
+    end
   end
 
   defp duplicate_nodes(source_files, mass_threshold) do
@@ -149,7 +133,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp collect_subhashes({_hash, node_items}, mass_threshold) do
     %{node: first_node, filename: filename} = Enum.at(node_items, 0)
 
-    my_hash = first_node |> CodeHelper.remove_metadata() |> to_hash
+    my_hash = first_node |> Credo.Code.remove_metadata() |> to_hash
     # don't count self
     subhashes =
       first_node
@@ -183,7 +167,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     if mass(ast) < mass_threshold do
       {ast, acc}
     else
-      hash = ast |> CodeHelper.remove_metadata() |> to_hash
+      hash = ast |> Credo.Code.remove_metadata() |> to_hash
       node_item = %{node: ast, filename: filename, mass: nil}
       node_items = Map.get(acc, hash, [])
       acc = Map.put(acc, hash, node_items ++ [node_item])
@@ -282,7 +266,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   def line_no_for(block) do
     block
-    |> CodeHelper.do_block_for!()
+    |> Credo.Code.Block.do_block_for!()
     |> line_no_for
   end
 end

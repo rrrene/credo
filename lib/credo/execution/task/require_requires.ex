@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.RequireRequires do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.Sources

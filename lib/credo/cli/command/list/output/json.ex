@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.List.Output.Json do
+  @moduledoc false
+
   alias Credo.CLI.Output.Formatter.JSON
   alias Credo.Execution
 

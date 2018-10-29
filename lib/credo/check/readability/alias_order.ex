@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.AliasOrder do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Alphabetically ordered lists are more easily scannable by the read.
 
       # preferred
@@ -36,13 +38,12 @@ defmodule Credo.Check.Readability.AliasOrder do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
+  @explanation [check: @checkdoc]
 
-  @explanation [check: @moduledoc]
+  use Credo.Check, base_priority: :low
 
   alias Credo.Code
   alias Credo.Code.Name
-
-  use Credo.Check, base_priority: :low
 
   @doc false
   def run(source_file, params \\ []) do
@@ -86,7 +87,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     issue_opts =
       cond do
         inner_group_order_issue(mod_list_first) ->
-          issue_opts(line_no1, mod_list_second)
+          issue_opts(line_no1, mod_list_first)
 
         inner_group_order_issue(mod_list_second) ->
           issue_opts(line_no2, mod_list_second)

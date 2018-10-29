@@ -1,5 +1,7 @@
 defmodule Credo.Check.Refactor.DoubleBooleanNegation do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Having double negations in your code obscures a parameters original value.
 
       # NOT preferred
@@ -30,8 +32,7 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
 
   This makes your code more explicit than relying on the implications of `!!`.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :low
 

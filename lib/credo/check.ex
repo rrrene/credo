@@ -47,10 +47,11 @@ defmodule Credo.Check do
   }
 
   alias Credo.Check
-  alias Credo.Check.CodeHelper
+  alias Credo.Code.Scope
   alias Credo.Issue
   alias Credo.IssueMeta
   alias Credo.Priority
+  alias Credo.Service.SourceFileScopes
   alias Credo.Severity
   alias Credo.SourceFile
 
@@ -202,7 +203,7 @@ defmodule Credo.Check do
 
   defp add_line_no_options(issue, line_no, source_file) do
     if line_no do
-      {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
+      {_def, scope} = scope_for(source_file, line: line_no)
 
       %Issue{
         issue
@@ -211,6 +212,54 @@ defmodule Credo.Check do
       }
     else
       issue
+    end
+  end
+
+  # Returns the scope for the given line as a tuple consisting of the call to
+  # define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
+  # name of the scope.
+  #
+  # Examples:
+  #
+  #     {:defmodule, "Foo.Bar"}
+  #     {:def, "Foo.Bar.baz"}
+  defp scope_for(source_file, line: line_no) do
+    source_file
+    |> scope_list
+    |> Enum.at(line_no - 1)
+  end
+
+  # Returns all scopes for the given source_file per line of source code as tuple
+  # consisting of the call to define the scope
+  # (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the name of the scope.
+  #
+  # Examples:
+  #
+  #     [
+  #       {:defmodule, "Foo.Bar"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:defmodule, "Foo.Bar"}
+  #     ]
+  defp scope_list(%SourceFile{filename: filename} = source_file) do
+    case SourceFileScopes.get(filename) do
+      {:ok, value} ->
+        value
+
+      :notfound ->
+        ast = SourceFile.ast(source_file)
+        lines = SourceFile.lines(source_file)
+
+        result =
+          Enum.map(lines, fn {line_no, _} ->
+            Scope.name(ast, line: line_no)
+          end)
+
+        SourceFileScopes.put(filename, result)
+
+        result
     end
   end
 

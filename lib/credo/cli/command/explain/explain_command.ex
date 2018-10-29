@@ -1,8 +1,9 @@
 defmodule Credo.CLI.Command.Explain.ExplainCommand do
-  use Credo.CLI.Command
+  @moduledoc false
 
   @shortdoc "Show code object and explain why it is/might be an issue"
-  @moduledoc @shortdoc
+
+  use Credo.CLI.Command
 
   alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output

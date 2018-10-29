@@ -1,5 +1,5 @@
 defmodule Credo.Issue do
-  @doc """
+  @moduledoc """
   `Issue` structs represent all issues found during the code analysis.
   """
 

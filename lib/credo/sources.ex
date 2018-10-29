@@ -1,4 +1,8 @@
 defmodule Credo.Sources do
+  @moduledoc """
+  This module is used to find and read all source files for analysis.
+  """
+
   alias Credo.SourceFile
 
   @default_sources_glob ~w(** *.{ex,exs})
@@ -11,10 +15,12 @@ defmodule Credo.Sources do
   patterns. For `included`, patterns can be file paths, directory paths and globs.
   For `excluded`, patterns can also be specified as regular expressions.
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: [~r/messy/], included: ["lib/mix", "root.ex"]}})
   """
+  def find(exec)
+
   def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename
     |> source_file_from_stdin()

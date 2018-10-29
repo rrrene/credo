@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Explain.ExplainOutput do
+  @moduledoc false
+
   alias Credo.CLI.Output.UI
 
   alias Credo.CLI.Command.Explain.Output.Default

@@ -174,7 +174,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
               severity: severity
             }
             if line_no do
-              {_def, scope} = CodeHelper.scope_for(source_file.ast, line: line_no)
+              {_def, scope} = Credo.Code.scope_for(source_file.ast, line: line_no)
               issue =
                 %Issue{
                   issue |

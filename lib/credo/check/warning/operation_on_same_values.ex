@@ -1,5 +1,7 @@
 defmodule Credo.Check.Warning.OperationOnSameValues do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Operations on the same values always yield the same result and therefore make
   little sense in production code.
 
@@ -16,9 +18,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   In practice they are likely the result of a debugging session or were made by
   mistake.
   """
-
-  @explanation [check: @moduledoc]
-
+  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
   @ops ~w(== >= <= != > < / -)a
   @ops_and_constant_results [
@@ -56,7 +56,7 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   for {op, operation_name, constant_result} <- @ops_and_constant_results do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
       if variable_or_mod_attribute?(lhs) &&
-           CodeHelper.remove_metadata(lhs) == CodeHelper.remove_metadata(rhs) do
+           Credo.Code.remove_metadata(lhs) == Credo.Code.remove_metadata(rhs) do
         new_issue =
           issue_for(
             issue_meta,
