@@ -242,6 +242,6 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
 
-    assert rounded_abc_size(source, ["where", "join", "select", "distinct"]) == 1
+    assert rounded_abc_size(source, [:where, :join, :select, :distinct]) == 1
   end
 end

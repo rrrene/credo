@@ -104,10 +104,15 @@ defmodule Credo.Check.Refactor.ABCSize do
   def abc_size_for(nil, _arguments, _excluded_functions), do: 0
 
   def abc_size_for(ast, arguments, excluded_functions) do
-    initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
+    initial_acc = [a: 0, b: 0, c: 0, scope: [], depth: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] =
-      Credo.Code.prewalk(ast, &traverse_abc(&1, &2, excluded_functions), initial_acc)
+    {_ast, [a: a, b: b, c: c, scope: [], depth: 0, var_names: _]} =
+      Macro.traverse(
+        ast,
+        initial_acc,
+        &prewalk_abc(&1, &2, excluded_functions),
+        &postwalk_abc(&1, &2, excluded_functions)
+      )
 
     :math.sqrt(a * a + b * b + c * c)
   end
@@ -122,22 +127,27 @@ defmodule Credo.Check.Refactor.ABCSize do
     end
   end
 
+  # PREWALKS
+  #
+  # Here we count points and push function calls on scope.
+  # If we are inside an excluded scope we do not count points.
+
   for op <- @def_ops do
-    defp traverse_abc({unquote(op), _, arguments} = ast, abc, _excluded_functions)
+    defp prewalk_abc({unquote(op), _, arguments} = ast, abc, _excluded_functions)
          when is_list(arguments) do
       {ast, abc}
     end
   end
 
   # Ignore string interpolation
-  defp traverse_abc({:<<>>, _, _}, acc, _excluded_functions) do
+  defp prewalk_abc({:<<>>, _, _}, acc, _excluded_functions) do
     {nil, acc}
   end
 
   # A - assignments
-  defp traverse_abc(
+  defp prewalk_abc(
          {:=, _meta, [lhs | rhs]},
-         [a: a, b: b, c: c, var_names: var_names],
+         [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
          _excluded_functions
        ) do
     var_names =
@@ -152,75 +162,153 @@ defmodule Credo.Check.Refactor.ABCSize do
           Enum.into(var_names, [name])
       end
 
-    {rhs, [a: a + 1, b: b, c: c, var_names: var_names]}
+    {rhs, [a: a + 1, b: b, c: c, scope: scope, depth: depth, var_names: var_names]}
   end
 
   # B - branch
-  defp traverse_abc(
+  defp prewalk_abc(
          {:->, _meta, arguments} = ast,
-         [a: a, b: b, c: c, var_names: var_names],
+         [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
          _excluded_functions
        ) do
     var_names = Enum.into(var_names, fn_parameters(arguments))
-    {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
+    {ast, [a: a, b: b + 1, c: c, scope: scope, depth: depth, var_names: var_names]}
   end
 
   for op <- @branch_ops do
-    defp traverse_abc(
+    defp prewalk_abc(
            {unquote(op), _meta, [{_, _, nil}, _] = arguments} = ast,
-           [a: a, b: b, c: c, var_names: var_names],
+           [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
            _excluded_functions
          )
          when is_list(arguments) do
-      {ast, [a: a, b: b, c: c, var_names: var_names]}
+      {ast, [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names]}
     end
 
-    defp traverse_abc(
+    defp prewalk_abc(
            {unquote(op), _meta, arguments} = ast,
-           [a: a, b: b, c: c, var_names: var_names],
+           [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
            _excluded_functions
          )
          when is_list(arguments) do
-      {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
+      {ast, [a: a, b: b + 1, c: c, scope: scope, depth: depth, var_names: var_names]}
     end
   end
 
-  defp traverse_abc(
+  defp prewalk_abc(
          {fun_or_var_name, _meta, nil} = ast,
-         [a: a, b: b, c: c, var_names: var_names],
-         _excluded_functions
+         [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names] = acc,
+         excluded_functions
        ) do
-    is_variable = Enum.member?(var_names, fun_or_var_name)
+    unless Enum.any?(excluded_functions, &Enum.member?(scope, &1)) do
+      is_variable = Enum.member?(var_names, fun_or_var_name)
 
-    if is_variable do
-      {ast, [a: a, b: b, c: c, var_names: var_names]}
+      if is_variable do
+        {ast, [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names]}
+      else
+        {ast, [a: a, b: b + 1, c: c, scope: scope, depth: depth, var_names: var_names]}
+      end
     else
-      {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
+      {ast, acc}
     end
   end
 
   # C - conditions
   for op <- @condition_ops do
-    defp traverse_abc(
+    defp prewalk_abc(
            {unquote(op), _meta, arguments} = ast,
-           [a: a, b: b, c: c, var_names: var_names],
-           _excluded_functions
+           [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names] = acc,
+           excluded_functions
          )
          when is_list(arguments) do
-      {ast, [a: a, b: b, c: c + 1, var_names: var_names]}
+      unless Enum.any?(excluded_functions, &Enum.member?(scope, &1)) do
+        {ast, [a: a, b: b, c: c + 1, scope: scope, depth: depth, var_names: var_names]}
+      else
+        {ast, acc}
+      end
     end
   end
 
-  defp traverse_abc({fun_name, _meta, arguments} = ast, abc, excluded_functions)
+  defp prewalk_abc(
+         {fun_name, _meta, arguments} = ast,
+         [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
+         _excluded_functions
+       )
        when is_atom(fun_name) and is_list(arguments) do
-    if Enum.member?(excluded_functions, to_string(fun_name)) do
-      {nil, abc}
-    else
+    {ast, [a: a, b: b, c: c, scope: [fun_name | scope], depth: depth + 1, var_names: var_names]}
+  end
+
+  defp prewalk_abc(ast, abc, _excluded_functions) do
+    {ast, abc}
+  end
+
+  # POST WALKS
+  #
+  # Here what we need to do is basically pop functions from the scope.
+  # Any case that pushes into the stack must be handled here as a pop.
+  # We do 2 checks after the traversal: depth == 0 and scope == []
+
+  for op <- @def_ops do
+    defp postwalk_abc({unquote(op), _, arguments} = ast, abc, _excluded_functions)
+         when is_list(arguments) do
       {ast, abc}
     end
   end
 
-  defp traverse_abc(ast, abc, _excluded_functions) do
+  # Ignore string interpolation
+  defp postwalk_abc({:<<>>, _, _}, acc, _excluded_functions) do
+    {nil, acc}
+  end
+
+  # A - assignments
+  defp postwalk_abc({:=, _meta, _args} = ast, acc, _excluded_functions) do
+    {ast, acc}
+  end
+
+  # B - branch
+  defp postwalk_abc({:->, _meta, _args} = ast, acc, _excluded_functions) do
+    {ast, acc}
+  end
+
+  for op <- @branch_ops do
+    defp postwalk_abc(
+           {unquote(op), _meta, [{_, _, nil}, arguments]} = ast,
+           acc,
+           _excluded_functions
+         )
+         when is_list(arguments) do
+      {ast, acc}
+    end
+
+    defp postwalk_abc({unquote(op), _meta, arguments} = ast, acc, _excluded_functions)
+         when is_list(arguments) do
+      {ast, acc}
+    end
+  end
+
+  defp postwalk_abc({_fun_or_var_name, _meta, nil} = ast, acc, _excluded_functions) do
+    {ast, acc}
+  end
+
+  # C - conditions
+  for op <- @condition_ops do
+    defp postwalk_abc({unquote(op), _meta, arguments} = ast, acc, _excluded_functions)
+         when is_list(arguments) do
+      {ast, acc}
+    end
+  end
+
+  # This is the case where we need to pop things off the scope.
+  defp postwalk_abc(
+         {fun_name, _meta, arguments} = ast,
+         [a: a, b: b, c: c, scope: scope, depth: depth, var_names: var_names],
+         _excluded_functions
+       )
+       when is_atom(fun_name) and is_list(arguments) do
+    {ast, [a: a, b: b, c: c, scope: tl(scope), depth: depth - 1, var_names: var_names]}
+  end
+
+  defp postwalk_abc(ast, abc, _excluded_functions) do
     {ast, abc}
   end
 
