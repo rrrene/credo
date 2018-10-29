@@ -21,7 +21,16 @@ defmodule Credo.Check.Refactor.ABCSize do
   ]
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
-  @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
+  @condition_ops [:if, :else, :unless, :for, :try, :case, :cond, :and, :or, :&&]
+  @non_calls @condition_ops ++
+               [
+                 :__aliases__,
+                 :fn,
+                 :__block__,
+                 :|>,
+                 :==,
+                 :%{}
+               ]
 
   use Credo.Check
 
@@ -94,7 +103,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   def abc_size_for(ast, arguments) do
     initial_acc = [a: 0, b: 0, c: 0, var_names: get_parameters(arguments)]
 
-    [a: a, b: b, c: c, var_names: _] = Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
+    [a: a, b: b, c: c, var_names: _] =
+      Credo.Code.prewalk(ast, &traverse_abc/2, initial_acc)
 
     :math.sqrt(a * a + b * b + c * c)
   end
@@ -178,6 +188,17 @@ defmodule Credo.Check.Refactor.ABCSize do
          when is_list(arguments) do
       {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
     end
+  end
+
+  defp traverse_abc(
+         {fun_or_var_name, _meta, args} = ast,
+         a: a,
+         b: b,
+         c: c,
+         var_names: var_names
+       )
+       when is_atom(fun_or_var_name) and fun_or_var_name not in @non_calls and is_list(args) do
+    {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
   end
 
   defp traverse_abc(
