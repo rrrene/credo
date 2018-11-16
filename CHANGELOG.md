@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-rc1
+## 1.0.0
 
 - Improve documentation
 - Add error handling for malformed config files
@@ -8,7 +8,6 @@
 - Fix false positive for charlists in PipeChainStart
 - Remove deprecated --one-line switch
 - Deactivate checks `DuplicatedCode` and `DoubleBooleanNegation` by default
-
 
 ### BREAKING CHANGES
 
