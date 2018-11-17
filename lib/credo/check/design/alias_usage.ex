@@ -71,127 +71,124 @@ defmodule Credo.Check.Design.AliasUsage do
     issue_meta = IssueMeta.for(source_file, params)
 
     excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
-
     excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
-
     if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
-
     if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
 
-    source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
+    fragments = load_or_get_fragments(source_file)
+
+    fragments
+    |> Enum.reduce(
+      [],
+      &fragment_to_issue(
+        &1,
+        &2,
+        issue_meta,
+        excluded_namespaces,
+        excluded_lastnames
+      )
+    )
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end
 
-  defp traverse(
-         {:defmodule, _, _} = ast,
-         issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames
-       ) do
+  defp load_or_get_fragments(source_file) do
+    case Credo.Fragment.load(source_file) do
+      {:ok, _meta, fragments} ->
+        fragments
+
+      _ ->
+        fragments = Credo.Code.prewalk(source_file, &traverse/2)
+
+        Credo.Fragment.save(source_file, [], fragments)
+
+        fragments
+    end
+  end
+
+  defp traverse({:defmodule, _, _} = ast, issues) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
 
-    new_issues =
-      Credo.Code.prewalk(
-        ast,
-        &find_issues(
-          &1,
-          &2,
-          issue_meta,
-          excluded_namespaces,
-          excluded_lastnames,
-          aliases,
-          mod_deps
-        )
-      )
+    fragments = Credo.Code.prewalk(ast, &find_fragments(&1, &2, aliases, mod_deps))
 
-    {ast, issues ++ new_issues}
+    {ast, issues ++ fragments}
   end
 
-  defp traverse(
-         ast,
-         issues,
-         _source_file,
-         _excluded_namespaces,
-         _excluded_lastnames
-       ) do
+  defp traverse(ast, issues) do
     {ast, issues}
   end
 
   # Ignore module attributes
-  defp find_issues({:@, _, _}, issues, _, _, _, _, _) do
+  defp find_fragments({:@, _, _}, issues, _aliases, _mod_deps) do
     {nil, issues}
   end
 
   # Ignore multi alias call
-  defp find_issues(
-         {:., _, [{:__aliases__, _, _}, :{}]} = ast,
-         issues,
-         _,
-         _,
-         _,
-         _,
-         _
-       ) do
+  defp find_fragments({:., _, [{:__aliases__, _, _}, :{}]} = ast, issues, _aliases, _mod_deps) do
     {ast, issues}
   end
 
   # Ignore alias containg an `unquote` call
-  defp find_issues(
+  defp find_fragments(
          {:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast,
          issues,
-         _,
-         _,
-         _,
-         _,
-         _
+         _aliases,
+         _mod_deps
        )
        when is_list(mod_list) do
     {ast, issues}
   end
 
-  defp find_issues(
+  defp find_fragments(
          {:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast,
          issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames,
          aliases,
          mod_deps
        )
        when is_list(mod_list) and is_atom(fun_atom) do
+    fragment = {mod_list, meta[:line], aliases, mod_deps}
+
+    {ast, issues ++ [fragment]}
+  end
+
+  defp find_fragments(ast, issues, _aliases, _mod_deps) do
+    {ast, issues}
+  end
+
+  defp fragment_to_issue(
+         {mod_list, line_no, aliases, mod_deps},
+         issues,
+         issue_meta,
+         excluded_namespaces,
+         excluded_lastnames
+       )
+       when is_list(mod_list) do
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
-        {ast, issues}
+        issues
 
       Enum.any?(mod_list, &unquote?/1) ->
-        {ast, issues}
+        issues
 
       excluded_lastname_or_namespace?(
         mod_list,
         excluded_namespaces,
         excluded_lastnames
       ) ->
-        {ast, issues}
+        issues
 
       conflicting_with_aliases?(mod_list, aliases) ->
-        {ast, issues}
+        issues
 
       conflicting_with_other_modules?(mod_list, mod_deps) ->
-        {ast, issues}
+        issues
 
       true ->
         trigger = Enum.join(mod_list, ".")
 
-        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
+        issues ++ [issue_for(issue_meta, line_no, trigger)]
     end
-  end
-
-  defp find_issues(ast, issues, _, _, _, _, _) do
-    {ast, issues}
   end
 
   defp unquote?({:unquote, _, arguments}) when is_list(arguments), do: true
