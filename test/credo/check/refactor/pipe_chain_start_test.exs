@@ -304,6 +304,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> refute_issues(@described_check, excluded_argument_types: [:fn])
   end
 
+  test "it should NOT report a violation for an excluded argument type /6" do
+    """
+    max(0, interval - elapsed_time) |> schedule_events()
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, excluded_argument_types: [:number])
+  end
+
   #
   # cases raising issues
   #
