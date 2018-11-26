@@ -15,7 +15,7 @@ defmodule Credo.Check.Consistency.Collector do
         def run(source_files, exec, params) when is_list(source_files) do
           issue_formatter = &issues_for/3
 
-          @collector.find_and_append_issues(source_files, exec, params, issue_formatter)
+          @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
         end
 
         defp issues_for(expected, source_file, params) do
