@@ -3,7 +3,8 @@ defmodule Credo.CLI.Command.List.ListOutput do
     default: Credo.CLI.Command.List.Output.Default,
     flycheck: Credo.CLI.Command.List.Output.FlyCheck,
     oneline: Credo.CLI.Command.List.Output.Oneline,
-    json: Credo.CLI.Command.List.Output.Json
+    json: Credo.CLI.Command.List.Output.Json,
+    codeclimate: Credo.CLI.Command.List.Output.Codeclimate
 
   alias Credo.CLI.Output.UI
 
@@ -34,7 +35,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
           --config-file       Use the given config file
       -C, --config-name       Use the given config instead of "default"
       -i, --ignore-checks     Ignore checks that match the given strings
-          --format            Display the list in a specific format (oneline,flycheck)
+          --format            Display the list in a specific format (oneline,flycheck,codeclimate)
           --mute-exit-status  Exit with status zero even if there are issues
 
     General options:

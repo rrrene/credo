@@ -3,7 +3,8 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
     default: Credo.CLI.Command.Suggest.Output.Default,
     flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
     oneline: Credo.CLI.Command.Suggest.Output.Oneline,
-    json: Credo.CLI.Command.Suggest.Output.Json
+    json: Credo.CLI.Command.Suggest.Output.Json,
+    codeclimate: Credo.CLI.Command.Suggest.Output.Codeclimate
 
   alias Credo.CLI.Output.UI
 
@@ -34,7 +35,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
           --config-file       Use the given config file
       -C, --config-name       Use the given config instead of "default"
       -i, --ignore-checks     Ignore checks that match the given strings
-          --format            Display the list in a specific format (oneline,flycheck)
+          --format            Display the list in a specific format (oneline,flycheck,codeclimate)
           --mute-exit-status  Exit with status zero even if there are issues
 
     General options:

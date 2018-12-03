@@ -30,6 +30,10 @@ defmodule Credo.CLI.Output.Summary do
     nil
   end
 
+  def print(_source_files, %Execution{format: "codeclimate"}, _time_load, _time_run) do
+    nil
+  end
+
   def print(source_files, exec, time_load, time_run) do
     issues = Execution.get_issues(exec)
 

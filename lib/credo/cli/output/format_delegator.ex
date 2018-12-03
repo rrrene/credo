@@ -9,7 +9,8 @@ defmodule Credo.CLI.Output.FormatDelegator do
         default: Credo.CLI.Command.Suggest.Output.Default,
         flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
         oneline: Credo.CLI.Command.Suggest.Output.Oneline,
-        json: Credo.CLI.Command.Suggest.Output.Json
+        json: Credo.CLI.Command.Suggest.Output.Json,
+        codeclimate: Credo.CLI.Command.Suggest.Output.Codeclimate
 
   """
 
