@@ -14,6 +14,7 @@ defmodule Credo.Service.Commands do
     "info" => Credo.CLI.Command.Info.InfoCommand,
     "list" => Credo.CLI.Command.List.ListCommand,
     "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
+    "report_card" => Credo.CLI.Command.ReportCard.ReportCardCommand,
     "version" => Credo.CLI.Command.Version
   }
 
