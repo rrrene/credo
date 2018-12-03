@@ -34,7 +34,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
           column: column,
           filename: filename,
           priority: priority
-        },
+        } = issue,
         path
       ) do
     %{
@@ -42,7 +42,7 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
       categories: categories(check),
       check_name: check_name(check),
       description: message,
-      remediation_points: 50_000,
+      remediation_points: remediation_points_for(issue),
       severity: severity(priority),
       content: %{
         body: check.explanation
@@ -75,6 +75,10 @@ defmodule Credo.CLI.Output.Formatter.Codeclimate do
     |> Macro.underscore()
     |> String.replace("_", " ")
     |> String.capitalize()
+  end
+
+  def remediation_points_for(issue) do
+    issue.severity
   end
 
   defp severity(priority) do
