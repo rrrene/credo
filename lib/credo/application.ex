@@ -12,7 +12,8 @@ defmodule Credo.Application do
       worker(Credo.Service.SourceFileScopes, []),
       worker(Credo.Service.SourceFileAST, []),
       worker(Credo.Service.SourceFileLines, []),
-      worker(Credo.Service.SourceFileSource, [])
+      worker(Credo.Service.SourceFileSource, []),
+      worker(Credo.Service.ExcoverallsMissingCoverage, [])
     ]
 
     opts = [strategy: :one_for_one, name: Credo.Supervisor]
