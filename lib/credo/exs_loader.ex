@@ -73,7 +73,9 @@ defmodule Credo.ExsLoader do
 
   defp process_exs({:__aliases__, _meta, name_list}) do
     raise ArgumentError,
-          "Custom checks and executable configuration are disabled in safe mode: #{Module.concat(name_list)}"
+          "Custom checks and executable configuration are disabled in safe mode: #{
+            Module.concat(name_list)
+          }"
   end
 
   defp process_exs({{:__aliases__, _meta, name_list = [:Credo, :Check | _]}, options}) do
@@ -81,7 +83,8 @@ defmodule Credo.ExsLoader do
   end
 
   defp process_exs({{:__aliases__, _meta, _name_list} = tuple, _options}) do
-    process_exs(tuple) # get the error response for this alias
+    # get the error response for this alias
+    process_exs(tuple)
   end
 
   defp process_exs({key, value}) when is_atom(key) or is_binary(key) do

@@ -131,7 +131,7 @@ defmodule Credo.ExsLoaderTest do
     expected_safe = %{
       configs: [
         %{
-          name: "default",
+          name: "default"
         }
       ]
     }
@@ -161,7 +161,7 @@ defmodule Credo.ExsLoaderTest do
           name: "default",
           checks: [
             {Credo.Check.Style.MaxLineLength, priority: :low, max_length: 100},
-            {MyModule.MyCheck.Style.TrailingBlankLine},
+            {MyModule.MyCheck.Style.TrailingBlankLine}
           ]
         }
       ]
@@ -170,5 +170,4 @@ defmodule Credo.ExsLoaderTest do
     assert {:error, %ArgumentError{}} = Credo.ExsLoader.parse(exs_string, true)
     assert {:ok, expected} == Credo.ExsLoader.parse(exs_string)
   end
-
 end
