@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.LargeNumbers do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Numbers can contain underscores for readability purposes.
   These do not affect the value of the number, but can help read large numbers
   more easily.
@@ -12,9 +14,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
   But you can improve the odds of others reading and liking your code by making
   it easier to follow.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       only_greater_than: "The check only reports numbers greater than this."
     ]
@@ -170,13 +171,15 @@ defmodule Credo.Check.Readability.LargeNumbers do
       |> SourceFile.line_at(line_no)
 
     beginning_of_number =
-      Regex.run(~r/[^0-9_oxb]*([0-9_oxb]+$)/, String.slice(line, 1..column1))
+      ~r/[^0-9_oxb]*([0-9_oxb]+$)/
+      |> Regex.run(String.slice(line, 1..column1))
       |> List.wrap()
       |> List.last()
       |> to_string()
 
     ending_of_number =
-      Regex.run(~r/^([0-9_\.]+)/, String.slice(line, (column1 + 1)..-1))
+      ~r/^([0-9_\.]+)/
+      |> Regex.run(String.slice(line, (column1 + 1)..-1))
       |> List.wrap()
       |> List.last()
       |> to_string()

@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.DetermineCommand do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Options

@@ -47,7 +47,7 @@ defmodule Credo.Check.Consistency.Collector do
   `find_locations_not_matching/2`, and `issue_formatter`.
   """
 
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.Issue
   alias Credo.SourceFile
 
@@ -154,7 +154,7 @@ defmodule Credo.Check.Consistency.Collector do
   end
 
   def append_issue_via_issue_service(%Issue{filename: filename} = issue, exec) do
-    Issues.append(exec, %SourceFile{filename: filename}, issue)
+    ExecutionIssues.append(exec, %SourceFile{filename: filename}, issue)
   end
 
   defp files_with_issues(frequencies_per_file, most_frequent_match) do

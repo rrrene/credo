@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.AssignExitStatusForIssues do
+  @moduledoc false
+
   use Credo.Execution.Task
   use Bitwise
 

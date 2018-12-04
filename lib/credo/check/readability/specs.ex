@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.Specs do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Functions, callbacks and macros need typespecs.
 
   Adding typespecs gives tools like Dialyzer more information when performing
@@ -18,8 +20,7 @@ defmodule Credo.Check.Readability.Specs do
   The check only considers whether the specification is present, it doesn't
   perform any actual type checking.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check
 

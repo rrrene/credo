@@ -1,8 +1,33 @@
 # Changelog
 
+## 1.0.0
+
+- Improve documentation
+- Add error handling for malformed config files
+- Write all warnings to `:stderr`
+- Fix false positive for charlists in PipeChainStart
+- Remove deprecated --one-line switch
+- Deactivate checks `DuplicatedCode` and `DoubleBooleanNegation` by default
+
+### BREAKING CHANGES
+
+These changes concern people writing their own checks for Credo.
+
+- `Credo.Check.CodeHelper` was removed. Please use the corresponding functions inside the `Credo.Code` namespace.
+
+## 0.10.2
+
+- Fix bug in AliasOrder
+
 ## 0.10.1
 
 - Fixed "unnecessary atom quotes" compiler warning during analysis
+- Handle timeouts when reading source files
+- Ignore function calls for OperationOnSameValues
+- Do not treat `|>` as an operator in SpaceAroundOperators
+- Fix AliasOrder bug for multi alias statements
+- Fix multiple false positives for SpaceAroundOperators
+- ... and lots of important little fixes to issue messages, docs and the like!
 
 ## 0.10.0
 

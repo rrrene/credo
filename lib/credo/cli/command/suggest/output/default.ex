@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Suggest.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.Summary
@@ -62,16 +64,11 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       |> Enum.uniq()
 
     issue_map =
-      categories
-      |> Enum.map(fn category ->
+      Enum.into(categories, %{}, fn category ->
         {category, issues |> Enum.filter(&(&1.category == category))}
       end)
-      |> Enum.into(%{})
 
-    source_file_map =
-      source_files
-      |> Enum.map(&{&1.filename, &1})
-      |> Enum.into(%{})
+    source_file_map = Enum.into(source_files, %{}, &{&1.filename, &1})
 
     categories
     |> Sorter.ensure(@category_starting_order, @category_ending_order)

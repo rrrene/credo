@@ -38,7 +38,7 @@ defmodule CredoSourceFileCase do
 
   def to_source_file(source, filename) do
     case Credo.SourceFile.parse(source, filename) do
-      %{valid?: true} = source_file ->
+      %{status: :valid} = source_file ->
         source_file
 
       _ ->
@@ -54,7 +54,7 @@ end
 defmodule CredoCheckCase do
   use ExUnit.Case
 
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.SourceFile
 
   def refute_issues(source_file, check \\ nil, params \\ []) do
@@ -77,7 +77,7 @@ defmodule CredoCheckCase do
   def assert_issue(source_file, check \\ nil, params \\ [], callback \\ nil) do
     issues = issues_for(source_file, check, create_config(), params)
 
-    refute Enum.count(issues) == 0, "There should be one issue, got none."
+    refute Enum.empty?(issues), "There should be one issue, got none."
 
     assert Enum.count(issues) == 1,
            "There should be only 1 issue, got #{Enum.count(issues)}: #{to_inspected(issues)}"
@@ -163,12 +163,12 @@ defmodule CredoCheckCase do
 
   defp create_config do
     %Credo.Execution{}
-    |> Credo.Execution.SourceFiles.start_server()
-    |> Credo.Execution.Issues.start_server()
-    |> Credo.Execution.Timing.start_server()
+    |> Credo.Execution.ExecutionSourceFiles.start_server()
+    |> Credo.Execution.ExecutionIssues.start_server()
+    |> Credo.Execution.ExecutionTiming.start_server()
   end
 
   defp get_issues_from_source_file(source_file, exec) do
-    Issues.get(exec, source_file)
+    ExecutionIssues.get(exec, source_file)
   end
 end

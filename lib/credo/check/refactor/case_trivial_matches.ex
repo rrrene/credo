@@ -1,11 +1,12 @@
 defmodule Credo.Check.Refactor.CaseTrivialMatches do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   PLEASE NOTE: This check is deprecated as it might do more harm than good.
 
   Related discussion: https://github.com/rrrene/credo/issues/65
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check
 
@@ -19,7 +20,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   defp traverse({:case, meta, arguments} = ast, issues, issue_meta) do
     cases =
       arguments
-      |> CodeHelper.do_block_for!()
+      |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
       |> Enum.map(&case_statement_for/1)
       |> Enum.sort()

@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Categories.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
 

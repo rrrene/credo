@@ -1,5 +1,7 @@
 defmodule Credo.Check.Design.TagFIXME do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   FIXME comments are used to indicate places where source code needs fixing.
 
   Example:
@@ -15,9 +17,8 @@ defmodule Credo.Check.Design.TagFIXME do
   Like all `Software Design` issues, this is just advice and might not be
   applicable to your project/situation.
   """
-
   @explanation [
-    check: @moduledoc,
+    check: @checkdoc,
     params: [
       include_doc: "Set to `true` to also include tags from @doc attributes."
     ]
@@ -25,9 +26,9 @@ defmodule Credo.Check.Design.TagFIXME do
   @default_params [include_doc: true]
   @tag_name "FIXME"
 
-  alias Credo.Check.Design.TagHelper
-
   use Credo.Check, base_priority: :high
+
+  alias Credo.Check.Design.TagHelper
 
   @doc false
   def run(source_file, params \\ []) do

@@ -1,5 +1,7 @@
 defmodule Credo.Check.Readability.SinglePipe do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   Pipes (`|>`) should only be used when piping data through multiple calls.
 
   So while this is fine:
@@ -21,8 +23,7 @@ defmodule Credo.Check.Readability.SinglePipe do
   Using a single |> to invoke functions makes the code harder to read. Instead,
   write a function call when a pipeline is only one function long.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
 
   use Credo.Check, base_priority: :high
 

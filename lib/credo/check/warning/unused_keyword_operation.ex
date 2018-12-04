@@ -1,51 +1,47 @@
 defmodule Credo.Check.Warning.UnusedKeywordOperation do
-  @moduledoc """
+  @moduledoc false
+
+  @checkdoc """
   The result of a call to the Keyword module's functions has to be used.
 
-  # TODO: write example
+  While this is correct ...
+
+      def clean_and_verify_options!(keywords) do
+        keywords = Keyword.delete(keywords, :debug)
+
+        if Enum.length(keywords) == 0, do: raise "OMG!!!1"
+
+        keywords
+      end
+
+  ... we forgot to save the result in this example:
+
+      def clean_and_verify_options!(keywords) do
+        Keyword.delete(keywords, :debug)
+
+        if Enum.length(keywords) == 0, do: raise "OMG!!!1"
+
+        keywords
+      end
 
   Keyword operations never work on the variable you pass in, but return a new
   variable which has to be used somehow.
   """
-
-  @explanation [check: @moduledoc]
+  @explanation [check: @checkdoc]
   @checked_module :Keyword
-
-  alias Credo.Check.Warning.UnusedFunctionReturnHelper
+  @funs_with_return_value nil
 
   use Credo.Check, base_priority: :high
 
-  @doc false
+  alias Credo.Check.Warning.UnusedOperation
+
   def run(source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    all_unused_calls =
-      UnusedFunctionReturnHelper.find_unused_calls(
-        source_file,
-        params,
-        [@checked_module],
-        nil
-      )
-
-    Enum.reduce(all_unused_calls, [], fn invalid_call, issues ->
-      {_, meta, _} = invalid_call
-
-      trigger =
-        invalid_call
-        |> Macro.to_string()
-        |> String.split("(")
-        |> List.first()
-
-      issues ++ [issue_for(issue_meta, meta[:line], trigger)]
-    end)
-  end
-
-  defp issue_for(issue_meta, line_no, trigger) do
-    format_issue(
-      issue_meta,
-      message: "There should be no unused return values for Keyword functions.",
-      trigger: trigger,
-      line_no: line_no
+    UnusedOperation.run(
+      source_file,
+      params,
+      @checked_module,
+      @funs_with_return_value,
+      &format_issue/2
     )
   end
 end

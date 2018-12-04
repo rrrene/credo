@@ -1,15 +1,42 @@
 defmodule Credo.Check do
   @moduledoc """
-  `Check` modules represent the checks which are run during the code analysis.
+  `Check` modules represent the checks which are run during Credo's analysis.
 
   Example:
 
       defmodule MyCheck do
-        use Credo.Check, category: :warning, base_priority: :high, elixir_version: ">= 1.3"
+        use Credo.Check, category: :warning, base_priority: :high
+
+        def run(source_file, params) do
+          #
+        end
       end
+
+  The `run/2` function takes two parameters: a source file and a list of parameters for the check.
+  It has to return a list of found issues.
   """
 
   @type t :: module
+
+  @doc """
+  Returns the base priority for the check.
+  """
+  @callback base_priority() :: integer
+
+  @doc """
+  Returns the category for the check.
+  """
+  @callback category() :: atom
+
+  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+
+  @callback run_on_all?() :: boolean
+
+  @callback explanation() :: String.t()
+
+  @callback explanation_for_params() :: Keyword.t()
+
+  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
 
   @base_category_exit_status_map %{
     consistency: 1,
@@ -19,7 +46,14 @@ defmodule Credo.Check do
     warning: 16
   }
 
+  alias Credo.Check
+  alias Credo.Code.Scope
+  alias Credo.Issue
+  alias Credo.IssueMeta
   alias Credo.Priority
+  alias Credo.Service.SourceFileScopes
+  alias Credo.Severity
+  alias Credo.SourceFile
 
   @doc false
   defmacro __using__(opts) do
@@ -96,34 +130,6 @@ defmodule Credo.Check do
     end
   end
 
-  alias Credo.Check
-  alias Credo.Check.CodeHelper
-  alias Credo.Issue
-  alias Credo.IssueMeta
-  alias Credo.Priority
-  alias Credo.Severity
-  alias Credo.SourceFile
-
-  @doc """
-  Returns the base priority for the check.
-  """
-  @callback base_priority() :: integer
-
-  @doc """
-  Returns the category for the check.
-  """
-  @callback category() :: atom
-
-  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
-
-  @callback run_on_all?() :: boolean
-
-  @callback explanation() :: String.t()
-
-  @callback explanation_for_params() :: Keyword.t()
-
-  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
-
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]
 
@@ -197,7 +203,7 @@ defmodule Credo.Check do
 
   defp add_line_no_options(issue, line_no, source_file) do
     if line_no do
-      {_def, scope} = CodeHelper.scope_for(source_file, line: line_no)
+      {_def, scope} = scope_for(source_file, line: line_no)
 
       %Issue{
         issue
@@ -206,6 +212,54 @@ defmodule Credo.Check do
       }
     else
       issue
+    end
+  end
+
+  # Returns the scope for the given line as a tuple consisting of the call to
+  # define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
+  # name of the scope.
+  #
+  # Examples:
+  #
+  #     {:defmodule, "Foo.Bar"}
+  #     {:def, "Foo.Bar.baz"}
+  defp scope_for(source_file, line: line_no) do
+    source_file
+    |> scope_list
+    |> Enum.at(line_no - 1)
+  end
+
+  # Returns all scopes for the given source_file per line of source code as tuple
+  # consisting of the call to define the scope
+  # (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the name of the scope.
+  #
+  # Examples:
+  #
+  #     [
+  #       {:defmodule, "Foo.Bar"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:def, "Foo.Bar.baz"},
+  #       {:defmodule, "Foo.Bar"}
+  #     ]
+  defp scope_list(%SourceFile{filename: filename} = source_file) do
+    case SourceFileScopes.get(filename) do
+      {:ok, value} ->
+        value
+
+      :notfound ->
+        ast = SourceFile.ast(source_file)
+        lines = SourceFile.lines(source_file)
+
+        result =
+          Enum.map(lines, fn {line_no, _} ->
+            Scope.name(ast, line: line_no)
+          end)
+
+        SourceFileScopes.put(filename, result)
+
+        result
     end
   end
 

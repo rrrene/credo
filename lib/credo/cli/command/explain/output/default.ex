@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Explain.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.Code.Scope
@@ -171,7 +173,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
       UI.edge(outer_color, @indent),
       filename_color,
       :faint,
-      filename |> to_string,
+      to_string(filename),
       :default_color,
       :faint,
       pos,
@@ -181,81 +183,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     |> UI.puts()
 
     if issue.line_no do
-      UI.puts_edge([outer_color, :faint])
-
-      [
-        UI.edge([outer_color, :faint]),
-        :reset,
-        :color239,
-        String.duplicate(" ", @indent - 5),
-        "__ CODE IN QUESTION"
-      ]
-      |> UI.puts()
-
-      UI.puts_edge([outer_color, :faint])
-
-      code_color = :faint
-
-      print_source_line(
-        source_file,
-        issue.line_no - 2,
-        term_width,
-        code_color,
-        outer_color
-      )
-
-      print_source_line(
-        source_file,
-        issue.line_no - 1,
-        term_width,
-        code_color,
-        outer_color
-      )
-
-      print_source_line(
-        source_file,
-        issue.line_no,
-        term_width,
-        [:cyan, :bright],
-        outer_color
-      )
-
-      if issue.column do
-        offset = 0
-        # column is one-based
-        x = max(issue.column - offset - 1, 0)
-
-        w =
-          case issue.trigger do
-            nil -> 1
-            atom -> atom |> to_string |> String.length()
-          end
-
-        [
-          UI.edge([outer_color, :faint], @indent),
-          inner_color,
-          String.duplicate(" ", x),
-          :faint,
-          String.duplicate("^", w)
-        ]
-        |> UI.puts()
-      end
-
-      print_source_line(
-        source_file,
-        issue.line_no + 1,
-        term_width,
-        code_color,
-        outer_color
-      )
-
-      print_source_line(
-        source_file,
-        issue.line_no + 2,
-        term_width,
-        code_color,
-        outer_color
-      )
+      print_issue_line_no(source_file, term_width, issue, outer_color, inner_color)
     end
 
     UI.puts_edge([outer_color, :faint], @indent)
@@ -497,5 +425,88 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     # Round up to the next multiple of 2
     (trunc(params_indent / 2) + 1) * 2
+  end
+
+  defp print_issue_column(issue, outer_color, inner_color) do
+    offset = 0
+    # column is one-based
+    x = max(issue.column - offset - 1, 0)
+
+    w =
+      if is_nil(issue.trigger) do
+        1
+      else
+        issue.trigger
+        |> to_string()
+        |> String.length()
+      end
+
+    [
+      UI.edge([outer_color, :faint], @indent),
+      inner_color,
+      String.duplicate(" ", x),
+      :faint,
+      String.duplicate("^", w)
+    ]
+    |> UI.puts()
+  end
+
+  defp print_issue_line_no(source_file, term_width, issue, outer_color, inner_color) do
+    UI.puts_edge([outer_color, :faint])
+
+    [
+      UI.edge([outer_color, :faint]),
+      :reset,
+      :color239,
+      String.duplicate(" ", @indent - 5),
+      "__ CODE IN QUESTION"
+    ]
+    |> UI.puts()
+
+    UI.puts_edge([outer_color, :faint])
+
+    code_color = :faint
+
+    print_source_line(
+      source_file,
+      issue.line_no - 2,
+      term_width,
+      code_color,
+      outer_color
+    )
+
+    print_source_line(
+      source_file,
+      issue.line_no - 1,
+      term_width,
+      code_color,
+      outer_color
+    )
+
+    print_source_line(
+      source_file,
+      issue.line_no,
+      term_width,
+      [:cyan, :bright],
+      outer_color
+    )
+
+    if issue.column, do: print_issue_column(issue, outer_color, inner_color)
+
+    print_source_line(
+      source_file,
+      issue.line_no + 1,
+      term_width,
+      code_color,
+      outer_color
+    )
+
+    print_source_line(
+      source_file,
+      issue.line_no + 2,
+      term_width,
+      code_color,
+      outer_color
+    )
   end
 end

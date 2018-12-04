@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Task.RunChecks do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.Check.Runner

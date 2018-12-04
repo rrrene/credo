@@ -1,13 +1,7 @@
 defmodule Credo.MainProcess do
-  @moduledoc """
-  This module defines all Tasks which make up the execution of Credo.
+  @moduledoc false
 
-  Each task receives an Execution struct and returns an Execution struct upon completion.
-  Any Task can mark the Execution as "halted" to stop Credo's execution.
-  Subsequent Tasks won't be run.
-
-  Tasks are organized in named activities.
-  """
+  # This module defines all Tasks which make up the execution of Credo.
 
   use Credo.Execution.ProcessDefinition
 
