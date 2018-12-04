@@ -11,6 +11,9 @@ defmodule Credo.ExsLoader do
       {:error, value} ->
         {:error, value}
     end
+  rescue
+    error ->
+      {:error, error}
   end
 
   def parse(exs_string, false) do

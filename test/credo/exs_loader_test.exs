@@ -103,11 +103,8 @@ defmodule Credo.ExsLoaderTest do
       ]
     }
 
-    assert_raise ArgumentError, fn ->
-      Credo.ExsLoader.parse(exs_string, true)
-    end
-
-    assert expected == Credo.ExsLoader.parse(exs_string)
+    assert {:error, %ArgumentError{}} = Credo.ExsLoader.parse(exs_string, true)
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string)
   end
 
   test "Should parse the requires field only w/o safe mode" do
@@ -139,8 +136,8 @@ defmodule Credo.ExsLoaderTest do
       ]
     }
 
-    assert expected_unsafe == Credo.ExsLoader.parse(exs_string)
-    assert expected_safe == Credo.ExsLoader.parse(exs_string, true)
+    assert {:ok, expected_unsafe} == Credo.ExsLoader.parse(exs_string)
+    assert {:ok, expected_safe} == Credo.ExsLoader.parse(exs_string, true)
   end
 
   test "Should allow custom checks only w/o safe mode" do
@@ -170,11 +167,8 @@ defmodule Credo.ExsLoaderTest do
       ]
     }
 
-    assert_raise ArgumentError, fn ->
-      Credo.ExsLoader.parse(exs_string, true)
-    end
-
-    assert expected == Credo.ExsLoader.parse(exs_string)
+    assert {:error, %ArgumentError{}} = Credo.ExsLoader.parse(exs_string, true)
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string)
   end
 
 end
