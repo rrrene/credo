@@ -15,6 +15,26 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     |> Float.round(2)
   end
 
+  test "it should return the correct ABC size for nullary function calls" do
+    source = """
+    def foo() do
+      baz()
+    end
+    """
+
+    assert rounded_abc_size(source) == 1.0
+  end
+
+  test "it should return the correct ABC size for regular function calls" do
+    source = """
+    def foo() do
+      baz 1, 2
+    end
+    """
+
+    assert rounded_abc_size(source) == 1.0
+  end
+
   test "it should return the correct ABC size for value assignment" do
     source = """
     def first_fun do

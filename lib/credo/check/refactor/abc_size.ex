@@ -25,6 +25,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
+  @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}]
 
   use Credo.Check
 
@@ -186,6 +187,19 @@ defmodule Credo.Check.Refactor.ABCSize do
   end
 
   defp traverse_abc(
+         {fun_name, _meta, arguments} = ast,
+         [a: a, b: b, c: c, var_names: var_names],
+         excluded_functions
+       )
+       when is_atom(fun_name) and fun_name not in @non_calls and is_list(arguments) do
+    if Enum.member?(excluded_functions, to_string(fun_name)) do
+      {nil, [a: a, b: b, c: c, var_names: var_names]}
+    else
+      {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
+    end
+  end
+
+  defp traverse_abc(
          {fun_or_var_name, _meta, nil} = ast,
          [a: a, b: b, c: c, var_names: var_names],
          _excluded_functions
@@ -208,15 +222,6 @@ defmodule Credo.Check.Refactor.ABCSize do
          )
          when is_list(arguments) do
       {ast, [a: a, b: b, c: c + 1, var_names: var_names]}
-    end
-  end
-
-  defp traverse_abc({fun_name, _meta, arguments} = ast, abc, excluded_functions)
-       when is_atom(fun_name) and is_list(arguments) do
-    if Enum.member?(excluded_functions, to_string(fun_name)) do
-      {nil, abc}
-    else
-      {ast, abc}
     end
   end
 
