@@ -49,7 +49,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  def traverse([do: {:__block__, _, ast}], issues, issue_meta = {_, _, opt}) do
+  def traverse([do: {:__block__, _, ast}], issues, {_, _, opt} = issue_meta) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
