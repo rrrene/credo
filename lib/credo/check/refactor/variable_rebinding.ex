@@ -154,9 +154,9 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   end
 
   defp bang_sigil({name, _}, allowed) do
-    allowed && (name
+    allowed &&
+      name
       |> Atom.to_string()
       |> String.ends_with?("!")
-    )
   end
 end
