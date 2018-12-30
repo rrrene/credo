@@ -49,13 +49,14 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  def traverse([do: {:__block__, _, ast}], issues, issue_meta) do
+  def traverse([do: {:__block__, _, ast}], issues, issue_meta = {_, _, opt}) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
       |> List.flatten()
       |> Enum.filter(&(&1 != nil))
       |> Enum.filter(&only_variables/1)
+      |> Enum.reject(&bang_sigil(&1, opt[:allow_bang]))
 
     duplicates =
       variables
@@ -150,5 +151,12 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     |> Atom.to_string()
     |> String.starts_with?("_")
     |> Kernel.not()
+  end
+
+  defp bang_sigil({name, _}, allowed) do
+    allowed && (name
+      |> Atom.to_string()
+      |> String.ends_with?("!")
+    )
   end
 end
