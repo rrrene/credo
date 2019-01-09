@@ -98,6 +98,16 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> refute_issues(@described_check)
   end
 
+  test "does NOT crash if string contains non utf8 characters" do
+    snippet = ~S(defmodule CredoTest do
+      @module_var "\xFF"
+    end)
+
+    snippet
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #

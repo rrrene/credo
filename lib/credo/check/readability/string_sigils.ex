@@ -128,6 +128,10 @@ defmodule Credo.Check.Readability.StringSigils do
     too_many_quotes?(rest, count, limit)
   end
 
+  defp too_many_quotes?(<<_::binary>>, _count, _limit) do
+    false
+  end
+
   defp issue_for(issue_meta, line_no, trigger, maximum_allowed_quotes) do
     format_issue(
       issue_meta,
