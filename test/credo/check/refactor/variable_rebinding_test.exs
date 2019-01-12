@@ -36,6 +36,19 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     |> refute_issues(@described_check)
   end
 
+  test "rebinding opt-in bang sigils is allowed" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        a! = 1
+        a! = 2
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, allow_bang: true)
+  end
+
   #
   # cases raising issues
   #
@@ -115,6 +128,19 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
       def some_function(opts) do
         %{a: foo, b: bar} = opts
         bar = 3
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "rebinding bang sigils is forbidden without the :allow_bang option" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        a! = 1
+        a! = 2
       end
     end
     """

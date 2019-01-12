@@ -28,6 +28,15 @@ defmodule Credo.Check.Refactor.VariableRebinding do
         verified_time
       end
 
+  In some rare cases you might really want to rebind a variable.  This can be
+  enabled "opt-in" on a per-variable basis by setting the :allow_bang option
+  to true and adding a bang suffix sigil to your variable.
+
+      def uses_mutating_parameters(params!) do
+        params! = do_a_thing(params!)
+        params! = do_another_thing(params!)
+        params! = do_yet_another_thing(params!)
+      end
   """
   @explanation [check: @checkdoc]
 
@@ -40,13 +49,14 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  def traverse([do: {:__block__, _, ast}], issues, issue_meta) do
+  def traverse([do: {:__block__, _, ast}], issues, {_, _, opt} = issue_meta) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
       |> List.flatten()
       |> Enum.filter(&(&1 != nil))
       |> Enum.filter(&only_variables/1)
+      |> Enum.reject(&bang_sigil(&1, opt[:allow_bang]))
 
     duplicates =
       variables
@@ -141,5 +151,12 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     |> Atom.to_string()
     |> String.starts_with?("_")
     |> Kernel.not()
+  end
+
+  defp bang_sigil({name, _}, allowed) do
+    allowed &&
+      name
+      |> Atom.to_string()
+      |> String.ends_with?("!")
   end
 end
