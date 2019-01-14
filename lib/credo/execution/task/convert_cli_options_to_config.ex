@@ -46,12 +46,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
         UI.warn("")
 
         Enum.each(lines, fn {line_no2, line} ->
-          color =
-            if line_no2 == line_no do
-              [:bright, :cyan]
-            else
-              [:faint]
-            end
+          color = color_list(line_no, line_no2)
 
           UI.warn([color, String.pad_leading("#{line_no2}", 5), :reset, "  ", color, line])
         end)
@@ -64,4 +59,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
 
     exec
   end
+
+  defp color_list(line_no, line_no2) when line_no == line_no2, do: [:bright, :cyan]
+  defp color_list(_, _), do: [:faint]
 end

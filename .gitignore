@@ -1,4 +1,5 @@
 /_build
+/.credo
 /deps
 /docs
 /doc

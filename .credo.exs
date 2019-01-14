@@ -108,7 +108,10 @@
         {Credo.Check.Refactor.NegatedConditionsWithElse, []},
         {Credo.Check.Refactor.Nesting, []},
         {Credo.Check.Refactor.PipeChainStart,
-         [excluded_argument_types: [:atom, :binary, :fn, :keyword], excluded_functions: []]},
+         [
+           excluded_argument_types: [:atom, :binary, :fn, :keyword, :number],
+           excluded_functions: []
+         ]},
         {Credo.Check.Refactor.UnlessWithElse, []},
 
         #

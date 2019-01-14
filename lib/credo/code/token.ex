@@ -228,6 +228,7 @@ defmodule Credo.Code.Token do
     end
   end
 
+  # credo:disable-for-next-line Credo.Check.Readability.ModuleNames
   defmodule ElixirPre1_6_0 do
     @moduledoc false
 
