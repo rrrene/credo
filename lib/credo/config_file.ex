@@ -101,9 +101,10 @@ defmodule Credo.ConfigFile do
     case Credo.ExsLoader.parse(exs_string, safe) do
       {:ok, data} ->
         config = from_data(data, dir, config_name)
+
         case check_safe(config, safe) do
           {:error, reason} -> {:error, {:badconfig, filename, reason}}
-          _                -> {:ok, config}
+          _ -> {:ok, config}
         end
 
       {:error, {line_no, description, trigger}} ->

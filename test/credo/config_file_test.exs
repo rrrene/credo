@@ -198,7 +198,8 @@ defmodule Credo.ConfigFileTest do
 
     result = ConfigFile.read_from_file_path(".", config_file, "default", true)
 
-    expected = {:error, {:badconfig, config_file, "non-empty requires[] is not allowed in safe mode"}}
+    expected =
+      {:error, {:badconfig, config_file, "non-empty requires[] is not allowed in safe mode"}}
 
     assert expected == result
   end
