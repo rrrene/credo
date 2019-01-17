@@ -40,7 +40,7 @@ defmodule Credo.ConfigFile do
   - `config_file`: full path to the custom configuration file
   - `config_name`: name of the configuration to load
   - `safe`: if +true+, the config files are loaded using static analysis rather
-            than `Code.eval_string/1`
+            than `Code.eval_string/1`, and requires are disallowed
   """
   def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ false) do
     combine_configs([config_file], dir, config_name, safe)
@@ -100,7 +100,11 @@ defmodule Credo.ConfigFile do
   defp from_exs(dir, config_name, {filename, exs_string}, safe) do
     case Credo.ExsLoader.parse(exs_string, safe) do
       {:ok, data} ->
-        {:ok, from_data(data, dir, config_name)}
+        config = from_data(data, dir, config_name)
+        case check_safe(config, safe) do
+          {:error, reason} -> {:error, {:badconfig, filename, reason}}
+          _                -> {:ok, config}
+        end
 
       {:error, {line_no, description, trigger}} ->
         {:error, {:badconfig, filename, line_no, description, trigger}}
@@ -125,6 +129,12 @@ defmodule Credo.ConfigFile do
       color: data[:color] || false
     }
   end
+
+  defp check_safe(%__MODULE__{requires: [_ | _]}, true) do
+    {:error, "non-empty requires[] is not allowed in safe mode"}
+  end
+
+  defp check_safe(config, _), do: {:ok, config}
 
   defp files_from_data(data, dir) do
     files = data[:files] || %{}

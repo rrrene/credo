@@ -107,39 +107,6 @@ defmodule Credo.ExsLoaderTest do
     assert {:ok, expected} == Credo.ExsLoader.parse(exs_string)
   end
 
-  test "Should parse the requires field only w/o safe mode" do
-    exs_string = """
-      %{
-        configs: [
-          %{
-            name: "default",
-            requires: ["code.ex", "othercode.ex"]
-          }
-        ]
-      }
-    """
-
-    expected_unsafe = %{
-      configs: [
-        %{
-          name: "default",
-          requires: ["code.ex", "othercode.ex"]
-        }
-      ]
-    }
-
-    expected_safe = %{
-      configs: [
-        %{
-          name: "default"
-        }
-      ]
-    }
-
-    assert {:ok, expected_unsafe} == Credo.ExsLoader.parse(exs_string)
-    assert {:ok, expected_safe} == Credo.ExsLoader.parse(exs_string, true)
-  end
-
   test "Should allow custom checks only w/o safe mode" do
     exs_string = """
       %{

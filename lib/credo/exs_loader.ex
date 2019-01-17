@@ -114,11 +114,6 @@ defmodule Credo.ExsLoader do
     process_map(tail, acc)
   end
 
-  # Safe mode processing ignores 'requires'
-  defp process_map_item({:requires, _value}, acc) do
-    acc
-  end
-
   defp process_map_item({key, value}, acc)
        when is_atom(key) or is_binary(key) do
     Map.put(acc, key, process_exs(value))
