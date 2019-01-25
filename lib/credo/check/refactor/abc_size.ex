@@ -150,7 +150,7 @@ defmodule Credo.Check.Refactor.ABCSize do
           var_names
 
         name ->
-          Enum.into(var_names, [name])
+          var_names ++ [name]
       end
 
     {rhs, [a: a + 1, b: b, c: c, var_names: var_names]}
@@ -162,7 +162,7 @@ defmodule Credo.Check.Refactor.ABCSize do
          [a: a, b: b, c: c, var_names: var_names],
          _excluded_functions
        ) do
-    var_names = Enum.into(var_names, fn_parameters(arguments))
+    var_names = var_names ++ fn_parameters(arguments)
     {ast, [a: a, b: b + 1, c: c, var_names: var_names]}
   end
 
