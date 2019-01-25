@@ -18,6 +18,9 @@ defmodule Credo.CLI do
   def main(argv) do
     Credo.Application.start(nil, nil)
 
+    Credo.Service.Plugins.modules
+    |> IO.inspect
+
     argv
     |> Execution.build()
     |> MainProcess.call()
