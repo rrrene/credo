@@ -2,6 +2,7 @@
 
 ## 1.0.1
 
+- Compilation warnings for Elixir 1.8
 - Fix `StringSigils` to not crash with strings containing non-UTF8 characters
 
 ## 1.0.0
