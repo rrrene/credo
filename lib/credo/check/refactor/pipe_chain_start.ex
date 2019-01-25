@@ -159,10 +159,21 @@ defmodule Credo.Check.Refactor.PipeChainStart do
        ),
        do: true
 
+  # Elixir <= 1.8.0
   # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
   # we want to consider these charlists a valid pipe chain start
   defp valid_chain_start?(
          {{:., _, [String, :to_charlist]}, _, [{:<<>>, _, _}]},
+         _excluded_functions,
+         _excluded_argument_types
+       ),
+       do: true
+
+  # Elixir >= 1.8.0
+  # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
+  # we want to consider these charlists a valid pipe chain start
+  defp valid_chain_start?(
+         {{:., _, [List, :to_charlist]}, _, [[_ | _]]},
          _excluded_functions,
          _excluded_argument_types
        ),
