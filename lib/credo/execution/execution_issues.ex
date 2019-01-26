@@ -53,7 +53,7 @@ defmodule Credo.Execution.ExecutionIssues do
   end
 
   def handle_call({:set, issues}, _from, _current_state) do
-    new_current_state = Enum.group_by(issues, &Map.get(&1, :filename))
+    new_current_state = Enum.group_by(issues, fn issue -> issue.filename end)
     {:reply, new_current_state, new_current_state}
   end
 
