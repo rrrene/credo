@@ -42,7 +42,7 @@ defmodule Credo.Execution.ExecutionIssues do
 
   def handle_call({:append, filename, issue}, _from, current_state) do
     issues = List.wrap(current_state[filename])
-    new_issue_list = List.wrap(issue) ++ issues
+    new_issue_list = [issue | issues]
     new_current_state = Map.put(current_state, filename, new_issue_list)
 
     {:reply, new_issue_list, new_current_state}
@@ -53,18 +53,7 @@ defmodule Credo.Execution.ExecutionIssues do
   end
 
   def handle_call({:set, issues}, _from, _current_state) do
-    filenames =
-      issues
-      |> Enum.map(& &1.filename)
-      |> Enum.uniq()
-
-    new_current_state =
-      Enum.reduce(filenames, %{}, fn filename, state ->
-        new_issue_list = Enum.filter(issues, &(&1.filename == filename))
-
-        Map.put(state, filename, new_issue_list)
-      end)
-
+    new_current_state = Enum.group_by(issues, &Map.get(&1, :filename))
     {:reply, new_current_state, new_current_state}
   end
 
