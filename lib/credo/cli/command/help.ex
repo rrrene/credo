@@ -9,7 +9,6 @@ defmodule Credo.CLI.Command.Help do
 
   use Credo.CLI.Command
 
-  alias Credo.CLI
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
   alias Credo.Execution

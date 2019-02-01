@@ -36,6 +36,39 @@ defmodule Credo.Execution do
             read_from_stdin: false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            process: [
+              parse_cli_options: [
+                {Credo.Execution.Task.ParseOptions, []}
+              ],
+              validate_cli_options: [
+                {Credo.Execution.Task.ValidateOptions, []}
+              ],
+              convert_cli_options_to_config: [
+                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
+              ],
+              start_plugin_modules: [
+                {Credo.Execution.Task.InitializePlugins, []}
+              ],
+              determine_command: [
+                {Credo.Execution.Task.DetermineCommand, []}
+              ],
+              set_default_command: [
+                {Credo.Execution.Task.SetDefaultCommand, []}
+              ],
+              resolve_config: [
+                {Credo.Execution.Task.UseColors, []},
+                {Credo.Execution.Task.RequireRequires, []}
+              ],
+              validate_config: [
+                {Credo.Execution.Task.ValidateConfig, []}
+              ],
+              run_command: [
+                {Credo.Execution.Task.RunCommand, []}
+              ],
+              halt_execution: [
+                {Credo.Execution.Task.AssignExitStatusForIssues, []}
+              ]
+            ],
             commands: %{
               "categories" => Credo.CLI.Command.Categories.CategoriesCommand,
               "explain" => Credo.CLI.Command.Explain.ExplainCommand,
@@ -244,5 +277,48 @@ defmodule Credo.Execution do
   @doc false
   def set_parent_and_current_task(exec, parent_task, current_task) do
     %__MODULE__{exec | parent_task: parent_task, current_task: current_task}
+  end
+
+  # Running tasks
+
+  @doc false
+  def run(initial_exec, process_name) do
+    process_list = Map.get(initial_exec, process_name)
+
+    Enum.reduce(process_list, initial_exec, fn {_name, list}, outer_exec ->
+      Enum.reduce(list, outer_exec, fn {task, opts}, exec ->
+        Credo.Execution.Task.run(task, exec, opts)
+      end)
+    end)
+  end
+
+  @doc false
+  def prepend_task(exec, group_name, task_mod) when is_atom(task_mod) do
+    prepend_task(exec, group_name, {task_mod, []})
+  end
+
+  def prepend_task(exec, group_name, task_tuple) do
+    process =
+      Enum.map(exec.process, fn
+        {^group_name, list} -> {group_name, [task_tuple] ++ list}
+        value -> value
+      end)
+
+    %__MODULE__{exec | process: process}
+  end
+
+  @doc false
+  def append_task(exec, group_name, task_mod) when is_atom(task_mod) do
+    append_task(exec, group_name, {task_mod, []})
+  end
+
+  def append_task(exec, group_name, task_tuple) do
+    process =
+      Enum.map(exec.process, fn
+        {^group_name, list} -> {group_name, list ++ [task_tuple]}
+        value -> value
+      end)
+
+    %__MODULE__{exec | process: process}
   end
 end

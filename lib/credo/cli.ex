@@ -9,7 +9,6 @@ defmodule Credo.CLI do
 
   alias Credo.Execution
   alias Credo.Execution.Task.WriteDebugReport
-  alias Credo.MainProcess
 
   @doc """
   Runs Credo's main process.
@@ -19,7 +18,7 @@ defmodule Credo.CLI do
 
     argv
     |> Execution.build()
-    |> MainProcess.call()
+    |> Execution.run(:process)
     |> WriteDebugReport.call([])
     |> halt_if_exit_status_assigned()
   end
