@@ -38,6 +38,7 @@ defmodule Credo.ConfigBuilder do
         color: config_file.color,
         checks: config_file.checks,
         requires: config_file.requires,
+        plugin_modules: config_file.plugin_modules,
         check_for_updates: config_file.check_for_updates
     }
   end

@@ -10,16 +10,12 @@ defmodule Credo.CLI do
   alias Credo.Execution
   alias Credo.Execution.Task.WriteDebugReport
   alias Credo.MainProcess
-  alias Credo.Service.Commands
 
   @doc """
   Runs Credo's main process.
   """
   def main(argv) do
     Credo.Application.start(nil, nil)
-
-    Credo.Service.Plugins.modules
-    |> IO.inspect
 
     argv
     |> Execution.build()
@@ -40,28 +36,4 @@ defmodule Credo.CLI do
 
   defp halt_if_failed(0), do: nil
   defp halt_if_failed(x), do: System.halt(x)
-
-  @doc """
-  Returns the module of a given `command`.
-
-      iex> command_for(:help)
-      Credo.CLI.Command.Help
-  """
-  def command_for(nil), do: nil
-
-  def command_for(command_mod) when is_atom(command_mod) do
-    if Enum.member?(Commands.modules(), command_mod) do
-      command_mod
-    else
-      nil
-    end
-  end
-
-  def command_for(command_name) when is_binary(command_name) do
-    if Enum.member?(Commands.names(), command_name) do
-      Commands.get(command_name)
-    else
-      nil
-    end
-  end
 end

@@ -16,7 +16,9 @@ defmodule Credo.Execution do
             debug: false,
             checks: nil,
             requires: [],
+            plugin_modules: [],
             strict: false,
+
             # checks if there is a new version of Credo
             check_for_updates: true,
 
@@ -34,6 +36,17 @@ defmodule Credo.Execution do
             read_from_stdin: false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            commands: %{
+              "categories" => Credo.CLI.Command.Categories.CategoriesCommand,
+              "explain" => Credo.CLI.Command.Explain.ExplainCommand,
+              "gen.check" => Credo.CLI.Command.GenCheck,
+              "gen.config" => Credo.CLI.Command.GenConfig,
+              "help" => Credo.CLI.Command.Help,
+              "info" => Credo.CLI.Command.Info.InfoCommand,
+              "list" => Credo.CLI.Command.List.ListCommand,
+              "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
+              "version" => Credo.CLI.Command.Version
+            },
             current_task: nil,
             parent_task: nil,
             halted: false,
@@ -123,14 +136,30 @@ defmodule Credo.Execution do
 
   def set_strict(exec), do: exec
 
+  @doc false
+  def get_path(exec) do
+    exec.cli_options.path
+  end
+
+  # Commands
+
   @doc "Returns the name of the command, which should be run by the given execution."
   def get_command_name(exec) do
     exec.cli_options.command
   end
 
-  @doc false
-  def get_path(exec) do
-    exec.cli_options.path
+  @doc "Returns all valid command names."
+  def get_valid_command_names(exec) do
+    Map.keys(exec.commands)
+  end
+
+  def get_command(exec, name) do
+    Map.get(exec.commands, name)
+  end
+
+  @doc "Puts the given `command_mod` with the given `name` as command into the given `exec` struct."
+  def put_command(exec, name, command_mod) do
+    %__MODULE__{exec | commands: Map.put(exec.commands, name, command_mod)}
   end
 
   # Assigns

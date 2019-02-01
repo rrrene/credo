@@ -15,6 +15,7 @@ defmodule Credo.ConfigFile do
             color: true,
             checks: nil,
             requires: [],
+            plugin_modules: [],
             strict: false,
             # checks if there is a new version of Credo
             check_for_updates: true
@@ -119,6 +120,7 @@ defmodule Credo.ConfigFile do
     %__MODULE__{
       check_for_updates: data[:check_for_updates] || false,
       requires: data[:requires] || [],
+      plugin_modules: data[:plugin_modules] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data),
       strict: data[:strict] || false,
@@ -187,6 +189,7 @@ defmodule Credo.ConfigFile do
     config_file = %__MODULE__{
       check_for_updates: other.check_for_updates,
       requires: base.requires ++ other.requires,
+      plugin_modules: base.plugin_modules ++ other.plugin_modules,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
       strict: other.strict,
