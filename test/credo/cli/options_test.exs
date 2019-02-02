@@ -4,6 +4,37 @@ defmodule Credo.CLI.OptionsTest do
 
   @command_names ["cmd1", "cmd2", "cmd3"]
   @fixture_name "options"
+  @switches [
+    all_priorities: :boolean,
+    all: :boolean,
+    checks: :string,
+    config_name: :string,
+    config_file: :string,
+    color: :boolean,
+    crash_on_error: :boolean,
+    debug: :boolean,
+    mute_exit_status: :boolean,
+    format: :string,
+    help: :boolean,
+    ignore_checks: :string,
+    ignore: :string,
+    min_priority: :string,
+    only: :string,
+    read_from_stdin: :boolean,
+    strict: :boolean,
+    verbose: :boolean,
+    version: :boolean
+  ]
+  @aliases [
+    a: :all,
+    A: :all_priorities,
+    c: :checks,
+    C: :config_name,
+    d: :debug,
+    h: :help,
+    i: :ignore_checks,
+    v: :version
+  ]
 
   doctest Credo.CLI.Options
 
@@ -17,7 +48,7 @@ defmodule Credo.CLI.OptionsTest do
 
   defp parse(args) do
     dir = fixture_path(@fixture_name)
-    Options.parse(args, dir, @command_names, [])
+    Options.parse(args, dir, @command_names, [], @switches, @aliases)
   end
 
   defp switches(args), do: parse(args).switches

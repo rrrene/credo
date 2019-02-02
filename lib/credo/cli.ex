@@ -18,7 +18,7 @@ defmodule Credo.CLI do
 
     argv
     |> Execution.build()
-    |> Execution.run(:process)
+    |> Execution.run()
     |> WriteDebugReport.call([])
     |> halt_if_exit_status_assigned()
   end

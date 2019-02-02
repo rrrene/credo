@@ -9,6 +9,37 @@ defmodule Credo.Execution do
   """
   defstruct argv: [],
             cli_options: nil,
+            cli_switches: [
+              all_priorities: :boolean,
+              all: :boolean,
+              checks: :string,
+              config_name: :string,
+              config_file: :string,
+              color: :boolean,
+              crash_on_error: :boolean,
+              debug: :boolean,
+              mute_exit_status: :boolean,
+              format: :string,
+              help: :boolean,
+              ignore_checks: :string,
+              ignore: :string,
+              min_priority: :string,
+              only: :string,
+              read_from_stdin: :boolean,
+              strict: :boolean,
+              verbose: :boolean,
+              version: :boolean
+            ],
+            cli_aliases: [
+              a: :all,
+              A: :all_priorities,
+              c: :checks,
+              C: :config_name,
+              d: :debug,
+              h: :help,
+              i: :ignore_checks,
+              v: :version
+            ],
 
             # config
             files: nil,
@@ -16,7 +47,7 @@ defmodule Credo.Execution do
             debug: false,
             checks: nil,
             requires: [],
-            plugin_modules: [],
+            plugins: [],
             strict: false,
 
             # checks if there is a new version of Credo
@@ -37,6 +68,11 @@ defmodule Credo.Execution do
 
             # state, which is accessed and changed over the course of Credo's execution
             process: [
+              __pre__: [
+                {Credo.Execution.Task.ParseOptions, []},
+                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
+                {Credo.Execution.Task.InitializePlugins, []}
+              ],
               parse_cli_options: [
                 {Credo.Execution.Task.ParseOptions, []}
               ],
@@ -45,9 +81,6 @@ defmodule Credo.Execution do
               ],
               convert_cli_options_to_config: [
                 {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
-              ],
-              start_plugin_modules: [
-                {Credo.Execution.Task.InitializePlugins, []}
               ],
               determine_command: [
                 {Credo.Execution.Task.DetermineCommand, []}
@@ -190,9 +223,46 @@ defmodule Credo.Execution do
     Map.get(exec.commands, name)
   end
 
-  @doc "Puts the given `command_mod` with the given `name` as command into the given `exec` struct."
+  @doc false
   def put_command(exec, name, command_mod) do
     %__MODULE__{exec | commands: Map.put(exec.commands, name, command_mod)}
+  end
+
+  # Plugin params
+
+  def get_plugin_param(exec, plugin_mod, param_name) do
+    exec.plugins[plugin_mod][param_name]
+  end
+
+  def put_plugin_param(exec, plugin_mod, param_name, param_value) do
+    plugins =
+      Keyword.update(exec.plugins, plugin_mod, [], fn list ->
+        Keyword.update(list, param_name, param_value, fn -> param_value end)
+      end)
+
+    %__MODULE__{exec | plugins: plugins}
+    |> IO.inspect(label: "put_plugin_param")
+  end
+
+  # CLI switches
+
+  @doc false
+  def put_cli_switch(exec, name, type) do
+    %__MODULE__{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
+  end
+
+  @doc false
+  def put_cli_switch_alias(exec, name, alias_name) do
+    %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
+  end
+
+  def get_given_cli_switch(exec, switch_name) do
+    exec.cli_options.switches[switch_name]
+  end
+
+  @doc false
+  def put_cli_switch_alias(exec, name, alias_name) do
+    %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
   end
 
   # Assigns
@@ -282,12 +352,10 @@ defmodule Credo.Execution do
   # Running tasks
 
   @doc false
-  def run(initial_exec, process_name) do
-    process_list = Map.get(initial_exec, process_name)
-
-    Enum.reduce(process_list, initial_exec, fn {_name, list}, outer_exec ->
-      Enum.reduce(list, outer_exec, fn {task, opts}, exec ->
-        Credo.Execution.Task.run(task, exec, opts)
+  def run(initial_exec) do
+    Enum.reduce(initial_exec.process, initial_exec, fn {name, _list}, outer_exec ->
+      Enum.reduce(outer_exec.process[name], outer_exec, fn {task, opts}, inner_exec ->
+        Credo.Execution.Task.run(task, inner_exec, opts)
       end)
     end)
   end
