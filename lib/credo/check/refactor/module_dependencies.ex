@@ -44,8 +44,8 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
         []
 
       false ->
-        source_file
-        |> Credo.Code.prewalk(
+        Credo.Code.prewalk(
+          source_file,
           &traverse(
             &1,
             &2,
@@ -61,6 +61,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   # Check if analyzed module path is within ignored paths
   defp ignore_path?(filename, excluded_paths) do
     directory = Path.dirname(filename)
+
     Enum.any?(excluded_paths, &String.starts_with?(directory, &1))
   end
 
@@ -79,7 +80,8 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
         []
       else
         module_dependencies = get_dependencies(ast, dependency_namespaces)
-        issues_for_module(module_name, module_dependencies, max, issue_meta, meta)
+
+        issues_for_module(module_dependencies, max, issue_meta, meta)
       end
 
     {ast, issues ++ new_issues}
@@ -98,11 +100,11 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     |> filter_namespaces(dependency_namespaces)
   end
 
-  defp issues_for_module(mod, deps, max_deps, issue_meta, meta) when length(deps) > max_deps do
+  defp issues_for_module(deps, max_deps, issue_meta, meta) when length(deps) > max_deps do
     [
       format_issue(
         issue_meta,
-        message: "Module #{Name.last(mod)} has too many dependencies: #{length(deps)}",
+        message: "Module has too many dependencies: #{length(deps)} (max is #{max_deps})",
         trigger: deps,
         line_no: meta[:line],
         column_no: meta[:column]
@@ -110,7 +112,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     ]
   end
 
-  defp issues_for_module(_, _, _, _, _), do: []
+  defp issues_for_module(_, _, _, _), do: []
 
   # Resolve dependencies to full module names
   defp with_fullnames(dependencies, aliases) do
