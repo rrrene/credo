@@ -65,14 +65,20 @@ defmodule Credo.Execution do
   def checks(exec)
 
   def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
-    only_matching = filter_checks(checks, only_checks)
-    ignore_matching = filter_checks(checks, ignore_checks)
+    only_matching = filter_only_checks(checks, only_checks)
+    ignore_matching = filter_ignore_checks(checks, ignore_checks)
     result = only_matching -- ignore_matching
 
     {result, only_matching, ignore_matching}
   end
 
-  defp filter_checks(_checks, []), do: []
+  defp filter_only_checks(checks, nil), do: checks
+  defp filter_only_checks(checks, []), do: checks
+  defp filter_only_checks(checks, patterns), do: filter_checks(checks, patterns)
+
+  defp filter_ignore_checks(_checks, nil), do: []
+  defp filter_ignore_checks(_checks, []), do: []
+  defp filter_ignore_checks(checks, patterns), do: filter_checks(checks, patterns)
 
   defp filter_checks(checks, patterns) do
     regexes =
