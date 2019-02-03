@@ -20,7 +20,8 @@ defmodule Credo.Check.Refactor.MapInto do
   """
   @explanation [check: @checkdoc]
 
-  use Credo.Check, base_priority: :high
+  # only avaible in Elixir < 1.8 since performance improvements have since made this check obsolete
+  use Credo.Check, base_priority: :high, elixir_version: "< 1.8.0"
 
   @doc false
   def run(source_file, params \\ []) do
