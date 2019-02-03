@@ -7,6 +7,8 @@ defmodule Credo.Execution.Task.InitializePlugins do
     Enum.reduce(exec.plugins, exec, &init_plugin(&2, &1))
   end
 
+  defp init_plugin(exec, {_mod, false}), do: exec
+
   defp init_plugin(exec, {mod, params}) do
     case mod.init(exec, params) do
       %Execution{} = exec ->
