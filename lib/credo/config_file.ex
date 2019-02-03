@@ -118,13 +118,13 @@ defmodule Credo.ConfigFile do
       |> Enum.find(&(&1[:name] == config_name))
 
     %__MODULE__{
-      check_for_updates: data[:check_for_updates] || false,
+      check_for_updates: data[:check_for_updates],
       requires: data[:requires] || [],
       plugins: data[:plugins] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data),
-      strict: data[:strict] || false,
-      color: data[:color] || false
+      strict: data[:strict],
+      color: data[:color]
     }
   end
 
@@ -187,29 +187,32 @@ defmodule Credo.ConfigFile do
 
   def merge({:ok, base}, {:ok, other}) do
     config_file = %__MODULE__{
-      check_for_updates: other.check_for_updates,
+      check_for_updates: merge_boolean(base.check_for_updates, other.check_for_updates),
       requires: base.requires ++ other.requires,
       plugins: base.plugins ++ other.plugins,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
-      strict: other.strict,
-      color: other.color
+      strict: merge_boolean(base.strict, other.strict),
+      color: merge_boolean(base.color, other.color)
     }
 
     {:ok, config_file}
   end
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{
-        checks: checks_other
-      }) do
+  defp merge_boolean(base, other)
+
+  defp merge_boolean(_base, true), do: true
+  defp merge_boolean(_base, false), do: false
+  defp merge_boolean(base, _), do: base
+
+  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
     base = normalize_check_tuples(checks_base)
     other = normalize_check_tuples(checks_other)
+
     Keyword.merge(base, other)
   end
 
-  def merge_files(%__MODULE__{files: files_base}, %__MODULE__{
-        files: files_other
-      }) do
+  def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
       included: files_other[:included] || files_base[:included],
       excluded: files_other[:excluded] || files_base[:excluded]
