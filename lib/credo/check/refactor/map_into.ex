@@ -37,6 +37,7 @@ defmodule Credo.Check.Refactor.MapInto do
          issue_meta
        ) do
     new_issue = issue_for(issue_meta, meta[:line], "map_into")
+
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -50,6 +51,7 @@ defmodule Credo.Check.Refactor.MapInto do
          issue_meta
        ) do
     new_issue = issue_for(issue_meta, meta[:line], "map_into")
+
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -63,6 +65,7 @@ defmodule Credo.Check.Refactor.MapInto do
          issue_meta
        ) do
     new_issue = issue_for(issue_meta, meta[:line], "map_into")
+
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -74,12 +77,14 @@ defmodule Credo.Check.Refactor.MapInto do
                _,
                {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
              ]},
-            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
+            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, into_args}
           ]} = ast,
          issues,
          issue_meta
-       ) do
+       )
+       when length(into_args) == 1 do
     new_issue = issue_for(issue_meta, meta[:line], "map_into")
+
     {ast, issues ++ List.wrap(new_issue)}
   end
 

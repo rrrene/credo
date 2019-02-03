@@ -12,6 +12,12 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.into([:apple, :banana, :carrot], %{}, &({&1, to_string(&1)}))
+
+        my_list
+        |> Enum.map(&square/1)
+        |> Enum.into(%{}, &to_tuple/1)
+
+        Enum.into(Enum.map(my_list, &square/1), %{}, &to_tuple/1)
       end
     end
     """
