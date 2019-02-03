@@ -175,10 +175,7 @@ defmodule Credo.CLI.Output do
       "the following checks were skipped because they're not compatible with\n",
       :reset,
       :faint,
-      "your version of Elixir (#{System.version()}). Upgrade to the newest version of Elixir to\n",
-      :reset,
-      :faint,
-      "get the most out of Credo!\n"
+      "your version of Elixir (#{System.version()}).\n"
     ]
 
     UI.warn("")
