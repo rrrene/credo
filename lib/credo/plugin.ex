@@ -7,7 +7,6 @@ defmodule Credo.Plugin do
   - prepend/append tasks to ProcessDefinitions
   - add CLI options
   - add plugin params
-
   - override existing commands
     - implement better Explain command
   - override existing CLI options
@@ -15,6 +14,7 @@ defmodule Credo.Plugin do
   - add default config
     - also: change default config, so that an Inch plugin
     - can deactivate the ModuleDoc check in the default config
+
   - checks with their own categories
   - add format options (?)
   """
@@ -29,6 +29,10 @@ defmodule Credo.Plugin do
     Execution.put_command(exec, name, command_mod)
   end
 
+  def register_config(exec, config_file_string) do
+    Execution.put_config_file(exec, {:plugin, config_file_string})
+  end
+
   def register_cli_switch(exec, name, type, alias_name \\ nil) do
     exec
     |> Execution.put_cli_switch(name, type)
@@ -36,7 +40,6 @@ defmodule Credo.Plugin do
   end
 
   def register_cli_to_config_parser(exec, parser_mod) do
-    exec
-    |> Execution.append_task(:convert_cli_options_to_config, parser_mod)
+    Execution.append_task(exec, :convert_cli_options_to_config, parser_mod)
   end
 end

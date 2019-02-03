@@ -113,6 +113,7 @@ defmodule Credo.Execution do
               "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
               "version" => Credo.CLI.Command.Version
             },
+            config_files: [],
             current_task: nil,
             parent_task: nil,
             halted: false,
@@ -228,6 +229,11 @@ defmodule Credo.Execution do
     %__MODULE__{exec | commands: Map.put(exec.commands, name, command_mod)}
   end
 
+  @doc false
+  def put_config_file(exec, {_, _} = config_file) do
+    %__MODULE__{exec | config_files: exec.config_files ++ [config_file]}
+  end
+
   # Plugin params
 
   def get_plugin_param(exec, plugin_mod, param_name) do
@@ -241,7 +247,6 @@ defmodule Credo.Execution do
       end)
 
     %__MODULE__{exec | plugins: plugins}
-    |> IO.inspect(label: "put_plugin_param")
   end
 
   # CLI switches

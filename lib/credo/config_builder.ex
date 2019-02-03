@@ -7,7 +7,7 @@ defmodule Credo.ConfigBuilder do
   def parse(exec) do
     options = exec.cli_options
 
-    case get_config_file(options) do
+    case get_config_file(exec, options) do
       {:ok, config_file} ->
         exec
         |> add_config_file_to_exec(config_file)
@@ -19,15 +19,15 @@ defmodule Credo.ConfigBuilder do
     end
   end
 
-  defp get_config_file(%Options{} = options) do
+  defp get_config_file(exec, %Options{} = options) do
     config_name = options.switches[:config_name]
     config_file = options.switches[:config_file]
     dir = Filename.remove_line_no_and_column(options.path)
 
     if is_binary(config_file) do
-      ConfigFile.read_from_file_path(dir, config_file, config_name)
+      ConfigFile.read_from_file_path(exec, dir, config_file, config_name)
     else
-      ConfigFile.read_or_default(dir, config_name)
+      ConfigFile.read_or_default(exec, dir, config_name)
     end
   end
 

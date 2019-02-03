@@ -28,10 +28,10 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_or_default(dir, config_name \\ nil, safe \\ false) do
+  def read_or_default(exec, dir, config_name \\ nil, safe \\ false) do
     dir
     |> relevant_config_files
-    |> combine_configs(dir, config_name, safe)
+    |> combine_configs(exec, dir, config_name, safe)
   end
 
   @doc """
@@ -43,14 +43,17 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ false) do
-    combine_configs([config_file], dir, config_name, safe)
+  def read_from_file_path(exec, dir, config_file, config_name \\ nil, safe \\ false) do
+    combine_configs([config_file], exec, dir, config_name, safe)
   end
 
-  defp combine_configs(files, dir, config_name, safe) do
-    files
-    |> Enum.filter(&File.exists?/1)
-    |> Enum.map(&{&1, File.read!(&1)})
+  defp combine_configs(files, exec, dir, config_name, safe) do
+    config_files =
+      files
+      |> Enum.filter(&File.exists?/1)
+      |> Enum.map(&{&1, File.read!(&1)})
+
+    (exec.config_files ++ config_files)
     |> List.insert_at(0, {:default, @default_config_file})
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
