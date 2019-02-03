@@ -11,11 +11,7 @@ defmodule Credo.Execution.ExecutionIssues do
   end
 
   @doc "Appends an `issue` for the specified `filename`."
-  def append(
-        %Execution{issues_pid: pid},
-        %SourceFile{filename: filename},
-        issue
-      ) do
+  def append(%Execution{issues_pid: pid}, %SourceFile{filename: filename}, issue) do
     GenServer.call(pid, {:append, filename, issue})
   end
 
@@ -54,6 +50,7 @@ defmodule Credo.Execution.ExecutionIssues do
 
   def handle_call({:set, issues}, _from, _current_state) do
     new_current_state = Enum.group_by(issues, fn issue -> issue.filename end)
+
     {:reply, new_current_state, new_current_state}
   end
 
