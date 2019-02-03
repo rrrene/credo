@@ -64,24 +64,23 @@ defmodule Credo.Execution do
   """
   def checks(exec)
 
-  def checks(%__MODULE__{
-        checks: checks,
-        only_checks: only_checks,
-        ignore_checks: ignore_checks
-      }) do
-    match_regexes =
-      only_checks
+  def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
+    only_matching = filter_checks(checks, only_checks)
+    ignore_matching = filter_checks(checks, ignore_checks)
+    result = only_matching -- ignore_matching
+
+    {result, only_matching, ignore_matching}
+  end
+
+  defp filter_checks(_checks, []), do: []
+
+  defp filter_checks(checks, patterns) do
+    regexes =
+      patterns
       |> List.wrap()
       |> to_match_regexes
 
-    ignore_regexes =
-      ignore_checks
-      |> List.wrap()
-      |> to_match_regexes
-
-    checks
-    |> Enum.filter(&match_regex(&1, match_regexes, true))
-    |> Enum.reject(&match_regex(&1, ignore_regexes, false))
+    Enum.filter(checks, &match_regex(&1, regexes, true))
   end
 
   defp match_regex(_tuple, [], default_for_empty), do: default_for_empty
