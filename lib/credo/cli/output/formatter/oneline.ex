@@ -7,7 +7,9 @@ defmodule Credo.CLI.Output.Formatter.Oneline do
   alias Credo.Issue
 
   def print_issues(issues) do
-    Enum.each(issues, fn issue ->
+    issues
+    |> Enum.sort_by(fn issue -> {issue.filename, issue.line_no, issue.column} end)
+    |> Enum.each(fn issue ->
       UI.puts(to_oneline(issue))
     end)
   end
