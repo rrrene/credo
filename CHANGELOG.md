@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- Fix false positive in `MapInto`
+- Disable `MapInto` for Elixir 1.8 and higher
+- Ensure issues are sorted by filename, line number and column number
+- Warn about ineffective check filter patterns
+- Add `ModuleDependencies` check to experimental checks
+
 ## 1.0.1
 
 - Compilation warnings for Elixir 1.8
