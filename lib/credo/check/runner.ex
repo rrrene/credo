@@ -187,8 +187,8 @@ defmodule Credo.Check.Runner do
   end
 
   defp warn_about_ineffective_patterns(
-         {checks, [], ignored_checks},
-         %Execution{only_checks: [_ | _] = only_checks, ignore_checks: ignore_checks}
+         {checks, [], _ignored_checks},
+         %Execution{only_checks: [_ | _] = only_checks}
        ) do
     UI.warn([
       :red,
@@ -200,8 +200,8 @@ defmodule Credo.Check.Runner do
   end
 
   defp warn_about_ineffective_patterns(
-         {checks, included_checks, []},
-         %Execution{only_checks: only_checks, ignore_checks: [_ | _] = ignore_checks}
+         {checks, _included_checks, []},
+         %Execution{ignore_checks: [_ | _] = ignore_checks}
        ) do
     UI.warn([
       :red,
