@@ -450,14 +450,21 @@ This functionality can include:
 
 - adding new commands
 - overriding existing commands (e.g. implement better Explain command)
+- modifying the default config
 - adding checks, which can add their own issues, with their own categories,
 - prepending/appending steps to Credo's execution process
 - adding new CLI options
-- modifying the default config
 
 ### Using plugins
 
-Plugins can be configured via params, just like checks.
+Plugins are just modules. Most of the time, a Credo plugin will be published on Hex. You include it as a dependency:
+
+```elixir
+{:credo_demo_plugin, "~> 0.1.0"},
+```
+
+Plugins, like checks, are just modules and functions.
+They can be included by listing them under the `:plugins` field in Credo's configuration file.
 
 ```elixir
 %{
@@ -472,9 +479,9 @@ Plugins can be configured via params, just like checks.
 }
 ```
 
-Plugins, like checks, are just modules and functions.
-They can be included by listing them under the `:plugins` field in Credo's configuration file.
+### Configuring plugins
 
+Plugins can be configured via params, just like checks.
 Each entry consists of a two-element tuple: the plugin's module and a keyword list of parameters, which can be used to configure the plugin itself.
 
 ```elixir
@@ -483,7 +490,7 @@ Each entry consists of a two-element tuple: the plugin's module and a keyword li
     %{
       name: "default",
       plugins: [
-        {CredoDemoPlugin, [castle: "Winterfell"]}
+        {CredoDemoPlugin, [castle: "Grayskull"]}
       ]
     }
   ]
@@ -613,7 +620,7 @@ The configuration's loading order is this:
 
 Config values set in later stages are overwriting values from earlier ones.
 
-### Adding checks, which can add their own issues, with their own categories,
+### Adding checks
 
 To add checks from your plugin, simply extend the default config ...
 
@@ -701,7 +708,20 @@ This example would have the effect that typing `mix credo` would no longer run t
 
 ### Adding new CLI options
 
-Text
+We saw how plugins can be configured via params in the "Configuring plugins" section:
+
+```elixir
+{CredoDemoPlugin, [castle: "Grayskull"]}
+```
+
+But what about those situations where we want to be able to configure things on-the-fly via the CLI?
+Plugins should be able to provide custom CLI options as well, so we can do something like:
+
+```bash
+mix credo --castle Winterfell
+```
+
+Registering a custom CLI switch is easy:
 
 ```elixir
 defmodule CredoDemoPlugin do
