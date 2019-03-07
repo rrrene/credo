@@ -23,11 +23,15 @@ matrix:
   allow_failures:
   - elixir: 1.4.5
   exclude:
+  - elixir: 1.4.5
+    otp_release: 21.2
+  - elixir: 1.5.3
+    otp_release: 21.2
   - elixir: 1.6.6
     otp_release: 18.3
   - elixir: 1.7.2
     otp_release: 18.3
-  - elixir: 1.4.5
-    otp_release: 21.0
-  - elixir: 1.5.3
-    otp_release: 21.0
+  - elixir: 1.8.1
+    otp_release: 18.3
+  - elixir: 1.8.1
+    otp_release: 19.3
