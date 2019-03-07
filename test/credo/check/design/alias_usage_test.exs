@@ -19,6 +19,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
       def fun1 do
         Case.something
 
+        fun_call().Api.Case
+
         {:error, reason} = __MODULE__.Sup.start_link(fn() -> :foo end)
 
         [:faint, filename]    # should not throw an error since
