@@ -7,6 +7,9 @@ defmodule Credo.ConfigFile do
   @default_config_name "default"
   @default_config_file File.read!(@config_filename)
 
+  @origin_user :file
+  @origin_credo :credo
+
   @default_glob "**/*.{ex,exs}"
   @default_files_included [@default_glob]
   @default_files_excluded []
@@ -51,10 +54,10 @@ defmodule Credo.ConfigFile do
     config_files =
       files
       |> Enum.filter(&File.exists?/1)
-      |> Enum.map(&{&1, File.read!(&1)})
+      |> Enum.map(&{@origin_user, &1, File.read!(&1)})
 
     (exec.config_files ++ config_files)
-    |> List.insert_at(0, {:default, @default_config_file})
+    |> List.insert_at(0, {@origin_credo, nil, @default_config_file})
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
@@ -101,7 +104,7 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {filename, exs_string}, safe) do
+  defp from_exs(dir, config_name, {_origin, filename, exs_string}, safe) do
     case Credo.ExsLoader.parse(exs_string, safe) do
       {:ok, data} ->
         {:ok, from_data(data, dir, config_name)}

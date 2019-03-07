@@ -40,6 +40,7 @@ defmodule Credo.Execution do
               i: :ignore_checks,
               v: :version
             ],
+            cli_plugin_param_converters: [],
 
             # config
             files: nil,
@@ -116,6 +117,7 @@ defmodule Credo.Execution do
             config_files: [],
             current_task: nil,
             parent_task: nil,
+            initializing_plugin: nil,
             halted: false,
             source_files_pid: nil,
             issues_pid: nil,
@@ -225,13 +227,22 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_command(exec, name, command_mod) do
+  def put_command(exec, _plugin_mod, name, command_mod) do
     %__MODULE__{exec | commands: Map.put(exec.commands, name, command_mod)}
   end
 
   @doc false
-  def put_config_file(exec, {_, _} = config_file) do
+  def put_config_file(exec, {_, _, _} = config_file) do
     %__MODULE__{exec | config_files: exec.config_files ++ [config_file]}
+  end
+
+  @doc false
+  def set_initializing_plugin(%__MODULE__{initializing_plugin: nil} = exec, plugin_mod) do
+    %__MODULE__{exec | initializing_plugin: plugin_mod}
+  end
+
+  def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
+    raise "Attempting to initialize plugin #{mod2}, while already initializing plugin #{mod1}"
   end
 
   # Plugin params
@@ -252,22 +263,27 @@ defmodule Credo.Execution do
   # CLI switches
 
   @doc false
-  def put_cli_switch(exec, name, type) do
+  def put_cli_switch(exec, _plugin_mod, name, type) do
     %__MODULE__{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
   end
 
   @doc false
-  def put_cli_switch_alias(exec, name, alias_name) do
+  def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
     %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
+  end
+
+  @doc false
+  def put_cli_switch_plugin_param_converter(exec, plugin_mod, cli_switch_name, plugin_param_name) do
+    converter_tuple = {cli_switch_name, plugin_mod, plugin_param_name}
+
+    %__MODULE__{
+      exec
+      | cli_plugin_param_converters: exec.cli_plugin_param_converters ++ [converter_tuple]
+    }
   end
 
   def get_given_cli_switch(exec, switch_name) do
     exec.cli_options.switches[switch_name]
-  end
-
-  @doc false
-  def put_cli_switch_alias(exec, name, alias_name) do
-    %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
   end
 
   # Assigns
@@ -366,11 +382,11 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def prepend_task(exec, group_name, task_mod) when is_atom(task_mod) do
-    prepend_task(exec, group_name, {task_mod, []})
+  def prepend_task(exec, plugin_mod, group_name, task_mod) when is_atom(task_mod) do
+    prepend_task(exec, plugin_mod, group_name, {task_mod, []})
   end
 
-  def prepend_task(exec, group_name, task_tuple) do
+  def prepend_task(exec, _plugin_mod, group_name, task_tuple) do
     process =
       Enum.map(exec.process, fn
         {^group_name, list} -> {group_name, [task_tuple] ++ list}
@@ -381,11 +397,11 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def append_task(exec, group_name, task_mod) when is_atom(task_mod) do
-    append_task(exec, group_name, {task_mod, []})
+  def append_task(exec, plugin_mod, group_name, task_mod) when is_atom(task_mod) do
+    append_task(exec, plugin_mod, group_name, {task_mod, []})
   end
 
-  def append_task(exec, group_name, task_tuple) do
+  def append_task(exec, _plugin_mod, group_name, task_tuple) do
     process =
       Enum.map(exec.process, fn
         {^group_name, list} -> {group_name, list ++ [task_tuple]}
