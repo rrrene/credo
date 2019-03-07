@@ -95,6 +95,16 @@ defmodule Credo.Code.NameTest do
     assert mod_list |> Name.full() == expected
   end
 
+  test "returns full name for a function call" do
+    mod_list = [
+      {:my_fun, [line: 62], [{:param1, [line: 62], nil}, {:param2, [line: 62], nil}]},
+      :Module
+    ]
+
+    expected = "my_fun(param1, param2).Module"
+    assert mod_list |> Name.full() == expected
+  end
+
   #
   # parts_count
   #
