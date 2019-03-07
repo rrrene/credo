@@ -93,7 +93,8 @@
         {Credo.Check.Readability.StringSigils, []},
         {Credo.Check.Readability.TrailingBlankLine, []},
         {Credo.Check.Readability.TrailingWhiteSpace, []},
-        {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
+        # TODO: enable by default in Credo 1.1
+        {Credo.Check.Readability.UnnecessaryAliasExpansion, false},
         {Credo.Check.Readability.VariableNames, []},
 
         #
