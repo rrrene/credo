@@ -25,7 +25,7 @@ defmodule Credo.ExecutionTest do
       ]
     ]
 
-    result = Execution.prepend_task(exec, :validate_cli_options, Credo.ExecutionTest)
+    result = Execution.prepend_task(exec, Credo, :validate_cli_options, Credo.ExecutionTest)
 
     assert expected_process == result.process
   end
@@ -52,7 +52,7 @@ defmodule Credo.ExecutionTest do
       ]
     ]
 
-    result = Execution.append_task(exec, :validate_cli_options, Credo.ExecutionTest)
+    result = Execution.append_task(exec, Credo, :validate_cli_options, Credo.ExecutionTest)
 
     assert expected_process == result.process
   end
