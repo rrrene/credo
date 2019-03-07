@@ -91,6 +91,19 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> refute_issues(@described_check)
   end
 
+  test "does NOT report for double quotes in heredoc /2" do
+    """
+    \"\"\"
+    {
+    "hello": "world",
+    "foo": "bar"
+    }
+    \"\"\"
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "does NOT report for single quotes in heredoc" do
     ~s(f\\"\\"b\\"\\")
     |> create_heredoc_snippet_w_single_quotes()
