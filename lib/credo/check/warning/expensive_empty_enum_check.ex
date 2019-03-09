@@ -53,7 +53,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {ast, issues}
   end
 
-  def issues_for_call(meta, issues, issue_meta, ast) do
+  defp issues_for_call(meta, issues, issue_meta, ast) do
     [issue_for(issue_meta, meta[:line], Macro.to_string(ast)) | issues]
   end
 

@@ -69,7 +69,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
     to_one_line(message)
   end
 
-  def to_one_line(str) do
+  defp to_one_line(str) do
     str
     |> String.split()
     |> Enum.join(" ")

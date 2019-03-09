@@ -31,7 +31,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
     end
   end
 
-  def issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
       message: "There should be a final \\n at the end of each file.",

@@ -32,7 +32,7 @@ defmodule Credo.Check.Warning.IExPry do
     {ast, issues}
   end
 
-  def issues_for_call(meta, issues, issue_meta) do
+  defp issues_for_call(meta, issues, issue_meta) do
     [issue_for(issue_meta, meta[:line], @call_string) | issues]
   end
 

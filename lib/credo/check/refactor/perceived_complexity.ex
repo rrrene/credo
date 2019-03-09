@@ -165,7 +165,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     count * @op_complexity_map[op]
   end
 
-  def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
       message: "Function is too complex (CC is #{actual_value}, max is #{max_value}).",

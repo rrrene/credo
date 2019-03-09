@@ -54,12 +54,12 @@ defmodule Credo.Check.Readability.StringSigils do
     |> SourceFile.parse(source_file.filename)
   end
 
-  def traverse(
-        {maybe_sigil, meta, [str | rest_ast]} = ast,
-        issues,
-        issue_meta,
-        maximum_allowed_quotes
-      ) do
+  defp traverse(
+         {maybe_sigil, meta, [str | rest_ast]} = ast,
+         issues,
+         issue_meta,
+         maximum_allowed_quotes
+       ) do
     line_no = meta[:line]
 
     cond do
@@ -83,7 +83,7 @@ defmodule Credo.Check.Readability.StringSigils do
     end
   end
 
-  def traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
+  defp traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
     {ast, issues}
   end
 

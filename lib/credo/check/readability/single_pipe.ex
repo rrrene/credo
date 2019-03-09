@@ -52,7 +52,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     {ast, {true, issues}}
   end
 
-  def issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
       message: "Use a function call when a pipeline is only one function long",

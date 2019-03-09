@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.ModuleNames do
     end
   end
 
-  def issues_for_name(name, meta, issues, issue_meta) do
+  defp issues_for_name(name, meta, issues, issue_meta) do
     all_pascal_case? =
       name
       |> to_string

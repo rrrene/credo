@@ -57,7 +57,7 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
   end
 
-  def issues_for_name(name, meta, issues, issue_meta) do
+  defp issues_for_name(name, meta, issues, issue_meta) do
     if name |> to_string |> Name.snake_case?() do
       issues
     else

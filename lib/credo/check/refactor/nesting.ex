@@ -120,7 +120,7 @@ defmodule Credo.Check.Refactor.Nesting do
     {Enum.count(nest_list), line_no, trigger}
   end
 
-  def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
       message:
