@@ -31,6 +31,9 @@ defmodule Credo.Check.Readability.StringSigils do
   ]
   @quote_codepoint 34
 
+  alias Credo.SourceFile
+  alias Credo.Code.Heredocs
+
   use Credo.Check, base_priority: :low
 
   @doc false
@@ -39,10 +42,16 @@ defmodule Credo.Check.Readability.StringSigils do
 
     maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
 
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, maximum_allowed_quotes)
-    )
+    source_file
+    |> remove_heredocs()
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, maximum_allowed_quotes))
+  end
+
+  defp remove_heredocs(source_file) do
+    source_file
+    |> SourceFile.source()
+    |> Heredocs.replace_with_spaces()
+    |> SourceFile.parse(source_file.filename)
   end
 
   def traverse(
@@ -93,18 +102,11 @@ defmodule Credo.Check.Readability.StringSigils do
          issue_meta,
          line_no
        ) do
-    if !is_heredoc(issue_meta, line_no) && too_many_quotes?(string, maximum_allowed_quotes) do
+    if too_many_quotes?(string, maximum_allowed_quotes) do
       [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
     else
       issues
     end
-  end
-
-  defp is_heredoc({_, source_file, _}, line_no) do
-    lines = SourceFile.lines(source_file)
-    {_, line} = Enum.find(lines, fn {n, _} -> n == line_no end)
-
-    Regex.match?(~r/("""|''')$/, line)
   end
 
   defp too_many_quotes?(string, limit) do
