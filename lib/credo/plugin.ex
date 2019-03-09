@@ -15,6 +15,7 @@ defmodule Credo.Plugin do
     Execution.prepend_task(exec, plugin_mod, group_name, task_mod)
   end
 
+  # register_cli_switch(exec, :castle, :string, :X, false | true | :other_castle)
   def register_cli_switch(
         %Execution{initializing_plugin: plugin_mod} = exec,
         name,

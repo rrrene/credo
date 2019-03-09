@@ -9,10 +9,10 @@ defmodule Credo.Execution.Task.InitializePlugins do
 
   defp init_plugin(exec, {_mod, false}), do: exec
 
-  defp init_plugin(exec, {mod, params}) do
+  defp init_plugin(exec, {mod, _params}) do
     exec = Execution.set_initializing_plugin(exec, mod)
 
-    case mod.init(exec, params) do
+    case mod.init(exec) do
       %Execution{} = exec ->
         Execution.set_initializing_plugin(exec, nil)
 

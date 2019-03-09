@@ -40,7 +40,7 @@ defmodule Credo.Execution do
               i: :ignore_checks,
               v: :version
             ],
-            cli_plugin_param_converters: [],
+            cli_switch_plugin_param_converters: [],
 
             # config
             files: nil,
@@ -278,7 +278,8 @@ defmodule Credo.Execution do
 
     %__MODULE__{
       exec
-      | cli_plugin_param_converters: exec.cli_plugin_param_converters ++ [converter_tuple]
+      | cli_switch_plugin_param_converters:
+          exec.cli_switch_plugin_param_converters ++ [converter_tuple]
     }
   end
 
