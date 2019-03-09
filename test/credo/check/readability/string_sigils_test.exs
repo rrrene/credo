@@ -99,6 +99,7 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     "foo": "bar"
     }
     \"\"\"
+    |> Jason.decode!
     """
     |> to_source_file
     |> refute_issues(@described_check)
