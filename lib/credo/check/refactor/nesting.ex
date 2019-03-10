@@ -60,17 +60,17 @@ defmodule Credo.Check.Refactor.Nesting do
     {ast, issues}
   end
 
-  def handle_depth(nil, ast, _issue_meta, issues, _max_nesting) do
+  defp handle_depth(nil, ast, _issue_meta, issues, _max_nesting) do
     {ast, issues}
   end
 
-  def handle_depth(
-        {depth, line_no, trigger},
-        ast,
-        issue_meta,
-        issues,
-        max_nesting
-      ) do
+  defp handle_depth(
+         {depth, line_no, trigger},
+         ast,
+         issue_meta,
+         issues,
+         max_nesting
+       ) do
     if depth > max_nesting do
       {
         ast,
