@@ -16,6 +16,15 @@ defmodule Credo.Check.Consistency.FilenamesTest do
     |> refute_issues(@described_check, acronyms: ["IEx"])
   end
 
+  test "it should NOT report violation for nested module with acronyms" do
+    """
+    defmodule MYAppGraphQL.Products.Resolver do
+    end
+    """
+    |> to_source_file("lib/myapp_graphql/products/resolver.ex")
+    |> refute_issues(@described_check, acronyms: [{"MYAppGraphQL", "myapp_graphql"}])
+  end
+
   test "it should NOT report violation for nested module and duplicated name" do
     """
     defmodule Foo.Bar do

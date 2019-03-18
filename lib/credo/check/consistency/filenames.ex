@@ -140,9 +140,18 @@ defmodule Credo.Check.Consistency.Filenames do
   end
 
   defp replace_acronyms(module, acronyms) do
-    Enum.reduce(acronyms, module, fn string, acc ->
-      downcase_string = String.downcase(string)
-      String.replace(acc, string, downcase_string)
-    end)
+    Enum.reduce(acronyms, module, &process_acronym/2)
   end
+
+  defp process_acronym(string, acc) when is_binary(string) do
+    downcase_string = String.downcase(string)
+    String.replace(acc, string, downcase_string)
+  end
+
+  defp process_acronym({string, processed_string}, acc) do
+    downcase_string = String.downcase(processed_string)
+    String.replace(acc, string, downcase_string)
+  end
+
+  defp process_acronym(_, acc), do: acc
 end
