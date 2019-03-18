@@ -23,6 +23,32 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report heredocs" do
+    """
+    defmodule ModuleWithoutRedundantBlankLines do
+      def a do
+        \"\"\"
+        This is a heredoc (multi-line string)
+
+
+        ---
+
+
+
+
+        White Space seems intentional here.
+        \"\"\"
+      end
+
+      def b do
+        2
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should not fail when file doesn't have empty lines" do
     "defmodule ModuleWithoutEmptyLines do
   def foo do
