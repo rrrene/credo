@@ -14,14 +14,14 @@ defmodule Credo.CLI.Output.Formatter.Oneline do
     end)
   end
 
-  def to_oneline(
-        %Issue{
-          check: check,
-          message: message,
-          filename: filename,
-          priority: priority
-        } = issue
-      ) do
+  defp to_oneline(
+         %Issue{
+           check: check,
+           message: message,
+           filename: filename,
+           priority: priority
+         } = issue
+       ) do
     inner_color = Output.check_color(issue)
     message_color = inner_color
     filename_color = :default_color

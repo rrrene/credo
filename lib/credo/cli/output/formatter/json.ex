@@ -15,15 +15,15 @@ defmodule Credo.CLI.Output.Formatter.JSON do
     UI.puts(Jason.encode!(map, pretty: true))
   end
 
-  def to_json(
-        %Issue{
-          check: check,
-          category: category,
-          message: message,
-          filename: filename,
-          priority: priority
-        } = issue
-      ) do
+  defp to_json(
+         %Issue{
+           check: check,
+           category: category,
+           message: message,
+           filename: filename,
+           priority: priority
+         } = issue
+       ) do
     check_name =
       check
       |> to_string()
