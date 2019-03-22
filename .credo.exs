@@ -141,6 +141,7 @@
         #
         {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Design.DuplicatedCode, false},
+        {Credo.Check.Readability.MultiAlias, false},
         {Credo.Check.Readability.Specs, false},
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
