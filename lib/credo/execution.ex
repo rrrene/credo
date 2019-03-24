@@ -223,7 +223,10 @@ defmodule Credo.Execution do
   end
 
   def get_command(exec, name) do
-    Map.get(exec.commands, name)
+    Map.get(exec.commands, name) ||
+      raise "Command not found: #{name}\n\nRegistered commands: #{
+              inspect(exec.commands, pretty: true)
+            }"
   end
 
   @doc false
@@ -241,8 +244,14 @@ defmodule Credo.Execution do
     %__MODULE__{exec | initializing_plugin: plugin_mod}
   end
 
+  def set_initializing_plugin(exec, nil) do
+    %__MODULE__{exec | initializing_plugin: nil}
+  end
+
   def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
-    raise "Attempting to initialize plugin #{mod2}, while already initializing plugin #{mod1}"
+    raise "Attempting to initialize plugin #{inspect(mod2)}, while already initializing plugin #{
+            mod1
+          }"
   end
 
   # Plugin params
@@ -284,7 +293,11 @@ defmodule Credo.Execution do
   end
 
   def get_given_cli_switch(exec, switch_name) do
-    exec.cli_options.switches[switch_name]
+    if Map.has_key?(exec.cli_options.switches, switch_name) do
+      {:ok, exec.cli_options.switches[switch_name]}
+    else
+      :error
+    end
   end
 
   # Assigns

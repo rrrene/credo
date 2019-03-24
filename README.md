@@ -515,7 +515,7 @@ Plugins can be deactivated by setting the second tuple element to `false`.
 
 ### Creating a plugin
 
-A plugin is basically just a module that provides a `init/2` callback.
+A plugin is basically just a module that provides an `init/1` callback.
 
 ```elixir
 defmodule CredoDemoPlugin do
@@ -579,7 +579,8 @@ end
 Users can use this command by typing
 
 ```bash
-mix credo demo
+$ mix credo demo
+By the power of !
 ```
 
 ### Override an existing command
@@ -718,7 +719,8 @@ But what about those situations where we want to be able to configure things on-
 Plugins should be able to provide custom CLI options as well, so we can do something like:
 
 ```bash
-mix credo --castle Winterfell
+$ mix credo --castle Winterfell
+Unknown switch: --castle
 ```
 
 Registering a custom CLI switch is easy:
@@ -728,41 +730,32 @@ defmodule CredoDemoPlugin do
   import Credo.Plugin
 
   def init(exec) do
-    exec
-    |> register_cli_switch(:castle, :string, :X)
-    |> append_task(:convert_cli_options_to_config, CredoDemoPlugin.ConvertCliSwitchesToPluginParams)
+    register_cli_switch(exec, :castle, :string, :X)
   end
 end
 ```
 
 Of course, having a CLI option is not worth much if we can not utilize it.
+This is why every registered CLI switch is automatically converted into a plugin param of the same name.
 
-Use the plugin's params to store the param information, by first registering a new CLI switch and then converting the given CLI options into params:
+```bash
+$ mix credo --castle Winterfell
+By the power of Winterfell!
+```
+
+Plugin authors can also provide a function to control the plugin param's name and value more granularly:
 
 ```elixir
 defmodule CredoDemoPlugin do
   import Credo.Plugin
 
   def init(exec) do
-    exec
-    |> register_cli_switch(:castle, :string, :X)
-    |> append_task(:convert_cli_options_to_config, CredoDemoPlugin.ConvertCliSwitchesToPluginParams)
+    register_cli_switch(exec, :kastle, :string, :K, fn(switch_value) ->
+      {:castle, switch_value}
+    end)
   end
 end
 ```
-
-```elixir
-defmodule CredoDemoPlugin.ConvertCliSwitchesToPluginParams do
-  use Credo.Execution.Task
-
-  def call(exec, _) do
-    castle = Execution.get_given_cli_switch(exec, :castle)
-
-    Execution.put_plugin_param(exec, CredoDemoPlugin, :castle, castle)
-  end
-end
-```
-
 
 ## Integrations
 

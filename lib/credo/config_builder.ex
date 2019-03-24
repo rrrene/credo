@@ -13,6 +13,7 @@ defmodule Credo.ConfigBuilder do
         |> add_config_file_to_exec(config_file)
         |> add_strict_to_exec(config_file, options)
         |> add_switches_to_exec(options.switches)
+        |> run_cli_switch_plugin_param_converters()
 
       {:error, _} = error ->
         error
@@ -189,4 +190,47 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_ignore(exec, _), do: exec
+
+  defp run_cli_switch_plugin_param_converters(exec) do
+    Enum.reduce(
+      exec.cli_switch_plugin_param_converters,
+      exec,
+      &reduce_converters/2
+    )
+  end
+
+  defp reduce_converters({_switch_name, _plugin_mod, false}, exec) do
+    exec
+  end
+
+  defp reduce_converters({switch_name, plugin_mod, true}, exec) do
+    reduce_converters({switch_name, plugin_mod, switch_name}, exec)
+  end
+
+  defp reduce_converters({switch_name, plugin_mod, param_name}, exec) when is_atom(param_name) do
+    converter_fun = fn switch_value -> {param_name, switch_value} end
+
+    reduce_converters({switch_name, plugin_mod, converter_fun}, exec)
+  end
+
+  defp reduce_converters({switch_name, plugin_mod, converter_fun}, exec)
+       when is_function(converter_fun) do
+    case Execution.get_given_cli_switch(exec, switch_name) do
+      {:ok, switch_value} ->
+        validate_converter_fun_result(exec, plugin_mod, switch_name, converter_fun.(switch_value))
+
+      _ ->
+        exec
+    end
+  end
+
+  defp validate_converter_fun_result(exec, plugin_mod, _switch_name, {param_name, param_value}) do
+    Execution.put_plugin_param(exec, plugin_mod, param_name, param_value)
+  end
+
+  defp validate_converter_fun_result(_exec, plugin_mod, switch_name, value) do
+    raise "Expected CLI switch to plugin param converter function to return a two-element tuple of {param_name, param_value}, got #{
+            inspect(value)
+          } (plugin: #{inspect(plugin_mod)}, switch: #{inspect(switch_name)})"
+  end
 end
