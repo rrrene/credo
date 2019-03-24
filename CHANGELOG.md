@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+- Ignore heredocs in `RedundantBlankLines`
+- Fix bug in `StringSigils`
+- Minor refactorings
+
 ## 1.0.3
 
 - Fix bug in `Name.full/1`
