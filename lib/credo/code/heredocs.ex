@@ -37,7 +37,7 @@ defmodule Credo.Code.Heredocs do
   end
 
   defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement, empty_line_replacement)
+    parse_heredoc(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
 
   defp parse_code(<<h::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
@@ -64,6 +64,10 @@ defmodule Credo.Code.Heredocs do
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_code(t, acc <> ~s("""), replacement, empty_line_replacement)
+  end
+
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_code(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
 
   defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do

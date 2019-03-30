@@ -35,6 +35,10 @@ defmodule Credo.Code.Charlists do
     parse_heredoc(t, acc <> ~s("""), replacement)
   end
 
+  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s('''), replacement)
+  end
+
   defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement) do
     parse_string_literal(t, acc <> "\"", replacement)
   end
@@ -126,6 +130,10 @@ defmodule Credo.Code.Charlists do
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
     parse_code(t, acc <> ~s("""), replacement)
+  end
+
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+    parse_code(t, acc <> ~s('''), replacement)
   end
 
   defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement) do
