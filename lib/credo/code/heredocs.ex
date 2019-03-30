@@ -28,6 +28,10 @@ defmodule Credo.Code.Heredocs do
     parse_code(t, acc <> "\\\"", replacement, empty_line_replacement)
   end
 
+  defp parse_code(<<"#"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_comment(t, acc <> "#", replacement, empty_line_replacement)
+  end
+
   defp parse_code(<<"?\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_code(t, acc <> "?\"", replacement, empty_line_replacement)
   end
@@ -48,6 +52,20 @@ defmodule Credo.Code.Heredocs do
     {h, t} = String.next_codepoint(str)
 
     parse_code(t, acc <> h, replacement, empty_line_replacement)
+  end
+
+  defp parse_comment("", acc, _replacement, _empty_line_replacement) do
+    acc
+  end
+
+  defp parse_comment(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_code(t, acc <> "\n", replacement, empty_line_replacement)
+  end
+
+  defp parse_comment(str, acc, replacement, empty_line_replacement) when is_binary(str) do
+    {h, t} = String.next_codepoint(str)
+
+    parse_comment(t, acc <> h, replacement, empty_line_replacement)
   end
 
   defp parse_heredoc("", acc, _replacement, _empty_line_replacement) do
