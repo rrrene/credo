@@ -42,16 +42,21 @@ defmodule Credo.Check.Readability.StringSigils do
 
     maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
 
-    source_file
-    |> remove_heredocs()
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, maximum_allowed_quotes))
+    case remove_heredocs_and_convert_to_ast(source_file) do
+      {:ok, ast} ->
+        Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
+
+      {:error, errors} ->
+        IO.warn("Unexpected error while parsing #{source_file.filename}: #{inspect(errors)}")
+        []
+    end
   end
 
-  defp remove_heredocs(source_file) do
+  defp remove_heredocs_and_convert_to_ast(source_file) do
     source_file
     |> SourceFile.source()
     |> Heredocs.replace_with_spaces()
-    |> SourceFile.parse(source_file.filename)
+    |> Credo.Code.ast()
   end
 
   defp traverse(
