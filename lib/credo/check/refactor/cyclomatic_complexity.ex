@@ -19,7 +19,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   @default_params [max_complexity: 9]
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
-  @double_condition_ops [:if, :unless, :for, :try, :and, :or, :&&, :||]
+  @double_condition_ops [:if, :unless, :for, :try, :and, :or, :&&, :||, :&, :fn]
   # these can have multiple outcomes as they are defined in their do blocks
   @multiple_condition_ops [:case, :cond]
   @op_complexity_map [
@@ -35,7 +35,9 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     &&: 1,
     ||: 1,
     case: 1,
-    cond: 1
+    cond: 1,
+    &: 0.5,
+    fn: 1
   ]
 
   use Credo.Check

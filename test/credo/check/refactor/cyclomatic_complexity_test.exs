@@ -245,4 +245,14 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     |> assert_issue(@described_check, max_complexity: 4)
     |> assert_trigger(:foobar)
   end
+
+  test "it should return the complexity for a function with anonymous functions" do
+   source = """
+    def first_fun(map) do
+      map
+      |> Enum.reduce(fn(item) -> Enum.map(item, &(&1)) end)
+    end
+    """
+    assert 3 == rounded_complexity(source)
+  end
 end
