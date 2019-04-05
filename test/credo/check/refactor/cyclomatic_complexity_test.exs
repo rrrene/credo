@@ -247,12 +247,13 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
   end
 
   test "it should return the complexity for a function with anonymous functions" do
-   source = """
+    source = """
     def first_fun(map) do
       map
       |> Enum.reduce(fn(item) -> Enum.map(item, &(&1)) end)
     end
     """
+
     assert 3 == rounded_complexity(source)
   end
 end
