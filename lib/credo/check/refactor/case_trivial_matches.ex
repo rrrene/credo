@@ -40,7 +40,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatches do
   defp case_statement_for({:->, _, [[false], _]}), do: false
   defp case_statement_for(_), do: nil
 
-  def issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
       message: "Case statements should not only contain `true` and `false`.",

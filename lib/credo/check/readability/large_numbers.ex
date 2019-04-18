@@ -144,7 +144,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     |> String.reverse()
   end
 
-  def issue_for(issue_meta, line_no, column, trigger, expected) do
+  defp issue_for(issue_meta, line_no, column, trigger, expected) do
     format_issue(
       issue_meta,
       message: "Large numbers should be written with underscores: #{expected}",

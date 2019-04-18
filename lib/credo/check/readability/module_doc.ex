@@ -125,15 +125,15 @@ defmodule Credo.Check.Readability.ModuleDoc do
     {ast, {continue, issues}}
   end
 
-  def matches_any?(name, list) when is_list(list) do
+  defp matches_any?(name, list) when is_list(list) do
     Enum.any?(list, &matches_any?(name, &1))
   end
 
-  def matches_any?(name, string) when is_binary(string) do
+  defp matches_any?(name, string) when is_binary(string) do
     String.contains?(name, string)
   end
 
-  def matches_any?(name, regex) do
+  defp matches_any?(name, regex) do
     String.match?(name, regex)
   end
 

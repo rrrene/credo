@@ -69,6 +69,8 @@ defmodule Credo.CLI.Output.UI do
   Truncation is indicated by a trailing ellipsis (…), and you can override this
   using an optional third argument.
 
+      iex> Credo.CLI.Output.UI.truncate(nil, 7)
+      ""
       iex> Credo.CLI.Output.UI.truncate("  7 chars\\n", 7)
       "  7 ch…"
       iex> Credo.CLI.Output.UI.truncate("  more than 7\\n", 7)
@@ -76,7 +78,7 @@ defmodule Credo.CLI.Output.UI do
       iex> Credo.CLI.Output.UI.truncate("  more than 7\\n", 7, " ...")
       "  m ..."
   """
-  def truncate(_line, max_length) when max_length <= 0, do: ""
+  def truncate(line, max_length) when max_length <= 0 or is_nil(line), do: ""
 
   def truncate(line, max_length) when max_length > 0 do
     truncate(line, max_length, @ellipsis)

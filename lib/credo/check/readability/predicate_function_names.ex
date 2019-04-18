@@ -69,7 +69,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     end
   end
 
-  def issues_for_name(_op, name, meta, issues, issue_meta) do
+  defp issues_for_name(_op, name, meta, issues, issue_meta) do
     name = to_string(name)
 
     cond do

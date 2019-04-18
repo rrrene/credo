@@ -40,7 +40,7 @@ defmodule Credo.Check.Readability.Semicolons do
 
   defp collect_issues([_ | rest], acc, issue_meta), do: collect_issues(rest, acc, issue_meta)
 
-  def issue_for(issue_meta, line_no, column) do
+  defp issue_for(issue_meta, line_no, column) do
     format_issue(
       issue_meta,
       message: "Don't use ; to separate statements and expressions",

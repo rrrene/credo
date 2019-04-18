@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.4
+
+- Ignore heredocs in `RedundantBlankLines`
+- Fix bug in `StringSigils`
+- Minor refactorings
+
+## 1.0.3
+
+- Fix bug in `Name.full/1`
+- Fix bug in `UI.truncate/2`
+- Disable `LazyLogging` for Elixir >= 1.7
+- Add UnnecessaryAliasExpansion check to experimental checks
+
 ## 1.0.2
 
 - Fix false positive in `MapInto`

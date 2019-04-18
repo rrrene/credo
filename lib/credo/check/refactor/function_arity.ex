@@ -61,11 +61,11 @@ defmodule Credo.Check.Refactor.FunctionArity do
     {ast, issues}
   end
 
-  def issue?(:defp, true, _, _), do: false
-  def issue?(_, _, arity, max_arity) when arity > max_arity, do: true
-  def issue?(_, _, _, _), do: false
+  defp issue?(:defp, true, _, _), do: false
+  defp issue?(_, _, arity, max_arity) when arity > max_arity, do: true
+  defp issue?(_, _, _, _), do: false
 
-  def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
       message:

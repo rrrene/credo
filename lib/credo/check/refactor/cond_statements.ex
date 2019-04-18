@@ -51,7 +51,7 @@ defmodule Credo.Check.Refactor.CondStatements do
     {ast, issues}
   end
 
-  def issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
       message:

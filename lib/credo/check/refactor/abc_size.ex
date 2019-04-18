@@ -113,7 +113,7 @@ defmodule Credo.Check.Refactor.ABCSize do
     :math.sqrt(a * a + b * b + c * c)
   end
 
-  def get_parameters(arguments) do
+  defp get_parameters(arguments) do
     case Enum.at(arguments, 0) do
       {_name, _meta, nil} ->
         []
@@ -232,21 +232,21 @@ defmodule Credo.Check.Refactor.ABCSize do
   defp var_name({name, _, nil}) when is_atom(name), do: name
   defp var_name(_), do: nil
 
-  def fn_parameters([params, tuple]) when is_list(params) and is_tuple(tuple) do
+  defp fn_parameters([params, tuple]) when is_list(params) and is_tuple(tuple) do
     fn_parameters(params)
   end
 
-  def fn_parameters([[{:when, _, params}], _]) when is_list(params) do
+  defp fn_parameters([[{:when, _, params}], _]) when is_list(params) do
     fn_parameters(params)
   end
 
-  def fn_parameters(params) when is_list(params) do
+  defp fn_parameters(params) when is_list(params) do
     params
     |> Enum.map(&var_name/1)
     |> Enum.reject(&is_nil/1)
   end
 
-  def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
       message: "Function is too complex (ABC size is #{actual_value}, max is #{max_value}).",

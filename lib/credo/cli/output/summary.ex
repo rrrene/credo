@@ -39,67 +39,30 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts([:faint, format_time_spent(time_load, time_run)])
 
     UI.puts(summary_parts(source_files, issues))
-
-    # print_badge(source_files, issues)
     UI.puts()
 
     print_priority_hint(issues, exec)
   end
 
-  def print_priority_hint([], %Execution{min_priority: min_priority})
-      when min_priority >= 0 do
+  defp print_priority_hint([], %Execution{min_priority: min_priority})
+       when min_priority >= 0 do
     UI.puts([
       :faint,
       "Use `--strict` to show all issues, `--help` for options."
     ])
   end
 
-  def print_priority_hint([], _exec), do: nil
+  defp print_priority_hint([], _exec), do: nil
 
-  def print_priority_hint(_, %Execution{min_priority: min_priority})
-      when min_priority >= 0 do
+  defp print_priority_hint(_, %Execution{min_priority: min_priority})
+       when min_priority >= 0 do
     UI.puts([
       :faint,
       "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
     ])
   end
 
-  def print_priority_hint(_, _exec), do: nil
-
-  def print_badge([], _), do: nil
-
-  def print_badge(source_files, issues) do
-    scopes = scope_count(source_files)
-
-    parts =
-      @category_wording
-      |> Enum.map(fn {category, _, _} -> category_count(issues, category) end)
-
-    parts = [scopes] ++ parts
-    sum = Enum.sum(parts)
-
-    width = 105
-
-    bar =
-      parts
-      |> Enum.map(&(&1 / sum))
-      |> Enum.map(&Float.round(&1, 3))
-      |> Enum.with_index()
-      |> Enum.map(fn {quota, index} ->
-        color =
-          if index == 0 do
-            :green
-          else
-            {category, _, _} = @category_wording |> Enum.at(index - 1)
-            Output.check_color(category)
-          end
-
-        [color, String.duplicate("=", round(quota * width))]
-      end)
-
-    [bar]
-    |> UI.puts()
-  end
+  defp print_priority_hint(_, _exec), do: nil
 
   defp format_time_spent(time_load, time_run) do
     time_run = time_run |> div(10_000)
