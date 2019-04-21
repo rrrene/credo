@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+- Fix bug due to commented-out heredocs
+- Fix variable explanation for `VariableRebinding` check
+- Add `MultiAlias` check to experimental checks
+
 ## 1.0.4
 
 - Ignore heredocs in `RedundantBlankLines`
