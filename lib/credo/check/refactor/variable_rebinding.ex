@@ -38,7 +38,12 @@ defmodule Credo.Check.Refactor.VariableRebinding do
         params! = do_yet_another_thing(params!)
       end
   """
-  @explanation [check: @checkdoc]
+  @explanation [
+    check: @checkdoc,
+    params: [
+      allow_bang: "Variables with a bang suffix will be ignored."
+    ]
+  ]
 
   use Credo.Check
 
