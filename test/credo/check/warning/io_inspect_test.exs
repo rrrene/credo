@@ -59,4 +59,28 @@ defmodule Credo.Check.Warning.IoInspectTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "should not report if filename excluded" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(a, b, c) do
+        map([a,b,c], &IO.inspect(&1))
+      end
+    end
+    """
+    |> to_source_file("its_a_match.exs")
+    |> refute_issues(@described_check, excluded: [~r/its_a_match\.exs$/])
+  end
+
+  test "should report if filename is not excluded" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(a, b, c) do
+        map([a,b,c], &IO.inspect(&1))
+      end
+    end
+    """
+    |> to_source_file("its_a_not_a_match.exs")
+    |> assert_issue(@described_check, excluded: [~r/its_a_match\.exs$/])
+  end
 end
