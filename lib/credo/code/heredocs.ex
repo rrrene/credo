@@ -44,6 +44,10 @@ defmodule Credo.Code.Heredocs do
     parse_heredoc(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
 
+  defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_string_literal(t, acc <> "\"", replacement, empty_line_replacement)
+  end
+
   defp parse_code(<<h::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_code(t, acc <> <<h::utf8>>, replacement, empty_line_replacement)
   end
@@ -103,5 +107,31 @@ defmodule Credo.Code.Heredocs do
 
   defp parse_heredoc(<<_::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_heredoc(t, acc <> replacement, replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal("", acc, _replacement, _empty_line_replacement) do
+    acc
+  end
+
+  defp parse_string_literal(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_string_literal(t, acc, replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_string_literal(t, acc, replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal(<<"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_code(t, acc <> ~s("), replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_string_literal(t, acc <> "\n", replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal(str, acc, replacement, empty_line_replacement) when is_binary(str) do
+    {h, t} = String.next_codepoint(str)
+
+    parse_string_literal(t, acc <> h, replacement, empty_line_replacement)
   end
 end

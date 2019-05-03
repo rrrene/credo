@@ -4,18 +4,13 @@ defmodule Credo.Code.HeredocsTest do
   alias Credo.Code.Heredocs
 
   test "does NOT crash if string is part of a function capture" do
-    source =
-      ~S"""
-      defmodule CredoTest do
-        def fun do
-          decorate.(&"Ola #{kinds[&1]}")
-        end
+    source = ~S"""
+    defmodule CredoTest do
+      def fun do
+        decorate.(&"Ola #{kinds[&1]}")
       end
-      """
-      |> String.replace(
-        "@@EMPTY_STRING@@",
-        "                                                        "
-      )
+    end
+    """
 
     assert source == source |> Heredocs.replace_with_spaces()
   end

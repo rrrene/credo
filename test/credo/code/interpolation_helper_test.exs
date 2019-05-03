@@ -136,6 +136,22 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  test "should replace heredoc interpolations with given character if string is part of a function capture" do
+    source = ~S"""
+    def fun do
+      decorate.(&"Ola #{kinds[&1]}")
+    end
+    """
+
+    expected = ~S"""
+    def fun do
+      decorate.(&"Ola $$$$$$$$$$$$")
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
   @tag :token_position
   test "should give correct token position" do
     positions = InterpolationHelper.interpolation_positions(@no_interpolations_source)
