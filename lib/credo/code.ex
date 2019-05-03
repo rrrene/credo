@@ -196,50 +196,7 @@ defmodule Credo.Code do
   @doc """
   Returns an AST without its metadata.
   """
-  def remove_metadata(ast) when is_tuple(ast) do
-    update_metadata(ast, fn _ast -> [] end)
-  end
-
   def remove_metadata(ast) do
-    ast
-    |> List.wrap()
-    |> Enum.map(&update_metadata(&1, fn _ast -> [] end))
+    Macro.prewalk(ast, &Macro.update_meta(&1, fn _meta -> [] end))
   end
-
-  defp update_metadata({atom, _meta, list} = ast, fun) when is_list(list) do
-    {atom, fun.(ast), Enum.map(list, &update_metadata(&1, fun))}
-  end
-
-  defp update_metadata([do: tuple], fun) when is_tuple(tuple) do
-    [do: update_metadata(tuple, fun)]
-  end
-
-  defp update_metadata([do: tuple, else: tuple2], fun) when is_tuple(tuple) do
-    [do: update_metadata(tuple, fun), else: update_metadata(tuple2, fun)]
-  end
-
-  defp update_metadata({:do, tuple}, fun) when is_tuple(tuple) do
-    {:do, update_metadata(tuple, fun)}
-  end
-
-  defp update_metadata({:else, tuple}, fun) when is_tuple(tuple) do
-    {:else, update_metadata(tuple, fun)}
-  end
-
-  defp update_metadata({atom, _meta, arguments} = ast, fun) do
-    {atom, fun.(ast), arguments}
-  end
-
-  defp update_metadata(v, fun) when is_list(v), do: Enum.map(v, &update_metadata(&1, fun))
-
-  defp update_metadata(tuple, fun) when is_tuple(tuple) do
-    tuple
-    |> Tuple.to_list()
-    |> Enum.map(&update_metadata(&1, fun))
-    |> List.to_tuple()
-  end
-
-  defp update_metadata(v, _fun)
-       when is_atom(v) or is_binary(v) or is_float(v) or is_integer(v),
-       do: v
 end

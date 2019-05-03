@@ -363,4 +363,22 @@ defmodule Credo.CodeTest do
 
     assert expected == Credo.Code.remove_metadata(ast)
   end
+
+  test "returns ast with external call without metadata" do
+    ast =
+      {{:., [line: 1, column: 7],
+        [
+          {:__aliases__, [line: 1, column: 1], [:Kernel]},
+          :node
+        ]}, [line: 1, column: 7], []}
+
+    expected =
+      {{:., [],
+        [
+          {:__aliases__, [], [:Kernel]},
+          :node
+        ]}, [], []}
+
+    assert expected == Credo.Code.remove_metadata(ast)
+  end
 end
