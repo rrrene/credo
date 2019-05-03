@@ -3,6 +3,23 @@ defmodule Credo.Code.HeredocsTest do
 
   alias Credo.Code.Heredocs
 
+  test "does NOT crash if string is part of a function capture" do
+    source =
+      ~S"""
+      defmodule CredoTest do
+        def fun do
+          decorate.(&"Ola #{kinds[&1]}")
+        end
+      end
+      """
+      |> String.replace(
+        "@@EMPTY_STRING@@",
+        "                                                        "
+      )
+
+    assert source == source |> Heredocs.replace_with_spaces()
+  end
+
   test "it should return the source without string literals 2" do
     source = """
     @moduledoc \"\"\"
