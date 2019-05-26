@@ -163,7 +163,11 @@ This also works for umbrella projects, where you can have individual `.credo.exs
 }
 ```
 
-You can use `mix credo gen.config` to generate a complete example configuration.
+`mix credo --config-name <NAME_OF_CONFIG>` allows you to use a specific config (instead of `default`) inside a config file.
+
+`mix credo --config-file <PATH_TO_CONFIG_FILE>` let's you use a specific config file.
+
+Finally, you can use `mix credo gen.config` to generate a complete example configuration.
 
 
 ### Inline Configuration via Config Comments
