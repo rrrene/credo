@@ -92,7 +92,7 @@ defmodule Credo.CodeTest do
     assert :foobar == Credo.Code.Module.def_name(ast)
   end
 
-  test "it should NOT report expected code 0" do
+  test "it should NOT report expected code /1" do
     source = """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -103,6 +103,20 @@ defmodule Credo.CodeTest do
 
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \" \n  end\nend\n"
+
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
+  end
+
+  test "it should NOT report expected code /2" do
+    source = """
+    defmodule CredoSampleModule do
+      defp escape_subsection_impl([c | remainder], reversed_result)
+        when c == ?\\ or c == ?",
+          do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
+    end
+    """
+
+    expected = source
 
     assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end

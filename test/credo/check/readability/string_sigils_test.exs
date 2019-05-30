@@ -122,20 +122,6 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> refute_issues(@described_check)
   end
 
-  test "does NOT crash if string is part of a function capture" do
-    snippet = ~S"""
-    defmodule CredoTest do
-      def fun do
-        decorate.(&"Ola #{kinds[&1]}")
-      end
-    end
-    """
-
-    snippet
-    |> to_source_file
-    |> refute_issues(@described_check)
-  end
-
   #
   # cases raising issues
   #

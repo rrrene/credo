@@ -3,18 +3,6 @@ defmodule Credo.Code.HeredocsTest do
 
   alias Credo.Code.Heredocs
 
-  test "does NOT crash if string is part of a function capture" do
-    source = ~S"""
-    defmodule CredoTest do
-      def fun do
-        decorate.(&"Ola #{kinds[&1]}")
-      end
-    end
-    """
-
-    assert source == source |> Heredocs.replace_with_spaces()
-  end
-
   test "it should return the source without string literals 2" do
     source = """
     @moduledoc \"\"\"
@@ -104,6 +92,37 @@ defmodule Credo.Code.HeredocsTest do
 
     result = source |> Heredocs.replace_with_spaces(".")
     assert expected == result
+  end
+
+  test "it should return the source without the strings and replace the contents" do
+    source = """
+    t = ~S\"\"\"
+    abc
+    \"\"\"
+    """
+
+    expected = """
+    t = ~S\"\"\"
+    ...
+    \"\"\"
+    """
+
+    result = source |> Heredocs.replace_with_spaces(".")
+    assert expected == result
+  end
+
+  test "it should NOT report expected code /2" do
+    source = """
+    defmodule CredoSampleModule do
+      defp escape_subsection_impl([c | remainder], reversed_result)
+        when c == ?\\ or c == ?",
+          do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
+    end
+    """
+
+    expected = source
+
+    assert expected == Heredocs.replace_with_spaces(source)
   end
 
   test "it should return the source without string sigils and replace the contents including interpolation" do
