@@ -112,11 +112,38 @@ defmodule Credo.Code.HeredocsTest do
   end
 
   test "it should NOT report expected code /2" do
-    source = """
+    source = ~S"""
     defmodule CredoSampleModule do
+      def escape_subsection(""), do: "\"\""
+
+      def escape_subsection(x) when is_binary(x) do
+        x
+        |> String.to_charlist()
+        |> escape_subsection_impl([])
+        |> Enum.reverse()
+        |> to_quoted_string()
+      end
+
+      defp to_quoted_string(s), do: ~s["test string"]
+
+      # git-config(1) lists the limited set of supported escape sequences
+      # (which is even more limited for subsection names than for values).
+
+      defp escape_subsection_impl([], reversed_result), do: reversed_result
+
+      defp escape_subsection_impl([0 | _], _reversed_result),
+        do: raise(ConfigInvalidError, "config subsection name contains byte 0x00")
+
+      defp escape_subsection_impl([?\n | _], _reversed_result),
+        do: raise(ConfigInvalidError, "config subsection name contains newline")
+
       defp escape_subsection_impl([c | remainder], reversed_result)
-        when c == ?\\ or c == ?",
-          do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
+           when c == ?\\ or c == ?",
+           do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
+
+      defp escape_subsection_impl([c | remainder], reversed_result),
+        do: escape_subsection_impl(remainder, [c | reversed_result])
+
     end
     """
 
@@ -182,5 +209,38 @@ defmodule Credo.Code.HeredocsTest do
     expected = source
 
     assert expected == source |> Heredocs.replace_with_spaces(".")
+  end
+
+  test "it should overwrite whitespace in heredocs" do
+    source =
+      """
+      defmodule CredoSampleModule do
+        @doc '''
+        Foo++
+        Bar
+        '''
+      end
+      """
+      |> String.replace("++", "  ")
+
+    expected = """
+    defmodule CredoSampleModule do
+      @doc '''
+    .......
+    .....
+    ..'''
+    end
+    """
+
+    assert expected == source |> Heredocs.replace_with_spaces(".")
+  end
+
+  @example_code File.read!("test/fixtures/example_code/clean_redux.ex")
+  test "it should produce valid code" do
+    result = Heredocs.replace_with_spaces(@example_code)
+    result2 = Heredocs.replace_with_spaces(result)
+
+    assert result == result2, "Heredocs.replace_with_spaces/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 end

@@ -162,4 +162,12 @@ defmodule Credo.Code.StringsTest do
 
     assert expected == source |> Strings.replace_with_spaces(".")
   end
+
+  test "it should NOT report expected code 2" do
+    input = ~S"""
+    escape_charlist('"\\' ++ r)
+    """
+
+    assert input == Strings.replace_with_spaces(input)
+  end
 end

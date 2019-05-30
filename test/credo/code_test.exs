@@ -107,21 +107,21 @@ defmodule Credo.CodeTest do
     assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
-  test "it should NOT report expected code /2" do
-    source = """
-    defmodule CredoSampleModule do
-      defp escape_subsection_impl([c | remainder], reversed_result)
-        when c == ?\\ or c == ?",
-          do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
-    end
+  test "it should NOT report expected code 4" do
+    input = ~S"""
+    defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
+    do: escape_charlist('"\\' ++ reversed_result, remainder, needs_quote?)
     """
 
-    expected = source
+    expected = ~S"""
+    defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
+    do: escape_charlist('   ' ++ reversed_result, remainder, needs_quote?)
+    """
 
-    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
+    assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(input)
   end
 
-  test "it should NOT report expected code 2" do
+  test "it should NOT report expected code 3" do
     source = """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -240,6 +240,15 @@ defmodule Credo.CodeTest do
       |> to_source_file
 
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
+  end
+
+  @example_code File.read!("test/fixtures/example_code/clean.ex")
+  test "it should produce valid code" do
+    result = Credo.Code.clean_charlists_strings_sigils_and_comments(@example_code)
+    result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
+
+    assert result == result2, "clean_charlists_strings_sigils_and_comments/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
   test "returns ast without metadata" do

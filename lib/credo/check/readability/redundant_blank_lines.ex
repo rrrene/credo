@@ -22,6 +22,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
 
   alias Credo.Code.Charlists
   alias Credo.Code.Heredocs
+  alias Credo.Code.Sigils
   alias Credo.Code.Strings
 
   @doc false
@@ -31,8 +32,9 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
 
     source_file
-    |> Strings.replace_with_spaces("=", "=")
     |> Charlists.replace_with_spaces("=")
+    |> Sigils.replace_with_spaces("=", "=")
+    |> Strings.replace_with_spaces("=", "=")
     |> Heredocs.replace_with_spaces("=", "=", "=")
     |> Credo.Code.to_lines()
     |> blank_lines()

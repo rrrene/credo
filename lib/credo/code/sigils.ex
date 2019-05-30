@@ -66,6 +66,18 @@ defmodule Credo.Code.Sigils do
     parse_code(t, acc <> "\\\"", replacement)
   end
 
+  defp parse_code(<<"\\\'"::utf8, t::binary>>, acc, replacement) do
+    parse_code(t, acc <> "\\\'", replacement)
+  end
+
+  defp parse_code(<<"?'"::utf8, t::binary>>, acc, replacement) do
+    parse_code(t, acc <> "?'", replacement)
+  end
+
+  defp parse_code(<<"'"::utf8, t::binary>>, acc, replacement) do
+    parse_charlist(t, acc <> "'", replacement)
+  end
+
   defp parse_code(<<"?\""::utf8, t::binary>>, acc, replacement) do
     parse_code(t, acc <> "?\"", replacement)
   end
@@ -92,6 +104,36 @@ defmodule Credo.Code.Sigils do
     parse_code(t, acc <> h, replacement)
   end
 
+  #
+  # Charlists
+  #
+
+  defp parse_charlist(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
+    parse_charlist(t, acc <> "\\\\", replacement)
+  end
+
+  defp parse_charlist(<<"\\\'"::utf8, t::binary>>, acc, replacement) do
+    parse_charlist(t, acc <> "\\\'", replacement)
+  end
+
+  defp parse_charlist(<<"\'"::utf8, t::binary>>, acc, replacement) do
+    parse_code(t, acc <> "'", replacement)
+  end
+
+  defp parse_charlist(<<"\n"::utf8, t::binary>>, acc, replacement) do
+    parse_charlist(t, acc <> "\n", replacement)
+  end
+
+  defp parse_charlist(str, acc, replacement) when is_binary(str) do
+    {h, t} = String.next_codepoint(str)
+
+    parse_comment(t, acc <> h, replacement)
+  end
+
+  #
+  # Comments
+  #
+
   defp parse_comment("", acc, _replacement) do
     acc
   end
@@ -106,16 +148,20 @@ defmodule Credo.Code.Sigils do
     parse_comment(t, acc <> h, replacement)
   end
 
+  #
+  # String Literals
+  #
+
   defp parse_string_literal("", acc, _replacement) do
     acc
   end
 
   defp parse_string_literal(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
-    parse_string_literal(t, acc, replacement)
+    parse_string_literal(t, acc <> "\\\\", replacement)
   end
 
   defp parse_string_literal(<<"\\\""::utf8, t::binary>>, acc, replacement) do
-    parse_string_literal(t, acc, replacement)
+    parse_string_literal(t, acc <> "\\\"", replacement)
   end
 
   defp parse_string_literal(<<"\""::utf8, t::binary>>, acc, replacement) do
@@ -130,6 +176,10 @@ defmodule Credo.Code.Sigils do
     {h, t} = String.next_codepoint(str)
     parse_string_literal(t, acc <> h, replacement)
   end
+
+  #
+  # Sigils
+  #
 
   for {_sigil_start, sigil_end} <- @removable_sigils do
     defp parse_removable_sigil("", acc, unquote(sigil_end), _replacement) do
@@ -192,16 +242,20 @@ defmodule Credo.Code.Sigils do
     end
   end
 
+  #
+  # Heredocs
+  #
+
   defp parse_heredoc("", acc, _replacement) do
     acc
   end
 
   defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc, replacement)
+    parse_heredoc(t, acc <> "\\\\", replacement)
   end
 
   defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc, replacement)
+    parse_heredoc(t, acc <> "\\\"", replacement)
   end
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do

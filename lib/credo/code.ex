@@ -13,6 +13,7 @@ defmodule Credo.Code do
   """
 
   alias Credo.Code.Charlists
+  alias Credo.Code.Heredocs
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
 
@@ -166,6 +167,7 @@ defmodule Credo.Code do
     source_file_or_source
     |> Sigils.replace_with_spaces(" ", " ", filename)
     |> Strings.replace_with_spaces(" ", " ", filename)
+    |> Heredocs.replace_with_spaces(" ", " ", "", filename)
     |> Charlists.replace_with_spaces()
   end
 
@@ -179,6 +181,7 @@ defmodule Credo.Code do
     source_file_or_source
     |> Sigils.replace_with_spaces(sigil_replacement, " ", filename)
     |> Strings.replace_with_spaces(" ", " ", filename)
+    |> Heredocs.replace_with_spaces(" ", " ", "", filename)
     |> Charlists.replace_with_spaces()
     |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
   end

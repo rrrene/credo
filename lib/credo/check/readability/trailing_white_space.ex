@@ -20,6 +20,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
 
   alias Credo.Code
   alias Credo.Code.Strings
+  alias Credo.Code.Heredocs
 
   @doc false
   def run(source_file, params \\ []) do
@@ -34,6 +35,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   defp to_lines(source_file, true) do
     source_file
     |> Strings.replace_with_spaces(".")
+    |> Heredocs.replace_with_spaces(".", ".", ".")
     |> Code.to_lines()
   end
 

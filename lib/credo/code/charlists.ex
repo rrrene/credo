@@ -3,16 +3,36 @@ defmodule Credo.Code.Charlists do
   This module lets you strip charlists from source code.
   """
 
+  alias Credo.Code.InterpolationHelper
+  alias Credo.SourceFile
+
   @doc """
   Replaces all characters inside charlists with the equivalent amount of
   white-space.
   """
-  def replace_with_spaces(source, replacement \\ " ") when is_binary(source) do
-    parse_code(source, "", replacement)
+  def replace_with_spaces(
+        source_file,
+        replacement \\ " ",
+        interpolation_replacement \\ " ",
+        filename \\ "nofilename"
+      ) do
+    {source, filename} = SourceFile.source_and_filename(source_file, filename)
+
+    source
+    |> InterpolationHelper.replace_interpolations(interpolation_replacement, filename)
+    |> parse_code("", replacement)
   end
 
   defp parse_code("", acc, _replacement) do
     acc
+  end
+
+  defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s("""), replacement)
+  end
+
+  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s('''), replacement)
   end
 
   defp parse_code(<<"\\\'"::utf8, t::binary>>, acc, replacement) do
@@ -23,20 +43,16 @@ defmodule Credo.Code.Charlists do
     parse_code(t, acc <> "?'", replacement)
   end
 
+  defp parse_code(<<"?\""::utf8, t::binary>>, acc, replacement) do
+    parse_code(t, acc <> "?\"", replacement)
+  end
+
   defp parse_code(<<"'"::utf8, t::binary>>, acc, replacement) do
     parse_charlist(t, acc <> "'", replacement)
   end
 
   defp parse_code(<<"#"::utf8, t::binary>>, acc, replacement) do
     parse_comment(t, acc <> "#", replacement)
-  end
-
-  defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement)
-  end
-
-  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement)
   end
 
   defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement) do
@@ -53,6 +69,10 @@ defmodule Credo.Code.Charlists do
     parse_code(t, acc <> h, replacement)
   end
 
+  #
+  # Comments
+  #
+
   defp parse_comment("", acc, _replacement) do
     acc
   end
@@ -66,6 +86,10 @@ defmodule Credo.Code.Charlists do
 
     parse_comment(t, acc <> h, replacement)
   end
+
+  #
+  # String Literals
+  #
 
   defp parse_string_literal("", acc, _replacement) do
     acc
@@ -92,12 +116,16 @@ defmodule Credo.Code.Charlists do
     parse_string_literal(t, acc <> h, replacement)
   end
 
+  #
+  # Charlists
+  #
+
   defp parse_charlist("", acc, _replacement) do
     acc
   end
 
   defp parse_charlist(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
-    parse_charlist(t, acc, replacement)
+    parse_charlist(t, acc <> replacement <> replacement, replacement)
   end
 
   defp parse_charlist(<<"\\\'"::utf8, t::binary>>, acc, replacement) do
@@ -115,6 +143,10 @@ defmodule Credo.Code.Charlists do
   defp parse_charlist(<<_::utf8, t::binary>>, acc, replacement) do
     parse_charlist(t, acc <> replacement, replacement)
   end
+
+  #
+  # Heredocs
+  #
 
   defp parse_heredoc("", acc, _replacement) do
     acc
