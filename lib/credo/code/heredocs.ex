@@ -4,19 +4,22 @@ defmodule Credo.Code.Heredocs do
   """
 
   alias Credo.Code.InterpolationHelper
+  alias Credo.SourceFile
 
   @doc """
   Replaces all characters inside heredocs
   with the equivalent amount of white-space.
   """
   def replace_with_spaces(
-        source,
+        source_file,
         replacement \\ " ",
         interpolation_replacement \\ " ",
         empty_line_replacement \\ ""
       ) do
+    {source, filename} = SourceFile.source_and_filename(source_file)
+
     source
-    |> InterpolationHelper.replace_interpolations(interpolation_replacement)
+    |> InterpolationHelper.replace_interpolations(interpolation_replacement, filename)
     |> parse_code("", replacement, empty_line_replacement)
   end
 
@@ -114,11 +117,11 @@ defmodule Credo.Code.Heredocs do
   end
 
   defp parse_string_literal(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc, replacement, empty_line_replacement)
+    parse_string_literal(t, acc <> "\\\\", replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc, replacement, empty_line_replacement)
+    parse_string_literal(t, acc <> "\\\"", replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(<<"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do

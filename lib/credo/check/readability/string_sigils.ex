@@ -54,7 +54,6 @@ defmodule Credo.Check.Readability.StringSigils do
 
   defp remove_heredocs_and_convert_to_ast(source_file) do
     source_file
-    |> SourceFile.source()
     |> Heredocs.replace_with_spaces()
     |> Credo.Code.ast()
   end

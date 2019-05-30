@@ -47,13 +47,11 @@ defmodule Credo.Check.Readability.MaxLineLength do
     definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
-    source = SourceFile.source(source_file)
-
     source =
       if ignore_heredocs do
-        Heredocs.replace_with_spaces(source, "")
+        Heredocs.replace_with_spaces(source_file, "")
       else
-        source
+        SourceFile.source(source_file)
       end
 
     lines = Credo.Code.to_lines(source)
@@ -61,7 +59,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     lines_for_comparison =
       if ignore_strings do
         source
-        |> Strings.replace_with_spaces("")
+        |> Strings.replace_with_spaces("", " ", source_file.filename)
         |> Credo.Code.to_lines()
       else
         lines

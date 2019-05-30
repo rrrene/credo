@@ -4,8 +4,9 @@ defmodule Credo.Code.InterpolationHelper do
   alias Credo.Code.Token
 
   @doc false
-  def replace_interpolations(source, char \\ " ") do
-    positions = interpolation_positions(source)
+  def replace_interpolations(source, char \\ " ", filename \\ "nofilename")
+      when is_binary(source) do
+    positions = interpolation_positions(source, filename)
     lines = String.split(source, "\n")
 
     positions
@@ -60,9 +61,9 @@ defmodule Credo.Code.InterpolationHelper do
   end
 
   @doc false
-  def interpolation_positions(source) do
+  def interpolation_positions(source, filename \\ "nofilename") do
     source
-    |> Credo.Code.to_tokens()
+    |> Credo.Code.to_tokens(filename)
     |> Enum.flat_map(&map_interpolations(&1, source))
     |> Enum.reject(&is_nil/1)
   end

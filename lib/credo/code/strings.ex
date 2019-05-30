@@ -4,6 +4,7 @@ defmodule Credo.Code.Strings do
   """
 
   alias Credo.Code.InterpolationHelper
+  alias Credo.SourceFile
 
   @sigil_delimiters [
     {"(", ")"},
@@ -25,9 +26,16 @@ defmodule Credo.Code.Strings do
   Replaces all characters inside string literals and string sigils
   with the equivalent amount of white-space.
   """
-  def replace_with_spaces(source, replacement \\ " ", interpolation_replacement \\ " ") do
+  def replace_with_spaces(
+        source_file,
+        replacement \\ " ",
+        interpolation_replacement \\ " ",
+        filename \\ "@"
+      ) do
+    {source, filename} = SourceFile.source_and_filename(source_file, filename)
+
     source
-    |> InterpolationHelper.replace_interpolations(interpolation_replacement)
+    |> InterpolationHelper.replace_interpolations(interpolation_replacement, filename)
     |> parse_code("", replacement)
   end
 

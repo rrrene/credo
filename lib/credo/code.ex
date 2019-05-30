@@ -77,7 +77,7 @@ defmodule Credo.Code do
   @doc false
   def ast(source, filename \\ "nofilename") when is_binary(source) do
     try do
-      case Code.string_to_quoted(source, line: 1, columns: true) do
+      case Code.string_to_quoted(source, line: 1, columns: true, file: filename) do
         {:ok, value} ->
           {:ok, value}
 
@@ -126,14 +126,14 @@ defmodule Credo.Code do
   def to_tokens(%SourceFile{} = source_file) do
     source_file
     |> SourceFile.source()
-    |> to_tokens()
+    |> to_tokens(source_file.filename)
   end
 
-  def to_tokens(source) when is_binary(source) do
+  def to_tokens(source, filename \\ "nofilename") when is_binary(source) do
     result =
       source
       |> String.to_charlist()
-      |> :elixir_tokenizer.tokenize(1, [])
+      |> :elixir_tokenizer.tokenize(1, file: filename)
 
     case result do
       # Elixir < 1.6
@@ -160,16 +160,12 @@ defmodule Credo.Code do
   Takes a SourceFile and returns its source code stripped of all Strings and
   Sigils.
   """
-  def clean_charlists_strings_and_sigils(%SourceFile{} = source_file) do
-    source_file
-    |> SourceFile.source()
-    |> clean_charlists_strings_and_sigils
-  end
+  def clean_charlists_strings_and_sigils(source_file_or_source) do
+    {_source, filename} = Credo.SourceFile.source_and_filename(source_file_or_source)
 
-  def clean_charlists_strings_and_sigils(source) do
-    source
-    |> Sigils.replace_with_spaces()
-    |> Strings.replace_with_spaces()
+    source_file_or_source
+    |> Sigils.replace_with_spaces(" ", " ", filename)
+    |> Strings.replace_with_spaces(" ", " ", filename)
     |> Charlists.replace_with_spaces()
   end
 
@@ -177,18 +173,12 @@ defmodule Credo.Code do
   Takes a SourceFile and returns its source code stripped of all Strings, Sigils
   and code comments.
   """
-  def clean_charlists_strings_sigils_and_comments(source, sigil_replacement \\ " ")
+  def clean_charlists_strings_sigils_and_comments(source_file_or_source, sigil_replacement \\ " ") do
+    {_source, filename} = Credo.SourceFile.source_and_filename(source_file_or_source)
 
-  def clean_charlists_strings_sigils_and_comments(%SourceFile{} = source_file, sigil_replacement) do
-    source_file
-    |> SourceFile.source()
-    |> clean_charlists_strings_sigils_and_comments(sigil_replacement)
-  end
-
-  def clean_charlists_strings_sigils_and_comments(source, sigil_replacement) do
-    source
-    |> Sigils.replace_with_spaces(sigil_replacement)
-    |> Strings.replace_with_spaces()
+    source_file_or_source
+    |> Sigils.replace_with_spaces(sigil_replacement, " ", filename)
+    |> Strings.replace_with_spaces(" ", " ", filename)
     |> Charlists.replace_with_spaces()
     |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
   end

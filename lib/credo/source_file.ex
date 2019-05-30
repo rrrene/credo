@@ -96,6 +96,17 @@ defmodule Credo.SourceFile do
     end
   end
 
+  @doc "Retuns the source code and filename for the given `source_file_or_source`."
+  def source_and_filename(source_file_or_source, default_filename \\ "nofilename")
+
+  def source_and_filename(%__MODULE__{filename: filename} = source_file, _default_filename) do
+    {source(source_file), filename}
+  end
+
+  def source_and_filename(source, default_filename) when is_binary(source) do
+    {source, default_filename}
+  end
+
   @doc """
   Returns the line at the given `line_no`.
 

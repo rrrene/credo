@@ -7,7 +7,7 @@ defmodule Credo.Code.Charlists do
   Replaces all characters inside charlists with the equivalent amount of
   white-space.
   """
-  def replace_with_spaces(source, replacement \\ " ") do
+  def replace_with_spaces(source, replacement \\ " ") when is_binary(source) do
     parse_code(source, "", replacement)
   end
 

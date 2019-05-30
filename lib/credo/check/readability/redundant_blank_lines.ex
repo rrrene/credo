@@ -31,7 +31,6 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
 
     source_file
-    |> SourceFile.source()
     |> Strings.replace_with_spaces("=", "=")
     |> Charlists.replace_with_spaces("=")
     |> Heredocs.replace_with_spaces("=", "=", "=")
