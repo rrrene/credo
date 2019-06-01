@@ -263,7 +263,7 @@ defmodule Credo.Execution do
   def put_plugin_param(exec, plugin_mod, param_name, param_value) do
     plugins =
       Keyword.update(exec.plugins, plugin_mod, [], fn list ->
-        Keyword.update(list, param_name, param_value, fn -> param_value end)
+        Keyword.update(list, param_name, param_value, fn _ -> param_value end)
       end)
 
     %__MODULE__{exec | plugins: plugins}
