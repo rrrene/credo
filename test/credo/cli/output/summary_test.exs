@@ -7,7 +7,7 @@ defmodule Credo.CLI.Output.SummaryTest do
   doctest Credo.CLI.Output.Summary
 
   test "print/4 it does not blow up on an empty umbrella project" do
-    exec = Execution.start_servers(%Execution{})
+    exec = Execution.build()
 
     Summary.print([], exec, 0, 0)
   end

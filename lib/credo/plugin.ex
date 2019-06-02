@@ -37,6 +37,6 @@ defmodule Credo.Plugin do
         %Execution{initializing_plugin: plugin_mod} = exec,
         config_file_string
       ) do
-    Execution.put_config_file(exec, {:plugin, plugin_mod, config_file_string})
+    Execution.append_config_file(exec, {:plugin, plugin_mod, config_file_string})
   end
 end

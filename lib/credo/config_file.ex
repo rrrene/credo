@@ -5,14 +5,13 @@ defmodule Credo.ConfigFile do
 
   @config_filename ".credo.exs"
   @default_config_name "default"
-  @default_config_file File.read!(@config_filename)
-
   @origin_user :file
-  @origin_credo :credo
 
   @default_glob "**/*.{ex,exs}"
   @default_files_included [@default_glob]
   @default_files_excluded []
+
+  alias Credo.Execution
 
   defstruct files: nil,
             color: true,
@@ -56,8 +55,9 @@ defmodule Credo.ConfigFile do
       |> Enum.filter(&File.exists?/1)
       |> Enum.map(&{@origin_user, &1, File.read!(&1)})
 
-    (exec.config_files ++ config_files)
-    |> List.insert_at(0, {@origin_credo, nil, @default_config_file})
+    exec = Enum.reduce(config_files, exec, &Execution.append_config_file(&2, &1))
+
+    Execution.get_config_files(exec)
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)

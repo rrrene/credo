@@ -70,12 +70,17 @@ defmodule Credo.Execution do
             # state, which is accessed and changed over the course of Credo's execution
             process: [
               __pre__: [
+                {Credo.Execution.Task.AppendDefaultConfig, []},
                 {Credo.Execution.Task.ParseOptions, []},
                 {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
                 {Credo.Execution.Task.InitializePlugins, []}
               ],
               parse_cli_options: [
                 {Credo.Execution.Task.ParseOptions, []}
+              ],
+              initialize_plugins: [
+                # This is where plugins can put their hooks to intialize themselves based on
+                # the params given in the config as well as in their own command line switches.
               ],
               validate_cli_options: [
                 {Credo.Execution.Task.ValidateOptions, []}
@@ -119,6 +124,7 @@ defmodule Credo.Execution do
             parent_task: nil,
             initializing_plugin: nil,
             halted: false,
+            config_files_pid: nil,
             source_files_pid: nil,
             issues_pid: nil,
             timing_pid: nil,
@@ -129,13 +135,24 @@ defmodule Credo.Execution do
 
   @type t :: module
 
+  alias Credo.Execution.ExecutionConfigFiles
   alias Credo.Execution.ExecutionIssues
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
   @doc "Builds an Execution struct for the the given `argv`."
-  def build(argv) when is_list(argv) do
+  def build(argv \\ []) when is_list(argv) do
     %__MODULE__{argv: argv}
+    |> start_servers()
+  end
+
+  @doc false
+  defp start_servers(%__MODULE__{} = exec) do
+    exec
+    |> ExecutionConfigFiles.start_server()
+    |> ExecutionSourceFiles.start_server()
+    |> ExecutionIssues.start_server()
+    |> ExecutionTiming.start_server()
   end
 
   @doc """
@@ -235,11 +252,6 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_config_file(exec, {_, _, _} = config_file) do
-    %__MODULE__{exec | config_files: exec.config_files ++ [config_file]}
-  end
-
-  @doc false
   def set_initializing_plugin(%__MODULE__{initializing_plugin: nil} = exec, plugin_mod) do
     %__MODULE__{exec | initializing_plugin: plugin_mod}
   end
@@ -249,9 +261,8 @@ defmodule Credo.Execution do
   end
 
   def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
-    raise "Attempting to initialize plugin #{inspect(mod2)}, while already initializing plugin #{
-            mod1
-          }"
+    raise "Attempting to initialize plugin #{inspect(mod2)}, " <>
+            "while already initializing plugin #{mod1}"
   end
 
   # Plugin params
@@ -312,6 +323,22 @@ defmodule Credo.Execution do
     %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
+  # Config Files
+
+  @doc "Returns all source files for the given `exec` struct."
+  def get_config_files(exec) do
+    Credo.Execution.ExecutionConfigFiles.get(exec)
+  end
+
+  @doc false
+  def append_config_file(exec, {_, _, _} = config_file) do
+    config_files = get_config_files(exec) ++ [config_file]
+
+    ExecutionConfigFiles.put(exec, config_files)
+
+    exec
+  end
+
   # Source Files
 
   @doc "Returns all source files for the given `exec` struct."
@@ -367,14 +394,6 @@ defmodule Credo.Execution do
   @doc "Halts further execution of the process."
   def halt(exec) do
     %__MODULE__{exec | halted: true}
-  end
-
-  @doc false
-  def start_servers(%__MODULE__{} = exec) do
-    exec
-    |> ExecutionSourceFiles.start_server()
-    |> ExecutionIssues.start_server()
-    |> ExecutionTiming.start_server()
   end
 
   # Task tracking
