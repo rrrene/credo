@@ -7,6 +7,7 @@ GENEREATE_CREDO_CHECK="lib/my_first_credo_check.ex"
 mix compile --force --warnings-as-errors
 
 mix credo --mute-exit-status
+mix credo --debug --mute-exit-status
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
 
