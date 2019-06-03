@@ -87,9 +87,16 @@ defmodule Credo.Check.Refactor.WithClauses do
     Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:with, meta, [_ | _] = clauses_and_body} = ast, issues, issue_meta)
+  defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
        when is_list(clauses_and_body) do
-    {maybe_clauses, maybe_body} = Enum.split(clauses_and_body, -1)
+    # If clauses_and_body is a list with at least two elements in it, we think
+    # this might be a call to the special form "with". To be sure of that,
+    # we get the last element of clauses_and_body and check that it's a keyword
+    # list with a :do key in it (the body).
+
+    # We can hard-match on [maybe_body] here since we know that clauses_and_body
+    # has at least two elements.
+    {maybe_clauses, [maybe_body]} = Enum.split(clauses_and_body, -1)
 
     if Keyword.keyword?(maybe_body) and Keyword.has_key?(maybe_body, :do) do
       {ast, issues_for_with(maybe_clauses, maybe_body, meta[:line], issue_meta) ++ issues}

@@ -86,4 +86,18 @@ defmodule Credo.Check.Refactor.WithClausesTest do
       assert issue.message =~ ~s("with" doesn't end with a <- clause)
     end)
   end
+
+  #
+  # cases that should not be examined at all
+  #
+
+  test "it shouldn't check calls to functions called \"with\"" do
+    """
+    def some_function(parameter1, parameter2) do
+      with(parameter1, parameter2)
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
 end
