@@ -87,28 +87,31 @@ defmodule Credo.Check.Refactor.WithClauses do
     Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:with, meta, clauses} = ast, issues, issue_meta) do
-    {ast, issues_for_with(clauses, meta[:line], issue_meta) ++ issues}
+  defp traverse({:with, meta, [_ | _] = clauses_and_body} = ast, issues, issue_meta)
+       when is_list(clauses_and_body) do
+    {maybe_clauses, maybe_body} = Enum.split(clauses_and_body, -1)
+
+    if Keyword.keyword?(maybe_body) and Keyword.has_key?(maybe_body, :do) do
+      {ast, issues_for_with(maybe_clauses, maybe_body, meta[:line], issue_meta) ++ issues}
+    else
+      {ast, issues}
+    end
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issues_for_with(clauses, line, issue_meta) do
-    clauses_without_body = Enum.drop(clauses, -1)
-
-    issue_if_one_pattern_clause(clauses, line, issue_meta) ++
-      issue_if_not_starting_with_pattern_clause(clauses_without_body, line, issue_meta) ++
-      issue_if_not_ending_with_pattern_clause(clauses_without_body, line, issue_meta)
+  defp issues_for_with(clauses, body, line, issue_meta) do
+    issue_if_one_pattern_clause_with_else(clauses, body, line, issue_meta) ++
+      issue_if_not_starting_with_pattern_clause(clauses, line, issue_meta) ++
+      issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta)
   end
 
-  defp issue_if_one_pattern_clause(clauses, line, issue_meta) do
-    {clauses, body} = Enum.split(clauses, -1)
+  defp issue_if_one_pattern_clause_with_else(clauses, body, line, issue_meta) do
     pattern_clauses_count = Enum.count(clauses, &match?({:<-, _, _}, &1))
-    else? = body != [] and Keyword.has_key?(List.first(body), :else)
 
-    if pattern_clauses_count <= 1 and else? do
+    if pattern_clauses_count <= 1 and Keyword.has_key?(body, :else) do
       [format_issue(issue_meta, message: @message_only_one_pattern_clause, line_no: line)]
     else
       []
