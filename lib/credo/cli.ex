@@ -17,10 +17,15 @@ defmodule Credo.CLI do
     Credo.Application.start(nil, nil)
 
     argv
+    |> run()
+    |> halt_if_exit_status_assigned()
+  end
+
+  def run(argv) do
+    argv
     |> Execution.build()
     |> Execution.run()
     |> WriteDebugReport.call([])
-    |> halt_if_exit_status_assigned()
   end
 
   defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do

@@ -171,19 +171,6 @@ defmodule Credo.ConfigFileTest do
     assert config_subdir_count > 1
   end
 
-  test "loads custom config file and merges with default" do
-    exec = Credo.Execution.build([])
-    config_file_path = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs"])
-
-    {:ok, config_file} = ConfigFile.read_from_file_path(exec, ".", config_file_path)
-
-    # from default
-    assert(Enum.member?(config_file.checks, {Credo.Check.Readability.ModuleNames, []}))
-
-    # from custom file
-    assert(Enum.member?(config_file.checks, {Credo.Check.Readability.ModuleDoc, false}))
-  end
-
   test "loads broken config file and return error tuple" do
     exec = Credo.Execution.build([])
     config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs.malformed"])
