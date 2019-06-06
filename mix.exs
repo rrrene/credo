@@ -25,10 +25,11 @@ defmodule Credo.Mixfile do
       files: [
         ".credo.exs",
         ".template.check.ex",
+        "debug-template.html",
         "lib",
+        "LICENSE",
         "mix.exs",
-        "README.md",
-        "LICENSE"
+        "README.md"
       ],
       maintainers: ["René Föhring"],
       licenses: ["MIT"],
