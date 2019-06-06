@@ -9,14 +9,14 @@ defmodule Credo.CLI.Command.Help do
 
   use Credo.CLI.Command
 
-  alias Credo.CLI
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
+  alias Credo.Execution
 
   @doc false
   def call(exec, _opts) do
     print_banner()
-    print_message()
+    print_message(exec)
 
     exec
   end
@@ -30,15 +30,16 @@ defmodule Credo.CLI.Command.Help do
     UI.puts()
   end
 
-  def print_message do
+  def print_message(exec) do
     UI.puts("Credo Version #{Credo.version()}")
     UI.puts(["Usage: ", :olive, "$ mix credo <command> [options]"])
     UI.puts("\nCommands:\n")
 
-    Credo.Service.Commands.names()
+    exec
+    |> Execution.get_valid_command_names()
     |> Sorter.ensure(@starting_order, @ending_order)
     |> Enum.each(fn name ->
-      module = CLI.command_for(name)
+      module = Execution.get_command(exec, name)
 
       name2 =
         name
@@ -50,8 +51,7 @@ defmodule Credo.CLI.Command.Help do
           UI.puts("  " <> name2 <> shortdesc)
 
         _ ->
-          # skip commands without @shortdesc
-          nil
+          UI.puts("  " <> name2)
       end
     end)
 

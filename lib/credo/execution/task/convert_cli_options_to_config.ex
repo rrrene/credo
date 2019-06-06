@@ -9,18 +9,17 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
   def call(exec, _opts) do
     exec
     |> ConfigBuilder.parse()
-    |> start_servers_or_halt(exec)
+    |> halt_on_error(exec)
   end
 
-  def start_servers_or_halt({:error, error}, exec) do
+  def halt_on_error({:error, error}, exec) do
     exec
     |> Execution.put_assign("#{__MODULE__}.error", error)
     |> Execution.halt()
   end
 
-  def start_servers_or_halt(exec, _) do
+  def halt_on_error(exec, _) do
     exec
-    |> Execution.start_servers()
   end
 
   def error(exec, _opts) do

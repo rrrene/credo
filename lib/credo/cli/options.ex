@@ -5,38 +5,6 @@ defmodule Credo.CLI.Options do
   The `Options` struct is stored as part of the `Execution` struct.
   """
 
-  @switches [
-    all_priorities: :boolean,
-    all: :boolean,
-    checks: :string,
-    config_name: :string,
-    config_file: :string,
-    color: :boolean,
-    crash_on_error: :boolean,
-    debug: :boolean,
-    mute_exit_status: :boolean,
-    format: :string,
-    help: :boolean,
-    ignore_checks: :string,
-    ignore: :string,
-    min_priority: :string,
-    only: :string,
-    read_from_stdin: :boolean,
-    strict: :boolean,
-    verbose: :boolean,
-    version: :boolean
-  ]
-  @aliases [
-    a: :all,
-    A: :all_priorities,
-    c: :checks,
-    C: :config_name,
-    d: :debug,
-    h: :help,
-    i: :ignore_checks,
-    v: :version
-  ]
-
   alias Credo.Priority
 
   defstruct command: nil,
@@ -49,13 +17,13 @@ defmodule Credo.CLI.Options do
   @doc """
   Returns a `Options` struct for the given parameters.
 
-      iex> Credo.CLI.Options.parse(["alice", "--debug"], ".", ["alice", "bob", "eve"], [])
+      iex> Credo.CLI.Options.parse(["alice", "--debug"], ".", ["alice", "bob", "eve"], [], [debug: :boolean], [])
       %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{debug: true}, unknown_args: [], unknown_switches: []}
 
   """
-  def parse(argv, current_dir, command_names, ignored_args) do
+  def parse(argv, current_dir, command_names, ignored_args, switches, aliases) do
     argv
-    |> OptionParser.parse(strict: @switches, aliases: @aliases)
+    |> OptionParser.parse(strict: switches, aliases: aliases)
     |> parse_result(current_dir, command_names, ignored_args)
   end
 

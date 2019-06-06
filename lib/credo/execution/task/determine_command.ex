@@ -4,12 +4,14 @@ defmodule Credo.Execution.Task.DetermineCommand do
   use Credo.Execution.Task
 
   alias Credo.CLI.Options
+  alias Credo.Execution
 
   def call(exec, _opts) do
     exec
     |> determine_command(exec.cli_options)
   end
 
+  # `--help` given
   defp determine_command(
          %Execution{help: true} = exec,
          %Options{command: nil} = options
@@ -17,6 +19,7 @@ defmodule Credo.Execution.Task.DetermineCommand do
     set_command_and_path(exec, options, "help", options.path)
   end
 
+  # `--version` given
   defp determine_command(
          %Execution{version: true} = exec,
          %Options{command: nil} = options
@@ -24,7 +27,24 @@ defmodule Credo.Execution.Task.DetermineCommand do
     set_command_and_path(exec, options, "version", options.path)
   end
 
-  defp determine_command(exec, _options), do: exec
+  defp determine_command(exec, options) do
+    command_name =
+      case exec.cli_options.args do
+        [potential_command_name | _] ->
+          command_names = Execution.get_valid_command_names(exec)
+
+          if Enum.member?(command_names, potential_command_name) do
+            potential_command_name
+          end
+
+        _ ->
+          nil
+      end
+
+    set_command_and_path(exec, options, command_name, options.path)
+  end
+
+  defp set_command_and_path(exec, _options, nil, _path), do: exec
 
   defp set_command_and_path(exec, options, command, path) do
     %Execution{

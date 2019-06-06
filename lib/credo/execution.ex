@@ -9,6 +9,38 @@ defmodule Credo.Execution do
   """
   defstruct argv: [],
             cli_options: nil,
+            cli_switches: [
+              all_priorities: :boolean,
+              all: :boolean,
+              checks: :string,
+              config_name: :string,
+              config_file: :string,
+              color: :boolean,
+              crash_on_error: :boolean,
+              debug: :boolean,
+              mute_exit_status: :boolean,
+              format: :string,
+              help: :boolean,
+              ignore_checks: :string,
+              ignore: :string,
+              min_priority: :string,
+              only: :string,
+              read_from_stdin: :boolean,
+              strict: :boolean,
+              verbose: :boolean,
+              version: :boolean
+            ],
+            cli_aliases: [
+              a: :all,
+              A: :all_priorities,
+              c: :checks,
+              C: :config_name,
+              d: :debug,
+              h: :help,
+              i: :ignore_checks,
+              v: :version
+            ],
+            cli_switch_plugin_param_converters: [],
 
             # config
             files: nil,
@@ -16,7 +48,9 @@ defmodule Credo.Execution do
             debug: false,
             checks: nil,
             requires: [],
+            plugins: [],
             strict: false,
+
             # checks if there is a new version of Credo
             check_for_updates: true,
 
@@ -34,9 +68,63 @@ defmodule Credo.Execution do
             read_from_stdin: false,
 
             # state, which is accessed and changed over the course of Credo's execution
+            process: [
+              __pre__: [
+                {Credo.Execution.Task.AppendDefaultConfig, []},
+                {Credo.Execution.Task.ParseOptions, []},
+                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
+                {Credo.Execution.Task.InitializePlugins, []}
+              ],
+              parse_cli_options: [
+                {Credo.Execution.Task.ParseOptions, []}
+              ],
+              initialize_plugins: [
+                # This is where plugins can put their hooks to intialize themselves based on
+                # the params given in the config as well as in their own command line switches.
+              ],
+              validate_cli_options: [
+                {Credo.Execution.Task.ValidateOptions, []}
+              ],
+              convert_cli_options_to_config: [
+                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
+              ],
+              determine_command: [
+                {Credo.Execution.Task.DetermineCommand, []}
+              ],
+              set_default_command: [
+                {Credo.Execution.Task.SetDefaultCommand, []}
+              ],
+              resolve_config: [
+                {Credo.Execution.Task.UseColors, []},
+                {Credo.Execution.Task.RequireRequires, []}
+              ],
+              validate_config: [
+                {Credo.Execution.Task.ValidateConfig, []}
+              ],
+              run_command: [
+                {Credo.Execution.Task.RunCommand, []}
+              ],
+              halt_execution: [
+                {Credo.Execution.Task.AssignExitStatusForIssues, []}
+              ]
+            ],
+            commands: %{
+              "categories" => Credo.CLI.Command.Categories.CategoriesCommand,
+              "explain" => Credo.CLI.Command.Explain.ExplainCommand,
+              "gen.check" => Credo.CLI.Command.GenCheck,
+              "gen.config" => Credo.CLI.Command.GenConfig,
+              "help" => Credo.CLI.Command.Help,
+              "info" => Credo.CLI.Command.Info.InfoCommand,
+              "list" => Credo.CLI.Command.List.ListCommand,
+              "suggest" => Credo.CLI.Command.Suggest.SuggestCommand,
+              "version" => Credo.CLI.Command.Version
+            },
+            config_files: [],
             current_task: nil,
             parent_task: nil,
+            initializing_plugin: nil,
             halted: false,
+            config_files_pid: nil,
             source_files_pid: nil,
             issues_pid: nil,
             timing_pid: nil,
@@ -47,13 +135,24 @@ defmodule Credo.Execution do
 
   @type t :: module
 
+  alias Credo.Execution.ExecutionConfigFiles
   alias Credo.Execution.ExecutionIssues
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
   @doc "Builds an Execution struct for the the given `argv`."
-  def build(argv) when is_list(argv) do
+  def build(argv \\ []) when is_list(argv) do
     %__MODULE__{argv: argv}
+    |> start_servers()
+  end
+
+  @doc false
+  defp start_servers(%__MODULE__{} = exec) do
+    exec
+    |> ExecutionConfigFiles.start_server()
+    |> ExecutionSourceFiles.start_server()
+    |> ExecutionIssues.start_server()
+    |> ExecutionTiming.start_server()
   end
 
   @doc """
@@ -123,14 +222,93 @@ defmodule Credo.Execution do
 
   def set_strict(exec), do: exec
 
+  @doc false
+  def get_path(exec) do
+    exec.cli_options.path
+  end
+
+  # Commands
+
   @doc "Returns the name of the command, which should be run by the given execution."
   def get_command_name(exec) do
     exec.cli_options.command
   end
 
+  @doc "Returns all valid command names."
+  def get_valid_command_names(exec) do
+    Map.keys(exec.commands)
+  end
+
+  def get_command(exec, name) do
+    Map.get(exec.commands, name) ||
+      raise "Command not found: #{name}\n\nRegistered commands: #{
+              inspect(exec.commands, pretty: true)
+            }"
+  end
+
   @doc false
-  def get_path(exec) do
-    exec.cli_options.path
+  def put_command(exec, _plugin_mod, name, command_mod) do
+    %__MODULE__{exec | commands: Map.put(exec.commands, name, command_mod)}
+  end
+
+  @doc false
+  def set_initializing_plugin(%__MODULE__{initializing_plugin: nil} = exec, plugin_mod) do
+    %__MODULE__{exec | initializing_plugin: plugin_mod}
+  end
+
+  def set_initializing_plugin(exec, nil) do
+    %__MODULE__{exec | initializing_plugin: nil}
+  end
+
+  def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
+    raise "Attempting to initialize plugin #{inspect(mod2)}, " <>
+            "while already initializing plugin #{mod1}"
+  end
+
+  # Plugin params
+
+  def get_plugin_param(exec, plugin_mod, param_name) do
+    exec.plugins[plugin_mod][param_name]
+  end
+
+  def put_plugin_param(exec, plugin_mod, param_name, param_value) do
+    plugins =
+      Keyword.update(exec.plugins, plugin_mod, [], fn list ->
+        Keyword.update(list, param_name, param_value, fn _ -> param_value end)
+      end)
+
+    %__MODULE__{exec | plugins: plugins}
+  end
+
+  # CLI switches
+
+  @doc false
+  def put_cli_switch(exec, _plugin_mod, name, type) do
+    %__MODULE__{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
+  end
+
+  @doc false
+  def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
+    %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
+  end
+
+  @doc false
+  def put_cli_switch_plugin_param_converter(exec, plugin_mod, cli_switch_name, plugin_param_name) do
+    converter_tuple = {cli_switch_name, plugin_mod, plugin_param_name}
+
+    %__MODULE__{
+      exec
+      | cli_switch_plugin_param_converters:
+          exec.cli_switch_plugin_param_converters ++ [converter_tuple]
+    }
+  end
+
+  def get_given_cli_switch(exec, switch_name) do
+    if Map.has_key?(exec.cli_options.switches, switch_name) do
+      {:ok, exec.cli_options.switches[switch_name]}
+    else
+      :error
+    end
   end
 
   # Assigns
@@ -143,6 +321,22 @@ defmodule Credo.Execution do
   @doc "Puts the given `value` with the given `name` as assign into the given `exec` struct."
   def put_assign(exec, name, value) do
     %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
+  end
+
+  # Config Files
+
+  @doc "Returns all source files for the given `exec` struct."
+  def get_config_files(exec) do
+    Credo.Execution.ExecutionConfigFiles.get(exec)
+  end
+
+  @doc false
+  def append_config_file(exec, {_, _, _} = config_file) do
+    config_files = get_config_files(exec) ++ [config_file]
+
+    ExecutionConfigFiles.put(exec, config_files)
+
+    exec
   end
 
   # Source Files
@@ -202,18 +396,51 @@ defmodule Credo.Execution do
     %__MODULE__{exec | halted: true}
   end
 
-  @doc false
-  def start_servers(%__MODULE__{} = exec) do
-    exec
-    |> ExecutionSourceFiles.start_server()
-    |> ExecutionIssues.start_server()
-    |> ExecutionTiming.start_server()
-  end
-
   # Task tracking
 
   @doc false
   def set_parent_and_current_task(exec, parent_task, current_task) do
     %__MODULE__{exec | parent_task: parent_task, current_task: current_task}
+  end
+
+  # Running tasks
+
+  @doc false
+  def run(initial_exec) do
+    Enum.reduce(initial_exec.process, initial_exec, fn {name, _list}, outer_exec ->
+      Enum.reduce(outer_exec.process[name], outer_exec, fn {task, opts}, inner_exec ->
+        Credo.Execution.Task.run(task, inner_exec, opts)
+      end)
+    end)
+  end
+
+  @doc false
+  def prepend_task(exec, plugin_mod, group_name, task_mod) when is_atom(task_mod) do
+    prepend_task(exec, plugin_mod, group_name, {task_mod, []})
+  end
+
+  def prepend_task(exec, _plugin_mod, group_name, task_tuple) do
+    process =
+      Enum.map(exec.process, fn
+        {^group_name, list} -> {group_name, [task_tuple] ++ list}
+        value -> value
+      end)
+
+    %__MODULE__{exec | process: process}
+  end
+
+  @doc false
+  def append_task(exec, plugin_mod, group_name, task_mod) when is_atom(task_mod) do
+    append_task(exec, plugin_mod, group_name, {task_mod, []})
+  end
+
+  def append_task(exec, _plugin_mod, group_name, task_tuple) do
+    process =
+      Enum.map(exec.process, fn
+        {^group_name, list} -> {group_name, list ++ [task_tuple]}
+        value -> value
+      end)
+
+    %__MODULE__{exec | process: process}
   end
 end

@@ -1,7 +1,7 @@
 defmodule Credo.Execution.Task.WriteDebugReport do
   @moduledoc false
 
-  @debug_template_filename "debug-template.html"
+  @debug_template File.read!("debug-template.html")
   @debug_output_filename "credo-debug-log.html"
 
   use Credo.Execution.Task
@@ -12,8 +12,8 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()
 
-    time_load = exec |> get_assign("credo.time.source_files") |> div(1000)
-    time_run = exec |> get_assign("credo.time.run_checks") |> div(1000)
+    time_load = exec |> get_assign("credo.time.source_files", 0) |> div(1000)
+    time_run = exec |> get_assign("credo.time.run_checks", 0) |> div(1000)
     time_total = time_load + time_run
 
     all_timings = ExecutionTiming.all(exec)
@@ -31,7 +31,7 @@ defmodule Credo.Execution.Task.WriteDebugReport do
       time_run: time_run
     ]
 
-    content = EEx.eval_file(@debug_template_filename, assigns: assigns)
+    content = EEx.eval_string(@debug_template, assigns: assigns)
 
     File.write!(@debug_output_filename, content)
 

@@ -5,16 +5,19 @@ defmodule Credo.ConfigFile do
 
   @config_filename ".credo.exs"
   @default_config_name "default"
-  @default_config_file File.read!(@config_filename)
+  @origin_user :file
 
   @default_glob "**/*.{ex,exs}"
   @default_files_included [@default_glob]
   @default_files_excluded []
 
+  alias Credo.Execution
+
   defstruct files: nil,
             color: true,
             checks: nil,
             requires: [],
+            plugins: [],
             strict: false,
             # checks if there is a new version of Credo
             check_for_updates: true
@@ -27,10 +30,10 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_or_default(dir, config_name \\ nil, safe \\ false) do
+  def read_or_default(exec, dir, config_name \\ nil, safe \\ false) do
     dir
     |> relevant_config_files
-    |> combine_configs(dir, config_name, safe)
+    |> combine_configs(exec, dir, config_name, safe)
   end
 
   @doc """
@@ -42,15 +45,19 @@ defmodule Credo.ConfigFile do
   - `safe`: if +true+, the config files are loaded using static analysis rather
             than `Code.eval_string/1`
   """
-  def read_from_file_path(dir, config_file, config_name \\ nil, safe \\ false) do
-    combine_configs([config_file], dir, config_name, safe)
+  def read_from_file_path(exec, dir, config_file, config_name \\ nil, safe \\ false) do
+    combine_configs([config_file], exec, dir, config_name, safe)
   end
 
-  defp combine_configs(files, dir, config_name, safe) do
-    files
-    |> Enum.filter(&File.exists?/1)
-    |> Enum.map(&{&1, File.read!(&1)})
-    |> List.insert_at(0, {:default, @default_config_file})
+  defp combine_configs(files, exec, dir, config_name, safe) do
+    config_files =
+      files
+      |> Enum.filter(&File.exists?/1)
+      |> Enum.map(&{@origin_user, &1, File.read!(&1)})
+
+    exec = Enum.reduce(config_files, exec, &Execution.append_config_file(&2, &1))
+
+    Execution.get_config_files(exec)
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
@@ -97,7 +104,7 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {filename, exs_string}, safe) do
+  defp from_exs(dir, config_name, {_origin, filename, exs_string}, safe) do
     case Credo.ExsLoader.parse(exs_string, safe) do
       {:ok, data} ->
         {:ok, from_data(data, dir, config_name)}
@@ -117,12 +124,13 @@ defmodule Credo.ConfigFile do
       |> Enum.find(&(&1[:name] == config_name))
 
     %__MODULE__{
-      check_for_updates: data[:check_for_updates] || false,
+      check_for_updates: data[:check_for_updates],
       requires: data[:requires] || [],
+      plugins: data[:plugins] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data),
-      strict: data[:strict] || false,
-      color: data[:color] || false
+      strict: data[:strict],
+      color: data[:color]
     }
   end
 
@@ -185,28 +193,32 @@ defmodule Credo.ConfigFile do
 
   def merge({:ok, base}, {:ok, other}) do
     config_file = %__MODULE__{
-      check_for_updates: other.check_for_updates,
+      check_for_updates: merge_boolean(base.check_for_updates, other.check_for_updates),
       requires: base.requires ++ other.requires,
+      plugins: base.plugins ++ other.plugins,
       files: merge_files(base, other),
       checks: merge_checks(base, other),
-      strict: other.strict,
-      color: other.color
+      strict: merge_boolean(base.strict, other.strict),
+      color: merge_boolean(base.color, other.color)
     }
 
     {:ok, config_file}
   end
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{
-        checks: checks_other
-      }) do
+  defp merge_boolean(base, other)
+
+  defp merge_boolean(_base, true), do: true
+  defp merge_boolean(_base, false), do: false
+  defp merge_boolean(base, _), do: base
+
+  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
     base = normalize_check_tuples(checks_base)
     other = normalize_check_tuples(checks_other)
+
     Keyword.merge(base, other)
   end
 
-  def merge_files(%__MODULE__{files: files_base}, %__MODULE__{
-        files: files_other
-      }) do
+  def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
       included: files_other[:included] || files_base[:included],
       excluded: files_other[:excluded] || files_base[:excluded]
