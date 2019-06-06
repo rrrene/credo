@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.0-rc1
+
+- Credo now requires Elixir 1.5
+- Fix false negative in `DuplicatedCode`
+
+### Plugin Support
+
+Credo now supports plugins that run alongside Credo's own analysis. While Credo provided the ability to write custom checks since `v0.4.0`, users can now access the complete toolset of Credo to create their own commands, require compilation, run external tools and still include the results in Credo's standard report.
+
+Please refer to Credo's [README](https://github.com/rrrene/credo#plugins) as well as the [Credo Demo Plugin](https://github.com/rrrene/credo_demo_plugin) for further information on how to get started.
+
+### New checks
+
+- Credo.Check.Refactor.WithClauses
+
 ## 1.0.5
 
 - Fix bug due to commented-out heredocs
