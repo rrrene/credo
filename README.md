@@ -442,7 +442,7 @@ While refactor checks show you possible problems, these checks try to highlight 
 
 These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
 
-## Plugin System
+## Plugins
 
 Plugins can provide additional functionality to Credo.
 
