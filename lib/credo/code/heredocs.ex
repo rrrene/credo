@@ -29,11 +29,11 @@ defmodule Credo.Code.Heredocs do
   end
 
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement, empty_line_replacement)
+    parse_heredoc(t, acc <> ~s("""), replacement, empty_line_replacement, ~s("""))
   end
 
   defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement, empty_line_replacement)
+    parse_heredoc(t, acc <> ~s('''), replacement, empty_line_replacement, ~s('''))
   end
 
   defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
@@ -122,27 +122,61 @@ defmodule Credo.Code.Heredocs do
   # Heredocs
   #
 
-  defp parse_heredoc("", acc, _replacement, _empty_line_replacement) do
+  defp parse_heredoc("", acc, _replacement, _empty_line_replacement, _here_doc_delimiter) do
     acc
   end
 
-  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc, replacement, empty_line_replacement)
+  defp parse_heredoc(
+         <<"\\\\"::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         here_doc_delimiter
+       ) do
+    parse_heredoc(t, acc, replacement, empty_line_replacement, here_doc_delimiter)
   end
 
-  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc, replacement, empty_line_replacement)
+  defp parse_heredoc(
+         <<"\\\""::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         here_doc_delimiter
+       ) do
+    parse_heredoc(t, acc, replacement, empty_line_replacement, here_doc_delimiter)
   end
 
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+  defp parse_heredoc(
+         <<"\"\"\""::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         "\"\"\""
+       ) do
+    acc = pad_replaced_heredoc(acc, ~s("""))
+
     parse_code(t, acc <> ~s("""), replacement, empty_line_replacement)
   end
 
-  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+  defp parse_heredoc(
+         <<"\'\'\'"::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         "\'\'\'"
+       ) do
+    acc = pad_replaced_heredoc(acc, ~s('''))
+
     parse_code(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
 
-  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+  defp parse_heredoc(
+         <<"\n"::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         here_doc_delimiter
+       ) do
     end_of_empty_line? = String.slice(acc, -1..-1) == "\n"
 
     acc =
@@ -152,11 +186,17 @@ defmodule Credo.Code.Heredocs do
         acc
       end
 
-    parse_heredoc(t, acc <> "\n", replacement, empty_line_replacement)
+    parse_heredoc(t, acc <> "\n", replacement, empty_line_replacement, here_doc_delimiter)
   end
 
-  defp parse_heredoc(<<_::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> replacement, replacement, empty_line_replacement)
+  defp parse_heredoc(
+         <<_::utf8, t::binary>>,
+         acc,
+         replacement,
+         empty_line_replacement,
+         here_doc_delimiter
+       ) do
+    parse_heredoc(t, acc <> replacement, replacement, empty_line_replacement, here_doc_delimiter)
   end
 
   #
@@ -187,5 +227,32 @@ defmodule Credo.Code.Heredocs do
     {h, t} = String.next_codepoint(str)
 
     parse_string_literal(t, acc <> h, replacement, empty_line_replacement)
+  end
+
+  defp pad_replaced_heredoc(acc, delimiter) do
+    no_of_chars_to_replace =
+      if acc =~ ~r/\n\Z/m do
+        0
+      else
+        [leading_string] = Regex.run(~r/[^\n]*\Z/m, acc)
+
+        String.length(leading_string)
+      end
+
+    pad_string = "\n" <> String.pad_leading("", no_of_chars_to_replace)
+
+    {byte_index, _match_size} =
+      Regex.scan(~r/#{delimiter}/m, acc, return: :index)
+      |> List.last()
+      |> List.first()
+
+    length_after_byte_index = String.length(acc) - byte_index
+
+    new_acc =
+      acc
+      |> String.slice(byte_index, length_after_byte_index)
+      |> String.replace(~r/\n(.{#{no_of_chars_to_replace}})/, pad_string)
+
+    String.slice(acc, 0, byte_index) <> new_acc
   end
 end

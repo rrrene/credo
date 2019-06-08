@@ -164,8 +164,8 @@ defmodule Credo.Code.HeredocsTest do
     expected = """
     def fun() do
       a = \"\"\"
-    ........................................................
-    ..\"\"\"
+      ......................................................
+      \"\"\"
     end
     """
 
@@ -226,9 +226,9 @@ defmodule Credo.Code.HeredocsTest do
     expected = """
     defmodule CredoSampleModule do
       @doc '''
-    .......
-    .....
-    ..'''
+      .....
+      ...
+      '''
     end
     """
 
