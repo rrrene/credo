@@ -35,7 +35,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   defp to_lines(source_file, true) do
     source_file
     |> Strings.replace_with_spaces(".")
-    |> Heredocs.replace_with_spaces(".", ".", ".")
+    |> Heredocs.replace_with_spaces(".", ".", ".", source_file.filename)
     |> Code.to_lines()
   end
 

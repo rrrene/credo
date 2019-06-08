@@ -168,7 +168,7 @@ defmodule Credo.Code do
     |> Sigils.replace_with_spaces(" ", " ", filename)
     |> Strings.replace_with_spaces(" ", " ", filename)
     |> Heredocs.replace_with_spaces(" ", " ", "", filename)
-    |> Charlists.replace_with_spaces()
+    |> Charlists.replace_with_spaces(" ", " ", filename)
   end
 
   @doc """
@@ -182,7 +182,7 @@ defmodule Credo.Code do
     |> Sigils.replace_with_spaces(sigil_replacement, " ", filename)
     |> Strings.replace_with_spaces(" ", " ", filename)
     |> Heredocs.replace_with_spaces(" ", " ", "", filename)
-    |> Charlists.replace_with_spaces()
+    |> Charlists.replace_with_spaces(" ", " ", filename)
     |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
   end
 
