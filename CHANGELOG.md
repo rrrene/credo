@@ -1,9 +1,10 @@
 # Changelog
 
-## 1.1.0-rc1
+## 1.1.0-rc3
 
 - Credo now requires Elixir 1.5
 - Fix false negative in `DuplicatedCode`
+- `PipeChainStart` has been made opt-in
 
 ### Plugin Support
 
