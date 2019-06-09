@@ -27,7 +27,10 @@ defmodule Credo.Check.Refactor.PipeChainStart do
       excluded_argument_types: "All pipes with argument types listed will be ignored."
     ]
   ]
-  @default_params [excluded_argument_types: [], excluded_functions: []]
+  @default_params [
+    excluded_argument_types: [:atom, :binary, :fn, :keyword, :number],
+    excluded_functions: []
+  ]
 
   use Credo.Check
 
