@@ -33,9 +33,9 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
 
     source_file
     |> Charlists.replace_with_spaces("=")
-    |> Sigils.replace_with_spaces("=", "=")
-    |> Strings.replace_with_spaces("=", "=")
-    |> Heredocs.replace_with_spaces("=", "=", "=")
+    |> Sigils.replace_with_spaces("=", "=", source_file.filename)
+    |> Strings.replace_with_spaces("=", "=", source_file.filename)
+    |> Heredocs.replace_with_spaces("=", "=", "=", source_file.filename)
     |> Credo.Code.to_lines()
     |> blank_lines()
     |> consecutive_lines(max_blank_lines)
