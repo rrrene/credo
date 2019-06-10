@@ -49,7 +49,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       def f(), do: 1 + 2
       def g(), do: 3 + 1
       def l(), do: [&+/2, &-/2, &*/2, &//2]
+
+      def x do
+        entries
+        |> Stream.map(&json_library().encode!/1)
+        |> Enum.join(".")
+      end
     end
+
     defmodule InlineModule do
       @type config_or_func :: Config.t() | (-> Config.t())
 
