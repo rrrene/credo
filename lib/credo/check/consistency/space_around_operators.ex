@@ -136,7 +136,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp number_in_fun?(line, column) do
     line
     |> String.slice(0..(column - 2))
-    |> String.match?(~r/[\.\&][a-z0-9_]+$/)
+    |> String.match?(~r/[\.\&][a-z0-9_]+[\!\?]?$/)
   end
 
   # TODO: this implementation is a bit naive. improve it.
