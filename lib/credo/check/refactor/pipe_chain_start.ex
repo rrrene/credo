@@ -28,7 +28,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     ]
   ]
   @default_params [
-    excluded_argument_types: [:atom, :binary, :fn, :keyword, :number],
+    excluded_argument_types: [],
     excluded_functions: []
   ]
 
