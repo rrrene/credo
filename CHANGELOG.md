@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.1.0-rc3
+## 1.1.0
 
-- Credo now requires Elixir 1.5
+- Credo now requires Elixir 1.5 and Erlang/OTP 19
 - Fix false negative in `DuplicatedCode`
 - `PipeChainStart` has been made opt-in
 
