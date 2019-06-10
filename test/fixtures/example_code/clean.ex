@@ -840,7 +840,8 @@ defmodule Xgit.Lib.Config do
   thus behaves the same as though the backing store exists, but is empty.
   """
   def load(%__MODULE__{storage: nil}) do
-    raise(ArgumentError,
+    raise(
+      ArgumentError,
       message: "Config.load() called for a Config that doesn't have a storage mechanism defined"
     )
   end
@@ -852,7 +853,8 @@ defmodule Xgit.Lib.Config do
   """
 
   def save(%__MODULE__{storage: nil}) do
-    raise(ArgumentError,
+    raise(
+      ArgumentError,
       message: "Config.save() called for a Config that doesn't have a storage mechanism defined"
     )
   end
