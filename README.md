@@ -460,7 +460,7 @@ This functionality can include:
 Plugins are just modules. Most of the time, a Credo plugin will be published on Hex. You include it as a dependency:
 
 ```elixir
-{:credo_demo_plugin, "~> 0.1.0-rc1"},
+{:credo_demo_plugin, "~> 0.1.0"},
 ```
 
 Plugins, like checks, are just modules and functions.
