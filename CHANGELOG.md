@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fix incompatibilities between Elixir 1.9, `Credo.Code.Token` and  `Credo.Code.InterpolationHelper`
+
 ## 1.1.0
 
 - Credo now requires Elixir 1.5 and Erlang/OTP 19
