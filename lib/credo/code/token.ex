@@ -74,6 +74,12 @@ defmodule Credo.Code.Token do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
     end
 
+    # Elixir >= 1.9.0 tuple syntax
+    def position({{line_no, col_start, nil}, {_line_no2, _col_start2, nil}, atom_or_charlist}) do
+      position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+    end
+
+    # Elixir < 1.9.0 tuple syntax
     def position({_, {line_no, col_start, _}, atom_or_charlist}) do
       position_tuple(atom_or_charlist, line_no, col_start)
     end
@@ -151,8 +157,26 @@ defmodule Credo.Code.Token do
       Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
     end
 
+    # Elixir < 1.9.0
+    #
     # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
     defp convert_to_col_end(_, _, {{line_no, col_start, _}, list}) do
+      {line_no_end, col_end, _terminator} = convert_to_col_end(line_no, col_start, list)
+
+      # add 1 for } (closing parens of interpolation)
+      col_end = col_end + 1
+
+      {line_no_end, col_end, :interpolation}
+    end
+
+    # Elixir >= 1.9.0
+    #
+    # {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, nil}, :name}]}
+    defp convert_to_col_end(
+           _,
+           _,
+           {{line_no, col_start, nil}, {_line_no2, _col_start2, nil}, list}
+         ) do
       {line_no_end, col_end, _terminator} = convert_to_col_end(line_no, col_start, list)
 
       # add 1 for } (closing parens of interpolation)
