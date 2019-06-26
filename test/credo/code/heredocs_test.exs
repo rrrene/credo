@@ -98,12 +98,14 @@ defmodule Credo.Code.HeredocsTest do
     source = """
     t = ~S\"\"\"
     abc
+    我是中國人
     \"\"\"
     """
 
     expected = """
     t = ~S\"\"\"
     ...
+    .....
     \"\"\"
     """
 
