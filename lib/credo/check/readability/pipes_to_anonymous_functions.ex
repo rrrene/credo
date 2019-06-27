@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.PipesToAnonymousFunctions do
       |> times_2()
       |> times_2()
   Piping into anonymous functions is cluttered and difficult to read.
-  Instead, define a private function and use that instead.
+  Instead, define a private function and use that.
   """
   @explanation [check: @checkdoc]
 
