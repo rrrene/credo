@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
   # cases raising issues
   #
 
-  test "it should report a violation" do
+  test "it should report a violation with parens (by default)" do
     """
     defmodule Mix.Tasks.Credo do
       def run() do
@@ -37,6 +37,18 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     """
     |> to_source_file
     |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation with no parens if parens: true" do
+    """
+    defmodule Mix.Tasks.Credo do
+      def run do
+        21
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, [parens: true], _callback = nil)
   end
 
   test "it should not crash on macros creating zero arity functions" do
