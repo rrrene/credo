@@ -116,4 +116,22 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation /10" do
+    """
+    def credo_SampleFunction when 1 == 1 do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /11" do
+    """
+    def credo_SampleFunction(x, y) when x == y do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end

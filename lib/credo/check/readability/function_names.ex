@@ -49,6 +49,9 @@ defmodule Credo.Check.Readability.FunctionNames do
 
   defp issues_for_definition(body, issues, issue_meta) do
     case Enum.at(body, 0) do
+      {:when, _when_meta, [{name, meta, _args} | _guard]} ->
+        issues_for_name(name, meta, issues, issue_meta)
+
       {name, meta, _args} when is_atom(name) ->
         issues_for_name(name, meta, issues, issue_meta)
 
