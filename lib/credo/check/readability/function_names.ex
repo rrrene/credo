@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   it easier to follow.
   """
   @explanation [check: @checkdoc]
-  @def_ops [:def, :defp, :defmacro]
+  @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   use Credo.Check, base_priority: :high
 

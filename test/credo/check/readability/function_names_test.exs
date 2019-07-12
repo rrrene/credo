@@ -15,6 +15,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     defmacro credo_sample_macro do
     end
+    defmacrop credo_sample_macro_p do
+    end
     """
     |> to_source_file
     |> refute_issues(@described_check)
@@ -63,7 +65,16 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
 
   test "it should report a violation /4" do
     """
-    defmacro credo_Sample_Function do
+    defmacro credo_Sample_Macro do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /5" do
+    """
+    defmacrop credo_Sample_Macro_p do
     end
     """
     |> to_source_file
