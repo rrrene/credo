@@ -15,6 +15,10 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     defmacro credo_sample_macro do
     end
+    defmacrop credo_sample_macro_p do
+    end
+    defguard credo_sample_guard(x) when is_integer(x)
+    defguardp credo_sample_guard(x) when is_integer(x)
     """
     |> to_source_file
     |> refute_issues(@described_check)
@@ -63,8 +67,98 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
 
   test "it should report a violation /4" do
     """
-    defmacro credo_Sample_Function do
+    defmacro credo_Sample_Macro do
     end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /5" do
+    """
+    defmacrop credo_Sample_Macro_p do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /6" do
+    """
+    def credoSampleFunction() do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /7" do
+    """
+    def credoSampleFunction(x, y) do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /8" do
+    """
+    defmacro credoSampleMacro() do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /9" do
+    """
+    defmacro credoSampleMacro(x, y) do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /10" do
+    """
+    def credo_SampleFunction when 1 == 1 do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /11" do
+    """
+    def credo_SampleFunction(x, y) when x == y do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /12" do
+    """
+    defguard credo_SampleGuard(x) when is_integer(x)
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /13" do
+    """
+    defguardp credo_SampleGuard(x) when is_integer(x)
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /14" do
+    """
+    def credoSampleFunction(0), do: :ok
+    def credoSampleFunction(1), do: :ok
+    def credoSampleFunction(2), do: :ok
+    def credoSampleFunction(_), do: :ok
     """
     |> to_source_file
     |> assert_issue(@described_check)
