@@ -80,4 +80,40 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation /6" do
+    """
+    def credoSampleFunction() do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /7" do
+    """
+    def credoSampleFunction(x, y) do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /8" do
+    """
+    defmacro credoSampleMacro() do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /9" do
+    """
+    defmacro credoSampleMacro(x, y) do
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end
