@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   @moduledoc false
 
   @checkdoc """
-  Function and macro names are always written in snake_case in Elixir.
+  Function, macro, and guard names are always written in snake_case in Elixir.
 
       # snake_case
 
@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   it easier to follow.
   """
   @explanation [check: @checkdoc]
-  @def_ops [:def, :defp, :defmacro, :defmacrop]
+  @def_ops [:def, :defp, :defmacro, :defmacrop, :defguard, :defguardp]
 
   use Credo.Check, base_priority: :high
 
@@ -71,7 +71,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Function/macro names should be written in snake_case.",
+      message: "Function/macro/guard names should be written in snake_case.",
       trigger: trigger,
       line_no: line_no
     )

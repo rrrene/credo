@@ -17,6 +17,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     defmacrop credo_sample_macro_p do
     end
+    defguard credo_sample_guard(x) when is_integer(x)
+    defguardp credo_sample_guard(x) when is_integer(x)
     """
     |> to_source_file
     |> refute_issues(@described_check)
@@ -130,6 +132,22 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     """
     def credo_SampleFunction(x, y) when x == y do
     end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /12" do
+    """
+    defguard credo_SampleGuard(x) when is_integer(x)
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
+
+  test "it should report a violation /13" do
+    """
+    defguardp credo_SampleGuard(x) when is_integer(x)
     """
     |> to_source_file
     |> assert_issue(@described_check)
