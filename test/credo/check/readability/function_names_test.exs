@@ -152,4 +152,15 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation /14" do
+    """
+    def credoSampleFunction(0), do: :ok
+    def credoSampleFunction(1), do: :ok
+    def credoSampleFunction(2), do: :ok
+    def credoSampleFunction(_), do: :ok
+    """
+    |> to_source_file
+    |> assert_issue(@described_check)
+  end
 end

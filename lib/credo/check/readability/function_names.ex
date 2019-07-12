@@ -29,7 +29,19 @@ defmodule Credo.Check.Readability.FunctionNames do
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    source_file
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta), empty_issues())
+    |> issues_list()
+  end
+
+  defp empty_issues(), do: %{}
+
+  defp add_issue(issues, name, arity, issue), do: Map.put_new(issues, {name, arity}, issue)
+
+  defp issues_list(issues) do
+    issues
+    |> Map.values()
+    |> Enum.sort_by(& &1.line_no)
   end
 
   for op <- @def_ops do
@@ -49,22 +61,24 @@ defmodule Credo.Check.Readability.FunctionNames do
 
   defp issues_for_definition(body, issues, issue_meta) do
     case Enum.at(body, 0) do
-      {:when, _when_meta, [{name, meta, _args} | _guard]} ->
-        issues_for_name(name, meta, issues, issue_meta)
+      {:when, _when_meta, [{name, meta, args} | _guard]} ->
+        issues_for_name(name, args, meta, issues, issue_meta)
 
-      {name, meta, _args} when is_atom(name) ->
-        issues_for_name(name, meta, issues, issue_meta)
+      {name, meta, args} when is_atom(name) ->
+        issues_for_name(name, args, meta, issues, issue_meta)
 
       _ ->
         issues
     end
   end
 
-  defp issues_for_name(name, meta, issues, issue_meta) do
+  defp issues_for_name(name, args, meta, issues, issue_meta) do
     if name |> to_string |> Name.snake_case?() do
       issues
     else
-      [issue_for(issue_meta, meta[:line], name) | issues]
+      issue = issue_for(issue_meta, meta[:line], name)
+      arity = length(args || [])
+      add_issue(issues, name, arity, issue)
     end
   end
 
