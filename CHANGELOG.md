@@ -3,6 +3,8 @@
 ## 1.1.1
 
 - Fix incompatibilities between Elixir 1.9, `Credo.Code.Token` and  `Credo.Code.InterpolationHelper`
+- Fix error in `Heredocs` with certain UTF-8 chars
+- New param for `ParenthesesOnZeroArityDefs`: use `[parens: true]` to force presence of parentheses on zero arity defs
 
 ## 1.1.0
 
