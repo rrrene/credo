@@ -246,7 +246,7 @@ defmodule Credo.Code.Heredocs do
       |> List.last()
       |> List.first()
 
-    length_after_byte_index = String.length(acc) - byte_index
+    length_after_byte_index = byte_size(acc) - byte_index
 
     new_acc =
       acc
