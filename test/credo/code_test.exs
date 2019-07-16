@@ -251,6 +251,40 @@ defmodule Credo.CodeTest do
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
+  test "it should produce valid code /2" do
+    source = ~S"""
+    file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
+    """
+
+    expected = ~S"""
+    file_patt   = "                                  "
+    """
+
+    result = Credo.Code.clean_charlists_strings_sigils_and_comments(source)
+    result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
+
+    assert result == expected
+    assert result == result2, "clean_charlists_strings_sigils_and_comments/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
+
+  test "it should produce valid code /3" do
+    source = ~S"""
+    file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
+    """
+
+    expected = ~S"""
+    file_patt   = "                                  "
+    """
+
+    result = Credo.Code.clean_charlists_strings_and_sigils(source)
+    result2 = Credo.Code.clean_charlists_strings_and_sigils(result)
+
+    assert result == expected
+    assert result == result2, "clean_charlists_strings_and_sigils/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
+
   test "returns ast without metadata" do
     ast =
       {:__block__, [],

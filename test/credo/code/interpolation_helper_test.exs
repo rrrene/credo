@@ -454,4 +454,17 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
+
+  @tag needs_elixir: "1.7.0"
+  test "it should replace a single interpolation in a string" do
+    source = ~S"""
+    file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
+    """
+
+    expected = ~S"""
+    file_patt   = "*.{$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$}"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
