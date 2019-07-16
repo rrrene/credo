@@ -98,11 +98,11 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   end
 
   # ignore pinned variables
-  defp find_variables({:::, _, [{:^, _, _} | _]}) do
+  defp find_variables({:"::", _, [{:^, _, _} | _]}) do
     []
   end
 
-  defp find_variables({:::, _, [lhs | _rhs]}) do
+  defp find_variables({:"::", _, [lhs | _rhs]}) do
     find_variables(lhs)
   end
 

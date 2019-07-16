@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.Specs do
   end
 
   defp find_specs(
-         {:spec, _, [{:when, _, [{:::, _, [{name, _, args}, _]}, _]} | _]} = ast,
+         {:spec, _, [{:when, _, [{:"::", _, [{name, _, args}, _]}, _]} | _]} = ast,
          specs
        ) do
     {ast, [{name, length(args)} | specs]}
