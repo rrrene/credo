@@ -553,16 +553,16 @@ defmodule Credo.Code.HeredocsTest do
       end
 
       @doc """
-    ..........................
-    .."""
+      ........................
+      """
       @spec preload_all(t()) :: t()
       def preload_all(issue) do
         Repo.preload(issue, [:author, :assignee, :tags, :bug_creator])
       end
 
       @doc ~S"""
-    .............
-    .."""
+      ...........
+      """
       @spec build_query(Ecto.Query.t(), Map.t()) :: Ecto.Query.t()
       def build_query(base \\ __MODULE__, params) do
         params
@@ -604,8 +604,8 @@ defmodule Credo.Code.HeredocsTest do
       defp query_by(query, _, _), do: query
 
       @doc """
-    ...........
-    .."""
+      .........
+      """
       def changeset(issue, attrs \\ %{}) do
         permitted_attrs = ~w(
           code

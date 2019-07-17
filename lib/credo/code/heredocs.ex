@@ -253,6 +253,6 @@ defmodule Credo.Code.Heredocs do
       |> :binary.part(byte_index, length_after_byte_index)
       |> String.replace(~r/\n(.{#{no_of_chars_to_replace}})/, pad_string)
 
-    String.slice(acc, 0, byte_index) <> new_acc
+    :binary.part(acc, 0, byte_index) <> new_acc
   end
 end
