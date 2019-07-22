@@ -24,6 +24,20 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /2" do
+    ~S"""
+    @properties ~w(legacy_switch beta_tester)a
+
+    for property <- @properties do
+      def unquote(property)(user_id) when is_integer(user_id) do
+        get_user_property(user_id, unquote(property))
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   test "it should NOT report expected code 2" do
     """
     defmodule CredoSample do
