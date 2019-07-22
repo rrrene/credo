@@ -54,6 +54,16 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report expected code /5" do
+    """
+    def sigil_O(input, args) do
+      # ...
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
