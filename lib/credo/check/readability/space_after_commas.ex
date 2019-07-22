@@ -46,7 +46,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
     source_file
     |> Sigils.replace_with_spaces(" ", " ", source_file.filename)
     |> Strings.replace_with_spaces(" ", " ", source_file.filename)
-    |> Heredocs.replace_with_spaces(" ", " ", source_file.filename)
+    |> Heredocs.replace_with_spaces(" ", " ", "", source_file.filename)
     |> Charlists.replace_with_spaces(" ", " ", source_file.filename)
     |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
     |> Credo.Code.to_lines()
