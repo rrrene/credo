@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Fix bug in `Heredocs` regarding indentation
+- Fix bug in `FunctionNames` when using `unquote/1` in guards
+- Fix bug in `FunctionNames` when defining `sigil_` functions for uppercase sigils
+
 ## 1.1.1
 
 - Fix incompatibilities between Elixir 1.9, `Credo.Code.Token` and  `Credo.Code.InterpolationHelper`
