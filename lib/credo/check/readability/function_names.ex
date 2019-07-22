@@ -20,6 +20,8 @@ defmodule Credo.Check.Readability.FunctionNames do
   """
   @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro, :defmacrop, :defguard, :defguardp]
+  @all_sigil_chars ~w(a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z)
+  @all_sigil_atoms Enum.map(@all_sigil_chars, &:"sigil_#{&1}")
 
   use Credo.Check, base_priority: :high
 
@@ -44,8 +46,19 @@ defmodule Credo.Check.Readability.FunctionNames do
     |> Enum.sort_by(& &1.line_no)
   end
 
+  # Ignore sigil definitions
+  for sigil <- @all_sigil_atoms do
+    defp traverse(
+           {:def, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast,
+           issues,
+           _issue_meta
+         ) do
+      {ast, issues}
+    end
+  end
+
   for op <- @def_ops do
-    # catch variables named e.g. `defp`
+    # Ignore variables named e.g. `defp`
     defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
       {ast, issues}
     end
@@ -72,7 +85,7 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
   end
 
-  defp issues_for_name({:unquote, _, _}, args, meta, issues, issue_meta) do
+  defp issues_for_name({:unquote, _, _}, _args, _meta, issues, _issue_meta) do
     issues
   end
 
