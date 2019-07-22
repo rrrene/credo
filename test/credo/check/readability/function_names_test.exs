@@ -26,19 +26,25 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
 
   test "it should NOT report expected code /2" do
     ~S"""
-    @properties ~w(legacy_switch beta_tester)a
-
-    for property <- @properties do
-      def unquote(property)(user_id) when is_integer(user_id) do
-        get_user_property(user_id, unquote(property))
-      end
+    def unquote(property)(user_id) when is_integer(user_id) do
+      get_user_property(user_id, unquote(property))
     end
     """
     |> to_source_file
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report expected code 2" do
+  test "it should NOT report expected code /3" do
+    ~S"""
+    def something(user_id) when is_integer(unquote(property)) do
+      nil
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
+  test "it should NOT report expected code /4" do
     """
     defmodule CredoSample do
       defmacro unquote(:{})(args)

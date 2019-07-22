@@ -72,12 +72,17 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
   end
 
+  defp issues_for_name({:unquote, _, _}, args, meta, issues, issue_meta) do
+    issues
+  end
+
   defp issues_for_name(name, args, meta, issues, issue_meta) do
     if name |> to_string |> Name.snake_case?() do
       issues
     else
       issue = issue_for(issue_meta, meta[:line], name)
       arity = length(args || [])
+
       add_issue(issues, name, arity, issue)
     end
   end
