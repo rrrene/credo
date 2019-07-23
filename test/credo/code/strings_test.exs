@@ -170,4 +170,13 @@ defmodule Credo.Code.StringsTest do
 
     assert input == Strings.replace_with_spaces(input)
   end
+
+  @example_code File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  test "it should produce valid code /2" do
+    result = Strings.replace_with_spaces(@example_code)
+    result2 = Strings.replace_with_spaces(result)
+
+    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
 end

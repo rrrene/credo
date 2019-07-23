@@ -6,7 +6,7 @@ defmodule Credo.Code.Strings do
   alias Credo.Code.InterpolationHelper
   alias Credo.SourceFile
 
-  @sigil_delimiters [
+  @string_sigil_delimiters [
     {"(", ")"},
     {"[", "]"},
     {"{", "}"},
@@ -15,9 +15,16 @@ defmodule Credo.Code.Strings do
     {"\"", "\""},
     {"'", "'"}
   ]
-  @all_string_sigils Enum.flat_map(@sigil_delimiters, fn {b, e} ->
+  @heredocs__sigil_delimiters [
+    {"'''", "'''"},
+    {~s("""), ~s(""")}
+  ]
+  @all_string_sigils Enum.flat_map(@string_sigil_delimiters, fn {b, e} ->
                        [{"~s#{b}", e}, {"~S#{b}", e}]
                      end)
+  @all_heredocs_sigils Enum.flat_map(@heredocs__sigil_delimiters, fn {b, e} ->
+                         [{"~s#{b}", e}, {"~S#{b}", e}]
+                       end)
 
   # TODO v1.0: this should not remove heredocs, since
   #             there is a separate module for that
@@ -43,6 +50,25 @@ defmodule Credo.Code.Strings do
     acc
   end
 
+  for {sigil_start, sigil_end} <- @all_heredocs_sigils do
+    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
+      parse_heredoc(
+        t,
+        acc <> unquote(sigil_start),
+        replacement,
+        unquote(sigil_end)
+      )
+    end
+  end
+
+  defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s("""), replacement, ~s("""))
+  end
+
+  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s('''), replacement, ~s('''))
+  end
+
   for {sigil_start, sigil_end} <- @all_string_sigils do
     defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
       parse_string_sigil(
@@ -52,14 +78,6 @@ defmodule Credo.Code.Strings do
         replacement
       )
     end
-  end
-
-  defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement)
-  end
-
-  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement)
   end
 
   defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement) do
@@ -235,31 +253,31 @@ defmodule Credo.Code.Strings do
   # Heredocs
   #
 
-  defp parse_heredoc("", acc, _replacement) do
-    acc
-  end
-
-  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc, replacement)
-  end
-
-  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc, replacement)
-  end
-
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do
     parse_code(t, acc <> ~s("""), replacement)
   end
 
-  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
     parse_code(t, acc <> ~s('''), replacement)
   end
 
-  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> "\n", replacement)
+  defp parse_heredoc("", acc, _replacement, _delimiter) do
+    acc
   end
 
-  defp parse_heredoc(<<_::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> replacement, replacement)
+  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc, replacement, delimiter)
+  end
+
+  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc, replacement, delimiter)
+  end
+
+  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc <> "\n", replacement, delimiter)
+  end
+
+  defp parse_heredoc(<<_::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc <> replacement, replacement, delimiter)
   end
 end
