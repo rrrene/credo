@@ -49,10 +49,11 @@ defmodule Credo.Check.Readability.FunctionNames do
   # Ignore sigil definitions
   for sigil <- @all_sigil_atoms do
     defp traverse(
-           {:def, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast,
+           {op, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast,
            issues,
            _issue_meta
-         ) do
+         )
+         when op in [:def, :defmacro] do
       {ast, issues}
     end
   end
