@@ -246,9 +246,9 @@ defmodule Credo.Code.HeredocsTest do
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
-  @example_code File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  @example_code2 File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
   test "it should produce valid code /2" do
-    result = Heredocs.replace_with_spaces(@example_code)
+    result = Heredocs.replace_with_spaces(@example_code2)
     result2 = Heredocs.replace_with_spaces(result)
 
     assert result == result2, "Heredocs.replace_with_spaces/2 should be idempotent"
