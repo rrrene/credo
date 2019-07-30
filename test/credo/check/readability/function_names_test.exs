@@ -59,6 +59,9 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     def sigil_O(input, args) do
       # ...
     end
+    defmacro sigil_U({:<<>>, _, [string]}, []) do
+      # ...
+    end
     """
     |> to_source_file
     |> refute_issues(@described_check)
