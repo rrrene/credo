@@ -37,7 +37,7 @@ defmodule Credo.Check do
   @callback explanation_for_params() :: Keyword.t()
 
   @callback format_issue(
-              issue_meta :: {IssueMeta.t(), SourceFile.t(), list()},
+              issue_meta :: {IssueMeta.t(), SourceFile.t(), list()} | SourceFile.t(),
               opts :: Keyword.t()
             ) ::
               Issue.t()
