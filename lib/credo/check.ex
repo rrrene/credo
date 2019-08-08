@@ -36,7 +36,11 @@ defmodule Credo.Check do
 
   @callback explanation_for_params() :: Keyword.t()
 
-  @callback format_issue(issue_meta :: IssueMeta, opts :: Keyword.t()) :: Issue.t()
+  @callback format_issue(
+              issue_meta :: {IssueMeta.t(), SourceFile.t(), list()},
+              opts :: Keyword.t()
+            ) ::
+              Issue.t()
 
   @base_category_exit_status_map %{
     consistency: 1,
