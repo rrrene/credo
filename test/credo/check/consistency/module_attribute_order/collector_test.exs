@@ -197,4 +197,86 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
              }
     end
   end
+
+  describe ".transform_frequencies/1" do
+    test "it should merge frequencies for matches where some attributes are simply unused" do
+      frequencies = %{
+        [
+          :moduledoc,
+          :use,
+          :alias,
+          :type
+        ] => 23,
+        [
+          :use,
+          :alias,
+          :require,
+          :type
+        ] => 20,
+        [
+          :moduledoc,
+          :require,
+          :alias
+        ] => 1
+      }
+
+      assert Collector.transform_frequencies(frequencies) == %{
+               [
+                 :moduledoc,
+                 :use,
+                 :alias,
+                 :require,
+                 :type
+               ] => 23 + 20,
+               [
+                 :moduledoc,
+                 :require,
+                 :alias
+               ] => 1
+             }
+    end
+
+    test "it should merge frequencies for matches where the order is unclear by looking at the rest" do
+      frequencies = %{
+        [
+          :moduledoc,
+          :use,
+          :alias,
+          :type
+        ] => 23,
+        [
+          :use,
+          :alias,
+          :require
+        ] => 20,
+        [
+          :alias,
+          :require,
+          :type,
+          :callback
+        ] => 10,
+        [
+          :moduledoc,
+          :require,
+          :alias
+        ] => 1
+      }
+
+      assert Collector.transform_frequencies(frequencies) == %{
+               [
+                 :moduledoc,
+                 :use,
+                 :alias,
+                 :require,
+                 :type,
+                 :callback
+               ] => 23 + 20 + 10,
+               [
+                 :moduledoc,
+                 :require,
+                 :alias
+               ] => 1
+             }
+    end
+  end
 end

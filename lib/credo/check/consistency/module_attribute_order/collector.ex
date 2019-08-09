@@ -11,6 +11,10 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.Collector do
     |> collapse()
   end
 
+  defdelegate transform_frequencies(frequencies),
+    to: Credo.Check.Consistency.ModuleAttributeOrder.Merger,
+    as: :merge_frequencies
+
   def find_locations_not_matching(expected, source_file) do
     source_file
     |> Code.prewalk(&traverse_file/2, [])
