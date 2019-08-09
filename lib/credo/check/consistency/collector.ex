@@ -134,9 +134,9 @@ defmodule Credo.Check.Consistency.Collector do
         :ok
       end
 
-      def transform_fequencies(frequencies), do: frequencies
+      def transform_frequencies(frequencies), do: frequencies
 
-      defoverridable transform_fequencies: 1
+      defoverridable transform_frequencies: 1
     end
   end
 
