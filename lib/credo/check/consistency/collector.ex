@@ -51,6 +51,8 @@ defmodule Credo.Check.Consistency.Collector do
   alias Credo.Issue
   alias Credo.SourceFile
 
+  @type frequencies :: %{term => non_neg_integer}
+
   @doc """
   When you call `@collector.find_and_append_issues/4` inside the check module,
   the collector first counts the occurrences of different matches
@@ -66,9 +68,9 @@ defmodule Credo.Check.Consistency.Collector do
   @callback collect_matches(
               source_file :: SourceFile.t(),
               params :: Keyword.t()
-            ) :: %{
-              term => non_neg_integer
-            }
+            ) :: frequencies()
+
+  @callback transform_frequencies(frequencies()) :: frequencies()
 
   # Once the most frequent match is identified, the `Collector` looks up
   # source files that have other matches (e.g. both :with_space
@@ -106,7 +108,7 @@ defmodule Credo.Check.Consistency.Collector do
               source_file :: SourceFile.t()
             ) :: list(term)
 
-  @optional_callbacks find_locations_not_matching: 2
+  @optional_callbacks transform_frequencies: 1, find_locations_not_matching: 2
 
   defmacro __using__(_opts) do
     quote do
@@ -131,6 +133,10 @@ defmodule Credo.Check.Consistency.Collector do
 
         :ok
       end
+
+      def transform_fequencies(frequencies), do: frequencies
+
+      defoverridable transform_fequencies: 1
     end
   end
 
@@ -140,7 +146,10 @@ defmodule Credo.Check.Consistency.Collector do
         {source_file, collector.collect_matches(source_file, params)}
       end)
 
-    frequencies = total_frequencies(frequencies_per_source_file)
+    frequencies =
+      frequencies_per_source_file
+      |> total_frequencies()
+      |> collector.transform_frequencies()
 
     if map_size(frequencies) > 0 do
       {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
