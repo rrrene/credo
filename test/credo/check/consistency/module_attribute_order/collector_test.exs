@@ -128,7 +128,7 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
                  :alias,
                  :require,
                  :defstruct,
-                 :@,
+                 :moduleattribute,
                  :type,
                  :callback,
                  :macrocallback,
@@ -149,7 +149,7 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
                  :use,
                  :alias,
                  :require,
-                 :@,
+                 :moduleattribute,
                  :type
                ] => 1
              }
@@ -167,7 +167,7 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
                  :use,
                  :import,
                  :require,
-                 :@,
+                 :moduleattribute,
                  :alias,
                  :type
                ] => 1
@@ -186,7 +186,7 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
                  :use,
                  :alias,
                  :require,
-                 :@,
+                 :moduleattribute,
                  :type
                ] => 1,
                [

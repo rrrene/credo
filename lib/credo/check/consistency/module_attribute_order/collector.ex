@@ -46,9 +46,11 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.Collector do
     defp match_attribute({:@, _, [{unquote(attribute), _, _}]}), do: unquote(attribute)
   end
 
-  for attribute <- [:use, :import, :alias, :require, :defstruct, :@] do
+  for attribute <- [:use, :import, :alias, :require, :defstruct] do
     defp match_attribute({unquote(attribute), _, _}), do: unquote(attribute)
   end
+
+  defp match_attribute({:@, _, _}), do: :moduleattribute
 
   defp match_attribute(_), do: nil
 
