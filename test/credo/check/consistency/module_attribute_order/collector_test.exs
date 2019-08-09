@@ -278,5 +278,69 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
                ] => 1
              }
     end
+
+    test "it should merge frequencies for matches where the order is unclear by looking at the previously processed things" do
+      frequencies = %{
+        [
+          :moduledoc,
+          :type,
+          :require,
+          :alias
+        ] => 30,
+        [
+          :moduledoc,
+          :use,
+          :alias,
+          :type
+        ] => 23,
+        [
+          :use,
+          :alias,
+          :require
+        ] => 20
+      }
+
+      assert Collector.transform_frequencies(frequencies) == %{
+               [
+                 :moduledoc,
+                 :use,
+                 :alias,
+                 :type,
+                 :require
+               ] => 23 + 20,
+               [
+                 :moduledoc,
+                 :type,
+                 :require,
+                 :alias
+               ] => 30
+             }
+    end
+
+    test "it should merge frequencies for matches where the order is unclear according to the styleguide if no other reference is available" do
+      frequencies = %{
+        [
+          :moduledoc,
+          :use,
+          :alias,
+          :type
+        ] => 23,
+        [
+          :use,
+          :alias,
+          :require
+        ] => 20
+      }
+
+      assert Collector.transform_frequencies(frequencies) == %{
+               [
+                 :moduledoc,
+                 :use,
+                 :alias,
+                 :require,
+                 :type
+               ] => 23 + 20
+             }
+    end
   end
 end

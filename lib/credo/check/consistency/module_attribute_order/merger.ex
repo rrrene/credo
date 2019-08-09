@@ -1,4 +1,21 @@
 defmodule Credo.Check.Consistency.ModuleAttributeOrder.Merger do
+  # From: https://github.com/christopheradams/elixir_style_guide#module-attribute-ordering
+  # Used as fallback if the codebase has insufficient examples
+  @styleguide_order [
+    :moduledoc,
+    :behaviour,
+    :use,
+    :import,
+    :alias,
+    :require,
+    :module_attribute,
+    :defstruct,
+    :type,
+    :callback,
+    :macrocallback,
+    :optional_callbacks
+  ]
+
   def merge_frequencies(%{} = frequencies) do
     frequencies
     |> Enum.sort_by(fn {attributes, frequency} -> {frequency, length(attributes)} end, &>=/2)
@@ -60,7 +77,8 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.Merger do
           {ordered, [] = _unclear} ->
             ordered
 
-            # TODO: Fallback to styleguide
+          {_ordered, _unclear} ->
+            Enum.filter(@styleguide_order, &(&1 in unclear))
         end
 
       try_to_merge_occurrences(merged, to_merge, order: order, reference: reference)
