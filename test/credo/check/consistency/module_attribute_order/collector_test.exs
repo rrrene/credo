@@ -1,6 +1,8 @@
 defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
   use Credo.TestHelper
 
+  import ExUnit.CaptureIO
+
   alias Credo.Check.Consistency.ModuleAttributeOrder.Collector
 
   @all_relevant_attributes """
@@ -332,15 +334,38 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.CollectorTest do
         ] => 20
       }
 
-      assert Collector.transform_frequencies(frequencies) == %{
-               [
-                 :moduledoc,
-                 :use,
-                 :alias,
-                 :require,
-                 :type
-               ] => 23 + 20
-             }
+      # Ignore warning for this test, next test takes care of that
+      capture_io(:stderr, fn ->
+        assert Collector.transform_frequencies(frequencies) == %{
+                 [
+                   :moduledoc,
+                   :use,
+                   :alias,
+                   :require,
+                   :type
+                 ] => 23 + 20
+               }
+      end)
+    end
+
+    test "it should prints a warning when having to fallback to the styleguide" do
+      frequencies = %{
+        [
+          :moduledoc,
+          :use,
+          :alias,
+          :type
+        ] => 23,
+        [
+          :use,
+          :alias,
+          :require
+        ] => 20
+      }
+
+      assert capture_io(:stderr, fn -> Collector.transform_frequencies(frequencies) end) =~
+               "the ModuleAttributeOrder check didn't find enough code examples to determine " <>
+                 "the preferred order of `type` and `require`, it will fallback to the community styleguide ordering."
     end
   end
 end

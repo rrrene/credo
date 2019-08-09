@@ -78,6 +78,8 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.Merger do
             ordered
 
           {_ordered, _unclear} ->
+            warn_styleguide_fallback(unclear)
+
             Enum.filter(@styleguide_order, &(&1 in unclear))
         end
 
@@ -154,5 +156,15 @@ defmodule Credo.Check.Consistency.ModuleAttributeOrder.Merger do
       |> Enum.sort_by(&Enum.find_index(attributes, fn attribute -> attribute == &1 end))
 
     {ordered ++ new_ordered, unclear -- new_ordered}
+  end
+
+  defp warn_styleguide_fallback(unclear) do
+    unclear = Enum.map_join(unclear, " and ", &"`#{&1}`")
+
+    IO.warn(
+      "the ModuleAttributeOrder check didn't find enough code examples " <>
+        "to determine the preferred order of #{unclear}, " <>
+        "it will fallback to the community styleguide ordering."
+    )
   end
 end
