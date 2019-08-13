@@ -5,7 +5,7 @@ defmodule Credo.IssueMeta do
   params (by default).
   """
 
-  @type t :: module
+  @type t :: {__MODULE__, Credo.SourceFile.t(), Keyword.t()}
 
   alias Credo.SourceFile
 
