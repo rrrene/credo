@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   @moduledoc false
 
   @checkdoc """
-  Either use parentheses or not when defininig a function with no arguments.
+  Either use parentheses or not when defining a function with no arguments.
 
   By default, this check enforces no parentheses, so zero-arity function
   and macro definitions should look like this:
