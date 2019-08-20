@@ -172,18 +172,19 @@ defmodule Credo.CLI.Output do
       "info: ",
       :reset,
       :faint,
-      "the following checks were skipped because they're not compatible with\n",
+      "some checks were skipped because they're not compatible with\n",
       :reset,
       :faint,
-      "your version of Elixir (#{System.version()}).\n"
+      "your version of Elixir (#{System.version()}).\n\n",
+      "You can deactivate these checks by adding this to the `checks` list in your config:\n"
     ]
 
-    UI.warn("")
-    UI.warn(msg)
+    UI.puts("")
+    UI.puts(msg)
 
     skipped_checks
     |> Enum.map(&check_name/1)
-    |> print_numbered_list
+    |> print_disabled_check_config
   end
 
   defp check_name({check, _check_info}), do: check_name({check})
@@ -206,5 +207,18 @@ defmodule Credo.CLI.Output do
       ]
     end)
     |> UI.warn()
+  end
+
+  defp print_disabled_check_config(list) do
+    list
+    |> Enum.flat_map(fn string ->
+      [
+        :reset,
+        String.pad_leading(" ", 4),
+        :faint,
+        "{#{string}, false},\n"
+      ]
+    end)
+    |> UI.puts()
   end
 end
