@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- Improve warning message about skipped checks
+- Fix false positive in `FunctionNames`
+- Fix typespec in `IssueMeta`
+- Add `AliasAs` check to list of optional checks
+
 ## 1.1.2
 
 - Fix bug in `Heredocs` regarding indentation
