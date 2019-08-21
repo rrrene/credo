@@ -9,6 +9,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(_, %{foo: foo} = _, _) do
+            version = Mix.Project.config()[:version]
           end
         end
       end
