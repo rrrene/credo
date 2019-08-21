@@ -101,4 +101,26 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> to_source_file()
     |> refute_issues(@described_check)
   end
+
+  test "it should NOT report functions with `@impl SomeMod`" do
+    """
+    defmodule CredoTypespecTest do
+      @impl SomeMod
+      def foo(a), do: a
+    end
+    """
+    |> to_source_file()
+    |> refute_issues(@described_check)
+  end
+
+  test "it should report functions with `@impl false`" do
+    """
+    defmodule CredoTypespecTest do
+      @impl false
+      def foo(a), do: a
+    end
+    """
+    |> to_source_file()
+    |> assert_issue(@described_check)
+  end
 end

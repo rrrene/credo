@@ -44,7 +44,7 @@ defmodule Credo.Check.Readability.Specs do
     {ast, [{name, length(args)} | specs]}
   end
 
-  defp find_specs({:impl, _, [true]} = ast, specs) do
+  defp find_specs({:impl, _, [impl]} = ast, specs) when impl != false do
     {ast, [:impl | specs]}
   end
 
