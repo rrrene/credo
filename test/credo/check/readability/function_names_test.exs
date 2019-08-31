@@ -67,7 +67,6 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues(@described_check)
   end
 
-  @tag :one
   test "it should NOT report expected code (for operators) /6" do
     """
     defmacro @expr2
