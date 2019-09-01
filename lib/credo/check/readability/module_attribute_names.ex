@@ -29,6 +29,11 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # ignore non-alphanumeric @ ASTs, for when you're redefining the @ macro.
+  defp traverse({:@, _meta, [{:{}, _, _}]} = ast, issues, _) do
+    {ast, issues}
+  end
+
   defp traverse(
          {:@, _meta, [{name, meta, _arguments}]} = ast,
          issues,

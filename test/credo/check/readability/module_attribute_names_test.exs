@@ -31,6 +31,20 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT fail when redefining the @ operator" do
+    """
+    defmodule CredoSampleModule do
+      defmacro @{_, _, _} do
+        quote do
+          # some_code_here
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
