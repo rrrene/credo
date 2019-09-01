@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+- Fix name parsing bug in `UnusedVariableNames`
+- Fix bug when redefining operators in `FunctionNames`
+- Fix false positive in `Specs`
+
 ## 1.1.3
 
 - Improve warning message about skipped checks
