@@ -122,6 +122,16 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> refute_issues(@described_check)
   end
 
+  test "does NOT crash if string contains singnle quotes and an interpolation" do
+    snippet = ~S"""
+      function.("'#{parameter}'")
+    """
+
+    snippet
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
