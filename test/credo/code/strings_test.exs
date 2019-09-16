@@ -171,6 +171,18 @@ defmodule Credo.Code.StringsTest do
     assert input == Strings.replace_with_spaces(input)
   end
 
+  test "it should replace interpolations" do
+    input = ~S"""
+    x = "#{~s(Hello, #{name})}"
+    """
+
+    expected = ~S"""
+    x = "                     "
+    """
+
+    assert expected == Strings.replace_with_spaces(input)
+  end
+
   @example_code File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
   test "it should produce valid code /2" do
     result = Strings.replace_with_spaces(@example_code)
