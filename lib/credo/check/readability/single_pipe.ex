@@ -44,7 +44,7 @@ defmodule Credo.Check.Readability.SinglePipe do
   defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta) do
     {
       ast,
-      {false, issues ++ [issue_for(issue_meta, meta[:line], "single pipe")]}
+      {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
     }
   end
 
