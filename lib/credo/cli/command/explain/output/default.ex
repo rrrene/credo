@@ -4,8 +4,6 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI
   alias Credo.Code.Scope
-  alias Credo.Issue
-  alias Credo.SourceFile
 
   @indent 8
   @params_min_indent 20
@@ -24,55 +22,22 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
   end
 
   @doc "Called after the analysis has run."
-  def print_after_info(source_file, exec, line_no, column) do
+  def print_after_info(explanations, exec, line_no, column) do
     term_width = Output.term_columns()
 
-    print_issues(source_file, exec, term_width, line_no, column)
+    print_explanations(explanations, exec, term_width, line_no, column)
   end
 
-  defp print_issues(nil, _exec, _term_width, _line_no, _column) do
-    nil
-  end
-
-  defp print_issues(
-         %SourceFile{filename: filename} = source_file,
-         exec,
-         term_width,
-         line_no,
-         column
-       ) do
-    issues = Credo.Execution.get_issues(exec, filename)
-
-    issues
-    |> Enum.sort_by(& &1.line_no)
-    |> filter_issues(line_no, column)
-    |> print_issues(filename, source_file, exec, term_width, line_no, column)
-  end
-
-  defp print_issues(
-         [],
-         _filename,
-         _source_file,
-         _exec,
-         _term_width,
-         _line_no,
-         _column
-       ) do
-    nil
-  end
-
-  defp print_issues(
-         issues,
-         _filename,
-         source_file,
+  defp print_explanations(
+         explanations,
          _exec,
          term_width,
          _line_no,
          _column
        ) do
-    first_issue = issues |> List.first()
-    scope_name = Scope.mod_name(first_issue.scope)
-    color = Output.check_color(first_issue)
+    first_explanation = explanations |> List.first()
+    scope_name = Scope.mod_name(first_explanation.scope)
+    color = Output.check_color(first_explanation.check)
 
     UI.puts()
 
@@ -89,40 +54,30 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     UI.puts_edge(color)
 
-    issues
-    |> Enum.each(&print_issue(&1, source_file, term_width))
+    explanations
+    |> Enum.each(&print_issue(&1, term_width))
   end
-
-  defp filter_issues(issues, line_no, nil) do
-    line_no = line_no |> String.to_integer()
-    issues |> Enum.filter(&filter_issue(&1, line_no, nil))
-  end
-
-  defp filter_issues(issues, line_no, column) do
-    line_no = line_no |> String.to_integer()
-    column = column |> String.to_integer()
-
-    issues |> Enum.filter(&filter_issue(&1, line_no, column))
-  end
-
-  defp filter_issue(%Issue{line_no: a, column: b}, a, b), do: true
-  defp filter_issue(%Issue{line_no: a}, a, _), do: true
-  defp filter_issue(_, _, _), do: false
 
   defp print_issue(
-         %Issue{
+         %{
+           category: category,
            check: check,
-           message: message,
+           column: column,
+           explanation_for_issue: explanation_for_issue,
            filename: filename,
-           priority: priority
-         } = issue,
-         source_file,
+           trigger: trigger,
+           line_no: line_no,
+           message: message,
+           priority: priority,
+           related_code: related_code,
+           scope: scope
+         },
          term_width
        ) do
-    pos = pos_string(issue.line_no, issue.column)
+    pos = pos_string(line_no, column)
 
-    outer_color = Output.check_color(issue)
-    inner_color = Output.check_color(issue)
+    outer_color = Output.check_color(category)
+    inner_color = Output.check_color(category)
     message_color = inner_color
     filename_color = :default_color
 
@@ -178,12 +133,20 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
       :faint,
       pos,
       :faint,
-      " (#{issue.scope})"
+      " (#{scope})"
     ]
     |> UI.puts()
 
-    if issue.line_no do
-      print_issue_line_no(source_file, term_width, issue, outer_color, inner_color)
+    if line_no do
+      print_issue_line_no(
+        term_width,
+        line_no,
+        column,
+        trigger,
+        related_code,
+        outer_color,
+        inner_color
+      )
     end
 
     UI.puts_edge([outer_color, :faint], @indent)
@@ -199,7 +162,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     UI.puts_edge([outer_color, :faint])
 
-    (issue.check.explanation || "TODO: Insert explanation")
+    (explanation_for_issue || "TODO: Insert explanation")
     |> String.trim()
     |> String.split("\n")
     |> Enum.flat_map(&format_explanation(&1, outer_color))
@@ -208,33 +171,9 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     UI.puts_edge([outer_color, :faint])
 
-    issue.check
-    |> print_params_explanation(outer_color)
+    print_params_explanation(check, outer_color)
 
     UI.puts_edge([outer_color, :faint])
-  end
-
-  defp print_source_line(_, line_no, _, _, _) when line_no < 1 do
-    nil
-  end
-
-  defp print_source_line(source_file, line_no, term_width, color, outer_color) do
-    line = SourceFile.line_at(source_file, line_no)
-
-    line_no_str =
-      "#{line_no} "
-      |> String.pad_leading(@indent - 2)
-
-    [
-      UI.edge([outer_color, :faint]),
-      :reset,
-      :faint,
-      line_no_str,
-      :reset,
-      color,
-      UI.truncate(line, term_width - @indent)
-    ]
-    |> UI.puts()
   end
 
   def format_explanation(line, outer_color) do
@@ -427,16 +366,16 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     (trunc(params_indent / 2) + 1) * 2
   end
 
-  defp print_issue_column(issue, outer_color, inner_color) do
+  defp print_issue_column(column, trigger, outer_color, inner_color) do
     offset = 0
     # column is one-based
-    x = max(issue.column - offset - 1, 0)
+    x = max(column - offset - 1, 0)
 
     w =
-      if is_nil(issue.trigger) do
+      if is_nil(trigger) do
         1
       else
-        issue.trigger
+        trigger
         |> to_string()
         |> String.length()
       end
@@ -451,7 +390,15 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     |> UI.puts()
   end
 
-  defp print_issue_line_no(source_file, term_width, issue, outer_color, inner_color) do
+  defp print_issue_line_no(
+         term_width,
+         line_no,
+         column,
+         trigger,
+         related_code,
+         outer_color,
+         inner_color
+       ) do
     UI.puts_edge([outer_color, :faint])
 
     [
@@ -468,45 +415,71 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     code_color = :faint
 
     print_source_line(
-      source_file,
-      issue.line_no - 2,
+      related_code,
+      line_no - 2,
       term_width,
       code_color,
       outer_color
     )
 
     print_source_line(
-      source_file,
-      issue.line_no - 1,
+      related_code,
+      line_no - 1,
       term_width,
       code_color,
       outer_color
     )
 
     print_source_line(
-      source_file,
-      issue.line_no,
+      related_code,
+      line_no,
       term_width,
       [:cyan, :bright],
       outer_color
     )
 
-    if issue.column, do: print_issue_column(issue, outer_color, inner_color)
+    if column, do: print_issue_column(column, trigger, outer_color, inner_color)
 
     print_source_line(
-      source_file,
-      issue.line_no + 1,
+      related_code,
+      line_no + 1,
       term_width,
       code_color,
       outer_color
     )
 
     print_source_line(
-      source_file,
-      issue.line_no + 2,
+      related_code,
+      line_no + 2,
       term_width,
       code_color,
       outer_color
     )
+  end
+
+  defp print_source_line(related_code, line_no, term_width, code_color, outer_color) do
+    line =
+      related_code
+      |> Enum.find_value(fn
+        {line_no2, line} when line_no2 == line_no -> line
+        _ -> nil
+      end)
+
+    if line do
+      line_no_str =
+        "#{line_no} "
+        |> String.pad_leading(@indent - 2)
+
+      [
+        UI.edge([outer_color, :faint]),
+        :reset,
+        :faint,
+        line_no_str,
+        :reset,
+        code_color,
+        UI.truncate(line, term_width - @indent)
+      ]
+      |> UI.puts()
+    end
   end
 end
