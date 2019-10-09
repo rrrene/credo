@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.5
+
+- Add JSON output to `categories` and `explain` commands
+- Include number of executed checks in summary
+- Fix wrong trigger in `SinglePipe`
+
 ## 1.1.4
 
 - Fix name parsing bug in `UnusedVariableNames`
