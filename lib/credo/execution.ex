@@ -163,6 +163,10 @@ defmodule Credo.Execution do
   """
   def checks(exec)
 
+  def checks(%__MODULE__{checks: nil}) do
+    {[], [], []}
+  end
+
   def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
     only_matching = filter_only_checks(checks, only_checks)
     ignore_matching = filter_ignore_checks(checks, ignore_checks)
