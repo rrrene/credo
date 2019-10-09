@@ -32,16 +32,23 @@ defmodule Credo.CLI.Output.Summary do
 
   def print(source_files, exec, time_load, time_run) do
     issues = Execution.get_issues(exec)
+    checks_count = count_checks(exec)
 
     UI.puts()
     UI.puts([:faint, @cry_for_help])
     UI.puts()
-    UI.puts([:faint, format_time_spent(time_load, time_run)])
+    UI.puts([:faint, format_time_spent(checks_count, time_load, time_run)])
 
     UI.puts(summary_parts(source_files, issues))
     UI.puts()
 
     print_priority_hint(issues, exec)
+  end
+
+  defp count_checks(exec) do
+    {result, _only_matching, _ignore_matching} = Execution.checks(exec)
+
+    Enum.count(result)
   end
 
   defp print_priority_hint([], %Execution{min_priority: min_priority})
@@ -64,7 +71,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp print_priority_hint(_, _exec), do: nil
 
-  defp format_time_spent(time_load, time_run) do
+  defp format_time_spent(check_count, time_load, time_run) do
     time_run = time_run |> div(10_000)
     time_load = time_load |> div(10_000)
 
@@ -76,9 +83,17 @@ defmodule Credo.CLI.Output.Summary do
         value -> "#{value} seconds"
       end
 
-    "Analysis took #{total_in_seconds} (#{format_in_seconds(time_load)}s to load, #{
-      format_in_seconds(time_run)
-    }s running checks)"
+    checks =
+      if check_count == 1 do
+        "1 check"
+      else
+        "#{check_count} checks"
+      end
+
+    breakdown =
+      "#{format_in_seconds(time_load)}s to load, #{format_in_seconds(time_run)}s running #{checks}"
+
+    "Analysis took #{total_in_seconds} (#{breakdown})"
   end
 
   defp format_in_seconds(t) do
