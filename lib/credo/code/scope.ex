@@ -4,9 +4,6 @@ defmodule Credo.Code.Scope do
   point in the analysed code.
   """
 
-  alias Credo.Code.Block
-  alias Credo.Code.Module
-
   @def_ops [:def, :defp, :defmacro]
 
   @doc """
@@ -47,100 +44,97 @@ defmodule Credo.Code.Scope do
   def name(_ast, line: 0), do: nil
 
   def name(ast, line: line) do
+    ast
+    |> scope_info_list()
+    |> name_from_scope_info_list(line)
+  end
+
+  @doc false
+  def name_from_scope_info_list(scope_info_list, line) do
     result =
-      case find_scope(ast, line, [], nil) do
-        nil ->
-          name(ast, line: line - 1)
+      Enum.find(scope_info_list, fn
+        {line_no, _op, _arguments} when line_no <= line -> true
+        _ -> false
+      end)
 
-        {op, list} ->
-          name =
-            list
-            |> Enum.map(&name_to_string/1)
-            |> Enum.join(".")
+    case result do
+      {_line_no, op, arguments} ->
+        name = Credo.Code.Name.full(arguments)
+        {op, name}
 
-          {op, name}
-      end
-
-    result || {nil, ""}
-  end
-
-  defp name_to_string(atom) when is_atom(atom), do: to_string(atom)
-  defp name_to_string(term), do: Macro.to_string(term)
-
-  # Returns a List for the scope name
-  defp find_scope({:__block__, _meta, arguments}, line, name_list, last_op) do
-    find_scope(arguments, line, name_list, last_op)
-  end
-
-  defp find_scope({:do, arguments}, line, name_list, last_op) do
-    find_scope(arguments, line, name_list, last_op)
-  end
-
-  defp find_scope({:else, arguments}, line, name_list, last_op) do
-    find_scope(arguments, line, name_list, last_op)
-  end
-
-  defp find_scope(list, line, name_list, last_op) when is_list(list) do
-    Enum.find_value(list, &find_scope(&1, line, name_list, last_op))
-  end
-
-  defp find_scope(
-         {:defmodule, meta, [{:__aliases__, _, module_name}, arguments]},
-         line,
-         name_list,
-         _last_op
-       ) do
-    name_list = name_list ++ module_name
-
-    cond do
-      meta[:line] == line ->
-        {:defmodule, name_list}
-
-      meta[:line] > line ->
-        nil
-
-      true ->
-        arguments
-        |> Block.do_block_for!()
-        |> find_scope(line, name_list, :defmodule)
+      _ ->
+        {nil, ""}
     end
+  end
+
+  @doc false
+  def scope_info_list(ast) do
+    {_, scope_info_list} = Macro.prewalk(ast, [], &traverse_modules(&1, &2, nil, nil))
+
+    Enum.reverse(scope_info_list)
+  end
+
+  defp traverse_modules({:defmodule, meta, arguments} = ast, acc, current_scope, _current_op)
+       when is_list(arguments) do
+    new_scope_part = Credo.Code.Module.name(ast)
+
+    scope_name =
+      [current_scope, new_scope_part]
+      |> Enum.reject(&is_nil/1)
+      |> Credo.Code.Name.full()
+
+    defmodule_scope_info = {meta[:line], :defmodule, scope_name}
+
+    {_, def_scope_infos} =
+      Macro.prewalk(arguments, [], &traverse_defs(&1, &2, scope_name, :defmodule))
+
+    new_acc = (acc ++ [defmodule_scope_info]) ++ def_scope_infos
+
+    {nil, new_acc}
+  end
+
+  defp traverse_modules({_op, meta, _arguments} = ast, acc, current_scope, current_op) do
+    scope_info = {meta[:line], current_op, current_scope}
+
+    {ast, acc ++ [scope_info]}
+  end
+
+  defp traverse_modules(ast, acc, _current_scope, _current_op) do
+    {ast, acc}
+  end
+
+  defp traverse_defs({:defmodule, _meta, arguments} = ast, acc, current_scope, _current_op)
+       when is_list(arguments) do
+    {_, scopes} = Macro.prewalk(ast, [], &traverse_modules(&1, &2, current_scope, :defmodule))
+
+    {nil, acc ++ scopes}
   end
 
   for op <- @def_ops do
-    defp find_scope(
-           {unquote(op) = op, meta, arguments} = ast,
-           line,
-           name_list,
-           _last_op
-         )
+    defp traverse_defs({unquote(op), meta, arguments} = ast, acc, current_scope, _current_op)
          when is_list(arguments) do
-      fun_name = Module.def_name(ast)
-      name_list = name_list ++ [fun_name]
+      new_scope_part = Credo.Code.Module.def_name(ast)
 
-      cond do
-        meta[:line] == line ->
-          {op, name_list}
+      scope_name =
+        [current_scope, new_scope_part]
+        |> Enum.reject(&is_nil/1)
+        |> Credo.Code.Name.full()
 
-        meta[:line] > line ->
-          nil
+      scope_info = {meta[:line], unquote(op), scope_name}
 
-        true ->
-          arguments
-          |> Block.do_block_for!()
-          |> find_scope(line, name_list, op)
-      end
+      new_acc = acc ++ [scope_info]
+
+      {nil, new_acc}
     end
   end
 
-  defp find_scope({_atom, meta, arguments}, line, name_list, last_op) do
-    if meta[:line] == line do
-      {last_op, name_list}
-    else
-      find_scope(arguments, line, name_list, last_op)
-    end
+  defp traverse_defs({_op, meta, _arguments} = ast, acc, current_scope, current_op) do
+    scope_info = {meta[:line], current_op, current_scope}
+
+    {ast, acc ++ [scope_info]}
   end
 
-  defp find_scope(_value, _line, _name_list, _last_op) do
-    nil
+  defp traverse_defs(ast, acc, _current_scope, _current_op) do
+    {ast, acc}
   end
 end

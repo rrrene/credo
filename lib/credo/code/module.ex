@@ -87,6 +87,8 @@ defmodule Credo.Code.Module do
   end
 
   @doc "Returns the arity of the given function definition `ast`"
+  def def_arity(ast)
+
   for op <- @def_ops do
     def def_arity({unquote(op) = op, _, [{:when, _, fun_ast}, _]}) do
       def_arity({op, nil, fun_ast})
