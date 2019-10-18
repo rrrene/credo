@@ -57,4 +57,52 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should not report a violation on non-umbrella test path" do
+    """
+    defmodule CredoSampleModule do
+      def some_function() do
+        [
+          DateTime,
+          Kernel,
+          GenServer,
+          GenEvent,
+          File,
+          Time,
+          IO,
+          Logger,
+          URI,
+          Path,
+          String
+        ]
+      end
+    end
+    """
+    |> to_source_file("test/foo/my_test.exs")
+    |> refute_issues(@described_check)
+  end
+
+  test "it should not report a violation on umbrella test path" do
+    """
+    defmodule CredoSampleModule do
+      def some_function() do
+        [
+          DateTime,
+          Kernel,
+          GenServer,
+          GenEvent,
+          File,
+          Time,
+          IO,
+          Logger,
+          URI,
+          Path,
+          String
+        ]
+      end
+    end
+    """
+    |> to_source_file("apps/foo/test/foo/my_test.exs")
+    |> refute_issues(@described_check)
+  end
 end

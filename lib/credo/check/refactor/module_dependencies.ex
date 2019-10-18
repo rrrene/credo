@@ -14,7 +14,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       max_deps: "Maximum number of module dependencies.",
       dependency_namespaces: "List of dependency namespaces to include in this check",
       excluded_namespaces: "List of namespaces to exclude from this check",
-      excluded_paths: "List of paths to exclude from this check"
+      excluded_paths: "List of paths or regex to exclude from this check"
     ]
   ]
 
@@ -22,7 +22,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     max_deps: 10,
     dependency_namespaces: [],
     excluded_namespaces: [],
-    excluded_paths: ["test"]
+    excluded_paths: [~r"/test/", ~r"^test/"]
   ]
 
   use Credo.Check, base_priority: :normal
@@ -62,8 +62,11 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   defp ignore_path?(filename, excluded_paths) do
     directory = Path.dirname(filename)
 
-    Enum.any?(excluded_paths, &String.starts_with?(directory, &1))
+    Enum.any?(excluded_paths, &matches?(directory, &1))
   end
+
+  defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
+  defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
 
   defp traverse(
          {:defmodule, meta, [mod | _]} = ast,
