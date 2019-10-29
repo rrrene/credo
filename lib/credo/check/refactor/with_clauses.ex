@@ -77,7 +77,7 @@ defmodule Credo.Check.Refactor.WithClauses do
   @message_last_clause_not_pattern "\"with\" doesn't end with a <- clause, move " <>
                                      "the non-pattern <- clauses inside the body of the \"with\""
 
-  use Credo.Check, base_priority: :high, category: :refactor, exit_status: 1
+  use Credo.Check, base_priority: :high
 
   alias Credo.Code
 
