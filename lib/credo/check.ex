@@ -63,8 +63,18 @@ defmodule Credo.Check do
   alias Credo.Severity
   alias Credo.SourceFile
 
+  @valid_use_opts [:base_priority, :category, :elixir_version, :run_on_all]
+
   @doc false
   defmacro __using__(opts) do
+    Enum.each(opts, fn
+      {key, _name} when key not in @valid_use_opts ->
+        raise "Could not find key `#{key}` in #{inspect(@valid_use_opts)}"
+
+      _ ->
+        nil
+    end)
+
     quote do
       @behaviour Credo.Check
       @before_compile Credo.Check
@@ -103,10 +113,10 @@ defmodule Credo.Check do
         Check.explanation_for(@explanation, :params) || []
       end
 
-      def format_issue(issue_meta, opts) do
+      def format_issue(issue_meta, issue_options) do
         Check.format_issue(
           issue_meta,
-          opts,
+          issue_options,
           category(),
           base_priority(),
           __MODULE__
