@@ -12,7 +12,15 @@ defmodule Credo.Check do
         end
       end
 
-  The `run/2` function takes two parameters: a source file and a list of parameters for the check.
+  The check can be configured by passing the following
+  options to `use Credo.Check`:
+
+  - `:base_priority`  Sets the checks's base priority (`:low`, `:normal`, `:high`, `:higher` or `:ignore`).
+  - `:category`       Sets the check's category.
+  - `:elixir_version` Sets the check's version requirement for Elixir (defaults to `>= 0.0.1`).
+  - `:run_on_all`     Sets whether the check runs on all source files at once or each source file separatly.
+
+  The `run/2` function of a Check module takes two parameters: a source file and a list of parameters for the check.
   It has to return a list of found issues.
   """
 
