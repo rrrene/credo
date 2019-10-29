@@ -68,46 +68,48 @@ defmodule Credo.Execution do
             read_from_stdin: false,
 
             # state, which is accessed and changed over the course of Credo's execution
-            process: [
-              __pre__: [
-                {Credo.Execution.Task.AppendDefaultConfig, []},
-                {Credo.Execution.Task.ParseOptions, []},
-                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
-                {Credo.Execution.Task.InitializePlugins, []}
-              ],
-              parse_cli_options: [
-                {Credo.Execution.Task.ParseOptions, []}
-              ],
-              initialize_plugins: [
-                # This is where plugins can put their hooks to intialize themselves based on
-                # the params given in the config as well as in their own command line switches.
-              ],
-              validate_cli_options: [
-                {Credo.Execution.Task.ValidateOptions, []}
-              ],
-              convert_cli_options_to_config: [
-                {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
-              ],
-              determine_command: [
-                {Credo.Execution.Task.DetermineCommand, []}
-              ],
-              set_default_command: [
-                {Credo.Execution.Task.SetDefaultCommand, []}
-              ],
-              resolve_config: [
-                {Credo.Execution.Task.UseColors, []},
-                {Credo.Execution.Task.RequireRequires, []}
-              ],
-              validate_config: [
-                {Credo.Execution.Task.ValidateConfig, []}
-              ],
-              run_command: [
-                {Credo.Execution.Task.RunCommand, []}
-              ],
-              halt_execution: [
-                {Credo.Execution.Task.AssignExitStatusForIssues, []}
+            pipeline_map: %{
+              __MODULE__ => [
+                __pre__: [
+                  {Credo.Execution.Task.AppendDefaultConfig, []},
+                  {Credo.Execution.Task.ParseOptions, []},
+                  {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
+                  {Credo.Execution.Task.InitializePlugins, []}
+                ],
+                parse_cli_options: [
+                  {Credo.Execution.Task.ParseOptions, []}
+                ],
+                initialize_plugins: [
+                  # This is where plugins can put their hooks to intialize themselves based on
+                  # the params given in the config as well as in their own command line switches.
+                ],
+                validate_cli_options: [
+                  {Credo.Execution.Task.ValidateOptions, []}
+                ],
+                convert_cli_options_to_config: [
+                  {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
+                ],
+                determine_command: [
+                  {Credo.Execution.Task.DetermineCommand, []}
+                ],
+                set_default_command: [
+                  {Credo.Execution.Task.SetDefaultCommand, []}
+                ],
+                resolve_config: [
+                  {Credo.Execution.Task.UseColors, []},
+                  {Credo.Execution.Task.RequireRequires, []}
+                ],
+                validate_config: [
+                  {Credo.Execution.Task.ValidateConfig, []}
+                ],
+                run_command: [
+                  {Credo.Execution.Task.RunCommand, []}
+                ],
+                halt_execution: [
+                  {Credo.Execution.Task.AssignExitStatusForIssues, []}
+                ]
               ]
-            ],
+            },
             commands: %{
               "categories" => Credo.CLI.Command.Categories.CategoriesCommand,
               "explain" => Credo.CLI.Command.Explain.ExplainCommand,
@@ -395,7 +397,7 @@ defmodule Credo.Execution do
 
   # Halt
 
-  @doc "Halts further execution of the process."
+  @doc "Halts further execution of the pipeline."
   def halt(exec) do
     %__MODULE__{exec | halted: true}
   end
@@ -410,12 +412,36 @@ defmodule Credo.Execution do
   # Running tasks
 
   @doc false
-  def run(initial_exec) do
-    Enum.reduce(initial_exec.process, initial_exec, fn {name, _list}, outer_exec ->
-      Enum.reduce(outer_exec.process[name], outer_exec, fn {task, opts}, inner_exec ->
-        Credo.Execution.Task.run(task, inner_exec, opts)
+  def run(exec) do
+    run_pipeline(exec, __MODULE__)
+  end
+
+  @doc false
+  def run_pipeline(initial_exec, pipeline_key) do
+    initial_pipeline = get_pipeline(initial_exec, pipeline_key)
+
+    Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, outer_exec ->
+      outer_pipeline = get_pipeline(outer_exec, pipeline_key)
+      task_group = outer_pipeline[group_name]
+
+      Enum.reduce(task_group, outer_exec, fn {task_mod, opts}, inner_exec ->
+        Credo.Execution.Task.run(task_mod, inner_exec, opts)
       end)
     end)
+  end
+
+  @doc false
+  defp get_pipeline(exec, pipeline_key) do
+    case exec.pipeline_map[pipeline_key] do
+      nil -> raise "Could not find execution pipeline for '#{pipeline_key}'"
+      pipeline -> pipeline
+    end
+  end
+
+  def put_pipeline(exec, pipeline_key, pipeline) do
+    new_pipelines = Map.update!(exec.pipeline_map, pipeline_key, fn _ -> pipeline end)
+
+    %__MODULE__{exec | pipeline_map: new_pipelines}
   end
 
   @doc false
@@ -424,13 +450,15 @@ defmodule Credo.Execution do
   end
 
   def prepend_task(exec, _plugin_mod, group_name, task_tuple) do
-    process =
-      Enum.map(exec.process, fn
+    pipeline =
+      exec
+      |> get_pipeline(__MODULE__)
+      |> Enum.map(fn
         {^group_name, list} -> {group_name, [task_tuple] ++ list}
         value -> value
       end)
 
-    %__MODULE__{exec | process: process}
+    put_pipeline(exec, __MODULE__, pipeline)
   end
 
   @doc false
@@ -439,12 +467,14 @@ defmodule Credo.Execution do
   end
 
   def append_task(exec, _plugin_mod, group_name, task_tuple) do
-    process =
-      Enum.map(exec.process, fn
+    pipeline =
+      exec
+      |> get_pipeline(__MODULE__)
+      |> Enum.map(fn
         {^group_name, list} -> {group_name, list ++ [task_tuple]}
         value -> value
       end)
 
-    %__MODULE__{exec | process: process}
+    put_pipeline(exec, __MODULE__, pipeline)
   end
 end

@@ -1,8 +1,4 @@
 defmodule Credo.Plugin do
-  @moduledoc """
-
-  """
-
   # TODO: add format options (?)
 
   alias Credo.Execution
