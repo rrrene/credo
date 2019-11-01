@@ -44,4 +44,15 @@ defmodule Credo.Check.Readability.AliasAsTest do
     assert issue2.trigger == "App.Module3"
     assert issue3.trigger == "App.Module4"
   end
+
+  test "it should not raise on alias __MODULE__, as: Foo" do
+    _ =
+      """
+      defmodule Test do
+        alias __MODULE__, as: Foo
+      end
+      """
+      |> to_source_file
+      |> assert_issue(@described_check)
+  end
 end
