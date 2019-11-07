@@ -41,4 +41,16 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     |> to_source_file
     |> assert_issue(@described_check)
   end
+
+  test "it should report a violation for multiple nested expansions" do
+    """
+    defmodule CredoSampleModule do
+      alias App.{Module1.Submodule1, Module2}
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, fn issue ->
+      assert issue.trigger == "Module1.Submodule1"
+    end)
+  end
 end
