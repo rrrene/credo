@@ -21,7 +21,11 @@ defmodule Credo.Check.Warning.IExPry do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:IEx]}, :pry]}, meta, _arguments} = ast,
+         {
+           {:., _, [{:__aliases__, _, [:IEx]}, :pry]},
+           meta,
+           _arguments
+         } = ast,
          issues,
          issue_meta
        ) do
@@ -33,15 +37,14 @@ defmodule Credo.Check.Warning.IExPry do
   end
 
   defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line], @call_string) | issues]
-  end
+    new_issue =
+      format_issue(
+        issue_meta,
+        message: "There should be no calls to IEx.pry/0.",
+        trigger: @call_string,
+        line_no: meta[:line]
+      )
 
-  defp issue_for(issue_meta, line_no, trigger) do
-    format_issue(
-      issue_meta,
-      message: "There should be no calls to IEx.pry/1.",
-      trigger: trigger,
-      line_no: line_no
-    )
+    [new_issue | issues]
   end
 end
