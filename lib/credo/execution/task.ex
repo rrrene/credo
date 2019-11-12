@@ -49,23 +49,18 @@ defmodule Credo.Execution.Task do
     old_parent_task = exec.parent_task
     old_current_task = exec.current_task
 
-    exec = Execution.set_parent_and_current_task(exec, exec.current_task, task)
+    exec =
+      exec
+      |> Execution.set_parent_and_current_task(exec.current_task, task)
+      |> task.call(opts)
+      |> Execution.ensure_execution_struct("#{task}.call/2")
 
-    case task.call(exec, opts) do
-      %Execution{halted: false} = exec ->
-        exec
-        |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
-
-      %Execution{halted: true} = exec ->
-        exec
-        |> task.error(opts)
-        |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
-
-      value ->
-        # TODO: improve message
-        IO.warn("Expected task to return %Credo.Execution{}, got: #{inspect(exec)}")
-
-        value
+    if exec.halted do
+      exec
+      |> task.error(opts)
+      |> Execution.set_parent_and_current_task(old_parent_task, old_current_task)
+    else
+      Execution.set_parent_and_current_task(exec, old_parent_task, old_current_task)
     end
   end
 

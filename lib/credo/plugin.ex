@@ -4,11 +4,29 @@ defmodule Credo.Plugin do
   alias Credo.Execution
 
   def append_task(%Execution{initializing_plugin: plugin_mod} = exec, group_name, task_mod) do
-    Execution.append_task(exec, plugin_mod, group_name, task_mod)
+    Execution.append_task(exec, plugin_mod, nil, group_name, task_mod)
+  end
+
+  def append_task(
+        %Execution{initializing_plugin: plugin_mod} = exec,
+        pipeline_key,
+        group_name,
+        task_mod
+      ) do
+    Execution.append_task(exec, plugin_mod, pipeline_key, group_name, task_mod)
   end
 
   def prepend_task(%Execution{initializing_plugin: plugin_mod} = exec, group_name, task_mod) do
-    Execution.prepend_task(exec, plugin_mod, group_name, task_mod)
+    Execution.prepend_task(exec, plugin_mod, nil, group_name, task_mod)
+  end
+
+  def prepend_task(
+        %Execution{initializing_plugin: plugin_mod} = exec,
+        pipeline_key,
+        group_name,
+        task_mod
+      ) do
+    Execution.prepend_task(exec, plugin_mod, pipeline_key, group_name, task_mod)
   end
 
   # register_cli_switch(exec, :castle, :string, :X, false | true | :other_castle)
@@ -25,6 +43,9 @@ defmodule Credo.Plugin do
     |> Execution.put_cli_switch_plugin_param_converter(plugin_mod, name, convert_to_param)
   end
 
+  @doc """
+  Registers and initializes a Command module with a given `name`.
+  """
   def register_command(%Execution{initializing_plugin: plugin_mod} = exec, name, command_mod) do
     Execution.put_command(exec, plugin_mod, name, command_mod)
   end

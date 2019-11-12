@@ -26,9 +26,33 @@ defmodule Credo.CLI.Command do
       Module.register_attribute(__MODULE__, :shortdoc, persist: true)
 
       defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
+
+      @doc """
+      Initializes the command.
+
+      This can be used to initialize execution pipelines for the current command:
+
+          def init(exec) do
+            Execution.put_pipeline(exec, __MODULE__,
+              run_my_thing: [
+                {RunMySpecialThing, []}
+              ],
+              filter_results: [
+                {FilterResults, []}
+              ],
+              print_results: [
+                {PrintResultsAndSummary, []}
+              ]
+            )
+          end
+
+      """
+      def init(exec), do: exec
+
+      defoverridable init: 1
     end
   end
 
   @doc "Runs the Command."
-  @callback call(exec :: Credo.Execution.t(), opts :: List.t()) :: List.t()
+  @callback call(exec :: Credo.Execution.t(), opts :: List.t()) :: Credo.Execution.t()
 end
