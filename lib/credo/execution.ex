@@ -457,10 +457,10 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def prepend_task(exec, _plugin_mod, group_name, task_tuple) do
+  def prepend_task(exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
     pipeline =
       exec
-      |> get_pipeline(__MODULE__)
+      |> get_pipeline(pipeline_key)
       |> Enum.map(fn
         {^group_name, list} -> {group_name, [task_tuple] ++ list}
         value -> value
