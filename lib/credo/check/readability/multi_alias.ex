@@ -36,7 +36,9 @@ defmodule Credo.Check.Readability.MultiAlias do
          issues,
          issue_meta
        ) do
-    {:__aliases__, _, [module | []]} = multi_alias
+    {:__aliases__, _, module} = multi_alias
+    module = Enum.join(module, ".")
+
     new_issue = issue_for(issue_meta, Keyword.get(opts, :line), base_alias, module)
 
     {ast, [new_issue | issues]}
