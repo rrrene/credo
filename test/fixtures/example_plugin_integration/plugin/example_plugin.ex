@@ -17,6 +17,8 @@ end
 defmodule ExamplePlugin.ExampleCommand do
   @moduledoc false
 
+  use Credo.CLI.Command
+
   alias Credo.Execution
 
   def call(exec, _) do
