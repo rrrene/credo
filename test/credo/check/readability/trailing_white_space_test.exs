@@ -30,6 +30,15 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues(@described_check)
   end
 
+  test "it should NOT report \r line endings" do
+    """
+    defmodule CredoSampleModule do\r
+    end\r
+    """
+    |> to_source_file
+    |> refute_issues(@described_check)
+  end
+
   #
   # cases raising issues
   #
