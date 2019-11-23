@@ -33,10 +33,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
   end
 
   def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
-
-  def call(exec, _opts) do
-    Execution.run_pipeline(exec, __MODULE__)
-  end
+  def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   defmodule PrintBeforeInfo do
     @moduledoc false
