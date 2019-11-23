@@ -34,6 +34,9 @@ defmodule Credo.Check.Readability.AliasAs do
   defp add_issue(issues, nil), do: issues
   defp add_issue(issues, issue), do: [issue | issues]
 
+  defp issue({:alias, _, [{:__MODULE__, _, nil}, [as: {_, meta, _}]]}, issue_meta),
+    do: issue_for(issue_meta, meta[:line], inspect(:__MODULE__))
+
   defp issue({:alias, _, [{_, _, original}, [as: {_, meta, _}]]}, issue_meta),
     do: issue_for(issue_meta, meta[:line], inspect(Module.concat(original)))
 
