@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0-rc1
+
+- Commands can now have their own pipelines, so that plugins can extend them.
+- Add pipelines to `SuggestCommand` and `ListCommand`
+- `Credo.Plugin.append_task/4` and `Credo.Plugin.prepend_task/4` let you append/prepend tasks to Command's pipelines.
+- Validate options given to `use Credo.Check`
+- Fix `TrailingWhiteSpace` check on Windows
+- Fix `MultiAlias` to work with submodule expansion
+- Fix crash in `AliasAs` check when __MODULE__ is aliased
+
 ## 1.1.5
 
 - Add JSON output to `categories` and `explain` commands
