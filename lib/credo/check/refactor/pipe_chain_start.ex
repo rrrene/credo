@@ -205,9 +205,10 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     function_name = to_function_call_name(ast)
 
     found_argument_types =
-      arguments
-      |> List.first()
-      |> argument_type()
+      case arguments do
+        [nil | _] -> [:atom]
+        x -> x |> List.first() |> argument_type()
+      end
 
     Enum.member?(excluded_functions, function_name) ||
       Enum.any?(
