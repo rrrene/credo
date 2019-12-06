@@ -33,13 +33,13 @@ defmodule Credo.Sources do
     |> List.wrap()
   end
 
-  def find(%Credo.Execution{files: files}) do
+  def find(%Credo.Execution{files: files, parse_timeout: parse_timeout}) do
     MapSet.new()
     |> include(files.included)
     |> exclude(files.excluded)
     |> Enum.sort()
     |> Enum.take(max_file_count())
-    |> read_files()
+    |> read_files(parse_timeout)
   end
 
   def find(paths) when is_list(paths) do
@@ -118,7 +118,7 @@ defmodule Credo.Sources do
     Enum.map(paths, &Path.expand/1)
   end
 
-  defp read_files(filenames) do
+  defp read_files(filenames, parse_timeout) do
     tasks = Enum.map(filenames, &Task.async(fn -> to_source_file(&1) end))
 
     task_dictionary =
@@ -126,7 +126,7 @@ defmodule Credo.Sources do
       |> Enum.zip(filenames)
       |> Enum.into(%{})
 
-    tasks_with_results = Task.yield_many(tasks)
+    tasks_with_results = Task.yield_many(tasks, parse_timeout)
 
     results =
       Enum.map(tasks_with_results, fn {task, res} ->
