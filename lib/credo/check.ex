@@ -241,7 +241,9 @@ defmodule Credo.Check do
   #
   #     {:defmodule, "Foo.Bar"}
   #     {:def, "Foo.Bar.baz"}
-  defp scope_for(source_file, line: line_no) do
+  #
+  @doc false
+  def scope_for(source_file, line: line_no) do
     source_file
     |> scope_list
     |> Enum.at(line_no - 1)
@@ -269,10 +271,11 @@ defmodule Credo.Check do
       :notfound ->
         ast = SourceFile.ast(source_file)
         lines = SourceFile.lines(source_file)
+        scope_info_list = Scope.scope_info_list(ast)
 
         result =
           Enum.map(lines, fn {line_no, _} ->
-            Scope.name(ast, line: line_no)
+            Scope.name_from_scope_info_list(scope_info_list, line_no)
           end)
 
         SourceFileScopes.put(filename, result)
