@@ -121,10 +121,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp number_with_sign?(line, column) do
-    # -2 because we need to subtract the operator
     line
+    # -2 because we need to subtract the operator
     |> String.slice(0..(column - 2))
-    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
+    # remove potential rest of the number (this happens on some versions of elixir due to differences in the tokenizer)
+    |> String.replace(~r/\d+$/, "")
+    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+\.?|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
   defp number_in_range?(line, column) do

@@ -325,4 +325,20 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> to_source_files()
     |> assert_issues(@described_check)
   end
+
+  test "it should report the correct result /7" do
+    [
+      ~S"""
+      defmodule TestTest do
+        def test do
+          a = fn b, c -> b + c end
+
+          a.(-30, 10)
+        end
+      end
+      """
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
 end
