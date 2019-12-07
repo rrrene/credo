@@ -100,7 +100,7 @@ defmodule Credo.Execution do
       {Credo.Execution.Task.ParseOptions, []}
     ],
     initialize_plugins: [
-      # This is where plugins can put their hooks to intialize themselves based on
+      # This is where plugins can put their hooks to initialize themselves based on
       # the params given in the config as well as in their own command line switches.
     ],
     validate_cli_options: [
