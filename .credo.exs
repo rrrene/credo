@@ -137,7 +137,6 @@
         {Credo.Check.Warning.IExPry, []},
         {Credo.Check.Warning.IoInspect, []},
         {Credo.Check.Warning.LazyLogging, []},
-        {Credo.Check.Warning.MixEnv, []},
         {Credo.Check.Warning.OperationOnSameValues, []},
         {Credo.Check.Warning.OperationWithConstantResult, []},
         {Credo.Check.Warning.RaiseInsideRescue, []},
@@ -149,6 +148,11 @@
         {Credo.Check.Warning.UnusedRegexOperation, []},
         {Credo.Check.Warning.UnusedStringOperation, []},
         {Credo.Check.Warning.UnusedTupleOperation, []},
+
+
+        #
+        # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
+        {Credo.Check.Warning.MixEnv, false},
 
         #
         # Controversial and experimental checks (opt-in, just replace `false` with `[]`)
