@@ -40,6 +40,7 @@ defmodule Credo.ConfigBuilder do
         checks: config_file.checks,
         requires: config_file.requires,
         plugins: config_file.plugins,
+        parse_timeout: config_file.parse_timeout,
         check_for_updates: config_file.check_for_updates
     }
   end

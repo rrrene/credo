@@ -49,6 +49,7 @@ defmodule Credo.Execution do
             checks: nil,
             requires: [],
             plugins: [],
+            parse_timeout: 5000,
             strict: false,
 
             # checks if there is a new version of Credo

@@ -18,6 +18,7 @@ defmodule Credo.ConfigFile do
             checks: nil,
             requires: [],
             plugins: [],
+            parse_timeout: nil,
             strict: false,
             # checks if there is a new version of Credo
             check_for_updates: true
@@ -129,6 +130,7 @@ defmodule Credo.ConfigFile do
       plugins: data[:plugins] || [],
       files: files_from_data(data, dir),
       checks: checks_from_data(data),
+      parse_timeout: data[:parse_timeout],
       strict: data[:strict],
       color: data[:color]
     }
@@ -199,6 +201,7 @@ defmodule Credo.ConfigFile do
       files: merge_files(base, other),
       checks: merge_checks(base, other),
       strict: merge_boolean(base.strict, other.strict),
+      parse_timeout: merge_parse_timeout(base.parse_timeout, other.parse_timeout),
       color: merge_boolean(base.color, other.color)
     }
 
@@ -210,6 +213,9 @@ defmodule Credo.ConfigFile do
   defp merge_boolean(_base, true), do: true
   defp merge_boolean(_base, false), do: false
   defp merge_boolean(base, _), do: base
+
+  defp merge_parse_timeout(_base, timeout) when is_integer(timeout), do: timeout
+  defp merge_parse_timeout(base, _), do: base
 
   def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
     base = normalize_check_tuples(checks_base)
