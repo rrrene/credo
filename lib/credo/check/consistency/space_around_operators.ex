@@ -108,7 +108,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp create_issue?(line, column, trigger) when trigger == :/ do
-    !number_in_fun?(line, column)
+    !number_in_function_capture?(line, column)
   end
 
   defp create_issue?(_, _, _), do: true
@@ -124,8 +124,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     line
     # -2 because we need to subtract the operator
     |> String.slice(0..(column - 2))
-    # remove potential rest of the number (this happens on some versions of elixir due to differences in the tokenizer)
-    |> String.replace(~r/\d+$/, "")
     |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+\.?|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
@@ -135,7 +133,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     |> String.match?(~r/^\d+\.\./)
   end
 
-  defp number_in_fun?(line, column) do
+  defp number_in_function_capture?(line, column) do
     line
     |> String.slice(0..(column - 2))
     |> String.match?(~r/[\.\&][a-z0-9_]+[\!\?]?$/)

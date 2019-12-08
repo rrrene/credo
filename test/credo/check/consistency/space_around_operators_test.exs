@@ -334,6 +334,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
           a = fn b, c -> b + c end
 
           a.(-30, 10)
+          a.(-3.0, 1.0)
         end
       end
       """
