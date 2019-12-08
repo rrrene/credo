@@ -20,9 +20,11 @@ exclude = Keyword.merge([to_be_implemented: true], check_version)
 ExUnit.configure(exclude: exclude)
 
 defmodule Credo.TestHelper do
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
+    async = opts[:async] != false
+
     quote do
-      use ExUnit.Case
+      use ExUnit.Case, async: unquote(async)
       import CredoSourceFileCase
       import CredoCheckCase
     end
