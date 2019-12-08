@@ -305,7 +305,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues(@described_check)
   end
 
-  test "it should NOT report a violation when in function call 2" do
+  test "it should NOT report a violation when in function call /2" do
     """
       defp print_process(pid_atom, count, own) do
         IO.puts([?", Enum.join(own, "-")])

@@ -71,9 +71,10 @@ defmodule Credo.Code.CharlistsTest do
     assert expected == source |> Charlists.replace_with_spaces(".")
   end
 
-  @example_code2 File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  @tag slow: :disk_io
   test "it should produce valid code /2" do
-    result = Charlists.replace_with_spaces(@example_code2)
+    example_code = File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+    result = Charlists.replace_with_spaces(example_code)
     result2 = Charlists.replace_with_spaces(result)
 
     assert result == result2, "Charlists.replace_with_spaces/2 should be idempotent"

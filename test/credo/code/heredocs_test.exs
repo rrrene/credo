@@ -237,18 +237,20 @@ defmodule Credo.Code.HeredocsTest do
     assert expected == source |> Heredocs.replace_with_spaces(".")
   end
 
-  @example_code File.read!("test/fixtures/example_code/clean_redux.ex")
+  @tag slow: :disk_io
   test "it should produce valid code" do
-    result = Heredocs.replace_with_spaces(@example_code)
+    example_code = File.read!("test/fixtures/example_code/clean_redux.ex")
+    result = Heredocs.replace_with_spaces(example_code)
     result2 = Heredocs.replace_with_spaces(result)
 
     assert result == result2, "Heredocs.replace_with_spaces/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
-  @example_code2 File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  @tag slow: :disk_io
   test "it should produce valid code /2" do
-    result = Heredocs.replace_with_spaces(@example_code2)
+    example_code = File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+    result = Heredocs.replace_with_spaces(example_code)
     result2 = Heredocs.replace_with_spaces(result)
 
     assert result == result2, "Heredocs.replace_with_spaces/2 should be idempotent"

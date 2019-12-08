@@ -1,5 +1,6 @@
 defmodule Credo.SourcesTest do
   use ExUnit.Case
+  @moduletag slow: :disk_io
 
   test "it finds all files inside directories recursively" do
     exec = %Credo.Execution{files: %{excluded: [], included: ["lib/mix"]}}

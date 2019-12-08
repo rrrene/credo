@@ -242,18 +242,20 @@ defmodule Credo.CodeTest do
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
   end
 
-  @example_code File.read!("test/fixtures/example_code/clean.ex")
+  @tag slow: :disk_io
   test "it should produce valid code" do
-    result = Credo.Code.clean_charlists_strings_sigils_and_comments(@example_code)
+    example_code = File.read!("test/fixtures/example_code/clean.ex")
+    result = Credo.Code.clean_charlists_strings_sigils_and_comments(example_code)
     result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
 
     assert result == result2, "clean_charlists_strings_sigils_and_comments/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
-  @example_code File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  @tag slow: :disk_io
   test "it should produce valid code /2" do
-    result = Credo.Code.clean_charlists_strings_sigils_and_comments(@example_code)
+    example_code = File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+    result = Credo.Code.clean_charlists_strings_sigils_and_comments(example_code)
     result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
 
     assert result == result2,
@@ -263,18 +265,20 @@ defmodule Credo.CodeTest do
            "Credo.Code.clean_charlists_strings_sigils_and_comments/1 should produce valid code"
   end
 
-  @example_code File.read!("test/fixtures/example_code/clean.ex")
+  @tag slow: :disk_io
   test "it should produce valid code /3" do
-    result = Credo.Code.clean_charlists_strings_and_sigils(@example_code)
+    example_code = File.read!("test/fixtures/example_code/clean.ex")
+    result = Credo.Code.clean_charlists_strings_and_sigils(example_code)
     result2 = Credo.Code.clean_charlists_strings_and_sigils(result)
 
     assert result == result2, "clean_charlists_strings_and_sigils/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
-  @example_code File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+  @tag slow: :disk_io
   test "it should produce valid code /4" do
-    result = Credo.Code.clean_charlists_strings_and_sigils(@example_code)
+    example_code = File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")
+    result = Credo.Code.clean_charlists_strings_and_sigils(example_code)
     result2 = Credo.Code.clean_charlists_strings_and_sigils(result)
 
     assert result == result2,
