@@ -22,8 +22,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   Returns true if there is no space after the operator (usually).
 
   Examples:
-  x..-1   # .. is the operator here and there is usually no space before that
+  x..-1   # .. is the operator here and there is usually no space after that
   """
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:number, _, _}), do: true
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:int, _, _}), do: true
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:float, _, _}), do: true
   def usually_no_space_after?({_, _, :^}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :=}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :..}, {_, _, :-}, _), do: true
