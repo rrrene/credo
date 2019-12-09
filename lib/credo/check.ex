@@ -80,7 +80,6 @@ defmodule Credo.Check do
       @before_compile Credo.Check
 
       alias Credo.Check
-      alias Credo.Check.CodeHelper
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
       alias Credo.Issue
