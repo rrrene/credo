@@ -1,6 +1,6 @@
 ### Precheck
 
-* For proposing a new feature, be sure to name your issue "Proposal: ..."
+* Proposals for new features should be submitted via: https://github.com/rrrene/credo-proposals
 * For bugs, please do a quick search and make sure the bug has not yet been reported here
 
 ### Environment
