@@ -7,9 +7,6 @@ defmodule Credo.Code do
   value of a module attribute inside a given module, we want to extract that
   function and put it in the `Credo.Code` namespace, so others can utilize them
   without reinventing the wheel.
-
-  The most often utilized functions are conveniently imported to
-  `Credo.Check.CodeHelper`.
   """
 
   alias Credo.Code.Charlists
