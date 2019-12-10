@@ -40,7 +40,6 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
   defp collect_parenthetical_tokens([head | t], acc, prev_head) do
     acc =
       case check_for_opening_paren(head, t, prev_head) do
-        nil -> acc
         false -> acc
         token -> acc ++ [token]
       end

@@ -43,7 +43,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
     acc =
       case number_token(head, min_number) do
         nil -> acc
-        false -> acc
         token -> acc ++ [token]
       end
 

@@ -16,6 +16,7 @@ defmodule Credo.Execution.Task.ValidateOptions do
     end
   end
 
+  @spec error(Credo.Execution.t(), keyword()) :: no_return
   def error(exec, _opts) do
     UI.use_colors(exec)
 

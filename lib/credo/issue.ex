@@ -3,7 +3,7 @@ defmodule Credo.Issue do
   `Issue` structs represent all issues found during the code analysis.
   """
 
-  @type t :: module
+  @type t :: %__MODULE__{}
 
   defstruct check: nil,
             category: nil,

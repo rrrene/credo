@@ -24,8 +24,6 @@ defmodule Credo.Check do
   It has to return a list of found issues.
   """
 
-  @type t :: module
-
   @doc """
   Returns the base priority for the check.
   """
@@ -36,7 +34,7 @@ defmodule Credo.Check do
   """
   @callback category() :: atom
 
-  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: List.t
+  # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: list()
 
   @callback run_on_all?() :: boolean
 
@@ -44,7 +42,8 @@ defmodule Credo.Check do
 
   @callback explanation_for_params() :: Keyword.t()
 
-  @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) :: Issue.t()
+  @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
+              Credo.Issue.t()
 
   @base_category_exit_status_map %{
     consistency: 1,
