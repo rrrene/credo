@@ -85,7 +85,7 @@ defmodule Credo.Execution do
             results: %{},
             config_comment_map: %{}
 
-  @type t :: module
+  @type t :: %__MODULE__{}
 
   @execution_pipeline [
     __pre__: [
