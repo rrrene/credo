@@ -34,6 +34,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
 
   defp traverse(_callback, ast, acc), do: {ast, acc}
 
+  defp reduce_unused_variables(nil, _callback, acc), do: acc
+
   defp reduce_unused_variables(ast, callback, acc) do
     Enum.reduce(ast, acc, &if(unused_variable_name?(&1), do: callback.(&1, &2), else: &2))
   end
