@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0-rc1
+## 1.2.0-rc2
 
 - Commands can now have their own pipelines, so that plugins can extend them.
 - Add pipelines to `SuggestCommand` and `ListCommand`
@@ -8,7 +8,15 @@
 - Validate options given to `use Credo.Check`
 - Fix `TrailingWhiteSpace` check on Windows
 - Fix `MultiAlias` to work with submodule expansion
+- Fix `UnusedVariableNames` bug
 - Fix crash in `AliasAs` check when __MODULE__ is aliased
+- Fix speed pitfall in `Scope.name/2`
+- New config option: `parse_timeout`
+- Improved default settings for umbrella apps
+
+### New checks
+
+- Credo.Check.Warning.MixEnv
 
 ## 1.1.5
 
