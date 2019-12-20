@@ -114,4 +114,63 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     |> to_source_file()
     |> assert_issue(@described_check)
   end
+
+  describe "Jason decode/decode!" do
+
+    def generate_no_keys_module(fun, pipeline) do
+      [
+        "defmodule CredoSampleModule do",
+        "  def some_function(parameter) do",
+        if pipeline do
+          "parameter |> Jason.#{fun}()"
+        else
+          "Jason.#{fun}(parameter)"
+        end,
+        "  end",
+        "end"
+      ]
+      |> Enum.join("\n")
+    end
+
+    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
+      test "it should not report a violation on Jason.#{fun} without keys #{if pipeline, do: "with", else: "without"} a pipeline" do
+        generate_no_keys_module(unquote(fun), unquote(pipeline))
+        |> to_source_file()
+        |> refute_issues(@described_check)
+      end
+    end
+
+
+    def generate_keys_module(fun, pipeline, keys) do
+      [
+        "defmodule CredoSampleModule do",
+        "  def some_function(parameter) do",
+        if pipeline do
+          "parameter |> Jason.#{fun}(keys: #{keys})"
+        else
+          "Jason.#{fun}(parameter, keys: #{keys})"
+        end,
+        "  end",
+        "end"
+      ]
+      |> Enum.join("\n")
+    end
+
+    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
+      test "it should not report a violation on Jason.#{fun} with keys: :atoms! #{if pipeline, do: "with", else: "without"} a pipeline" do
+        generate_keys_module(unquote(fun), unquote(pipeline), ":atoms!")
+        |> to_source_file()
+        |> refute_issues(@described_check)
+      end
+    end
+
+    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
+      test "it should report a violation on Jason.#{fun} with keys: :atoms #{if pipeline, do: "with", else: "without"} a pipeline" do
+        generate_keys_module(unquote(fun), unquote(pipeline), ":atoms")
+        |> to_source_file()
+        |> assert_issue(@described_check)
+      end
+    end
+  end
+
 end
