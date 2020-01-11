@@ -342,4 +342,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> to_source_files()
     |> refute_issues(@described_check)
   end
+
+  test "it should not crash for issue #731" do
+    [
+      ~S"""
+      %{acc | "#{date_type}_dates": :foo}
+      """
+    ]
+    |> to_source_files()
+    |> refute_issues(@described_check)
+  end
 end

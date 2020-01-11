@@ -114,6 +114,18 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  test "should replace interpolations in map keys" do
+    source = ~S"""
+    %{acc | "#{date_type}_dates": :foo}
+    """
+
+    expected = ~S"""
+    %{acc | "$$$$$$$$$$$$_dates": :foo}
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
   test "should replace heredoc interpolations with given character" do
     source = ~S'''
     def fun() do
