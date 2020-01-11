@@ -79,6 +79,10 @@ defmodule Credo.Code.Token do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
     end
 
+    def position({:kw_identifier_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
+      position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+    end
+
     # Elixir < 1.9.0 tuple syntax
     def position({_, {line_no, col_start, _}, atom_or_charlist}) do
       position_tuple(atom_or_charlist, line_no, col_start)

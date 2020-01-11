@@ -93,6 +93,13 @@ defmodule Credo.Code.InterpolationHelper do
          ) do
       handle_atom_string_or_sigil(token, list, source)
     end
+
+    defp map_interpolations(
+           {:kw_identifier_unsafe, {_line_no, _col_start, _}, list} = token,
+           source
+         ) do
+      handle_atom_string_or_sigil(token, list, source)
+    end
   else
     #
     # Elixir <= 1.5.x
