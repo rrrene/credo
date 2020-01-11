@@ -23,6 +23,17 @@ Default values for the checks are based on their category:
     refactor:     8
     warning:     16
 
-So an exit status of `12` tells you that you have only Readability Issues and Refactoring Opportunities, but e.g. no Warnings.
+Let's see what this means using an example:
+
+```shell
+$ mix credo
+
+[...snip...]
+
+$ echo $?
+12
+```
+
+So an exit status of `12` tells you that you have only Readability Issues (`4`) and Refactoring Opportunities (`8`), but e.g. no Warnings.
 
 Naturally, custom checks and plugins can provide their own exit statuses.
