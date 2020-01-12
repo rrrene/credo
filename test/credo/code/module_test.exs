@@ -3,6 +3,8 @@ defmodule Credo.Code.ModuleTest do
 
   alias Credo.Code.Module
 
+  doctest Credo.Code.Module
+
   #
   # attribute
   #

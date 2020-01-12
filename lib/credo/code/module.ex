@@ -244,10 +244,22 @@ defmodule Credo.Code.Module do
     {ast, modules}
   end
 
-  @doc "Returns the name of a module's given ast node."
+  @doc """
+  Returns the name of a module's given ast node.
+  """
+  def name(ast)
+
   def name({:defmodule, _, [{:__aliases__, _, name_list}, _]}) do
-    Enum.join(name_list, ".")
+    name_list
+    |> Enum.map(&name/1)
+    |> Enum.join(".")
   end
+
+  def name({:__MODULE__, _meta, nil}), do: "__MODULE__"
+
+  def name(atom) when is_atom(atom), do: atom
+
+  def name(string) when is_binary(string), do: string
 
   def name(_), do: "<Unknown Module Name>"
 
