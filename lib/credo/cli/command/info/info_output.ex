@@ -31,15 +31,17 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
     options = """
 
     Info options:
-      -c, --checks          Only include checks that match the given strings
-      -C, --config-name     Use the given config instead of "default"
-      -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
-          --verbose         Display more information (e.g. checked files)
+      -c, --checks            Only include checks that match the given strings
+      -C, --config-name       Use the given config instead of "default"
+          --files-included    Only include these files (accepts globs, can be used multiple times)
+          --files-excluded    Exclude these files (accepts globs, can be used multiple times)
+          --format            Display the list in a specific format (oneline,flycheck)
+      -i, --ignore-checks     Ignore checks that match the given strings
+          --verbose           Display more information (e.g. checked files)
 
     General options:
-      -v, --version         Show version
-      -h, --help            Show this help
+      -v, --version           Show version
+      -h, --help              Show this help
     """
 
     UI.puts(usage)

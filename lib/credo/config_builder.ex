@@ -65,6 +65,8 @@ defmodule Credo.ConfigBuilder do
   defp add_switches_to_exec(%Execution{} = exec, switches) do
     exec
     |> add_switch_all(switches)
+    |> add_switch_files_included(switches)
+    |> add_switch_files_excluded(switches)
     |> add_switch_color(switches)
     |> add_switch_debug(switches)
     |> add_switch_strict(switches)
@@ -85,6 +87,18 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_all(exec, _), do: exec
+
+  defp add_switch_files_included(exec, %{files_included: [_head | _tail] = files_included}) do
+    %Execution{exec | files: %{exec.files | included: files_included}}
+  end
+
+  defp add_switch_files_included(exec, _), do: exec
+
+  defp add_switch_files_excluded(exec, %{files_excluded: [_head | _tail] = files_excluded}) do
+    %Execution{exec | files: %{exec.files | excluded: files_excluded}}
+  end
+
+  defp add_switch_files_excluded(exec, _), do: exec
 
   defp add_switch_color(exec, %{color: color}) do
     %Execution{exec | color: color}

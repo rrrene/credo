@@ -12,6 +12,8 @@ defmodule Credo.Execution do
             cli_switches: [
               all_priorities: :boolean,
               all: :boolean,
+              files_included: :keep,
+              files_excluded: :keep,
               checks: :string,
               config_name: :string,
               config_file: :string,
