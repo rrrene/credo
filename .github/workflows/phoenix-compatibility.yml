@@ -15,4 +15,6 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
       - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile
       - run: ./test/test_phoenix_compatibility.sh
