@@ -10,7 +10,7 @@
   configs: [
     %{
       #
-      # Run any exec using `mix credo -C <name>`. If no exec name is given
+      # Run any config using `mix credo -C <name>`. If no config name is given
       # "default" is used.
       #
       name: "default",
@@ -148,7 +148,6 @@
         {Credo.Check.Warning.UnusedRegexOperation, []},
         {Credo.Check.Warning.UnusedStringOperation, []},
         {Credo.Check.Warning.UnusedTupleOperation, []},
-
 
         #
         # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
