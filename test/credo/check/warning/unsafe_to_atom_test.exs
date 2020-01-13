@@ -116,61 +116,151 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
   end
 
   describe "Jason decode/decode!" do
-
-    def generate_no_keys_module(fun, pipeline) do
-      [
-        "defmodule CredoSampleModule do",
-        "  def some_function(parameter) do",
-        if pipeline do
-          "parameter |> Jason.#{fun}()"
-        else
-          "Jason.#{fun}(parameter)"
-        end,
-        "  end",
-        "end"
-      ]
-      |> Enum.join("\n")
-    end
-
-    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
-      test "it should not report a violation on Jason.#{fun} without keys #{if pipeline, do: "with", else: "without"} a pipeline" do
-        generate_no_keys_module(unquote(fun), unquote(pipeline))
-        |> to_source_file()
-        |> refute_issues(@described_check)
+    # Keys unspecified
+    test "it should not report a violation on Jason.decode without keys with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode()
+        end
       end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
     end
 
-
-    def generate_keys_module(fun, pipeline, keys) do
-      [
-        "defmodule CredoSampleModule do",
-        "  def some_function(parameter) do",
-        if pipeline do
-          "parameter |> Jason.#{fun}(keys: #{keys})"
-        else
-          "Jason.#{fun}(parameter, keys: #{keys})"
-        end,
-        "  end",
-        "end"
-      ]
-      |> Enum.join("\n")
-    end
-
-    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
-      test "it should not report a violation on Jason.#{fun} with keys: :atoms! #{if pipeline, do: "with", else: "without"} a pipeline" do
-        generate_keys_module(unquote(fun), unquote(pipeline), ":atoms!")
-        |> to_source_file()
-        |> refute_issues(@described_check)
+    test "it should not report a violation on Jason.decode without keys without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode(parameter)
+        end
       end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
     end
 
-    for fun <- ["decode", "decode!"], pipeline <- [true, false] do
-      test "it should report a violation on Jason.#{fun} with keys: :atoms #{if pipeline, do: "with", else: "without"} a pipeline" do
-        generate_keys_module(unquote(fun), unquote(pipeline), ":atoms")
-        |> to_source_file()
-        |> assert_issue(@described_check)
+    test "it should not report a violation on Jason.decode! without keys with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode!()
+        end
       end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    test "it should not report a violation on Jason.decode! without keys without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode!(parameter)
+        end
+      end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    # keys: :atoms! (safe)
+    test "it should not report a violation on Jason.decode with keys: :atoms! with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode(keys: :atoms!)
+        end
+      end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    test "it should not report a violation on Jason.decode with keys: :atoms! without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode(parameter, keys: :atoms!)
+        end
+      end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    test "it should not report a violation on Jason.decode! with keys: :atoms! with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode!(keys: :atoms!)
+        end
+      end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    test "it should not report a violation on Jason.decode! with keys: :atoms! without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode!(parameter, keys: :atoms!)
+        end
+      end
+      """
+      |> to_source_file()
+      |> refute_issues(@described_check)
+    end
+
+    # keys: :atoms (unsafe)
+    test "it should report a violation on Jason.decode with keys: :atoms!with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode(keys: :atoms)
+        end
+      end
+      """
+      |> to_source_file()
+      |> assert_issue(@described_check)
+    end
+
+    test "it should report a violation on Jason.decode with keys: :atoms without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode(parameter, keys: :atoms)
+        end
+      end
+      """
+      |> to_source_file()
+      |> assert_issue(@described_check)
+    end
+
+    test "it should report a violation on Jason.decode! with keys: :atoms with a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          parameter |> Jason.decode!(keys: :atoms)
+        end
+      end
+      """
+      |> to_source_file()
+      |> assert_issue(@described_check)
+    end
+
+    test "it should report a violation on Jason.decode! with keys: :atoms without a pipeline" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter) do
+          Jason.decode!(parameter, keys: :atoms)
+        end
+      end
+      """
+      |> to_source_file()
+      |> assert_issue(@described_check)
     end
   end
-
 end
