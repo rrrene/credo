@@ -23,6 +23,7 @@ defmodule Credo.Check.Readability.Semicolons do
   use Credo.Check, base_priority: :high
 
   @doc false
+  # TODO: consider for experimental check front-loader (tokens)
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

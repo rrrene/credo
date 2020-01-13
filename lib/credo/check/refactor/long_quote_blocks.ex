@@ -88,6 +88,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
     )
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {:quote, meta, arguments} = ast,
          issues,

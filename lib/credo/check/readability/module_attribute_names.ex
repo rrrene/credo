@@ -34,6 +34,8 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above how we want to exclude certain front-loads
   defp traverse(
          {:@, _meta, [{name, meta, _arguments}]} = ast,
          issues,

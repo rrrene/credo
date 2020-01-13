@@ -37,6 +37,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     issues
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _) do
     {ast, {false, issues}}
   end

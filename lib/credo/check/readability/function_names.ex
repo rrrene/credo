@@ -61,6 +61,8 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above for how we want to avoid `sigil_X` definitions
   for op <- @def_ops do
     # Ignore variables named e.g. `defp`
     defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do

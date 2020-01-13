@@ -33,6 +33,7 @@ defmodule Credo.Check.Refactor.CondStatements do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
     count =
       arguments

@@ -56,6 +56,8 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: we have to exclude the cases matching the above
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
       # remove do/else blocks

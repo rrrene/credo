@@ -30,6 +30,7 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   end
 
   # [a] ++ b is OK
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
     {ast, issues}
   end

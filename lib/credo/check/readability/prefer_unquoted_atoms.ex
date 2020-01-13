@@ -40,6 +40,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   use Credo.Check, run_on_all: true, base_priority: :high, elixir_version: "< 1.7.0-dev"
 
   @doc false
+  # TODO: consider for experimental check front-loader (tokens)
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

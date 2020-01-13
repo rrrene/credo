@@ -35,6 +35,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
     {nil, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: we have to exclude the cases matching the above clause!
   defp traverse({:unless, _meta, arguments} = ast, issues, issue_meta)
        when is_list(arguments) do
     issue = issue_for_first_condition(List.first(arguments), issue_meta)

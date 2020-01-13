@@ -56,6 +56,8 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above for how we want to exclude `__using__` macros
   for op <- @def_ops do
     defp traverse(
            {unquote(op), meta, arguments} = ast,

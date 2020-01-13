@@ -26,6 +26,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   alias Credo.Code.Strings
 
   @doc false
+  # TODO: consider for experimental check front-loader (text)
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

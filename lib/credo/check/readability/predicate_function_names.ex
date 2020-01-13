@@ -40,6 +40,8 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see below for how we want to avoid `defp = "my_variable"` definitions
   for op <- @def_ops do
     # catch variables named e.g. `defp`
     defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
