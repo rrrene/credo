@@ -1,6 +1,8 @@
 defmodule Credo.Check.Readability.StringSigilsTest do
   use Credo.TestHelper
 
+  import ExUnit.CaptureIO
+
   @described_check Credo.Check.Readability.StringSigils
 
   def create_snippet(string_literal) do
@@ -148,5 +150,25 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> create_snippet()
     |> to_source_file
     |> assert_issue(@described_check, maximum_allowed_quotes: 5)
+  end
+
+  test "doesn't crash on #729" do
+    log =
+      capture_io(:stderr, fn ->
+        ~S"""
+        defmodule CredoInterpolationError do
+          def foo(env) do
+            case "#{env}" do
+              "A" <> _ = env -> "🇿🇼 #{String.upcase(env)}"
+              "B" <> _ = env -> "🇻🇺 #{String.upcase(env)}"
+            end
+          end
+        end
+        """
+        |> to_source_file
+        |> refute_issues(@described_check)
+      end)
+
+    assert log == ""
   end
 end

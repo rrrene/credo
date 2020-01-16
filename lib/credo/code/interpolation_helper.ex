@@ -55,9 +55,11 @@ defmodule Credo.Code.InterpolationHelper do
 
   defp replace_line(line, col_start, col_end, char) do
     length = max(col_end - col_start, 0)
-
-    String.slice(line, 0, col_start - 1) <>
-      String.duplicate(char, length) <> String.slice(line, (col_end - 1)..-1)
+    line = String.to_charlist(line)
+    part1 = Enum.slice(line, 0, col_start - 1)
+    part2 = String.to_charlist(String.duplicate(char, length))
+    part3 = Enum.slice(line, (col_end - 1)..-1)
+    List.to_string(part1 ++ part2 ++ part3)
   end
 
   @doc false
