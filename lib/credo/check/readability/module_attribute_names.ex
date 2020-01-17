@@ -18,7 +18,14 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
   """
   @explanation [check: @checkdoc]
 
-  use Credo.Check, base_priority: :high
+  use Credo.Check,
+    base_priority: :high,
+    prefilter: [
+      ast: [
+        filter: {:@, _meta, [{_name, _meta, _arguments}]},
+        reject: {:@, _meta, [{:{}, _, _}]}
+      ]
+    ]
 
   alias Credo.Code.Name
 

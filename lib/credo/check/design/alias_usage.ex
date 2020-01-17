@@ -62,7 +62,13 @@ defmodule Credo.Check.Design.AliasUsage do
     if_called_more_often_than: 0
   ]
 
-  use Credo.Check, base_priority: :normal
+  use Credo.Check,
+    base_priority: :normal,
+    prefilter: [
+      ast: [
+        filter: {:defmodule, _meta, _arguments}
+      ]
+    ]
 
   alias Credo.Code.Name
 

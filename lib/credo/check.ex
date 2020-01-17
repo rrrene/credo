@@ -62,7 +62,13 @@ defmodule Credo.Check do
   alias Credo.Severity
   alias Credo.SourceFile
 
-  @valid_use_opts [:base_priority, :category, :elixir_version, :run_on_all]
+  @valid_use_opts [
+    :base_priority,
+    :category,
+    :elixir_version,
+    :run_on_all,
+    :prefilter
+  ]
 
   @doc false
   defmacro __using__(opts) do
