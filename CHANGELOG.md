@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0-rc2
+## 1.2.0-rc3
 
 - Commands can now have their own pipelines, so that plugins can extend them.
 - Add pipelines to `SuggestCommand` and `ListCommand`
