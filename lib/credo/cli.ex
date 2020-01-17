@@ -13,7 +13,7 @@ defmodule Credo.CLI do
   @doc """
   Runs Credo's main process.
   """
-  def main(argv) do
+  def main(argv \\ []) do
     Credo.Application.start(nil, nil)
 
     argv
