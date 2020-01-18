@@ -19,6 +19,14 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
 
       Module.safe_concat([prefix, infix, suffix])
 
+  Jason.decode/Jason.decode! should be called using `keys: :atoms!` (*not* `keys: :atoms`):
+
+      Jason.decode(str, keys: :atoms!)
+
+  or `:keys` should be omitted (which defaults to `:strings`):
+
+      Jason.decode(str)
+
   """
 
   @explanation [check: @moduledoc]
@@ -68,6 +76,16 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
 
   defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_, _]) do
     {"Module.concat/2", "Module.safe_concat/2"}
+  end
+
+  defp get_forbidden_call([{:__aliases__, _, [:Jason]}, decode], args) when decode in [:decode, :decode!] do
+    args
+    |> Enum.any?(fn arg -> Keyword.keyword?(arg) and Keyword.get(arg, :keys) == :atoms end)
+    |> if do
+      {"Jason.#{decode}(..., keys: :atoms)", "Jason.#{decode}(..., keys: :atoms!)"}
+    else
+      nil
+    end
   end
 
   defp get_forbidden_call(_, _) do
