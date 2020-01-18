@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0-rc3
+## 1.2.0-rc4
 
 - Commands can now have their own pipelines, so that plugins can extend them.
 - Add pipelines to `SuggestCommand` and `ListCommand`
@@ -9,6 +9,7 @@
 - Fix `TrailingWhiteSpace` check on Windows
 - Fix `MultiAlias` to work with submodule expansion
 - Fix `UnusedVariableNames` bug
+- Fix `InterpolationHelper.replace_interpolations/2` bug
 - Fix crash in `AliasAs` check when __MODULE__ is aliased
 - Fix speed pitfall in `Scope.name/2`
 - New config option: `parse_timeout`
