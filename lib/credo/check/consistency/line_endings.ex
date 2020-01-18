@@ -18,9 +18,11 @@ defmodule Credo.Check.Consistency.LineEndings do
   end
 
   defp issues_for(expected, source_file, params) do
+    first_line_with_issue = @collector.first_line_with_issue(expected, source_file)
+
     source_file
     |> IssueMeta.for(params)
-    |> format_issue(message: message_for(expected))
+    |> format_issue(message: message_for(expected), line_no: first_line_with_issue)
     |> List.wrap()
   end
 
