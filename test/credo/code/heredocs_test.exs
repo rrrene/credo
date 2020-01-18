@@ -48,10 +48,7 @@ defmodule Credo.Code.HeredocsTest do
     """
 
     result = source |> Heredocs.replace_with_spaces()
-    assert source != result
-    assert String.length(source) == String.length(result)
-    refute String.contains?(result, "example")
-    refute String.contains?(result, "TODO:")
+    assert source == result
   end
 
   test "it should return the source without string literals 3" do
@@ -674,5 +671,28 @@ defmodule Credo.Code.HeredocsTest do
 
     result = source |> Heredocs.replace_with_spaces(".")
     assert expected == result
+  end
+
+  test "should treat heredoc sigils correctly (issue #732)" do
+    foo = """
+    defmodule InflictParserError do
+      @moduledoc false
+
+      def a_method do
+        ~S(")
+        ~S(])
+        ~S([)
+      end
+
+      @doc \"\"\"
+      \"\"\"
+      def another_method, do: nil
+    end
+    """
+
+    assert foo ==
+             foo
+             |> to_source_file
+             |> Heredocs.replace_with_spaces()
   end
 end
