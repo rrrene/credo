@@ -137,18 +137,23 @@ defmodule Credo.ConfigFile do
   end
 
   defp files_from_data(data, dir) do
-    files = data[:files] || %{}
-    included_files = files[:included] || dir
+    case data[:files] do
+      nil ->
+        nil
 
-    included_dir =
-      included_files
-      |> List.wrap()
-      |> Enum.map(&join_default_files_if_directory/1)
+      %{} = files ->
+        included_files = files[:included] || dir
 
-    %{
-      included: included_dir,
-      excluded: files[:excluded] || @default_files_excluded
-    }
+        included_dir =
+          included_files
+          |> List.wrap()
+          |> Enum.map(&join_default_files_if_directory/1)
+
+        %{
+          included: included_dir,
+          excluded: files[:excluded] || @default_files_excluded
+        }
+    end
   end
 
   defp checks_from_data(data) do

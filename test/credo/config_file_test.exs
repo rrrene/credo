@@ -47,6 +47,16 @@ defmodule Credo.ConfigFileTest do
       {Credo.Check.Consistency.Tabs}
     ]
   }
+  @example_config3 %ConfigFile{
+    files: %{
+      included: ["lib/**/*.exs"]
+    },
+    checks: [
+      {Credo.Check.Consistency.ExceptionNames},
+      {Credo.Check.Consistency.LineEndings},
+      {Credo.Check.Consistency.Tabs}
+    ]
+  }
 
   test "the truth" do
     expected = %ConfigFile{
@@ -89,6 +99,25 @@ defmodule Credo.ConfigFileTest do
     )
   end
 
+  test "merge works /3" do
+    expected = %ConfigFile{
+      files: %{
+        included: ["lib/**/*.exs"],
+        excluded: ["lib/**/*_test.exs"]
+      },
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Consistency.Tabs, []}
+      ]
+    }
+
+    assert_sorted_equality(
+      expected,
+      ConfigFile.merge({:ok, @example_config2}, {:ok, @example_config3})
+    )
+  end
+
   test "merge works in the other direction, overwriting files[:excluded]" do
     expected = %ConfigFile{
       files: %{
@@ -105,6 +134,25 @@ defmodule Credo.ConfigFileTest do
     assert_sorted_equality(
       expected,
       ConfigFile.merge({:ok, @example_config2}, {:ok, @default_config})
+    )
+  end
+
+  test "merge works in the other direction in reverse, NOT overwriting files[:excluded]" do
+    expected = %ConfigFile{
+      files: %{
+        included: ["lib/**/*.exs"],
+        excluded: []
+      },
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Consistency.Tabs, []}
+      ]
+    }
+
+    assert_sorted_equality(
+      expected,
+      ConfigFile.merge({:ok, @default_config}, {:ok, @example_config3})
     )
   end
 
