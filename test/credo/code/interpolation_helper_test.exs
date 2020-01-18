@@ -479,4 +479,16 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
+
+  test "it should replace issue #729 correctly" do
+    source = ~S"""
+    "🇿🇼 #{String.upcase(env)}"
+    """
+
+    expected = ~S"""
+    "🇿🇼 $$$$$$$$$$$$$$$$$$$$$"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
 end
