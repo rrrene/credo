@@ -9,6 +9,7 @@
 - Fix `TrailingWhiteSpace` check on Windows
 - Fix `MultiAlias` to work with submodule expansion
 - Fix `UnusedVariableNames` bug
+- Fix `Heredocs.replace_with_spaces/5` bug
 - Fix `InterpolationHelper.replace_interpolations/2` bug
 - Fix crash in `AliasAs` check when __MODULE__ is aliased
 - Fix speed pitfall in `Scope.name/2`
