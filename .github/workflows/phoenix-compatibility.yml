@@ -2,13 +2,34 @@ name: "Compatibility: Phoenix"
 on: push
 
 jobs:
-  test:
+  test_on_source:
     runs-on: ubuntu-latest
-    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    name: Run Credo on Phoenix source [${{matrix.repo_branch}} / OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}]
     strategy:
       matrix:
         otp: [20.3, 21.3, 22.2]
-        elixir: [1.7.2, 1.8.2, 1.9.4]
+        elixir: [1.6.6, 1.7.2, 1.8.2, 1.9.4]
+        repo_url: ["https://github.com/phoenixframework/phoenix.git"]
+        repo_branch: ["v1.4", "master"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile
+      - run: mkdir -p tmp
+      - run: git clone ${{matrix.repo_url}} ${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
+
+  test_on_new_project:
+    runs-on: ubuntu-latest
+    name: Run Credo on new Phoenix app [OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}]
+    strategy:
+      matrix:
+        otp: [20.3, 21.3, 22.2]
+        elixir: [1.6.6, 1.7.2, 1.8.2, 1.9.4]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
