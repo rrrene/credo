@@ -1,3 +1,4 @@
+name: "Compatibility: Phoenix"
 on: push
 
 jobs:
