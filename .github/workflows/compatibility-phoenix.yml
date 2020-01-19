@@ -21,7 +21,8 @@ jobs:
       - run: mix deps.compile
       - run: mix compile
       - run: mkdir -p tmp
-      - run: git clone ${{matrix.repo_url}} ${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
+      - run: git clone ${{matrix.repo_url}} tmp/${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
+      - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
 
   test_on_new_project:
     runs-on: ubuntu-latest
