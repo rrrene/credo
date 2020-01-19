@@ -7,7 +7,7 @@ on:
 jobs:
   test_on_source:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci') }}
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
     name: Run Credo on Elixir source [${{matrix.repo_branch}} / OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}]
     strategy:
       matrix:
