@@ -1,7 +1,7 @@
 defmodule Credo.Execution.Task.WriteDebugReport do
   @moduledoc false
 
-  @debug_template File.read!("debug-template.html")
+  @debug_template File.read!(".template.debug.html")
   @debug_output_filename "credo-debug-log.html"
 
   use Credo.Execution.Task

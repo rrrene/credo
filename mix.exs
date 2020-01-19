@@ -25,7 +25,7 @@ defmodule Credo.Mixfile do
       files: [
         ".credo.exs",
         ".template.check.ex",
-        "debug-template.html",
+        ".template.debug.html",
         "lib",
         "LICENSE",
         "mix.exs",
