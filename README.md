@@ -2,13 +2,9 @@
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
-It implements [its own style guide](https://github.com/rrrene/elixir-style-guide).
-
 ## What can it do?
 
 `credo` can show you refactoring opportunities in your code, complex code fragments, warn you about common mistakes, show inconsistencies in your naming scheme and - if needed - help you enforce a desired coding style.
-
-If you are a Rubyist it is best described as an opinionated mix between [Inch](https://github.com/rrrene/inch) and [Rubocop](https://github.com/bbatsov/rubocop).
 
 
 ![Credo](https://raw.github.com/rrrene/credo/master/assets/screenshot.png)
