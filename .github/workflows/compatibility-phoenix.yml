@@ -1,5 +1,8 @@
 name: "Compatibility: Phoenix"
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   test_on_source:

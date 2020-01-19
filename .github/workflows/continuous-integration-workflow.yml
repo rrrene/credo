@@ -1,5 +1,8 @@
 name: "Credo CI"
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   test:
