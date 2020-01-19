@@ -39,5 +39,5 @@ defmodule Credo.CLI do
   end
 
   defp halt_if_failed(0), do: nil
-  defp halt_if_failed(x), do: System.halt(x)
+  defp halt_if_failed(exit_status), do: exit({:shutdown, exit_status})
 end
