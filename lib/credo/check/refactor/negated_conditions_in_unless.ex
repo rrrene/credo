@@ -2,7 +2,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   @moduledoc false
 
   @checkdoc """
-  Unless blocks should not contain a negated condition.
+  Unless blocks should avoid having a negated condition.
 
   The code in this example ...
 

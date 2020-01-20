@@ -64,7 +64,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Unless conditions should not have an `else` block.",
+      message: "Unless conditions should avoid having an `else` block.",
       trigger: trigger,
       line_no: line_no
     )
