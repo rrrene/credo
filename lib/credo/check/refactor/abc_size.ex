@@ -22,6 +22,7 @@ defmodule Credo.Check.Refactor.ABCSize do
     max_size: 30,
     excluded_functions: []
   ]
+  @ecto_functions ["where", "from", "select", "join"]
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
@@ -31,15 +32,33 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   @doc false
   def run(source_file, params \\ []) do
+    ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = Params.get(params, :max_size, @default_params)
     excluded_functions = Params.get(params, :excluded_functions, @default_params)
+
+    excluded_functions =
+      if ignore_ecto? do
+        @ecto_functions ++ excluded_functions
+      else
+        excluded_functions
+      end
 
     Credo.Code.prewalk(
       source_file,
       &traverse(&1, &2, issue_meta, max_abc_size, excluded_functions)
     )
   end
+
+  defp imports_ecto_query?(source_file),
+    do: Credo.Code.prewalk(source_file, &traverse_for_ecto/2, false)
+
+  defp traverse_for_ecto(_, true), do: {nil, true}
+
+  defp traverse_for_ecto({:import, _, [{:__aliases__, _, [:Ecto, :Query]} | _]}, false),
+    do: {nil, true}
+
+  defp traverse_for_ecto(ast, false), do: {ast, false}
 
   defp traverse(
          {:defmacro, _, [{:__using__, _, _}, _]} = ast,
