@@ -1,7 +1,6 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.5.3
   - 1.6.6
   - 1.7.2
   - 1.8.2
@@ -20,10 +19,6 @@ after_script:
   - MIX_ENV=test mix inch.report
 matrix:
   exclude:
-  - elixir: 1.5.3
-    otp_release: 21.3
-  - elixir: 1.5.3
-    otp_release: 22.0
   - elixir: 1.6.6
     otp_release: 22.0
   - elixir: 1.8.2
