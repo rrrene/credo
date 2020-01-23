@@ -22,7 +22,7 @@ defmodule Credo.SourceFile do
   end
 
   @doc """
-  Retuns a `SourceFile` struct for the given `source` code and `filename`.
+  Returns a `SourceFile` struct for the given `source` code and `filename`.
   """
   def parse(source, filename) do
     filename = Path.relative_to_cwd(filename)
@@ -57,7 +57,7 @@ defmodule Credo.SourceFile do
     }
   end
 
-  @doc "Retuns the AST for the given `source_file`."
+  @doc "Returns the AST for the given `source_file`."
   def ast(source_file)
 
   def ast(%__MODULE__{filename: filename}) do
@@ -70,7 +70,7 @@ defmodule Credo.SourceFile do
     end
   end
 
-  @doc "Retuns the lines of source code for the given `source_file`."
+  @doc "Returns the lines of source code for the given `source_file`."
   def lines(source_file)
 
   def lines(%__MODULE__{filename: filename}) do
@@ -83,7 +83,7 @@ defmodule Credo.SourceFile do
     end
   end
 
-  @doc "Retuns the source code for the given `source_file`."
+  @doc "Returns the source code for the given `source_file`."
   def source(source_file)
 
   def source(%__MODULE__{filename: filename}) do
@@ -96,7 +96,7 @@ defmodule Credo.SourceFile do
     end
   end
 
-  @doc "Retuns the source code and filename for the given `source_file_or_source`."
+  @doc "Returns the source code and filename for the given `source_file_or_source`."
   def source_and_filename(source_file_or_source, default_filename \\ "nofilename")
 
   def source_and_filename(%__MODULE__{filename: filename} = source_file, _default_filename) do
