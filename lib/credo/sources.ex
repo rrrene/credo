@@ -34,6 +34,13 @@ defmodule Credo.Sources do
   end
 
   def find(%Credo.Execution{files: files, parse_timeout: parse_timeout}) do
+    parse_timeout =
+      if is_nil(parse_timeout) do
+        :infinity
+      else
+        parse_timeout
+      end
+
     MapSet.new()
     |> include(files.included)
     |> exclude(files.excluded)
