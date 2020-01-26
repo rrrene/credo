@@ -264,4 +264,47 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
 
     assert rounded_abc_size(source, ["where", "join", "select", "distinct"]) == 1
   end
+
+  test "it should NOT count ecto functions when Ecto.Query is imported" do
+    source = """
+    defmodule CredoEctoQueryModule do
+      import Ecto.Query
+
+      def fun() do
+        Favorite
+        |> where(user_id: ^user.id)
+        |> join(:left, [f], t in Template, f.entity_id == t.id and f.entity_type == "template")
+        |> join(:left, [f, t], d in Document, f.entity_id == d.id and f.entity_type == "document")
+        |> join(:left, [f, t, d], dt in Template, dt.id == d.template_id)
+        |> join(:left, [f, t, d, dt], c in Category, c.id == t.category_id or c.id == dt.category_id)
+        |> select([f, t, d, dt, c], c)
+        |> distinct(true)
+        |> Repo.all()
+      end
+    end
+    """
+    |> to_source_file
+    |> refute_issues(@described_check, max_size: 3)
+  end
+
+  test "it SHOULD count ecto functions when Ecto.Query is NOT imported" do
+    source = """
+    defmodule CredoEctoQueryModule do
+
+      def fun() do
+        Favorite
+        |> where(user_id: ^user.id)
+        |> join(:left, [f], t in Template, f.entity_id == t.id and f.entity_type == "template")
+        |> join(:left, [f, t], d in Document, f.entity_id == d.id and f.entity_type == "document")
+        |> join(:left, [f, t, d], dt in Template, dt.id == d.template_id)
+        |> join(:left, [f, t, d, dt], c in Category, c.id == t.category_id or c.id == dt.category_id)
+        |> select([f, t, d, dt, c], c)
+        |> distinct(true)
+        |> Repo.all()
+      end
+    end
+    """
+    |> to_source_file
+    |> assert_issue(@described_check, max_size: 3)
+  end
 end
