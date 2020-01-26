@@ -9,6 +9,9 @@
       checks: [
         {Credo.Check.Readability.ModuleDoc, false}
       ]
+    },
+    %{
+      name: "empty-config"
     }
   ]
 }

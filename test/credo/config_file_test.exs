@@ -58,7 +58,7 @@ defmodule Credo.ConfigFileTest do
     ]
   }
 
-  test "the truth" do
+  test "merge works" do
     expected = %ConfigFile{
       files: %{
         included: ["lib/", "src/", "web/"],
@@ -80,7 +80,7 @@ defmodule Credo.ConfigFileTest do
     )
   end
 
-  test "merge works 2" do
+  test "merge works /2" do
     expected = %ConfigFile{
       files: %{
         included: ["lib/", "src/", "web/"],
@@ -228,5 +228,21 @@ defmodule Credo.ConfigFileTest do
     expected = {:error, {:badconfig, config_file, 9, "syntax error before: ", "checks"}}
 
     assert expected == result
+  end
+
+  test "loads config file and sets defaults" do
+    exec = Credo.Execution.build([])
+    config_file = Path.join([File.cwd!(), "test", "fixtures", "custom-config.exs"])
+    config_name = "empty-config"
+
+    {:ok, result} = ConfigFile.read_from_file_path(exec, ".", config_file, config_name)
+
+    assert is_boolean(result.color)
+    assert is_boolean(result.strict)
+    assert is_integer(result.parse_timeout)
+    assert is_list(result.files.included)
+    assert not Enum.empty?(result.files.included)
+    assert is_list(result.files.excluded)
+    assert is_list(result.checks)
   end
 end
