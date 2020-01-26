@@ -10,6 +10,9 @@ defmodule Credo.ConfigFile do
   @default_glob "**/*.{ex,exs}"
   @default_files_included [@default_glob]
   @default_files_excluded []
+  @default_parse_timeout 5000
+  @default_strict false
+  @default_color true
 
   alias Credo.Execution
 
@@ -62,6 +65,7 @@ defmodule Credo.ConfigFile do
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> merge
     |> add_given_directory_to_files(dir)
+    |> ensure_values_present()
   end
 
   defp relevant_config_files(dir) do
@@ -82,6 +86,26 @@ defmodule Credo.ConfigFile do
     |> get_dir_paths
     |> add_config_dirs
   end
+
+  defp ensure_values_present({:ok, config}) do
+    config = %__MODULE__{
+      check_for_updates: config.check_for_updates,
+      requires: config.requires || [],
+      plugins: config.plugins || [],
+      files: %{
+        included: merge_files_default(@default_files_included, config.files.included),
+        excluded: merge_files_default(@default_files_excluded, config.files.excluded)
+      },
+      checks: config.checks,
+      parse_timeout: merge_parse_timeout(@default_parse_timeout, config.parse_timeout),
+      strict: merge_boolean(@default_strict, config.strict),
+      color: merge_boolean(@default_color, config.color)
+    }
+
+    {:ok, config}
+  end
+
+  defp ensure_values_present(error), do: error
 
   defp get_dir_paths(dirs), do: do_get_dir_paths(dirs, [])
 
@@ -219,6 +243,9 @@ defmodule Credo.ConfigFile do
   defp merge_boolean(_base, false), do: false
   defp merge_boolean(base, _), do: base
 
+  defp merge_files_default(_base, [_head | _tail] = non_empty_list), do: non_empty_list
+  defp merge_files_default(base, _), do: base
+
   defp merge_parse_timeout(_base, timeout) when is_integer(timeout), do: timeout
   defp merge_parse_timeout(base, _), do: base
 
@@ -261,10 +288,12 @@ defmodule Credo.ConfigFile do
     files = %{
       included:
         files[:included]
+        |> List.wrap()
         |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq(),
       excluded:
         files[:excluded]
+        |> List.wrap()
         |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq()
     }
