@@ -32,7 +32,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   alias Credo.Check.Params
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     parens? = Params.get(params, :parens, @default_params)
     issue_meta = IssueMeta.for(source_file, params)
 

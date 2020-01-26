@@ -33,7 +33,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
 
   alias Credo.Check.Warning.UnusedOperation
 
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     UnusedOperation.run(
       source_file,
       params,

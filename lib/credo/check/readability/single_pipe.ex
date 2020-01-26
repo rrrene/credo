@@ -28,7 +28,7 @@ defmodule Credo.Check.Readability.SinglePipe do
   use Credo.Check, base_priority: :high
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     {_continue, issues} =

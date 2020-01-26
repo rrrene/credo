@@ -41,7 +41,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
   use Credo.Check
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = Params.get(params, :max_complexity, @default_params)
 

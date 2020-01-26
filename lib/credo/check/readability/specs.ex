@@ -25,7 +25,7 @@ defmodule Credo.Check.Readability.Specs do
   use Credo.Check
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     specs = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
 

@@ -2,12 +2,26 @@ defmodule Credo.Execution.ExecutionIssues do
   use GenServer
 
   alias Credo.Execution
+  alias Credo.Issue
   alias Credo.SourceFile
 
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
     %Execution{exec | issues_pid: pid}
+  end
+
+  @doc "Appends an `issue` for the specified `filename`."
+  def append(%Execution{issues_pid: pid}, issues) when is_list(issues) do
+    issues
+    |> Enum.group_by(& &1.filename)
+    |> Enum.each(fn {filename, issue} ->
+      GenServer.call(pid, {:append, filename, issue})
+    end)
+  end
+
+  def append(%Execution{issues_pid: pid}, %Issue{} = issue) do
+    GenServer.call(pid, {:append, issue.filename, issue})
   end
 
   @doc "Appends an `issue` for the specified `filename`."

@@ -153,8 +153,8 @@ defmodule Credo.Check.Consistency.Collector do
     end
   end
 
-  def append_issue_via_issue_service(%Issue{filename: filename} = issue, exec) do
-    ExecutionIssues.append(exec, %SourceFile{filename: filename}, issue)
+  def append_issue_via_issue_service(%Issue{} = issue, exec) do
+    ExecutionIssues.append(exec, issue)
   end
 
   defp source_files_with_issues(frequencies_per_file, most_frequent_match) do

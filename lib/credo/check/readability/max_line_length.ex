@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
   alias Credo.Code.Strings
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, @default_params)
 

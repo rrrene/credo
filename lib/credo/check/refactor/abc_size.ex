@@ -31,7 +31,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   use Credo.Check
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = Params.get(params, :max_size, @default_params)

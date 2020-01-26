@@ -41,7 +41,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
 
   @doc false
   # TODO: consider for experimental check front-loader (tokens)
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file

@@ -24,6 +24,21 @@ defmodule Credo.Check do
   It has to return a list of found issues.
   """
 
+  @callback run_on_all_source_files(
+              exec :: Credo.Execution.t(),
+              source_files :: list(Credo.SourceFile.t()),
+              params :: Keyword.t()
+            ) :: :ok
+
+  @callback run_on_source_file(
+              exec :: Credo.Execution.t(),
+              source_file :: Credo.SourceFile.t(),
+              params :: Keyword.t()
+            ) :: :ok
+
+  @callback run(source_file :: Credo.SourceFile.t(), params :: Keyword.t()) ::
+              list(Credo.Issue.t())
+
   @doc """
   Returns the base priority for the check.
   """
@@ -93,6 +108,9 @@ defmodule Credo.Check do
       alias Credo.Severity
       alias Credo.SourceFile
 
+      # tinkering: to be removed:
+      alias Credo.CLI.Output.UI
+
       def base_priority do
         unquote(Priority.to_integer(opts[:base_priority]))
       end
@@ -125,6 +143,55 @@ defmodule Credo.Check do
           base_priority(),
           __MODULE__
         )
+      end
+
+      @doc false
+      def run_on_all_source_files(exec, source_files, params \\ [])
+
+      def run_on_all_source_files(exec, source_files, params) do
+        source_files
+        |> Enum.map(&Task.async(fn -> run_on_source_file(exec, &1, params) end))
+        |> Enum.each(&Task.await(&1, :infinity))
+
+        :ok
+      end
+
+      @doc false
+      def run_on_source_file(exec, source_file, params \\ [])
+
+      def run_on_source_file(exec, source_file, params) do
+        try do
+          run(source_file, params)
+        rescue
+          error ->
+            UI.warn("Error while running #{__MODULE__} on #{source_file.filename}")
+
+            if exec.crash_on_error do
+              reraise error, System.stacktrace()
+            else
+              []
+            end
+        end
+        |> append_issues_and_timings(exec)
+
+        :ok
+      end
+
+      @doc false
+      def run(source_file, params)
+
+      def run(source_file, params) do
+        throw("Implement me")
+      end
+
+      defoverridable Credo.Check
+
+      defp append_issues_and_timings([] = _issues, exec) do
+        exec
+      end
+
+      defp append_issues_and_timings([_ | _] = issues, exec) do
+        Credo.Execution.ExecutionIssues.append(exec, issues)
       end
     end
   end

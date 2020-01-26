@@ -31,7 +31,7 @@ defmodule Credo.Check.Design.TagTODO do
   alias Credo.Check.Design.TagHelper
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     include_doc? = Params.get(params, :include_doc, @default_params)
 

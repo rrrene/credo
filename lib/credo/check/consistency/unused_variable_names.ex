@@ -11,10 +11,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
   @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.UnusedVariableNames.Collector
 
-  use Credo.Check, run_on_all: true, base_priority: :high
+  use Credo.Check, base_priority: :high
 
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 

@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
 
   @doc false
   # TODO: consider for experimental check front-loader (text)
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     max_blank_lines = Params.get(params, :max_blank_lines, @default_params)

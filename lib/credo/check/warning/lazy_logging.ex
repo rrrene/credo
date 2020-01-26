@@ -34,7 +34,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   use Credo.Check, base_priority: :high, elixir_version: "< 1.7.0"
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     # {<Logger import seen?>, <list of issues>}
     state = {false, []}

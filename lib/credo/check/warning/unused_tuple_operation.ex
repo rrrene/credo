@@ -35,7 +35,7 @@ defmodule Credo.Check.Warning.UnusedTupleOperation do
 
   alias Credo.Check.Warning.UnusedOperation
 
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     UnusedOperation.run(
       source_file,
       params,

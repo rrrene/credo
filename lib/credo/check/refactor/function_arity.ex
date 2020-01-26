@@ -22,7 +22,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
   alias Credo.Code.Parameters
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_arity = Params.get(params, :max_arity, @default_params)
     ignore_defp = Params.get(params, :ignore_defp, @default_params)
