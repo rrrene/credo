@@ -11,11 +11,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
-    if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
     strategy:
       matrix:
         otp: [20.3, 21.3, 22.2]
         elixir: [1.6.6, 1.7.2, 1.8.2, 1.9.4, 1.10.0]
+    if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
