@@ -11,6 +11,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
     strategy:
       matrix:
         otp: [20.3, 21.3, 22.2]
