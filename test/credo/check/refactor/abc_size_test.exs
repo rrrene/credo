@@ -266,7 +266,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   end
 
   test "it should NOT count ecto functions when Ecto.Query is imported" do
-    source = """
+    """
     defmodule CredoEctoQueryModule do
       import Ecto.Query
 
@@ -288,7 +288,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   end
 
   test "it SHOULD count ecto functions when Ecto.Query is NOT imported" do
-    source = """
+    """
     defmodule CredoEctoQueryModule do
 
       def fun() do
