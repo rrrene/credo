@@ -12,9 +12,10 @@ defmodule Credo.Check.Consistency.LineEndings.Collector do
   end
 
   def first_line_with_issue(expected, source_file) do
-    {line_no, _} = source_file
-    |> SourceFile.lines()
-    |> Enum.find(&line_ending(&1) != expected)
+    {line_no, _} =
+      source_file
+      |> SourceFile.lines()
+      |> Enum.find(&(line_ending(&1) != expected))
 
     line_no
   end

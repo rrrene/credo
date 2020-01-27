@@ -23,7 +23,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   @all_sigil_chars ~w(a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z)
   @all_sigil_atoms Enum.map(@all_sigil_chars, &:"sigil_#{&1}")
 
-  #all non-special-form operators
+  # all non-special-form operators
   @all_nonspecial_operators ~W(! && ++ -- .. <> =~ @ |> || != !== * + - / <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~)a
 
   use Credo.Check, base_priority: :high
@@ -68,8 +68,12 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
 
     # ignore non-special-form (overridable) operators
-    defp traverse({unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast, issues, _issue_meta)
-    when operator in @all_nonspecial_operators do
+    defp traverse(
+           {unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast,
+           issues,
+           _issue_meta
+         )
+         when operator in @all_nonspecial_operators do
       {ast, issues}
     end
 
