@@ -43,7 +43,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
   defp check_defined?({atom, _}), do: check_defined?({atom})
 
   defp check_defined?({atom}) do
-    Code.ensure_compiled?(atom)
+    Credo.Backports.Code.ensure_compiled?(atom)
   end
 
   defp warn_if_check_missing({atom, _}), do: warn_if_check_missing({atom})
