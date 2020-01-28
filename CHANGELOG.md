@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Actually enable the new check (Credo.Check.Warning.MixEnv)
+
 ## 1.2.0
 
 - Commands can now have their own pipelines, so that plugins can extend them.
