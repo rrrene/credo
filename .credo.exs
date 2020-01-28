@@ -137,6 +137,7 @@
         {Credo.Check.Warning.IExPry, []},
         {Credo.Check.Warning.IoInspect, []},
         {Credo.Check.Warning.LazyLogging, []},
+        {Credo.Check.Warning.MixEnv, false},
         {Credo.Check.Warning.OperationOnSameValues, []},
         {Credo.Check.Warning.OperationWithConstantResult, []},
         {Credo.Check.Warning.RaiseInsideRescue, []},
@@ -151,7 +152,6 @@
 
         #
         # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
-        {Credo.Check.Warning.MixEnv, false},
 
         #
         # Controversial and experimental checks (opt-in, just replace `false` with `[]`)
@@ -167,6 +167,7 @@
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.DoubleBooleanNegation, false},
         {Credo.Check.Refactor.ModuleDependencies, false},
+        {Credo.Check.Refactor.NegatedIsNil, false},
         {Credo.Check.Refactor.PipeChainStart, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
