@@ -24,7 +24,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
 
   def error(exec, _opts) do
     case Execution.get_assign(exec, "#{__MODULE__}.error") do
-      {:badconfig, filename, line_no, description, trigger} ->
+      {:badconfig, filename, line_no, description, trigger} when not is_nil(filename) ->
         lines =
           filename
           |> File.read!()
