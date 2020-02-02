@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
+- Fix token interpretation of Floats
+
 ## 1.2.1
 
 - Actually enable the new check (Credo.Check.Warning.MixEnv)
