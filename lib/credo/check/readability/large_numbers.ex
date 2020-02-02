@@ -49,6 +49,11 @@ defmodule Credo.Check.Readability.LargeNumbers do
     collect_number_tokens(t, acc, min_number)
   end
 
+  # tuple for Elixir >= 1.10.0
+  defp number_token({:flt, {_, _, number}, _} = tuple, min_number) when min_number < number do
+    tuple
+  end
+
   # tuple for Elixir >= 1.6.0
   defp number_token({:int, {_, _, number}, _} = tuple, min_number) when min_number < number do
     tuple
@@ -67,6 +72,17 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   defp find_issues([], acc, _issue_meta) do
     acc
+  end
+
+  # tuple for Elixir >= 1.10.0
+  defp find_issues(
+         [{:flt, {line_no, column1, number} = location, _} | t],
+         acc,
+         issue_meta
+       ) do
+    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+
+    find_issues(t, acc, issue_meta)
   end
 
   # tuple for Elixir >= 1.6.0
