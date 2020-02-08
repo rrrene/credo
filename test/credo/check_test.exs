@@ -21,14 +21,14 @@ defmodule Credo.CheckTest do
       """
       |> to_source_file
 
-    {time, result} =
+    {time_in_microseconds, result} =
       :timer.tc(fn ->
         Check.scope_for(source_file, line: @generated_lines + 9)
       end)
 
     # Ensures that there are no speed pitfalls like reported here:
     # https://github.com/rrrene/credo/issues/702
-    assert time < 1_000_000
+    assert time_in_microseconds < 1_000_000
     assert {:def, "AliasTest.test"} == result
   end
 end
