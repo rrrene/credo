@@ -176,9 +176,9 @@ defmodule Credo.Code do
     {_source, filename} = Credo.SourceFile.source_and_filename(source_file_or_source)
 
     source_file_or_source
+    |> Heredocs.replace_with_spaces(" ", " ", "", filename)
     |> Sigils.replace_with_spaces(sigil_replacement, " ", filename)
     |> Strings.replace_with_spaces(" ", " ", filename)
-    |> Heredocs.replace_with_spaces(" ", " ", "", filename)
     |> Charlists.replace_with_spaces(" ", " ", filename)
     |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
   end
