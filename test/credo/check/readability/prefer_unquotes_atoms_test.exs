@@ -12,7 +12,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
     :unquoted_atom
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when using an unquoted keyword identifier" do
@@ -21,7 +22,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
     %{unquoted_atom: 1}
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when required to use a quoted atom" do
@@ -30,7 +32,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
     :"complex atom"
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when required to use a quoted keyword identifier" do
@@ -39,7 +42,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
     %{"complex\#{atom}": 1, "complex atom": 2}
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -54,7 +58,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
       :"quoted_atom"
       """
       |> to_source_file
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
     end
 
     test "it should report cases where a quoted keyword identifier is used and could be unquoted" do
@@ -63,7 +68,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
       %{"quoted_atom": 1}
       """
       |> to_source_file
-      |> assert_issues(@described_check)
+      |> run_check(@described_check)
+      |> assert_issues()
     end
 
     #

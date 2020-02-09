@@ -18,7 +18,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report operator definitions" do
@@ -32,7 +33,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report for function calls" do
@@ -45,7 +47,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -63,7 +66,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for module attributes" do
@@ -75,7 +79,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for all defined operations" do
@@ -98,7 +103,8 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 9 == Enum.count(issues)
     end)
   end

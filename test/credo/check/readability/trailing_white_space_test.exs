@@ -13,7 +13,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report trailing whitespace inside heredocs" do
@@ -27,7 +28,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     """
     |> String.replace("++", "  ")
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report \r line endings" do
@@ -36,7 +38,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     end\r
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -46,7 +49,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
   test "it should report a violation" do
     "defmodule CredoSampleModule do\n@test true   \nend"
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert 11 == issue.column
       assert "   " == issue.trigger
     end)
@@ -55,7 +59,8 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
   test "it should report multiple violations" do
     "defmodule CredoSampleModule do   \n@test true   \nend"
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report trailing whitespace inside heredocs if :ignore_strings is false" do
@@ -69,6 +74,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     """
     |> String.replace("++", "  ")
     |> to_source_file
-    |> assert_issue(@described_check, ignore_strings: false)
+    |> run_check(@described_check, ignore_strings: false)
+    |> assert_issue()
   end
 end

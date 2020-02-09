@@ -26,8 +26,10 @@ defmodule Credo.TestHelper do
 
     quote do
       use ExUnit.Case, async: unquote(async)
+
+      import Credo.Test.CheckRunner
       import Credo.Test.SourceFiles
-      import Credo.Test.Checks
+      import Credo.Test.Assertions
     end
   end
 end

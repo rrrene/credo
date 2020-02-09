@@ -11,7 +11,8 @@ defmodule Credo.Check.Readability.AliasAsTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation" do
@@ -22,7 +23,8 @@ defmodule Credo.Check.Readability.AliasAsTest do
       end
       """
       |> to_source_file
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
 
     assert issue.trigger == "App.Module1"
   end
@@ -38,7 +40,8 @@ defmodule Credo.Check.Readability.AliasAsTest do
       end
       """
       |> to_source_file
-      |> assert_issues(@described_check)
+      |> run_check(@described_check)
+      |> assert_issues()
 
     assert issue1.trigger == "App.Module1"
     assert issue2.trigger == "App.Module3"
@@ -53,6 +56,7 @@ defmodule Credo.Check.Readability.AliasAsTest do
       end
       """
       |> to_source_file
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
   end
 end
