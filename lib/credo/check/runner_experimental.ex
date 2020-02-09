@@ -22,7 +22,7 @@ defmodule Credo.Check.RunnerExperimental do
     runner_config = %{
       runner_pid: self(),
       server_pid: server_pid,
-      max_concurrent_checks: :erlang.system_info(:logical_processors_available)
+      max_concurrent_check_runs: :erlang.system_info(:logical_processors_available)
     }
 
     do_run(runner_config, exec, 0)
@@ -31,7 +31,7 @@ defmodule Credo.Check.RunnerExperimental do
   end
 
   defp do_run(runner_config, exec, taken) do
-    available = runner_config.max_concurrent_checks - taken
+    available = runner_config.max_concurrent_check_runs - taken
 
     # IO.puts("\ndo_run")
 
@@ -55,10 +55,9 @@ defmodule Credo.Check.RunnerExperimental do
   end
 
   defp wait_for_check_finished(runner_config, exec, taken) do
-    # IO.puts("!!!!!!! wait_for_check_finished")
-
     receive do
-      {_spawned_pid, :check_finished} ->
+      {_spawned_pid, {:check_finished, _check}} ->
+        # IO.puts("Finished #{check}")
         do_run(runner_config, exec, taken - 1)
     end
   end
@@ -88,7 +87,7 @@ defmodule Credo.Check.RunnerExperimental do
         end
     end
 
-    send(runner_config.runner_pid, {self(), :check_finished})
+    send(runner_config.runner_pid, {self(), {:check_finished, check}})
   end
 
   defp warn_about_failed_run(check, %Credo.SourceFile{} = source_file) do

@@ -136,18 +136,28 @@ defmodule Credo.Check.Consistency.Collector do
 
   def find_issues(source_files, collector, params, issue_formatter) do
     frequencies_per_source_file =
-      Enum.map(source_files, fn source_file ->
-        {source_file, collector.collect_matches(source_file, params)}
-      end)
+      source_files
+      |> Enum.map(&Task.async(fn -> {&1, collector.collect_matches(&1, params)} end))
+      |> Enum.map(&Task.await(&1, :infinity))
 
     frequencies = total_frequencies(frequencies_per_source_file)
 
     if map_size(frequencies) > 0 do
       {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
 
+      # x =
+      #   frequencies_per_source_file
+      #   |> source_files_with_issues(most_frequent_match)
+
+      # IO.puts("--- going into issue formatter #{inspect(issue_formatter)}")
+
+      # x
+      # |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
+
       frequencies_per_source_file
       |> source_files_with_issues(most_frequent_match)
-      |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
+      |> Enum.map(&Task.async(fn -> issue_formatter.(most_frequent_match, &1, params) end))
+      |> Enum.flat_map(&Task.await(&1, :infinity))
     else
       []
     end
