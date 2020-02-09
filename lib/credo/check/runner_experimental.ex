@@ -15,14 +15,13 @@ defmodule Credo.Check.RunnerExperimental do
       exec
       |> Execution.checks()
       |> warn_about_ineffective_patterns(exec)
-      |> fix_old_notation_for_checks_without_params()
+      |> fix_deprecated_notation_for_checks_without_params()
 
     {:ok, server_pid} = GenServer.start_link(__MODULE__.Server, check_tuples)
 
     runner_config = %{
       runner_pid: self(),
-      server_pid: server_pid,
-      max_concurrent_check_runs: :erlang.system_info(:logical_processors_available)
+      server_pid: server_pid
     }
 
     do_run(runner_config, exec, 0)
@@ -31,13 +30,10 @@ defmodule Credo.Check.RunnerExperimental do
   end
 
   defp do_run(runner_config, exec, taken) do
-    available = runner_config.max_concurrent_check_runs - taken
-
-    # IO.puts("\ndo_run")
+    available = exec.max_concurrent_check_runs - taken
 
     cond do
       available <= 0 ->
-        # IO.puts("1")
         wait_for_check_finished(runner_config, exec, taken)
 
       modules = __MODULE__.Server.take_check_tuples(runner_config.server_pid, available) ->
@@ -71,8 +67,17 @@ defmodule Credo.Check.RunnerExperimental do
     spawn_run_checks(runner_config, exec, rest, taken + 1)
   end
 
+  defp run_check(runner_config, %Execution{debug: true} = exec, {check, params}) do
+    Execution.ExecutionTiming.run(&do_run_check/3, [runner_config, exec, {check, params}])
+    |> Execution.ExecutionTiming.append(exec, task: exec.current_task, check: check)
+  end
+
   defp run_check(runner_config, exec, {check, params}) do
-    source_files = Credo.Execution.get_source_files(exec)
+    do_run_check(runner_config, exec, {check, params})
+  end
+
+  defp do_run_check(runner_config, exec, {check, params}) do
+    source_files = Execution.get_source_files(exec)
 
     try do
       check.run_on_all_source_files(exec, source_files, params)
@@ -98,7 +103,7 @@ defmodule Credo.Check.RunnerExperimental do
     UI.warn("Error while running #{check}")
   end
 
-  defp fix_old_notation_for_checks_without_params(checks) do
+  defp fix_deprecated_notation_for_checks_without_params(checks) do
     Enum.map(checks, fn
       {check} -> {check, []}
       {check, params} -> {check, params}

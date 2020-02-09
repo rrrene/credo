@@ -16,10 +16,10 @@ defmodule Credo.Execution.ExecutionTiming do
 
   """
   def inspect(label, fun) do
-    {time, result} = :timer.tc(fun)
+    {duration, result} = :timer.tc(fun)
 
     # credo:disable-for-lines:3 Credo.Check.Warning.IoInspect
-    time
+    duration
     |> format_time()
     |> IO.inspect(label: label)
 
@@ -32,7 +32,7 @@ defmodule Credo.Execution.ExecutionTiming do
   def now(), do: :os.system_time(:microsecond)
 
   @doc """
-  Runs the given `fun` and returns a tuple of `{started_at, time, result}`.
+  Runs the given `fun` and returns a tuple of `{started_at, duration, result}`.
 
       iex> Credo.Execution.ExecutionTiming.run(fn -> some_complicated_stuff() end)
       {1540540119448181, 51284, [:whatever, :fun, :returned]}
@@ -40,23 +40,32 @@ defmodule Credo.Execution.ExecutionTiming do
   """
   def run(fun) do
     started_at = now()
-    {time, result} = :timer.tc(fun)
+    {duration, result} = :timer.tc(fun)
 
-    {started_at, time, result}
+    {started_at, duration, result}
   end
 
   @doc "Same as `run/1` but takes `fun` and `args` separately."
   def run(fun, args) do
     started_at = now()
-    {time, result} = :timer.tc(fun, args)
+    {duration, result} = :timer.tc(fun, args)
 
-    {started_at, time, result}
+    {started_at, duration, result}
   end
 
   @doc """
   Adds a timing to the given `exec` using the given values of `tags`, `started_at` and `duration`.
   """
   def append(%Execution{timing_pid: pid}, tags, started_at, duration) do
+    spawn(fn ->
+      GenServer.call(pid, {:append, tags, started_at, duration})
+    end)
+  end
+
+  @doc """
+  Adds a timing piped from `run/2` to the given `exec` (using the given values of `tags`, `started_at` and `duration`).
+  """
+  def append({started_at, duration, _result}, %Execution{timing_pid: pid}, tags) do
     spawn(fn ->
       GenServer.call(pid, {:append, tags, started_at, duration})
     end)

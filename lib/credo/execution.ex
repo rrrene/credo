@@ -69,6 +69,7 @@ defmodule Credo.Execution do
             crash_on_error: true,
             mute_exit_status: false,
             read_from_stdin: false,
+            max_concurrent_check_runs: nil,
 
             # state, which is accessed and changed over the course of Credo's execution
             pipeline_map: %{},
@@ -137,7 +138,9 @@ defmodule Credo.Execution do
 
   @doc "Builds an Execution struct for the the given `argv`."
   def build(argv \\ []) when is_list(argv) do
-    %__MODULE__{argv: argv}
+    max_concurrent_check_runs = System.schedulers_online()
+
+    %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
     |> put_pipeline(__MODULE__, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
     |> put_builtin_command("explain", Credo.CLI.Command.Explain.ExplainCommand)
