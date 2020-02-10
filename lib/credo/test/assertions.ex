@@ -1,5 +1,5 @@
 defmodule Credo.Test.Assertions do
-  use ExUnit.Case
+  import ExUnit.Assertions
 
   def assert_trigger(issue, trigger)
 

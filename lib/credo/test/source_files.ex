@@ -1,8 +1,8 @@
 defmodule Credo.Test.SourceFiles do
-  alias Credo.Test.FilenameGenerator
-
   def to_source_file(source) do
-    to_source_file(source, FilenameGenerator.next())
+    filename = "test-untitled#{System.unique_integer()}.ex"
+
+    to_source_file(source, filename)
   end
 
   def to_source_file(source, filename) do

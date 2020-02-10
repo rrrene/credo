@@ -1,11 +1,10 @@
 defmodule Credo.Test.CheckRunner do
-  use ExUnit.Case
-
+  alias Credo.Execution
   alias Credo.Execution.ExecutionIssues
   alias Credo.SourceFile
 
   def run_check(source_file, check \\ nil, params \\ []) do
-    issues_for(source_file, check, create_execution(), params)
+    issues_for(source_file, check, Execution.build(), params)
   end
 
   defp issues_for(source_files, nil, exec, _) when is_list(source_files) do
@@ -22,30 +21,25 @@ defmodule Credo.Test.CheckRunner do
 
   defp issues_for(source_files, check, _exec, params)
        when is_list(source_files) do
-    exec = create_execution()
+    exec = Execution.build()
 
     if check.run_on_all? do
       :ok = check.run(source_files, exec, params)
 
-      source_files
-      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(exec)))
+      Enum.flat_map(source_files, &get_issues_from_source_file(&1, exec))
     else
       source_files
       |> check.run(params)
-      |> Enum.flat_map(&(&1 |> get_issues_from_source_file(exec)))
+      |> Enum.flat_map(&get_issues_from_source_file(&1, exec))
     end
   end
 
   defp issues_for(%SourceFile{} = source_file, nil, exec, _) do
-    source_file |> get_issues_from_source_file(exec)
+    get_issues_from_source_file(source_file, exec)
   end
 
   defp issues_for(%SourceFile{} = source_file, check, _exec, params) do
     _issues = check.run(source_file, params)
-  end
-
-  defp create_execution do
-    Credo.Execution.build()
   end
 
   defp get_issues_from_source_file(source_file, exec) do

@@ -3,8 +3,6 @@ ExUnit.start()
 Path.wildcard("test/support/*.exs")
 |> Enum.each(&Code.require_file/1)
 
-Credo.Test.Application.start([], [])
-
 check_version =
   ~w(1.6.5 1.7.0)
   |> Enum.reduce([], fn version, acc ->
