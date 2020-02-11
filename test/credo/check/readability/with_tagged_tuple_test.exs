@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.WithTokenTest do
+defmodule Credo.Check.Readability.WithTaggedTupleTest do
   use Credo.TestHelper
 
-  @described_check Credo.Check.Readability.WithToken
+  @described_check Credo.Check.Readability.WithTaggedTuple
 
   test "it should NOT report violation" do
     """

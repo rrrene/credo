@@ -1,8 +1,8 @@
-defmodule Credo.Check.Readability.WithToken do
+defmodule Credo.Check.Readability.WithTaggedTuple do
   @moduledoc false
 
   @checkdoc """
-  Avoid using token placeholders for error reporting.
+  Avoid using tags for error reporting.
 
   Consider the following code:
 
@@ -14,7 +14,7 @@ defmodule Credo.Check.Readability.WithToken do
         {:authz, _} -> {:error, :unauthorized}
       end
 
-  This code injects placeholder tokens such as `:resource` and `:authz` for the purpose of error
+  This code injects placeholder tags such as `:resource` and `:authz` for the purpose of error
   reporting.
 
   Instead, extract each validation into a separate helper function which returns error
