@@ -40,8 +40,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    mass_threshold = Params.get(params, :mass_threshold, @default_params)
-    nodes_threshold = Params.get(params, :nodes_threshold, @default_params)
+    mass_threshold = Params.get(params, :mass_threshold, __MODULE__)
+    nodes_threshold = Params.get(params, :nodes_threshold, __MODULE__)
 
     source_files
     |> duplicate_nodes(mass_threshold)

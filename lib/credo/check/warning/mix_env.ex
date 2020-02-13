@@ -25,7 +25,7 @@ defmodule Credo.Check.Warning.MixEnv do
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    excluded_paths = Params.get(params, :excluded_paths, @default_params)
+    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
 
     case ignore_path?(source_file.filename, excluded_paths) do
       true ->

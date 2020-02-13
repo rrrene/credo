@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       []
     else
       issue_meta = IssueMeta.for(source_file, params)
-      ignore_names = Params.get(params, :ignore_names, @default_params)
+      ignore_names = Params.get(params, :ignore_names, __MODULE__)
 
       {_continue, issues} =
         Credo.Code.prewalk(

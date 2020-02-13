@@ -38,9 +38,9 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    excluded_functions = Params.get(params, :excluded_functions, @default_params)
+    excluded_functions = Params.get(params, :excluded_functions, __MODULE__)
 
-    excluded_argument_types = Params.get(params, :excluded_argument_types, @default_params)
+    excluded_argument_types = Params.get(params, :excluded_argument_types, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,

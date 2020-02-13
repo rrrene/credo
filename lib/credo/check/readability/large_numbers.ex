@@ -29,7 +29,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    min_number = Params.get(params, :only_greater_than, @default_params)
+    min_number = Params.get(params, :only_greater_than, __MODULE__)
 
     source_file
     |> Credo.Code.to_tokens()

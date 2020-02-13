@@ -38,7 +38,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
 
   defp issues_for(expected, source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    allow_empty_enums = Params.get(params, :allow_empty_enums, @default_params)
+    allow_empty_enums = Params.get(params, :allow_empty_enums, __MODULE__)
 
     lines_with_issues =
       @collector.find_locations_not_matching(expected, source_file, allow_empty_enums)

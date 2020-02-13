@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
   @doc false
   def run(source_file, params \\ []) do
-    parens? = Params.get(params, :parens, @default_params)
+    parens? = Params.get(params, :parens, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, parens?))

@@ -25,7 +25,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    ignore_strings = Params.get(params, :ignore_strings, @default_params)
+    ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
 
     source_file
     |> to_lines(ignore_strings)

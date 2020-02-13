@@ -69,7 +69,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp ignored?(location, params) do
-    ignored_triggers = Params.get(params, :ignore, @default_params)
+    ignored_triggers = Params.get(params, :ignore, __MODULE__)
 
     Enum.member?(ignored_triggers, location[:trigger])
   end

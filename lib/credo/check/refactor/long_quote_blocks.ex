@@ -79,8 +79,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_line_count = Params.get(params, :max_line_count, @default_params)
-    ignore_comments = Params.get(params, :ignore_comments, @default_params)
+    max_line_count = Params.get(params, :max_line_count, __MODULE__)
+    ignore_comments = Params.get(params, :ignore_comments, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,

@@ -90,7 +90,7 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   defp find_issue(fun_name, arguments, meta, issue_meta) do
     params = IssueMeta.params(issue_meta)
-    ignored_functions = Params.get(params, :ignore, @default_params)
+    ignored_functions = Params.get(params, :ignore, __MODULE__)
 
     unless Enum.member?(ignored_functions, fun_name) do
       issue_for_call(arguments, meta, issue_meta)

@@ -34,10 +34,10 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    max_deps = Params.get(params, :max_deps, @default_params)
-    dependency_namespaces = Params.get(params, :dependency_namespaces, @default_params)
-    excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
-    excluded_paths = Params.get(params, :excluded_paths, @default_params)
+    max_deps = Params.get(params, :max_deps, __MODULE__)
+    dependency_namespaces = Params.get(params, :dependency_namespaces, __MODULE__)
+    excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)
+    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
 
     case ignore_path?(source_file.filename, excluded_paths) do
       true ->

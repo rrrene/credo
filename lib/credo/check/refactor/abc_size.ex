@@ -34,8 +34,8 @@ defmodule Credo.Check.Refactor.ABCSize do
   def run(source_file, params \\ []) do
     ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)
-    max_abc_size = Params.get(params, :max_size, @default_params)
-    excluded_functions = Params.get(params, :excluded_functions, @default_params)
+    max_abc_size = Params.get(params, :max_size, __MODULE__)
+    excluded_functions = Params.get(params, :excluded_functions, __MODULE__)
 
     excluded_functions =
       if ignore_ecto? do

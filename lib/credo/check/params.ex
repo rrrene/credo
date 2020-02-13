@@ -14,10 +14,10 @@ defmodule Credo.Check.Params do
       iex> Credo.Check.Params.get([foo: "baz"], :foo, [foo: "bar"])
       "baz"
   """
-  def get(params, field, default_params \\ []) when is_list(params) do
+  def get(params, field, check_mod) do
     case params[field] do
       nil ->
-        default_params[field]
+        check_mod.params_defaults[field]
 
       val ->
         val

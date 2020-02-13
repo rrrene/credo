@@ -35,14 +35,14 @@ defmodule Credo.Check.Readability.MaxLineLength do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_length = Params.get(params, :max_length, @default_params)
+    max_length = Params.get(params, :max_length, __MODULE__)
 
-    ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
+    ignore_definitions = Params.get(params, :ignore_definitions, __MODULE__)
 
-    ignore_specs = Params.get(params, :ignore_specs, @default_params)
-    ignore_strings = Params.get(params, :ignore_strings, @default_params)
-    ignore_heredocs = Params.get(params, :ignore_heredocs, @default_params)
-    ignore_urls = Params.get(params, :ignore_urls, @default_params)
+    ignore_specs = Params.get(params, :ignore_specs, __MODULE__)
+    ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
+    ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
+    ignore_urls = Params.get(params, :ignore_urls, __MODULE__)
 
     definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
     specs = Credo.Code.prewalk(source_file, &find_specs/2)

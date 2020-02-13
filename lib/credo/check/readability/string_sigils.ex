@@ -40,7 +40,7 @@ defmodule Credo.Check.Readability.StringSigils do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
+    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
 
     case remove_heredocs_and_convert_to_ast(source_file) do
       {:ok, ast} ->

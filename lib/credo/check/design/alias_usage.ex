@@ -70,13 +70,13 @@ defmodule Credo.Check.Design.AliasUsage do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
+    excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)
 
-    excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
+    excluded_lastnames = Params.get(params, :excluded_lastnames, __MODULE__)
 
-    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
+    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, __MODULE__)
 
-    if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
+    if_called_more_often_than = Params.get(params, :if_called_more_often_than, __MODULE__)
 
     source_file
     |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
