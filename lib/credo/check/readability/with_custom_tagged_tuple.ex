@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.WithTaggedTuple do
+defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   @moduledoc false
 
   @checkdoc """
