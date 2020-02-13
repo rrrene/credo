@@ -81,6 +81,7 @@ defmodule Credo.Check do
         nil
     end)
 
+    # deprecated
     deprecated_default_params_module_attribute =
       if opts[:default_params] do
         quote do
@@ -88,11 +89,23 @@ defmodule Credo.Check do
         end
       end
 
+    # deprecated
+    deprecated_explanation_module_attribute =
+      if opts[:explanation] do
+        quote do
+          @explanation unquote(opts[:explanation])
+        end
+      end
+
+    IO.puts("1")
+
     quote do
       @behaviour Credo.Check
       @before_compile Credo.Check
 
+      # deprecated
       unquote(deprecated_default_params_module_attribute)
+      unquote(deprecated_explanation_module_attribute)
 
       alias Credo.Check
       alias Credo.Check.Params
@@ -116,10 +129,12 @@ defmodule Credo.Check do
       end
 
       def explanation do
+        # deprecated - remove module attribute
         Check.explanation_for(unquote(opts[:explanation]) || @explanation, :check)
       end
 
       def explanation_for_params do
+        # deprecated - remove module attribute
         Check.explanation_for(unquote(opts[:explanation]) || @explanation, :params) || []
       end
 
@@ -133,12 +148,9 @@ defmodule Credo.Check do
         )
       end
 
-      def params_defaults do
-        unquote(opts[:default_params]) || @default_params
-      end
-
-      def params_names do
-        Keyword.keys(params_defaults())
+      def params_defaults_fallback do
+        # deprecated - remove module attribute
+        unquote(opts[:default_params])
       end
 
       def run_on_all? do
@@ -150,12 +162,25 @@ defmodule Credo.Check do
   @doc false
   defmacro __before_compile__(env) do
     quote do
+      # deprecated
       unquote(deprecated_default_params_module_attribute(env))
+
+      def params_defaults do
+        # deprecated - remove module attribute
+        params_defaults_fallback() || @default_params
+      end
+
+      def params_names do
+        Keyword.keys(params_defaults())
+      end
     end
   end
 
+  # deprecated
   defp deprecated_default_params_module_attribute(env) do
-    if env.module |> Module.get_attribute(:default_params) |> is_nil() do
+    default_params = Module.get_attribute(env.module, :default_params)
+
+    if is_nil(default_params) do
       quote do
         @default_params []
       end
