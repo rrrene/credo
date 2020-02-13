@@ -62,7 +62,14 @@ defmodule Credo.Check do
   alias Credo.Severity
   alias Credo.SourceFile
 
-  @valid_use_opts [:base_priority, :category, :elixir_version, :run_on_all]
+  @valid_use_opts [
+    :base_priority,
+    :category,
+    :default_params,
+    :elixir_version,
+    :explanation,
+    :run_on_all
+  ]
 
   @doc false
   defmacro __using__(opts) do
@@ -74,9 +81,18 @@ defmodule Credo.Check do
         nil
     end)
 
+    deprecated_default_params_module_attribute =
+      if opts[:default_params] do
+        quote do
+          @default_params unquote(opts[:default_params])
+        end
+      end
+
     quote do
       @behaviour Credo.Check
       @before_compile Credo.Check
+
+      unquote(deprecated_default_params_module_attribute)
 
       alias Credo.Check
       alias Credo.Check.Params
@@ -99,16 +115,12 @@ defmodule Credo.Check do
         unquote(opts[:elixir_version] || ">= 0.0.1")
       end
 
-      def run_on_all? do
-        unquote(run_on_all_body(opts[:run_on_all]))
-      end
-
       def explanation do
-        Check.explanation_for(@explanation, :check)
+        Check.explanation_for(unquote(opts[:explanation]) || @explanation, :check)
       end
 
       def explanation_for_params do
-        Check.explanation_for(@explanation, :params) || []
+        Check.explanation_for(unquote(opts[:explanation]) || @explanation, :params) || []
       end
 
       def format_issue(issue_meta, issue_options) do
@@ -120,25 +132,29 @@ defmodule Credo.Check do
           __MODULE__
         )
       end
+
+      def params_defaults do
+        unquote(opts[:default_params]) || @default_params
+      end
+
+      def params_names do
+        Keyword.keys(params_defaults())
+      end
+
+      def run_on_all? do
+        unquote(run_on_all_body(opts[:run_on_all]))
+      end
     end
   end
 
   @doc false
   defmacro __before_compile__(env) do
     quote do
-      unquote(default_params_module_attribute(env))
-
-      def params_defaults do
-        @default_params
-      end
-
-      def params_names do
-        Keyword.keys(params_defaults())
-      end
+      unquote(deprecated_default_params_module_attribute(env))
     end
   end
 
-  defp default_params_module_attribute(env) do
+  defp deprecated_default_params_module_attribute(env) do
     if env.module |> Module.get_attribute(:default_params) |> is_nil() do
       quote do
         @default_params []
