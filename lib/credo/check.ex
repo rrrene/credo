@@ -81,31 +81,9 @@ defmodule Credo.Check do
         nil
     end)
 
-    # deprecated
-    deprecated_default_params_module_attribute =
-      if opts[:default_params] do
-        quote do
-          @default_params unquote(opts[:default_params])
-        end
-      end
-
-    # deprecated
-    deprecated_explanation_module_attribute =
-      if opts[:explanation] do
-        quote do
-          @explanation unquote(opts[:explanation])
-        end
-      end
-
-    IO.puts("1")
-
     quote do
       @behaviour Credo.Check
       @before_compile Credo.Check
-
-      # deprecated
-      unquote(deprecated_default_params_module_attribute)
-      unquote(deprecated_explanation_module_attribute)
 
       alias Credo.Check
       alias Credo.Check.Params
@@ -128,16 +106,6 @@ defmodule Credo.Check do
         unquote(opts[:elixir_version] || ">= 0.0.1")
       end
 
-      def explanation do
-        # deprecated - remove module attribute
-        Check.explanation_for(unquote(opts[:explanation]) || @explanation, :check)
-      end
-
-      def explanation_for_params do
-        # deprecated - remove module attribute
-        Check.explanation_for(unquote(opts[:explanation]) || @explanation, :params) || []
-      end
-
       def format_issue(issue_meta, issue_options) do
         Check.format_issue(
           issue_meta,
@@ -148,13 +116,16 @@ defmodule Credo.Check do
         )
       end
 
-      def params_defaults_fallback do
-        # deprecated - remove module attribute
+      def run_on_all? do
+        unquote(run_on_all_body(opts[:run_on_all]))
+      end
+
+      defp __default_params__ do
         unquote(opts[:default_params])
       end
 
-      def run_on_all? do
-        unquote(run_on_all_body(opts[:run_on_all]))
+      defp __explanation__ do
+        unquote(opts[:explanation])
       end
     end
   end
@@ -162,27 +133,58 @@ defmodule Credo.Check do
   @doc false
   defmacro __before_compile__(env) do
     quote do
-      # deprecated
-      unquote(deprecated_default_params_module_attribute(env))
-
       def params_defaults do
         # deprecated - remove module attribute
-        params_defaults_fallback() || @default_params
+        unquote(deprecated_function_body_for_default_params(env))
       end
 
       def params_names do
         Keyword.keys(params_defaults())
       end
+
+      defp explanation_config do
+        # deprecated - remove module attribute
+        unquote(deprecated_function_body_for_explanation(env))
+      end
+
+      def explanation do
+        # deprecated - remove module attribute
+        Check.explanation_for(explanation_config(), :check)
+      end
+
+      def explanation_for_params do
+        # deprecated - remove module attribute
+        Check.explanation_for(explanation_config(), :params) || []
+      end
     end
   end
 
   # deprecated
-  defp deprecated_default_params_module_attribute(env) do
+  defp deprecated_function_body_for_default_params(env) do
     default_params = Module.get_attribute(env.module, :default_params)
 
     if is_nil(default_params) do
       quote do
-        @default_params []
+        __default_params__()
+      end
+    else
+      quote do
+        @default_params
+      end
+    end
+  end
+
+  # deprecated
+  defp deprecated_function_body_for_explanation(env) do
+    explanation = Module.get_attribute(env.module, :explanation)
+
+    if is_nil(explanation) do
+      quote do
+        __explanation__()
+      end
+    else
+      quote do
+        @explanation
       end
     end
   end
