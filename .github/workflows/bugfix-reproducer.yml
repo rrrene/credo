@@ -1,4 +1,4 @@
-name: "Bugfix Detector (experimental)"
+name: "Reproducing Test-Case Detector (experimental)"
 
 on:
   pull_request:
