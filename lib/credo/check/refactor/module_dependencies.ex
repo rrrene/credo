@@ -1,31 +1,27 @@
 defmodule Credo.Check.Refactor.ModuleDependencies do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :normal,
+    param_defaults: [
+      max_deps: 10,
+      dependency_namespaces: [],
+      excluded_namespaces: [],
+      excluded_paths: [~r"/test/", ~r"^test/"]
+    ],
+    explanations: [
+      check: """
+      This module might be doing too much. Consider limiting the number of
+      module dependencies.
 
-  @checkdoc """
-  This module might be doing too much. Consider limiting the number of
-  module dependencies.
-
-  As always: This is just a suggestion. Check the configuration options for
-  tweaking or disabling this check.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_deps: "Maximum number of module dependencies.",
-      dependency_namespaces: "List of dependency namespaces to include in this check",
-      excluded_namespaces: "List of namespaces to exclude from this check",
-      excluded_paths: "List of paths or regex to exclude from this check"
+      As always: This is just a suggestion. Check the configuration options for
+      tweaking or disabling this check.
+      """,
+      params: [
+        max_deps: "Maximum number of module dependencies.",
+        dependency_namespaces: "List of dependency namespaces to include in this check",
+        excluded_namespaces: "List of namespaces to exclude from this check",
+        excluded_paths: "List of paths or regex to exclude from this check"
+      ]
     ]
-  ]
-
-  @default_params [
-    max_deps: 10,
-    dependency_namespaces: [],
-    excluded_namespaces: [],
-    excluded_paths: [~r"/test/", ~r"^test/"]
-  ]
-
-  use Credo.Check, base_priority: :normal
 
   alias Credo.Code.Name
   alias Credo.Code.Module

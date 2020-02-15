@@ -1,30 +1,28 @@
 defmodule Credo.Check.Refactor.CondStatements do
-  @moduledoc false
+  use Credo.Check,
+    explanations: [
+      check: """
+      Each cond statement should have 3 or more statements including the
+      "always true" statement. Otherwise an `if` and `else` construct might be more
+      appropriate.
 
-  @checkdoc """
-  Each cond statement should have 3 or more statements including the
-  "always true" statement. Otherwise an `if` and `else` construct might be more
-  appropriate.
+      Example:
 
-  Example:
+        cond do
+          x == y -> 0
+          true -> 1
+        end
 
-    cond do
-      x == y -> 0
-      true -> 1
-    end
+        # should be written as
 
-    # should be written as
+        if x == y do
+          0
+        else
+          1
+        end
 
-    if x == y do
-      0
-    else
-      1
-    end
-
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

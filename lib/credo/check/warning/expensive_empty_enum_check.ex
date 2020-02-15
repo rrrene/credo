@@ -1,23 +1,22 @@
 defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      # TODO: improve checkdoc
+      check: """
+      Checking if the size of the enum is `0` can be very expensive, since you are
+      determining the exact count of elements.
 
-  # TODO: improve checkdoc
-  @checkdoc """
-  Checking if the size of the enum is `0` can be very expensive, since you are
-  determining the exact count of elements.
+      Checking if an enum is empty should be done by using
 
-  Checking if an enum is empty should be done by using
+        Enum.empty?(enum)
 
-    Enum.empty?(enum)
+      or
 
-  or
+        list == []
 
-    list == []
-
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :high
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

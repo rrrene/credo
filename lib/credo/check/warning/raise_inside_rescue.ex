@@ -1,40 +1,39 @@
 defmodule Credo.Check.Warning.RaiseInsideRescue do
-  @moduledoc false
+  use Credo.Check,
+    explanations: [
+      check: """
+      Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace,
+      which obscures the cause of the original error.
 
-  @checkdoc """
-  Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace,
-  which obscures the cause of the original error.
+      Example:
 
-  Example:
+          # preferred
 
-      # preferred
+          try do
+            raise "oops"
+          rescue
+            error ->
+              Logger.warn("An exception has occurred")
 
-      try do
-        raise "oops"
-      rescue
-        error ->
-          Logger.warn("An exception has occurred")
+              reraise error, System.stacktrace
+          end
 
-          reraise error, System.stacktrace
-      end
+          # NOT preferred
 
-      # NOT preferred
+          try do
+            raise "oops"
+          rescue
+            error ->
+              Logger.warn("An exception has occurred")
 
-      try do
-        raise "oops"
-      rescue
-        error ->
-          Logger.warn("An exception has occurred")
-
-          raise error
-      end
-  """
-  @explanation [check: @checkdoc]
-  @def_ops [:def, :defp, :defmacro, :defmacrop]
-
-  use Credo.Check
+              raise error
+          end
+      """
+    ]
 
   alias Credo.Code.Block
+
+  @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   @doc false
   def run(source_file, params \\ []) do

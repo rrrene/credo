@@ -1,37 +1,37 @@
 defmodule Credo.Check.Warning.UnusedStringOperation do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      The result of a call to the String module's functions has to be used.
 
-  @checkdoc """
-  The result of a call to the String module's functions has to be used.
+      While this is correct ...
 
-  While this is correct ...
+          def salutation(username) do
+            username = String.downcase(username)
 
-      def salutation(username) do
-        username = String.downcase(username)
+            "Hi #\{username}"
+          end
 
-        "Hi #\{username}"
-      end
+      ... we forgot to save the downcased username in this example:
 
-  ... we forgot to save the downcased username in this example:
+          # This is bad because it does not modify the username variable!
 
-      # This is bad because it does not modify the username variable!
+          def salutation(username) do
+            String.downcase(username)
 
-      def salutation(username) do
-        String.downcase(username)
+            "Hi #\{username}"
+          end
 
-        "Hi #\{username}"
-      end
-
-  Since Elixir variables are immutable, String operations never work on the
-  variable you pass in, but return a new variable which has to be used somehow.
-  """
-  @explanation [check: @checkdoc]
-  @checked_module :String
-  @funs_with_return_value nil
-
-  use Credo.Check, base_priority: :high
+      Since Elixir variables are immutable, String operations never work on the
+      variable you pass in, but return a new variable which has to be used somehow.
+      """
+    ]
 
   alias Credo.Check.Warning.UnusedOperation
+
+  @checked_module :String
+  @funs_with_return_value nil
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(

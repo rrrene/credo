@@ -1,36 +1,34 @@
 defmodule Credo.Check.Readability.MaxLineLength do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    param_defaults: [
+      max_length: 120,
+      ignore_definitions: true,
+      ignore_heredocs: true,
+      ignore_specs: false,
+      ignore_strings: true,
+      ignore_urls: true
+    ],
+    explanations: [
+      check: """
+      Checks for the length of lines.
 
-  @checkdoc """
-  Checks for the length of lines.
-
-  Ignores function definitions and (multi-)line strings by default.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_length: "The maximum number of characters a line may consist of.",
-      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
-      ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
-      ignore_urls: "Set to `true` to ignore lines that contain urls."
+      Ignores function definitions and (multi-)line strings by default.
+      """,
+      params: [
+        max_length: "The maximum number of characters a line may consist of.",
+        ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+        ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
+        ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
+        ignore_urls: "Set to `true` to ignore lines that contain urls."
+      ]
     ]
-  ]
-  @default_params [
-    max_length: 120,
-    ignore_definitions: true,
-    ignore_heredocs: true,
-    ignore_specs: false,
-    ignore_strings: true,
-    ignore_urls: true
-  ]
-  @def_ops [:def, :defp, :defmacro]
-  @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
-
-  use Credo.Check, base_priority: :low
 
   alias Credo.Code.Heredocs
   alias Credo.Code.Strings
+
+  @def_ops [:def, :defp, :defmacro]
+  @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
 
   @doc false
   def run(source_file, params \\ []) do

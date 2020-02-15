@@ -1,35 +1,32 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    param_defaults: [allow_empty_enums: false],
+    explanations: [
+      check: """
+      Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is
+      the **preferred** way, although other styles are possible, as long as it is
+      applied consistently.
 
-  @checkdoc """
-  Don't use spaces after `(`, `[`, and `{` or before `}`, `]`, and `)`. This is
-  the **preferred** way, although other styles are possible, as long as it is
-  applied consistently.
+          # preferred
 
-      # preferred
+          Helper.format({1, true, 2}, :my_atom)
 
-      Helper.format({1, true, 2}, :my_atom)
+          # also okay
 
-      # also okay
+          Helper.format( { 1, true, 2 }, :my_atom )
 
-      Helper.format( { 1, true, 2 }, :my_atom )
-
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      allow_empty_enums:
-        "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase."
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """,
+      params: [
+        allow_empty_enums:
+          "Allows [], %{} and similar empty enum values to be used regardless of spacing throughout the codebase."
+      ]
     ]
-  ]
-  @default_params [
-    allow_empty_enums: false
-  ]
-  @collector Credo.Check.Consistency.SpaceInParentheses.Collector
 
-  use Credo.Check, run_on_all: true, base_priority: :high
+  @collector Credo.Check.Consistency.SpaceInParentheses.Collector
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do

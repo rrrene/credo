@@ -1,24 +1,19 @@
 defmodule Credo.Check.Readability.RedundantBlankLines do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    param_defaults: [max_blank_lines: 1],
+    explanations: [
+      check: """
+      Files should not have two or more consecutive blank lines.
 
-  @checkdoc """
-  Files should not have two or more consecutive blank lines.
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_blank_lines: "The maximum number of tolerated consecutive blank lines."
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """,
+      params: [
+        max_blank_lines: "The maximum number of tolerated consecutive blank lines."
+      ]
     ]
-  ]
-  @default_params [
-    max_blank_lines: 1
-  ]
-
-  use Credo.Check, base_priority: :low
 
   alias Credo.Code.Charlists
   alias Credo.Code.Heredocs

@@ -1,39 +1,39 @@
 defmodule Credo.Check.Warning.UnusedKeywordOperation do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      The result of a call to the Keyword module's functions has to be used.
 
-  @checkdoc """
-  The result of a call to the Keyword module's functions has to be used.
+      While this is correct ...
 
-  While this is correct ...
+          def clean_and_verify_options!(keywords) do
+            keywords = Keyword.delete(keywords, :debug)
 
-      def clean_and_verify_options!(keywords) do
-        keywords = Keyword.delete(keywords, :debug)
+            if Enum.length(keywords) == 0, do: raise "OMG!!!1"
 
-        if Enum.length(keywords) == 0, do: raise "OMG!!!1"
+            keywords
+          end
 
-        keywords
-      end
+      ... we forgot to save the result in this example:
 
-  ... we forgot to save the result in this example:
+          def clean_and_verify_options!(keywords) do
+            Keyword.delete(keywords, :debug)
 
-      def clean_and_verify_options!(keywords) do
-        Keyword.delete(keywords, :debug)
+            if Enum.length(keywords) == 0, do: raise "OMG!!!1"
 
-        if Enum.length(keywords) == 0, do: raise "OMG!!!1"
+            keywords
+          end
 
-        keywords
-      end
-
-  Keyword operations never work on the variable you pass in, but return a new
-  variable which has to be used somehow.
-  """
-  @explanation [check: @checkdoc]
-  @checked_module :Keyword
-  @funs_with_return_value nil
-
-  use Credo.Check, base_priority: :high
+      Keyword operations never work on the variable you pass in, but return a new
+      variable which has to be used somehow.
+      """
+    ]
 
   alias Credo.Check.Warning.UnusedOperation
+
+  @checked_module :Keyword
+  @funs_with_return_value nil
 
   def run(source_file, params \\ []) do
     UnusedOperation.run(

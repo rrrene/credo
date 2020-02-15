@@ -1,31 +1,30 @@
 defmodule Credo.Check.Readability.SinglePipe do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Pipes (`|>`) should only be used when piping data through multiple calls.
 
-  @checkdoc """
-  Pipes (`|>`) should only be used when piping data through multiple calls.
+      So while this is fine:
 
-  So while this is fine:
+          list
+          |> Enum.take(5)
+          |> Enum.shuffle
+          |> evaluate()
 
-      list
-      |> Enum.take(5)
-      |> Enum.shuffle
-      |> evaluate()
+      The code in this example ...
 
-  The code in this example ...
+          list
+          |> evaluate()
 
-      list
-      |> evaluate()
+      ... should be refactored to look like this:
 
-  ... should be refactored to look like this:
+          evaluate(list)
 
-      evaluate(list)
-
-  Using a single |> to invoke functions makes the code harder to read. Instead,
-  write a function call when a pipeline is only one function long.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :high
+      Using a single |> to invoke functions makes the code harder to read. Instead,
+      write a function call when a pipeline is only one function long.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

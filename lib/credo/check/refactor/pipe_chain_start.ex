@@ -1,38 +1,34 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
-  @moduledoc false
+  use Credo.Check,
+    param_defaults: [
+      excluded_argument_types: [],
+      excluded_functions: []
+    ],
+    explanations: [
+      check: """
+      Pipes (`|>`) can become more readable by starting with a "raw" value.
 
-  @checkdoc """
-  Pipes (`|>`) can become more readable by starting with a "raw" value.
+      So while this is easily comprehendable:
 
-  So while this is easily comprehendable:
+          list
+          |> Enum.take(5)
+          |> Enum.shuffle
+          |> pick_winner()
 
-      list
-      |> Enum.take(5)
-      |> Enum.shuffle
-      |> pick_winner()
+      This might be harder to read:
 
-  This might be harder to read:
+          Enum.take(list, 5)
+          |> Enum.shuffle
+          |> pick_winner()
 
-      Enum.take(list, 5)
-      |> Enum.shuffle
-      |> pick_winner()
-
-  As always: This is just a suggestion. Check the configuration options for
-  tweaking or disabling this check.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      excluded_functions: "All functions listed will be ignored.",
-      excluded_argument_types: "All pipes with argument types listed will be ignored."
+      As always: This is just a suggestion. Check the configuration options for
+      tweaking or disabling this check.
+      """,
+      params: [
+        excluded_functions: "All functions listed will be ignored.",
+        excluded_argument_types: "All pipes with argument types listed will be ignored."
+      ]
     ]
-  ]
-  @default_params [
-    excluded_argument_types: [],
-    excluded_functions: []
-  ]
-
-  use Credo.Check
 
   @doc false
   def run(source_file, params \\ []) do

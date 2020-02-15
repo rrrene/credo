@@ -1,23 +1,23 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValues do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Boolean operations with identical values on the left and right side are
+      most probably a logical fallacy or a copy-and-paste error.
 
-  @checkdoc """
-  Boolean operations with identical values on the left and right side are
-  most probably a logical fallacy or a copy-and-paste error.
+      Examples:
 
-  Examples:
+          x && x
+          x || x
+          x and x
+          x or x
 
-      x && x
-      x || x
-      x and x
-      x or x
+      Each of these cases behaves the same as if you were just writing `x`.
+      """
+    ]
 
-  Each of these cases behaves the same as if you were just writing `x`.
-  """
-  @explanation [check: @checkdoc]
   @ops [:and, :or, :&&, :||]
-
-  use Credo.Check, base_priority: :high
 
   @doc false
   def run(source_file, params \\ []) do

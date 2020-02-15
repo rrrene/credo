@@ -1,25 +1,22 @@
 defmodule Credo.Check.Refactor.FunctionArity do
-  @moduledoc false
+  use Credo.Check,
+    param_defaults: [max_arity: 8, ignore_defp: false],
+    explanations: [
+      check: """
+      A function can take as many parameters as needed, but even in a functional
+      language there can be too many parameters.
 
-  @checkdoc """
-  A function can take as many parameters as needed, but even in a functional
-  language there can be too many parameters.
-
-  Can optionally ignore private functions (check configuration options).
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_arity: "The maximum number of parameters which a function should take.",
-      ignore_defp: "Set to `true` to ignore private functions."
+      Can optionally ignore private functions (check configuration options).
+      """,
+      params: [
+        max_arity: "The maximum number of parameters which a function should take.",
+        ignore_defp: "Set to `true` to ignore private functions."
+      ]
     ]
-  ]
-  @default_params [max_arity: 8, ignore_defp: false]
-  @def_ops [:def, :defp, :defmacro]
-
-  use Credo.Check
 
   alias Credo.Code.Parameters
+
+  @def_ops [:def, :defp, :defmacro]
 
   @doc false
   def run(source_file, params \\ []) do

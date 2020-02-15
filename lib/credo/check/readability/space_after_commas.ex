@@ -1,43 +1,42 @@
 defmodule Credo.Check.Readability.SpaceAfterCommas do
-  @moduledoc false
+  use Credo.Check,
+    explanations: [
+      check: """
+      You can use white-space after commas to make items of lists,
+      tuples and other enumerations easier to separate from one another.
 
-  @checkdoc """
-  You can use white-space after commas to make items of lists,
-  tuples and other enumerations easier to separate from one another.
+          # preferred
 
-      # preferred
+          alias Project.{Alpha, Beta}
 
-      alias Project.{Alpha, Beta}
+          def some_func(first, second, third) do
+            list = [1, 2, 3, 4, 5]
+            # ...
+          end
 
-      def some_func(first, second, third) do
-        list = [1, 2, 3, 4, 5]
-        # ...
-      end
+          # NOT preferred - items are harder to separate
 
-      # NOT preferred - items are harder to separate
+          alias Project.{Alpha,Beta}
 
-      alias Project.{Alpha,Beta}
+          def some_func(first,second,third) do
+            list = [1,2,3,4,5]
+            # ...
+          end
 
-      def some_func(first,second,third) do
-        list = [1,2,3,4,5]
-        # ...
-      end
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-  # Matches commas followed by non-whitespace unless preceded by
-  # a question mark that is not part of a variable or function name
-  @unspaced_commas ~r/(?<!\W\?)(\,\S)/
-
-  use Credo.Check
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code.Charlists
   alias Credo.Code.Heredocs
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
+
+  # Matches commas followed by non-whitespace unless preceded by
+  # a question mark that is not part of a variable or function name
+  @unspaced_commas ~r/(?<!\W\?)(\,\S)/
 
   @doc false
   def run(source_file, params \\ []) do

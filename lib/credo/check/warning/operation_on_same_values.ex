@@ -1,24 +1,26 @@
 defmodule Credo.Check.Warning.OperationOnSameValues do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Operations on the same values always yield the same result and therefore make
+      little sense in production code.
 
-  @checkdoc """
-  Operations on the same values always yield the same result and therefore make
-  little sense in production code.
+      Examples:
 
-  Examples:
+          x == x  # always returns true
+          x <= x  # always returns true
+          x >= x  # always returns true
+          x != x  # always returns false
+          x > x   # always returns false
+          y / y   # always returns 1
+          y - y   # always returns 0
 
-      x == x  # always returns true
-      x <= x  # always returns true
-      x >= x  # always returns true
-      x != x  # always returns false
-      x > x   # always returns false
-      y / y   # always returns 1
-      y - y   # always returns 0
+      In practice they are likely the result of a debugging session or were made by
+      mistake.
+      """
+    ]
 
-  In practice they are likely the result of a debugging session or were made by
-  mistake.
-  """
-  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
   @ops ~w(== >= <= != > < / -)a
   @ops_and_constant_results [
@@ -31,8 +33,6 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
     {:/, "Operation", 1},
     {:-, "Operation", 0}
   ]
-
-  use Credo.Check, base_priority: :high
 
   @doc false
   def run(source_file, params \\ []) do

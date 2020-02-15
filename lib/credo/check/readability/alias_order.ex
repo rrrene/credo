@@ -1,46 +1,45 @@
 defmodule Credo.Check.Readability.AliasOrder do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      Alphabetically ordered lists are more easily scannable by the read.
 
-  @checkdoc """
-  Alphabetically ordered lists are more easily scannable by the read.
+          # preferred
 
-      # preferred
+          alias ModuleA
+          alias ModuleB
+          alias ModuleC
 
-      alias ModuleA
-      alias ModuleB
-      alias ModuleC
+          # NOT preferred
 
-      # NOT preferred
+          alias ModuleA
+          alias ModuleC
+          alias ModuleB
 
-      alias ModuleA
-      alias ModuleC
-      alias ModuleB
+      Alias should be alphabetically ordered among their group:
 
-  Alias should be alphabetically ordered among their group:
+          # preferred
 
-      # preferred
+          alias ModuleC
+          alias ModuleD
 
-      alias ModuleC
-      alias ModuleD
+          alias ModuleA
+          alias ModuleB
 
-      alias ModuleA
-      alias ModuleB
+          # NOT preferred
 
-      # NOT preferred
+          alias ModuleC
+          alias ModuleD
 
-      alias ModuleC
-      alias ModuleD
+          alias ModuleB
+          alias ModuleA
 
-      alias ModuleB
-      alias ModuleA
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :low
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code
   alias Credo.Code.Name
