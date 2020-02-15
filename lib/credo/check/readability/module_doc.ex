@@ -1,6 +1,11 @@
 defmodule Credo.Check.Readability.ModuleDoc do
   use Credo.Check,
-    explanation: [
+    param_defaults: [
+      ignore_names: [
+        ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
+      ]
+    ],
+    explanations: [
       check: """
       Every module should contain comprehensive documentation.
 
@@ -36,11 +41,6 @@ defmodule Credo.Check.Readability.ModuleDoc do
       """,
       params: [
         ignore_names: "All modules matching this regex (or list of regexes) will be ignored."
-      ]
-    ],
-    default_params: [
-      ignore_names: [
-        ~r/(\.\w+Controller|\.Endpoint|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
       ]
     ]
 

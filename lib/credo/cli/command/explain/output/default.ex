@@ -221,8 +221,8 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     print_params_explanation(
       outer_color,
       check_name,
-      check.explanation_for_params,
-      check.params_defaults
+      check.explanations()[:params],
+      check.param_defaults
     )
   end
 

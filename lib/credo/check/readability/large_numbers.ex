@@ -1,30 +1,36 @@
 defmodule Credo.Check.Readability.LargeNumbers do
-  @moduledoc false
+  use Credo.Check
 
-  @checkdoc """
-  Numbers can contain underscores for readability purposes.
-  These do not affect the value of the number, but can help read large numbers
-  more easily.
+  def base_priority do
+    :high
+  end
 
-      141592654 # how large is this number?
+  def explanations do
+    [
+      check: """
+      Numbers can contain underscores for readability purposes.
+      These do not affect the value of the number, but can help read large numbers
+      more easily.
 
-      141_592_654 # ah, it's in the hundreds of millions!
+          141592654 # how large is this number?
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      only_greater_than: "The check only reports numbers greater than this."
+          141_592_654 # ah, it's in the hundreds of millions!
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """,
+      params: [
+        only_greater_than: "The check only reports numbers greater than this."
+      ]
     ]
-  ]
-  @default_params [
-    only_greater_than: 9_999
-  ]
+  end
 
-  use Credo.Check, base_priority: :high
+  def param_defaults do
+    [only_greater_than: 9_999]
+  end
+
+  @moduledoc false
 
   @doc false
   def run(source_file, params \\ []) do

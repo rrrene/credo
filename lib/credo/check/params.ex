@@ -17,7 +17,7 @@ defmodule Credo.Check.Params do
   def get(params, field, check_mod) do
     case params[field] do
       nil ->
-        check_mod.params_defaults[field]
+        check_mod.param_defaults[field]
 
       val ->
         val

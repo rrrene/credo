@@ -34,14 +34,29 @@ defmodule Credo.Check do
   """
   @callback category() :: atom
 
+  @doc """
+  Returns the required Elixir version for the check.
+  """
+  @callback elixir_version() :: String.t()
+
+  @doc """
+  Returns the explanations for the check and params as a keyword list.
+  """
+  @callback explanations() :: Keyword.t()
+
+  @doc """
+  Returns the default values for the check's params as a keyword list.
+  """
+  @callback param_defaults() :: Keyword.t()
+
   # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: list()
 
+  @doc """
+  Returns wether or not this check runs on all source files.
+  """
   @callback run_on_all?() :: boolean
 
-  @callback explanation() :: String.t()
-
-  @callback explanation_for_params() :: Keyword.t()
-
+  @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
 
@@ -65,9 +80,9 @@ defmodule Credo.Check do
   @valid_use_opts [
     :base_priority,
     :category,
-    :default_params,
+    :param_defaults,
     :elixir_version,
-    :explanation,
+    :explanations,
     :run_on_all
   ]
 
@@ -80,6 +95,68 @@ defmodule Credo.Check do
       _ ->
         nil
     end)
+
+    def_base_priority =
+      if opts[:base_priority] do
+        quote do
+          def base_priority, do: unquote(Priority.to_integer(opts[:base_priority]))
+        end
+      else
+        quote do
+          def base_priority, do: 0
+        end
+      end
+
+    def_category =
+      if opts[:category] do
+        quote do
+          def category, do: unquote(category_body(opts[:category]))
+        end
+      else
+        quote do
+          def category, do: unquote(category_body(nil))
+        end
+      end
+
+    def_elixir_version =
+      if opts[:elixir_version] do
+        quote do
+          def elixir_version do
+            unquote(opts[:elixir_version])
+          end
+        end
+      else
+        quote do
+          def elixir_version, do: ">= 0.0.1"
+        end
+      end
+
+    def_run_on_all? =
+      if opts[:run_on_all] do
+        quote do
+          def run_on_all?, do: unquote(opts[:run_on_all] == true)
+        end
+      else
+        quote do
+          def run_on_all?, do: false
+        end
+      end
+
+    def_param_defaults =
+      if opts[:param_defaults] do
+        quote do
+          def param_defaults, do: unquote(opts[:param_defaults])
+        end
+      end
+
+    def_explanations =
+      if opts[:explanations] do
+        quote do
+          def explanations do
+            unquote(opts[:explanations])
+          end
+        end
+      end
 
     quote do
       @behaviour Credo.Check
@@ -94,17 +171,12 @@ defmodule Credo.Check do
       alias Credo.Severity
       alias Credo.SourceFile
 
-      def base_priority do
-        unquote(Priority.to_integer(opts[:base_priority]))
-      end
-
-      def category do
-        unquote(category_body(opts[:category]) || :unknown)
-      end
-
-      def elixir_version do
-        unquote(opts[:elixir_version] || ">= 0.0.1")
-      end
+      unquote(def_base_priority)
+      unquote(def_category)
+      unquote(def_elixir_version)
+      unquote(def_run_on_all?)
+      unquote(def_param_defaults)
+      unquote(def_explanations)
 
       def format_issue(issue_meta, issue_options) do
         Check.format_issue(
@@ -116,75 +188,77 @@ defmodule Credo.Check do
         )
       end
 
-      def run_on_all? do
-        unquote(run_on_all_body(opts[:run_on_all]))
-      end
-
-      defp __default_params__ do
-        unquote(opts[:default_params])
-      end
-
-      defp __explanation__ do
-        unquote(opts[:explanation])
-      end
+      defoverridable(Credo.Check)
     end
   end
 
   @doc false
   defmacro __before_compile__(env) do
     quote do
+      unquote(deprecated_def_default_params(env))
+      unquote(deprecated_def_explanations(env))
+
+      def param_names do
+        Keyword.keys(param_defaults())
+      end
+
+      @deprecated "Use param_defaults/1 instead"
       def params_defaults do
         # deprecated - remove module attribute
-        unquote(deprecated_function_body_for_default_params(env))
+        param_defaults()
       end
 
+      @deprecated "Use param_names/1 instead"
       def params_names do
-        Keyword.keys(params_defaults())
+        param_names()
       end
 
-      defp explanation_config do
-        # deprecated - remove module attribute
-        unquote(deprecated_function_body_for_explanation(env))
-      end
-
+      @deprecated "Use explanations()[:check] instead"
       def explanation do
         # deprecated - remove module attribute
-        Check.explanation_for(explanation_config(), :check)
+        Check.explanation_for(explanations(), :check)
       end
 
+      @deprecated "Use explanations()[:params] instead"
       def explanation_for_params do
         # deprecated - remove module attribute
-        Check.explanation_for(explanation_config(), :params) || []
+        Check.explanation_for(explanations(), :params) || []
       end
+
+      defoverridable(Credo.Check)
     end
   end
 
-  # deprecated
-  defp deprecated_function_body_for_default_params(env) do
+  # deprecated - remove once we ditch @default_params
+  defp deprecated_def_default_params(env) do
     default_params = Module.get_attribute(env.module, :default_params)
 
-    if is_nil(default_params) do
+    if not is_nil(default_params) do
       quote do
-        __default_params__()
+        def param_defaults do
+          @default_params
+        end
       end
     else
       quote do
-        @default_params
+        def param_defaults, do: []
       end
     end
   end
 
-  # deprecated
-  defp deprecated_function_body_for_explanation(env) do
+  # deprecated - remove once we ditch @explanation
+  defp deprecated_def_explanations(env) do
     explanation = Module.get_attribute(env.module, :explanation)
 
-    if is_nil(explanation) do
+    if not is_nil(explanation) do
       quote do
-        __explanation__()
+        def explanations do
+          @explanation
+        end
       end
     else
       quote do
-        @explanation
+        def explanations, do: []
       end
     end
   end
@@ -357,7 +431,4 @@ defmodule Credo.Check do
   end
 
   def to_exit_status(value), do: value
-
-  defp run_on_all_body(true), do: true
-  defp run_on_all_body(_), do: false
 end
