@@ -18,10 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-<<<<<<< HEAD
-
-=======
->>>>>>> remove-mandatory-module-attributes
       - uses: actions/setup-elixir@v1
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
         with:
@@ -30,7 +26,6 @@ jobs:
 
       - run: mix deps.get
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-<<<<<<< HEAD
 
       - run: mix deps.compile
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
@@ -46,16 +41,3 @@ jobs:
 
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
-=======
-      - run: mix deps.compile
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-      - run: mix compile
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-      - run: mkdir -p tmp
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-      - run: git clone ${{matrix.repo_url}} tmp/${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-      - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
->>>>>>> remove-mandatory-module-attributes
