@@ -11,7 +11,7 @@ defmodule Credo.Code.CharlistsTest do
     # '
 
     \"\"\"
-    y = 'also: # TODO: no comment here'
+    inside_heredoc = 'also: # TODO: no comment here'
     \"\"\"
 
     'also: # TODO: no comment here as well'
@@ -24,7 +24,7 @@ defmodule Credo.Code.CharlistsTest do
     # '
 
     \"\"\"
-    y = 'also: # TODO: no comment here'
+    inside_heredoc = 'also: # TODO: no comment here'
     \"\"\"
 
     '                                     '
