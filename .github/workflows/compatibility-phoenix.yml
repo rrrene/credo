@@ -7,7 +7,7 @@ on:
 jobs:
   test_on_source:
     runs-on: ubuntu-latest
-    name: Run Credo on Phoenix source [${{matrix.repo_branch}} / OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}]
+    name: "[${{matrix.otp}}/${{matrix.elixir}}] Phoenix ${{matrix.repo_branch}} source code analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
         otp: [20.3, 21.3, 22.2]
@@ -17,27 +17,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - uses: actions/setup-elixir@v1
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+
       - run: mix deps.get
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mix deps.compile
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mix compile
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mkdir -p tmp
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: git clone ${{matrix.repo_url}} tmp/${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
   test_on_new_project:
     runs-on: ubuntu-latest
-    name: Run Credo on new Phoenix app [OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}]
+    name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
         otp: [20.3, 21.3, 22.2]
@@ -45,16 +52,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - uses: actions/setup-elixir@v1
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+
       - run: mix deps.get
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mix deps.compile
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: mix compile
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+
       - run: ./test/test_phoenix_compatibility.sh
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
