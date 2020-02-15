@@ -3,6 +3,23 @@ defmodule Credo.Code.CharlistsTest do
 
   alias Credo.Code.Charlists
 
+  test "it should return the source unchanged if there are no charlists" do
+    source = """
+    "it should report a violation if the with doesn't start with <- clauses"
+    \"\"\"
+    def some_function(parameter1, parameter2) do
+      with IO.puts("not a <- clause"),
+           :ok <- parameter1 do
+        parameter2
+      end
+    end
+    \"\"\"
+    ~s("with" doesn't start with a <- clause)
+    """
+
+    assert source == Charlists.replace_with_spaces(source)
+  end
+
   test "it should return the source without string literals 2" do
     source = """
     x = "this 'should not be' removed!"

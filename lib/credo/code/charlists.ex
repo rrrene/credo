@@ -232,12 +232,14 @@ defmodule Credo.Code.Charlists do
     end
 
     defp parse_string_sigil(
-           <<_::utf8, t::binary>>,
+           str,
            acc,
            unquote(sigil_end),
            replacement
          ) do
-      parse_string_sigil(t, acc <> replacement, unquote(sigil_end), replacement)
+      {h, t} = String.next_codepoint(str)
+
+      parse_string_sigil(t, acc <> h, unquote(sigil_end), replacement)
     end
   end
 
