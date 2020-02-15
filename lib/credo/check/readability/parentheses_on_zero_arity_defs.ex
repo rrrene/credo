@@ -1,39 +1,40 @@
 defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    param_defaults: [parens: false],
+    explanations: [
+      check: """
+      Either use parentheses or not when defining a function with no arguments.
 
-  @checkdoc """
-  Either use parentheses or not when defining a function with no arguments.
-
-  By default, this check enforces no parentheses, so zero-arity function
-  and macro definitions should look like this:
+      By default, this check enforces no parentheses, so zero-arity function
+      and macro definitions should look like this:
 
       def summer? do
         # ...
       end
 
-  If the `:parens` option is set to `true` for this check, then the check
-  enforces zero-arity function and macro definitions to have parens:
+      If the `:parens` option is set to `true` for this check, then the check
+      enforces zero-arity function and macro definitions to have parens:
 
       def summer?() do
         # ...
       end
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-  @def_ops [:def, :defp, :defmacro, :defmacrop]
-
-  @default_params [parens: false]
-
-  use Credo.Check, base_priority: :low
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Check.Params
 
+  @moduledoc false
+
+  @def_ops [:def, :defp, :defmacro, :defmacrop]
+
   @doc false
   def run(source_file, params \\ []) do
-    parens? = Params.get(params, :parens, @default_params)
+    parens? = Params.get(params, :parens, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, parens?))

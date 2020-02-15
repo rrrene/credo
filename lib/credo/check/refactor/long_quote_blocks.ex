@@ -1,86 +1,83 @@
 defmodule Credo.Check.Refactor.LongQuoteBlocks do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    param_defaults: [max_line_count: 150, ignore_comments: false],
+    explanations: [
+      check: """
+      Long `quote` blocks are generally an indication that too much is done inside
+      them.
 
-  @checkdoc """
-  Long `quote` blocks are generally an indication that too much is done inside
-  them.
+      Let's look at why this is problematic:
 
-  Let's look at why this is problematic:
+          defmodule MetaCommand do
+            def __using__(opts \\\\ []) do
+              modes = opts[:modes]
+              command_name = opts[:command_name]
 
-      defmodule MetaCommand do
-        def __using__(opts \\\\ []) do
-          modes = opts[:modes]
-          command_name = opts[:command_name]
+              quote do
+                def run(filename) do
+                  contents =
+                    if File.exists?(filename) do
+                      {:ok, file} = File.open(filename, unquote(modes))
+                      {:ok, contents} = IO.read(file, :line)
+                      File.close(file)
+                      contents
+                    else
+                      ""
+                    end
 
-          quote do
-            def run(filename) do
-              contents =
-                if File.exists?(filename) do
-                  {:ok, file} = File.open(filename, unquote(modes))
-                  {:ok, contents} = IO.read(file, :line)
-                  File.close(file)
-                  contents
-                else
-                  ""
+                  case contents do
+                    "" ->
+                      # ...
+                    unquote(command_name) <> rest ->
+                      # ...
+                  end
                 end
 
-              case contents do
-                "" ->
-                  # ...
-                unquote(command_name) <> rest ->
-                  # ...
+                # ...
+              end
+            end
+          end
+
+      A cleaner solution would be to call "regular" functions outside the
+      `quote` block to perform the actual work.
+
+          defmodule MyMetaCommand do
+            def __using__(opts \\\\ []) do
+              modes = opts[:modes]
+              command_name = opts[:command_name]
+
+              quote do
+                def run(filename) do
+                  MyMetaCommand.run_on_file(filename, unquote(modes), unquote(command_name))
+                end
+
+                # ...
               end
             end
 
-            # ...
-          end
-        end
-      end
-
-  A cleaner solution would be to call "regular" functions outside the
-  `quote` block to perform the actual work.
-
-      defmodule MyMetaCommand do
-        def __using__(opts \\\\ []) do
-          modes = opts[:modes]
-          command_name = opts[:command_name]
-
-          quote do
-            def run(filename) do
-              MyMetaCommand.run_on_file(filename, unquote(modes), unquote(command_name))
+            def run_on_file(filename, modes, command_name) do
+              contents =
+                # actual implementation
             end
-
-            # ...
           end
-        end
 
-        def run_on_file(filename, modes, command_name) do
-          contents =
-            # actual implementation
-        end
-      end
-
-  This way it is easier to reason about what is actually happening. And to debug
-  it.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_line_count: "The maximum number of lines a quote block should be allowed to have.",
-      ignore_comments: "Ignores comments when counting the lines of a `quote` block."
+      This way it is easier to reason about what is actually happening. And to debug
+      it.
+      """,
+      params: [
+        max_line_count: "The maximum number of lines a quote block should be allowed to have.",
+        ignore_comments: "Ignores comments when counting the lines of a `quote` block."
+      ]
     ]
-  ]
-  @default_params [max_line_count: 150, ignore_comments: false]
-
-  use Credo.Check, base_priority: :high
 
   alias Credo.IssueMeta
 
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_line_count = Params.get(params, :max_line_count, @default_params)
-    ignore_comments = Params.get(params, :ignore_comments, @default_params)
+    max_line_count = Params.get(params, :max_line_count, __MODULE__)
+    ignore_comments = Params.get(params, :ignore_comments, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,

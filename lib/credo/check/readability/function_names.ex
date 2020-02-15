@@ -1,34 +1,34 @@
 defmodule Credo.Check.Readability.FunctionNames do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Function, macro, and guard names are always written in snake_case in Elixir.
 
-  @checkdoc """
-  Function, macro, and guard names are always written in snake_case in Elixir.
+          # snake_case
 
-      # snake_case
+          def handle_incoming_message(message) do
+          end
 
-      def handle_incoming_message(message) do
-      end
+          # not snake_case
 
-      # not snake_case
+          def handleIncomingMessage(message) do
+          end
 
-      def handleIncomingMessage(message) do
-      end
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
+  alias Credo.Code.Name
+
   @def_ops [:def, :defp, :defmacro, :defmacrop, :defguard, :defguardp]
   @all_sigil_chars ~w(a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z)
   @all_sigil_atoms Enum.map(@all_sigil_chars, &:"sigil_#{&1}")
 
   # all non-special-form operators
   @all_nonspecial_operators ~W(! && ++ -- .. <> =~ @ |> || != !== * + - / <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~)a
-
-  use Credo.Check, base_priority: :high
-
-  alias Credo.Code.Name
 
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do

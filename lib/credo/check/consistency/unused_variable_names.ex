@@ -1,17 +1,18 @@
 defmodule Credo.Check.Consistency.UnusedVariableNames do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Elixir allows us to use `_` as a name for variables that are not meant to be
+      used. But it’s a common practice to give these variables meaningful names
+      anyway (`_user` instead of `_`), but some people prefer to name them all `_`.
 
-  @checkdoc """
-  Elixir allows us to use `_` as a name for variables that are not meant to be
-  used. But it’s a common practice to give these variables meaningful names
-  anyway (`_user` instead of `_`), but some people prefer to name them all `_`.
+      A single style should be present in the same codebase.
+      """
+    ]
 
-  A single style should be present in the same codebase.
-  """
-  @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.UnusedVariableNames.Collector
-
-  use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do

@@ -1,28 +1,27 @@
 defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Unless blocks should avoid having a negated condition.
 
-  @checkdoc """
-  Unless blocks should avoid having a negated condition.
+      The code in this example ...
 
-  The code in this example ...
+          unless !allowed? do
+            proceed_as_planned()
+          end
 
-      unless !allowed? do
-        proceed_as_planned()
-      end
+      ... should be refactored to look like this:
 
-  ... should be refactored to look like this:
+          if allowed? do
+            proceed_as_planned()
+          end
 
-      if allowed? do
-        proceed_as_planned()
-      end
-
-  The reason for this is not a technical but a human one. It is pretty difficult
-  to wrap your head around a block of code that is executed if a negated
-  condition is NOT met. See what I mean?
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :high
+      The reason for this is not a technical but a human one. It is pretty difficult
+      to wrap your head around a block of code that is executed if a negated
+      condition is NOT met. See what I mean?
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

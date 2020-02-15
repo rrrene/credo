@@ -1,27 +1,27 @@
 defmodule Credo.Check.Refactor.MapInto do
-  @moduledoc false
-
-  @checkdoc """
-  `Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`.
-
-  This should be refactored:
-
-      [:apple, :banana, :carrot]
-      |> Enum.map(&({&1, to_string(&1)}))
-      |> Enum.into(%{})
-
-  to look like this:
-
-      Enum.into([:apple, :banana, :carrot], %{}, &({&1, to_string(&1)}))
-
-  The reason for this is performance, because the separate calls to
-  `Enum.map/2` and `Enum.into/2` require two iterations whereas
-  `Enum.into/3` only requires one.
-  """
-  @explanation [check: @checkdoc]
-
   # only avaible in Elixir < 1.8 since performance improvements have since made this check obsolete
-  use Credo.Check, base_priority: :high, elixir_version: "< 1.8.0"
+  use Credo.Check,
+    base_priority: :high,
+    elixir_version: "< 1.8.0",
+    explanations: [
+      check: """
+      `Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`.
+
+      This should be refactored:
+
+          [:apple, :banana, :carrot]
+          |> Enum.map(&({&1, to_string(&1)}))
+          |> Enum.into(%{})
+
+      to look like this:
+
+          Enum.into([:apple, :banana, :carrot], %{}, &({&1, to_string(&1)}))
+
+      The reason for this is performance, because the separate calls to
+      `Enum.map/2` and `Enum.into/2` require two iterations whereas
+      `Enum.into/3` only requires one.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

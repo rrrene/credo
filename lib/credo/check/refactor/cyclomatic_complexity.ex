@@ -1,22 +1,21 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexity do
-  @moduledoc false
+  use Credo.Check,
+    param_defaults: [max_complexity: 9],
+    explanations: [
+      check: """
+      Cyclomatic complexity is a software complexity metric closely correlated with
+      coding errors.
 
-  @checkdoc """
-  Cyclomatic complexity is a software complexity metric closely correlated with
-  coding errors.
-
-  If a function feels like it's gotten too complex, it more often than not also
-  has a high CC value. So, if anything, this is useful to convince team members
-  and bosses of a need to refactor parts of the code based on "objective"
-  metrics.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_complexity: "The maximum cyclomatic complexity a function should have."
+      If a function feels like it's gotten too complex, it more often than not also
+      has a high CC value. So, if anything, this is useful to convince team members
+      and bosses of a need to refactor parts of the code based on "objective"
+      metrics.
+      """,
+      params: [
+        max_complexity: "The maximum cyclomatic complexity a function should have."
+      ]
     ]
-  ]
-  @default_params [max_complexity: 9]
+
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
   @double_condition_ops [:if, :unless, :for, :try, :and, :or, :&&, :||]
@@ -38,12 +37,10 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     cond: 1
   ]
 
-  use Credo.Check
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_complexity = Params.get(params, :max_complexity, @default_params)
+    max_complexity = Params.get(params, :max_complexity, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,

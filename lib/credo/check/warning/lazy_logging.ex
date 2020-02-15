@@ -1,37 +1,36 @@
 defmodule Credo.Check.Warning.LazyLogging do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    elixir_version: "< 1.7.0",
+    param_defaults: [
+      ignore: [:error, :warn, :info]
+    ],
+    explanations: [
+      check: """
+      Ensures laziness of Logger calls.
 
-  @checkdoc """
-  Ensures laziness of Logger calls.
+      You will want to wrap expensive logger calls into a zero argument
+      function (`fn -> "string that gets logged" end`).
 
-  You will want to wrap expensive logger calls into a zero argument
-  function (`fn -> "string that gets logged" end`).
+      Example:
 
-  Example:
+          # preferred
 
-      # preferred
+          Logger.debug fn ->
+            "This happened: \#{expensive_calculation(arg1, arg2)}"
+          end
 
-      Logger.debug fn ->
-        "This happened: \#{expensive_calculation(arg1, arg2)}"
-      end
+          # NOT preferred
+          # the interpolation is executed whether or not the info is logged
 
-      # NOT preferred
-      # the interpolation is executed whether or not the info is logged
-
-      Logger.debug "This happened: \#{expensive_calculation(arg1, arg2)}"
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      ignore: "Do not raise an issue for these Logger calls."
+          Logger.debug "This happened: \#{expensive_calculation(arg1, arg2)}"
+      """,
+      params: [
+        ignore: "Do not raise an issue for these Logger calls."
+      ]
     ]
-  ]
-  @logger_functions [:debug, :info, :warn, :error]
-  @default_params [
-    ignore: [:error, :warn, :info]
-  ]
 
-  use Credo.Check, base_priority: :high, elixir_version: "< 1.7.0"
+  @logger_functions [:debug, :info, :warn, :error]
 
   @doc false
   def run(source_file, params \\ []) do
@@ -90,7 +89,7 @@ defmodule Credo.Check.Warning.LazyLogging do
 
   defp find_issue(fun_name, arguments, meta, issue_meta) do
     params = IssueMeta.params(issue_meta)
-    ignored_functions = Params.get(params, :ignore, @default_params)
+    ignored_functions = Params.get(params, :ignore, __MODULE__)
 
     unless Enum.member?(ignored_functions, fun_name) do
       issue_for_call(arguments, meta, issue_meta)

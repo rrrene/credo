@@ -1,29 +1,28 @@
 defmodule Credo.Check.Readability.ParenthesesInCondition do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Because `if` and `unless` are macros, the preferred style is to not use
+      parentheses around conditions.
 
-  @checkdoc """
-  Because `if` and `unless` are macros, the preferred style is to not use
-  parentheses around conditions.
+          # preferred
 
-      # preferred
+          if valid?(username) do
+            # ...
+          end
 
-      if valid?(username) do
-        # ...
-      end
+          # NOT preferred
 
-      # NOT preferred
+          if( valid?(username) ) do
+            # ...
+          end
 
-      if( valid?(username) ) do
-        # ...
-      end
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :high
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

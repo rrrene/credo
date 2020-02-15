@@ -1,41 +1,38 @@
 defmodule Credo.Check.Refactor.ABCSize do
-  @moduledoc false
+  use Credo.Check,
+    param_defaults: [
+      max_size: 30,
+      excluded_functions: []
+    ],
+    explanations: [
+      check: """
+      The ABC size describes a metric based on assignments, branches and conditions.
 
-  @checkdoc """
-  The ABC size describes a metric based on assignments, branches and conditions.
+      A high ABC size is a hint that a function might be doing "more" than it
+      should.
 
-  A high ABC size is a hint that a function might be doing "more" than it
-  should.
-
-  As always: Take any metric with a grain of salt. Since this one was originally
-  introduced for C, C++ and Java, we still have to see whether or not this can
-  be a useful metric in a declarative language like Elixir.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_size: "The maximum ABC size a function should have.",
-      excluded_functions: "All functions listed will be ignored."
+      As always: Take any metric with a grain of salt. Since this one was originally
+      introduced for C, C++ and Java, we still have to see whether or not this can
+      be a useful metric in a declarative language like Elixir.
+      """,
+      params: [
+        max_size: "The maximum ABC size a function should have.",
+        excluded_functions: "All functions listed will be ignored."
+      ]
     ]
-  ]
-  @default_params [
-    max_size: 30,
-    excluded_functions: []
-  ]
+
   @ecto_functions ["where", "from", "select", "join"]
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
   @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}]
 
-  use Credo.Check
-
   @doc false
   def run(source_file, params \\ []) do
     ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)
-    max_abc_size = Params.get(params, :max_size, @default_params)
-    excluded_functions = Params.get(params, :excluded_functions, @default_params)
+    max_abc_size = Params.get(params, :max_size, __MODULE__)
+    excluded_functions = Params.get(params, :excluded_functions, __MODULE__)
 
     excluded_functions =
       if ignore_ecto? do

@@ -1,56 +1,9 @@
 defmodule Credo.Check.Design.AliasUsage do
-  @moduledoc false
-
-  @checkdoc """
-  Functions from other modules should be used via an alias if the module's
-  namespace is not top-level.
-
-  While this is completely fine:
-
-      defmodule MyApp.Web.Search do
-        def twitter_mentions do
-          MyApp.External.TwitterAPI.search(...)
-        end
-      end
-
-  ... you might want to refactor it to look like this:
-
-      defmodule MyApp.Web.Search do
-        alias MyApp.External.TwitterAPI
-
-        def twitter_mentions do
-          TwitterAPI.search(...)
-        end
-      end
-
-  The thinking behind this is that you can see the dependencies of your module
-  at a glance. So if you are attempting to build a medium to large project,
-  this can help you to get your boundaries/layers/contracts right.
-
-  As always: This is just a suggestion. Check the configuration options for
-  tweaking or disabling this check.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      excluded_namespaces: "List of namespaces to be excluded for this check.",
-      excluded_lastnames: "List of lastnames to be excluded for this check.",
-      if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
-      if_called_more_often_than: "Only raise an issue if a module is called more often than this."
-    ]
-  ]
-  @default_params [
-    excluded_namespaces: [
-      "File",
-      "IO",
-      "Inspect",
-      "Kernel",
-      "Macro",
-      "Supervisor",
-      "Task",
-      "Version"
-    ],
-    excluded_lastnames: ~w[Access Agent Application Atom Base Behaviour
+  use Credo.Check,
+    base_priority: :normal,
+    param_defaults: [
+      excluded_namespaces: ~w[File IO Inspect Kernel Macro Supervisor Task Version],
+      excluded_lastnames: ~w[Access Agent Application Atom Base Behaviour
                               Bitwise Code Date DateTime Dict Enum Exception
                               File Float GenEvent GenServer HashDict HashSet
                               Integer IO Kernel Keyword List Macro Map MapSet
@@ -58,11 +11,47 @@ defmodule Credo.Check.Design.AliasUsage do
                               Process Protocol Range Record Regex Registry Set
                               Stream String StringIO Supervisor System Task Time
                               Tuple URI Version],
-    if_nested_deeper_than: 0,
-    if_called_more_often_than: 0
-  ]
+      if_nested_deeper_than: 0,
+      if_called_more_often_than: 0
+    ],
+    explanations: [
+      check: """
+      Functions from other modules should be used via an alias if the module's
+      namespace is not top-level.
 
-  use Credo.Check, base_priority: :normal
+      While this is completely fine:
+
+          defmodule MyApp.Web.Search do
+            def twitter_mentions do
+              MyApp.External.TwitterAPI.search(...)
+            end
+          end
+
+      ... you might want to refactor it to look like this:
+
+          defmodule MyApp.Web.Search do
+            alias MyApp.External.TwitterAPI
+
+            def twitter_mentions do
+              TwitterAPI.search(...)
+            end
+          end
+
+      The thinking behind this is that you can see the dependencies of your module
+      at a glance. So if you are attempting to build a medium to large project,
+      this can help you to get your boundaries/layers/contracts right.
+
+      As always: This is just a suggestion. Check the configuration options for
+      tweaking or disabling this check.
+      """,
+      params: [
+        excluded_namespaces: "List of namespaces to be excluded for this check.",
+        excluded_lastnames: "List of lastnames to be excluded for this check.",
+        if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
+        if_called_more_often_than:
+          "Only raise an issue if a module is called more often than this."
+      ]
+    ]
 
   alias Credo.Code.Name
 
@@ -70,13 +59,13 @@ defmodule Credo.Check.Design.AliasUsage do
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    excluded_namespaces = Params.get(params, :excluded_namespaces, @default_params)
+    excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)
 
-    excluded_lastnames = Params.get(params, :excluded_lastnames, @default_params)
+    excluded_lastnames = Params.get(params, :excluded_lastnames, __MODULE__)
 
-    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, @default_params)
+    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, __MODULE__)
 
-    if_called_more_often_than = Params.get(params, :if_called_more_often_than, @default_params)
+    if_called_more_often_than = Params.get(params, :if_called_more_often_than, __MODULE__)
 
     source_file
     |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))

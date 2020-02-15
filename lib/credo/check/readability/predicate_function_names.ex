@@ -1,37 +1,37 @@
 defmodule Credo.Check.Readability.PredicateFunctionNames do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Predicate functions/macros should be named accordingly:
 
-  @checkdoc """
-  Predicate functions/macros should be named accordingly:
+      * For functions, they should end in a question mark.
 
-  * For functions, they should end in a question mark.
+          # preferred
 
-      # preferred
+          defp user?(cookie) do
+          end
 
-      defp user?(cookie) do
-      end
+          defp has_attachment?(mail) do
+          end
 
-      defp has_attachment?(mail) do
-      end
+          # NOT preferred
 
-      # NOT preferred
+          defp is_user?(cookie) do
+          end
 
-      defp is_user?(cookie) do
-      end
+          defp is_user(cookie) do
+          end
 
-      defp is_user(cookie) do
-      end
+      * For guard-safe macros they should have the prefix `is_` and not end in a question mark.
 
-  * For guard-safe macros they should have the prefix `is_` and not end in a question mark.
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
-
-  use Credo.Check, base_priority: :high
 
   @doc false
   def run(source_file, params \\ []) do

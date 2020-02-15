@@ -1,19 +1,18 @@
 defmodule Credo.Check.Readability.TrailingBlankLine do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      Files should end in a trailing blank line.
 
-  @checkdoc """
-  Files should end in a trailing blank line.
+      This is mostly for historical reasons: every text file should end with a \\n,
+      or newline since this acts as `eol` or the end of the line character.
 
-  This is mostly for historical reasons: every text file should end with a \\n,
-  or newline since this acts as `eol` or the end of the line character.
+      See also: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 
-  See also: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
-
-  Most text editors ensure this "final newline" automatically.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :low
+      Most text editors ensure this "final newline" automatically.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

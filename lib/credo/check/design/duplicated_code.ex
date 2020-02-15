@@ -1,47 +1,45 @@
 defmodule Credo.Check.Design.DuplicatedCode do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :higher,
+    param_defaults: [
+      mass_threshold: 40,
+      nodes_threshold: 2,
+      excluded_macros: []
+    ],
+    explanations: [
+      check: """
+      Code should not be copy-pasted in a codebase when there is room to abstract
+      the copied functionality in a meaningful way.
 
-  @checkdoc """
-  Code should not be copy-pasted in a codebase when there is room to abstract
-  the copied functionality in a meaningful way.
+      That said, you should by no means "ABSTRACT ALL THE THINGS!".
 
-  That said, you should by no means "ABSTRACT ALL THE THINGS!".
+      Sometimes it can serve a purpose to have code be explicit in two places, even
+      if it means the snippets are nearly identical. A good example for this are
+      Database Adapters in a project like Ecto, where you might have nearly
+      identical functions for things like `order_by` or `limit` in both the
+      Postgres and MySQL adapters.
 
-  Sometimes it can serve a purpose to have code be explicit in two places, even
-  if it means the snippets are nearly identical. A good example for this are
-  Database Adapters in a project like Ecto, where you might have nearly
-  identical functions for things like `order_by` or `limit` in both the
-  Postgres and MySQL adapters.
+      In this case, introducing an `AbstractAdapter` just to avoid code duplication
+      might cause more trouble down the line than having a bit of duplicated code.
 
-  In this case, introducing an `AbstractAdapter` just to avoid code duplication
-  might cause more trouble down the line than having a bit of duplicated code.
-
-  Like all `Software Design` issues, this is just advice and might not be
-  applicable to your project/situation.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      mass_threshold:
-        "The minimum mass which a part of code has to have to qualify for this check.",
-      nodes_threshold: "The number of nodes that need to be found to raise an issue.",
-      excluded_macros: "List of macros to be excluded for this check."
+      Like all `Software Design` issues, this is just advice and might not be
+      applicable to your project/situation.
+      """,
+      params: [
+        mass_threshold:
+          "The minimum mass which a part of code has to have to qualify for this check.",
+        nodes_threshold: "The number of nodes that need to be found to raise an issue.",
+        excluded_macros: "List of macros to be excluded for this check."
+      ]
     ]
-  ]
-  @default_params [
-    mass_threshold: 40,
-    nodes_threshold: 2,
-    excluded_macros: []
-  ]
-
-  use Credo.Check, run_on_all: true, base_priority: :higher
 
   alias Credo.SourceFile
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do
-    mass_threshold = Params.get(params, :mass_threshold, @default_params)
-    nodes_threshold = Params.get(params, :nodes_threshold, @default_params)
+    mass_threshold = Params.get(params, :mass_threshold, __MODULE__)
+    nodes_threshold = Params.get(params, :nodes_threshold, __MODULE__)
 
     source_files
     |> duplicate_nodes(mass_threshold)
@@ -107,7 +105,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   """
   def prune_hashes(
         given_hashes,
-        mass_threshold \\ @default_params[:mass_threshold]
+        mass_threshold \\ param_defaults()[:mass_threshold]
       ) do
     # remove entries containing a single node
     hashes_with_multiple_nodes =
@@ -153,7 +151,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
         ast,
         existing_hashes \\ %{},
         filename \\ "foo.ex",
-        mass_threshold \\ @default_params[:mass_threshold]
+        mass_threshold \\ param_defaults()[:mass_threshold]
       )
       when is_map(existing_hashes) do
     Credo.Code.prewalk(

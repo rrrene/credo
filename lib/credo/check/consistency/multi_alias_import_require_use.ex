@@ -1,27 +1,28 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    explanations: [
+      check: """
+      When using alias, import, require or use for multiple names from the same
+      namespace, you have two options:
 
-  @checkdoc """
-  When using alias, import, require or use for multiple names from the same
-  namespace, you have two options:
+      Use single instructions per name:
 
-  Use single instructions per name:
+        alias Ecto.Query
+        alias Ecto.Schema
+        alias Ecto.Multi
 
-    alias Ecto.Query
-    alias Ecto.Schema
-    alias Ecto.Multi
+      or use one multi instruction per namespace:
 
-  or use one multi instruction per namespace:
+        alias Ecto.{Query, Schema, Multi}
 
-    alias Ecto.{Query, Schema, Multi}
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """
+    ]
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-  @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
-
-  use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do

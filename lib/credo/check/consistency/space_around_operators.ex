@@ -1,32 +1,31 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    param_defaults: [ignore: [:|]],
+    explanations: [
+      check: """
+      Use spaces around operators like `+`, `-`, `*` and `/`. This is the
+      **preferred** way, although other styles are possible, as long as it is
+      applied consistently.
 
-  @checkdoc """
-  Use spaces around operators like `+`, `-`, `*` and `/`. This is the
-  **preferred** way, although other styles are possible, as long as it is
-  applied consistently.
+          # preferred
 
-      # preferred
+          1 + 2 * 4
 
-      1 + 2 * 4
+          # also okay
 
-      # also okay
+          1+2*4
 
-      1+2*4
-
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      ignore: "List of operators to be ignored for this check."
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """,
+      params: [
+        ignore: "List of operators to be ignored for this check."
+      ]
     ]
-  ]
-  @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
-  @default_params [ignore: [:|]]
 
-  use Credo.Check, run_on_all: true, base_priority: :high
+  @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 
   # TODO: add *ignored* operators, so you can add "|" and still write
   #       [head|tail] while enforcing 2 + 3 / 1 ...
@@ -69,7 +68,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp ignored?(location, params) do
-    ignored_triggers = Params.get(params, :ignore, @default_params)
+    ignored_triggers = Params.get(params, :ignore, __MODULE__)
 
     Enum.member?(ignored_triggers, location[:trigger])
   end

@@ -1,22 +1,19 @@
 defmodule Credo.Check.Readability.TrailingWhiteSpace do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    param_defaults: [
+      ignore_strings: true
+    ],
+    explanations: [
+      check: """
+      There should be no white-space (i.e. tabs, spaces) at the end of a line.
 
-  @checkdoc """
-  There should be no white-space (i.e. tabs, spaces) at the end of a line.
-
-  Most text editors provide a way to remove them automatically.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      ignore_strings: "Set to `false` to check lines that are strings or in heredocs"
+      Most text editors provide a way to remove them automatically.
+      """,
+      params: [
+        ignore_strings: "Set to `false` to check lines that are strings or in heredocs"
+      ]
     ]
-  ]
-  @default_params [
-    ignore_strings: true
-  ]
-
-  use Credo.Check, base_priority: :low
 
   alias Credo.Code
   alias Credo.Code.Strings
@@ -25,7 +22,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    ignore_strings = Params.get(params, :ignore_strings, @default_params)
+    ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
 
     source_file
     |> to_lines(ignore_strings)

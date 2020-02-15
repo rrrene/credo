@@ -1,16 +1,17 @@
 defmodule Credo.Check.Consistency.LineEndings do
-  @moduledoc false
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Windows and *nix systems use different line-endings in files.
 
-  @checkdoc """
-  Windows and *nix systems use different line-endings in files.
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """
+    ]
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-  @explanation [check: @checkdoc]
   @collector Credo.Check.Consistency.LineEndings.Collector
-
-  use Credo.Check, run_on_all: true, base_priority: :high
 
   @doc false
   def run(source_files, exec, params \\ []) when is_list(source_files) do

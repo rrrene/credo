@@ -1,34 +1,33 @@
 defmodule Credo.Check.Refactor.NegatedIsNil do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      We should avoid negating the `is_nil` predicate function.
 
-  @checkdoc """
-  We should avoid negating the `is_nil` predicate function.
+      Here are a couple of examples:
 
-  Here are a couple of examples:
+      The code here ...
 
-  The code here ...
+          def fun(%{external_id: external_id, id: id}) when not is_nil(external_id) do
+             ...
+          end
 
-      def fun(%{external_id: external_id, id: id}) when not is_nil(external_id) do
-         ...
-      end
+      ... can be refactored to look like this:
 
-  ... can be refactored to look like this:
+          def fun(%{external_id: nil, id: id}) do
+            ...
+          end
 
-      def fun(%{external_id: nil, id: id}) do
-        ...
-      end
+          def fun(%{external_id: external_id, id: id}) do
+            ...
+          end
 
-      def fun(%{external_id: external_id, id: id}) do
-        ...
-      end
-
-  Similar to negating unless blocks, the reason for this check is not
-  technical, but a human one. If we can use the positive, more direct and human
-  friendly case, we should.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :low
+      Similar to negating unless blocks, the reason for this check is not
+      technical, but a human one. If we can use the positive, more direct and human
+      friendly case, we should.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do

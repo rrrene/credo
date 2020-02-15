@@ -1,43 +1,40 @@
 defmodule Credo.Check.Refactor.Nesting do
-  @moduledoc false
+  use Credo.Check,
+    param_defaults: [max_nesting: 2],
+    explanations: [
+      check: """
+      Code should not be nested more than once inside a function.
 
-  @checkdoc """
-  Code should not be nested more than once inside a function.
+          defmodule CredoSampleModule do
+            def some_function(parameter1, parameter2) do
+              Enum.reduce(var1, list, fn({_hash, nodes}, list) ->
+                filenames = nodes |> Enum.map(&(&1.filename))
 
-      defmodule CredoSampleModule do
-        def some_function(parameter1, parameter2) do
-          Enum.reduce(var1, list, fn({_hash, nodes}, list) ->
-            filenames = nodes |> Enum.map(&(&1.filename))
+                Enum.reduce(list, [], fn(item, acc) ->
+                  if item.filename do
+                    item               # <-- this is nested 3 levels deep
+                  end
+                  acc ++ [item]
+                end)
+              end)
+            end
+          end
 
-            Enum.reduce(list, [], fn(item, acc) ->
-              if item.filename do
-                item               # <-- this is nested 3 levels deep
-              end
-              acc ++ [item]
-            end)
-          end)
-        end
-      end
-
-  At this point it might be a good idea to refactor the code to separate the
-  different loops and conditions.
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      max_nesting: "The maximum number of levels code should be nested."
+      At this point it might be a good idea to refactor the code to separate the
+      different loops and conditions.
+      """,
+      params: [
+        max_nesting: "The maximum number of levels code should be nested."
+      ]
     ]
-  ]
-  @default_params [max_nesting: 2]
+
   @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn]
-
-  use Credo.Check
 
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_nesting = Params.get(params, :max_nesting, @default_params)
+    max_nesting = Params.get(params, :max_nesting, __MODULE__)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_nesting))
   end

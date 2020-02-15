@@ -1,35 +1,35 @@
 defmodule Credo.Check.Readability.PreferImplicitTry do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      Prefer using an implicit `try` rather than explicit `try` if you try to rescue
+      anything the function does.
 
-  @checkdoc """
-  Prefer using an implicit `try` rather than explicit `try` if you try to rescue
-  anything the function does.
+      For example, this:
 
-  For example, this:
+          def failing_function(first) do
+            try do
+              to_string(first)
+            rescue
+              _ -> :rescued
+            end
+          end
 
-      def failing_function(first) do
-        try do
-          to_string(first)
-        rescue
-          _ -> :rescued
-        end
-      end
+      Can be rewritten without `try` as below:
 
-  Can be rewritten without `try` as below:
+          def failing_function(first) do
+            to_string(first)
+          rescue
+            _ -> :rescued
+          end
 
-      def failing_function(first) do
-        to_string(first)
-      rescue
-        _ -> :rescued
-      end
+      Like all `Readability` issues, this one is not a technical concern.
+      The code will behave identical in both ways.
+      """
+    ]
 
-  Like all `Readability` issues, this one is not a technical concern.
-  The code will behave identical in both ways.
-  """
-  @explanation [check: @checkdoc]
   @def_ops [:def, :defp, :defmacro]
-
-  use Credo.Check, base_priority: :low
 
   @doc false
   def run(source_file, params \\ []) do

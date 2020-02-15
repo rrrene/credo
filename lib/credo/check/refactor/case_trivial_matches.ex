@@ -1,14 +1,12 @@
 defmodule Credo.Check.Refactor.CaseTrivialMatches do
-  @moduledoc false
+  use Credo.Check,
+    explanations: [
+      check: """
+      PLEASE NOTE: This check is deprecated as it might do more harm than good.
 
-  @checkdoc """
-  PLEASE NOTE: This check is deprecated as it might do more harm than good.
-
-  Related discussion: https://github.com/rrrene/credo/issues/65
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check
+      Related discussion: https://github.com/rrrene/credo/issues/65
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do
