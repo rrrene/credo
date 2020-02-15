@@ -99,10 +99,12 @@ defmodule Credo.Check do
     def_base_priority =
       if opts[:base_priority] do
         quote do
+          @impl true
           def base_priority, do: unquote(Priority.to_integer(opts[:base_priority]))
         end
       else
         quote do
+          @impl true
           def base_priority, do: 0
         end
       end
@@ -110,10 +112,12 @@ defmodule Credo.Check do
     def_category =
       if opts[:category] do
         quote do
+          @impl true
           def category, do: unquote(category_body(opts[:category]))
         end
       else
         quote do
+          @impl true
           def category, do: unquote(category_body(nil))
         end
       end
@@ -121,12 +125,14 @@ defmodule Credo.Check do
     def_elixir_version =
       if opts[:elixir_version] do
         quote do
+          @impl true
           def elixir_version do
             unquote(opts[:elixir_version])
           end
         end
       else
         quote do
+          @impl true
           def elixir_version, do: ">= 0.0.1"
         end
       end
@@ -134,10 +140,12 @@ defmodule Credo.Check do
     def_run_on_all? =
       if opts[:run_on_all] do
         quote do
+          @impl true
           def run_on_all?, do: unquote(opts[:run_on_all] == true)
         end
       else
         quote do
+          @impl true
           def run_on_all?, do: false
         end
       end
@@ -145,6 +153,7 @@ defmodule Credo.Check do
     def_param_defaults =
       if opts[:param_defaults] do
         quote do
+          @impl true
           def param_defaults, do: unquote(opts[:param_defaults])
         end
       end
@@ -152,6 +161,7 @@ defmodule Credo.Check do
     def_explanations =
       if opts[:explanations] do
         quote do
+          @impl true
           def explanations do
             unquote(opts[:explanations])
           end
@@ -178,6 +188,7 @@ defmodule Credo.Check do
       unquote(def_param_defaults)
       unquote(def_explanations)
 
+      @impl true
       def format_issue(issue_meta, issue_options) do
         Check.format_issue(
           issue_meta,
@@ -188,7 +199,7 @@ defmodule Credo.Check do
         )
       end
 
-      defoverridable(Credo.Check)
+      defoverridable Credo.Check
     end
   end
 
@@ -216,49 +227,55 @@ defmodule Credo.Check do
       @deprecated "Use explanations()[:check] instead"
       def explanation do
         # deprecated - remove module attribute
-        Check.explanation_for(explanations(), :check)
+        explanations()[:check]
       end
 
       @deprecated "Use explanations()[:params] instead"
       def explanation_for_params do
         # deprecated - remove module attribute
-        Check.explanation_for(explanations(), :params) || []
+        explanations()[:params]
       end
-
-      defoverridable(Credo.Check)
     end
   end
 
-  # deprecated - remove once we ditch @default_params
   defp deprecated_def_default_params(env) do
     default_params = Module.get_attribute(env.module, :default_params)
 
     if not is_nil(default_params) do
+      # deprecated - remove once we ditch @default_params
       quote do
+        @impl true
         def param_defaults do
           @default_params
         end
       end
     else
-      quote do
-        def param_defaults, do: []
+      if not Module.defines?(env.module, {:param_defaults, 0}) do
+        quote do
+          @impl true
+          def param_defaults, do: []
+        end
       end
     end
   end
 
-  # deprecated - remove once we ditch @explanation
   defp deprecated_def_explanations(env) do
     explanation = Module.get_attribute(env.module, :explanation)
 
     if not is_nil(explanation) do
+      # deprecated - remove once we ditch @explanation
       quote do
+        @impl true
         def explanations do
           @explanation
         end
       end
     else
-      quote do
-        def explanations, do: []
+      if not Module.defines?(env.module, {:explanations, 0}) do
+        quote do
+          @impl true
+          def explanations, do: []
+        end
       end
     end
   end

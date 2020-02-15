@@ -226,7 +226,8 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     )
   end
 
-  def print_params_explanation(outer_color, check_name, [], _defaults) do
+  def print_params_explanation(outer_color, check_name, param_explanations, _defaults)
+      when param_explanations in [nil, []] do
     [
       UI.edge([outer_color, :faint]),
       :reset,
