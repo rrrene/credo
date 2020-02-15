@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0-rc
+
+- Enable `UnnecessaryAliasExpansion` check by default
+- Fix bugs when removing heredocs and charlists from sources
+- Deprecate the use of `@explanation` and `@default_params` module attributes for checks
+
 ## 1.2.2
 
 - Fix token interpretation of Floats
