@@ -44,7 +44,7 @@
 
     def category, do: :warning
 
-    def base_priority, do: high
+    def base_priority, do: :high
 
     def explanations do
       [
