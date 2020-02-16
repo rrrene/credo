@@ -67,18 +67,17 @@ defmodule Credo.CLI.OptionsTest do
     assert expected == switches(args)
   end
 
-  test "switches: it should not work w/ a string given for a number" do
-    args = String.split("--min-priority=abc --version")
-    expected = %{version: true}
-
-    assert expected == switches(args)
-  end
-
   test "switches: it should convert min_priority high to 10" do
     args = String.split("--min-priority=high --version")
     expected = %{version: true, min_priority: 10}
 
     assert expected == switches(args)
+  end
+
+  test "switches: it should not work w/ an arbitrary string given for a number" do
+    args = String.split("--min-priority=abc --version")
+
+    assert_raise RuntimeError, fn -> switches(args) end
   end
 
   test "switches: it should convert min_priority normal to 1" do
@@ -104,9 +103,8 @@ defmodule Credo.CLI.OptionsTest do
 
   test "switches: it should reject float min_priority" do
     args = String.split("--min-priority=-1234.12 --version")
-    expected = %{version: true}
 
-    assert expected == switches(args)
+    assert_raise RuntimeError, fn -> switches(args) end
   end
 
   test "command: it should work w/o command" do
