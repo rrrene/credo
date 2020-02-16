@@ -20,6 +20,19 @@ defmodule Credo.Check.Params do
       iex> Credo.Check.Params.get([foo: "baz"], :foo, SamepleCheck)
       "baz"
   """
+  def get(params, field, check_mod)
+
+  # this one is deprecated
+  def get(params, field, keywords) when is_list(keywords) do
+    case params[field] do
+      nil ->
+        keywords[field]
+
+      val ->
+        val
+    end
+  end
+
   def get(params, field, check_mod) do
     case params[field] do
       nil ->
