@@ -18,7 +18,47 @@ defmodule Credo.Check do
   - `:base_priority`  Sets the checks's base priority (`:low`, `:normal`, `:high`, `:higher` or `:ignore`).
   - `:category`       Sets the check's category.
   - `:elixir_version` Sets the check's version requirement for Elixir (defaults to `>= 0.0.1`).
+  - `:explanations`   Sets explanations displayed for the check, e.g.
+
+      ```elixir
+      [
+        check: "...",
+        params: [
+          param1: "Your favorite number",
+          param2: "Online/Offline mode"
+        ]
+      ]
+      ```
+
+  - `:param_defaults` Sets the default values for the check's params (e.g. `[param1: 42, param2: "offline"]`)
   - `:run_on_all`     Sets whether the check runs on all source files at once or each source file separatly.
+
+  Please also note that these options to `use Credo.Check` are just a convenience to implement the `Credo.Check`
+  behaviour. You can implement any of these by hand:
+
+      defmodule MyCheck do
+        use Credo.Check
+
+        def category, do: :warning
+
+        def base_priority, do: high
+
+        def explanations do
+          [
+            check: "...",
+            params: [
+              param1: "Your favorite number",
+              param2: "Online/Offline mode"
+            ]
+          ]
+        end
+
+        def param_defaults, do: [param1: 42, param2: "offline"]
+
+        def run(source_file, params) do
+          #
+        end
+      end
 
   The `run/2` function of a Check module takes two parameters: a source file and a list of parameters for the check.
   It has to return a list of found issues.
@@ -100,7 +140,7 @@ defmodule Credo.Check do
       if opts[:base_priority] do
         quote do
           @impl true
-          def base_priority, do: unquote(Priority.to_integer(opts[:base_priority]))
+          def base_priority, do: unquote(opts[:base_priority])
         end
       else
         quote do
@@ -300,17 +340,8 @@ defmodule Credo.Check do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
 
-    priority =
-      case params[:priority] do
-        nil -> issue_base_priority
-        val -> Priority.to_integer(val)
-      end
-
-    exit_status =
-      case params[:exit_status] do
-        nil -> Check.to_exit_status(issue_category)
-        val -> Check.to_exit_status(val)
-      end
+    priority = Priority.to_integer(params[:priority] || issue_base_priority)
+    exit_status = Check.to_exit_status(params[:exit_status] || issue_category)
 
     line_no = opts[:line_no]
     trigger = opts[:trigger]

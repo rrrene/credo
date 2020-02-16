@@ -21,14 +21,15 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   defp exclude_low_priority_checks(exec, below_priority) do
     checks =
       Enum.reject(exec.checks, fn
+        # deprecated
         {check} ->
-          check.base_priority < below_priority
+          Credo.Priority.to_integer(check.base_priority) < below_priority
 
         {_check, false} ->
           true
 
         {check, opts} ->
-          (opts[:priority] || check.base_priority) < below_priority
+          Credo.Priority.to_integer(opts[:priority] || check.base_priority) < below_priority
       end)
 
     %Execution{exec | checks: checks}
