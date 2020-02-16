@@ -32,12 +32,13 @@ defmodule Credo.CLI.Output.Summary do
 
   def print(source_files, exec, time_load, time_run) do
     issues = Execution.get_issues(exec)
+    source_file_count = exec |> Execution.get_source_files() |> Enum.count()
     checks_count = count_checks(exec)
 
     UI.puts()
     UI.puts([:faint, @cry_for_help])
     UI.puts()
-    UI.puts([:faint, format_time_spent(checks_count, time_load, time_run)])
+    UI.puts([:faint, format_time_spent(checks_count, source_file_count, time_load, time_run)])
 
     UI.puts(summary_parts(source_files, issues))
     UI.puts()
@@ -71,11 +72,14 @@ defmodule Credo.CLI.Output.Summary do
 
   defp print_priority_hint(_, _exec), do: nil
 
-  defp format_time_spent(check_count, time_load, time_run) do
+  defp format_time_spent(check_count, source_file_count, time_load, time_run) do
     time_run = time_run |> div(10_000)
     time_load = time_load |> div(10_000)
 
     formatted_total = format_in_seconds(time_run + time_load)
+
+    time_to_load = format_in_seconds(time_load)
+    time_to_run = format_in_seconds(time_run)
 
     total_in_seconds =
       case formatted_total do
@@ -90,8 +94,14 @@ defmodule Credo.CLI.Output.Summary do
         "#{check_count} checks"
       end
 
-    breakdown =
-      "#{format_in_seconds(time_load)}s to load, #{format_in_seconds(time_run)}s running #{checks}"
+    source_files =
+      if source_file_count == 1 do
+        "1 file"
+      else
+        "#{source_file_count} files"
+      end
+
+    breakdown = "#{time_to_load}s to load, #{time_to_run}s running #{checks} on #{source_files}"
 
     "Analysis took #{total_in_seconds} (#{breakdown})"
   end
