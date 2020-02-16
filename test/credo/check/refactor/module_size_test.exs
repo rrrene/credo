@@ -1,3 +1,3 @@
 defmodule Credo.Check.Refactor.ModuleSizeTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 end

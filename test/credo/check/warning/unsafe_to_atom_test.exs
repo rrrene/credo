@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnsafeToAtomTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.UnsafeToAtom
 

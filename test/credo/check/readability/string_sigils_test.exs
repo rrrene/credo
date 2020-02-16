@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.StringSigilsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   import ExUnit.CaptureIO
 

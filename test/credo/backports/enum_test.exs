@@ -1,5 +1,5 @@
 defmodule Credo.Backports.EnumTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   doctest Credo.Backports.Enum
 end

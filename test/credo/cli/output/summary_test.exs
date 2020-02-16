@@ -1,5 +1,5 @@
 defmodule Credo.CLI.Output.SummaryTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.CLI.Output.Summary
   alias Credo.Execution

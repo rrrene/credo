@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.NegatedIsNilTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.NegatedIsNil
 

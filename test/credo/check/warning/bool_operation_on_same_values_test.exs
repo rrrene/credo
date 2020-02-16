@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.BoolOperationOnSameValues
 

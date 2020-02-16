@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.ExceptionNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.ExceptionNames
 

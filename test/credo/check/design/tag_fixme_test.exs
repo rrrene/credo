@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagFIXMETest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.TagFIXME
 

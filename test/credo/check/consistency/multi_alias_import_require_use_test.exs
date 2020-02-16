@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
 

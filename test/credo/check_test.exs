@@ -1,5 +1,5 @@
 defmodule Credo.CheckTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Check
 

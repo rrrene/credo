@@ -337,7 +337,7 @@ defmodule Credo.Execution do
 
   # Config Files
 
-  @doc "Returns all source files for the given `exec` struct."
+  @doc "Returns all config files for the given `exec` struct."
   def get_config_files(exec) do
     Credo.Execution.ExecutionConfigFiles.get(exec)
   end

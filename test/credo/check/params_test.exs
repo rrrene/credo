@@ -1,5 +1,5 @@
 defmodule Credo.Check.ParamsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   # This is defined here so the doctest for `get/3` can use this module
   defmodule SamepleCheck do

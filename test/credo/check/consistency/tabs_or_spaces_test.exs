@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.TabsOrSpacesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.TabsOrSpaces
 

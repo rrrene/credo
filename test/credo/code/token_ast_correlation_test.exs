@@ -1,5 +1,5 @@
 defmodule Credo.Code.TokenAstCorrelationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @source_example1 """
   defmodule Credo.Sample do
