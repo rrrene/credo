@@ -36,7 +36,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -52,7 +53,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /2" do
@@ -64,7 +66,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /3" do
@@ -76,7 +79,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /4" do
@@ -88,7 +92,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /5" do
@@ -100,7 +105,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /6" do
@@ -112,7 +118,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     end
     """
     |> to_source_file()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   describe "Jason decode/decode!" do
@@ -126,7 +133,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode without keys without a pipeline" do
@@ -138,7 +146,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode! without keys with a pipeline" do
@@ -150,7 +159,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode! without keys without a pipeline" do
@@ -162,7 +172,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     # keys: :atoms! (safe)
@@ -175,7 +186,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode with keys: :atoms! without a pipeline" do
@@ -187,7 +199,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode! with keys: :atoms! with a pipeline" do
@@ -199,7 +212,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     test "it should not report a violation on Jason.decode! with keys: :atoms! without a pipeline" do
@@ -211,7 +225,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> refute_issues(@described_check)
+      |> run_check(@described_check)
+      |> refute_issues()
     end
 
     # keys: :atoms (unsafe)
@@ -224,7 +239,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
     end
 
     test "it should report a violation on Jason.decode with keys: :atoms without a pipeline" do
@@ -236,7 +252,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
     end
 
     test "it should report a violation on Jason.decode! with keys: :atoms with a pipeline" do
@@ -248,7 +265,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
     end
 
     test "it should report a violation on Jason.decode! with keys: :atoms without a pipeline" do
@@ -260,7 +278,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
       end
       """
       |> to_source_file()
-      |> assert_issue(@described_check)
+      |> run_check(@described_check)
+      |> assert_issue()
     end
   end
 end

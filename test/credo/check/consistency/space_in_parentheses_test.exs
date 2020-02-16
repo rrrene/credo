@@ -104,7 +104,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @without_spaces
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report the correct result 1" do
@@ -113,7 +114,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_spaces2
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -127,7 +129,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_spaces2
     ]
     |> to_source_files()
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report the correct result 3" do
@@ -135,7 +138,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_and_without_spaces
     ]
     |> to_source_files()
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert 7 == issue.line_no
       assert "{:" == issue.trigger
     end)
@@ -146,7 +150,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_spaces_empty_params1
     ]
     |> to_source_files()
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert 4 == issue.line_no
       assert "{}" == issue.trigger
     end)
@@ -157,7 +162,8 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_spaces_empty_params2
     ]
     |> to_source_files()
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert 4 == issue.line_no
       assert "[]" == issue.trigger
     end)
@@ -169,6 +175,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
       @with_spaces_empty_params2
     ]
     |> to_source_files()
-    |> refute_issues(@described_check, allow_empty_enums: true)
+    |> run_check(@described_check, allow_empty_enums: true)
+    |> refute_issues()
   end
 end

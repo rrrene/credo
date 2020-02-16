@@ -20,7 +20,8 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -36,7 +37,8 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with no parens if parens: true" do
@@ -48,7 +50,8 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, [parens: true], _callback = nil)
+    |> run_check(@described_check, parens: true)
+    |> assert_issue()
   end
 
   test "it should not crash on macros creating zero arity functions" do
@@ -62,6 +65,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end

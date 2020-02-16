@@ -125,7 +125,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_size: 0)
+    |> run_check(@described_check, max_size: 0)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -135,7 +136,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_size: 0)
+    |> run_check(@described_check, max_size: 0)
+    |> assert_issue()
   end
 
   test "it should NOT report expected code /x" do
@@ -147,7 +149,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_size: 3)
+    |> run_check(@described_check, max_size: 3)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for __using__ macro" do
@@ -213,7 +216,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation" do
@@ -230,7 +234,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_size: 3)
+    |> run_check(@described_check, max_size: 3)
+    |> assert_issue()
   end
 
   test "it should NOT count map/struct field access with dot notation for abc size" do
@@ -284,7 +289,8 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_size: 3)
+    |> run_check(@described_check, max_size: 3)
+    |> refute_issues()
   end
 
   test "it SHOULD count ecto functions when Ecto.Query is NOT imported" do
@@ -305,6 +311,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_size: 3)
+    |> run_check(@described_check, max_size: 3)
+    |> assert_issue()
   end
 end

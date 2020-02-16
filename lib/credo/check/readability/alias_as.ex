@@ -1,24 +1,23 @@
 defmodule Credo.Check.Readability.AliasAs do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      Aliases which are not completely renamed using the `:as` option are easier to follow.
 
-  @checkdoc """
-  Aliases which are not completely renamed using the `:as` option are easier to follow.
+          # preferred
 
-      # preferred
+          alias MyApp.Module1
 
-      alias MyApp.Module1
+          # NOT preferred
 
-      # NOT preferred
+          alias MyApp.Module1, as: M1
 
-      alias MyApp.Module1, as: M1
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :low
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code
 

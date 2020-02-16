@@ -20,7 +20,8 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report heredocs" do
@@ -46,7 +47,8 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not fail when file doesn't have empty lines" do
@@ -56,7 +58,8 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
   end
 end"
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -77,7 +80,8 @@ end"
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should be relative max_blank_lines param" do
@@ -99,9 +103,11 @@ end"
       |> to_source_file
 
     file
-    |> refute_issues(@described_check, max_blank_lines: 4)
+    |> run_check(@described_check, max_blank_lines: 4)
+    |> refute_issues()
 
     file
-    |> assert_issue(@described_check, max_blank_lines: 3)
+    |> run_check(@described_check, max_blank_lines: 3)
+    |> assert_issue()
   end
 end

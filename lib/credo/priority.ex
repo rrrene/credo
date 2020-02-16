@@ -23,8 +23,18 @@ defmodule Credo.Priority do
   @doc "Converts a given priority name to a numerical priority"
   def to_integer(nil), do: 0
 
-  def to_integer(key) do
-    @priority_names_map[to_string(key)]
+  def to_integer(value) when is_number(value), do: value
+
+  def to_integer(string) when is_binary(string) do
+    case Integer.parse(string) do
+      :error -> string |> String.to_atom() |> to_integer()
+      {value, ""} -> value
+      {_value, _rest} -> raise "Got an invalid priority: #{inspect(string)}"
+    end
+  end
+
+  def to_integer(key) when is_atom(key) do
+    @priority_names_map[to_string(key)] || raise "Got an invalid priority: #{inspect(key)}"
   end
 
   def scope_priorities(%SourceFile{} = source_file) do

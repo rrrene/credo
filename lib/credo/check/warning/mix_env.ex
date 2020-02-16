@@ -1,31 +1,27 @@
 defmodule Credo.Check.Warning.MixEnv do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :high,
+    param_defaults: [excluded_paths: []],
+    explanations: [
+      check: """
+      From the elixir-lang guide:
+
+      Mix is a build tool and, as such, it is not expected to be available in production.
+      Therefore, it is recommended to access Mix.env only in configuration files and inside
+      mix.exs, never in your application code (lib).
+      """,
+      params: [
+        excluded_paths: "List of paths or regex to exclude from this check"
+      ]
+    ]
 
   alias Credo.SourceFile
 
-  @checkdoc """
-  From the elixir-lang guide:
-
-  Mix is a build tool and, as such, it is not expected to be available in production.
-  Therefore, it is recommended to access Mix.env only in configuration files and inside
-  mix.exs, never in your application code (lib).
-
-  """
-  @explanation [
-    check: @checkdoc,
-    params: [
-      excluded_paths: "List of paths or regex to exclude from this check"
-    ]
-  ]
-
-  @default_params [excluded_paths: []]
   @call_string "Mix.env"
-
-  use Credo.Check, base_priority: :high
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    excluded_paths = Params.get(params, :excluded_paths, @default_params)
+    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
 
     case ignore_path?(source_file.filename, excluded_paths) do
       true ->

@@ -1,8 +1,15 @@
 defmodule Credo.Check.Readability.ModuleAttributeNames do
-  @moduledoc false
-
-  @checkdoc """
-  Module attribute names are always written in snake_case in Elixir.
+  use Credo.Check,
+    base_priority: :high,
+    prefilter: [
+      ast: [
+        filter: {:@, _meta, [{_name, _meta, _arguments}]},
+        reject: {:@, _meta, [{:{}, _, _}]}
+      ]
+    ],
+    explanations: [
+      check: """
+      Module attribute names are always written in snake_case in Elixir.
 
       # snake_case
 
@@ -12,19 +19,10 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
 
       @inboxName "incoming"
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check,
-    base_priority: :high,
-    prefilter: [
-      ast: [
-        filter: {:@, _meta, [{_name, _meta, _arguments}]},
-        reject: {:@, _meta, [{:{}, _, _}]}
-      ]
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
     ]
 
   alias Credo.Code.Name

@@ -15,7 +15,8 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -29,7 +30,8 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for multiple expansions" do
@@ -39,7 +41,8 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for multiple nested expansions" do
@@ -49,7 +52,8 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert issue.trigger == "Module1.Submodule1"
     end)
   end

@@ -33,7 +33,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "rebinding opt-in bang sigils is allowed" do
@@ -46,7 +47,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, allow_bang: true)
+    |> run_check(@described_check, allow_bang: true)
+    |> refute_issues()
   end
 
   #
@@ -63,7 +65,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report two violations" do
@@ -79,7 +82,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, nil, &(length(&1) == 2))
+    |> run_check(@described_check)
+    |> assert_issues(&(length(&1) == 2))
   end
 
   test "it should report violations when using destructuring tuples" do
@@ -93,7 +97,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report violations when using destructuring with nested assignments" do
@@ -106,7 +111,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report violations when using destructuring lists" do
@@ -119,7 +125,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report violations when using destructuring maps" do
@@ -132,7 +139,8 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "rebinding bang sigils is forbidden without the :allow_bang option" do
@@ -145,6 +153,7 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

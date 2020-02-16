@@ -29,7 +29,7 @@ defmodule <%= @check_name %> do
     # we use the `params` parameter and the `Params` module to extract a
     # configuration parameter from `.credo.exs` while also providing a
     # default value
-    line_regex = params |> Params.get(:regex, @default_params)
+    line_regex = params |> Params.get(:regex, __MODULE__)
 
     # Finally, we can run our custom made analysis.
     # In this example, we look for lines in source code matching our regex:

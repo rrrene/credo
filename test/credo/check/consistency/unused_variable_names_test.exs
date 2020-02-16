@@ -25,7 +25,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report correct behaviour (only one unused variable)" do
@@ -44,7 +45,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation for different naming schemes (expects anonymous)" do
@@ -68,7 +70,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       """
     ]
     |> to_source_files
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "_item" == issue.trigger
       assert 4 == issue.line_no
     end)
@@ -100,7 +103,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       """
     ]
     |> to_source_files
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "_" == issue.trigger
       assert 3 == issue.line_no
     end)

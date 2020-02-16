@@ -21,7 +21,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -41,7 +42,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation if used with parentheses" do
@@ -57,7 +59,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with not/2 as well" do
@@ -73,6 +76,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

@@ -16,7 +16,8 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report on instance in exs file" do
@@ -28,7 +29,8 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file("foo.exs")
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report on instance in excluded string path" do
@@ -40,9 +42,8 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file("foo/dangerous_stuff/bar.ex")
-    |> refute_issues(@described_check,
-      excluded_paths: ["foo/dangerous_stuff"]
-    )
+    |> run_check(@described_check, excluded_paths: ["foo/dangerous_stuff"])
+    |> refute_issues()
   end
 
   test "it should NOT report on instance in excluded regex path" do
@@ -54,9 +55,8 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file("foo/dangerous_stuff/bar.ex")
-    |> refute_issues(@described_check,
-      excluded_paths: [~r"danger"]
-    )
+    |> run_check(@described_check, excluded_paths: [~r"danger"])
+    |> refute_issues()
   end
 
   #
@@ -72,7 +72,8 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /2" do
@@ -84,6 +85,7 @@ defmodule Credo.Check.Warning.MixEnvTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

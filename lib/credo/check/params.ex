@@ -9,15 +9,21 @@ defmodule Credo.Check.Params do
 
   Example:
 
-      iex> Credo.Check.Params.get([], :foo, [foo: "bar"])
+      defmodule SamepleCheck do
+        def param_defaults do
+          [foo: "bar"]
+        end
+      end
+
+      iex> Credo.Check.Params.get([], :foo, SamepleCheck)
       "bar"
-      iex> Credo.Check.Params.get([foo: "baz"], :foo, [foo: "bar"])
+      iex> Credo.Check.Params.get([foo: "baz"], :foo, SamepleCheck)
       "baz"
   """
-  def get(params, field, default_params \\ []) when is_list(params) do
+  def get(params, field, check_mod) do
     case params[field] do
       nil ->
-        default_params[field]
+        check_mod.param_defaults[field]
 
       val ->
         val

@@ -1,0 +1,38 @@
+name: "Reproducing Test-Case Detector (experimental)"
+
+on:
+  pull_request:
+    paths:
+    - '**_test.exs'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: "Test for lib/ changes"
+    strategy:
+      matrix:
+        otp: [22.2]
+        elixir: [1.10.0]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - run: git fetch origin master:master
+
+      - name: Check changes to lib/
+        id: check_changes
+        run: echo "::set-output name=changes_to_lib::$(git diff --name-only master | grep "^lib")"
+
+      - name: There are changes to lib/
+        if: "contains(steps.check_changes.outputs.changes_to_lib, 'lib')"
+        run: |
+          mix deps.get
+          sh test/test_if_tests_fail_after_resetting_lib.sh
+
+      - name: There are no changes to lib/
+        if: "!contains(steps.check_changes.outputs.changes_to_lib, 'lib')"
+        run: echo "${{ toJSON(steps.check_changes.outputs.changes_to_lib) }}"

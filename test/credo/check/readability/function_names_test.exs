@@ -21,7 +21,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     defguardp credo_sample_guard(x) when is_integer(x)
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -31,7 +32,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /3" do
@@ -41,7 +43,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /4" do
@@ -51,7 +54,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /5" do
@@ -64,7 +68,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code (for operators) /6" do
@@ -79,7 +84,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -92,7 +98,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /2" do
@@ -101,7 +108,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /3" do
@@ -110,7 +118,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /4" do
@@ -119,7 +128,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /5" do
@@ -128,7 +138,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /6" do
@@ -137,7 +148,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /7" do
@@ -146,7 +158,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /8" do
@@ -155,7 +168,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /9" do
@@ -164,7 +178,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /10" do
@@ -173,7 +188,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /11" do
@@ -182,7 +198,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /12" do
@@ -190,7 +207,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     defguard credo_SampleGuard(x) when is_integer(x)
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /13" do
@@ -198,7 +216,8 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     defguardp credo_SampleGuard(x) when is_integer(x)
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /14" do
@@ -209,6 +228,7 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     def credoSampleFunction(_), do: :ok
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

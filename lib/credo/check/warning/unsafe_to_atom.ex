@@ -1,37 +1,38 @@
 defmodule Credo.Check.Warning.UnsafeToAtom do
-  @moduledoc """
-  Creating atoms from unknown or external sources dynamically is a potentially
-  unsafe operation because atoms are not garbage-collected by the runtime.
+  use Credo.Check,
+    base_priority: :high,
+    category: :warning,
+    explanations: [
+      check: """
+      Creating atoms from unknown or external sources dynamically is a potentially
+      unsafe operation because atoms are not garbage-collected by the runtime.
 
-  Creating an atom from a string or charlist should be done by using
+      Creating an atom from a string or charlist should be done by using
 
-      String.to_existing_atom(string)
+          String.to_existing_atom(string)
 
-  or
+      or
 
-      List.to_existing_atom(charlist)
+          List.to_existing_atom(charlist)
 
-  Module aliases should be constructed using
+      Module aliases should be constructed using
 
-      Module.safe_concat(prefix, suffix)
+          Module.safe_concat(prefix, suffix)
 
-  or
+      or
 
-      Module.safe_concat([prefix, infix, suffix])
+          Module.safe_concat([prefix, infix, suffix])
 
-  Jason.decode/Jason.decode! should be called using `keys: :atoms!` (*not* `keys: :atoms`):
+      Jason.decode/Jason.decode! should be called using `keys: :atoms!` (*not* `keys: :atoms`):
 
-      Jason.decode(str, keys: :atoms!)
+          Jason.decode(str, keys: :atoms!)
 
-  or `:keys` should be omitted (which defaults to `:strings`):
+      or `:keys` should be omitted (which defaults to `:strings`):
 
-      Jason.decode(str)
+          Jason.decode(str)
 
-  """
-
-  @explanation [check: @moduledoc]
-
-  use Credo.Check, base_priority: :high, category: :warning
+      """
+    ]
 
   @doc false
   def run(source_file, params) do

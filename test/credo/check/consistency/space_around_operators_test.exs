@@ -236,7 +236,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @without_spaces3
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere" do
@@ -247,7 +248,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces4
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere in a single file" do
@@ -255,7 +257,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces5
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere in two files" do
@@ -264,7 +267,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces6
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are omitted everywhere" do
@@ -273,7 +277,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @without_spaces2
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -288,7 +293,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces3
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue for mixed styles /2" do
@@ -298,7 +304,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces2
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /4" do
@@ -306,7 +313,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /5" do
@@ -314,7 +322,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces2
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /6" do
@@ -323,7 +332,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces2
     ]
     |> to_source_files()
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report the correct result /7" do
@@ -340,7 +350,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       """
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not crash for issue #731" do
@@ -350,6 +361,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       """
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end

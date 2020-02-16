@@ -48,49 +48,56 @@ defmodule Credo.Check.Readability.StringSigilsTest do
   test "does NOT report for empty string" do
     create_snippet("")
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report when exactly 3 quotes are found" do
     ~s(f\\"b\\"\\")
     |> create_snippet()
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report when less than :maximum_allowed_quotes quotes are found" do
     ~s(f\\"\\"\\"\\")
     |> create_snippet()
     |> to_source_file
-    |> refute_issues(@described_check, maximum_allowed_quotes: 5)
+    |> run_check(@described_check, maximum_allowed_quotes: 5)
+    |> refute_issues()
   end
 
   test "does NOT report when exactly :maximum_allowed_quotes quotes are found" do
     ~s(f\\"\\"\\"\\")
     |> create_snippet()
     |> to_source_file
-    |> refute_issues(@described_check, maximum_allowed_quotes: 4)
+    |> run_check(@described_check, maximum_allowed_quotes: 4)
+    |> refute_issues()
   end
 
   test "does NOT report for quotes in sigil_s" do
     ~s(f\\"\\"b\\"\\")
     |> create_sigil_snippet()
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report for quotes in sigil_r" do
     ~s(f\\"\\"b\\"\\")
     |> create_sigil_snippet("r")
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report for double quotes in heredoc" do
     ~s(f\\"\\"b\\"\\")
     |> create_heredoc_snippet_w_double_quotes()
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report for double quotes in heredoc /2" do
@@ -104,14 +111,16 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> Jason.decode!
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT report for single quotes in heredoc" do
     ~s(f\\"\\"b\\"\\")
     |> create_heredoc_snippet_w_single_quotes()
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT crash if string contains non utf8 characters" do
@@ -121,7 +130,8 @@ defmodule Credo.Check.Readability.StringSigilsTest do
 
     snippet
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "does NOT crash if string contains singnle quotes and an interpolation" do
@@ -131,7 +141,8 @@ defmodule Credo.Check.Readability.StringSigilsTest do
 
     snippet
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -142,14 +153,16 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     ~s(f\\"\\"b\\"\\")
     |> create_snippet()
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "reports for more than :maximum_allowed_quotes quotes" do
     ~s(f\\"\\"b\\"\\\"\\"\\")
     |> create_snippet()
     |> to_source_file
-    |> assert_issue(@described_check, maximum_allowed_quotes: 5)
+    |> run_check(@described_check, maximum_allowed_quotes: 5)
+    |> assert_issue()
   end
 
   test "doesn't crash on #729" do
@@ -166,7 +179,8 @@ defmodule Credo.Check.Readability.StringSigilsTest do
         end
         """
         |> to_source_file
-        |> refute_issues(@described_check)
+        |> run_check(@described_check)
+        |> refute_issues()
       end)
 
     assert log == ""

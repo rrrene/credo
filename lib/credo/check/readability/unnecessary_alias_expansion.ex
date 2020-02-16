@@ -1,26 +1,25 @@
 defmodule Credo.Check.Readability.UnnecessaryAliasExpansion do
-  @moduledoc false
+  use Credo.Check,
+    base_priority: :low,
+    explanations: [
+      check: """
+      Alias expansion is useful but when aliasing a single module,
+      it can be harder to read with unnecessary braces.
 
-  @checkdoc """
-  Alias expansion is useful but when aliasing a single module,
-  it can be harder to read with unnecessary braces.
+          # preferred
 
-      # preferred
+          alias ModuleA.Foo
+          alias ModuleA.{Foo, Bar}
 
-      alias ModuleA.Foo
-      alias ModuleA.{Foo, Bar}
+          # NOT preferred
 
-      # NOT preferred
+          alias ModuleA.{Foo}
 
-      alias ModuleA.{Foo}
-
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-  @explanation [check: @checkdoc]
-
-  use Credo.Check, base_priority: :low
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code
 

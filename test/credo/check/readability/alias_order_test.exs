@@ -23,7 +23,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation for independent blocks of alpha-ordered aliases" do
@@ -38,7 +39,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation for multi-aliases when they are alpha-ordered" do
@@ -56,7 +58,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with __MODULE__" do
@@ -70,7 +73,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with multi-alias" do
@@ -84,7 +88,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with an intersecting `require`" do
@@ -97,7 +102,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with multi alias syntax" do
@@ -108,7 +114,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -124,7 +131,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with as option" do
@@ -135,7 +143,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with alias groups" do
@@ -150,7 +159,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with multi-alias" do
@@ -172,7 +182,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with multi-alias /2" do
@@ -190,6 +201,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

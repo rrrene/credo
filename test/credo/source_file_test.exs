@@ -2,15 +2,17 @@ defmodule Credo.SourceFileTest do
   use Credo.TestHelper
 
   test "it should NOT report expected code" do
-    """
-    defmodule CredoSampleModule do
-      def some_function(parameter1, parameter2) do
-        some_value = parameter1 + parameter2
+    source_file =
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          some_value = parameter1 + parameter2
+        end
       end
-    end
-    """
-    |> Credo.SourceFile.parse("example.ex")
-    |> refute_issues
+      """
+      |> Credo.SourceFile.parse("example.ex")
+
+    assert source_file.status == :valid
   end
 
   test "it should report a violation" do
