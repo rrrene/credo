@@ -65,19 +65,20 @@ defmodule Credo.ConfigBuilder do
   defp add_switches_to_exec(%Execution{} = exec, switches) do
     exec
     |> add_switch_all(switches)
-    |> add_switch_files_included(switches)
-    |> add_switch_files_excluded(switches)
     |> add_switch_color(switches)
-    |> add_switch_debug(switches)
-    |> add_switch_strict(switches)
     |> add_switch_crash_on_error(switches)
-    |> add_switch_mute_exit_status(switches)
+    |> add_switch_debug(switches)
+    |> add_switch_enable_disabled_checks(switches)
+    |> add_switch_files_excluded(switches)
+    |> add_switch_files_included(switches)
     |> add_switch_format(switches)
     |> add_switch_help(switches)
     |> add_switch_ignore(switches)
     |> add_switch_min_priority(switches)
+    |> add_switch_mute_exit_status(switches)
     |> add_switch_only(switches)
     |> add_switch_read_from_stdin(switches)
+    |> add_switch_strict(switches)
     |> add_switch_verbose(switches)
     |> add_switch_version(switches)
   end
@@ -177,6 +178,12 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_min_priority(exec, _), do: exec
+
+  defp add_switch_enable_disabled_checks(exec, %{enable_disabled_checks: check_pattern}) do
+    %Execution{exec | enable_disabled_checks: String.split(check_pattern, ",")}
+  end
+
+  defp add_switch_enable_disabled_checks(exec, _), do: exec
 
   # exclude/ignore certain checks
   defp add_switch_only(exec, %{only: only}) do
