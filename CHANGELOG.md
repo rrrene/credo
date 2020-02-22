@@ -1,9 +1,18 @@
 # Changelog
 
-## 1.3.0-rc
+## 1.3.0-rc1
 
 - Enable `UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
+- Add `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`; this comes in handy when using checks on a case-by-case basis
+
+    As with other check-related switches, `pattern` is a comma-delimted list of patterns:
+
+      $ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation
+
+    Of course, we can have the same effect by choosing the pattern less explicitly:
+
+      $ mix credo info --enable-disabled-checks specs,double
 
 ### New API for custom checks
 

@@ -1,5 +1,5 @@
 defmodule Credo.SourceFileTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   test "it should NOT report expected code" do
     source_file =

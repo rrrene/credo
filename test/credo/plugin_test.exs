@@ -1,5 +1,5 @@
 defmodule Credo.PluginTest do
-  use Credo.TestHelper, async: false
+  use Credo.Test.Case, async: false
 
   @integration_path "test/fixtures/example_plugin_integration"
 

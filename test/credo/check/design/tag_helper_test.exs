@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagHelperTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Check.Design.TagHelper
 

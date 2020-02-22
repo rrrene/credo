@@ -1,5 +1,5 @@
 defmodule Credo.CLI.Command.GenCheckTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.CLI.Command.GenCheck
 

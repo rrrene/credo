@@ -20,6 +20,7 @@ defmodule Credo.Execution do
               color: :boolean,
               crash_on_error: :boolean,
               debug: :boolean,
+              enable_disabled_checks: :string,
               mute_exit_status: :boolean,
               format: :string,
               help: :boolean,
@@ -64,6 +65,7 @@ defmodule Credo.Execution do
             verbose: false,
             all: false,
             format: nil,
+            enable_disabled_checks: nil,
             only_checks: nil,
             ignore_checks: nil,
             crash_on_error: true,
@@ -337,7 +339,7 @@ defmodule Credo.Execution do
 
   # Config Files
 
-  @doc "Returns all source files for the given `exec` struct."
+  @doc "Returns all config files for the given `exec` struct."
   def get_config_files(exec) do
     Credo.Execution.ExecutionConfigFiles.get(exec)
   end

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.ParameterPatternMatching
   @left_and_right_mix """

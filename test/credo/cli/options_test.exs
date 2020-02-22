@@ -1,5 +1,5 @@
 defmodule Credo.CLI.OptionsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
   alias Credo.CLI.Options
 
   @command_names ["cmd1", "cmd2", "cmd3"]

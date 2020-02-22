@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedRegexOperationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.UnusedRegexOperation
 

@@ -1,5 +1,5 @@
 defmodule Credo.Code.InterpolationHelperTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.InterpolationHelper
 
