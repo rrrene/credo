@@ -60,7 +60,7 @@ defmodule Credo.Check.Consistency.ModuleLayout do
   def run(source_file, params \\ []) do
     source_file
     |> Code.ast()
-    |> Credo.Check.Module.analyze()
+    |> Credo.Code.Module.analyze()
     |> all_errors(expected_order(params), IssueMeta.for(source_file, params))
     |> Enum.sort_by(&{&1.line_no, &1.column})
   end
