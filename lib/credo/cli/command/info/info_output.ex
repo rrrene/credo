@@ -35,7 +35,7 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
       -C, --config-name       Use the given config instead of "default"
           --files-included    Only include these files (accepts globs, can be used multiple times)
           --files-excluded    Exclude these files (accepts globs, can be used multiple times)
-          --format            Display the list in a specific format (oneline,flycheck)
+          --format            Display the list in a specific format (json,flycheck,oneline)
       -i, --ignore-checks     Ignore checks that match the given strings
           --verbose           Display more information (e.g. checked files)
 
