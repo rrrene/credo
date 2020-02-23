@@ -41,18 +41,19 @@ defmodule Credo.Mixfile do
       "guides/introduction/overview.md",
       "guides/introduction/installation.md",
       "guides/introduction/basic_usage.md",
-      "guides/introduction/configuration.md",
+      "guides/introduction/exit_statuses.md",
+      "guides/introduction/mix_tasks.md",
 
       # Plugins
 
-      "guides/up_and_running.md",
-      "guides/adding_checks.md",
-      "guides/credo_mix_tasks.md",
-      "guides/exit_statuses.md",
+      "guides/custom_checks/adding_checks.md",
+      "guides/custom_checks/testing.md",
 
-      # Testing
+      # Configuration
 
-      "guides/testing/testing.md",
+      "guides/configuration/config_file.md",
+      "guides/configuration/cli_switches.md",
+      "guides/configuration/config_comments.md",
 
       # Plugins
 
@@ -63,9 +64,9 @@ defmodule Credo.Mixfile do
   defp groups_for_extras do
     [
       Introduction: ~r/guides\/introduction\/.?/,
-      Guides: ~r/guides\/[^\/]+\.md/,
-      Testing: ~r/guides\/testing\/.?/,
-      Deployment: ~r/guides\/deployment\/.?/
+      Configuration: ~r/guides\/configuration\//,
+      "Custom Checks": ~r/guides\/custom_checks\//,
+      Plugins: ~r/guides\/plugins\//
     ]
   end
 

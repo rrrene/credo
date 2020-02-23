@@ -1,4 +1,4 @@
-# Credo Mix Tasks
+# Mix Tasks
 
 After incuding Credo in a project's dependencies (see [Installation](installation.html)), there are a number of built-in mix tasks available:
 
@@ -13,6 +13,14 @@ If you want to know more about `mix`, check out [Introduction to Mix](https://el
 
 ## `mix credo`
 
+Runs Credo's analysis.
+Check out [Configuration](configuration.html) on how to customize inputs and outputs.
+
 ## `mix credo.gen.check`
 
+Generates a custom Credo check.
+
 ## `mix credo.gen.config`
+
+Generates a Credo config file.
+Check out [Configuration](configuration.html) on how to customize it.
