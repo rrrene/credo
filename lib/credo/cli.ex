@@ -1,17 +1,15 @@
 defmodule Credo.CLI do
   @moduledoc """
   `Credo.CLI` is the entrypoint for both the Mix task and the escript.
-
-  It takes the parameters passed from the command line and translates them into
-  a Command module (see the `Credo.CLI.Command` namespace), the work directory
-  where the Command should run and a `Credo.Execution` struct.
   """
 
   alias Credo.Execution
   alias Credo.Execution.Task.WriteDebugReport
 
   @doc """
-  Runs Credo's main process.
+  Runs Credo with the given `argv` and exits the process.
+
+  See `run/1` if you want to run Credo programmatically.
   """
   def main(argv \\ []) do
     Credo.Application.start(nil, nil)
@@ -21,6 +19,17 @@ defmodule Credo.CLI do
     |> halt_if_exit_status_assigned()
   end
 
+  @doc """
+  Runs Credo with the given `argv` and returns its final `Credo.Execution` struct.
+
+  Example:
+
+      iex> exec = Credo.CLI.run(["--only", "Readability"])
+      iex> issues = Credo.Execution.get_issues(exec)
+      iex> Enum.count(issues) > 0
+      true
+
+  """
   def run(argv) do
     argv
     |> Execution.build()
