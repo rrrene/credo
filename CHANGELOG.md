@@ -75,6 +75,7 @@
 
 ### New checks
 
+- Credo.Check.Readability.StrictModuleLayout
 - Credo.Check.Readability.WithCustomTaggedTuple
 
 

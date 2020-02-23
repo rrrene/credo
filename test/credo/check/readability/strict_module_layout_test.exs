@@ -1,7 +1,7 @@
-defmodule Credo.Check.Consistency.ModuleLayoutTest do
+defmodule Credo.Check.Readability.StrictModuleLayoutTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Consistency.ModuleLayout
+  @described_check Credo.Check.Readability.StrictModuleLayout
 
   describe "default order" do
     test "no errors are reported on a successful layout" do

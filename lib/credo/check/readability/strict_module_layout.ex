@@ -1,4 +1,4 @@
-defmodule Credo.Check.Consistency.ModuleLayout do
+defmodule Credo.Check.Readability.StrictModuleLayout do
   use Credo.Check,
     run_on_all: true,
     base_priority: :low,
