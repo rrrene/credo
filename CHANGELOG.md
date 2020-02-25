@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0-rc1
+## 1.3.0-rc2
 
 - Enable `UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
