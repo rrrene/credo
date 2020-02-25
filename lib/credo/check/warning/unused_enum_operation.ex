@@ -39,7 +39,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
       find find_index find_value flat_map flat_map_reduce group_by
       intersperse into into join map map_join map_reduce max max_by
       member min min_by min_max min_max_by partition random reduce
-      reduce reduce_while reject reverse reverse reverse_slice scan
+      reduce_while reject reverse reverse reverse_slice scan
       scan shuffle slice slice sort sort sort_by split split_while
       sum take take_every take_random take_while to_list uniq uniq_by
       unzip with_index zip
