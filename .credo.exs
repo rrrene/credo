@@ -148,6 +148,7 @@
         {Credo.Check.Warning.UnusedRegexOperation, []},
         {Credo.Check.Warning.UnusedStringOperation, []},
         {Credo.Check.Warning.UnusedTupleOperation, []},
+        {Credo.Check.Warning.UnsafeExec, []},
 
         #
         # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
@@ -172,7 +173,8 @@
         {Credo.Check.Refactor.PipeChainStart, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
-        {Credo.Check.Warning.UnsafeToAtom, false}
+        {Credo.Check.Warning.UnsafeToAtom, false},
+        {Credo.Check.Warning.LeakyEnvironment, false}
 
         #
         # Custom checks can be created using `mix credo.gen.check`.
