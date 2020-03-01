@@ -761,6 +761,7 @@ Some IDEs and editors are able to run Credo in the background and mark issues in
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
+* [ElixirLinter](https://marketplace.visualstudio.com/items?itemName=iampeterbanjo.elixirlinter) - VSCode plugin (by @iampeterbanjo)
 
 ### Automated Code Review
 
