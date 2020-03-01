@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3
+
+- Fix performance bottleneck in `Credo.Service.ETSTableHelper`
+
 ## 1.2.2
 
 - Fix token interpretation of Floats
