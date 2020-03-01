@@ -1,5 +1,5 @@
 defmodule Credo.CLI.SorterTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.CLI.Sorter
 

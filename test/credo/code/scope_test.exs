@@ -1,5 +1,5 @@
 defmodule Credo.Code.ScopeTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Scope
 

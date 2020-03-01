@@ -29,17 +29,18 @@ defmodule Credo.CLI.Command.List.ListOutput do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
     List options:
-      -a, --all               Show all issues
-      -A, --all-priorities    Show all issues including low priority ones
-      -c, --checks            Only include checks that match the given strings
-          --config-file       Use the given config file
-      -C, --config-name       Use the given config instead of "default"
-          --files-included    Only include these files (accepts globs, can be used multiple times)
-          --files-excluded    Exclude these files (accepts globs, can be used multiple times)
-          --format            Display the list in a specific format (oneline,flycheck)
-      -i, --ignore-checks     Ignore checks that match the given strings
-          --min-priority      Minimum priority to show issues (high,medium,normal,low,lower or number)
-          --mute-exit-status  Exit with status zero even if there are issues
+      -a, --all                     Show all issues
+      -A, --all-priorities          Show all issues including low priority ones
+      -c, --checks                  Only include checks that match the given strings
+          --config-file             Use the given config file
+      -C, --config-name             Use the given config instead of "default"
+          --enable-disabled-checks  Re-enable disabled checks that match the given strings
+          --files-included          Only include these files (accepts globs, can be used multiple times)
+          --files-excluded          Exclude these files (accepts globs, can be used multiple times)
+          --format                  Display the list in a specific format (oneline,flycheck)
+      -i, --ignore-checks           Ignore checks that match the given strings
+          --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+          --mute-exit-status        Exit with status zero even if there are issues
 
     General options:
           --[no-]color        Toggle colored output

@@ -1,5 +1,5 @@
 defmodule Credo.Test.AssertionsTest do
-  use Credo.TestHelper
+  use ExUnit.Case, async: true
 
   import Credo.Test.Assertions
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.LargeNumbersTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.LargeNumbers
 

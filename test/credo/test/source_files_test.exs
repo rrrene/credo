@@ -1,5 +1,5 @@
 defmodule Credo.Test.SourceFilesTest do
-  use Credo.TestHelper
+  use ExUnit.Case, async: true
 
   import Credo.Test.SourceFiles
 

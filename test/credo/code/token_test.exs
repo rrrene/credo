@@ -1,5 +1,5 @@
 defmodule Credo.Code.TokenTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Token
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Check.Consistency.SpaceAroundOperators.Collector
 

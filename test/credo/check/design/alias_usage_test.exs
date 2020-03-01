@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.AliasUsageTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.AliasUsage
 

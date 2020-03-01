@@ -225,6 +225,7 @@ defmodule Credo.Check do
       end
 
     quote do
+      @moduledoc false
       @behaviour Credo.Check
       @before_compile Credo.Check
 

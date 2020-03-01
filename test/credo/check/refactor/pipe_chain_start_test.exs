@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.PipeChainStartTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.PipeChainStart
 

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedEnumOperationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.UnusedEnumOperation
 
@@ -570,6 +570,30 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     """
     |> to_source_file
     |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for function calls that are ignored" do
+    """
+    defmodule CredoSampleModule do
+      def testcase(configs) do
+        fields
+        |> List.delete(:strategy)
+        |> Enum.sort()
+        |> Enum.reduce(0, fn field, priority ->
+          with {:ok, chunked_tasks} <- RedisApi.hget(job_id_key, field) do
+            priority = create(chunked_tasks, job_id, strategy, priority)
+            RedisApi.hdel(job_id_key, field)
+            priority
+          end
+        end)
+
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: [:reduce])
     |> refute_issues()
   end
 

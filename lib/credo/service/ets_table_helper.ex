@@ -16,7 +16,13 @@ defmodule Credo.Service.ETSTableHelper do
       end
 
       def get(filename) do
-        GenServer.call(__MODULE__, {:get, filename}, @timeout)
+        case :ets.lookup(@table_name, filename) do
+          [{^filename, value}] ->
+            {:ok, value}
+
+          [] ->
+            :notfound
+        end
       end
 
       def put(filename, value) do
@@ -36,16 +42,6 @@ defmodule Credo.Service.ETSTableHelper do
     ets = :ets.new(table_name, [:named_table, read_concurrency: true])
 
     {:ok, ets}
-  end
-
-  def handle_call(table_name, {:get, filename}, _from, current_state) do
-    case :ets.lookup(table_name, filename) do
-      [{^filename, value}] ->
-        {:reply, {:ok, value}, current_state}
-
-      [] ->
-        {:reply, :notfound, current_state}
-    end
   end
 
   def handle_call(table_name, {:put, filename, value}, _from, current_state) do

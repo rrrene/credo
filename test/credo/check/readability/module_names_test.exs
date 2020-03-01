@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ModuleNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.ModuleNames
 

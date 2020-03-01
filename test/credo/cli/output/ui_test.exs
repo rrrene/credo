@@ -1,5 +1,5 @@
 defmodule Credo.CLI.Output.UITest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.CLI.Output.UI
 

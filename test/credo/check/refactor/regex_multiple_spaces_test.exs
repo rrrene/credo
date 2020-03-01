@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.RegexMultipleSpacesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.RegexMultipleSpaces
 

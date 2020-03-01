@@ -1,9 +1,25 @@
 # Changelog
 
-## 1.3.0-rc
+## 1.3.0-rc2
 
 - Enable `UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
+- Fix false positive on TrailingWhiteSpace
+- Add `ignore: [:fun1, :fun2]` param to all `UnusedOperation*` checks; to ignore unused `Enum.reduce/3` operations, use
+
+      {Credo.Check.Warning.UnusedEnumOperation, [ignore: [:reduce]]},
+
+### New switch to re-enable disabled checks
+
+Use `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`. This comes in handy when using checks on a case-by-case basis
+
+As with other check-related switches, `pattern` is a comma-delimted list of patterns:
+
+    $ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation
+
+Of course, we can have the same effect by choosing the pattern less explicitly:
+
+    $ mix credo info --enable-disabled-checks specs,double
 
 ### New API for custom checks
 
@@ -66,8 +82,12 @@
 
 ### New checks
 
+- Credo.Check.Readability.StrictModuleLayout
 - Credo.Check.Readability.WithCustomTaggedTuple
 
+## 1.2.3
+
+- Fix performance bottleneck in `Credo.Service.ETSTableHelper`
 
 ## 1.2.2
 

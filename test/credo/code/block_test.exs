@@ -1,5 +1,5 @@
 defmodule Credo.Code.BlockTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Block
 
