@@ -85,6 +85,9 @@ Of course, we can have the same effect by choosing the pattern less explicitly:
 - Credo.Check.Readability.StrictModuleLayout
 - Credo.Check.Readability.WithCustomTaggedTuple
 
+## 1.2.3
+
+- Fix performance bottleneck in `Credo.Service.ETSTableHelper`
 
 ## 1.2.2
 
