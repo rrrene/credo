@@ -67,7 +67,7 @@ defmodule Credo.Check do
   @doc """
   Returns the base priority for the check.
   """
-  @callback base_priority() :: integer
+  @callback base_priority() :: :higher | :high | :normal | :low | 0
 
   @doc """
   Returns the category for the check.
