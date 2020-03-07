@@ -2,6 +2,8 @@
 
 Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine.
 
+You can use `mix credo gen.config` to generate a complete example configuration.
+
 This also works for umbrella projects, where you can have individual `.credo.exs` files for each app or a global one in the umbrella's `config/` or root folder.
 
 ```elixir
@@ -18,7 +20,7 @@ This also works for umbrella projects, where you can have individual `.credo.exs
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority
-        # Priority values are: `low, normal, high, higher`
+        # Priority values are: `low`, `normal`, `high`, `higher`
         {Credo.Check.Design.AliasUsage, priority: :low},
 
         # For others you can also set parameters
@@ -43,5 +45,3 @@ This also works for umbrella projects, where you can have individual `.credo.exs
 `mix credo --config-name <NAME_OF_CONFIG>` allows you to use a specific config (instead of `default`) inside a config file.
 
 `mix credo --config-file <PATH_TO_CONFIG_FILE>` let's you use a specific config file.
-
-Finally, you can use `mix credo gen.config` to generate a complete example configuration.
