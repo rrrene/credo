@@ -761,10 +761,12 @@ Some IDEs and editors are able to run Credo in the background and mark issues in
 
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
+* [ElixirLinter](https://marketplace.visualstudio.com/items?itemName=iampeterbanjo.elixirlinter) - VSCode plugin (by @iampeterbanjo)
 
 ### Automated Code Review
 
 * [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.
+* [SourceLevel](https://sourcelevel.io/) - tracks how your code changes over time and have this information accessible to your whole team.
 * [Stickler CI](https://stickler-ci.com/) - checks your code for style and best practices across your entire stack.
 
 ## Contributing

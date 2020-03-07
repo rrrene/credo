@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
 
   defp traverse_line([{line_no, line} | tail], issues, issue_meta) do
     issues =
-      case Regex.run(~r/\h+$/, line, return: :index) do
+      case Regex.run(~r/\h+$/u, line, return: :index) do
         [{column, line_length}] ->
           [issue_for(issue_meta, line_no, column + 1, line_length) | issues]
 

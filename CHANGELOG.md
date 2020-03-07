@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0-rc2
+## 1.3.0-rc3
 
 - Enable `UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
@@ -84,6 +84,8 @@ Of course, we can have the same effect by choosing the pattern less explicitly:
 
 - Credo.Check.Readability.StrictModuleLayout
 - Credo.Check.Readability.WithCustomTaggedTuple
+- Credo.Check.Warning.LeakyEnvironment
+- Credo.Check.Warning.UnsafeExec
 
 ## 1.2.3
 

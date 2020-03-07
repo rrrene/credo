@@ -37,7 +37,7 @@ sh $DIRNAME/run_on_project.sh https://github.com/thoughtbot/ex_machina.git ex_ma
 sh $DIRNAME/run_on_project.sh https://github.com/graphql-elixir/graphql.git graphql
 sh $DIRNAME/run_on_project.sh https://github.com/absinthe-graphql/absinthe.git absinthe
 sh $DIRNAME/run_on_project.sh https://github.com/devinus/poison.git poison
-sh $DIRNAME/run_on_project.sh https://github.com/plataformatec/mox.git mox
+sh $DIRNAME/run_on_project.sh https://github.com/dashbitco/mox.git mox
 sh $DIRNAME/run_on_project.sh https://github.com/PragTob/benchee.git benchee
 
 # Elixir
