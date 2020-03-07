@@ -135,10 +135,14 @@ defmodule Credo.Check.Consistency.Collector do
   end
 
   def find_issues(source_files, collector, params, issue_formatter) do
+    # IO.puts("#{collector}: find_issues 1")
+
     frequencies_per_source_file =
       source_files
       |> Enum.map(&Task.async(fn -> {&1, collector.collect_matches(&1, params)} end))
       |> Enum.map(&Task.await(&1, :infinity))
+
+    # IO.puts("#{collector}: find_issues 2")
 
     frequencies = total_frequencies(frequencies_per_source_file)
 
@@ -154,10 +158,17 @@ defmodule Credo.Check.Consistency.Collector do
       # x
       # |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
 
-      frequencies_per_source_file
-      |> source_files_with_issues(most_frequent_match)
-      |> Enum.map(&Task.async(fn -> issue_formatter.(most_frequent_match, &1, params) end))
-      |> Enum.flat_map(&Task.await(&1, :infinity))
+      # IO.puts("#{collector}: find_issues 3")
+
+      result =
+        frequencies_per_source_file
+        |> source_files_with_issues(most_frequent_match)
+        |> Enum.map(&Task.async(fn -> issue_formatter.(most_frequent_match, &1, params) end))
+        |> Enum.flat_map(&Task.await(&1, :infinity))
+
+      # IO.puts("#{collector}: find_issues 4")
+
+      result
     else
       []
     end
