@@ -321,7 +321,7 @@ defmodule Credo.Code.Heredocs do
            replacement,
            empty_line_replacement,
            current_line,
-           byte_index_start
+           byte_index_heredoc_start
          ) do
       parse_removable_heredoc_sigil(
         t,
@@ -330,7 +330,7 @@ defmodule Credo.Code.Heredocs do
         replacement,
         empty_line_replacement,
         current_line,
-        byte_index_start
+        byte_index_heredoc_start
       )
     end
 
@@ -341,7 +341,7 @@ defmodule Credo.Code.Heredocs do
            replacement,
            empty_line_replacement,
            current_line,
-           byte_index_start
+           byte_index_heredoc_start
          ) do
       parse_removable_heredoc_sigil(
         t,
@@ -350,7 +350,7 @@ defmodule Credo.Code.Heredocs do
         replacement,
         empty_line_replacement,
         current_line <> replacement <> replacement,
-        byte_index_start
+        byte_index_heredoc_start
       )
     end
 
@@ -361,9 +361,9 @@ defmodule Credo.Code.Heredocs do
            replacement,
            empty_line_replacement,
            current_line,
-           byte_index_start
+           byte_index_heredoc_start
          ) do
-      acc = pad_replaced_heredoc(acc, unquote(sigil_end), current_line, byte_index_start)
+      acc = pad_replaced_heredoc(acc, unquote(sigil_end), current_line, byte_index_heredoc_start)
 
       parse_code(t, acc <> unquote(sigil_end), replacement, empty_line_replacement)
     end
@@ -375,7 +375,7 @@ defmodule Credo.Code.Heredocs do
            replacement,
            empty_line_replacement,
            current_line,
-           byte_index_start
+           byte_index_heredoc_start
          ) do
       acc =
         if current_line == "\n" do
@@ -391,7 +391,7 @@ defmodule Credo.Code.Heredocs do
         replacement,
         empty_line_replacement,
         "\n",
-        byte_index_start
+        byte_index_heredoc_start
       )
     end
 
@@ -402,7 +402,7 @@ defmodule Credo.Code.Heredocs do
            replacement,
            empty_line_replacement,
            current_line,
-           byte_index_start
+           byte_index_heredoc_start
          ) do
       parse_removable_heredoc_sigil(
         t,
@@ -411,7 +411,7 @@ defmodule Credo.Code.Heredocs do
         replacement,
         empty_line_replacement,
         current_line <> replacement,
-        byte_index_start
+        byte_index_heredoc_start
       )
     end
   end
@@ -427,7 +427,7 @@ defmodule Credo.Code.Heredocs do
          _empty_line_replacement,
          _here_doc_delimiter,
          _current_line,
-         _byte_index_start
+         _byte_index_heredoc_start
        ) do
     acc
   end
@@ -439,7 +439,7 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          here_doc_delimiter,
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
     parse_heredoc(
       t,
@@ -448,7 +448,7 @@ defmodule Credo.Code.Heredocs do
       empty_line_replacement,
       here_doc_delimiter,
       current_line,
-      byte_index_start
+      byte_index_heredoc_start
     )
   end
 
@@ -459,7 +459,7 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          here_doc_delimiter,
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
     parse_heredoc(
       t,
@@ -468,7 +468,7 @@ defmodule Credo.Code.Heredocs do
       empty_line_replacement,
       here_doc_delimiter,
       current_line,
-      byte_index_start
+      byte_index_heredoc_start
     )
   end
 
@@ -479,9 +479,9 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          "\"\"\"",
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
-    acc = pad_replaced_heredoc(acc, ~s("""), current_line, byte_index_start)
+    acc = pad_replaced_heredoc(acc, ~s("""), current_line, byte_index_heredoc_start)
 
     parse_code(t, acc <> ~s("""), replacement, empty_line_replacement)
   end
@@ -493,9 +493,9 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          "\'\'\'",
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
-    acc = pad_replaced_heredoc(acc, ~s('''), current_line, byte_index_start)
+    acc = pad_replaced_heredoc(acc, ~s('''), current_line, byte_index_heredoc_start)
 
     parse_code(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
@@ -507,7 +507,7 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          here_doc_delimiter,
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
     acc =
       if current_line == "\n" do
@@ -523,7 +523,7 @@ defmodule Credo.Code.Heredocs do
       empty_line_replacement,
       here_doc_delimiter,
       "\n",
-      byte_index_start
+      byte_index_heredoc_start
     )
   end
 
@@ -534,7 +534,7 @@ defmodule Credo.Code.Heredocs do
          empty_line_replacement,
          here_doc_delimiter,
          current_line,
-         byte_index_start
+         byte_index_heredoc_start
        ) do
     parse_heredoc(
       t,
@@ -543,7 +543,7 @@ defmodule Credo.Code.Heredocs do
       empty_line_replacement,
       here_doc_delimiter,
       current_line <> replacement,
-      byte_index_start
+      byte_index_heredoc_start
     )
   end
 
@@ -577,15 +577,17 @@ defmodule Credo.Code.Heredocs do
     parse_string_literal(t, acc <> h, replacement, empty_line_replacement)
   end
 
-  defp pad_replaced_heredoc(acc, _delimiter, current_line, byte_index_start) do
+  defp pad_replaced_heredoc(acc, _delimiter, current_line, byte_index_heredoc_start) do
     no_of_chars_to_replace = String.length(current_line) - 1
     pad_string = "\n" <> String.pad_leading("", no_of_chars_to_replace)
 
+    start_binary = binary_part(acc, 0, byte_index_heredoc_start)
+
     new_acc =
       acc
-      |> :binary.part(byte_index_start, -1)
+      |> binary_part(byte_index_heredoc_start, byte_size(acc) - byte_index_heredoc_start)
       |> String.replace(~r/\n(.{#{no_of_chars_to_replace}})/, pad_string)
 
-    :binary.part(acc, 0, byte_index_start) <> new_acc
+    start_binary <> new_acc
   end
 end
