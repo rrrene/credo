@@ -21,7 +21,7 @@ defmodule Credo.Check.Worker do
   @doc """
   Called when a workload has finished.
   """
-  def workload_finished(worker_context, _workload, result) do
+  def send_workload_finished_to_runner(worker_context, _workload, result) do
     send(worker_context.runner_pid, {self(), {:workload_finished, result}})
   end
 
@@ -64,7 +64,7 @@ defmodule Credo.Check.Worker do
     spawn_fn = fn ->
       result = worker_context.work_fn.(workload)
 
-      workload_finished(worker_context, workload, result)
+      send_workload_finished_to_runner(worker_context, workload, result)
     end
 
     spawn_link(spawn_fn)
