@@ -76,7 +76,9 @@ defmodule Credo.Code.Heredocs do
         acc <> unquote(sigil_start),
         unquote(sigil_end),
         replacement,
-        empty_line_replacement
+        empty_line_replacement,
+        "",
+        byte_size(acc <> unquote(sigil_start))
       )
     end
   end
@@ -99,11 +101,27 @@ defmodule Credo.Code.Heredocs do
   end
 
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement, empty_line_replacement, ~s("""))
+    parse_heredoc(
+      t,
+      acc <> ~s("""),
+      replacement,
+      empty_line_replacement,
+      ~s("""),
+      "",
+      byte_size(acc <> ~s("""))
+    )
   end
 
   defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement, empty_line_replacement, ~s('''))
+    parse_heredoc(
+      t,
+      acc <> ~s('''),
+      replacement,
+      empty_line_replacement,
+      ~s('''),
+      "",
+      byte_size(acc <> ~s('''))
+    )
   end
 
   defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
@@ -290,7 +308,8 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            _replacement,
-           _empty_line_replacement
+           _empty_line_replacement,
+           _current_line
          ) do
       acc
     end
@@ -300,14 +319,18 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            replacement,
-           empty_line_replacement
+           empty_line_replacement,
+           current_line,
+           byte_index_start
          ) do
       parse_removable_heredoc_sigil(
         t,
         acc,
         unquote(sigil_end),
         replacement,
-        empty_line_replacement
+        empty_line_replacement,
+        current_line,
+        byte_index_start
       )
     end
 
@@ -316,14 +339,18 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            replacement,
-           empty_line_replacement
+           empty_line_replacement,
+           current_line,
+           byte_index_start
          ) do
       parse_removable_heredoc_sigil(
         t,
         acc <> replacement <> replacement,
         unquote(sigil_end),
         replacement,
-        empty_line_replacement
+        empty_line_replacement,
+        current_line <> replacement <> replacement,
+        byte_index_start
       )
     end
 
@@ -332,9 +359,11 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            replacement,
-           empty_line_replacement
+           empty_line_replacement,
+           current_line,
+           byte_index_start
          ) do
-      acc = pad_replaced_heredoc(acc, unquote(sigil_end))
+      acc = pad_replaced_heredoc(acc, unquote(sigil_end), current_line, byte_index_start)
 
       parse_code(t, acc <> unquote(sigil_end), replacement, empty_line_replacement)
     end
@@ -344,14 +373,25 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            replacement,
-           empty_line_replacement
+           empty_line_replacement,
+           current_line,
+           byte_index_start
          ) do
+      acc =
+        if current_line == "\n" do
+          acc <> empty_line_replacement
+        else
+          acc
+        end
+
       parse_removable_heredoc_sigil(
         t,
         acc <> "\n",
         unquote(sigil_end),
         replacement,
-        empty_line_replacement
+        empty_line_replacement,
+        "\n",
+        byte_index_start
       )
     end
 
@@ -360,14 +400,18 @@ defmodule Credo.Code.Heredocs do
            acc,
            unquote(sigil_end),
            replacement,
-           empty_line_replacement
+           empty_line_replacement,
+           current_line,
+           byte_index_start
          ) do
       parse_removable_heredoc_sigil(
         t,
         acc <> replacement,
         unquote(sigil_end),
         replacement,
-        empty_line_replacement
+        empty_line_replacement,
+        current_line <> replacement,
+        byte_index_start
       )
     end
   end
@@ -376,7 +420,15 @@ defmodule Credo.Code.Heredocs do
   # Heredocs
   #
 
-  defp parse_heredoc("", acc, _replacement, _empty_line_replacement, _here_doc_delimiter) do
+  defp parse_heredoc(
+         "",
+         acc,
+         _replacement,
+         _empty_line_replacement,
+         _here_doc_delimiter,
+         _current_line,
+         _byte_index_start
+       ) do
     acc
   end
 
@@ -385,9 +437,19 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         here_doc_delimiter
+         here_doc_delimiter,
+         current_line,
+         byte_index_start
        ) do
-    parse_heredoc(t, acc, replacement, empty_line_replacement, here_doc_delimiter)
+    parse_heredoc(
+      t,
+      acc,
+      replacement,
+      empty_line_replacement,
+      here_doc_delimiter,
+      current_line,
+      byte_index_start
+    )
   end
 
   defp parse_heredoc(
@@ -395,9 +457,19 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         here_doc_delimiter
+         here_doc_delimiter,
+         current_line,
+         byte_index_start
        ) do
-    parse_heredoc(t, acc, replacement, empty_line_replacement, here_doc_delimiter)
+    parse_heredoc(
+      t,
+      acc,
+      replacement,
+      empty_line_replacement,
+      here_doc_delimiter,
+      current_line,
+      byte_index_start
+    )
   end
 
   defp parse_heredoc(
@@ -405,9 +477,11 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         "\"\"\""
+         "\"\"\"",
+         current_line,
+         byte_index_start
        ) do
-    acc = pad_replaced_heredoc(acc, ~s("""))
+    acc = pad_replaced_heredoc(acc, ~s("""), current_line, byte_index_start)
 
     parse_code(t, acc <> ~s("""), replacement, empty_line_replacement)
   end
@@ -417,9 +491,11 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         "\'\'\'"
+         "\'\'\'",
+         current_line,
+         byte_index_start
        ) do
-    acc = pad_replaced_heredoc(acc, ~s('''))
+    acc = pad_replaced_heredoc(acc, ~s('''), current_line, byte_index_start)
 
     parse_code(t, acc <> ~s('''), replacement, empty_line_replacement)
   end
@@ -429,18 +505,26 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         here_doc_delimiter
+         here_doc_delimiter,
+         current_line,
+         byte_index_start
        ) do
-    end_of_empty_line? = String.slice(acc, -1..-1) == "\n"
-
     acc =
-      if end_of_empty_line? do
+      if current_line == "\n" do
         acc <> empty_line_replacement
       else
         acc
       end
 
-    parse_heredoc(t, acc <> "\n", replacement, empty_line_replacement, here_doc_delimiter)
+    parse_heredoc(
+      t,
+      acc <> "\n",
+      replacement,
+      empty_line_replacement,
+      here_doc_delimiter,
+      "\n",
+      byte_index_start
+    )
   end
 
   defp parse_heredoc(
@@ -448,9 +532,19 @@ defmodule Credo.Code.Heredocs do
          acc,
          replacement,
          empty_line_replacement,
-         here_doc_delimiter
+         here_doc_delimiter,
+         current_line,
+         byte_index_start
        ) do
-    parse_heredoc(t, acc <> replacement, replacement, empty_line_replacement, here_doc_delimiter)
+    parse_heredoc(
+      t,
+      acc <> replacement,
+      replacement,
+      empty_line_replacement,
+      here_doc_delimiter,
+      current_line <> replacement,
+      byte_index_start
+    )
   end
 
   #
@@ -483,30 +577,15 @@ defmodule Credo.Code.Heredocs do
     parse_string_literal(t, acc <> h, replacement, empty_line_replacement)
   end
 
-  defp pad_replaced_heredoc(acc, delimiter) do
-    no_of_chars_to_replace =
-      if acc =~ ~r/\n\Z/m do
-        0
-      else
-        [leading_string] = Regex.run(~r/[^\n]*\Z/m, acc)
-
-        String.length(leading_string)
-      end
-
+  defp pad_replaced_heredoc(acc, _delimiter, current_line, byte_index_start) do
+    no_of_chars_to_replace = String.length(current_line) - 1
     pad_string = "\n" <> String.pad_leading("", no_of_chars_to_replace)
-
-    {byte_index, _match_size} =
-      Regex.scan(~r/#{delimiter}/m, acc, return: :index)
-      |> List.last()
-      |> List.first()
-
-    length_after_byte_index = byte_size(acc) - byte_index
 
     new_acc =
       acc
-      |> :binary.part(byte_index, length_after_byte_index)
+      |> :binary.part(byte_index_start, -1)
       |> String.replace(~r/\n(.{#{no_of_chars_to_replace}})/, pad_string)
 
-    :binary.part(acc, 0, byte_index) <> new_acc
+    :binary.part(acc, 0, byte_index_start) <> new_acc
   end
 end
