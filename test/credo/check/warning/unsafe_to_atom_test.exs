@@ -10,6 +10,9 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
+      @test_module_attribute String.to_atom("foo")
+      @test_module_attribute2 Jason.decode("", keys: :atoms)
+
       def convert_module(parameter) do
         Module.safe_concat(__MODULE__, parameter)
       end
