@@ -41,6 +41,10 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  defp traverse({:@, _, _}, issues, _) do
+    {nil, issues}
+  end
+
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       {bad, suggestion} ->

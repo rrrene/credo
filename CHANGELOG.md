@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.3.0-rc3
+## 1.3.1
+
+- Fix new check (Credo.Check.Readability.StrictModuleLayout)
+- Ignore module attributes in UnsafeToAtom
+
+## 1.3.0
 
 - Enable `UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
@@ -25,60 +30,60 @@ Of course, we can have the same effect by choosing the pattern less explicitly:
 
 > This deprecates the mandatory use of `@explanation` and `@default_params` module attributes for checks.
 
-  Before `v1.3` you had to define module attributes named `@explanation` and `@default_params` before calling
-  `use Credo.Check`.
+Before `v1.3` you had to define module attributes named `@explanation` and `@default_params` before calling
+`use Credo.Check`.
 
-  Now you can pass `:explanations` (plural) and `:param_defaults` options directly to `use Credo.Check`.
+Now you can pass `:explanations` (plural) and `:param_defaults` options directly to `use Credo.Check`.
 
-  ```elixir
-  defmodule MyCheck do
-    use Credo.Check,
-      category: :warning,
-      base_priority: :high,
-      param_defaults: [param1: 42, param2: "offline"],
-      explanations: [
-        check: "...",
-        params: [
-          param1: "Your favorite number",
-          param2: "Online/Offline mode"
-        ]
+```elixir
+defmodule MyCheck do
+  use Credo.Check,
+    category: :warning,
+    base_priority: :high,
+    param_defaults: [param1: 42, param2: "offline"],
+    explanations: [
+      check: "...",
+      params: [
+        param1: "Your favorite number",
+        param2: "Online/Offline mode"
       ]
+    ]
 
-    def run(source_file, params) do
-      #
-    end
+  def run(source_file, params) do
+    #
   end
-  ```
+end
+```
 
-  Please note that these options
-  are also **just a convenience** to implement the functions specified by the  `Credo.Check` behaviour.
-  You can alternatively implement the respective functions yourself:
+Please note that these options
+are also **just a convenience** to implement the functions specified by the  `Credo.Check` behaviour.
+You can alternatively implement the respective functions yourself:
 
-  ```elixir
-  defmodule MyCheck do
-    use Credo.Check
+```elixir
+defmodule MyCheck do
+  use Credo.Check
 
-    def category, do: :warning
+  def category, do: :warning
 
-    def base_priority, do: :high
+  def base_priority, do: :high
 
-    def explanations do
-      [
-        check: "...",
-        params: [
-          param1: "Your favorite number",
-          param2: "Online/Offline mode"
-        ]
+  def explanations do
+    [
+      check: "...",
+      params: [
+        param1: "Your favorite number",
+        param2: "Online/Offline mode"
       ]
-    end
-
-    def param_defaults, do: [param1: 42, param2: "offline"]
-
-    def run(source_file, params) do
-      #
-    end
+    ]
   end
-  ```
+
+  def param_defaults, do: [param1: 42, param2: "offline"]
+
+  def run(source_file, params) do
+    #
+  end
+end
+```
 
 ### New checks
 

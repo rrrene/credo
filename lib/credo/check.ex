@@ -66,8 +66,11 @@ defmodule Credo.Check do
 
   @doc """
   Returns the base priority for the check.
+
+  This can be one of `:higher`, `:high`, `:normal`, `:low` or `:ignore`
+  (technically it can also be  or an integer, but these are internal representations although that is not recommended).
   """
-  @callback base_priority() :: integer
+  @callback base_priority() :: :higher | :high | :normal | :low | :ignore | integer
 
   @doc """
   Returns the category for the check.
@@ -209,7 +212,7 @@ defmodule Credo.Check do
       end
 
     quote do
-      @moduledoc false
+      @moduledoc unquote(moduledoc(opts))
       @behaviour Credo.Check
       @before_compile Credo.Check
 
@@ -250,33 +253,113 @@ defmodule Credo.Check do
       unquote(deprecated_def_default_params(env))
       unquote(deprecated_def_explanations(env))
 
+      @doc false
       def param_names do
         Keyword.keys(param_defaults())
       end
 
       @deprecated "Use param_defaults/1 instead"
+      @doc false
       def params_defaults do
         # deprecated - remove module attribute
         param_defaults()
       end
 
       @deprecated "Use param_names/1 instead"
+      @doc false
       def params_names do
         param_names()
       end
 
       @deprecated "Use explanations()[:check] instead"
+      @doc false
       def explanation do
         # deprecated - remove module attribute
         explanations()[:check]
       end
 
       @deprecated "Use explanations()[:params] instead"
+      @doc false
       def explanation_for_params do
         # deprecated - remove module attribute
         explanations()[:params]
       end
     end
+  end
+
+  defp moduledoc(opts) do
+    explanations = opts[:explanations]
+
+    base_priority = opts_to_string(opts[:base_priority]) || 0
+
+    # category = opts_to_string(opts[:category]) || to_string(__MODULE__)
+
+    elixir_version_hint =
+      if opts[:elixir_version] do
+        elixir_version = opts_to_string(opts[:elixir_version])
+
+        "requires Elixir `#{elixir_version}`"
+      else
+        "works with any version of Elixir"
+      end
+
+    check_doc = opts_to_string(explanations[:check])
+    params = explanations[:params] |> opts_to_string() |> List.wrap()
+    param_defaults = opts_to_string(opts[:param_defaults])
+
+    params_doc =
+      if params == [] do
+        "*There are no parameters for this check.*"
+      else
+        param_explanation =
+          Enum.map(params, fn {key, value} ->
+            default_value = inspect(param_defaults[key], limit: :infinity)
+
+            default_hint =
+              if default_value do
+                """
+
+                    *Defaults to* `#{default_value}`
+                """
+              end
+
+            """
+            - `#{key}`: #{value}
+              #{default_hint}
+
+            """
+          end)
+
+        """
+        Use the following parameters to configure this check:
+
+        #{param_explanation}
+
+        Parameters can be configured via the `.credo.exs` config file.
+        """
+      end
+
+    """
+    This check has a base priority of `#{base_priority}` and #{elixir_version_hint}.
+
+    ## Explanation
+
+    #{check_doc}
+
+    ## Configuration parameters
+
+    #{params_doc}
+
+    """
+  end
+
+  defp opts_to_string(value) do
+    {result, _} =
+      value
+      |> Macro.to_string()
+      |> Code.eval_string()
+
+    result
   end
 
   defp deprecated_def_default_params(env) do
