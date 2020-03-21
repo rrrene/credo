@@ -1,4 +1,6 @@
 defmodule Credo.Execution.ExecutionIssues do
+  @moduledoc false
+
   use GenServer
 
   alias Credo.Execution

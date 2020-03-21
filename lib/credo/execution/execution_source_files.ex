@@ -1,4 +1,6 @@
 defmodule Credo.Execution.ExecutionSourceFiles do
+  @moduledoc false
+
   use GenServer
 
   alias Credo.Execution

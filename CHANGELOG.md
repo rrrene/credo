@@ -2,12 +2,12 @@
 
 ## 1.3.1
 
-- Fix new check (Credo.Check.Readability.StrictModuleLayout)
+- Fix new check (`Credo.Check.Readability.StrictModuleLayout`)
 - Ignore module attributes in UnsafeToAtom
 
 ## 1.3.0
 
-- Enable `UnnecessaryAliasExpansion` check by default
+- Enable `Credo.Check.Readability.UnnecessaryAliasExpansion` check by default
 - Fix bugs when removing heredocs and charlists from sources
 - Fix false positive on TrailingWhiteSpace
 - Add `ignore: [:fun1, :fun2]` param to all `UnusedOperation*` checks; to ignore unused `Enum.reduce/3` operations, use
@@ -87,10 +87,10 @@ end
 
 ### New checks
 
-- Credo.Check.Readability.StrictModuleLayout
-- Credo.Check.Readability.WithCustomTaggedTuple
-- Credo.Check.Warning.LeakyEnvironment
-- Credo.Check.Warning.UnsafeExec
+- `Credo.Check.Readability.StrictModuleLayout`
+- `Credo.Check.Readability.WithCustomTaggedTuple`
+- `Credo.Check.Warning.LeakyEnvironment`
+- `Credo.Check.Warning.UnsafeExec`
 
 ## 1.2.3
 
@@ -102,7 +102,7 @@ end
 
 ## 1.2.1
 
-- Actually enable the new check (Credo.Check.Warning.MixEnv)
+- Actually enable the new check (`Credo.Check.Warning.MixEnv`)
 
 ## 1.2.0
 
@@ -122,7 +122,7 @@ end
 
 ### New checks
 
-- Credo.Check.Warning.MixEnv
+- `Credo.Check.Warning.MixEnv`
 
 ## 1.1.5
 

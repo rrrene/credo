@@ -38,6 +38,10 @@ defmodule Credo.Mixfile do
 
   defp extras do
     [
+      "CHANGELOG.md",
+
+      # Introduction
+
       "guides/introduction/overview.md",
       "guides/introduction/installation.md",
       "guides/introduction/basic_usage.md",
@@ -71,9 +75,20 @@ defmodule Credo.Mixfile do
   end
 
   defp groups_for_modules do
-    # Ungrouped Modules:
-
-    []
+    [
+      "Essential Behaviours": ~r/^Credo\.(Check|Plugin)$/,
+      "Essential Structs": ~r/^Credo\.(Execution|Issue|IssueMeta|SourceFile)$/,
+      "Code Analysis": ~r/^Credo\.Code(\.[^\.]+|)$/,
+      "Testing Utilities": ~r/^Credo\.Test\./,
+      "Check Utilities": ~r/^Credo\.Check(\.[^\.]+|)$/,
+      "Checks: Software Design": ~r/^Credo\.Check\.Design\./,
+      "Checks: Code Readability": ~r/^Credo\.Check\.Readability\./,
+      "Checks: Refactoring Opportunities": ~r/^Credo\.Check\.Refactor\./,
+      "Checks: Warnings": ~r/^Credo\.Check\.Warning\./,
+      "Checks: Consistency": ~r/^Credo\.Check\.Consistency\./,
+      "Commands & CLI": ~r/^Credo\.CLI(\.[^\.]+|)$/,
+      Internal: ~r/^Credo\..+/
+    ]
   end
 
   defp package do
