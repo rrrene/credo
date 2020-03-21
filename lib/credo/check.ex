@@ -81,8 +81,8 @@ defmodule Credo.Check do
 
   @doc """
   Returns the base priority for the check.
-  
-  This can be one of `:higher`, `:high`, `:normal`, `:low` or `:ignore` 
+
+  This can be one of `:higher`, `:high`, `:normal`, `:low` or `:ignore`
   (technically it can also be  or an integer, but these are internal representations although that is not recommended).
   """
   @callback base_priority() :: :higher | :high | :normal | :low | :ignore | integer
@@ -232,6 +232,8 @@ defmodule Credo.Check do
       @behaviour Credo.Check
       @before_compile Credo.Check
 
+      @use_deprecated_run_on_all? false
+
       alias Credo.Check
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
@@ -264,6 +266,19 @@ defmodule Credo.Check do
       def run_on_all_source_files(exec, source_files, params \\ [])
 
       def run_on_all_source_files(exec, source_files, params) do
+        if function_exported?(__MODULE__, :run, 3) do
+          IO.warn(
+            "Defining `run(source_files, exec, params)` for checks that run on all source files is deprecated. " <>
+              "Define `run_on_all_source_files(exec, source_files, params)` instead."
+          )
+
+          apply(__MODULE__, :run, [source_files, exec, params])
+        else
+          do_run_on_all_source_files(exec, source_files, params)
+        end
+      end
+
+      defp do_run_on_all_source_files(exec, source_files, params) do
         source_files
         |> Enum.map(&Task.async(fn -> run_on_source_file(exec, &1, params) end))
         |> Enum.each(&Task.await(&1, :infinity))
@@ -372,9 +387,12 @@ defmodule Credo.Check do
   end
 
   defp deprecated_def_explanations(env) do
-    explanation = Module.get_attribute(env.module, :explanation)
+    defines_deprecated_explanation_module_attribute? =
+      !is_nil(Module.get_attribute(env.module, :explanation))
 
-    if not is_nil(explanation) do
+    defines_deprecated_explanations_fun? = Module.defines?(env.module, {:explanations, 0})
+
+    if defines_deprecated_explanation_module_attribute? do
       # deprecated - remove once we ditch @explanation
       quote do
         @impl true
@@ -383,7 +401,7 @@ defmodule Credo.Check do
         end
       end
     else
-      if not Module.defines?(env.module, {:explanations, 0}) do
+      if !defines_deprecated_explanations_fun? do
         quote do
           @impl true
           def explanations, do: []

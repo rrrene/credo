@@ -14,7 +14,10 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp set_config_comments(exec, source_files) do
-    config_comment_map = Credo.Check.Runner.run_config_comment_finder(source_files, exec)
+    config_comment_map =
+      source_files
+      |> Credo.Check.ConfigCommentFinder.run()
+      |> Enum.into(%{})
 
     %Execution{exec | config_comment_map: config_comment_map}
   end

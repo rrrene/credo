@@ -184,7 +184,7 @@ defmodule Credo.Test.Case do
       "x = 5"
       |> to_source_file()
   """
-  def to_source_file(source) do
+  def to_source_file(source) when is_binary(source) do
     SourceFiles.to_source_file(source)
   end
 
@@ -194,7 +194,7 @@ defmodule Credo.Test.Case do
       "x = 5"
       |> to_source_file("simple.ex")
   """
-  def to_source_file(source, filename) do
+  def to_source_file(source, filename) when is_binary(source) and is_binary(filename) do
     SourceFiles.to_source_file(source, filename)
   end
 
@@ -204,7 +204,7 @@ defmodule Credo.Test.Case do
       ["x = 5", "y = 6"]
       |> to_source_files()
   """
-  def to_source_files(list) do
+  def to_source_files(list) when is_list(list) do
     Enum.map(list, &to_source_file/1)
   end
 end
