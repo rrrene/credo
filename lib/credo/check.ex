@@ -404,6 +404,10 @@ defmodule Credo.Check do
     end
   end
 
+  def builtin_param_names do
+    [:priority, :__priority__, :exit_status, :__exit_status__]
+  end
+
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]
 
@@ -424,8 +428,11 @@ defmodule Credo.Check do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
 
-    priority = Priority.to_integer(params[:priority] || issue_base_priority)
-    exit_status = Check.to_exit_status(params[:exit_status] || issue_category)
+    priority =
+      Priority.to_integer(params[:__priority__] || params[:priority] || issue_base_priority)
+
+    exit_status =
+      Check.to_exit_status(params[:__exit_status__] || params[:exit_status] || issue_category)
 
     line_no = opts[:line_no]
     trigger = opts[:trigger]

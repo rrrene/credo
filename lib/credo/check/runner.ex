@@ -179,11 +179,11 @@ defmodule Credo.Check.Runner do
   end
 
   defp warn_about_failed_run(check, %SourceFile{} = source_file) do
-    UI.warn("Error while running #{check} on #{source_file.filename}")
+    UI.warn([:red, "** (config) Error while running #{check} on #{source_file.filename}"])
   end
 
   defp warn_about_failed_run(check, _) do
-    UI.warn("Error while running #{check}")
+    UI.warn([:red, "** (config) Error while running #{check}"])
   end
 
   defp warn_about_ineffective_patterns(
@@ -192,7 +192,7 @@ defmodule Credo.Check.Runner do
        ) do
     UI.warn([
       :red,
-      "A pattern was given to filter checks, but it did not match any: ",
+      "** (config) A pattern was given to filter checks, but it did not match any: ",
       inspect(only_checks)
     ])
 
@@ -205,7 +205,7 @@ defmodule Credo.Check.Runner do
        ) do
     UI.warn([
       :red,
-      "A pattern was given to ignore checks, but it did not match any: ",
+      "** (config) A pattern was given to ignore checks, but it did not match any: ",
       inspect(ignore_checks)
     ])
 

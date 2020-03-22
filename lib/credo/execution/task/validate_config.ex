@@ -13,9 +13,68 @@ defmodule Credo.Execution.Task.ValidateConfig do
   end
 
   defp validate_checks(%Execution{checks: checks} = exec) do
-    Enum.each(checks, &warn_if_check_missing/1)
+    Enum.each(checks, fn check_tuple ->
+      warn_if_check_missing(check_tuple)
+      warn_if_check_params_invalid(check_tuple)
+    end)
 
     exec
+  end
+
+  defp warn_if_check_params_invalid({_check, false}), do: nil
+  defp warn_if_check_params_invalid({_check, []}), do: nil
+
+  defp warn_if_check_params_invalid({check, params}) do
+    if check_defined?(check) do
+      valid_param_names = check.param_names ++ Credo.Check.builtin_param_names()
+      check = check |> to_string |> String.to_existing_atom()
+
+      Enum.each(params, fn {param_name, _param_value} ->
+        unless Enum.member?(valid_param_names, param_name) do
+          candidate = find_best_match(valid_param_names, param_name)
+
+          warning =
+            if candidate do
+              "** (config) #{check_name(check)}: unknown param `#{param_name}`. Did you mean `#{
+                candidate
+              }`?"
+            else
+              "** (config) #{check_name(check)}: unknown param `#{param_name}`."
+            end
+
+          UI.warn([:red, warning])
+        end
+      end)
+    end
+  end
+
+  defp find_best_match(candidates, given, threshold \\ 0.8) do
+    given_string = to_string(given)
+
+    {jaro_distance, candidate} =
+      candidates
+      |> Enum.map(fn candidate_name ->
+        distance = String.jaro_distance(given_string, to_string(candidate_name))
+        {distance, candidate_name}
+      end)
+      |> Enum.sort()
+      |> List.last()
+
+    if jaro_distance > threshold do
+      candidate
+    end
+  end
+
+  defp warn_if_check_missing({check, _params}) do
+    unless check_defined?(check) do
+      UI.warn([:red, "** (config) Ignoring an undefined check: #{check_name(check)}"])
+    end
+  end
+
+  defp check_name(atom) do
+    atom
+    |> to_string()
+    |> String.replace(~r/^Elixir\./, "")
   end
 
   defp inspect_config_if_debug(%Execution{debug: true} = exec) do
@@ -40,22 +99,9 @@ defmodule Credo.Execution.Task.ValidateConfig do
     %Execution{exec | checks: checks}
   end
 
-  defp check_defined?({atom, _}), do: check_defined?({atom})
+  defp check_defined?({atom, _params}), do: check_defined?(atom)
 
-  defp check_defined?({atom}) do
+  defp check_defined?(atom) do
     Credo.Backports.Code.ensure_compiled?(atom)
-  end
-
-  defp warn_if_check_missing({atom, _}), do: warn_if_check_missing({atom})
-
-  defp warn_if_check_missing({atom}) do
-    unless check_defined?({atom}) do
-      check_name =
-        atom
-        |> to_string()
-        |> String.replace(~r/^Elixir\./, "")
-
-      UI.warn("Ignoring an undefined check: #{check_name}")
-    end
   end
 end

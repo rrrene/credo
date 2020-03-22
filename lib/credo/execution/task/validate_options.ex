@@ -27,12 +27,12 @@ defmodule Credo.Execution.Task.ValidateOptions do
   end
 
   defp print_argument(name) do
-    UI.warn([:red, "Unknown argument: #{name}"])
+    UI.warn([:red, "** (credo) Unknown argument: #{name}"])
   end
 
   defp print_switch({name, _value}), do: print_switch(name)
 
   defp print_switch(name) do
-    UI.warn([:red, "Unknown switch: #{name}"])
+    UI.warn([:red, "** (credo) Unknown switch: #{name}"])
   end
 end

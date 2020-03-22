@@ -33,7 +33,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
             line_no2 >= line_no - 2 and line_no2 <= line_no + 2
           end)
 
-        UI.warn([:red, :bright, "Error while loading config file!"])
+        UI.warn([:red, "** (config) Error while loading config file!"])
         UI.warn("")
 
         UI.warn([:cyan, "  file: ", :reset, filename])
