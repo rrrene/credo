@@ -2,6 +2,7 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    tags: [:formatter],
     explanations: [
       check: """
       Tabs should be used consistently.

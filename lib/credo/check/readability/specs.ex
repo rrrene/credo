@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.Specs do
   use Credo.Check,
+    tags: [:controversial],
     explanations: [
       check: """
       Functions, callbacks and macros need typespecs.
@@ -19,6 +20,10 @@ defmodule Credo.Check.Readability.Specs do
 
       The check only considers whether the specification is present, it doesn't
       perform any actual type checking.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 

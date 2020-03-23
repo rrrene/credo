@@ -126,7 +126,8 @@ defmodule Credo.Check do
     :param_defaults,
     :elixir_version,
     :explanations,
-    :run_on_all
+    :run_on_all,
+    :tags
   ]
 
   @doc false

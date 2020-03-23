@@ -2,6 +2,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    tags: [:controversial],
     explanations: [
       check: """
       When using alias, import, require or use for multiple names from the same
@@ -9,13 +10,13 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
 
       Use single instructions per name:
 
-        alias Ecto.Query
-        alias Ecto.Schema
-        alias Ecto.Multi
+          alias Ecto.Query
+          alias Ecto.Schema
+          alias Ecto.Multi
 
       or use one multi instruction per namespace:
 
-        alias Ecto.{Query, Schema, Multi}
+          alias Ecto.{Query, Schema, Multi}
 
       While this is not necessarily a concern for the correctness of your code,
       you should use a consistent style throughout your codebase.

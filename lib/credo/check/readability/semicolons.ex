@@ -1,6 +1,7 @@
 defmodule Credo.Check.Readability.Semicolons do
   use Credo.Check,
     base_priority: :high,
+    tags: [:formatter],
     explanations: [
       check: """
       Don't use ; to separate statements and expressions.

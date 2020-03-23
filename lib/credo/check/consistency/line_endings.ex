@@ -2,9 +2,12 @@ defmodule Credo.Check.Consistency.LineEndings do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    tags: [:formatter],
     explanations: [
       check: """
-      Windows and *nix systems use different line-endings in files.
+      Windows and Linux/macOS systems use different line-endings in files.
+
+      It seems like a good idea not to mix these in the same codebase.
 
       While this is not necessarily a concern for the correctness of your code,
       you should use a consistent style throughout your codebase.

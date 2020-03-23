@@ -9,16 +9,16 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
       By default, this check enforces no parentheses, so zero-arity function
       and macro definitions should look like this:
 
-      def summer? do
-        # ...
-      end
+          def summer? do
+            # ...
+          end
 
-      If the `:parens` option is set to `true` for this check, then the check
+      If the `:parens` param is set to `true` for this check, then the check
       enforces zero-arity function and macro definitions to have parens:
 
-      def summer?() do
-        # ...
-      end
+          def summer?() do
+            # ...
+          end
 
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making

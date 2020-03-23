@@ -2,6 +2,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   use Credo.Check,
     run_on_all: true,
     base_priority: :higher,
+    tags: [:legacy, :controversial],
     param_defaults: [
       mass_threshold: 40,
       nodes_threshold: 2,

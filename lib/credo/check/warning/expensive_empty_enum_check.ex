@@ -9,11 +9,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
       Checking if an enum is empty should be done by using
 
-        Enum.empty?(enum)
+          Enum.empty?(enum)
 
       or
 
-        list == []
+          list == []
 
       """
     ]

@@ -4,11 +4,11 @@ defmodule Credo.Check.Warning.MixEnv do
     param_defaults: [excluded_paths: []],
     explanations: [
       check: """
-      From the elixir-lang guide:
-
       Mix is a build tool and, as such, it is not expected to be available in production.
       Therefore, it is recommended to access Mix.env only in configuration files and inside
       mix.exs, never in your application code (lib).
+
+      (from the Elixir docs)
       """,
       params: [
         excluded_paths: "List of paths or regex to exclude from this check"

@@ -1,6 +1,7 @@
 defmodule Credo.Check.Refactor.NegatedIsNil do
   use Credo.Check,
     base_priority: :low,
+    tags: [:controversial],
     explanations: [
       check: """
       We should avoid negating the `is_nil` predicate function.

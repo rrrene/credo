@@ -1,6 +1,7 @@
 defmodule Credo.Check.Warning.LeakyEnvironment do
   use Credo.Check,
     base_priority: :high,
+    tags: [:controversial],
     category: :warning,
     explanations: [
       check: """
@@ -9,7 +10,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
       minimize the risk of such values leaking, clear or overwrite them when
       spawning executables.
 
-      The `System.cmd/2,3` function allows environment variables be cleared by
+      The functions `System.cmd/2` and `System.cmd/3` allow environment variables be cleared by
       setting their value to `nil`:
 
           System.cmd("env", [], env: %{"DB_PASSWORD" => nil})

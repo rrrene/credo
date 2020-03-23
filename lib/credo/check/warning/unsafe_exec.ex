@@ -5,6 +5,7 @@ defmodule Credo.Check.Warning.UnsafeExec do
     explanations: [
       check: """
       Spawning external commands can lead to command injection vulnerabilities.
+
       Use a safe API where arguments are passed as an explicit list, rather
       than unsafe APIs that run a shell to parse the arguments from a single
       string.

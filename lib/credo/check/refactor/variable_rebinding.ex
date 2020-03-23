@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
   use Credo.Check,
+    tags: [:controversial],
     explanations: [
       check: """
       You might want to refrain from rebinding variables.

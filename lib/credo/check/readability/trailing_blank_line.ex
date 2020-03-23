@@ -1,6 +1,7 @@
 defmodule Credo.Check.Readability.TrailingBlankLine do
   use Credo.Check,
     base_priority: :low,
+    tags: [:formatter],
     explanations: [
       check: """
       Files should end in a trailing blank line.

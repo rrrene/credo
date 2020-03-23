@@ -2,6 +2,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    tags: [:formatter],
     param_defaults: [allow_empty_enums: false],
     explanations: [
       check: """

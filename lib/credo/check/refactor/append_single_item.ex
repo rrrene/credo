@@ -1,6 +1,7 @@
 defmodule Credo.Check.Refactor.AppendSingleItem do
   use Credo.Check,
     base_priority: :low,
+    tags: [:controversial],
     explanations: [
       check: """
       When building up large lists, it is faster to prepend than

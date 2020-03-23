@@ -2,6 +2,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    tags: [:formatter],
     param_defaults: [ignore: [:|]],
     explanations: [
       check: """

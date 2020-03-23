@@ -1,6 +1,7 @@
 defmodule Credo.Check.Readability.StrictModuleLayout do
   use Credo.Check,
     base_priority: :low,
+    tags: [:controversial],
     explanations: [
       check: """
       Provide module parts in a required order.
@@ -14,6 +15,10 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
             alias Baz
             require Qux
           end
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """,
       params: [
         order: """

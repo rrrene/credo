@@ -1,6 +1,7 @@
 defmodule Credo.Check.Refactor.ModuleDependencies do
   use Credo.Check,
     base_priority: :normal,
+    tags: [:controversial],
     param_defaults: [
       max_deps: 10,
       dependency_namespaces: [],

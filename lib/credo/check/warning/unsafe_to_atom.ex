@@ -2,6 +2,7 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   use Credo.Check,
     base_priority: :high,
     category: :warning,
+    tags: [:controversial],
     explanations: [
       check: """
       Creating atoms from unknown or external sources dynamically is a potentially

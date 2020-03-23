@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
   use Credo.Check,
+    tags: [:controversial],
     param_defaults: [
       excluded_argument_types: [],
       excluded_functions: []

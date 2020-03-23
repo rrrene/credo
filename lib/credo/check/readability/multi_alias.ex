@@ -1,6 +1,7 @@
 defmodule Credo.Check.Readability.MultiAlias do
   use Credo.Check,
     base_priority: :low,
+    tags: [:controversial],
     explanations: [
       check: """
       Multi alias expansion makes module uses harder to search for in large code bases.

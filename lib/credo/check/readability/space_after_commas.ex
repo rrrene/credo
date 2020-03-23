@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.SpaceAfterCommas do
   use Credo.Check,
+    tags: [:formatter],
     explanations: [
       check: """
       You can use white-space after commas to make items of lists,

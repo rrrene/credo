@@ -1,9 +1,10 @@
 defmodule Credo.Check.Refactor.DoubleBooleanNegation do
   use Credo.Check,
     base_priority: :low,
+    tags: [:controversial],
     explanations: [
       check: """
-      Having double negations in your code obscures a parameters original value.
+      Having double negations in your code can obscure the parameter's original value.
 
           # NOT preferred
 

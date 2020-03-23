@@ -2,8 +2,9 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   use Credo.Check,
     explanations: [
       check: """
-      Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace,
-      which obscures the cause of the original error.
+      Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace.
+
+      Most of the time, this is not what you want to do since it obscures the cause of the original error.
 
       Example:
 

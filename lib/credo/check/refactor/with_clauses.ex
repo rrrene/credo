@@ -70,12 +70,12 @@ defmodule Credo.Check.Refactor.WithClauses do
 
   alias Credo.Code
 
-  @message_only_one_pattern_clause "\"with\" contains only one <- clause and an \"else\" " <>
-                                     "branch, use a \"case\" instead"
-  @message_first_clause_not_pattern "\"with\" doesn't start with a <- clause, " <>
-                                      "move the non-pattern <- clauses outside of the \"with\""
-  @message_last_clause_not_pattern "\"with\" doesn't end with a <- clause, move " <>
-                                     "the non-pattern <- clauses inside the body of the \"with\""
+  @message_only_one_pattern_clause "`with` contains only one <- clause and an `else` " <>
+                                     "branch, use a `case` instead"
+  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, " <>
+                                      "move the non-pattern <- clauses outside of the `with`"
+  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move " <>
+                                     "the non-pattern <- clauses inside the body of the `with`"
 
   @doc false
   def run(source_file, params \\ []) do
