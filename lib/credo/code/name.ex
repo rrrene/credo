@@ -100,7 +100,7 @@ defmodule Credo.Code.Name do
   end
 
   def snake_case?(name) do
-    String.match?(name, ~r/^[a-z0-9\_\?\!]+$/)
+    String.match?(name, ~r/^[[:lower:][:digit:]\_\?\!]+$/u)
   end
 
   def no_case?(name) do
