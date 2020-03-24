@@ -72,7 +72,7 @@ defmodule Credo.Check.Refactor.WithClausesTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message =~ ~s("with" doesn't start with a <- clause)
+      assert issue.message =~ ~s(doesn't start with a <- clause)
     end)
   end
 
@@ -88,7 +88,7 @@ defmodule Credo.Check.Refactor.WithClausesTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message =~ ~s("with" doesn't end with a <- clause)
+      assert issue.message =~ ~s(doesn't end with a <- clause)
     end)
   end
 
