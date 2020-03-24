@@ -19,6 +19,7 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         ^some_value = parameter1
         %{some_value: some_value} = parameter1
         ... = parameter1
+        latency_μs = 5
       end
     end
     """

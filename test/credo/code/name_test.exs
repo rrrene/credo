@@ -122,6 +122,10 @@ defmodule Credo.Code.NameTest do
 
   test "returns true if name is snake_case" do
     assert "snake_case_test" |> Name.snake_case?()
+    assert "snake_case23" |> Name.snake_case?()
+    assert "snake_case_23" |> Name.snake_case?()
+    assert "latency_μs" |> Name.snake_case?()
+    assert "rené_föhring" |> Name.snake_case?()
     refute "SnakeCase_mixed" |> Name.snake_case?()
   end
 
