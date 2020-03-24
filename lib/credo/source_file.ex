@@ -148,13 +148,12 @@ defmodule Credo.SourceFile do
       |> to_string
       |> Regex.escape()
 
-    case Regex.run(~r/\b#{regexed}\b/, line, return: :index) do
+    case Regex.run(~r/(\b|\(|\))(#{regexed})(\b|\(|\))/, line, return: :index) do
       nil ->
         nil
 
-      result ->
-        {col, _} = List.first(result)
-        col + 1
+      [_, _, {regexed_col, _regexed_length}, _] ->
+        regexed_col + 1
     end
   end
 
