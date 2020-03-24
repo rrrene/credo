@@ -571,4 +571,17 @@ defmodule Credo.Check do
   end
 
   def to_exit_status(value), do: value
+
+  @doc false
+  def defined?(check)
+
+  def defined?({atom, _params}), do: defined?(atom)
+
+  def defined?(binary) when is_binary(binary) do
+    binary |> String.to_atom() |> defined?()
+  end
+
+  def defined?(atom) when is_atom(atom) do
+    Credo.Backports.Code.ensure_compiled?(atom)
+  end
 end

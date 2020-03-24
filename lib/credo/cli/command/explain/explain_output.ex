@@ -11,12 +11,12 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
     usage = [
       "Usage: ",
       :olive,
-      "mix credo explain path_line_no_column [options]"
+      "mix credo explain <check_name_or_path_line_no_column> [options]"
     ]
 
     description = """
 
-    Explain the given issue.
+    Explain the given check or issue.
     """
 
     example = [
@@ -24,6 +24,13 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
       :olive,
       :faint,
       "$ mix credo explain lib/foo/bar.ex:13:6"
+    ]
+
+    example2 = [
+      "         ",
+      :olive,
+      :faint,
+      "$ mix credo explain Credo.Check.Refactor.Nesting"
     ]
 
     options = """
@@ -37,6 +44,7 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
     UI.puts(usage)
     UI.puts(description)
     UI.puts(example)
+    UI.puts(example2)
     UI.puts(options)
 
     exec

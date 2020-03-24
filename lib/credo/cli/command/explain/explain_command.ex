@@ -5,6 +5,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
   use Credo.CLI.Command
 
+  alias Credo.Check
   alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
   alias Credo.CLI.Filename
@@ -18,16 +19,34 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   def call(exec, _opts) do
     filename = get_filename_from_args(exec)
 
-    if Filename.contains_line_no?(filename) do
-      exec
-      |> run_task(Task.LoadAndValidateSourceFiles)
-      |> run_task(Task.PrepareChecksToRun)
-      |> run_task(Task.RunChecks)
-      |> run_task(Task.SetRelevantIssues)
-      |> print_results_and_summary()
-    else
-      Output.print_help(exec)
+    cond do
+      Filename.contains_line_no?(filename) ->
+        explain_issue(exec)
+
+      Check.defined?("Elixir.#{filename}") ->
+        explain_check(exec, filename)
+
+      true ->
+        Output.print_help(exec)
     end
+  end
+
+  defp explain_issue(exec) do
+    exec
+    |> run_task(Task.LoadAndValidateSourceFiles)
+    |> run_task(Task.PrepareChecksToRun)
+    |> run_task(Task.RunChecks)
+    |> run_task(Task.SetRelevantIssues)
+    |> print_results_and_summary()
+  end
+
+  defp explain_check(exec, check_name) do
+    check = :"Elixir.#{check_name}"
+    explanations = [cast_to_explanation(check)]
+
+    Output.print_after_info(explanations, exec, nil, nil)
+
+    exec
   end
 
   defp print_results_and_summary(exec) do
@@ -66,6 +85,15 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
     exec.cli_options.args
     |> List.wrap()
     |> List.first()
+  end
+
+  defp cast_to_explanation(check) do
+    %{
+      category: check.category,
+      check: check,
+      explanation_for_issue: check.explanation,
+      priority: check.base_priority
+    }
   end
 
   defp cast_to_explanation(issue, source_file) do

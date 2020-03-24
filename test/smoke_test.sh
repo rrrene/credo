@@ -13,10 +13,14 @@ mix credo --debug --mute-exit-status
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
 
+# explain issues
 mix credo test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status
 mix credo explain test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status
 mix credo test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status --format=json
 mix credo explain test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status --format=json
+# explain check
+mix credo explain Credo.Check.Refactor.Nesting --mute-exit-status
+mix credo explain Credo.Check.Refactor.Nesting --mute-exit-status --format=json
 
 mix credo.gen.check $GENEREATE_CREDO_CHECK
 rm $GENEREATE_CREDO_CHECK

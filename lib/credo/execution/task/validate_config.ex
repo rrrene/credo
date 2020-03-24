@@ -3,6 +3,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   use Credo.Execution.Task
 
+  alias Credo.Check
   alias Credo.CLI.Output.UI
 
   def call(exec, _opts) do
@@ -25,7 +26,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
   defp warn_if_check_params_invalid({_check, []}), do: nil
 
   defp warn_if_check_params_invalid({check, params}) do
-    if check_defined?(check) do
+    if Check.defined?(check) do
       valid_param_names = check.param_names ++ Credo.Check.builtin_param_names()
       check = check |> to_string |> String.to_existing_atom()
 
@@ -66,7 +67,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
   end
 
   defp warn_if_check_missing({check, _params}) do
-    unless check_defined?(check) do
+    unless Check.defined?(check) do
       UI.warn([:red, "** (config) Ignoring an undefined check: #{check_name(check)}"])
     end
   end
@@ -94,14 +95,8 @@ defmodule Credo.Execution.Task.ValidateConfig do
   defp inspect_config_if_debug(exec), do: exec
 
   defp remove_missing_checks(%Execution{checks: checks} = exec) do
-    checks = Enum.filter(checks, &check_defined?/1)
+    checks = Enum.filter(checks, &Check.defined?/1)
 
     %Execution{exec | checks: checks}
-  end
-
-  defp check_defined?({atom, _params}), do: check_defined?(atom)
-
-  defp check_defined?(atom) do
-    Credo.Backports.Code.ensure_compiled?(atom)
   end
 end

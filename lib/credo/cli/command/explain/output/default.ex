@@ -22,13 +22,110 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
   end
 
   @doc "Called after the analysis has run."
+  def print_after_info(explanations, exec, nil, nil) do
+    term_width = Output.term_columns()
+
+    print_explanations_for_check(explanations, exec, term_width)
+  end
+
   def print_after_info(explanations, exec, line_no, column) do
     term_width = Output.term_columns()
 
-    print_explanations(explanations, exec, term_width, line_no, column)
+    print_explanations_for_issue(explanations, exec, term_width, line_no, column)
   end
 
-  defp print_explanations(
+  #
+  # CHECK
+  #
+
+  defp print_explanations_for_check(explanations, _exec, term_width) do
+    Enum.each(explanations, &print_check(&1, term_width))
+  end
+
+  defp print_check(
+         %{
+           category: category,
+           check: check,
+           explanation_for_issue: explanation_for_issue,
+           priority: priority
+         },
+         term_width
+       ) do
+    check_name = check |> to_string |> String.replace(~r/^Elixir\./, "")
+    color = Output.check_color(check.category)
+
+    UI.puts()
+
+    [
+      :bright,
+      "#{color}_background" |> String.to_atom(),
+      color,
+      " ",
+      Output.foreground_color(color),
+      :normal,
+      " Check: #{check_name}" |> String.pad_trailing(term_width - 1)
+    ]
+    |> UI.puts()
+
+    UI.puts_edge(color)
+
+    outer_color = Output.check_color(category)
+    inner_color = Output.check_color(category)
+
+    tag_style =
+      if outer_color == inner_color do
+        :faint
+      else
+        :bright
+      end
+
+    [
+      UI.edge(outer_color),
+      inner_color,
+      tag_style,
+      "  ",
+      Output.check_tag(check.category),
+      :reset,
+      " Category: #{check.category} "
+    ]
+    |> UI.puts()
+
+    [
+      UI.edge(outer_color),
+      inner_color,
+      tag_style,
+      "   ",
+      priority |> Output.priority_arrow(),
+      :reset,
+      "  Priority: #{Output.priority_name(priority)} "
+    ]
+    |> UI.puts()
+
+    UI.puts_edge(outer_color)
+
+    UI.puts_edge([outer_color, :faint], @indent)
+
+    print_check_explanation(explanation_for_issue, outer_color)
+    print_params_explanation(check, outer_color)
+
+    UI.puts_edge([outer_color, :faint])
+  end
+
+  #
+  # ISSUE
+  #
+
+  defp print_explanations_for_issue(
+         [],
+         _exec,
+         _term_width,
+         _line_no,
+         _column
+       ) do
+    nil
+  end
+
+  defp print_explanations_for_issue(
          explanations,
          _exec,
          term_width,
@@ -37,7 +134,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
        ) do
     first_explanation = explanations |> List.first()
     scope_name = Scope.mod_name(first_explanation.scope)
-    color = Output.check_color(first_explanation.check)
+    color = Output.check_color(first_explanation.category)
 
     UI.puts()
 
@@ -54,8 +151,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     UI.puts_edge(color)
 
-    explanations
-    |> Enum.each(&print_issue(&1, term_width))
+    Enum.each(explanations, &print_issue(&1, term_width))
   end
 
   defp print_issue(
@@ -151,6 +247,13 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     UI.puts_edge([outer_color, :faint], @indent)
 
+    print_check_explanation(explanation_for_issue, outer_color)
+    print_params_explanation(check, outer_color)
+
+    UI.puts_edge([outer_color, :faint])
+  end
+
+  def print_check_explanation(explanation_for_issue, outer_color) do
     [
       UI.edge([outer_color, :faint]),
       :reset,
@@ -168,10 +271,6 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     |> Enum.flat_map(&format_explanation(&1, outer_color))
     |> Enum.slice(0..-2)
     |> UI.puts()
-
-    UI.puts_edge([outer_color, :faint])
-
-    print_params_explanation(check, outer_color)
 
     UI.puts_edge([outer_color, :faint])
   end
