@@ -51,7 +51,7 @@ defmodule Credo.Mixfile do
       # Plugins
 
       "guides/custom_checks/adding_checks.md",
-      "guides/custom_checks/testing.md",
+      "guides/custom_checks/testing_checks.md",
 
       # Configuration
 
