@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2
+
+- Support non-ascii characters in variable names
+- Fix false positive in `Credo.Check.Readability.ParenthesesOnZeroArityDefs`
+
 ## 1.3.1
 
 - Fix new check (Credo.Check.Readability.StrictModuleLayout)
