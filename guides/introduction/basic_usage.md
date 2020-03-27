@@ -116,6 +116,97 @@ $ mix credo lib/credo/check.ex:306 --format json
 }
 ```
 
+### Using Credo as stand alone
+
+If you do not want or are not allowed to include Credo in the current project, you can also install it as an archive. 
+For this, you also need to install [bunt](https://github.com/rrrene/bunt):
+
+```bash
+git clone git@github.com:rrrene/bunt.git
+cd bunt
+mix archive.build
+mix archive.install
+cd -
+git clone git@github.com:rrrene/credo.git
+cd credo
+mix deps.get
+mix archive.build
+mix archive.install
+```
+
+**Important:** You have to install `bunt` as well:
+
+```bash
+git clone https://github.com/rrrene/bunt
+cd bunt
+mix archive.build
+mix archive.install
+```
+
+You will now be able to invoke credo as usual through Mix with `mix credo`. This option is especially handy so credo can be used by external editors.
+
+## Commands
+
+### suggest (default command)
+
+`suggest` is the default command of Credo. It suggests issues to fix in your code, but it cuts the list to a digestable count. If you want to see the full list, use the `--all`  switch.
+
+Example usage:
+
+    $ mix credo                         # display standard report
+    $ mix credo suggest                 # same thing, since it's the default command
+    $ mix credo --all --format=json     # include low priority issues, output as JSON
+
+    $ mix credo suggest --help          # more options
+
+
+### list
+
+`list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.
+
+Example usage:
+
+    $ mix credo list                      # show issues grouped by file
+    $ mix credo list --format=oneline     # show issues grouped by file, one issue per line
+    $ mix credo list --format=oneline -a  # same thing, include low priority issues
+
+    $ mix credo list --help               # more options
+
+
+### explain
+
+`explain` allows you to dig deeper into an issue, by showing you details about the issue and the reasoning by it being reported. To be convenient, you can just copy-paste the `filename:line_number:column` string from the report behind the Credo command to check it out.
+
+*Credits:* This is inspired by how you can snap the info from failed tests behind `mix test`.
+
+Example usage:
+
+    $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
+    $ mix credo explain lib/my_app/server.ex:10:24  # same thing
+
+There are no additional options.
+
+
+
+### categories
+
+`categories` shows you all issue categories and explains their semantics.
+
+There are no additional options.
+
+
+### info
+
+`info` shows you information relevant to investigating errors and submitting bug reports.
+
+Example usage:
+
+    $ mix credo info
+    $ mix credo info --verbose
+    $ mix credo info --verbose --format=json
+
+### Further reading
+
 If you are interested in more ways to configure Credo, continue reading in the following sections:
 
 * [CLI switches](cli_switches.html)
