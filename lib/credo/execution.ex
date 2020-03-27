@@ -55,9 +55,6 @@ defmodule Credo.Execution do
             parse_timeout: 5000,
             strict: false,
 
-            # checks if there is a new version of Credo
-            check_for_updates: true,
-
             # options, set by the command line
             min_priority: 0,
             help: false,
@@ -157,8 +154,8 @@ defmodule Credo.Execution do
   defp start_servers(%__MODULE__{} = exec) do
     exec
     |> ExecutionConfigFiles.start_server()
-    |> ExecutionSourceFiles.start_server()
     |> ExecutionIssues.start_server()
+    |> ExecutionSourceFiles.start_server()
     |> ExecutionTiming.start_server()
   end
 
