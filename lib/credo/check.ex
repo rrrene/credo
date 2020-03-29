@@ -16,7 +16,7 @@ defmodule Credo.Check do
   options to `use Credo.Check`:
 
   - `:base_priority`  Sets the checks's base priority (`:low`, `:normal`, `:high`, `:higher` or `:ignore`).
-  - `:category`       Sets the check's category.
+  - `:category`       Sets the check's category (`:consistency`, `:design`, `:readability`, `:refactor`  or `:warning`).
   - `:elixir_version` Sets the check's version requirement for Elixir (defaults to `>= 0.0.1`).
   - `:explanations`   Sets explanations displayed for the check, e.g.
 

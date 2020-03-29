@@ -37,7 +37,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
           --enable-disabled-checks  Re-enable disabled checks that match the given strings
           --files-included          Only include these files (accepts globs, can be used multiple times)
           --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-          --format                  Display the list in a specific format (oneline,flycheck)
+          --format                  Display the list in a specific format (json,flycheck,oneline)
       -i, --ignore-checks           Ignore checks that match the given strings
           --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
           --mute-exit-status        Exit with status zero even if there are issues
