@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.4.0-rc.1
+
+The policy for release names changed with this release: There is now a `.` after the `rc`. That's it.
+
+- Add support for explaining checks (in addition to issues), i.e.
+
+    $ mix credo explain Credo.Check.Design.AliasUsage
+
+- Validate check params in config; if a param is not found, Credo checks for mispellings and suggests 
+
+    $ mix credo
+    ** (config) Credo.Check.Design.AliasUsage: unknown param `fi_called_more_often_than`. Did you mean `if_called_more_often_than`?
+
+- Add auto-generated check docs
+- Add ability to add tags to checks
+
 ## 1.3.2
 
 - Support non-ascii characters in variable names
