@@ -59,4 +59,18 @@ defmodule Credo.SourceFileTest do
     assert 20 == Credo.SourceFile.column(source_file, 2, :hashes)
     assert 19 == Credo.SourceFile.column(source_file, 3, :hashes)
   end
+
+  test "it should return line and column correctly with same term in line /2" do
+    source_file =
+      """
+      defmodule CredoSampleModule do
+        def foo!, do: impl().foo!()
+        def foo?, do: impl().foo?()
+      end
+      """
+      |> to_source_file
+
+    assert 7 == Credo.SourceFile.column(source_file, 2, :foo!)
+    assert 7 == Credo.SourceFile.column(source_file, 3, :foo?)
+  end
 end
