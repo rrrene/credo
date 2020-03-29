@@ -14,7 +14,7 @@ The policy for release names changed with this release: There is now a `.` after
       ** (config) Credo.Check.Design.AliasUsage: unknown param `fi_called_more_often_than`. Did you mean `if_called_more_often_than`?
 
 - Add auto-generated check docs
-- Add ability to add tags to checks
+- Add new documentation on Hex with extra guides and CHANGELOG
 
 ## 1.3.2
 
