@@ -44,8 +44,6 @@ defmodule Credo.Check.Readability.ModuleDoc do
       ]
     ]
 
-  @moduledoc false
-
   alias Credo.Code.Module
 
   @doc false

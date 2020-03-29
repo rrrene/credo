@@ -24,8 +24,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
       ]
     ]
 
-  @moduledoc false
-
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)

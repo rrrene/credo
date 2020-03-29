@@ -1,6 +1,4 @@
 defmodule Credo.Check.Warning.UnusedOperation do
-  @moduledoc false
-
   # The result of a call to the provided module's functions has to be used.
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper

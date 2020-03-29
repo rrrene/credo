@@ -28,8 +28,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
   alias Credo.Check.Params
 
-  @moduledoc false
-
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   @doc false
