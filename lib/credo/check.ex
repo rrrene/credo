@@ -212,6 +212,13 @@ defmodule Credo.Check do
         end
       end
 
+    def_tags =
+      quote do
+        def tags do
+          unquote(opts[:tags] || [])
+        end
+      end
+
     quote do
       @moduledoc unquote(moduledoc(opts))
       @behaviour Credo.Check
@@ -232,6 +239,7 @@ defmodule Credo.Check do
       unquote(def_run_on_all?)
       unquote(def_param_defaults)
       unquote(def_explanations)
+      unquote(def_tags)
 
       @impl true
       def format_issue(issue_meta, issue_options) do

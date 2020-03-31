@@ -14,6 +14,8 @@ defmodule Credo.Execution do
               all: :boolean,
               files_included: :keep,
               files_excluded: :keep,
+              checks_with_tag: :keep,
+              checks_without_tag: :keep,
               checks: :string,
               config_name: :string,
               config_file: :string,
@@ -64,7 +66,9 @@ defmodule Credo.Execution do
             format: nil,
             enable_disabled_checks: nil,
             only_checks: nil,
+            only_checks_tags: [],
             ignore_checks: nil,
+            ignore_checks_tags: [],
             crash_on_error: true,
             mute_exit_status: false,
             read_from_stdin: false,
@@ -171,9 +175,20 @@ defmodule Credo.Execution do
     {[], [], []}
   end
 
-  def checks(%__MODULE__{checks: checks, only_checks: only_checks, ignore_checks: ignore_checks}) do
-    only_matching = filter_only_checks(checks, only_checks)
-    ignore_matching = filter_ignore_checks(checks, ignore_checks)
+  def checks(%__MODULE__{
+        checks: checks,
+        only_checks: only_checks,
+        only_checks_tags: only_checks_tags,
+        ignore_checks: ignore_checks,
+        ignore_checks_tags: ignore_checks_tags
+      }) do
+    only_matching =
+      checks |> filter_only_checks_by_tags(only_checks_tags) |> filter_only_checks(only_checks)
+
+    ignore_matching_by_name = filter_ignore_checks(checks, ignore_checks)
+    ignore_matching_by_tags = filter_ignore_checks_by_tags(checks, ignore_checks_tags)
+    ignore_matching = ignore_matching_by_name ++ ignore_matching_by_tags
+
     result = only_matching -- ignore_matching
 
     {result, only_matching, ignore_matching}
@@ -213,6 +228,29 @@ defmodule Credo.Execution do
       {:ok, match_pattern} = Regex.compile(match_check, "i")
       match_pattern
     end)
+  end
+
+  defp filter_only_checks_by_tags(checks, nil), do: checks
+  defp filter_only_checks_by_tags(checks, []), do: checks
+  defp filter_only_checks_by_tags(checks, tags), do: filter_checks_by_tags(checks, tags)
+
+  defp filter_ignore_checks_by_tags(_checks, nil), do: []
+  defp filter_ignore_checks_by_tags(_checks, []), do: []
+  defp filter_ignore_checks_by_tags(checks, tags), do: filter_checks_by_tags(checks, tags)
+
+  defp filter_checks_by_tags(_checks, nil), do: []
+  defp filter_checks_by_tags(_checks, []), do: []
+
+  defp filter_checks_by_tags(checks, tags) do
+    tags = Enum.map(tags, &String.to_atom/1)
+
+    Enum.filter(checks, &match_tags(&1, tags, true))
+  end
+
+  defp match_tags(_tuple, [], default_for_empty), do: default_for_empty
+
+  defp match_tags({check, _params}, tags, _default_for_empty) do
+    Enum.any?(tags, &Enum.member?(check.tags, &1))
   end
 
   @doc """
