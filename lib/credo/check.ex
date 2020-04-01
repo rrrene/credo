@@ -32,6 +32,7 @@ defmodule Credo.Check do
 
   - `:param_defaults` Sets the default values for the check's params (e.g. `[param1: 42, param2: "offline"]`)
   - `:run_on_all`     Sets whether the check runs on all source files at once or each source file separatly.
+  - `:tags`           Sets the tags for this check (list of atoms, e.g. `[:tag1, :tag2]`)
 
   Please also note that these options to `use Credo.Check` are just a convenience to implement the `Credo.Check`
   behaviour. You can implement any of these by hand:

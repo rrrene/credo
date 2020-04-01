@@ -8,7 +8,29 @@ The policy for release names changed with this release: There is now a `.` after
 
       $ mix credo explain Credo.Check.Design.AliasUsage
 
-- Validate check params in config; if a param is not found, Credo checks for mispellings and suggests 
+- Add support for tags on checks
+
+  Checks can now declare tags via the `__using__` macro, i.e.
+
+      defmodule MyCheck do
+        use Credo.Check, tags: [:foo]
+
+        def run(source_file, params) do
+          #
+        end
+      end
+
+  Tags can be used via the CLI switch `--checks-with[out]-tag`:
+
+      # Only run checks tagged `:foo` during analysis
+      $ mix credo --checks-with-tag foo
+
+      # Exclude all checks tagged `:foo` from analysis
+      $ mix credo --checks-without-tag foo
+
+- Add validation of check params in config
+
+  If a param is not found, Credo checks for mispellings and suggests corrections:
 
       $ mix credo
       ** (config) Credo.Check.Design.AliasUsage: unknown param `fi_called_more_often_than`. Did you mean `if_called_more_often_than`?

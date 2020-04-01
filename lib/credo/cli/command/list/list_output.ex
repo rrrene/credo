@@ -21,7 +21,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
       "Example: ",
       :olive,
       :faint,
-      "$ mix credo list lib/**/*.ex --format=oneline"
+      "$ mix credo list lib/**/*.ex --format oneline"
     ]
 
     options = """
@@ -32,6 +32,8 @@ defmodule Credo.CLI.Command.List.ListOutput do
       -a, --all                     Show all issues
       -A, --all-priorities          Show all issues including low priority ones
       -c, --checks                  Only include checks that match the given strings
+          --checks-with-tag         Only include checks that match the given tag (can be used multiple times)
+          --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
           --config-file             Use the given config file
       -C, --config-name             Use the given config instead of "default"
           --enable-disabled-checks  Re-enable disabled checks that match the given strings
@@ -43,9 +45,9 @@ defmodule Credo.CLI.Command.List.ListOutput do
           --mute-exit-status        Exit with status zero even if there are issues
 
     General options:
-          --[no-]color        Toggle colored output
-      -v, --version           Show version
-      -h, --help              Show this help
+          --[no-]color              Toggle colored output
+      -v, --version                 Show version
+      -h, --help                    Show this help
     """
 
     UI.puts(usage)
