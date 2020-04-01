@@ -2,7 +2,7 @@
 
 ## 1.4.0-rc.1
 
-The policy for release names changed with this release: There is now a `.` after the `rc`. That's it.
+Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
 
 - Add support for explaining checks (in addition to issues), i.e.
 
