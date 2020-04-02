@@ -100,6 +100,11 @@ defmodule Credo.Check do
   """
   @callback run_on_all?() :: boolean
 
+  @doc """
+  Returns the tags for the check.
+  """
+  @callback tags() :: list(atom)
+
   @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
@@ -215,6 +220,7 @@ defmodule Credo.Check do
 
     def_tags =
       quote do
+        @impl true
         def tags do
           unquote(opts[:tags] || [])
         end
