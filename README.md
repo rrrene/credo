@@ -1,10 +1,8 @@
-# Credo [![Build Status](https://travis-ci.org/rrrene/credo.svg?branch=master)](https://travis-ci.org/rrrene/credo) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo)
+# Credo ![CI Tests](https://github.com/rrrene/credo/workflows/CI%20Tests/badge.svg) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo)
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
-## What can it do?
-
-`credo` can show you refactoring opportunities in your code, complex code fragments, warn you about common mistakes, show inconsistencies in your naming scheme and - if needed - help you enforce a desired coding style.
+It can show you refactoring opportunities in your code, complex code fragments, warn you about common mistakes, show inconsistencies in your naming scheme and - if needed - help you enforce a desired coding style.
 
 
 ![Credo](https://raw.github.com/rrrene/credo/master/assets/screenshot.png)
@@ -31,46 +29,9 @@ And run:
     $ mix credo
 
 
-## Issues
+## Documentation
 
-Like any code linter, Credo reports issues. Contrary to many other linters these issues are not created equal. Each issue is assigned a priority, based on a base priority set by the config and a dynamic component based on violation severity and location in the source code.
-
-These priorities hint at the importance of each issue and are displayed in the command-line interface using arrows: ↑ ↗ → ↘ ↓
-
-By default, only issues with a positive priority are part of the report (↑ ↗ →).
-
-
-
-## Checks
-
-
-### Consistency
-
-These checks take a look at your code and ensure a consistent coding style. Using tabs or spaces? Both is fine, just don't mix them or Credo will tell you.
-
-
-### Readability
-
-Readability checks do not concern themselves with the technical correctness of your code, but how easy it is to digest.
-
-
-### Refactoring Opportunities
-
-The Refactor checks show you opportunities to avoid future problems and technical debt.
-
-
-### Software Design
-
-While refactor checks show you possible problems, these checks try to highlight possibilities, like - potentially intended - duplicated code or `TODO:` and `FIXME` annotations.
-
-
-### Warnings
-
-These checks warn you about things that are potentially dangerous, like a missed call to `IEx.pry` or a call to `String.downcase` without saving the result.
-
-## Plugins
-
-
+Documentation is [available on Hexdocs](https://hexdocs.pm/credo/)
 
 ## Integrations
 
