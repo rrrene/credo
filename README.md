@@ -31,7 +31,7 @@ And run:
 
 ## Documentation
 
-Documentation is [available on Hexdocs](https://hexdocs.pm/credo/)
+Documentation is [available on Hexdocs](https://hexdocs.pm/credo/1.4.0-rc.1)
 
 ## Integrations
 
