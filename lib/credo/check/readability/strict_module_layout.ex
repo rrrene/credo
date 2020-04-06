@@ -61,6 +61,10 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
         Defaults to an empty list.
         """
       ]
+    ],
+    param_defaults: [
+      order: ~w/shortdoc moduledoc behaviour use import alias require/a,
+      ignore: []
     ]
 
   alias Credo.Code
