@@ -44,9 +44,9 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
             - `:module_attribute` - other module attribute
             - `:public_fun` - public function
             - `:private_fun` - private function or a public function marked with `@doc false`
-            - `:callback_fun` - public function marked with `@impl`
             - `:public_macro` - public macro
             - `:private_macro` - private macro or a public macro marked with `@doc false`
+            - `:callback_impl` - public function or macro marked with `@impl`
             - `:public_guard` - public guard
             - `:private_guard` - private guard or a public guard marked with `@doc false`
             - `:module` - inner module definition (`defmodule` expression inside a module)
@@ -81,6 +81,22 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
       modules_and_parts,
       [],
       fn {module, parts}, errors ->
+        parts =
+          Enum.map(
+            parts,
+            fn
+              # Converting `callback_macro` and `callback_fun` into a common `callback_impl`,
+              # because enforcing an internal order between these two kinds is counterproductive if
+              # a module implements multiple behaviours. In such cases, we typically want to group
+              # callbacks by the implementation, not by the kind (fun vs macro).
+              {callback_impl, location} when callback_impl in ~w/callback_macro callback_fun/a ->
+                {:callback_impl, location}
+
+              other ->
+                other
+            end
+          )
+
         module_errors(module, parts, expected_order, issue_meta) ++ errors
       end
     )
@@ -131,6 +147,6 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   defp part_to_string(:public_macro), do: "public macro"
   defp part_to_string(:public_fun), do: "public function"
   defp part_to_string(:private_fun), do: "private function"
-  defp part_to_string(:callback_fun), do: "callback implementation"
+  defp part_to_string(:callback_impl), do: "callback implementation"
   defp part_to_string(part), do: "#{part}"
 end

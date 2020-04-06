@@ -31,6 +31,7 @@ defmodule Credo.Code.Module do
           | :public_guard
           | :private_guard
           | :callback_fun
+          | :callback_macro
           | :module
 
   @type location :: [line: pos_integer, column: pos_integer]
@@ -404,7 +405,7 @@ defmodule Credo.Code.Module do
   defp code_type(:defp, _), do: :private_fun
 
   defp code_type(:defmacro, nil), do: :public_macro
-  defp code_type(:defmacro, :impl), do: :impl
+  defp code_type(:defmacro, :impl), do: :callback_macro
   defp code_type(macro, _) when macro in ~w/defmacro defmacrop/a, do: :private_macro
 
   defp code_type(:defguard, nil), do: :public_guard

@@ -146,6 +146,32 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
       assert issue.message == "alias must appear before require"
     end
+
+    test "callback functions and macros are handled by the `:callback_impl` option" do
+      assert [issue1, issue2] =
+               """
+               defmodule Test do
+                 @impl true
+                 def foo
+
+                 def baz, do: :ok
+
+                 @impl true
+                 defmacro bar
+
+                 def qux, do: :ok
+               end
+               """
+               |> to_source_file
+               |> run_check(@described_check, order: ~w/public_fun callback_impl/a)
+               |> assert_issues
+
+      assert issue1.message == "public function must appear before callback implementation"
+      assert issue1.scope == "Test.baz"
+
+      assert issue2.message == "public function must appear before callback implementation"
+      assert issue2.scope == "Test.qux"
+    end
   end
 
   describe "custom order" do
