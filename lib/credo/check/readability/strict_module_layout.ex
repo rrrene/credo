@@ -54,6 +54,11 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
         Notice that the desired order always starts from the top. For example, if you provide
         the order `~w/public_fun private_fun/a`, it means that everything else (e.g. `@moduledoc`)
         must appear after function definitions.
+        """,
+        ignore: """
+        List of atoms identifying the module parts which are not checked, and may therefore appear
+        anywhere in the module. Allowed values are the same as in the `:order` option.
+        Defaults to an empty list.
         """
       ]
     ]
@@ -65,8 +70,36 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
     source_file
     |> Code.ast()
     |> Credo.Code.Module.analyze()
-    |> all_errors(expected_order(params), IssueMeta.for(source_file, params))
+    |> all_errors(params, IssueMeta.for(source_file, params))
     |> Enum.sort_by(&{&1.line_no, &1.column})
+  end
+
+  defp all_errors(modules_and_parts, params, issue_meta) do
+    expected_order = expected_order(params)
+    ignored_parts = Keyword.get(params, :ignore, [])
+
+    Enum.reduce(
+      modules_and_parts,
+      [],
+      fn {module, parts}, errors ->
+        parts =
+          parts
+          |> Stream.map(fn
+            # Converting `callback_macro` and `callback_fun` into a common `callback_impl`,
+            # because enforcing an internal order between these two kinds is counterproductive if
+            # a module implements multiple behaviours. In such cases, we typically want to group
+            # callbacks by the implementation, not by the kind (fun vs macro).
+            {callback_impl, location} when callback_impl in ~w/callback_macro callback_fun/a ->
+              {:callback_impl, location}
+
+            other ->
+              other
+          end)
+          |> Stream.reject(fn {part, _location} -> part in ignored_parts end)
+
+        module_errors(module, parts, expected_order, issue_meta) ++ errors
+      end
+    )
   end
 
   defp expected_order(params) do
@@ -74,32 +107,6 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
     |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
     |> Enum.with_index()
     |> Map.new()
-  end
-
-  defp all_errors(modules_and_parts, expected_order, issue_meta) do
-    Enum.reduce(
-      modules_and_parts,
-      [],
-      fn {module, parts}, errors ->
-        parts =
-          Enum.map(
-            parts,
-            fn
-              # Converting `callback_macro` and `callback_fun` into a common `callback_impl`,
-              # because enforcing an internal order between these two kinds is counterproductive if
-              # a module implements multiple behaviours. In such cases, we typically want to group
-              # callbacks by the implementation, not by the kind (fun vs macro).
-              {callback_impl, location} when callback_impl in ~w/callback_macro callback_fun/a ->
-                {:callback_impl, location}
-
-              other ->
-                other
-            end
-          )
-
-        module_errors(module, parts, expected_order, issue_meta) ++ errors
-      end
-    )
   end
 
   defp module_errors(module, parts, expected_order, issue_meta) do

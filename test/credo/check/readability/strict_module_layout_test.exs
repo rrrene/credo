@@ -207,4 +207,37 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       assert issue2.line_no == 4
     end
   end
+
+  describe "ignored parts" do
+    test "no errors are reported on ignored parts" do
+      """
+      defmodule Test do
+        alias Foo
+        import Bar
+        use Baz
+        require Qux
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, ignore: ~w/use import/a)
+      |> refute_issues
+    end
+
+    test "reports errors on non-ignored parts" do
+      [issue] =
+        """
+        defmodule Test do
+          require Qux
+          import Bar
+          use Baz
+          alias Foo
+        end
+        """
+        |> to_source_file
+        |> run_check(@described_check, ignore: ~w/use import/a)
+        |> assert_issue
+
+      assert issue.message == "alias must appear before require"
+    end
+  end
 end
