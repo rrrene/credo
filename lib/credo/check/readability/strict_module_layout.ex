@@ -68,14 +68,36 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
     ]
 
   alias Credo.Code
+  alias Credo.CLI.Output.UI
 
   @doc false
   def run(source_file, params \\ []) do
+    params = normalize_params(params)
+
     source_file
     |> Code.ast()
     |> Credo.Code.Module.analyze()
     |> all_errors(params, IssueMeta.for(source_file, params))
     |> Enum.sort_by(&{&1.line_no, &1.column})
+  end
+
+  defp normalize_params(params) do
+    order =
+      params
+      |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
+      |> Enum.map(fn element ->
+        # TODO: This is done for backward compatibility and should be removed in some future version.
+        with :callback_fun <- element do
+          UI.warn([
+            :red,
+            "** (StrictModuleLayout) `:callback_fun` has been deprecated. Use `:callback_impl` instead."
+          ])
+
+          :callback_impl
+        end
+      end)
+
+    Keyword.put(params, :order, order)
   end
 
   defp all_errors(modules_and_parts, params, issue_meta) do
@@ -108,7 +130,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
 
   defp expected_order(params) do
     params
-    |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
+    |> Keyword.fetch!(:order)
     |> Enum.with_index()
     |> Map.new()
   end

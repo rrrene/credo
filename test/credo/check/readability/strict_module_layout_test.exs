@@ -206,6 +206,23 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       assert issue2.message == "public function must appear before private function"
       assert issue2.line_no == 4
     end
+
+    test "treats `:callback_fun` as `:callback_impl` for backward compatibility" do
+      [issue] =
+        """
+        defmodule Test do
+          @impl Foo
+          def foo, do: :ok
+
+          def bar, do: :ok
+        end
+        """
+        |> to_source_file
+        |> run_check(@described_check, order: ~w/public_fun callback_fun/a)
+        |> assert_issue
+
+      assert issue.message == "public function must appear before callback implementation"
+    end
   end
 
   describe "ignored parts" do
