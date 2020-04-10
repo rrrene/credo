@@ -339,6 +339,8 @@ defmodule Credo.Check do
                 """
               end
 
+            value = value |> String.split("\n") |> Enum.map(&"  #{&1}") |> Enum.join("\n")
+
             """
             - `#{key}`: #{value}
               #{default_hint}

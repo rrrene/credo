@@ -23,42 +23,43 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
       params: [
         order: """
         List of atoms identifying the desired order of module parts.
-        Defaults to  `~w/shortdoc moduledoc behaviour use import alias require/a`.
 
-        Following values can be provided:
+        Supported values are:
 
-            - `:moduledoc` - `@moduledoc` module attribute
-            - `:shortdoc` - `@shortdoc` module attribute
-            - `:behaviour` - `@behaviour` module attribute
-            - `:use` - `use` expression
-            - `:import` - `import` expression
-            - `:alias` - `alias` expression
-            - `:require` - `require` expression
-            - `:defstruct` - `defstruct` expression
-            - `:opaque` - `@opaque` module attribute
-            - `:type` - `@type` module attribute
-            - `:typep` - `@typep` module attribute
-            - `:callback` - `@callback` module attribute
-            - `:macrocallback` - `@macrocallback` module attribute
-            - `:optional_callbacks` - `@optional_callbacks` module attribute
-            - `:module_attribute` - other module attribute
-            - `:public_fun` - public function
-            - `:private_fun` - private function or a public function marked with `@doc false`
-            - `:public_macro` - public macro
-            - `:private_macro` - private macro or a public macro marked with `@doc false`
-            - `:callback_impl` - public function or macro marked with `@impl`
-            - `:public_guard` - public guard
-            - `:private_guard` - private guard or a public guard marked with `@doc false`
-            - `:module` - inner module definition (`defmodule` expression inside a module)
+        - `:moduledoc` - `@moduledoc` module attribute
+        - `:shortdoc` - `@shortdoc` module attribute
+        - `:behaviour` - `@behaviour` module attribute
+        - `:use` - `use` expression
+        - `:import` - `import` expression
+        - `:alias` - `alias` expression
+        - `:require` - `require` expression
+        - `:defstruct` - `defstruct` expression
+        - `:opaque` - `@opaque` module attribute
+        - `:type` - `@type` module attribute
+        - `:typep` - `@typep` module attribute
+        - `:callback` - `@callback` module attribute
+        - `:macrocallback` - `@macrocallback` module attribute
+        - `:optional_callbacks` - `@optional_callbacks` module attribute
+        - `:module_attribute` - other module attribute
+        - `:public_fun` - public function
+        - `:private_fun` - private function or a public function marked with `@doc false`
+        - `:public_macro` - public macro
+        - `:private_macro` - private macro or a public macro marked with `@doc false`
+        - `:callback_impl` - public function or macro marked with `@impl`
+        - `:public_guard` - public guard
+        - `:private_guard` - private guard or a public guard marked with `@doc false`
+        - `:module` - inner module definition (`defmodule` expression inside a module)
 
-        Notice that the desired order always starts from the top. For example, if you provide
-        the order `~w/public_fun private_fun/a`, it means that everything else (e.g. `@moduledoc`)
-        must appear after function definitions.
+        Notice that the desired order always starts from the top.
+
+        For example, if you provide the order `~w/public_fun private_fun/a`,
+        it means that everything else (e.g. `@moduledoc`) must appear after
+        function definitions.
         """,
         ignore: """
-        List of atoms identifying the module parts which are not checked, and may therefore appear
-        anywhere in the module. Allowed values are the same as in the `:order` option.
-        Defaults to an empty list.
+        List of atoms identifying the module parts which are not checked, and may
+        therefore appear anywhere in the module. Supported values are the same as
+        in the `:order` param.
         """
       ]
     ],
@@ -84,13 +85,14 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   defp normalize_params(params) do
     order =
       params
-      |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
+      |> Params.get(:order, __MODULE__)
       |> Enum.map(fn element ->
         # TODO: This is done for backward compatibility and should be removed in some future version.
         with :callback_fun <- element do
           UI.warn([
             :red,
-            "** (StrictModuleLayout) `:callback_fun` has been deprecated. Use `:callback_impl` instead."
+            "** (StrictModuleLayout) Check param `:callback_fun` has been deprecated. Use `:callback_impl` instead.\n\n",
+            "  Use `mix credo explain #{Credo.Code.Module.name(__MODULE__)}` to learn more. \n"
           ])
 
           :callback_impl

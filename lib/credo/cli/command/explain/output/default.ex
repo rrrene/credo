@@ -6,7 +6,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
   alias Credo.Code.Scope
 
   @indent 8
-  @params_min_indent 20
+  @params_min_indent 10
 
   @doc "Called before the analysis is run."
   def print_before_info(source_files, exec) do
@@ -419,6 +419,8 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
 
     keywords
     |> Enum.each(fn {param, text} ->
+      [head | tail] = String.split(text, "\n")
+
       [
         UI.edge([outer_color, :faint]),
         :reset,
@@ -426,9 +428,24 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
         :cyan,
         "  #{param}:" |> String.pad_trailing(params_indent + 3),
         :reset,
-        text
+        head
       ]
       |> UI.puts()
+
+      tail
+      |> List.wrap()
+      |> Enum.each(fn line ->
+        [
+          UI.edge([outer_color, :faint]),
+          :reset,
+          String.duplicate(" ", @indent - 2),
+          :cyan,
+          String.pad_trailing("", params_indent + 3),
+          :reset,
+          line
+        ]
+        |> UI.puts()
+      end)
 
       default = defaults[param]
 
@@ -453,7 +470,10 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
   defp get_params_indent(keywords, min_indent) do
     params_indent =
       Enum.reduce(keywords, min_indent, fn {param, _text}, current ->
-        size = param |> to_string |> String.length()
+        size =
+          param
+          |> to_string
+          |> String.length()
 
         if size > current do
           size

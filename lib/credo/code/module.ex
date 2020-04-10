@@ -285,7 +285,7 @@ defmodule Credo.Code.Module do
 
   def name({:__MODULE__, _meta, nil}), do: "__MODULE__"
 
-  def name(atom) when is_atom(atom), do: atom
+  def name(atom) when is_atom(atom), do: atom |> to_string |> String.replace(~r/^Elixir\./, "")
 
   def name(string) when is_binary(string), do: string
 
