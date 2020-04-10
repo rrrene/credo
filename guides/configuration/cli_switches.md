@@ -51,6 +51,22 @@ The second example illustrates how the command takes a comma-separated list. All
 
 You can use partial names to quickly exclude checks. `mix credo --ignore nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
 
+### Re-enable disabled checks
+
+Use `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`. This comes in handy when using checks on a case-by-case basis
+
+As with other check-related switches, `pattern` is a comma-delimted list of patterns:
+
+```bash
+$ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation
+```
+
+Of course, we can have the same effect by choosing the pattern less explicitly:
+
+```bash
+$ mix credo info --enable-disabled-checks specs,double
+```
+
 
 ### Parsing source from STDIN
 
