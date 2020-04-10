@@ -44,9 +44,9 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
             - `:module_attribute` - other module attribute
             - `:public_fun` - public function
             - `:private_fun` - private function or a public function marked with `@doc false`
-            - `:callback_fun` - public function marked with `@impl`
             - `:public_macro` - public macro
             - `:private_macro` - private macro or a public macro marked with `@doc false`
+            - `:callback_impl` - public function or macro marked with `@impl`
             - `:public_guard` - public guard
             - `:private_guard` - private guard or a public guard marked with `@doc false`
             - `:module` - inner module definition (`defmodule` expression inside a module)
@@ -54,36 +54,85 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
         Notice that the desired order always starts from the top. For example, if you provide
         the order `~w/public_fun private_fun/a`, it means that everything else (e.g. `@moduledoc`)
         must appear after function definitions.
+        """,
+        ignore: """
+        List of atoms identifying the module parts which are not checked, and may therefore appear
+        anywhere in the module. Allowed values are the same as in the `:order` option.
+        Defaults to an empty list.
         """
       ]
+    ],
+    param_defaults: [
+      order: ~w/shortdoc moduledoc behaviour use import alias require/a,
+      ignore: []
     ]
 
   alias Credo.Code
+  alias Credo.CLI.Output.UI
 
   @doc false
   def run(source_file, params \\ []) do
+    params = normalize_params(params)
+
     source_file
     |> Code.ast()
     |> Credo.Code.Module.analyze()
-    |> all_errors(expected_order(params), IssueMeta.for(source_file, params))
+    |> all_errors(params, IssueMeta.for(source_file, params))
     |> Enum.sort_by(&{&1.line_no, &1.column})
   end
 
-  defp expected_order(params) do
-    params
-    |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
-    |> Enum.with_index()
-    |> Map.new()
+  defp normalize_params(params) do
+    order =
+      params
+      |> Keyword.get(:order, ~w/shortdoc moduledoc behaviour use import alias require/a)
+      |> Enum.map(fn element ->
+        # TODO: This is done for backward compatibility and should be removed in some future version.
+        with :callback_fun <- element do
+          UI.warn([
+            :red,
+            "** (StrictModuleLayout) `:callback_fun` has been deprecated. Use `:callback_impl` instead."
+          ])
+
+          :callback_impl
+        end
+      end)
+
+    Keyword.put(params, :order, order)
   end
 
-  defp all_errors(modules_and_parts, expected_order, issue_meta) do
+  defp all_errors(modules_and_parts, params, issue_meta) do
+    expected_order = expected_order(params)
+    ignored_parts = Keyword.get(params, :ignore, [])
+
     Enum.reduce(
       modules_and_parts,
       [],
       fn {module, parts}, errors ->
+        parts =
+          parts
+          |> Stream.map(fn
+            # Converting `callback_macro` and `callback_fun` into a common `callback_impl`,
+            # because enforcing an internal order between these two kinds is counterproductive if
+            # a module implements multiple behaviours. In such cases, we typically want to group
+            # callbacks by the implementation, not by the kind (fun vs macro).
+            {callback_impl, location} when callback_impl in ~w/callback_macro callback_fun/a ->
+              {:callback_impl, location}
+
+            other ->
+              other
+          end)
+          |> Stream.reject(fn {part, _location} -> part in ignored_parts end)
+
         module_errors(module, parts, expected_order, issue_meta) ++ errors
       end
     )
+  end
+
+  defp expected_order(params) do
+    params
+    |> Keyword.fetch!(:order)
+    |> Enum.with_index()
+    |> Map.new()
   end
 
   defp module_errors(module, parts, expected_order, issue_meta) do
@@ -131,6 +180,6 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   defp part_to_string(:public_macro), do: "public macro"
   defp part_to_string(:public_fun), do: "public function"
   defp part_to_string(:private_fun), do: "private function"
-  defp part_to_string(:callback_fun), do: "callback implementation"
+  defp part_to_string(:callback_impl), do: "callback implementation"
   defp part_to_string(part), do: "#{part}"
 end

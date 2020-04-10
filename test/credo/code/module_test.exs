@@ -488,6 +488,11 @@ defmodule Credo.Code.ModuleTest do
                [{Test, [private_macro: [line: 3, column: 3]]}]
     end
 
+    test "interprets defmacro marked with @impl as callback macro" do
+      assert analyze(~s/@impl true\ndefmacro x, do: true/) ==
+               [{Test, [callback_macro: [line: 3, column: 3]]}]
+    end
+
     test "recognizes def" do
       assert analyze(~s/def x, do: true/) == [{Test, [public_fun: [line: 2, column: 3]]}]
     end
