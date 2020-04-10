@@ -41,8 +41,10 @@ defmodule Credo.CLI.Command.List.ListOutput do
           --files-excluded          Exclude these files (accepts globs, can be used multiple times)
           --format                  Display the list in a specific format (json,flycheck,oneline)
       -i, --ignore-checks           Ignore checks that match the given strings
+          --ignore                  Alias for --ignore-checks
           --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
           --mute-exit-status        Exit with status zero even if there are issues
+          --only                    Alias for --checks
 
     General options:
           --[no-]color              Toggle colored output
