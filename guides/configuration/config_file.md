@@ -5,7 +5,7 @@ Credo is configured via a file called `.credo.exs`. This file can live in your p
 You can use `mix credo gen.config` to generate a complete example configuration.
 
 ```elixir
-# config/.credo.exs
+# .credo.exs or config/.credo.exs
 %{
   configs: [
     %{
@@ -40,9 +40,61 @@ You can use `mix credo gen.config` to generate a complete example configuration.
 }
 ```
 
-`mix credo --config-name <NAME_OF_CONFIG>` allows you to use a specific config (instead of `default`) inside a config file.
+## Using different configurations in the same file
 
-`mix credo --config-file <PATH_TO_CONFIG_FILE>` let's you use a specific config file.
+Credo configs are given names. The default configuration is named `default`.
+
+You can specify which config to use on the command line:
+
+```shell
+mix credo --config-name <NAME_OF_CONFIG>
+```
+
+For example, say we have a directory `lib/that_big_namespace` with tons of issues and we do want to split our regular linting and the necessary clean up in that directory.
+
+We can exclude the directory from our `default` config and add another config for just that directory.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      files: %{
+        included: ["lib/", "src/", "web/", "apps/"],
+        excluded: ["lib/that_big_namespace"]
+      }
+    },
+    %{
+      name: "spring-cleaning",
+      files: %{
+        included: ["lib/that_big_namespace"],
+        excluded: []
+      }
+    }
+  ]
+}
+```
+
+Now you can use
+
+```shell
+mix credo --config-name spring-cleaning
+```
+
+to run the custom configuration we added.
+
+
+## Using a specific configuration file
+
+You can tell Creod to use a specific config file anywhere in the file system:
+
+```shell
+mix credo --config-file <PATH_TO_CONFIG_FILE>
+```
+
+Please note that when specifying a config file this way, only that config files contents are loaded.
+The "Transitive configuration files" mechanism described in the next section does not apply in this case.
 
 ## Transitive configuration files
 
