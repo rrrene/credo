@@ -10,6 +10,7 @@ defmodule Credo.CLI.Output.Summary do
     {:readability, "code readability issue", "code readability issues"},
     {:design, "software design suggestion", "software design suggestions"}
   ]
+  @get_more_details "For more information including configuration options on a specific issue, run `mix credo explain <location-of-issue>`"
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
   alias Credo.CLI.Output
@@ -34,6 +35,11 @@ defmodule Credo.CLI.Output.Summary do
     issues = Execution.get_issues(exec)
     source_file_count = exec |> Execution.get_source_files() |> Enum.count()
     checks_count = count_checks(exec)
+
+    if issues != [] do
+      UI.puts()
+      UI.puts([:reset, @get_more_details])
+    end
 
     UI.puts()
     UI.puts([:faint, @cry_for_help])
