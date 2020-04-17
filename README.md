@@ -17,7 +17,7 @@ Add `:credo` as a dependency to your project's `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 1.3", only: [:dev, :test], runtime: false}
+    {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
   ]
 end
 ```
@@ -31,7 +31,7 @@ And run:
 
 ## Documentation
 
-Documentation is [available on Hexdocs](https://hexdocs.pm/credo/1.4.0-rc.1)
+Documentation is [available on Hexdocs](https://hexdocs.pm/credo/)
 
 ## Integrations
 

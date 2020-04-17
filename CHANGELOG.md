@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0-rc.1
+## 1.4.0
 
 - Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
 
@@ -36,7 +36,7 @@
       ** (config) Credo.Check.Design.AliasUsage: unknown param `fi_called_more_often_than`. Did you mean `if_called_more_often_than`?
 
 - Add auto-generated check docs
-- Add new documentation on Hex with [extra guides](https://hexdocs.pm/credo/1.4.0-rc.1/overview.html) and [CHANGELOG](https://hexdocs.pm/credo/1.4.0-rc.1/changelog.html)
+- Add new documentation on Hex with [extra guides](https://hexdocs.pm/credo/1.4.0/overview.html) and [CHANGELOG](https://hexdocs.pm/credo/1.4.0/changelog.html)
 
 ## 1.3.2
 
