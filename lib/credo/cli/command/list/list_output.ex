@@ -45,6 +45,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
           --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
           --mute-exit-status        Exit with status zero even if there are issues
           --only                    Alias for --checks
+          --strict                  Alias for --all-priorities
 
     General options:
           --[no-]color              Toggle colored output

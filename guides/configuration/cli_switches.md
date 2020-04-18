@@ -2,9 +2,11 @@
 
 Most configuration options are also available as command line switches, so that you can e.g. only run certain checks at a time to focus attention on those issues.
 
+
 ## Common use cases
 
 Here are a couple of common use case and their respective command line switches:
+
 
 ### Output Formats
 
@@ -51,6 +53,7 @@ The second example illustrates how the command takes a comma-separated list. All
 
 You can use partial names to quickly exclude checks. `mix credo --ignore nameredec` will exclude all checks for variables/parameters having the same name as declared functions by matching Credo.Check.Warning.**NameRedeclarationBy...**
 
+
 ### Re-enable disabled checks
 
 Use `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`. This comes in handy when using checks on a case-by-case basis
@@ -74,22 +77,26 @@ You can also use Credo to parse source that has been piped directly into it.
 This is especially useful when integrating with external editors. You can use this feature by passing the `--read-from-stdin` option as follows:
 
 ```bash
-$ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin
+$ echo 'IO.puts("hello world");' | mix credo --format flycheck --read-from-stdin
 # stdin:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
 ```
 
 Notice the origin if the source is coming annotated as `stdin`, you can change this annotation by passing it along after option like so:
 
 ```bash
-$ echo 'IO.puts("hello world");' | mix credo --format=flycheck --read-from-stdin /path/representing/the_current/source.ex
+$ echo 'IO.puts("hello world");' | mix credo --format flycheck --read-from-stdin /path/representing/the_current/source.ex
 # /path/representing/the_current/source.ex:1: C: There is no whitespace around parentheses/brackets most of the time, but here there is.
 ```
 
 Do note with the passed option as filename is a stub that is just used to prefix the error and so certain editors can annotate the original file.
 
-### Show all issues including low priority ones
+
+### Show all issues (including low priority ones)
+
+By default, Credo's CLI output shows only the 5 most important issues per category. Using `--all`, you can show all the important issues in each category.
 
 Use the `--all-priorities` switch to include low priority issues in the output (aliased as `--strict`).
+
 
 ## Command line switches and config file
 
@@ -101,7 +108,7 @@ Usage: mix credo suggest [paths] [options]
 
 Suggests objects from every category that Credo thinks can be improved.
 
-Example: $ mix credo suggest lib/**/*.ex --all -c names
+Example: $ mix credo suggest lib/**/*.ex --only consistency --format json
 
 Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
@@ -109,6 +116,8 @@ Suggest options:
   -a, --all                     Show all issues
   -A, --all-priorities          Show all issues including low priority ones
   -c, --checks                  Only include checks that match the given strings
+      --checks-with-tag         Only include checks that match the given tag (can be used multiple times)
+      --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
       --config-file             Use the given config file
   -C, --config-name             Use the given config instead of "default"
       --enable-disabled-checks  Re-enable disabled checks that match the given strings
@@ -116,29 +125,19 @@ Suggest options:
       --files-excluded          Exclude these files (accepts globs, can be used multiple times)
       --format                  Display the list in a specific format (json,flycheck,oneline)
   -i, --ignore-checks           Ignore checks that match the given strings
+      --ignore                  Alias for --ignore-checks
       --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
       --mute-exit-status        Exit with status zero even if there are issues
+      --only                    Alias for --checks
+      --strict                  Alias for --all-priorities
 
 General options:
-      --[no-]color        Toggle colored output
-  -v, --version           Show version
-  -h, --help              Show this help
+      --[no-]color              Toggle colored output
+  -v, --version                 Show version
+  -h, --help                    Show this help
 ```
 
-Some of these are not available as options in `.credo.exs`:
+Some of these are not available as configuration options in `.credo.exs`:
 
 * `--enable-disabled-checks [PATTERN]` activates disabled checks on the fly
 * `--mute-exit-status` forces Credo to exit with an exit status of `0`
-
-In all check-related switches, `PATTERN` is a comma-delimted list of case-insensitive patterns:
-
-```shell
-$ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation
-```
-
-Of course, you can have the same effect by choosing the pattern less explicitly:
-
-```shell
-$ mix credo info --enable-disabled-checks specs,double
-```
-
