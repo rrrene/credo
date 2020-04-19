@@ -1,7 +1,7 @@
 defmodule Credo.Mixfile do
   use Mix.Project
 
-  @version "1.4.0-rc.2"
+  @version "1.4.0"
 
   def project do
     [
