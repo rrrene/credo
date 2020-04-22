@@ -7,18 +7,33 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
   # cases NOT raising issues
   #
 
-  test "it should not report a violation with accented characters" do
-    "defmodule CredoSampleModule do\n@test true # voilà\nend"
-    |> to_source_file
-    |> run_check(@described_check)
-    |> refute_issues()
-  end
-
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
     end
     """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation with fencing # characters" do
+    """
+    defmodule CredoSampleModule do
+      ###########################################
+      ## asdf # lorem ipsum                     #
+      ## asdf # lorem ipsum                     #
+      ## asdf # lorem ipsum                     #
+      ###########################################
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation with accented characters" do
+    "defmodule CredoSampleModule do\n@test true # voilà\nend"
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
