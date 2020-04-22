@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.SeparateAliasRequire
 
@@ -11,7 +11,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report violation on separate aliases" do
@@ -23,7 +24,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should NOT report violation on consecutive single-line multi-aliases" do
@@ -34,7 +36,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report violation on separate single-line multi-aliases" do
@@ -46,7 +49,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should NOT report violation on consecutive multi-line multi-aliases" do
@@ -63,7 +67,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report violation on separate multi-line multi-aliases" do
@@ -81,7 +86,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should NOT report violation on consecutive requires" do
@@ -92,7 +98,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report violation on separate requires" do
@@ -104,7 +111,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should not report violation on functions named require or alias" do
@@ -123,7 +131,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report violation on multiline alias as" do
@@ -138,7 +147,8 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report violation on macro quotes" do
@@ -155,6 +165,7 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end
