@@ -1,6 +1,7 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
   use Credo.Check,
     tags: [:controversial],
+    param_defaults: [allow_bang: false],
     explanations: [
       check: """
       You might want to refrain from rebinding variables.
