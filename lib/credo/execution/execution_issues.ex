@@ -4,12 +4,26 @@ defmodule Credo.Execution.ExecutionIssues do
   use GenServer
 
   alias Credo.Execution
+  alias Credo.Issue
   alias Credo.SourceFile
 
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
     %Execution{exec | issues_pid: pid}
+  end
+
+  @doc "Appends an `issue` for the specified `filename`."
+  def append(%Execution{issues_pid: pid}, issues) when is_list(issues) do
+    issues
+    |> Enum.group_by(& &1.filename)
+    |> Enum.each(fn {filename, issues} ->
+      GenServer.call(pid, {:append, filename, issues})
+    end)
+  end
+
+  def append(%Execution{issues_pid: pid}, %Issue{} = issue) do
+    GenServer.call(pid, {:append, issue.filename, issue})
   end
 
   @doc "Appends an `issue` for the specified `filename`."
@@ -38,9 +52,9 @@ defmodule Credo.Execution.ExecutionIssues do
     {:ok, %{}}
   end
 
-  def handle_call({:append, filename, issue}, _from, current_state) do
-    issues = List.wrap(current_state[filename])
-    new_issue_list = [issue | issues]
+  def handle_call({:append, filename, issue_or_issue_list}, _from, current_state) do
+    existing_issues = List.wrap(current_state[filename])
+    new_issue_list = List.wrap(issue_or_issue_list) ++ existing_issues
     new_current_state = Map.put(current_state, filename, new_issue_list)
 
     {:reply, new_issue_list, new_current_state}

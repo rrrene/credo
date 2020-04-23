@@ -16,7 +16,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     {line_no, last_line} =

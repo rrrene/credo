@@ -28,7 +28,7 @@ defmodule Credo.Check.Readability.Specs do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     specs = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
 
@@ -67,6 +67,7 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {:def, meta, [{:when, _, def_ast} | _]},
          issues,

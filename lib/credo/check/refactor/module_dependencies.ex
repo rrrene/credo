@@ -28,7 +28,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   alias Credo.Code.Module
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     max_deps = Params.get(params, :max_deps, __MODULE__)

@@ -23,13 +23,14 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   # [a] ++ b is OK
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
     {ast, issues}
   end

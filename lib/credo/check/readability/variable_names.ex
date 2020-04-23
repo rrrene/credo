@@ -24,7 +24,7 @@ defmodule Credo.Check.Readability.VariableNames do
   @special_var_names [:__CALLER__, :__DIR__, :__ENV__, :__MODULE__]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))

@@ -5,6 +5,8 @@ defmodule Credo.Service.ETSTableHelper do
     quote do
       use GenServer
 
+      @timeout 60_000
+
       alias Credo.Service.ETSTableHelper
 
       @table_name __MODULE__
@@ -24,7 +26,7 @@ defmodule Credo.Service.ETSTableHelper do
       end
 
       def put(filename, value) do
-        GenServer.call(__MODULE__, {:put, filename, value})
+        GenServer.call(__MODULE__, {:put, filename, value}, @timeout)
       end
 
       # callbacks

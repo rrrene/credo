@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)
     max_abc_size = Params.get(params, :max_size, __MODULE__)
@@ -68,6 +68,8 @@ defmodule Credo.Check.Refactor.ABCSize do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above how we want to exclude certain front-loads
   for op <- @def_ops do
     defp traverse(
            {unquote(op), meta, arguments} = ast,

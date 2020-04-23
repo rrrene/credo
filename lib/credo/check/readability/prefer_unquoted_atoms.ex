@@ -42,7 +42,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   @token_types [:atom_unsafe, :kw_identifier_unsafe]
 
   @doc false
-  def run(source_file, params \\ []) do
+  # TODO: consider for experimental check front-loader (tokens)
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file

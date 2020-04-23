@@ -31,13 +31,14 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     parens? = Params.get(params, :parens, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, parens?))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     # catch variables named e.g. `defp`
     defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do

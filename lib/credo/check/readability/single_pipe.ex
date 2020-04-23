@@ -32,7 +32,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     {_continue, issues} =
@@ -41,6 +41,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     issues
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _) do
     {ast, {false, issues}}
   end

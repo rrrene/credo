@@ -34,7 +34,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
@@ -44,6 +44,8 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     {nil, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: we have to exclude the cases matching the above clause!
   defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
     new_issue = issue_for_else_block(Credo.Code.Block.else_block_for!(ast), meta, issue_meta)
 

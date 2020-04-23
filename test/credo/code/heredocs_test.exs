@@ -93,17 +93,17 @@ defmodule Credo.Code.HeredocsTest do
 
   test "it should return the source without the strings and replace the contents" do
     source = """
-    t = ~S\"\"\"
-    abc
-    我是中國人
-    \"\"\"
+      t = ~S\"\"\"
+      abc
+      我是中國人
+      \"\"\"
     """
 
     expected = """
-    t = ~S\"\"\"
-    ...
-    .....
-    \"\"\"
+      t = ~S\"\"\"
+      ...
+      .....
+      \"\"\"
     """
 
     result = source |> Heredocs.replace_with_spaces(".")

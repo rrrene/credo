@@ -23,7 +23,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   @collector Credo.Check.Consistency.ParameterPatternMatching.Collector
 
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 

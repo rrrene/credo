@@ -32,12 +32,13 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp traverse(
            {unquote(op), _, [{_, _, _}, [do: {:try, meta, _}]]} = ast,

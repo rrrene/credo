@@ -78,11 +78,12 @@ defmodule Credo.Check.Refactor.WithClauses do
                                      "the non-pattern <- clauses inside the body of the `with`"
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
        when is_list(clauses_and_body) do
     # If clauses_and_body is a list with at least two elements in it, we think

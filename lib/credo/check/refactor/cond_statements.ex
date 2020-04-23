@@ -28,12 +28,13 @@ defmodule Credo.Check.Refactor.CondStatements do
     ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
     count =
       arguments

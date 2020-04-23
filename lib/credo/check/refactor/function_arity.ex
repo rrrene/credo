@@ -19,7 +19,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_arity = Params.get(params, :max_arity, __MODULE__)
     ignore_defp = Params.get(params, :ignore_defp, __MODULE__)
@@ -30,6 +30,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
     )
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp traverse(
            {unquote(op) = op, meta, arguments} = ast,

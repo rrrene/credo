@@ -24,12 +24,13 @@ defmodule Credo.Check.Readability.MultiAlias do
   alias Credo.Code
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {:alias, _, [{{_, _, [{:__aliases__, opts, base_alias}, :{}]}, _, [multi_alias | _]}]} =
            ast,

@@ -1,16 +1,21 @@
 defmodule Credo.Check.Design.AliasUsage do
   use Credo.Check,
     base_priority: :normal,
+    prefilter: [
+      ast: [
+        filter: {:defmodule, _meta, _arguments}
+      ]
+    ],
     param_defaults: [
       excluded_namespaces: ~w[File IO Inspect Kernel Macro Supervisor Task Version],
       excluded_lastnames: ~w[Access Agent Application Atom Base Behaviour
-                              Bitwise Code Date DateTime Dict Enum Exception
-                              File Float GenEvent GenServer HashDict HashSet
-                              Integer IO Kernel Keyword List Macro Map MapSet
-                              Module NaiveDateTime Node OptionParser Path Port
-                              Process Protocol Range Record Regex Registry Set
-                              Stream String StringIO Supervisor System Task Time
-                              Tuple URI Version],
+                          Bitwise Code Date DateTime Dict Enum Exception
+                          File Float GenEvent GenServer HashDict HashSet
+                          Integer IO Kernel Keyword List Macro Map MapSet
+                          Module NaiveDateTime Node OptionParser Path Port
+                          Process Protocol Range Record Regex Registry Set
+                          Stream String StringIO Supervisor System Task Time
+                          Tuple URI Version],
       if_nested_deeper_than: 0,
       if_called_more_often_than: 0
     ],
@@ -56,7 +61,7 @@ defmodule Credo.Check.Design.AliasUsage do
   alias Credo.Code.Name
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)

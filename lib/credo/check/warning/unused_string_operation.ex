@@ -33,7 +33,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
   @checked_module :String
   @funs_with_return_value nil
 
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     UnusedOperation.run(
       source_file,
       params,

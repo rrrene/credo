@@ -38,7 +38,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = Params.get(params, :max_complexity, __MODULE__)
 
@@ -53,6 +53,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above how we want to exclude certain front-loads
   for op <- @def_ops do
     defp traverse(
            {unquote(op), meta, arguments} = ast,
