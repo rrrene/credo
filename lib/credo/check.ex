@@ -148,8 +148,7 @@ defmodule Credo.Check do
     :explanations,
     :param_defaults,
     :run_on_all,
-    :tags,
-    :prefilter
+    :tags
   ]
 
   @doc false

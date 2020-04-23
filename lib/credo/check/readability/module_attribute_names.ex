@@ -1,12 +1,6 @@
 defmodule Credo.Check.Readability.ModuleAttributeNames do
   use Credo.Check,
     base_priority: :high,
-    prefilter: [
-      ast: [
-        filter: {:@, _meta, [{_name, _meta, _arguments}]},
-        reject: {:@, _meta, [{:{}, _, _}]}
-      ]
-    ],
     explanations: [
       check: """
       Module attribute names are always written in snake_case in Elixir.

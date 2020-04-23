@@ -1,11 +1,6 @@
 defmodule Credo.Check.Design.AliasUsage do
   use Credo.Check,
     base_priority: :normal,
-    prefilter: [
-      ast: [
-        filter: {:defmodule, _meta, _arguments}
-      ]
-    ],
     param_defaults: [
       excluded_namespaces: ~w[File IO Inspect Kernel Macro Supervisor Task Version],
       excluded_lastnames: ~w[Access Agent Application Atom Base Behaviour
