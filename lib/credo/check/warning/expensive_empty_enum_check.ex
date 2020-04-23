@@ -37,10 +37,12 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {@length_pattern, 0},
     {0, @length_pattern}
   ]
+  @operators [:==, :===]
 
-  for {lhs, rhs} <- @comparisons do
+  for {lhs, rhs} <- @comparisons,
+      operator <- @operators do
     defp traverse(
-           {:==, meta, [unquote(lhs), unquote(rhs)]} = ast,
+           {unquote(operator), meta, [unquote(lhs), unquote(rhs)]} = ast,
            issues,
            issue_meta
          ) do
