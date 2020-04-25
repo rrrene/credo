@@ -10,7 +10,6 @@ defmodule Credo.CLI.Output.Summary do
     {:readability, "code readability issue", "code readability issues"},
     {:design, "software design suggestion", "software design suggestions"}
   ]
-  @get_more_details "For more information including configuration options on a specific issue, run `mix credo explain <location-of-issue>`"
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
 
   alias Credo.CLI.Output
@@ -36,11 +35,6 @@ defmodule Credo.CLI.Output.Summary do
     source_file_count = exec |> Execution.get_source_files() |> Enum.count()
     checks_count = count_checks(exec)
 
-    if issues != [] do
-      UI.puts()
-      UI.puts([:reset, @get_more_details])
-    end
-
     UI.puts()
     UI.puts([:faint, @cry_for_help])
     UI.puts()
@@ -49,7 +43,7 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts(summary_parts(source_files, issues))
     UI.puts()
 
-    print_priority_hint(issues, exec)
+    print_priority_hint(exec)
   end
 
   defp count_checks(exec) do
@@ -58,25 +52,20 @@ defmodule Credo.CLI.Output.Summary do
     Enum.count(result)
   end
 
-  defp print_priority_hint([], %Execution{min_priority: min_priority})
+  defp print_priority_hint(%Execution{min_priority: min_priority})
        when min_priority >= 0 do
     UI.puts([
       :faint,
-      "Use `--strict` to show all issues, `--help` for options."
+      "Showing priority issues: ↑ ↗ →  (use `mix credo explain` to explain issues, `mix credo --help` for options)."
     ])
   end
 
-  defp print_priority_hint([], _exec), do: nil
-
-  defp print_priority_hint(_, %Execution{min_priority: min_priority})
-       when min_priority >= 0 do
+  defp print_priority_hint(_) do
     UI.puts([
       :faint,
-      "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
+      "Use `mix credo explain` to explain issues, `mix credo --help` for options."
     ])
   end
-
-  defp print_priority_hint(_, _exec), do: nil
 
   defp format_time_spent(check_count, source_file_count, time_load, time_run) do
     time_run = time_run |> div(10_000)
