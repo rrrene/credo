@@ -138,4 +138,21 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report when checking if length is 0 with triple-equals" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(some_list) do
+        if length(some_list) === 0 do
+          "empty"
+        else
+          "not empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
