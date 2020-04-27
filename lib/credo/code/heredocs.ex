@@ -309,7 +309,8 @@ defmodule Credo.Code.Heredocs do
            unquote(sigil_end),
            _replacement,
            _empty_line_replacement,
-           _current_line
+           _current_line,
+           _byte_index_heredoc_start
          ) do
       acc
     end
