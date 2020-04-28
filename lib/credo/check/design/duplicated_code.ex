@@ -51,38 +51,71 @@ defmodule Credo.Check.Design.DuplicatedCode do
 
   defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec)
        when is_map(found_hashes) do
-    Enum.each(found_hashes, fn {_hash, nodes} ->
-      filenames = Enum.map(nodes, & &1.filename)
-
-      Enum.each(
-        source_files,
-        &new_issue_for_members(filenames, &1, nodes_threshold, nodes, params, exec)
-      )
-    end)
+    found_hashes
+    |> Enum.map(
+      &Task.async(fn ->
+        do_append_issues_via_issue_service(
+          &1,
+          source_files,
+          nodes_threshold,
+          params,
+          exec
+        )
+      end)
+    )
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp new_issue_for_members(filenames, source_file, nodes_threshold, nodes, params, exec) do
-    if Enum.member?(filenames, source_file.filename) do
-      this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
-      other_nodes = List.delete(nodes, this_node)
-      issue_meta = IssueMeta.for(source_file, params)
-      issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
+  defp do_append_issues_via_issue_service(
+         {_hash, nodes},
+         source_files,
+         nodes_threshold,
+         params,
+         exec
+       ) do
+    filename_map = nodes |> Enum.map(&{&1.filename, true}) |> Enum.into(%{})
 
-      if issue do
-        Credo.Execution.ExecutionIssues.append(exec, source_file, issue)
-      end
+    source_files
+    |> Enum.filter(fn source_file -> filename_map[source_file.filename] end)
+    |> Enum.each(&new_issue_for_members(&1, nodes_threshold, nodes, params, exec))
+  end
+
+  defp new_issue_for_members(source_file, nodes_threshold, nodes, params, exec) do
+    this_node = Enum.find(nodes, &(&1.filename == source_file.filename))
+    other_nodes = List.delete(nodes, this_node)
+    issue_meta = IssueMeta.for(source_file, params)
+    issue = issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params)
+
+    if issue do
+      Credo.Execution.ExecutionIssues.append(exec, source_file, issue)
     end
   end
 
   defp duplicate_nodes(source_files, mass_threshold) do
-    source_files
-    |> Enum.reduce(%{}, fn source_file, acc ->
+    chunked_nodes =
+      source_files
+      |> Enum.chunk_every(30)
+      |> Enum.map(&Task.async(fn -> calculate_hashes_for_chunk(&1, mass_threshold) end))
+      |> Enum.map(&Task.await(&1, :infinity))
+
+    nodes =
+      Enum.reduce(chunked_nodes, %{}, fn current_hashes, existing_hashes ->
+        Map.merge(existing_hashes, current_hashes, fn _hash, node_items1, node_items2 ->
+          node_items1 ++ node_items2
+        end)
+      end)
+
+    nodes
+    |> prune_hashes
+    |> add_masses
+  end
+
+  defp calculate_hashes_for_chunk(source_files, mass_threshold) do
+    Enum.reduce(source_files, %{}, fn source_file, acc ->
       ast = SourceFile.ast(source_file)
 
       calculate_hashes(ast, acc, source_file.filename, mass_threshold)
     end)
-    |> prune_hashes
-    |> add_masses
   end
 
   def add_masses(found_hashes) do
@@ -162,15 +195,17 @@ defmodule Credo.Check.Design.DuplicatedCode do
     )
   end
 
-  defp collect_hashes(ast, acc, filename, mass_threshold) do
+  defp collect_hashes(ast, existing_hashes, filename, mass_threshold) do
     if mass(ast) < mass_threshold do
-      {ast, acc}
+      {ast, existing_hashes}
     else
       hash = ast |> Credo.Code.remove_metadata() |> to_hash
       node_item = %{node: ast, filename: filename, mass: nil}
-      node_items = Map.get(acc, hash, [])
-      acc = Map.put(acc, hash, node_items ++ [node_item])
-      {ast, acc}
+      node_items = Map.get(existing_hashes, hash, [])
+
+      updated_hashes = Map.put(existing_hashes, hash, node_items ++ [node_item])
+
+      {ast, updated_hashes}
     end
   end
 
