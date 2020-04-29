@@ -5,6 +5,7 @@ defmodule Credo.SourceFile do
 
   @type t :: %__MODULE__{
           filename: nil | String.t(),
+          hash: String.t(),
           status: :valid | :invalid | :timed_out
         }
 
@@ -13,6 +14,7 @@ defmodule Credo.SourceFile do
   alias Credo.Service.SourceFileSource
 
   defstruct filename: nil,
+            hash: nil,
             status: nil
 
   defimpl Inspect, for: __MODULE__ do
@@ -26,6 +28,7 @@ defmodule Credo.SourceFile do
   """
   def parse(source, filename) do
     filename = Path.relative_to_cwd(filename)
+
     lines = Credo.Code.to_lines(source)
 
     {valid, ast} =
@@ -37,14 +40,22 @@ defmodule Credo.SourceFile do
           {false, []}
       end
 
-    SourceFileAST.put(filename, ast)
-    SourceFileLines.put(filename, lines)
-    SourceFileSource.put(filename, source)
+    hash =
+      :sha256
+      |> :crypto.hash(source)
+      |> Base.encode16()
 
-    %Credo.SourceFile{
+    source_file = %Credo.SourceFile{
       filename: filename,
+      hash: hash,
       status: if(valid, do: :valid, else: :invalid)
     }
+
+    SourceFileAST.put(source_file, ast)
+    SourceFileLines.put(source_file, lines)
+    SourceFileSource.put(source_file, source)
+
+    source_file
   end
 
   @spec timed_out(String.t()) :: t
@@ -53,6 +64,7 @@ defmodule Credo.SourceFile do
 
     %Credo.SourceFile{
       filename: filename,
+      hash: "timed_out:#{filename}",
       status: :timed_out
     }
   end
@@ -60,39 +72,39 @@ defmodule Credo.SourceFile do
   @doc "Returns the AST for the given `source_file`."
   def ast(source_file)
 
-  def ast(%__MODULE__{filename: filename}) do
-    case SourceFileAST.get(filename) do
+  def ast(%__MODULE__{} = source_file) do
+    case SourceFileAST.get(source_file) do
       {:ok, ast} ->
         ast
 
       _ ->
-        raise "Could not get source from ETS: #{filename}"
+        raise "Could not get source from ETS: #{source_file.filename}"
     end
   end
 
   @doc "Returns the lines of source code for the given `source_file`."
   def lines(source_file)
 
-  def lines(%__MODULE__{filename: filename}) do
-    case SourceFileLines.get(filename) do
+  def lines(%__MODULE__{} = source_file) do
+    case SourceFileLines.get(source_file) do
       {:ok, lines} ->
         lines
 
       _ ->
-        raise "Could not get source from ETS: #{filename}"
+        raise "Could not get source from ETS: #{source_file.filename}"
     end
   end
 
   @doc "Returns the source code for the given `source_file`."
   def source(source_file)
 
-  def source(%__MODULE__{filename: filename}) do
-    case SourceFileSource.get(filename) do
+  def source(%__MODULE__{} = source_file) do
+    case SourceFileSource.get(source_file) do
       {:ok, source} ->
         source
 
       _ ->
-        raise "Could not get source from ETS: #{filename}"
+        raise "Could not get source from ETS: #{source_file.filename}"
     end
   end
 

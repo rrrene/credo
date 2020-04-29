@@ -620,8 +620,8 @@ defmodule Credo.Check do
   #       {:def, "Foo.Bar.baz"},
   #       {:defmodule, "Foo.Bar"}
   #     ]
-  defp scope_list(%SourceFile{filename: filename} = source_file) do
-    case SourceFileScopes.get(filename) do
+  defp scope_list(%SourceFile{} = source_file) do
+    case SourceFileScopes.get(source_file) do
       {:ok, value} ->
         value
 
@@ -635,7 +635,7 @@ defmodule Credo.Check do
             Scope.name_from_scope_info_list(scope_info_list, line_no)
           end)
 
-        SourceFileScopes.put(filename, result)
+        SourceFileScopes.put(source_file, result)
 
         result
     end
