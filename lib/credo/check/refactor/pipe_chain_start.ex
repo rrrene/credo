@@ -32,7 +32,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     ]
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     excluded_functions = Params.get(params, :excluded_functions, __MODULE__)

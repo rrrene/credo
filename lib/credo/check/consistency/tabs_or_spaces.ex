@@ -21,6 +21,7 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
   @collector Credo.Check.Consistency.TabsOrSpaces.Collector
 
   @doc false
+  @impl true
   def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end

@@ -31,7 +31,7 @@ defmodule Credo.Check.Warning.UnusedRegexOperation do
   @checked_module :Regex
   @funs_with_return_value nil
 
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     UnusedOperation.run(
       source_file,
       params,

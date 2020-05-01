@@ -21,7 +21,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
   alias Credo.Code.Heredocs
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
 

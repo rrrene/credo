@@ -32,7 +32,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
   @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_length = Params.get(params, :max_length, __MODULE__)
 

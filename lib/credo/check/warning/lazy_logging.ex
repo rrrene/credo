@@ -33,7 +33,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   @logger_functions [:debug, :info, :warn, :error]
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     # {<Logger import seen?>, <list of issues>}
     state = {false, []}

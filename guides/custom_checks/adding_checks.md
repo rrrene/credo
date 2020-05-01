@@ -10,7 +10,7 @@ Custom checks are simply modules implementing the `Credo.Check` behaviour, which
     defmodule MyProject.Checks.MyCheck do
       use Credo.Check
 
-      def run(source_file, params) do
+      def run(%SourceFile{} = source_file, params) do
         #
       end
     end

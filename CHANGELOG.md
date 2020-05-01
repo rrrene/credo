@@ -15,7 +15,7 @@
       defmodule MyCheck do
         use Credo.Check, tags: [:foo]
 
-        def run(source_file, params) do
+        def run(%SourceFile{} = source_file, params) do
           #
         end
       end
@@ -92,7 +92,7 @@ defmodule MyCheck do
       ]
     ]
 
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     #
   end
 end
@@ -122,7 +122,7 @@ defmodule MyCheck do
 
   def param_defaults, do: [param1: 42, param2: "offline"]
 
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     #
   end
 end

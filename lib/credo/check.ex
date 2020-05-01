@@ -7,7 +7,7 @@ defmodule Credo.Check do
       defmodule MyCheck do
         use Credo.Check, category: :warning, base_priority: :high
 
-        def run(source_file, params) do
+        def run(%SourceFile{} = source_file, params) do
           #
         end
       end
@@ -56,7 +56,7 @@ defmodule Credo.Check do
 
         def param_defaults, do: [param1: 42, param2: "offline"]
 
-        def run(source_file, params) do
+        def run(%SourceFile{} = source_file, params) do
           #
         end
       end
@@ -251,6 +251,7 @@ defmodule Credo.Check do
       alias Credo.Check
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
+      alias Credo.CLI.Output.UI
       alias Credo.Issue
       alias Credo.IssueMeta
       alias Credo.Priority
@@ -280,6 +281,7 @@ defmodule Credo.Check do
       @impl true
       def run_on_all_source_files(exec, source_files, params \\ [])
 
+      @impl true
       def run_on_all_source_files(exec, source_files, params) do
         if function_exported?(__MODULE__, :run, 3) do
           IO.warn(
@@ -306,21 +308,21 @@ defmodule Credo.Check do
       def run_on_source_file(exec, source_file, params \\ [])
 
       def run_on_source_file(exec, source_file, params) do
-        try do
-          run(source_file, params)
-        rescue
-          error ->
-            Credo.CLI.Output.UI.warn(
-              "Error while running #{__MODULE__} on #{source_file.filename}"
-            )
+        issues =
+          try do
+            run(source_file, params)
+          rescue
+            error ->
+              UI.warn("Error while running #{__MODULE__} on #{source_file.filename}")
 
-            if exec.crash_on_error do
-              reraise error, System.stacktrace()
-            else
-              []
-            end
-        end
-        |> append_issues_and_timings(exec)
+              if exec.crash_on_error do
+                reraise error, System.stacktrace()
+              else
+                []
+              end
+          end
+
+        append_issues_and_timings(issues, exec)
 
         :ok
       end
@@ -329,7 +331,7 @@ defmodule Credo.Check do
       @impl true
       def run(source_file, params)
 
-      def run(source_file, params) do
+      def run(%SourceFile{} = source_file, params) do
         throw("Implement me")
       end
 

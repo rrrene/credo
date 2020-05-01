@@ -40,7 +40,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
     ]
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))

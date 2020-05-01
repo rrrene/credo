@@ -38,6 +38,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   alias Credo.SourceFile
 
   @doc false
+  @impl true
   def run_on_all_source_files(exec, source_files, params) do
     mass_threshold = Params.get(params, :mass_threshold, __MODULE__)
     nodes_threshold = Params.get(params, :nodes_threshold, __MODULE__)

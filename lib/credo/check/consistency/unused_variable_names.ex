@@ -15,6 +15,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
   @collector Credo.Check.Consistency.UnusedVariableNames.Collector
 
   @doc false
+  @impl true
   def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end

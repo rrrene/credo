@@ -19,7 +19,7 @@ defmodule Credo.Test.Case do
       defmodule MyProject.MyCustomChecks.FooBar do
         use Credo.Check, category: :warning, base_priority: :high
 
-        def run(source_file, params) do
+        def run(%SourceFile{} = source_file, params) do
           # ... implement all the "FooBar rules" ...
         end
       end

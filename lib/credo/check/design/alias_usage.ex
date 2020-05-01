@@ -56,7 +56,7 @@ defmodule Credo.Check.Design.AliasUsage do
   alias Credo.Code.Name
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)

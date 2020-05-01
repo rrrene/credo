@@ -41,7 +41,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
 
   @doc false
   # TODO: consider for experimental check front-loader (text)
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file

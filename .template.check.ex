@@ -19,7 +19,7 @@ defmodule <%= @check_name %> do
   use Credo.Check, base_priority: :high, category: :custom, exit_status: 0
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     lines = SourceFile.lines(source_file)
 
     # IssueMeta helps us pass down both the source_file and params of a check

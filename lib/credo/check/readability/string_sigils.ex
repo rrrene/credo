@@ -39,7 +39,7 @@ defmodule Credo.Check.Readability.StringSigils do
   @quote_codepoint 34
 
   @doc false
-  def run(source_file, params) do
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
