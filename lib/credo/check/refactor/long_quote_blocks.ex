@@ -74,6 +74,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
   alias Credo.IssueMeta
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_line_count = Params.get(params, :max_line_count, __MODULE__)

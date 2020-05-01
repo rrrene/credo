@@ -45,6 +45,8 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
       unzip with_index zip
     )a
 
+  @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     UnusedOperation.run(
       source_file,

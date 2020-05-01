@@ -19,6 +19,7 @@ defmodule <%= @check_name %> do
   use Credo.Check, base_priority: :high, category: :custom, exit_status: 0
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     lines = SourceFile.lines(source_file)
 

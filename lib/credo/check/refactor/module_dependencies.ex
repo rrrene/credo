@@ -28,6 +28,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   alias Credo.Code.Module
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

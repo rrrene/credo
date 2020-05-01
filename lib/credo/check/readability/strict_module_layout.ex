@@ -72,7 +72,8 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   alias Credo.CLI.Output.UI
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params \\ []) do
     params = normalize_params(params)
 
     source_file

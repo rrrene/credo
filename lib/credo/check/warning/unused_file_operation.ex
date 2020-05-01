@@ -32,6 +32,8 @@ defmodule Credo.Check.Warning.UnusedFileOperation do
   @checked_module :File
   @funs_with_return_value ~w(cwd cwd! dir? exists? read read! regular? stat stat!)a
 
+  @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     UnusedOperation.run(
       source_file,

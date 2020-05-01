@@ -31,6 +31,7 @@ defmodule Credo.Check.Readability.FunctionNames do
   @all_nonspecial_operators ~W(! && ++ -- .. <> =~ @ |> || != !== * + - / <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~)a
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 

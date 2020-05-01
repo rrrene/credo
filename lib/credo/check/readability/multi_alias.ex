@@ -24,6 +24,7 @@ defmodule Credo.Check.Readability.MultiAlias do
   alias Credo.Code
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

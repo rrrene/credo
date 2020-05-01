@@ -11,7 +11,7 @@ defmodule Credo.Test.CheckRunnerTest do
   defmodule FakeTestCheck do
     use Credo.Check
 
-    def run(source_file, params \\ []) do
+    def run(%SourceFile{} = source_file, params \\ []) do
       if params[:issue_count] do
         issue_count = params[:issue_count] || 0
 

@@ -35,6 +35,8 @@ defmodule Credo.Check.Warning.UnusedKeywordOperation do
   @checked_module :Keyword
   @funs_with_return_value nil
 
+  @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     UnusedOperation.run(
       source_file,

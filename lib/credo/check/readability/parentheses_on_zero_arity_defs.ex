@@ -31,6 +31,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     parens? = Params.get(params, :parens, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)

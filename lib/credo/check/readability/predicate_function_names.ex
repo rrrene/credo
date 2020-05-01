@@ -47,6 +47,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

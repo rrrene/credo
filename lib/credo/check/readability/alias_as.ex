@@ -36,6 +36,7 @@ defmodule Credo.Check.Readability.AliasAs do
   alias Credo.Code
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     source_file
     |> Code.prewalk(&traverse(&1, &2, IssueMeta.for(source_file, params)))

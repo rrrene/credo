@@ -40,6 +40,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   @unspaced_commas ~r/(?<!\W\?)(\,\S)/
 
   @doc false
+  @impl true
   # TODO: consider for experimental check front-loader (text)
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)

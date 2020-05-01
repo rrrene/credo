@@ -19,6 +19,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_arity = Params.get(params, :max_arity, __MODULE__)

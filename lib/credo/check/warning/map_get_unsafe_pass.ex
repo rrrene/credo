@@ -28,6 +28,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   @unsafe_modules [:Enum]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

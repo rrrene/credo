@@ -44,6 +44,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   @condition_ops [:if, :unless]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

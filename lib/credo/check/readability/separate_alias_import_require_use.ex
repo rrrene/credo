@@ -40,7 +40,8 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
   alias Credo.Code
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
     line_map =

@@ -56,6 +56,7 @@ defmodule Credo.Check.Design.AliasUsage do
   alias Credo.Code.Name
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

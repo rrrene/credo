@@ -14,6 +14,7 @@ defmodule Credo.Check.Warning.IExPry do
   @call_string "IEx.pry"
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 

@@ -29,6 +29,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}]
 
   @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     ignore_ecto? = imports_ecto_query?(source_file)
     issue_meta = IssueMeta.for(source_file, params)

@@ -31,6 +31,8 @@ defmodule Credo.Check.Warning.UnusedPathOperation do
   @checked_module :Path
   @funs_with_return_value nil
 
+  @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params) do
     UnusedOperation.run(
       source_file,

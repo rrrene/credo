@@ -42,7 +42,9 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
 
   alias Credo.Code
 
-  def run(source_file, params \\ []) do
+  @doc false
+  @impl true
+  def run(%SourceFile{} = source_file, params \\ []) do
     source_file
     |> errors()
     |> Enum.map(&credo_error(&1, IssueMeta.for(source_file, params)))
