@@ -511,6 +511,30 @@ defmodule Credo.Code.ModuleTest do
                [{Test, [callback_fun: [line: 3, column: 3]]}]
     end
 
+    test "deduplicates multiclauses" do
+      assert analyze("""
+             def a(1), do: true
+             def a(2), do: false
+
+             @impl true
+             def b(1), do: true
+             def b(2), do: false
+
+             @doc false
+             def c(1), do: true
+             def c(2), do: false
+
+             defp d(1), do: true
+             defp d(2), do: false
+             """) == [
+               {Test,
+                public_fun: [line: 2, column: 3],
+                callback_fun: [line: 6, column: 3],
+                private_fun: [line: 10, column: 3],
+                private_fun: [line: 13, column: 3]}
+             ]
+    end
+
     test "handles multiple modules" do
       full_source =
         """

@@ -381,11 +381,18 @@ defmodule Credo.Code.Module do
        when clause in ~w/use import alias require defstruct/a,
        do: add_module_element(state, clause, meta)
 
-  defp analyze(state, {clause, meta, _})
+  defp analyze(state, {clause, meta, definition})
        when clause in ~w/def defmacro defguard defp defmacrop defguardp/a do
-    state
-    |> add_module_element(code_type(clause, state.next_fun_modifier), meta)
-    |> clear_next_fun_modifier()
+    fun_name = fun_name(definition)
+
+    if fun_name != state.last_fun_name do
+      state
+      |> add_module_element(code_type(clause, state.next_fun_modifier), meta)
+      |> Map.put(:last_fun_name, fun_name)
+      |> clear_next_fun_modifier()
+    else
+      state
+    end
   end
 
   defp analyze(state, {:do, _code}) do
@@ -398,6 +405,10 @@ defmodule Credo.Code.Module do
     do: add_module_element(state, :module, meta)
 
   defp analyze(_state, _ast), do: nil
+
+  defp fun_name([{name, _context, arity} | _]) when is_list(arity), do: {name, length(arity)}
+  defp fun_name([{name, _context, _} | _]), do: {name, 0}
+  defp fun_name(_), do: nil
 
   defp code_type(:def, nil), do: :public_fun
   defp code_type(:def, :impl), do: :callback_fun
@@ -413,7 +424,8 @@ defmodule Credo.Code.Module do
 
   # Internal state
 
-  defp initial_state, do: %{modules: [], current_module: nil, next_fun_modifier: nil}
+  defp initial_state,
+    do: %{modules: [], current_module: nil, next_fun_modifier: nil, last_fun_name: nil}
 
   defp set_next_fun_modifier(state, value), do: %{state | next_fun_modifier: value}
 
