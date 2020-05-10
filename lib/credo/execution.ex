@@ -33,7 +33,8 @@ defmodule Credo.Execution do
               read_from_stdin: :boolean,
               strict: :boolean,
               verbose: :boolean,
-              version: :boolean
+              version: :boolean,
+              watch: :boolean
             ],
             cli_aliases: [
               a: :all,
