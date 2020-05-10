@@ -71,6 +71,7 @@ defmodule Credo.Priority do
 
   defp make_base_map(priority_list, %SourceFile{} = source_file) do
     ast = SourceFile.ast(source_file)
+    scope_info_list = Scope.scope_info_list(ast)
 
     priority_list
     |> Enum.with_index()
@@ -80,7 +81,7 @@ defmodule Credo.Priority do
           nil
 
         _ ->
-          {_, scope_name} = Scope.name(ast, line: index + 1)
+          {_, scope_name} = Scope.name_from_scope_info_list(scope_info_list, index + 1)
           {scope_name, Enum.sum(list)}
       end
     end)
