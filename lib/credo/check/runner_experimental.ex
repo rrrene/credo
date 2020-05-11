@@ -6,6 +6,7 @@ defmodule Credo.Check.RunnerExperimental do
 
   alias Credo.CLI.Output.UI
   alias Credo.Execution
+  alias Credo.Execution.ExecutionTiming
 
   @doc """
   Runs all checks on all source files (according to the config).
@@ -25,8 +26,8 @@ defmodule Credo.Check.RunnerExperimental do
   end
 
   defp run_check(%Execution{debug: true} = exec, {check, params}) do
-    Execution.ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
-    |> Execution.ExecutionTiming.append(exec, task: exec.current_task, check: check)
+    ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
+    |> ExecutionTiming.append(exec, task: exec.current_task, check: check)
   end
 
   defp run_check(exec, {check, params}) do
