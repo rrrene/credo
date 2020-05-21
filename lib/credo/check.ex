@@ -252,6 +252,8 @@ defmodule Credo.Check do
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
       alias Credo.CLI.Output.UI
+      alias Credo.Execution
+      alias Credo.Execution.ExecutionTiming
       alias Credo.Issue
       alias Credo.IssueMeta
       alias Credo.Priority
@@ -307,7 +309,20 @@ defmodule Credo.Check do
       @impl true
       def run_on_source_file(exec, source_file, params \\ [])
 
+      def run_on_source_file(%Execution{debug: true} = exec, source_file, params) do
+        ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
+        |> ExecutionTiming.append(exec,
+          task: exec.current_task,
+          check: __MODULE__,
+          filename: source_file.filename
+        )
+      end
+
       def run_on_source_file(exec, source_file, params) do
+        do_run_on_source_file(exec, source_file, params)
+      end
+
+      def do_run_on_source_file(exec, source_file, params) do
         issues =
           try do
             run(source_file, params)
