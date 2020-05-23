@@ -22,11 +22,17 @@ defmodule Credo.ConfigBuilder do
 
   defp get_config_file(exec, %Options{} = options) do
     config_name = options.switches[:config_name]
-    config_file = options.switches[:config_file]
+    config_filename = options.switches[:config_file]
     dir = Filename.remove_line_no_and_column(options.path)
 
-    if is_binary(config_file) do
-      ConfigFile.read_from_file_path(exec, dir, config_file, config_name)
+    if is_binary(config_filename) do
+      filename = Path.expand(config_filename)
+
+      if File.exists?(filename) do
+        ConfigFile.read_from_file_path(exec, dir, config_filename, config_name)
+      else
+        {:error, {:notfound, "Given config file does not exist: #{filename}"}}
+      end
     else
       ConfigFile.read_or_default(exec, dir, config_name)
     end

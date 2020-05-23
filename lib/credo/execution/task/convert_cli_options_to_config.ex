@@ -23,40 +23,50 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
   end
 
   def error(exec, _opts) do
-    case Execution.get_assign(exec, "#{__MODULE__}.error") do
-      {:badconfig, filename, line_no, description, trigger} when not is_nil(filename) ->
-        lines =
-          filename
-          |> File.read!()
-          |> Credo.Code.to_lines()
-          |> Enum.filter(fn {line_no2, _line} ->
-            line_no2 >= line_no - 2 and line_no2 <= line_no + 2
-          end)
-
-        UI.warn([:red, "** (config) Error while loading config file!"])
-        UI.warn("")
-
-        UI.warn([:cyan, "  file: ", :reset, filename])
-        UI.warn([:cyan, "  line: ", :reset, "#{line_no}"])
-        UI.warn("")
-
-        UI.warn(["  ", description, :reset, :cyan, :bright, trigger])
-
-        UI.warn("")
-
-        Enum.each(lines, fn {line_no2, line} ->
-          color = color_list(line_no, line_no2)
-
-          UI.warn([color, String.pad_leading("#{line_no2}", 5), :reset, "  ", color, line])
-        end)
-
-        UI.warn("")
-
-      error ->
-        IO.warn("Execution halted during #{__MODULE__}! Unrecognized error: #{inspect(error)}")
-    end
+    exec
+    |> Execution.get_assign("#{__MODULE__}.error")
+    |> puts_error_message()
 
     exec
+  end
+
+  defp puts_error_message({:badconfig, filename, line_no, description, trigger})
+       when not is_nil(filename) do
+    lines =
+      filename
+      |> File.read!()
+      |> Credo.Code.to_lines()
+      |> Enum.filter(fn {line_no2, _line} ->
+        line_no2 >= line_no - 2 and line_no2 <= line_no + 2
+      end)
+
+    UI.warn([:red, "** (config) Error while loading config file!"])
+    UI.warn("")
+
+    UI.warn([:cyan, "  file: ", :reset, filename])
+    UI.warn([:cyan, "  line: ", :reset, "#{line_no}"])
+    UI.warn("")
+
+    UI.warn(["  ", description, :reset, :cyan, :bright, trigger])
+
+    UI.warn("")
+
+    Enum.each(lines, fn {line_no2, line} ->
+      color = color_list(line_no, line_no2)
+
+      UI.warn([color, String.pad_leading("#{line_no2}", 5), :reset, "  ", color, line])
+    end)
+
+    UI.warn("")
+  end
+
+  defp puts_error_message({:notfound, message}) do
+    UI.warn([:red, "** (config) #{message}"])
+    UI.warn("")
+  end
+
+  defp puts_error_message(error) do
+    IO.warn("Execution halted during #{__MODULE__}! Unrecognized error: #{inspect(error)}")
   end
 
   defp color_list(line_no, line_no2) when line_no == line_no2, do: [:bright, :cyan]
