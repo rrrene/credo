@@ -28,11 +28,7 @@ defmodule Credo.ConfigBuilder do
     if is_binary(config_filename) do
       filename = Path.expand(config_filename)
 
-      if File.exists?(filename) do
-        ConfigFile.read_from_file_path(exec, dir, config_filename, config_name)
-      else
-        {:error, {:notfound, "Given config file does not exist: #{filename}"}}
-      end
+      ConfigFile.read_from_file_path(exec, dir, config_filename, config_name)
     else
       ConfigFile.read_or_default(exec, dir, config_name)
     end
