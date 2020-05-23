@@ -24,9 +24,16 @@ defmodule Credo do
       true
 
   """
-  def run(argv) do
-    argv
+  def run(argv_or_exec) do
+    argv_or_exec
     |> Execution.build()
+    |> Execution.run()
+    |> WriteDebugReport.call([])
+  end
+
+  def run(argv_or_exec, files_that_changed) do
+    argv_or_exec
+    |> Execution.build(files_that_changed)
     |> Execution.run()
     |> WriteDebugReport.call([])
   end

@@ -37,6 +37,15 @@ defmodule Credo.Check.RunnerExperimental do
   defp do_run_check(exec, {check, params}) do
     source_files = Execution.get_source_files(exec)
 
+    source_files =
+      if params[:__included__] do
+        Enum.filter(source_files, fn source_file ->
+          Enum.member?(params[:__included__], source_file.filename)
+        end)
+      else
+        source_files
+      end
+
     try do
       check.run_on_all_source_files(exec, source_files, params)
     rescue
