@@ -4,24 +4,27 @@ defmodule Credo.Watcher do
   @default_watch_path "."
 
   def run(argv) do
-    path = get_path(argv)
+    spawn(fn ->
+      path = get_path(argv)
 
-    UI.puts([
-      :bright,
-      :magenta,
-      "watch: ",
-      :reset,
-      :faint,
-      "Now watching for changes in '#{path}' ...\n"
-    ])
+      UI.puts([
+        :bright,
+        :magenta,
+        "watch: ",
+        :reset,
+        :faint,
+        "Now watching for changes in '#{path}' ...\n"
+      ])
 
-    start_watcher_process(path)
+      start_watcher_process(path)
 
-    watch_loop(argv, nil)
+      watch_loop(argv, nil)
+    end)
   end
 
   defp start_watcher_process(path) do
     {:ok, pid} = FileSystem.start_link(dirs: [path])
+
     FileSystem.subscribe(pid)
   end
 
@@ -36,19 +39,16 @@ defmodule Credo.Watcher do
           if Enum.member?(events, :closed) && elixir_file? && !in_ignored_directory? do
             UI.puts([:bright, :magenta, "watch: ", :reset, :faint, relative_path, "\n"])
 
-            Credo.run(argv)
+            file_that_changed = Path.relative_to_cwd(relative_path)
+
+            Credo.run(exec_from_last_run || argv, [file_that_changed])
           else
-            # UI.puts([
-            #   :bright,
-            #   :magenta,
-            #   "changes: ",
-            #   :reset,
-            #   :faint,
-            #   inspect({System.os_time(:milliseconds), events, relative_path})
-            # ])
+            # data = inspect({System.os_time(:milliseconds), events, relative_path})
+            # UI.puts([:bright, :magenta, "changes: ", :reset, :faint, data])
+            exec_from_last_run
           end
 
-        watch_loop(argv, exec || exec_from_last_run)
+        watch_loop(argv, exec)
     end
   end
 

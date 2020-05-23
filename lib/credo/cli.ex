@@ -17,6 +17,10 @@ defmodule Credo.CLI do
 
     if options[:watch] do
       Credo.Watcher.run(argv)
+
+      receive do
+        _ -> nil
+      end
     else
       argv
       |> Credo.run()

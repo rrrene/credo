@@ -158,6 +158,16 @@ defmodule Credo.Execution do
     |> start_servers()
   end
 
+  def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
+    previous_exec.argv
+    |> build()
+    |> put_rerun(previous_exec, files_that_changed)
+  end
+
+  def build(argv, files_that_changed) when is_list(files_that_changed) do
+    build(argv)
+  end
+
   @doc false
   defp start_servers(%__MODULE__{} = exec) do
     exec
@@ -464,15 +474,20 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def run_pipeline(initial_exec, pipeline_key) do
+  def run_pipeline(%__MODULE__{} = initial_exec, pipeline_key)
+      when is_atom(pipeline_key) and not is_nil(pipeline_key) do
+    pipeline_key
+    |> IO.inspect(label: "pipeline_key")
+
     initial_pipeline = get_pipeline(initial_exec, pipeline_key)
 
-    Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, outer_exec ->
-      outer_pipeline = get_pipeline(outer_exec, pipeline_key)
+    Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, exec_inside_pipeline ->
+      outer_pipeline = get_pipeline(exec_inside_pipeline, pipeline_key)
+
       task_group = outer_pipeline[group_name]
 
-      Enum.reduce(task_group, outer_exec, fn {task_mod, opts}, inner_exec ->
-        Credo.Execution.Task.run(task_mod, inner_exec, opts)
+      Enum.reduce(task_group, exec_inside_pipeline, fn {task_mod, opts}, exec_inside_task_group ->
+        Credo.Execution.Task.run(task_mod, exec_inside_task_group, opts)
       end)
     end)
   end
@@ -560,5 +575,26 @@ defmodule Credo.Execution do
 
   def ensure_execution_struct(value, fun_name) do
     raise("Expected #{fun_name} to return %Credo.Execution{}, got: #{inspect(value)}")
+  end
+
+  @doc false
+  def get_rerun(exec) do
+    case get_assign(exec, "credo.rerun.previous_execution") do
+      nil -> :notfound
+      previous_exec -> {previous_exec, get_assign(exec, "credo.rerun.files_that_changed")}
+    end
+  end
+
+  defp put_rerun(exec, previous_exec, files_that_changed) do
+    exec
+    |> put_assign("credo.rerun.previous_execution", previous_exec)
+    |> put_assign(
+      "credo.rerun.files_that_changed",
+      Enum.map(files_that_changed, fn filename ->
+        filename
+        |> Path.expand()
+        |> Path.relative_to_cwd()
+      end)
+    )
   end
 end
