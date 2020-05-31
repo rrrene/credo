@@ -28,7 +28,7 @@ defmodule Credo.ConfigBuilder do
     if is_binary(config_filename) do
       filename = Path.expand(config_filename)
 
-      ConfigFile.read_from_file_path(exec, dir, config_filename, config_name)
+      ConfigFile.read_from_file_path(exec, dir, filename, config_name)
     else
       ConfigFile.read_or_default(exec, dir, config_name)
     end
