@@ -207,6 +207,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     """
   end
 
+  @with_spaces7 """
+  defmodule AlwaysNoSpacesInBinaryTypespecTest do
+    @callback foo() :: <<_::_*8>>
+
+    def foo, do: 1 + 1
+  end
+  """
+
   @with_and_without_spaces """
   defmodule OtherModule3 do
     defmacro foo do
@@ -360,6 +368,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       %{acc | "#{date_type}_dates": :foo}
       """
     ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should always allow no spaces in binary typespec" do
+    [@with_spaces7]
     |> to_source_files()
     |> run_check(@described_check)
     |> refute_issues()
