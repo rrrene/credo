@@ -36,7 +36,7 @@ defmodule Credo.Check.Readability.ExprPipe do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Use a variable instead of piping to a case, if, or unless expression",
+      message: "Use a variable or create a new function instead of piping to a case, if, or unless expression",
       trigger: trigger,
       line_no: line_no
     )
