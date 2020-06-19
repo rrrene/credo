@@ -133,4 +133,27 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report function with arity zero and no parentheses" do
+    """
+    defmodule CredoTypespecTest do
+      def foo, do: :ok
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should NOT report function with arity zero and a spec with no parentheses" do
+    """
+    defmodule CredoTypespecTest do
+      @spec foo :: :ok
+      def foo, do: :ok
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
