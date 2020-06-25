@@ -30,11 +30,11 @@ jobs:
           - otp: 23.0.2
             elixir: 1.10.3
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.1
 
-      - uses: actions/setup-elixir@v1
+      - uses: actions/setup-elixir@v1.3
         with:
-          otp: ${{matrix.otp}}
+          otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
       - run: mix deps.get
