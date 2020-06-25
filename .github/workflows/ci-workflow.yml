@@ -14,29 +14,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: [20.3, 21.3, 22.2]
-        elixir: [1.6.6, 1.7.2, 1.8.2, 1.9.4, 1.10.0]
+        include:
+          - otp: 18.3.4.11
+            elixir: 1.5.3
+          - otp: 19.3.6.13
+            elixir: 1.6.6
+          - otp: 19.3.6.13
+            elixir: 1.7.4
+          - otp: 20.3.8.26
+            elixir: 1.8.2
+          - otp: 20.3.8.26
+            elixir: 1.9.4
+          - otp: 21.3.8.16
+            elixir: 1.10.3
+          - otp: 23.0.2
+            elixir: 1.10.3
     steps:
       - uses: actions/checkout@v2
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
       - uses: actions/setup-elixir@v1
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
         with:
-          otp-version: ${{matrix.otp}}
+          otp: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
       - run: mix deps.get
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
       - run: mix deps.compile
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
       - run: mix compile --warnings-as-errors
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
       - run: mix test
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
 
       - run: ./test/smoke_test.sh
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
