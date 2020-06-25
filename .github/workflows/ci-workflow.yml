@@ -37,12 +37,14 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
-      - run: mix deps.get
+      - run: mix deps.get --only test
 
       - run: mix deps.compile
 
       - run: mix compile --warnings-as-errors
 
       - run: mix test
+        env:
+          MIX_ENV: test
 
       - run: ./test/smoke_test.sh
