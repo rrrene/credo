@@ -146,6 +146,7 @@ defmodule Credo.Execution do
     %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
     |> put_pipeline(__MODULE__, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
+    |> put_builtin_command("diff", Credo.CLI.Command.Diff.DiffCommand)
     |> put_builtin_command("explain", Credo.CLI.Command.Explain.ExplainCommand)
     |> put_builtin_command("gen.check", Credo.CLI.Command.GenCheck)
     |> put_builtin_command("gen.config", Credo.CLI.Command.GenConfig)
