@@ -31,16 +31,11 @@ jobs:
             elixir: 1.10.3
     steps:
       - uses: actions/checkout@v2.3.1
-
       - uses: actions/setup-elixir@v1.3
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-
       - run: mix deps.get --only test
-
-      - run: mix deps.compile
-
       - run: mix compile
         env:
           MIX_ENV: test
@@ -51,24 +46,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.1
-
       - uses: actions/setup-elixir@v1.3
         with:
           otp-version: 23.0.2
           elixir-version: 1.10.3
-
       - run: mix deps.get
-
       - run: mix compile --warnings-as-errors
 
   check_formatting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.1
-
       - uses: actions/setup-elixir@v1.3
         with:
           otp-version: 23.0.2
           elixir-version: 1.10.3
-
       - run: mix format --check-formatted
