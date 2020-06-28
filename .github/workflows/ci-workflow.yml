@@ -44,7 +44,7 @@ jobs:
       - run: mix compile
         env:
           MIX_ENV: test
-
+      - run: mix test
       - run: ./test/smoke_test.sh
 
   compile_with_no_warnings:
