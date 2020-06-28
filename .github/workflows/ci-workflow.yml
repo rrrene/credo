@@ -45,6 +45,8 @@ jobs:
       - run: ./test/smoke_test.sh
 
   compile_with_no_warnings:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2.3.1
 
       - uses: actions/setup-elixir@v1.3
@@ -57,6 +59,8 @@ jobs:
       - run: mix compile --warnings-as-errors
 
   check_formatting:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2.3.1
 
       - uses: actions/setup-elixir@v1.3
