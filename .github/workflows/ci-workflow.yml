@@ -37,8 +37,6 @@ jobs:
       - run: mix deps.compile
 
       - run: mix compile
-
-      - run: mix compile --warnings-as-errors
         env:
           MIX_ENV: test
 
