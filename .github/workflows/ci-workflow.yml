@@ -51,7 +51,10 @@ jobs:
           otp-version: 23.0.2
           elixir-version: 1.10.3
       - run: mix deps.get
-      - run: mix compile --warnings-as-errors
+      - run: mix compile
+        env:
+          ELIXIRC_OPTS: "--warnings-as-errors"
+          ERLC_OPTS: "warnings_as_errors"
 
   check_formatting:
     runs-on: ubuntu-latest
