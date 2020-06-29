@@ -28,6 +28,9 @@ And run:
 
     $ mix credo
 
+### Requirements
+
+Although Credo mostly supports Elixir 1.5, which is [compatible](https://hexdocs.pm/elixir/compatibility-and-deprecations.html#compatibility-between-elixir-and-erlang-otp) with Erlang/OTP 18–20, Credo itself requires Erlang/OTP 20+.
 
 ## Documentation
 
