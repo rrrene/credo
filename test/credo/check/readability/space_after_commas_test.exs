@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.SpaceAfterCommasTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.SpaceAfterCommas
 
@@ -15,7 +15,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when commas are in interpolations" do
@@ -34,7 +35,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when commas have newlines" do
@@ -45,7 +47,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report commas in sigils" do
@@ -57,7 +60,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT require spaces after commas preceded by the `?` operator" do
@@ -67,7 +71,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it does not get confused by ' in a comment" do
@@ -80,7 +85,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -94,7 +100,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert 19 == issue.column
       assert ",:" == issue.trigger
     end)
@@ -107,7 +114,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 4 == Enum.count(issues)
       assert [16, 18, 26, 28] == Enum.map(issues, & &1.column)
       assert [",2", ",\"", ",4", ",5"] == Enum.map(issues, & &1.trigger)
@@ -121,7 +129,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it requires spaces after commas preceded by variables ending with a ?" do
@@ -131,7 +140,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it requires spaces after commas followed by [" do
@@ -141,6 +151,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

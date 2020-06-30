@@ -1,6 +1,9 @@
 defmodule Credo.Check.Readability.ModuleAttributeNames do
-  @moduledoc """
-  Module attribute names are always written in snake_case in Elixir.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Module attribute names are always written in snake_case in Elixir.
 
       # snake_case
 
@@ -10,24 +13,29 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
 
       @inboxName "incoming"
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-
-  @explanation [check: @moduledoc]
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code.Name
 
-  use Credo.Check, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # ignore non-alphanumeric @ ASTs, for when you're redefining the @ macro.
+  defp traverse({:@, _meta, [{:{}, _, _}]} = ast, issues, _) do
+    {ast, issues}
+  end
+
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above how we want to exclude certain front-loads
   defp traverse(
          {:@, _meta, [{name, meta, _arguments}]} = ast,
          issues,

@@ -1,46 +1,50 @@
 defmodule Credo.Check.Warning.RaiseInsideRescue do
-  @moduledoc """
-  Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace,
-  which obscures the cause of the original error.
+  use Credo.Check,
+    explanations: [
+      check: """
+      Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace.
 
-  Example:
+      Most of the time, this is not what you want to do since it obscures the cause of the original error.
 
-      # preferred
+      Example:
 
-      try do
-        raise "oops"
-      rescue
-        error ->
-          Logger.warn("An exception has occurred")
+          # preferred
 
-          reraise error, System.stacktrace
-      end
+          try do
+            raise "oops"
+          rescue
+            error ->
+              Logger.warn("An exception has occurred")
 
-      # NOT preferred
+              reraise error, System.stacktrace
+          end
 
-      try do
-        raise "oops"
-      rescue
-        error ->
-          Logger.warn("An exception has occurred")
+          # NOT preferred
 
-          raise error
-      end
-  """
+          try do
+            raise "oops"
+          rescue
+            error ->
+              Logger.warn("An exception has occurred")
 
-  @explanation [check: @moduledoc]
-  @def_ops [:def, :defp, :defmacro, :defmacrop]
+              raise error
+          end
+      """
+    ]
 
-  use Credo.Check
   alias Credo.Code.Block
 
+  @def_ops [:def, :defp, :defmacro, :defmacrop]
+
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:try, _meta, _arguments} = ast, issues, issue_meta) do
     case Block.rescue_block_for(ast) do
       {:ok, ast} ->

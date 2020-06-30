@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.VariableNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.VariableNames
 
@@ -19,11 +19,13 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         ^some_value = parameter1
         %{some_value: some_value} = parameter1
         ... = parameter1
+        latency_μs = 5
       end
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -39,7 +41,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /2" do
@@ -51,7 +54,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /3" do
@@ -63,7 +67,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /4" do
@@ -75,7 +80,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /5" do
@@ -87,7 +93,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /6" do
@@ -99,7 +106,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /7" do
@@ -111,7 +119,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /8" do
@@ -123,7 +132,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /9" do
@@ -135,7 +145,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /10" do
@@ -147,7 +158,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /11" do
@@ -161,7 +173,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /12" do
@@ -177,7 +190,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /13" do
@@ -193,7 +207,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /14" do
@@ -208,7 +223,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /15" do
@@ -224,7 +240,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /16" do
@@ -236,7 +253,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /17" do
@@ -251,7 +269,8 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report multiple violations" do
@@ -263,6 +282,7 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

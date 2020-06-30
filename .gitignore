@@ -1,7 +1,9 @@
 /_build
+/.credo
 /deps
 /docs
 /doc
+/.elixir_ls/
 /.idea
 /tmp
 /.vscode
@@ -10,3 +12,4 @@ erl_crash.dump
 *.ez
 lib/my_first_credo_check.ex
 .tool-versions-e
+credo-debug-log.html

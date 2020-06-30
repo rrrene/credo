@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Suggest.SuggestOutput do
+  @moduledoc false
+
   use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.Suggest.Output.Default,
     flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
@@ -19,7 +21,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
       "Example: ",
       :olive,
       :faint,
-      "$ mix credo suggest lib/**/*.ex --all -c names"
+      "$ mix credo suggest lib/**/*.ex --only consistency --format json"
     ]
 
     options = """
@@ -27,17 +29,28 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
     Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
     Suggest options:
-      -a, --all             Show all issues
-      -A, --all-priorities  Show all issues including low priority ones
-          --min-priority    Minimum priority to show issues (high,medium,normal,low,lower or number)
-      -c, --checks          Only include checks that match the given strings
-      -C, --config-name     Use the given config instead of "default"
-      -i, --ignore-checks   Ignore checks that match the given strings
-          --format          Display the list in a specific format (oneline,flycheck)
+      -a, --all                     Show all issues
+      -A, --all-priorities          Show all issues including low priority ones
+      -c, --checks                  Only include checks that match the given strings
+          --checks-with-tag         Only include checks that match the given tag (can be used multiple times)
+          --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
+          --config-file             Use the given config file
+      -C, --config-name             Use the given config instead of "default"
+          --enable-disabled-checks  Re-enable disabled checks that match the given strings
+          --files-included          Only include these files (accepts globs, can be used multiple times)
+          --files-excluded          Exclude these files (accepts globs, can be used multiple times)
+          --format                  Display the list in a specific format (json,flycheck,oneline)
+      -i, --ignore-checks           Ignore checks that match the given strings
+          --ignore                  Alias for --ignore-checks
+          --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+          --mute-exit-status        Exit with status zero even if there are issues
+          --only                    Alias for --checks
+          --strict                  Alias for --all-priorities
 
     General options:
-      -v, --version         Show version
-      -h, --help            Show this help
+          --[no-]color              Toggle colored output
+      -v, --version                 Show version
+      -h, --help                    Show this help
     """
 
     UI.puts(usage)

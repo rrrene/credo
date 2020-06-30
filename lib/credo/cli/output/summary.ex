@@ -1,8 +1,7 @@
 defmodule Credo.CLI.Output.Summary do
-  alias Credo.CLI.Output
-  alias Credo.CLI.Output.UI
-  alias Credo.Execution
-  alias Credo.SourceFile
+  @moduledoc false
+
+  # This module is responsible for printing the summary at the end of the analysis.
 
   @category_wording [
     {:consistency, "consistency issue", "consistency issues"},
@@ -12,6 +11,11 @@ defmodule Credo.CLI.Output.Summary do
     {:design, "software design suggestion", "software design suggestions"}
   ]
   @cry_for_help "Please report incorrect results: https://github.com/rrrene/credo/issues"
+
+  alias Credo.CLI.Output
+  alias Credo.CLI.Output.UI
+  alias Credo.Execution
+  alias Credo.SourceFile
 
   def print(
         _source_files,
@@ -28,76 +32,49 @@ defmodule Credo.CLI.Output.Summary do
 
   def print(source_files, exec, time_load, time_run) do
     issues = Execution.get_issues(exec)
+    source_file_count = exec |> Execution.get_source_files() |> Enum.count()
+    checks_count = count_checks(exec)
 
     UI.puts()
     UI.puts([:faint, @cry_for_help])
     UI.puts()
-    UI.puts([:faint, format_time_spent(time_load, time_run)])
+    UI.puts([:faint, format_time_spent(checks_count, source_file_count, time_load, time_run)])
 
     UI.puts(summary_parts(source_files, issues))
-
-    # print_badge(source_files, issues)
     UI.puts()
 
-    print_priority_hint(issues, exec)
+    print_priority_hint(exec)
   end
 
-  def print_priority_hint([], %Execution{min_priority: min_priority})
-      when min_priority >= 0 do
-    "Use `--strict` to show all issues, `--help` for options."
-    |> UI.puts(:faint)
+  defp count_checks(exec) do
+    {result, _only_matching, _ignore_matching} = Execution.checks(exec)
+
+    Enum.count(result)
   end
 
-  def print_priority_hint([], _exec), do: nil
-
-  def print_priority_hint(_, %Execution{min_priority: min_priority})
-      when min_priority >= 0 do
-    "Showing priority issues: ↑ ↗ →  (use `--strict` to show all issues, `--help` for options)."
-    |> UI.puts(:faint)
+  defp print_priority_hint(%Execution{min_priority: min_priority})
+       when min_priority >= 0 do
+    UI.puts([
+      :faint,
+      "Showing priority issues: ↑ ↗ →  (use `mix credo explain` to explain issues, `mix credo --help` for options)."
+    ])
   end
 
-  def print_priority_hint(_, _exec), do: nil
-
-  def print_badge([], _), do: nil
-
-  def print_badge(source_files, issues) do
-    scopes = scope_count(source_files)
-
-    parts =
-      @category_wording
-      |> Enum.map(fn {category, _, _} -> category_count(issues, category) end)
-
-    parts = [scopes] ++ parts
-    sum = Enum.sum(parts)
-
-    width = 105
-
-    bar =
-      parts
-      |> Enum.map(&(&1 / sum))
-      |> Enum.map(&Float.round(&1, 3))
-      |> Enum.with_index()
-      |> Enum.map(fn {quota, index} ->
-        color =
-          if index == 0 do
-            :green
-          else
-            {category, _, _} = @category_wording |> Enum.at(index - 1)
-            Output.check_color(category)
-          end
-
-        [color, String.duplicate("=", round(quota * width))]
-      end)
-
-    [bar]
-    |> UI.puts()
+  defp print_priority_hint(_) do
+    UI.puts([
+      :faint,
+      "Use `mix credo explain` to explain issues, `mix credo --help` for options."
+    ])
   end
 
-  defp format_time_spent(time_load, time_run) do
+  defp format_time_spent(check_count, source_file_count, time_load, time_run) do
     time_run = time_run |> div(10_000)
     time_load = time_load |> div(10_000)
 
     formatted_total = format_in_seconds(time_run + time_load)
+
+    time_to_load = format_in_seconds(time_load)
+    time_to_run = format_in_seconds(time_run)
 
     total_in_seconds =
       case formatted_total do
@@ -105,9 +82,23 @@ defmodule Credo.CLI.Output.Summary do
         value -> "#{value} seconds"
       end
 
-    "Analysis took #{total_in_seconds} (#{format_in_seconds(time_load)}s to load, #{
-      format_in_seconds(time_run)
-    }s running checks)"
+    checks =
+      if check_count == 1 do
+        "1 check"
+      else
+        "#{check_count} checks"
+      end
+
+    source_files =
+      if source_file_count == 1 do
+        "1 file"
+      else
+        "#{source_file_count} files"
+      end
+
+    breakdown = "#{time_to_load}s to load, #{time_to_run}s running #{checks} on #{source_files}"
+
+    "Analysis took #{total_in_seconds} (#{breakdown})"
   end
 
   defp format_in_seconds(t) do
@@ -171,7 +162,8 @@ defmodule Credo.CLI.Output.Summary do
 
   defp scope_count(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&scope_count/1)
+    |> Enum.map(&Task.async(fn -> scope_count(&1) end))
+    |> Enum.map(&Task.await/1)
     |> Enum.reduce(&(&1 + &2))
   end
 

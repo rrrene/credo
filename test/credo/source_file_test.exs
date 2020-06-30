@@ -1,16 +1,18 @@
 defmodule Credo.SourceFileTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   test "it should NOT report expected code" do
-    """
-    defmodule CredoSampleModule do
-      def some_function(parameter1, parameter2) do
-        some_value = parameter1 + parameter2
+    source_file =
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          some_value = parameter1 + parameter2
+        end
       end
-    end
-    """
-    |> Credo.SourceFile.parse("example.ex")
-    |> refute_issues
+      """
+      |> Credo.SourceFile.parse("example.ex")
+
+    assert source_file.status == :valid
   end
 
   test "it should report a violation" do
@@ -23,7 +25,7 @@ defmodule Credo.SourceFileTest do
 
     source_file = Credo.SourceFile.parse(s1, "example.ex")
 
-    refute source_file.valid?
+    assert source_file.status == :invalid
   end
 
   test "it should return line and column correctly" do
@@ -56,5 +58,19 @@ defmodule Credo.SourceFileTest do
 
     assert 20 == Credo.SourceFile.column(source_file, 2, :hashes)
     assert 19 == Credo.SourceFile.column(source_file, 3, :hashes)
+  end
+
+  test "it should return line and column correctly with same term in line /2" do
+    source_file =
+      """
+      defmodule CredoSampleModule do
+        def foo!, do: impl().foo!()
+        def foo?, do: impl().foo?()
+      end
+      """
+      |> to_source_file
+
+    assert 7 == Credo.SourceFile.column(source_file, 2, :foo!)
+    assert 7 == Credo.SourceFile.column(source_file, 3, :foo?)
   end
 end

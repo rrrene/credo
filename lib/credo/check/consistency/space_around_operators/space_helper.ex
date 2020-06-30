@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
+  @moduledoc false
+
   alias Credo.Code.Token
 
   @doc """
@@ -12,6 +14,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def usually_no_space_before?({:number, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?({:int, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?({:float, _, _}, {_, _, :-}, _), do: false
+  def usually_no_space_before?({:flt, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?(_, {_, _, :-}, _), do: true
   def usually_no_space_before?(_, {_, _, :..}, _), do: true
   def usually_no_space_before?(_, _, _), do: false
@@ -20,8 +23,12 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   Returns true if there is no space after the operator (usually).
 
   Examples:
-  x..-1   # .. is the operator here and there is usually no space before that
+  x..-1   # .. is the operator here and there is usually no space after that
   """
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:number, _, _}), do: true
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:int, _, _}), do: true
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:float, _, _}), do: true
+  def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:flt, _, _}), do: true
   def usually_no_space_after?({_, _, :^}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :=}, {_, _, :-}, _), do: true
   def usually_no_space_after?({_, _, :..}, {_, _, :-}, _), do: true
@@ -34,7 +41,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def operator?({:dual_op, _, _}), do: true
   def operator?({:mult_op, _, _}), do: true
   def operator?({:two_op, _, _}), do: true
-  def operator?({:arrow_op, _, _}), do: true
   def operator?({:rel_op, _, _}), do: true
   def operator?({:rel_op2, _, _}), do: true
   def operator?({:and_op, _, _}), do: true
@@ -43,6 +49,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def operator?({:in_match_op, _, _}), do: true
   def operator?({:stab_op, _, _}), do: true
   def operator?({:pipe_op, _, _}), do: true
+  # Space around |> is ignored
+  def operator?({:arrow_op, _, _}), do: false
   def operator?(_), do: false
 
   def no_space_between?(arg1, arg2) do

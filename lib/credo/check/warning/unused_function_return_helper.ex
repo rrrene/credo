@@ -1,13 +1,12 @@
 defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
-  @moduledoc """
-  Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
-  the candidates (the acc is used to keep state).
-  """
+  @moduledoc false
+
+  # Finds candidates and then postwalks the AST to either VERIFY or FALSIFY
+  # the candidates (the acc is used to keep state).
 
   @def_ops [:def, :defp, :defmacro]
   @block_ops_with_head_expr [:if, :unless, :case, :for, :quote]
 
-  alias Credo.Check.CodeHelper
   alias Credo.Code.Block
   alias Credo.SourceFile
 
@@ -84,7 +83,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   #
 
   defp traverse_verify_candidate(ast, acc, candidate) do
-    if CodeHelper.contains_child?(ast, candidate) do
+    if Credo.Code.contains_child?(ast, candidate) do
       verify_candidate(ast, acc, candidate)
     else
       {ast, acc}
@@ -110,14 +109,14 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     ast
     |> Block.calls_in_do_block()
     |> List.last()
-    |> CodeHelper.contains_child?(candidate)
+    |> Credo.Code.contains_child?(candidate)
   end
 
   defp last_call_in_rescue_block?(ast, candidate) do
     ast
     |> Block.calls_in_rescue_block()
     |> List.last()
-    |> CodeHelper.contains_child?(candidate)
+    |> Credo.Code.contains_child?(candidate)
   end
 
   for op <- @block_ops_with_head_expr do
@@ -127,7 +126,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
       head_expression = Enum.slice(arguments, 0..-2)
 
-      if CodeHelper.contains_child?(head_expression, candidate) do
+      if Credo.Code.contains_child?(head_expression, candidate) do
         {nil, :VERIFIED}
       else
         {ast, acc}
@@ -138,7 +137,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   defp verify_candidate({:=, _, _} = ast, :not_verified = acc, candidate) do
     # IO.inspect(ast, label: ":= (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(ast, candidate) do
+    if Credo.Code.contains_child?(ast, candidate) do
       {nil, :VERIFIED}
     else
       {ast, acc}
@@ -155,7 +154,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
     last_call = List.last(arguments)
 
-    if CodeHelper.contains_child?(last_call, candidate) do
+    if Credo.Code.contains_child?(last_call, candidate) do
       {ast, acc}
     else
       {nil, :FALSIFIED}
@@ -171,7 +170,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
     last_call = List.last(arguments)
 
-    if CodeHelper.contains_child?(last_call, candidate) do
+    if Credo.Code.contains_child?(last_call, candidate) do
       {ast, acc}
     else
       {nil, :VERIFIED}
@@ -200,7 +199,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
 
     after_block = Block.after_block_for!(ast)
 
-    if after_block && CodeHelper.contains_child?(after_block, candidate) do
+    if after_block && Credo.Code.contains_child?(after_block, candidate) do
       {nil, :FALSIFIED}
     else
       {ast, acc}
@@ -216,7 +215,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        when is_atom(fun_name) and is_list(arguments) do
     # IO.inspect(ast, label: "my_fun() (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(arguments, candidate) do
+    if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
     else
       {ast, acc}
@@ -232,7 +231,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        when is_atom(fun_name) and is_atom(module) and is_list(arguments) do
     # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(arguments, candidate) do
+    if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
     else
       {ast, acc}
@@ -248,7 +247,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        when is_atom(fun_name) and is_atom(module) and is_list(arguments) do
     # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(arguments, candidate) do
+    if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
     else
       {ast, acc}
@@ -264,7 +263,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        when is_atom(fun_name) and is_list(mods) and is_list(arguments) do
     # IO.inspect(ast, label: "Mod.fun() (#{Macro.to_string(candidate)} #{acc})")
 
-    if CodeHelper.contains_child?(arguments, candidate) do
+    if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
     else
       {ast, acc}

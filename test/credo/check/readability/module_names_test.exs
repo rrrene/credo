@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ModuleNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.ModuleNames
 
@@ -13,7 +13,8 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report if module name cannot be determinated" do
@@ -27,7 +28,8 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -40,6 +42,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

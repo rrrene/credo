@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.DoubleBooleanNegation
 
@@ -13,7 +13,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     not true
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -25,7 +26,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     !!true
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn %Credo.Issue{trigger: trigger} ->
+    |> run_check(@described_check)
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
       assert "!!" == trigger
     end)
   end
@@ -35,7 +37,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     !!!true
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn %Credo.Issue{trigger: trigger} ->
+    |> run_check(@described_check)
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
       assert "!!" == trigger
     end)
   end
@@ -45,7 +48,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     !!!!true
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation 2" do
@@ -53,7 +57,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     not not true
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn %Credo.Issue{trigger: trigger} ->
+    |> run_check(@described_check)
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
       assert "not not" == trigger
     end)
   end

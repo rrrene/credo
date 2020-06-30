@@ -1,34 +1,37 @@
 defmodule Credo.Check.Refactor.AppendSingleItem do
-  @moduledoc """
-  When building up large lists, it is faster to prepend than
-  append. Therefore: It is sometimes best to prepend to the list
-  during iteration and call Enum.reverse/1 at the end, as it is quite
-  fast.
+  use Credo.Check,
+    base_priority: :low,
+    tags: [:controversial],
+    explanations: [
+      check: """
+      When building up large lists, it is faster to prepend than
+      append. Therefore: It is sometimes best to prepend to the list
+      during iteration and call Enum.reverse/1 at the end, as it is quite
+      fast.
 
-  Example:
+      Example:
 
-      list = list_so_far ++ [new_item]
+          list = list_so_far ++ [new_item]
 
-      # refactoring it like this can make the code faster:
+          # refactoring it like this can make the code faster:
 
-      list = [new_item] ++ list_so_far
-      # ...
-      Enum.reverse(list)
+          list = [new_item] ++ list_so_far
+          # ...
+          Enum.reverse(list)
 
-  """
-
-  @explanation [check: @moduledoc]
-
-  use Credo.Check, base_priority: :low
+      """
+    ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   # [a] ++ b is OK
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
     {ast, issues}
   end

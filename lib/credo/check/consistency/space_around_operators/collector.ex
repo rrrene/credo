@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
   alias Credo.Code
@@ -27,7 +29,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   defp traverse_tokens(tokens, callback, acc) do
     tokens
-    |> skip_function_capture
+    |> skip_specs_types_and_capture
     |> case do
       [prev | [current | [next | rest]]] ->
         acc =
@@ -44,7 +46,42 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     end
   end
 
-  defp skip_function_capture([{:capture_op, _, _} | tokens]) do
+  defp skip_specs_types_and_capture([{:at_op, {line, _, _}, :@} | tokens]) do
+    case tokens do
+      # @spec - drop whole line
+      [{:identifier, _, :spec} | tokens] ->
+        drop_while_on_line(tokens, line)
+
+      # @type - drop whole line
+      [{:identifier, _, :type} | tokens] ->
+        drop_while_on_line(tokens, line)
+
+      tokens ->
+        tokens
+    end
+  end
+
+  defp skip_specs_types_and_capture([{:capture_op, _, _} | tokens]) do
+    drop_while_in_fun_capture(tokens)
+  end
+
+  # When quoting &//2 (which captures the / operator via &fun_name/2), the
+  # {:capture_op, _, :&} token becomes an {:identifier, _, :&} token ...
+  defp skip_specs_types_and_capture([{:identifier, _, :&} | [{:identifier, _, :/} | tokens]]) do
+    drop_while_in_fun_capture(tokens)
+  end
+
+  defp skip_specs_types_and_capture(tokens), do: tokens
+
+  defp drop_while_on_line(tokens, line) do
+    Enum.drop_while(tokens, fn
+      {_, {^line, _, _}} -> true
+      {_, {^line, _, _}, _} -> true
+      _ -> false
+    end)
+  end
+
+  defp drop_while_in_fun_capture(tokens) do
     Enum.drop_while(tokens, fn
       # :erlang_module
       {:atom, _, _} ->
@@ -70,6 +107,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
       {:at_op, _, _} ->
         true
 
+      {:mult_op, _, :/} ->
+        true
+
       {:., _} ->
         true
 
@@ -83,8 +123,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
         false
     end)
   end
-
-  defp skip_function_capture(tokens), do: tokens
 
   defp record_spaces(prev, current, next, acc) do
     acc

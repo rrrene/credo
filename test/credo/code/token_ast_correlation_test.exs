@@ -1,34 +1,271 @@
 defmodule Credo.Code.TokenAstCorrelationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
+
+  @source_example1 """
+  defmodule Credo.Sample do
+    @test_attribute :foo
+
+    def foobar(parameter) do
+      String.split(parameter) + parameter
+    end
+
+    defmodule InlineModule do
+      def foobar(v) when is_atom(v) do
+        {:ok} = File.read
+      end
+    end
+  end
+  """
+
+  @source_example2 """
+  defmodule Credo.Sample do
+    defmodule InlineModule do
+      def foobar(x) do
+        x = f(g(h(a), b), k(i(c-1) + j(d-2)) * l(e))
+      end
+    end
+  end
+  """
+
+  # Elixir >= 1.10.0
+  if Version.match?(System.version(), ">= 1.10.0") do
+    test "should give correct ast for source_example1" do
+      source = @source_example1
+      {:ok, ast} = Credo.Code.ast(source)
+
+      expected = {
+        :defmodule,
+        [line: 1, column: 1],
+        [
+          {
+            :__aliases__,
+            [line: 1, column: 11],
+            [:Credo, :Sample]
+          },
+          [
+            do: {
+              :__block__,
+              '',
+              [
+                {
+                  :@,
+                  [line: 2, column: 3],
+                  [
+                    {
+                      :test_attribute,
+                      [line: 2, column: 4],
+                      [:foo]
+                    }
+                  ]
+                },
+                {
+                  :def,
+                  [line: 4, column: 3],
+                  [
+                    {
+                      :foobar,
+                      [line: 4, column: 7],
+                      [
+                        {
+                          :parameter,
+                          [line: 4, column: 14],
+                          nil
+                        }
+                      ]
+                    },
+                    [
+                      do: {
+                        :+,
+                        [line: 5, column: 29],
+                        [
+                          {
+                            {
+                              :.,
+                              [line: 5, column: 11],
+                              [
+                                {
+                                  :__aliases__,
+                                  [line: 5, column: 5],
+                                  [:String]
+                                },
+                                :split
+                              ]
+                            },
+                            [line: 5, column: 11],
+                            [
+                              {
+                                :parameter,
+                                [line: 5, column: 18],
+                                nil
+                              }
+                            ]
+                          },
+                          {
+                            :parameter,
+                            [line: 5, column: 31],
+                            nil
+                          }
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  :defmodule,
+                  [line: 8, column: 3],
+                  [
+                    {
+                      :__aliases__,
+                      [line: 8, column: 13],
+                      [:InlineModule]
+                    },
+                    [
+                      do: {
+                        :def,
+                        [line: 9, column: 5],
+                        [
+                          {
+                            :when,
+                            [line: 9, column: 19],
+                            [
+                              {
+                                :foobar,
+                                [line: 9, column: 9],
+                                [
+                                  {
+                                    :v,
+                                    [line: 9, column: 16],
+                                    nil
+                                  }
+                                ]
+                              },
+                              {
+                                :is_atom,
+                                [line: 9, column: 24],
+                                [
+                                  {
+                                    :v,
+                                    [line: 9, column: 32],
+                                    nil
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          [
+                            do: {
+                              :=,
+                              [line: 10, column: 13],
+                              [
+                                {
+                                  :{},
+                                  [line: 10, column: 7],
+                                  [:ok]
+                                },
+                                {
+                                  {
+                                    :.,
+                                    [line: 10, column: 19],
+                                    [
+                                      {
+                                        :__aliases__,
+                                        [line: 10, column: 15],
+                                        [:File]
+                                      },
+                                      :read
+                                    ]
+                                  },
+                                  [
+                                    {:no_parens, true},
+                                    {:line, 10},
+                                    {:column, 19}
+                                  ],
+                                  ''
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        ]
+      }
+
+      assert expected == ast
+    end
+  end
+
+  # Elixir >= 1.6.0 and <= 1.10.0
+  if Version.match?(System.version(), ">= 1.6.0 and < 1.10.0") do
+    test "should give correct ast for source_example1" do
+      source = @source_example1
+      {:ok, ast} = Credo.Code.ast(source)
+
+      expected =
+        {:defmodule, [line: 1, column: 1],
+         [
+           {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
+           [
+             do:
+               {:__block__, [],
+                [
+                  {:@, [line: 2, column: 3], [{:test_attribute, [line: 2, column: 4], [:foo]}]},
+                  {:def, [line: 4, column: 3],
+                   [
+                     {:foobar, [line: 4, column: 7], [{:parameter, [line: 4, column: 14], nil}]},
+                     [
+                       do:
+                         {:+, [line: 5, column: 29],
+                          [
+                            {{:., [line: 5, column: 11],
+                              [{:__aliases__, [line: 5, column: 5], [:String]}, :split]},
+                             [line: 5, column: 11], [{:parameter, [line: 5, column: 18], nil}]},
+                            {:parameter, [line: 5, column: 31], nil}
+                          ]}
+                     ]
+                   ]},
+                  {:defmodule, [line: 8, column: 3],
+                   [
+                     {:__aliases__, [line: 8, column: 13], [:InlineModule]},
+                     [
+                       do:
+                         {:def, [line: 9, column: 5],
+                          [
+                            {:when, [line: 9, column: 19],
+                             [
+                               {:foobar, [line: 9, column: 9],
+                                [{:v, [line: 9, column: 16], nil}]},
+                               {:is_atom, [line: 9, column: 24],
+                                [{:v, [line: 9, column: 32], nil}]}
+                             ]},
+                            [
+                              do:
+                                {:=, [line: 10, column: 13],
+                                 [
+                                   {:{}, [line: 10, column: 7], [:ok]},
+                                   {{:., [line: 10, column: 19],
+                                     [{:__aliases__, [line: 10, column: 15], [:File]}, :read]},
+                                    [line: 10, column: 19], []}
+                                 ]}
+                            ]
+                          ]}
+                     ]
+                   ]}
+                ]}
+           ]
+         ]}
+
+      assert expected == ast
+    end
+  end
 
   # Elixir >= 1.6.0
   if Version.match?(System.version(), ">= 1.6.0-rc") do
-    @source_example1 """
-    defmodule Credo.Sample do
-      @test_attribute :foo
-
-      def foobar(parameter) do
-        String.split(parameter) + parameter
-      end
-
-      defmodule InlineModule do
-        def foobar(v) when is_atom(v) do
-          {:ok} = File.read
-        end
-      end
-    end
-    """
-
-    @source_example2 """
-    defmodule Credo.Sample do
-      defmodule InlineModule do
-        def foobar(x) do
-          x = f(g(h(a), b), k(i(c-1) + j(d-2)) * l(e))
-        end
-      end
-    end
-    """
-
     test "should give correct result for source_example1" do
       source = @source_example1
       wanted_token = {:identifier, {4, 14, nil}, :parameter}
@@ -106,67 +343,6 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       ]
 
       assert expected == tokens
-    end
-
-    test "should give correct ast for source_example1" do
-      source = @source_example1
-      {:ok, ast} = Credo.Code.ast(source)
-
-      expected =
-        {:defmodule, [line: 1, column: 1],
-         [
-           {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
-           [
-             do:
-               {:__block__, [],
-                [
-                  {:@, [line: 2, column: 3], [{:test_attribute, [line: 2, column: 4], [:foo]}]},
-                  {:def, [line: 4, column: 3],
-                   [
-                     {:foobar, [line: 4, column: 7], [{:parameter, [line: 4, column: 14], nil}]},
-                     [
-                       do:
-                         {:+, [line: 5, column: 29],
-                          [
-                            {{:., [line: 5, column: 11],
-                              [{:__aliases__, [line: 5, column: 5], [:String]}, :split]},
-                             [line: 5, column: 11], [{:parameter, [line: 5, column: 18], nil}]},
-                            {:parameter, [line: 5, column: 31], nil}
-                          ]}
-                     ]
-                   ]},
-                  {:defmodule, [line: 8, column: 3],
-                   [
-                     {:__aliases__, [line: 8, column: 13], [:InlineModule]},
-                     [
-                       do:
-                         {:def, [line: 9, column: 5],
-                          [
-                            {:when, [line: 9, column: 19],
-                             [
-                               {:foobar, [line: 9, column: 9],
-                                [{:v, [line: 9, column: 16], nil}]},
-                               {:is_atom, [line: 9, column: 24],
-                                [{:v, [line: 9, column: 32], nil}]}
-                             ]},
-                            [
-                              do:
-                                {:=, [line: 10, column: 13],
-                                 [
-                                   {:{}, [line: 10, column: 7], [:ok]},
-                                   {{:., [line: 10, column: 19],
-                                     [{:__aliases__, [line: 10, column: 15], [:File]}, :read]},
-                                    [line: 10, column: 19], []}
-                                 ]}
-                            ]
-                          ]}
-                     ]
-                   ]}
-                ]}
-           ]
-         ]}
-
-      assert expected == ast
     end
 
     test "should give correct tokens for source_example2" do

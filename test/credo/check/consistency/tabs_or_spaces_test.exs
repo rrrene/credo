@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.TabsOrSpacesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.TabsOrSpaces
 
@@ -42,7 +42,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       @with_tabs
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report for only spaces" do
@@ -51,7 +52,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       @with_spaces2
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -65,7 +67,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       @with_spaces2
     ]
     |> to_source_files
-    |> assert_issues(@described_check, force: :spaces)
+    |> run_check(@described_check, force: :spaces)
+    |> assert_issues()
   end
 
   test "it should report for mixed indentation" do
@@ -75,7 +78,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       @with_spaces2
     ]
     |> to_source_files
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   @tag :to_be_implemented
@@ -85,6 +89,7 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       @with_spaces2
     ]
     |> to_source_files
-    |> assert_issues(@described_check, force: :tabs)
+    |> run_check(@described_check, force: :tabs)
+    |> assert_issues()
   end
 end

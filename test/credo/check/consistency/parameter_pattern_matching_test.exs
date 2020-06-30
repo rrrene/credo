@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.ParameterPatternMatching
   @left_and_right_mix """
@@ -80,13 +80,15 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
   test "it should NOT report issues when variable decalrations are consistently on the left side" do
     [@var_left_map, @var_left_struct, @var_left_list]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report issues when variable decalrations are consistently on the right side" do
     [@var_right_map, @var_right_struct, @var_right_list]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT break when input has a function without bindings or private funs" do
@@ -104,7 +106,8 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
 
     [module_with_fun_without_bindings]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -114,7 +117,8 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
   test "it should report issues when variable declarations are mixed on the left and right side when pattern matching" do
     [@left_and_right_mix]
     |> to_source_files
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert Enum.any?(issues, fn issue ->
                issue.trigger == :foo_left && issue.line_no == 5
              end)
@@ -139,7 +143,8 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
         @var_left_list
       ]
       |> to_source_files
-      |> assert_issues(@described_check)
+      |> run_check(@described_check)
+      |> assert_issues()
 
     assert 3 == Enum.count(issues)
   end
@@ -156,7 +161,8 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
         @var_left_list
       ]
       |> to_source_files
-      |> assert_issues(@described_check)
+      |> run_check(@described_check)
+      |> assert_issues()
 
     assert 3 == Enum.count(issues)
   end

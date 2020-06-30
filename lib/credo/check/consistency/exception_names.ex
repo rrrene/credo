@@ -1,39 +1,41 @@
 defmodule Credo.Check.Consistency.ExceptionNames do
-  @moduledoc """
-  Exception names should end with a common suffix like "Error".
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Exception names should end with a common suffix like "Error".
 
-  Try to name your exception modules consistently:
+      Try to name your exception modules consistently:
 
-      defmodule BadCodeError do
-        defexception [:message]
-      end
+          defmodule BadCodeError do
+            defexception [:message]
+          end
 
-      defmodule ParserError do
-        defexception [:message]
-      end
+          defmodule ParserError do
+            defexception [:message]
+          end
 
-  Inconsistent use should be avoided:
+      Inconsistent use should be avoided:
 
-      defmodule BadHTTPResponse do
-        defexception [:message]
-      end
+          defmodule BadHTTPResponse do
+            defexception [:message]
+          end
 
-      defmodule HTTPHeaderException do
-        defexception [:message]
-      end
+          defmodule HTTPHeaderException do
+            defexception [:message]
+          end
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-
-  @explanation [check: @moduledoc]
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """
+    ]
 
   @collector Credo.Check.Consistency.ExceptionNames.Collector
 
-  use Credo.Check, run_on_all: true, base_priority: :high
-
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  @impl true
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 
@@ -69,7 +71,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
     to_one_line(message)
   end
 
-  def to_one_line(str) do
+  defp to_one_line(str) do
     str
     |> String.split()
     |> Enum.join(" ")

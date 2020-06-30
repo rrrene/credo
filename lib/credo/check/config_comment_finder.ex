@@ -1,17 +1,18 @@
 defmodule Credo.Check.ConfigCommentFinder do
-  @moduledoc """
-  """
-  @explanation nil
+  @moduledoc false
+
+  # This check is used internally by Credo.
+  #
+  # It traverses the given codebase to find `Credo.Check.ConfigComment`
+  # compatible comments, which control Credo's behaviour.
+
   @config_comment_format ~r/#\s*credo\:([\w-\:]+)\s*(.*)/im
 
-  use Credo.Check, run_on_all: true, base_priority: :high
-
-  alias Credo.Check.CodeHelper
   alias Credo.Check.ConfigComment
   alias Credo.SourceFile
 
   @doc false
-  def run(source_files, _exec, _params) when is_list(source_files) do
+  def run(source_files) when is_list(source_files) do
     source_files
     |> Enum.map(&find_and_set_in_source_file/1)
     |> Enum.reject(&is_nil/1)
@@ -32,7 +33,7 @@ defmodule Credo.Check.ConfigCommentFinder do
 
     if source =~ @config_comment_format do
       source
-      |> CodeHelper.clean_charlists_strings_and_sigils()
+      |> Credo.Code.clean_charlists_strings_and_sigils()
       |> Credo.Code.to_lines()
       |> Enum.reduce([], &find_config_comment/2)
     else

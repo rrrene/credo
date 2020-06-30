@@ -1,25 +1,40 @@
 defmodule Credo.CLI do
   @moduledoc """
-  Credo.CLI is the entrypoint for both the Mix task and the escript.
-
-  It takes the parameters passed from the command line and translates them into
-  a Command module (see the `Credo.CLI.Command` namespace), the work directory
-  where the Command should run and a `Credo.Execution` struct.
+  `Credo.CLI` is the entrypoint for both the Mix task and the escript.
   """
 
   alias Credo.Execution
-  alias Credo.MainProcess
-  alias Credo.Service.Commands
+  alias Credo.Execution.Task.WriteDebugReport
 
   @doc """
-  Runs Credo's main process.
+  Runs Credo with the given `argv` and exits the process.
+
+  See `run/1` if you want to run Credo programmatically.
   """
-  def main(argv) do
+  def main(argv \\ []) do
     Credo.Application.start(nil, nil)
 
-    %Execution{argv: argv}
-    |> MainProcess.call()
+    argv
+    |> run()
     |> halt_if_exit_status_assigned()
+  end
+
+  @doc """
+  Runs Credo with the given `argv` and returns its final `Credo.Execution` struct.
+
+  Example:
+
+      iex> exec = Credo.CLI.run(["--only", "Readability"])
+      iex> issues = Credo.Execution.get_issues(exec)
+      iex> Enum.count(issues) > 0
+      true
+
+  """
+  def run(argv) do
+    argv
+    |> Execution.build()
+    |> Execution.run()
+    |> WriteDebugReport.call([])
   end
 
   defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do
@@ -33,29 +48,5 @@ defmodule Credo.CLI do
   end
 
   defp halt_if_failed(0), do: nil
-  defp halt_if_failed(x), do: System.halt(x)
-
-  @doc """
-  Returns the module of a given `command`.
-
-      iex> command_for(:help)
-      Credo.CLI.Command.Help
-  """
-  def command_for(nil), do: nil
-
-  def command_for(command_mod) when is_atom(command_mod) do
-    if Enum.member?(Commands.modules(), command_mod) do
-      command_mod
-    else
-      nil
-    end
-  end
-
-  def command_for(command_name) when is_binary(command_name) do
-    if Enum.member?(Commands.names(), command_name) do
-      Commands.get(command_name)
-    else
-      nil
-    end
-  end
+  defp halt_if_failed(exit_status), do: exit({:shutdown, exit_status})
 end

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.LongQuoteBlocks
 
@@ -20,7 +20,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation if comments are ignored" do
@@ -48,7 +49,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_line_count: 7, ignore_comments: true)
+    |> run_check(@described_check, max_line_count: 7, ignore_comments: true)
+    |> refute_issues()
   end
 
   #
@@ -72,7 +74,8 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_line_count: 2)
+    |> run_check(@described_check, max_line_count: 2)
+    |> assert_issue()
   end
 
   test "it should report a violation if comments are NOT ignored" do
@@ -100,6 +103,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_line_count: 7)
+    |> run_check(@described_check, max_line_count: 7)
+    |> assert_issue()
   end
 end

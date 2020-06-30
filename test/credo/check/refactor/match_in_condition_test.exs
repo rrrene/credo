@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.MatchInConditionTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.MatchInCondition
 
@@ -36,7 +36,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not crash with ecto query" do
@@ -56,7 +57,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -74,7 +76,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation 2" do
@@ -94,7 +97,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when wrapped in parens" do
@@ -108,7 +112,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for :unless" do
@@ -122,7 +127,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for :if with nested match" do
@@ -134,7 +140,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for :if with nested match /2" do
@@ -148,7 +155,8 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for :unless with nested match" do
@@ -160,6 +168,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

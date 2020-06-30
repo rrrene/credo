@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.LineEndings.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
   def collect_matches(source_file, _params) do
@@ -7,6 +9,15 @@ defmodule Credo.Check.Consistency.LineEndings.Collector do
     |> Enum.reduce(%{}, fn line, stats ->
       Map.update(stats, line_ending(line), 1, &(&1 + 1))
     end)
+  end
+
+  def first_line_with_issue(expected, source_file) do
+    {line_no, _} =
+      source_file
+      |> SourceFile.lines()
+      |> Enum.find(&(line_ending(&1) != expected))
+
+    line_no
   end
 
   defp line_ending({_line_no, line}) do

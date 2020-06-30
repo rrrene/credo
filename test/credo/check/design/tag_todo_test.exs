@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagTODOTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.TagTODO
 
@@ -22,7 +22,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected @doc values" do
@@ -42,7 +43,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a couple of issues" do
@@ -63,7 +65,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -83,7 +86,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue for @doc tags" do
@@ -101,7 +105,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue for @moduledoc tags" do
@@ -119,7 +124,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue for @shortdoc tags" do
@@ -137,7 +143,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue when not indented" do
@@ -153,7 +160,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue when no spaces" do
@@ -163,7 +171,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue with more spaces after #" do
@@ -173,7 +182,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue with more spaces after tag" do
@@ -183,7 +193,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue at the end of a line w/o space" do
@@ -195,7 +206,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue when lower case" do
@@ -208,7 +220,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a couple of issues" do
@@ -229,7 +242,8 @@ defmodule Credo.Check.Design.TagTODOTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 3 == Enum.count(issues)
     end)
   end

@@ -1,44 +1,61 @@
 defmodule Credo.Check.Readability.PredicateFunctionNames do
-  @moduledoc """
-  Predicate functions/macros should be named accordingly:
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Predicate functions/macros should be named accordingly:
 
-  * For functions, they should end in a question mark.
+      * For functions, they should end in a question mark.
 
-      # preferred
+          # preferred
 
-      defp user?(cookie) do
-      end
+          defp user?(cookie) do
+          end
 
-      defp has_attachment?(mail) do
-      end
+          defp has_attachment?(mail) do
+          end
 
-      # NOT preferred
+          # NOT preferred
 
-      defp is_user?(cookie) do
-      end
+          defp is_user?(cookie) do
+          end
 
-      defp is_user(cookie) do
-      end
+          defp is_user(cookie) do
+          end
 
-  * For guard-safe macros they should have the prefix `is_` and not end in a question mark.
+      * For guard-safe macros they should have the prefix `is_` and not end in a question mark.
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
+          # preferred
 
-  @explanation [check: @moduledoc]
+          defmacro is_user(cookie) do
+          end
+
+          # NOT preferred
+
+          defmacro is_user?(cookie) do
+          end
+
+          defmacro user?(cookie) do
+          end
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
+
   @def_ops [:def, :defp, :defmacro]
 
-  use Credo.Check, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see below for how we want to avoid `defp = "my_variable"` definitions
   for op <- @def_ops do
     # catch variables named e.g. `defp`
     defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
@@ -68,7 +85,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     end
   end
 
-  def issues_for_name(_op, name, meta, issues, issue_meta) do
+  defp issues_for_name(_op, name, meta, issues, issue_meta) do
     name = to_string(name)
 
     cond do

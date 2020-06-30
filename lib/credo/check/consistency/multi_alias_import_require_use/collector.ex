@@ -1,4 +1,6 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
   alias Credo.Code

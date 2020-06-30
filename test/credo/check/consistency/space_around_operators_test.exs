@@ -1,10 +1,11 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.SpaceAroundOperators
 
   @without_spaces """
   defmodule Credo.Sample1 do
+    @spec f(<<_::16, _::_*8>>) :: binary
     defmodule InlineModule do
       @min -1
       @max +1
@@ -12,10 +13,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
       def foobar do
         1+2
+        |> test1()
+        |> test2()
+        |> test3()
+        |> test4()
       end
     end
-  end
+     end
   """
+
   @without_spaces2 """
   defmodule OtherModule3 do
     defmacro foo do
@@ -39,6 +45,18 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   """
   @with_spaces """
   defmodule Credo.Sample2 do
+    defmodule F do
+      def f(), do: 1 + 2
+      def g(), do: 3 + 1
+      def l(), do: [&+/2, &-/2, &*/2, &//2]
+
+      def x do
+        entries
+        |> Stream.map(&json_library().encode!/1)
+        |> Enum.join(".")
+      end
+    end
+
     defmodule InlineModule do
       @type config_or_func :: Config.t() | (-> Config.t())
 
@@ -189,6 +207,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     """
   end
 
+  @with_spaces7 """
+  defmodule AlwaysNoSpacesInBinaryTypespecTest do
+    @callback foo() :: <<_::_*8>>
+
+    def foo, do: 1 + 1
+  end
+  """
+
   @with_and_without_spaces """
   defmodule OtherModule3 do
     defmacro foo do
@@ -218,7 +244,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @without_spaces3
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere" do
@@ -229,7 +256,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces4
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere in a single file" do
@@ -237,7 +265,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces5
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are used everywhere in two files" do
@@ -246,7 +275,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces6
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not report issues if spaces are omitted everywhere" do
@@ -255,7 +285,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @without_spaces2
     ]
     |> to_source_files()
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -270,7 +301,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces3
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue for mixed styles /2" do
@@ -280,7 +312,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_spaces2
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /4" do
@@ -288,7 +321,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /5" do
@@ -296,7 +330,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces2
     ]
     |> to_source_files()
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report the correct result /6" do
@@ -305,6 +340,43 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       @with_and_without_spaces2
     ]
     |> to_source_files()
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
+  end
+
+  test "it should report the correct result /7" do
+    [
+      ~S"""
+      defmodule TestTest do
+        def test do
+          a = fn b, c -> b + c end
+
+          a.(-30, 10)
+          a.(-3.0, 1.0)
+        end
+      end
+      """
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should not crash for issue #731" do
+    [
+      ~S"""
+      %{acc | "#{date_type}_dates": :foo}
+      """
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should always allow no spaces in binary typespec" do
+    [@with_spaces7]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end

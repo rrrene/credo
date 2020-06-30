@@ -1,7 +1,8 @@
 defmodule Credo.CLI.Output.Shell do
-  @moduledoc """
-  GenServer used by Credo.CLI.Output.UI to write to the shell.
-  """
+  @moduledoc false
+
+  # This module is used by `Credo.CLI.Output.UI` to write to the shell.
+
   use GenServer
 
   def start_link(opts \\ []) do
@@ -12,6 +13,7 @@ defmodule Credo.CLI.Output.Shell do
     puts("")
   end
 
+  @doc "Write the given `value` to `:stdout`."
   def puts(value) do
     GenServer.call(__MODULE__, {:puts, value})
   end
@@ -20,7 +22,7 @@ defmodule Credo.CLI.Output.Shell do
     GenServer.call(__MODULE__, {:use_colors, use_colors})
   end
 
-  @doc "Like `puts`, but writes to `:stderr`."
+  @doc "Like `puts/1`, but writes to `:stderr`."
   def warn(value) do
     GenServer.call(__MODULE__, {:warn, value})
   end

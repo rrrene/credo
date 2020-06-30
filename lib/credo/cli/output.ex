@@ -1,8 +1,12 @@
 defmodule Credo.CLI.Output do
-  alias Credo.CLI.Output.UI
-  alias Credo.Execution
+  @moduledoc """
+  This module provides helper functions regarding command line output.
+  """
 
   @category_tag_map %{"refactor" => "F"}
+
+  alias Credo.CLI.Output.UI
+  alias Credo.Execution
 
   def check_tag(category, in_parens \\ true)
 
@@ -94,6 +98,18 @@ defmodule Credo.CLI.Output do
     end
   end
 
+  @doc """
+  Returns a suitable foreground color for a given `background_color`.
+
+      iex> Credo.CLI.Output.foreground_color(:yellow)
+      :black
+
+      iex> Credo.CLI.Output.foreground_color(:blue)
+      :white
+
+  """
+  def foreground_color(background_color)
+
   def foreground_color(:cyan), do: :black
   def foreground_color(:yellow), do: :black
   def foreground_color(_), do: :white
@@ -122,9 +138,28 @@ defmodule Credo.CLI.Output do
       "Some source files could not be parsed correctly and are excluded:\n"
     ]
 
-    UI.puts(output)
+    UI.warn(output)
 
     print_numbered_list(invalid_source_filenames)
+  end
+
+  def complain_about_timed_out_source_files([]), do: nil
+
+  def complain_about_timed_out_source_files(large_source_files) do
+    large_source_filenames = Enum.map(large_source_files, & &1.filename)
+
+    output = [
+      :reset,
+      :bright,
+      :orange,
+      "info: ",
+      :red,
+      "Some source files were not parsed in the time allotted:\n"
+    ]
+
+    UI.warn(output)
+
+    print_numbered_list(large_source_filenames)
   end
 
   def print_skipped_checks(%Execution{skipped_checks: []}), do: nil
@@ -137,21 +172,19 @@ defmodule Credo.CLI.Output do
       "info: ",
       :reset,
       :faint,
-      "the following checks were skipped because they're not compatible with\n",
+      "some checks were skipped because they're not compatible with\n",
       :reset,
       :faint,
-      "your version of Elixir (#{System.version()}). Upgrade to the newest version of Elixir to\n",
-      :reset,
-      :faint,
-      "get the most out of Credo!\n"
+      "your version of Elixir (#{System.version()}).\n\n",
+      "You can deactivate these checks by adding this to the `checks` list in your config:\n"
     ]
 
-    UI.puts()
+    UI.puts("")
     UI.puts(msg)
 
     skipped_checks
     |> Enum.map(&check_name/1)
-    |> print_numbered_list
+    |> print_disabled_check_config
   end
 
   defp check_name({check, _check_info}), do: check_name({check})
@@ -171,6 +204,19 @@ defmodule Credo.CLI.Output do
         String.pad_leading("#{index + 1})", 5),
         :faint,
         " #{string}\n"
+      ]
+    end)
+    |> UI.warn()
+  end
+
+  defp print_disabled_check_config(list) do
+    list
+    |> Enum.flat_map(fn string ->
+      [
+        :reset,
+        String.pad_leading(" ", 4),
+        :faint,
+        "{#{string}, false},\n"
       ]
     end)
     |> UI.puts()

@@ -1,40 +1,41 @@
 defmodule Credo.Check.Refactor.UnlessWithElse do
-  @moduledoc """
-  An `unless` block should not contain an else block.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      An `unless` block should not contain an else block.
 
-  So while this is fine:
+      So while this is fine:
 
-      unless allowed? do
-        raise "Not allowed!"
-      end
+          unless allowed? do
+            raise "Not allowed!"
+          end
 
-  This should be refactored:
+      This should be refactored:
 
-      unless allowed? do
-        raise "Not allowed!"
-      else
-        proceed_as_planned()
-      end
+          unless allowed? do
+            raise "Not allowed!"
+          else
+            proceed_as_planned()
+          end
 
-  to look like this:
+      to look like this:
 
-      if allowed? do
-        proceed_as_planned()
-      else
-        raise "Not allowed!"
-      end
+          if allowed? do
+            proceed_as_planned()
+          else
+            raise "Not allowed!"
+          end
 
-  The reason for this is not a technical but a human one. The `else` in this
-  case will be executed when the condition is met, which is the opposite of
-  what the wording seems to apply.
-  """
-
-  @explanation [check: @moduledoc]
-
-  use Credo.Check, base_priority: :high
+      The reason for this is not a technical but a human one. The `else` in this
+      case will be executed when the condition is met, which is the opposite of
+      what the wording seems to apply.
+      """
+    ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
@@ -44,8 +45,10 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     {nil, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: we have to exclude the cases matching the above clause!
   defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
-    new_issue = issue_for_else_block(CodeHelper.else_block_for!(ast), meta, issue_meta)
+    new_issue = issue_for_else_block(Credo.Code.Block.else_block_for!(ast), meta, issue_meta)
 
     {ast, issues ++ List.wrap(new_issue)}
   end
@@ -63,7 +66,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Unless conditions should not have an `else` block.",
+      message: "Unless conditions should avoid having an `else` block.",
       trigger: trigger,
       line_no: line_no
     )

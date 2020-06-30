@@ -1,27 +1,29 @@
 defmodule Credo.Check.Warning.OperationWithConstantResult do
-  @moduledoc """
-  Operations on the same values always yield the same result and therefore make
-  little sense in production code.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Some numerical operations always yield the same result and therefore make
+      little sense in production code.
 
-  Examples:
+      Examples:
 
-      x * 1   # always returns x
-      x * 0   # always returns 0
+          x * 1   # always returns x
+          x * 0   # always returns 0
 
-  In practice they are likely the result of a debugging session or were made by
-  mistake.
-  """
+      In practice they are likely the result of a debugging session or were made by
+      mistake.
+      """
+    ]
 
-  @explanation [check: @moduledoc]
   @ops_and_constant_results [
     {:*, "zero", 0},
     {:*, "the left side of the expression", 1}
   ]
 
-  use Credo.Check, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))

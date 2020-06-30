@@ -1,5 +1,5 @@
 defmodule Credo.Code.ParametersTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Parameters
 
@@ -38,7 +38,7 @@ defmodule Credo.Code.ParametersTest do
 
     {:ok, ast} =
       """
-      defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+      defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not(prev in ?A..?Z) do
       :ok
       end
       """
@@ -127,7 +127,7 @@ defmodule Credo.Code.ParametersTest do
 
     {:ok, ast} =
       """
-      defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not prev in ?A..?Z do
+      defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not(prev in ?A..?Z) do
       :ok
       end
       """

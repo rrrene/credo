@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.NegatedConditionsInUnless
 
@@ -21,7 +21,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -36,7 +37,8 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -54,6 +56,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

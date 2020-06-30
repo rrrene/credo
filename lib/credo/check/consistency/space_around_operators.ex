@@ -1,28 +1,32 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
-  @moduledoc """
-  Use spaces around operators like `+`, `-`, `*` and `/`. This is the
-  **preferred** way, although other styles are possible, as long as it is
-  applied consistently.
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    tags: [:formatter],
+    param_defaults: [ignore: [:|]],
+    explanations: [
+      check: """
+      Use spaces around operators like `+`, `-`, `*` and `/`. This is the
+      **preferred** way, although other styles are possible, as long as it is
+      applied consistently.
 
-      # preferred
+          # preferred
 
-      1 + 2 * 4
+          1 + 2 * 4
 
-      # also okay
+          # also okay
 
-      1+2*4
+          1+2*4
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-
-  @explanation [check: @moduledoc]
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """,
+      params: [
+        ignore: "List of operators to be ignored for this check."
+      ]
+    ]
 
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
-
-  @default_params [ignore: [:|]]
-
-  use Credo.Check, run_on_all: true, base_priority: :high
 
   # TODO: add *ignored* operators, so you can add "|" and still write
   #       [head|tail] while enforcing 2 + 3 / 1 ...
@@ -30,7 +34,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   # any related test cases around.
 
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  @impl true
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 
@@ -65,7 +70,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp ignored?(location, params) do
-    ignored_triggers = Params.get(params, :ignore, @default_params)
+    ignored_triggers = Params.get(params, :ignore, __MODULE__)
 
     Enum.member?(ignored_triggers, location[:trigger])
   end
@@ -104,10 +109,23 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp create_issue?(line, column, trigger) when trigger == :/ do
-    !number_in_fun?(line, column)
+    !number_in_function_capture?(line, column)
+  end
+
+  defp create_issue?(line, _column, trigger) when trigger == :* do
+    # The Elixir formatter always removes spaces around the asterisk in
+    # typespecs for binaries by default. Credo shouldn't conflict with the
+    # default Elixir formatter settings.
+    !typespec_binary_unit_operator_without_spaces?(line)
   end
 
   defp create_issue?(_, _, _), do: true
+
+  defp typespec_binary_unit_operator_without_spaces?(line) do
+    # In code this construct can only appear inside a binary typespec. It could
+    # also appear verbatim in a string, but it's rather unlikely...
+    line =~ "_::_*"
+  end
 
   defp arrow_in_typespec?(line, column) do
     # -2 because we need to subtract the operator
@@ -117,10 +135,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   end
 
   defp number_with_sign?(line, column) do
-    # -2 because we need to subtract the operator
     line
+    # -2 because we need to subtract the operator
     |> String.slice(0..(column - 2))
-    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
+    |> String.match?(~r/(\A\s+|\@[a-zA-Z0-9\_]+\.?|[\|\\\{\[\(\,\:\>\<\=\+\-\*\/])\s*$/)
   end
 
   defp number_in_range?(line, column) do
@@ -129,10 +147,10 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     |> String.match?(~r/^\d+\.\./)
   end
 
-  defp number_in_fun?(line, column) do
+  defp number_in_function_capture?(line, column) do
     line
     |> String.slice(0..(column - 2))
-    |> String.match?(~r/[\.\&][a-z0-9_]+$/)
+    |> String.match?(~r/[\.\&][a-z0-9_]+[\!\?]?$/)
   end
 
   # TODO: this implementation is a bit naive. improve it.
@@ -184,7 +202,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
   defp parameter_in_function_call?(location_tuple, tokens, ast) do
     case find_prev_current_next_token(tokens, location_tuple) do
       {prev, _current, _next} ->
-        Credo.Code.TokenAstCorrelation.find_tokens_in_ast(prev, ast)
+        prev
+        |> Credo.Code.TokenAstCorrelation.find_tokens_in_ast(ast)
         |> List.wrap()
         |> List.first()
         |> is_parameter_in_function_call()

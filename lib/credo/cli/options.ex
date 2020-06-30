@@ -1,4 +1,12 @@
 defmodule Credo.CLI.Options do
+  @moduledoc """
+  The `Options` struct represents the options given on the command line.
+
+  The `Options` struct is stored as part of the `Execution` struct.
+  """
+
+  alias Credo.Priority
+
   defstruct command: nil,
             path: nil,
             args: [],
@@ -6,61 +14,61 @@ defmodule Credo.CLI.Options do
             unknown_switches: [],
             unknown_args: []
 
-  @switches [
-    all_priorities: :boolean,
-    all: :boolean,
-    checks: :string,
-    config_name: :string,
-    color: :boolean,
-    crash_on_error: :boolean,
-    debug: :boolean,
-    mute_exit_status: :boolean,
-    format: :string,
-    help: :boolean,
-    ignore_checks: :string,
-    ignore: :string,
-    min_priority: :string,
-    only: :string,
-    read_from_stdin: :boolean,
-    strict: :boolean,
-    verbose: :boolean,
-    version: :boolean
-  ]
-  @aliases [
-    a: :all,
-    A: :all_priorities,
-    c: :checks,
-    C: :config_name,
-    d: :debug,
-    h: :help,
-    i: :ignore_checks,
-    v: :version
-  ]
+  @doc """
+  Returns a `Options` struct for the given parameters.
 
-  alias Credo.Priority
+      iex> Credo.CLI.Options.parse(["alice", "--debug"], ".", ["alice", "bob", "eve"], [], [debug: :boolean], [])
+      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{debug: true}, unknown_args: [], unknown_switches: []}
 
-  def parse(argv, current_dir, command_names, ignored_args) do
+      iex> Credo.CLI.Options.parse(["alice", "--friend", "bob", "--friend", "eve"], ".", ["alice", "bob", "eve"], [], [friend: :keep], [])
+      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{friend: ["bob", "eve"]}, unknown_args: [], unknown_switches: []}
+
+      iex> Credo.CLI.Options.parse(["alice", "--friend", "bob", "--friend", "eve"], ".", ["alice", "bob", "eve"], [], [friend: [:string, :keep]], [])
+      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{friend: ["bob", "eve"]}, unknown_args: [], unknown_switches: []}
+
+  """
+  def parse(argv, current_dir, command_names, ignored_args, switches_definition, aliases) do
     argv
-    |> OptionParser.parse(strict: @switches, aliases: @aliases)
-    |> parse_result(current_dir, command_names, ignored_args)
+    |> OptionParser.parse(strict: switches_definition, aliases: aliases)
+    |> parse_result(current_dir, command_names, ignored_args, switches_definition)
   end
 
   defp parse_result(
          {switches_keywords, args, unknown_switches_keywords},
          current_dir,
          command_names,
-         ignored_args
+         ignored_args,
+         switches_definition
        ) do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
     {command, path, unknown_args} = split_args(args, current_dir, command_names)
 
     {switches_keywords, extra_unknown_switches} = patch_switches(switches_keywords)
 
+    switch_definitions_for_lists =
+      Enum.filter(switches_definition, fn
+        {_name, :keep} -> true
+        {_name, [_, :keep]} -> true
+        {_name, _value} -> false
+      end)
+
+    switches_with_lists_as_map =
+      switch_definitions_for_lists
+      |> Enum.map(fn {name, _value} ->
+        {name, Keyword.get_values(switches_keywords, name)}
+      end)
+      |> Enum.into(%{})
+
+    switches =
+      switches_keywords
+      |> Enum.into(%{})
+      |> Map.merge(switches_with_lists_as_map)
+
     %__MODULE__{
       command: command,
       path: path,
       args: unknown_args,
-      switches: Enum.into(switches_keywords, %{}),
+      switches: switches,
       unknown_switches: unknown_switches_keywords ++ extra_unknown_switches
     }
   end

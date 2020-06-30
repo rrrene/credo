@@ -1,55 +1,72 @@
 defmodule Credo.Check.Readability.StringSigils do
-  @moduledoc ~S"""
-  If you used quoted strings that contain quotes, you might want to consider
-  switching to the use of sigils instead.
+  alias Credo.SourceFile
+  alias Credo.Code.Heredocs
 
-      # okay
+  use Credo.Check,
+    base_priority: :low,
+    param_defaults: [
+      maximum_allowed_quotes: 3
+    ],
+    explanations: [
+      check: ~S"""
+      If you used quoted strings that contain quotes, you might want to consider
+      switching to the use of sigils instead.
 
-      "<a href=\"http://elixirweekly.net\">#\{text}</a>"
+          # okay
 
-      # not okay, lots of escaped quotes
+          "<a href=\"http://elixirweekly.net\">#\{text}</a>"
 
-      "<a href=\"http://elixirweekly.net\" target=\"_blank\">#\{text}</a>"
+          # not okay, lots of escaped quotes
 
-      # refactor to
+          "<a href=\"http://elixirweekly.net\" target=\"_blank\">#\{text}</a>"
 
-      ~S(<a href="http://elixirweekly.net" target="_blank">#\{text}</a>)
+          # refactor to
 
-  This allows us to remove the noise which results from the need to escape
-  quotes within quotes.
-  """
+          ~S(<a href="http://elixirweekly.net" target="_blank">#\{text}</a>)
 
-  @explanation [
-    check: @moduledoc,
-    params: [
-      maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
+      This allows us to remove the noise which results from the need to escape
+      quotes within quotes.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """,
+      params: [
+        maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
+      ]
     ]
-  ]
-  @default_params [
-    maximum_allowed_quotes: 3
-  ]
+
   @quote_codepoint 34
 
-  use Credo.Check, base_priority: :low
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, @default_params)
+    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
 
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, maximum_allowed_quotes)
-    )
+    case remove_heredocs_and_convert_to_ast(source_file) do
+      {:ok, ast} ->
+        Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
+
+      {:error, errors} ->
+        IO.warn("Unexpected error while parsing #{source_file.filename}: #{inspect(errors)}")
+        []
+    end
   end
 
-  def traverse(
-        {maybe_sigil, meta, [str | rest_ast]} = ast,
-        issues,
-        issue_meta,
-        maximum_allowed_quotes
-      ) do
+  defp remove_heredocs_and_convert_to_ast(source_file) do
+    source_file
+    |> Heredocs.replace_with_spaces()
+    |> Credo.Code.ast()
+  end
+
+  defp traverse(
+         {maybe_sigil, meta, [str | rest_ast]} = ast,
+         issues,
+         issue_meta,
+         maximum_allowed_quotes
+       ) do
     line_no = meta[:line]
 
     cond do
@@ -73,7 +90,7 @@ defmodule Credo.Check.Readability.StringSigils do
     end
   end
 
-  def traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
+  defp traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
     {ast, issues}
   end
 
@@ -92,18 +109,11 @@ defmodule Credo.Check.Readability.StringSigils do
          issue_meta,
          line_no
        ) do
-    if !is_heredoc(issue_meta, line_no) && too_many_quotes?(string, maximum_allowed_quotes) do
+    if too_many_quotes?(string, maximum_allowed_quotes) do
       [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
     else
       issues
     end
-  end
-
-  defp is_heredoc({_, source_file, _}, line_no) do
-    lines = SourceFile.lines(source_file)
-    {_, line} = Enum.find(lines, fn {n, _} -> n == line_no end)
-
-    Regex.match?(~r/("""|''')$/, line)
   end
 
   defp too_many_quotes?(string, limit) do
@@ -125,6 +135,10 @@ defmodule Credo.Check.Readability.StringSigils do
 
   defp too_many_quotes?(<<_::utf8, rest::binary>>, count, limit) do
     too_many_quotes?(rest, count, limit)
+  end
+
+  defp too_many_quotes?(<<_::binary>>, _count, _limit) do
+    false
   end
 
   defp issue_for(issue_meta, line_no, trigger, maximum_allowed_quotes) do

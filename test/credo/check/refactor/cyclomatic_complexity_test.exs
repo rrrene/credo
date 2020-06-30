@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.CyclomaticComplexity
 
@@ -120,7 +120,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_complexity: 1)
+    |> run_check(@described_check, max_complexity: 1)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -130,7 +131,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_complexity: 1)
+    |> run_check(@described_check, max_complexity: 1)
+    |> assert_issue()
   end
 
   test "it should NOT report expected code /x" do
@@ -142,7 +144,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, max_complexity: 3)
+    |> run_check(@described_check, max_complexity: 3)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for __using__ macro" do
@@ -174,7 +177,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
               severity: severity
             }
             if line_no do
-              {_def, scope} = CodeHelper.scope_for(source_file.ast, line: line_no)
+              {_def, scope} = Credo.Code.scope_for(source_file.ast, line: line_no)
               issue =
                 %Issue{
                   issue |
@@ -208,7 +211,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation" do
@@ -227,7 +231,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_complexity: 4)
+    |> run_check(@described_check, max_complexity: 4)
+    |> assert_issue()
   end
 
   test "it should report a violation on def rather than when" do
@@ -242,7 +247,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_complexity: 4)
+    |> run_check(@described_check, max_complexity: 4)
+    |> assert_issue()
     |> assert_trigger(:foobar)
   end
 end

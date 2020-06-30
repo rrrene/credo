@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.AppendSingleItemTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.AppendSingleItem
 
@@ -12,7 +12,8 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report prepending an item" do
@@ -24,7 +25,8 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report on 2 lists" do
@@ -36,7 +38,8 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report appending 2 items on a pre-existing list" do
@@ -48,7 +51,8 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation" do
@@ -60,6 +64,7 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

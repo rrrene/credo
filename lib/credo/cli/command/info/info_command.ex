@@ -1,20 +1,21 @@
 defmodule Credo.CLI.Command.Info.InfoCommand do
+  @moduledoc false
+
+  @shortdoc "Show useful debug information"
+
   use Credo.CLI.Command
 
   alias Credo.CLI.Command.Info.InfoOutput
   alias Credo.CLI.Task
   alias Credo.Execution
 
-  @shortdoc "Show useful debug information"
-  @moduledoc @shortdoc
-
   @doc false
   def call(%Execution{help: true} = exec, _opts), do: InfoOutput.print_help(exec)
 
   def call(exec, _opts) do
     exec
-    |> Task.LoadAndValidateSourceFiles.call()
-    |> Task.PrepareChecksToRun.call()
+    |> run_task(Task.LoadAndValidateSourceFiles)
+    |> run_task(Task.PrepareChecksToRun)
     |> print_info()
   end
 
@@ -39,11 +40,9 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
   end
 
   defp checks(exec) do
-    exec.checks
-    |> Enum.map(fn
-      {name} -> name
-      {name, _} -> name
-    end)
+    {checks, _only_matching, _ignore_matching} = Execution.checks(exec)
+
+    Enum.map(checks, fn {name, _} -> name end)
   end
 
   defp files(exec) do

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.RaiseInsideRescueTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.RaiseInsideRescue
 
@@ -21,7 +21,8 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -37,7 +38,8 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation when raise appears inside of a rescue block" do
@@ -57,7 +59,8 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 10 == issue.line_no
     end)
@@ -78,7 +81,8 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 9 == issue.line_no
     end)
@@ -99,7 +103,8 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 8 == issue.line_no
     end)

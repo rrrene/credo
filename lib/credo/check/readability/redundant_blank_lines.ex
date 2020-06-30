@@ -1,33 +1,40 @@
 defmodule Credo.Check.Readability.RedundantBlankLines do
-  @moduledoc """
-  Files should not have two or more consecutive blank lines.
+  use Credo.Check,
+    base_priority: :low,
+    tags: [:formatter],
+    param_defaults: [max_blank_lines: 1],
+    explanations: [
+      check: """
+      Files should not have two or more consecutive blank lines.
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
-
-  @explanation [
-    check: @moduledoc,
-    params: [
-      max_blank_lines: "The maximum number of tolerated consecutive blank lines."
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """,
+      params: [
+        max_blank_lines: "The maximum number of tolerated consecutive blank lines."
+      ]
     ]
-  ]
-  @default_params [
-    max_blank_lines: 1
-  ]
 
-  use Credo.Check, base_priority: :low
+  alias Credo.Code.Charlists
+  alias Credo.Code.Heredocs
+  alias Credo.Code.Sigils
+  alias Credo.Code.Strings
 
   @doc false
-  def run(source_file, params \\ []) do
+  # TODO: consider for experimental check front-loader (text)
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    max_blank_lines = Params.get(params, :max_blank_lines, @default_params)
+    max_blank_lines = Params.get(params, :max_blank_lines, __MODULE__)
 
     source_file
-    |> SourceFile.lines()
-    |> blank_lines
+    |> Charlists.replace_with_spaces("=")
+    |> Sigils.replace_with_spaces("=", "=", source_file.filename)
+    |> Strings.replace_with_spaces("=", "=", source_file.filename)
+    |> Heredocs.replace_with_spaces("=", "=", "=", source_file.filename)
+    |> Credo.Code.to_lines()
+    |> blank_lines()
     |> consecutive_lines(max_blank_lines)
     |> Enum.map(fn line -> issue_for(issue_meta, line, max_blank_lines) end)
   end

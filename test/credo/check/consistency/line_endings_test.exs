@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.LineEndingsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.LineEndings
 
@@ -34,7 +34,8 @@ defmodule Credo.Check.Readability.LineEndingsTest do
   test "it should not report expected code" do
     [@unix_line_endings, @unix_line_endings2]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues
   end
 
   #
@@ -44,6 +45,7 @@ defmodule Credo.Check.Readability.LineEndingsTest do
   test "it should report an issue here" do
     [@unix_line_endings, @windows_line_endings]
     |> to_source_files
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue
   end
 end

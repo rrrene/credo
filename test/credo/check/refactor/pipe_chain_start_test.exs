@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.PipeChainStartTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.PipeChainStart
 
@@ -16,6 +16,9 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         "Fahrenheit 451" |> String.trim
 
         do_something() |> then_something_else() |> and_last_step()
+
+        ':#{token}'
+        |> :elixir_tokenizer.tokenize(1, [])
 
         something
         |> String.downcase
@@ -128,7 +131,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -151,10 +155,10 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     end
     """
     |> to_source_file
-    |> refute_issues(
-      @described_check,
+    |> run_check(@described_check,
       excluded_functions: ["Stream.repeatedly"]
     )
+    |> refute_issues
   end
 
   test "it should NOT report a violation for an excluded function call" do
@@ -162,10 +166,11 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     String.trim("users") |> String.upcase
     """
     |> to_source_file
-    |> refute_issues(
+    |> run_check(
       @described_check,
       excluded_functions: ~w(String.trim table put_in)
     )
+    |> refute_issues
   end
 
   test "it should NOT report a violation for an excluded function call /2" do
@@ -175,10 +180,11 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(
+    |> run_check(
       @described_check,
       excluded_functions: ~w(String.trim table put_in)
     )
+    |> refute_issues
   end
 
   test "it should NOT report a violation for an excluded function call /3" do
@@ -187,10 +193,11 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> some_other_fun()
     """
     |> to_source_file
-    |> refute_issues(
+    |> run_check(
       @described_check,
       excluded_functions: ~w(String.trim table put_in)
     )
+    |> refute_issues
   end
 
   test "it should NOT report a violation for an excluded function call /4" do
@@ -198,7 +205,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     :crypto.hash(:md5, "test") |> Base.encode16(case: :lower)
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_functions: ~w(:crypto.hash))
+    |> run_check(@described_check, excluded_functions: ~w(:crypto.hash))
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for ++" do
@@ -212,7 +220,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for --" do
@@ -224,7 +233,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for string concatenation" do
@@ -238,7 +248,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for captures" do
@@ -253,7 +264,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type" do
@@ -262,7 +274,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_argument_types: [:regex])
+    |> run_check(@described_check, excluded_argument_types: [:regex])
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /2" do
@@ -271,7 +284,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_argument_types: [:sigil_R])
+    |> run_check(@described_check, excluded_argument_types: [:sigil_R])
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /3" do
@@ -280,7 +294,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_argument_types: [:binary])
+    |> run_check(@described_check, excluded_argument_types: [:binary])
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /4" do
@@ -289,7 +304,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_argument_types: [:sigil_f])
+    |> run_check(@described_check, excluded_argument_types: [:sigil_f])
+    |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /5" do
@@ -298,7 +314,35 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> DB.run
     """
     |> to_source_file
-    |> refute_issues(@described_check, excluded_argument_types: [:fn])
+    |> run_check(@described_check, excluded_argument_types: [:fn])
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for an excluded argument type /6" do
+    """
+    max(0, interval - elapsed_time) |> schedule_events()
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_argument_types: [:number])
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for an excluded argument type /7" do
+    """
+    insert(:event) |> schedule_events()
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_argument_types: [:atom])
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for an excluded argument type /8" do
+    """
+    foo(nil) |> bar()
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_argument_types: [:atom])
+    |> refute_issues()
   end
 
   #
@@ -313,7 +357,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> String.trim
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation for a function call 2" do
@@ -325,7 +370,8 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> IO.inspect
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for a function call 3" do
@@ -337,6 +383,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> IO.inspect
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

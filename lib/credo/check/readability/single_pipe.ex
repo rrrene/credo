@@ -1,33 +1,39 @@
 defmodule Credo.Check.Readability.SinglePipe do
-  @moduledoc """
-  Pipes (`|>`) should only be used when piping data through multiple calls.
+  use Credo.Check,
+    base_priority: :high,
+    tags: [:controversial],
+    explanations: [
+      check: """
+      Pipes (`|>`) should only be used when piping data through multiple calls.
 
-  So while this is fine:
+      So while this is fine:
 
-      list
-      |> Enum.take(5)
-      |> Enum.shuffle
-      |> evaluate()
+          list
+          |> Enum.take(5)
+          |> Enum.shuffle
+          |> evaluate()
 
-  The code in this example ...
+      The code in this example ...
 
-      list
-      |> evaluate()
+          list
+          |> evaluate()
 
-  ... should be refactored to look like this:
+      ... should be refactored to look like this:
 
-      evaluate(list)
+          evaluate(list)
 
-  Using a single |> to invoke functions makes the code harder to read. Instead,
-  write a function call when a pipeline is only one function long.
-  """
+      Using a single |> to invoke functions makes the code harder to read. Instead,
+      write a function call when a pipeline is only one function long.
 
-  @explanation [check: @moduledoc]
-
-  use Credo.Check, base_priority: :high
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     {_continue, issues} =
@@ -36,6 +42,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     issues
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _) do
     {ast, {false, issues}}
   end
@@ -43,7 +50,7 @@ defmodule Credo.Check.Readability.SinglePipe do
   defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta) do
     {
       ast,
-      {false, issues ++ [issue_for(issue_meta, meta[:line], "single pipe")]}
+      {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
     }
   end
 
@@ -51,7 +58,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     {ast, {true, issues}}
   end
 
-  def issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
       message: "Use a function call when a pipeline is only one function long",

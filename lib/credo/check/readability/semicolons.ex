@@ -1,21 +1,31 @@
 defmodule Credo.Check.Readability.Semicolons do
-  @moduledoc """
-  Don't use ; to separate statements and expressions.
-  Statements and expressions should be separated by lines.
+  use Credo.Check,
+    base_priority: :high,
+    tags: [:formatter],
+    explanations: [
+      check: """
+      Don't use ; to separate statements and expressions.
+      Statements and expressions should be separated by lines.
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of others reading and liking your code by making
-  it easier to follow.
-  """
+          # preferred
 
-  @explanation [
-    check: @moduledoc
-  ]
+          a = 1
+          b = 2
 
-  use Credo.Check, base_priority: :high
+          # NOT preferred
+
+          a = 1; b = 2
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  # TODO: consider for experimental check front-loader (tokens)
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
@@ -32,7 +42,7 @@ defmodule Credo.Check.Readability.Semicolons do
 
   defp collect_issues([_ | rest], acc, issue_meta), do: collect_issues(rest, acc, issue_meta)
 
-  def issue_for(issue_meta, line_no, column) do
+  defp issue_for(issue_meta, line_no, column) do
     format_issue(
       issue_meta,
       message: "Don't use ; to separate statements and expressions",

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.PreferImplicitTryTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.PreferImplicitTry
 
@@ -18,7 +18,8 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation in cases where we need `try`" do
@@ -39,7 +40,8 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -59,7 +61,8 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report cases where a `try` block is the entire body of a private function" do
@@ -75,7 +78,8 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report cases where a `try` block is the entire body of macro definition" do
@@ -91,6 +95,7 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

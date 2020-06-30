@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.LargeNumbersTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.LargeNumbers
 
@@ -10,12 +10,12 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
   test "it should NOT report expected code" do
     """
     @budgets %{
-      "budget1": 100_000,
-      "budget2": 200_000,
-      "budget3": 300_000,
-      "budget4": 500_000,
-      "budget5": 1_000_000,
-      "budget6": 2_000_000
+      budget1: 100_000,
+      budget2: 200_000,
+      budget3: 300_000,
+      budget4: 500_000,
+      budget5: 1_000_000,
+      budget6: 2_000_000
     }
 
     @int32_min -2_147_483_648
@@ -29,7 +29,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should allow multiple large floats on a line" do
@@ -39,7 +40,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not complain about numbers in anon function calls" do
@@ -57,7 +59,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should not complain about non-decimal numbers" do
@@ -70,13 +73,15 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "check old false positive is fixed /1" do
     " defmacro oid_ansi_x9_62, do: quote do: {1,2,840,10_045}"
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "check old false positive is fixed /2" do
@@ -89,7 +94,19 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     }
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "check old false positive is fixed /3" do
+    """
+    check all integer <- integer(-10_000..-1) do
+      assert is_integer(integer)
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -103,7 +120,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation, since it is formatted incorrectly" do
@@ -113,7 +131,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report only one violation" do
@@ -123,7 +142,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, only_greater_than: 50000)
+    |> run_check(@described_check, only_greater_than: 50_000)
+    |> assert_issue()
   end
 
   test "it should report only one violation for ranges /1" do
@@ -133,7 +153,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report only one violation for ranges /2" do
@@ -143,7 +164,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report only two violation for ranges" do
@@ -153,7 +175,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation /2" do
@@ -163,7 +186,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /3" do
@@ -173,7 +197,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /4" do
@@ -183,7 +208,8 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should format floating point numbers nicely" do
@@ -193,8 +219,9 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn %Credo.Issue{message: message} ->
-      assert Regex.run(~r/[\d\._]+/, message) |> hd == "10_000.00001"
+    |> run_check(@described_check)
+    |> assert_issue(fn %Credo.Issue{message: message} ->
+      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.00001"
     end)
   end
 
@@ -205,8 +232,9 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn %Credo.Issue{message: message} ->
-      assert Regex.run(~r/[\d\._]+/, message) |> hd == "10_000.000010"
+    |> run_check(@described_check)
+    |> assert_issue(fn %Credo.Issue{message: message} ->
+      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.000010"
     end)
   end
 
@@ -217,6 +245,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

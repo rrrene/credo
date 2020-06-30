@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.List.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.Summary
@@ -124,42 +126,51 @@ defmodule Credo.CLI.Command.List.Output.Default do
     |> UI.puts()
 
     if issue.line_no do
-      raw_line = SourceFile.line_at(source_file, issue.line_no)
-      line = String.trim(raw_line)
-
-      UI.puts_edge([outer_color, :faint])
-
-      [
-        UI.edge([outer_color, :faint]),
-        :cyan,
-        :faint,
-        String.duplicate(" ", @indent - 2),
-        UI.truncate(line, term_width - @indent)
-      ]
-      |> UI.puts()
-
-      if issue.column do
-        offset = String.length(raw_line) - String.length(line)
-        # column is one-based
-        x = max(issue.column - offset - 1, 0)
-
-        w =
-          case issue.trigger do
-            nil -> 1
-            atom -> atom |> to_string |> String.length()
-          end
-
-        [
-          UI.edge([outer_color, :faint], @indent),
-          inner_color,
-          String.duplicate(" ", x),
-          :faint,
-          String.duplicate("^", w)
-        ]
-        |> UI.puts()
-      end
+      print_issue_line_no(source_file, term_width, issue, outer_color, inner_color)
     end
 
     UI.puts_edge([outer_color, :faint], @indent)
+  end
+
+  defp print_issue_column(raw_line, line, issue, outer_color, inner_color) do
+    offset = String.length(raw_line) - String.length(line)
+    # column is one-based
+    x = max(issue.column - offset - 1, 0)
+
+    w =
+      if is_nil(issue.trigger) do
+        1
+      else
+        issue.trigger
+        |> to_string()
+        |> String.length()
+      end
+
+    [
+      UI.edge([outer_color, :faint], @indent),
+      inner_color,
+      String.duplicate(" ", x),
+      :faint,
+      String.duplicate("^", w)
+    ]
+    |> UI.puts()
+  end
+
+  defp print_issue_line_no(source_file, term_width, issue, outer_color, inner_color) do
+    raw_line = SourceFile.line_at(source_file, issue.line_no)
+    line = String.trim(raw_line)
+
+    UI.puts_edge([outer_color, :faint])
+
+    [
+      UI.edge([outer_color, :faint]),
+      :cyan,
+      :faint,
+      String.duplicate(" ", @indent - 2),
+      UI.truncate(line, term_width - @indent)
+    ]
+    |> UI.puts()
+
+    if issue.column, do: print_issue_column(raw_line, line, issue, outer_color, inner_color)
   end
 end

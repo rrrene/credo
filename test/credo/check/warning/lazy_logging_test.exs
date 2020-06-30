@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.LazyLoggingTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.LazyLogging
 
@@ -18,7 +18,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report imported :debug from Logger" do
@@ -34,7 +35,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report for user-defined debug function" do
@@ -52,7 +54,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report for non interpolated strings" do
@@ -64,7 +67,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report for function call" do
@@ -81,7 +85,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation with :levels param" do
@@ -93,7 +98,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore: [:debug])
+    |> run_check(@described_check, ignore: [:debug])
+    |> refute_issues()
   end
 
   #
@@ -113,7 +119,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation with imported :debug from Logger" do
@@ -127,6 +134,7 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

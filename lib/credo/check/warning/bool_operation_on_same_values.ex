@@ -1,25 +1,27 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValues do
-  @moduledoc """
-  Boolean operations with identical values on the left and right side are
-  most probably a logical fallacy or a copy-and-paste error.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Boolean operations with identical values on the left and right side are
+      most probably a logical fallacy or a copy-and-paste error.
 
-  Examples:
+      Examples:
 
-      x && x
-      x || x
-      x and x
-      x or x
+          x && x
+          x || x
+          x and x
+          x or x
 
-  Each of these cases behaves the same as if you were just writing `x`.
-  """
+      Each of these cases behaves the same as if you were just writing `x`.
+      """
+    ]
 
-  @explanation [check: @moduledoc]
   @ops [:and, :or, :&&, :||]
 
-  use Credo.Check, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
@@ -27,7 +29,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
 
   for op <- @ops do
     defp traverse({unquote(op), meta, [lhs, rhs]} = ast, issues, issue_meta) do
-      if CodeHelper.remove_metadata(lhs) === CodeHelper.remove_metadata(rhs) do
+      if Credo.Code.remove_metadata(lhs) === Credo.Code.remove_metadata(rhs) do
         new_issue = issue_for(issue_meta, meta[:line], unquote(op))
         {ast, issues ++ [new_issue]}
       else

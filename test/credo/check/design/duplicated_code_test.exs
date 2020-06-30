@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.DuplicatedCodeTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.DuplicatedCode
 
@@ -32,7 +32,8 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
     [s1, s2]
     |> to_source_files
-    |> assert_issues(@described_check, mass_threshold: 16)
+    |> run_check(@described_check, mass_threshold: 16)
+    |> assert_issues()
   end
 
   test "should raise an issue for duplicated code via macros" do
@@ -72,7 +73,40 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
     [s1, s2]
     |> to_source_files
-    |> assert_issues(@described_check, mass_threshold: 16)
+    |> run_check(@described_check, mass_threshold: 16)
+    |> assert_issues()
+  end
+
+  test "should raise an issue for duplicated code with different line numbers and external function call" do
+    s1 = """
+    defmodule M1 do
+      def myfun(p1, p2) when is_list(p2) do
+        if p1 == p2 do
+          A.f(p1)
+        else
+          p2 + p1
+        end
+      end
+    end
+    """
+
+    s2 = """
+    defmodule M2 do
+      # additional line here
+      def myfun(p1, p2) when is_list(p2) do
+        if p1 == p2 do
+          A.f(p1)
+        else
+          p2 + p1
+        end
+      end
+    end
+    """
+
+    [s1, s2]
+    |> to_source_files
+    |> run_check(@described_check, mass_threshold: 16)
+    |> assert_issues()
   end
 
   test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
@@ -112,7 +146,8 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
     [s1, s2]
     |> to_source_files
-    |> refute_issues(@described_check, excluded_macros: [:test])
+    |> run_check(@described_check, excluded_macros: [:test])
+    |> refute_issues
   end
 
   # unit tests for different aspects

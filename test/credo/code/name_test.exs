@@ -1,5 +1,5 @@
 defmodule Credo.Code.NameTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Name
 
@@ -95,6 +95,16 @@ defmodule Credo.Code.NameTest do
     assert mod_list |> Name.full() == expected
   end
 
+  test "returns full name for a function call" do
+    mod_list = [
+      {:my_fun, [line: 62], [{:param1, [line: 62], nil}, {:param2, [line: 62], nil}]},
+      :Module
+    ]
+
+    expected = "my_fun(param1, param2).Module"
+    assert mod_list |> Name.full() == expected
+  end
+
   #
   # parts_count
   #
@@ -112,6 +122,10 @@ defmodule Credo.Code.NameTest do
 
   test "returns true if name is snake_case" do
     assert "snake_case_test" |> Name.snake_case?()
+    assert "snake_case23" |> Name.snake_case?()
+    assert "snake_case_23" |> Name.snake_case?()
+    assert "latency_μs" |> Name.snake_case?()
+    assert "rené_föhring" |> Name.snake_case?()
     refute "SnakeCase_mixed" |> Name.snake_case?()
   end
 

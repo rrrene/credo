@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Command.Suggest.Output.Default do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.Summary
@@ -62,16 +64,11 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       |> Enum.uniq()
 
     issue_map =
-      categories
-      |> Enum.map(fn category ->
+      Enum.into(categories, %{}, fn category ->
         {category, issues |> Enum.filter(&(&1.category == category))}
       end)
-      |> Enum.into(%{})
 
-    source_file_map =
-      source_files
-      |> Enum.map(&{&1.filename, &1})
-      |> Enum.into(%{})
+    source_file_map = Enum.into(source_files, %{}, &{&1.filename, &1})
 
     categories
     |> Sorter.ensure(@category_starting_order, @category_ending_order)
@@ -152,15 +149,15 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
     |> do_print_issues(source_file_map, exec, term_width)
   end
 
-  def per_category(%Execution{all: true}), do: 1_000_000
-  def per_category(%Execution{all: false}), do: @per_category
+  defp per_category(%Execution{all: true}), do: 1_000_000
+  defp per_category(%Execution{all: false}), do: @per_category
 
-  def do_print_issues(
-        issues,
-        source_file_map,
-        %Execution{format: _} = exec,
-        term_width
-      ) do
+  defp do_print_issues(
+         issues,
+         source_file_map,
+         %Execution{format: _} = exec,
+         term_width
+       ) do
     Enum.each(issues, fn %Issue{filename: filename} = issue ->
       source_file = source_file_map[filename]
 
@@ -168,17 +165,17 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
     end)
   end
 
-  def do_print_issue(
-        %Issue{
-          check: check,
-          message: message,
-          filename: filename,
-          priority: priority
-        } = issue,
-        source_file,
-        %Execution{format: _} = exec,
-        term_width
-      ) do
+  defp do_print_issue(
+         %Issue{
+           check: check,
+           message: message,
+           filename: filename,
+           priority: priority
+         } = issue,
+         source_file,
+         %Execution{format: _} = exec,
+         term_width
+       ) do
     outer_color = Output.check_color(issue)
     inner_color = Output.issue_color(issue)
     message_color = outer_color

@@ -1,55 +1,66 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
-  @moduledoc """
-  You might want to refrain from rebinding variables.
+  use Credo.Check,
+    tags: [:controversial],
+    param_defaults: [allow_bang: false],
+    explanations: [
+      check: """
+      You might want to refrain from rebinding variables.
 
-  Although technically fine, rebinding to the same name can lead to less
-  precise naming.
+      Although technically fine, rebinding to the same name can lead to less
+      precise naming.
 
-  Consider this example:
+      Consider this example:
 
-      def find_a_good_time do
-        time = MyApp.DateTime.now
-        time = MyApp.DateTime.later(time, 5, :days)
-        {:ok, time} = verify_available_time(time)
+          def find_a_good_time do
+            time = MyApp.DateTime.now
+            time = MyApp.DateTime.later(time, 5, :days)
+            {:ok, time} = verify_available_time(time)
 
-        time
-      end
+            time
+          end
 
-  While there is nothing wrong with this, many would consider the following
-  implementation to be easier to comprehend:
+      While there is nothing wrong with this, many would consider the following
+      implementation to be easier to comprehend:
 
-      def find_a_good_time do
-        today = DateTime.now
-        proposed_time = DateTime.later(today, 5, :days)
-        {:ok, verified_time} = verify_available_time(proposed_time)
+          def find_a_good_time do
+            today = DateTime.now
+            proposed_time = DateTime.later(today, 5, :days)
+            {:ok, verified_time} = verify_available_time(proposed_time)
 
-        verified_time
-      end
+            verified_time
+          end
 
-  """
+      In some rare cases you might really want to rebind a variable.  This can be
+      enabled "opt-in" on a per-variable basis by setting the :allow_bang option
+      to true and adding a bang suffix sigil to your variable.
 
-  @explanation [
-    check: @moduledoc
-  ]
-
-  alias Credo.Check.CodeHelper
-
-  use Credo.Check
+          def uses_mutating_parameters(params!) do
+            params! = do_a_thing(params!)
+            params! = do_another_thing(params!)
+            params! = do_yet_another_thing(params!)
+          end
+      """,
+      params: [
+        allow_bang: "Variables with a bang suffix will be ignored."
+      ]
+    ]
 
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  def traverse([do: {:__block__, _, ast}], issues, issue_meta) do
+  defp traverse([do: {:__block__, _, ast}], issues, {_, _, opt} = issue_meta) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
       |> List.flatten()
       |> Enum.filter(&(&1 != nil))
       |> Enum.filter(&only_variables/1)
+      |> Enum.reject(&bang_sigil(&1, opt[:allow_bang]))
 
     duplicates =
       variables
@@ -71,7 +82,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     end
   end
 
-  def traverse(ast, issues, _issue_meta) do
+  defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
@@ -86,11 +97,11 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   end
 
   # ignore pinned variables
-  defp find_variables({:::, _, [{:^, _, _} | _]}) do
+  defp find_variables({:"::", _, [{:^, _, _} | _]}) do
     []
   end
 
-  defp find_variables({:::, _, [lhs | _rhs]}) do
+  defp find_variables({:"::", _, [lhs | _rhs]}) do
     find_variables(lhs)
   end
 
@@ -144,5 +155,12 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     |> Atom.to_string()
     |> String.starts_with?("_")
     |> Kernel.not()
+  end
+
+  defp bang_sigil({name, _}, allowed) do
+    allowed &&
+      name
+      |> Atom.to_string()
+      |> String.ends_with?("!")
   end
 end

@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.PredicateFunctionNames
 
@@ -15,7 +15,8 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -28,7 +29,8 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation /2" do
@@ -39,6 +41,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

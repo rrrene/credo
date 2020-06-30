@@ -77,8 +77,10 @@ defmodule Credo.Code.Name do
     "@#{name}"
   end
 
-  def full({:unquote, _, [{name, _, nil}]}) when is_atom(name) do
-    "unquote(#{name})"
+  def full({name, _, arguments}) when is_atom(name) and is_list(arguments) do
+    arg_list = arguments |> Enum.map(&full/1) |> Enum.join(", ")
+
+    "#{full(name)}(#{arg_list})"
   end
 
   def parts_count(module_name) do
@@ -98,7 +100,7 @@ defmodule Credo.Code.Name do
   end
 
   def snake_case?(name) do
-    String.match?(name, ~r/^[a-z0-9\_\?\!]+$/)
+    String.match?(name, ~r/^[[:lower:][:digit:]\_\?\!]+$/u)
   end
 
   def no_case?(name) do

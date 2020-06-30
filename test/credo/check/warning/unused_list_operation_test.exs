@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.UnusedListOperationTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.UnusedListOperation
 
@@ -12,7 +12,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report when result is piped" do
@@ -27,7 +28,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when end of pipe AND return value" do
@@ -40,7 +42,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of pipe" do
@@ -56,7 +59,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when inside an assignment" do
@@ -70,7 +74,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a condition" do
@@ -99,7 +104,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a quote" do
@@ -115,7 +121,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of assignment" do
@@ -149,7 +156,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block but is the last call" do
@@ -165,7 +173,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block and is not the last call, but the result is assigned to a variable" do
@@ -184,7 +193,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when buried in :if, :when and :fn 2" do
@@ -206,7 +216,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case" do
@@ -223,7 +234,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when part of a function call" do
@@ -240,7 +252,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case 2" do
@@ -252,7 +265,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when in :after block" do
@@ -276,7 +290,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call" do
@@ -290,7 +305,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call 2" do
@@ -302,7 +318,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
       end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when in list that is returned" do
@@ -312,7 +329,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation when :fn is in the surrounding function calls arguments" do
@@ -325,7 +343,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation when buried in :if, :when and :fn" do
@@ -350,7 +369,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   ##############################################################################
@@ -369,7 +389,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when end of pipe" do
@@ -384,7 +405,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when buried in :if" do
@@ -404,7 +426,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when buried in :else" do
@@ -421,7 +444,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when buried in :if, :when and :fn 2" do
@@ -445,7 +469,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
@@ -463,7 +488,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call 2" do
@@ -480,7 +506,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "List.to_tuple" == issue.trigger
     end)
   end
@@ -503,7 +530,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 3 == Enum.count(issues)
     end)
   end
@@ -520,7 +548,8 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "List.flatten" == issue.trigger
     end)
   end

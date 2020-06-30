@@ -1,5 +1,5 @@
 defmodule Credo.Code.InterpolationHelperTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.InterpolationHelper
 
@@ -109,6 +109,18 @@ defmodule Credo.Code.InterpolationHelperTest do
         values = ~s{ $$$$$$ }
       end
     end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  test "should replace interpolations in map keys" do
+    source = ~S"""
+    %{acc | "#{date_type}_dates": :foo}
+    """
+
+    expected = ~S"""
+    %{acc | "$$$$$$$$$$$$_dates": :foo}
     """
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
@@ -429,7 +441,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.6.5"
+  @tag needs_elixir: "1.7.0"
   test "it should replace a single interpolation in a value of a map" do
     source = ~S"""
     %{"some-atom-with-quotes": "#{filename} world"}
@@ -442,7 +454,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.6.5"
+  @tag needs_elixir: "1.7.0"
   test "it should replace a single interpolation in a value of a map /2" do
     source = ~S"""
     %{some_atom_wo_quotes: "#{filename} world"}
@@ -450,6 +462,31 @@ defmodule Credo.Code.InterpolationHelperTest do
 
     expected = ~S"""
     %{some_atom_wo_quotes: "$$$$$$$$$$$ world"}
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.7.0"
+  test "it should replace a single interpolation in a string" do
+    source = ~S"""
+    file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
+    """
+
+    expected = ~S"""
+    file_patt   = "*.{$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$}"
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  test "it should replace issue #729 correctly" do
+    source = ~S"""
+    "🇿🇼 #{String.upcase(env)}"
+    """
+
+    expected = ~S"""
+    "🇿🇼 $$$$$$$$$$$$$$$$$$$$$"
     """
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")

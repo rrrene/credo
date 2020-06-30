@@ -4,8 +4,9 @@ defmodule Credo.Code.InterpolationHelper do
   alias Credo.Code.Token
 
   @doc false
-  def replace_interpolations(source, char \\ " ") do
-    positions = interpolation_positions(source)
+  def replace_interpolations(source, char \\ " ", filename \\ "nofilename")
+      when is_binary(source) do
+    positions = interpolation_positions(source, filename)
     lines = String.split(source, "\n")
 
     positions
@@ -54,15 +55,17 @@ defmodule Credo.Code.InterpolationHelper do
 
   defp replace_line(line, col_start, col_end, char) do
     length = max(col_end - col_start, 0)
-
-    String.slice(line, 0, col_start - 1) <>
-      String.duplicate(char, length) <> String.slice(line, (col_end - 1)..-1)
+    line = String.to_charlist(line)
+    part1 = Enum.slice(line, 0, col_start - 1)
+    part2 = String.to_charlist(String.duplicate(char, length))
+    part3 = Enum.slice(line, (col_end - 1)..-1)
+    List.to_string(part1 ++ part2 ++ part3)
   end
 
   @doc false
-  def interpolation_positions(source) do
+  def interpolation_positions(source, filename \\ "nofilename") do
     source
-    |> Credo.Code.to_tokens()
+    |> Credo.Code.to_tokens(filename)
     |> Enum.flat_map(&map_interpolations(&1, source))
     |> Enum.reject(&is_nil/1)
   end
@@ -88,6 +91,13 @@ defmodule Credo.Code.InterpolationHelper do
 
     defp map_interpolations(
            {:bin_string, {_line_no, _col_start, _}, list} = token,
+           source
+         ) do
+      handle_atom_string_or_sigil(token, list, source)
+    end
+
+    defp map_interpolations(
+           {:kw_identifier_unsafe, {_line_no, _col_start, _}, list} = token,
            source
          ) do
       handle_atom_string_or_sigil(token, list, source)
@@ -142,7 +152,8 @@ defmodule Credo.Code.InterpolationHelper do
     #       indentation, not the first line of the heredoc.
     padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
 
-    find_interpolations(list, source)
+    list
+    |> find_interpolations(source)
     |> Enum.reject(&is_nil/1)
     |> add_to_col_start_and_end(padding_in_first_line)
   end
@@ -151,11 +162,51 @@ defmodule Credo.Code.InterpolationHelper do
     Enum.map(list, &find_interpolations(&1, source))
   end
 
+  # Elixir < 1.9.0
+  #
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
     {line_no, col_start, line_no_end, col_end}
+
+    col_end =
+      if line_no_end > line_no && col_end == 1 do
+        # This means we encountered :eol and jumped in the next line.
+        # We need to add the closing `}`.
+        col_end + 1
+      else
+        col_end
+      end
+
+    line = get_line(source, line_no_end)
+
+    # `col_end - 1` to account for the closing `}`
+    rest_of_line = get_rest_of_line(line, col_end - 1)
+
+    # IO.inspect(rest_of_line, label: "rest_of_line")
+
+    padding = determine_padding_at_start_of_line(rest_of_line, ~r/^\s*\}/)
+
+    # -1 to remove the accounted-for `}`
+    padding = max(padding - 1, 0)
+
+    # IO.inspect(padding, label: "padding")
+
+    {line_no, col_start, line_no_end, col_end + padding}
+  end
+
+  # Elixir >= 1.9.0
+  #
+  # {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, nil}, :name}]}
+  defp find_interpolations(
+         {{_line_no, _col_start, nil}, {_line_no2, _col_start2, nil}, _list} = token,
+         source
+       ) do
+    {line_no, col_start, line_no_end, col_end} = Token.position(token)
+
+    {line_no, col_start, line_no_end, col_end}
+
     # |> IO.inspect()
 
     col_end =
@@ -184,7 +235,9 @@ defmodule Credo.Code.InterpolationHelper do
     {line_no, col_start, line_no_end, col_end + padding}
   end
 
-  defp find_interpolations(_value, _source), do: nil
+  defp find_interpolations(_value, _source) do
+    nil
+  end
 
   defp determine_padding_at_start_of_line(line, regex \\ ~r/^\s+/) do
     regex

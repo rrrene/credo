@@ -1,5 +1,5 @@
 defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Warning.BoolOperationOnSameValues
 
@@ -21,7 +21,8 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -44,7 +45,8 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 5 == Enum.count(issues)
     end)
   end

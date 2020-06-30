@@ -1,0 +1,338 @@
+<html>
+
+<head>
+  <title>Credo Debug Log</title>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+</head>
+
+<body>
+
+  <h1>Experimental Credo Debug Log</h1>
+
+  <p>
+    Analysis in
+    <code>
+      <%= File.cwd! %>
+    </code> took
+    <%= @time_total %> ms (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
+  </p>
+
+  <div id="root"></div>
+
+  <h2>Task Timings</h2>
+  <p>
+    This shows the timings for individual tasks (which are the building blocks of Credo's execution).
+  </p>
+
+  <table class="timing-data js-timing-data-tasks">
+    <thead>
+      <th>Time (ms)</th>
+      <th>Tags</th>
+      <th>Duration (ms)</th>
+    </thead>
+  </table>
+
+  <h2>Check Timings</h2>
+
+  <p>
+    This shows the accumulated timings for individual checks.
+  </p>
+
+  <table class="timing-data js-timing-data-checks-accumulated">
+    <thead>
+      <th>Time (ms)</th>
+      <th>Tags</th>
+      <th>Duration (ms)</th>
+    </thead>
+  </table>
+
+  <script>
+    let state;
+    /*  */
+    state = {
+      started_at: <%= @started_at %>,
+      ended_at: <%= @ended_at %>,
+      duration: <%= @duration %>,
+      timings: <%= Jason.encode!(@all_timings, pretty: true) %>
+    };
+
+    const datasetTasks =
+      state.timings
+      .filter((x) => x.tags.task) // && x.tags.task.match(/MainProcess/))
+      .map(({
+        tags,
+        started_at,
+        duration
+      }) => [Math.floor((started_at - state.started_at) / 1000), JSON.stringify(tags), Math.floor(duration / 1000)]);
+
+    const checkTimingsAsObject =
+      state.timings
+      .filter((x) => x.tags.check)
+      .reduce((acc, val) => {
+        const tag_name = "check"
+        const key = val.tags[tag_name];
+        if (!acc[key]) {
+          acc[key] = {
+            tags: {
+              accumulated: true
+            },
+            started_at: null,
+            duration: 0
+          };
+          acc[key]["tags"][tag_name] = val.tags[tag_name];
+        }
+        acc[key].duration += val.duration;
+
+        return acc;
+      }, Object.create(null));
+
+    const datasetChecks =
+      Object.values(checkTimingsAsObject)
+      .map(({
+        tags,
+        started_at,
+        duration
+      }) => ["", JSON.stringify(tags), Math.floor(duration / 1000)]);
+
+    $(document).ready(function () {
+      $('.js-timing-data-tasks').DataTable({
+        data: datasetTasks
+      });
+      $('.js-timing-data-checks-accumulated').DataTable({
+        data: datasetChecks,
+        "order": [
+          [2, "desc"]
+        ]
+      });
+    });
+
+  </script>
+
+  <script type="text/babel">
+    class App extends React.Component {
+      originalTimings;
+
+      constructor(props) {
+        super(props);
+        this.state = props.state;
+        this.originalTimings = this.state.timings;
+      }
+      round(val) {
+        return Math.round(val * 1000) / 1000;
+      }
+
+      getStyleModifier(timing, index) {
+        const colors = [
+          '#FF3B30',
+          '#FF9500',
+          '#FFCC00',
+          '#4CD964',
+          '#5AC8FA',
+          '#007AFF',
+          '#5856D6',
+          '#EFEFF4',
+          '#E5E5EA',
+          '#D1D1D6',
+          '#C7C7CC',
+          '#8E8E93'
+        ];
+
+        return `color${index}`;
+      }
+
+      getTaskName(name) {
+        if( name ) {
+          return name.toString().replace(/^Elixir\./, '');
+        } else {
+          return '- none -';
+        }
+      }
+
+      filterTimings(timings) {
+        return timings.filter((x) => {
+          return x.tags.task && (
+            x.tags.task.match(/MainProcess/) ||
+            (this.state.toggledTask && x.tags.parent_task == this.state.toggledTask)
+          )
+        });
+      }
+
+      toggleTiming(timing, e) {
+        if( this.state.toggledTask ) {
+          this.setState({"toggledTask": null});
+        } else {
+          this.setState({"toggledTask": timing.tags.task});
+        }
+      }
+
+      render() {
+        let {started_at, ended_at, duration} = this.props.state;
+
+        let timings = this.filterTimings(this.originalTimings);
+
+        let timing_markers = timings.map(({started_at}) => started_at);
+
+        return <div className="timeline">
+            <div className="timeline__container-left">
+              <div className="timeline__row timeline__row--headline">
+                Task/Check
+              </div>
+              {timings.map((timing) =>
+                <div className="timeline__row">
+                  <div className="timeline__col">{this.getTaskName(timing.tags.task)}</div>
+                </div>
+              )}
+            </div>
+            <div className="timeline__container-middle">
+              <div className="timeline__row timeline__row--headline">
+                Duration
+              </div>
+              {timings.map((timing) =>
+                <div className="timeline__row">
+                  <div className="timeline__col">{Math.floor(timing.duration / 1000)} ms</div>
+                </div>
+              )}
+            </div>
+            <div className="timeline__container-right">
+              {timing_markers.map((time) =>
+                <div className="timeline__marker" style={{left: this.round((time - started_at) / duration * 100) + '%'}}>
+                  {Math.floor((time - started_at) / 1000)} ms
+                </div>
+              )}
+              <div className="timeline__row">
+                Timeline
+              </div>
+              {timings.map((timing, index) =>
+                <div className="timeline__row">
+                  <div className="timeline__col timeline__col--graph">
+                    <div onClick={(e) => this.toggleTiming(timing, e)} className={['timeline__span', `timeline__span--${this.getStyleModifier(timing, index)}`].join(' ')} title={JSON.stringify(timing.tags)} style={{left: this.round((timing.started_at - started_at) / duration * 100) + '%', width: this.round(timing.duration / duration * 100) + '%'}}>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+        </div>;
+      }
+    }
+
+    ReactDOM.render(
+      <App state={state}/>,
+      document.getElementById('root')
+    );
+
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    .timeline {
+      display: flex;
+      align-content: stretch;
+
+      margin-bottom: 20px;
+      width: 100%;
+
+      font-size: 12px;
+      color: #aaa;
+      border-collapse: collapse;
+    }
+
+    .timeline__marker {
+      position: absolute;
+      height: 100%;
+      width: 1px;
+      white-space: nowrap;
+
+      border-left: 1px solid #f0f0f0;
+    }
+
+    .timeline__container-left {
+      flex-basis: 20%;
+
+      display: flex;
+      flex-direction: column;
+    }
+    .timeline__container-left {
+      display: flex;
+      flex-direction: column;
+    }
+    .timeline__container-right {
+      position: relative;
+      flex-grow: 1;
+    }
+
+    .timeline__row {
+      height: 24px;
+
+      padding: 3px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .timeline__col {
+      position: relative;
+      white-space: nowrap;
+      padding-top: 3px;
+      padding-right: 10px;
+    }
+
+    .timeline__span {
+      position: absolute;
+      height: 6px;
+      background-color: deepskyblue;
+      border-radius: 2px;
+    }
+    .timeline__span--color0 {
+      background-color: #EFEFF4;
+    }
+    .timeline__span--color1 {
+      background-color: #E5E5EA;
+    }
+    .timeline__span--color2 {
+      background-color: #D1D1D6;
+    }
+    .timeline__span--color3 {
+      background-color: #4CD964;
+    }
+    .timeline__span--color4 {
+      background-color: #5AC8FA;
+    }
+    .timeline__span--color5 {
+      background-color: #007AFF;
+    }
+    .timeline__span--color6 {
+      background-color: #5856D6;
+    }
+    .timeline__span--color7 {
+      background-color: #FF3B30;
+    }
+    .timeline__span--color8 {
+      background-color: #FF9500;
+    }
+    .timeline__span--color9 {
+      background-color: #FFCC00;
+    }
+    .timeline__span--color10 {
+      background-color: #C7C7CC;
+    }
+    .timeline__span--color11 {
+      background-color: #8E8E93;
+    }
+
+  </style>
+
+</body>
+
+</html>

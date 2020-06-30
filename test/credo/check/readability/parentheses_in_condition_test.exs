@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ParenthesesInConditionTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.ParenthesesInCondition
 
@@ -51,7 +51,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
@@ -61,7 +62,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
       unless(admin?(username), do: [:restricted])
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /3" do
@@ -73,7 +75,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report expected code /4" do
@@ -90,7 +93,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -110,7 +114,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report violations with oneliners if used with parentheses" do
@@ -123,7 +128,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 
   test "it should report a violation if used with parentheses" do
@@ -139,7 +145,8 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report violations with spaces before the parentheses" do
@@ -159,6 +166,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

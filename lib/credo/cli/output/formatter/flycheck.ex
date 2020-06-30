@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.Formatter.Flycheck do
+  @moduledoc false
+
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
   alias Credo.CLI.Output.UI

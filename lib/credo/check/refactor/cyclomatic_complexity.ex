@@ -1,21 +1,20 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexity do
-  @moduledoc """
-  Cyclomatic complexity is a software complexity metric closely correlated with
-  coding errors.
+  use Credo.Check,
+    param_defaults: [max_complexity: 9],
+    explanations: [
+      check: """
+      Cyclomatic complexity is a software complexity metric closely correlated with
+      coding errors.
 
-  If a function feels like it's gotten too complex, it more often than not also
-  has a high CC value. So, if anything, this is useful to convince team members
-  and bosses of a need to refactor parts of the code based on "objective"
-  metrics.
-  """
-
-  @explanation [
-    check: @moduledoc,
-    params: [
-      max_complexity: "The maximum cyclomatic complexity a function should have."
+      If a function feels like it's gotten too complex, it more often than not also
+      has a high CC value. So, if anything, this is useful to convince team members
+      and bosses of a need to refactor parts of the code based on "objective"
+      metrics.
+      """,
+      params: [
+        max_complexity: "The maximum cyclomatic complexity a function should have."
+      ]
     ]
-  ]
-  @default_params [max_complexity: 9]
 
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
@@ -38,15 +37,11 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     cond: 1
   ]
 
-  alias Credo.Check.CodeHelper
-  alias Credo.SourceFile
-
-  use Credo.Check
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_complexity = Params.get(params, :max_complexity, @default_params)
+    max_complexity = Params.get(params, :max_complexity, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,
@@ -59,6 +54,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: see above how we want to exclude certain front-loads
   for op <- @def_ops do
     defp traverse(
            {unquote(op), meta, arguments} = ast,
@@ -73,7 +70,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
         |> round
 
       if complexity > max_complexity do
-        fun_name = CodeHelper.def_name(ast)
+        fun_name = Credo.Code.Module.def_name(ast)
 
         {
           ast,
@@ -146,7 +143,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
          when is_list(arguments) do
       block_cc =
         arguments
-        |> CodeHelper.do_block_for!()
+        |> Credo.Code.Block.do_block_for!()
         |> do_block_complexity(op)
 
       {ast, complexity + block_cc}
@@ -168,7 +165,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     count * @op_complexity_map[op]
   end
 
-  def issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
       message: "Function is too complex (CC is #{actual_value}, max is #{max_value}).",

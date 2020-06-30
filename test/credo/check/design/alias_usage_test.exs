@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.AliasUsageTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.AliasUsage
 
@@ -19,6 +19,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
       def fun1 do
         Case.something
 
+        fun_call().Api.Case
+
         {:error, reason} = __MODULE__.Sup.start_link(fn() -> :foo end)
 
         [:faint, filename]    # should not throw an error since
@@ -29,7 +31,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report if configured not to complain until a certain depth" do
@@ -43,7 +46,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, if_nested_deeper_than: 3)
+    |> run_check(@described_check, if_nested_deeper_than: 3)
+    |> refute_issues()
   end
 
   test "it should NOT report if configured not to complain up to a certain number of calls to the same module" do
@@ -57,7 +61,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, if_called_more_often_than: 1)
+    |> run_check(@described_check, if_called_more_often_than: 1)
+    |> refute_issues()
   end
 
   test "it should NOT report violation in `@spec`s" do
@@ -70,7 +75,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation on impossible additional alias" do
@@ -86,7 +92,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation on impossible additional alias /2" do
@@ -109,7 +116,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation in case of ambiguous module deps" do
@@ -121,7 +129,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation in case of ambiguous module deps (different modules binary parts count)" do
@@ -133,7 +142,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with __MODULE__" do
@@ -143,7 +153,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -159,7 +170,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report if configured to complain start at a certain depth" do
@@ -174,7 +186,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, if_nested_deeper_than: 3)
+    |> run_check(@described_check, if_nested_deeper_than: 3)
+    |> assert_issue()
   end
 
   test "it should report if configured to complain up to a certain number of calls to the same module" do
@@ -192,7 +205,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, if_called_more_often_than: 1)
+    |> run_check(@described_check, if_called_more_often_than: 1)
+    |> assert_issues()
   end
 
   #
@@ -219,7 +233,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation in quotes" do
@@ -228,6 +243,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
       alias Exzmq.{Socket, Tcp}
       alias Socket.unquote(stuff).test1
       alias unquote(stuff).Socket.test2
+      alias Socket.unquote(stuff)
+      alias Exzmq.{Socket, unquote(stuff)}
 
       def just_an_example do
         Socket.test1  # Exzmq.Socket.test
@@ -240,18 +257,21 @@ defmodule Credo.Check.Design.AliasUsageTest do
             alias Socket.unquote(module).test1
             alias unquote(module).Socket.test2
             alias unquote(module)
+            alias Exzmq.{Socket, unquote(stuff)}
           end
           defmodule unquote(module).Thing.Foo do
             alias Socket.unquote(module).test1
             alias unquote(module).Socket.test2
             alias unquote(module)
+            alias Exzmq.{Socket, unquote(stuff)}
           end
         end
       end
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -270,6 +290,7 @@ defmodule Credo.Check.Design.AliasUsageTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

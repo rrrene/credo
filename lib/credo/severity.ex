@@ -1,9 +1,5 @@
 defmodule Credo.Severity do
-  @moduledoc """
-  Severity describes how strongly a check has failed and produced an issue.
-
-  The default value is 1 and values only take values higher than that.
-  """
+  @moduledoc false
 
   def default_value, do: 1
 

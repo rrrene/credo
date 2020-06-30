@@ -1,4 +1,8 @@
 defmodule Credo.Sources do
+  @moduledoc """
+  This module is used to find and read all source files for analysis.
+  """
+
   alias Credo.SourceFile
 
   @default_sources_glob ~w(** *.{ex,exs})
@@ -11,14 +15,13 @@ defmodule Credo.Sources do
   patterns. For `included`, patterns can be file paths, directory paths and globs.
   For `excluded`, patterns can also be specified as regular expressions.
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
 
-  iex> Sources.find(%Credo.Execution{files: %{excluded: [/messy/], included: ["lib/mix", "root.ex"]}})
+      iex> Sources.find(%Credo.Execution{files: %{excluded: [~r/messy/], included: ["lib/mix", "root.ex"]}})
   """
-  def find(%Credo.Execution{
-        read_from_stdin: true,
-        files: %{included: [filename]}
-      }) do
+  def find(exec)
+
+  def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename
     |> source_file_from_stdin()
     |> List.wrap()
@@ -30,14 +33,20 @@ defmodule Credo.Sources do
     |> List.wrap()
   end
 
-  def find(%Credo.Execution{files: files}) do
+  def find(%Credo.Execution{files: files, parse_timeout: parse_timeout}) do
+    parse_timeout =
+      if is_nil(parse_timeout) do
+        :infinity
+      else
+        parse_timeout
+      end
+
     MapSet.new()
     |> include(files.included)
     |> exclude(files.excluded)
     |> Enum.sort()
     |> Enum.take(max_file_count())
-    |> Enum.map(&Task.async(fn -> to_source_file(&1) end))
-    |> Enum.map(&Task.await/1)
+    |> read_files(parse_timeout)
   end
 
   def find(paths) when is_list(paths) do
@@ -114,6 +123,28 @@ defmodule Credo.Sources do
       end
 
     Enum.map(paths, &Path.expand/1)
+  end
+
+  defp read_files(filenames, parse_timeout) do
+    tasks = Enum.map(filenames, &Task.async(fn -> to_source_file(&1) end))
+
+    task_dictionary =
+      tasks
+      |> Enum.zip(filenames)
+      |> Enum.into(%{})
+
+    tasks_with_results = Task.yield_many(tasks, parse_timeout)
+
+    results =
+      Enum.map(tasks_with_results, fn {task, res} ->
+        # Shutdown the tasks that did not reply nor exit
+        {task, res || Task.shutdown(task, :brutal_kill)}
+      end)
+
+    Enum.map(results, fn
+      {_task, {:ok, value}} -> value
+      {task, nil} -> SourceFile.timed_out(task_dictionary[task])
+    end)
   end
 
   defp to_source_file(filename) do

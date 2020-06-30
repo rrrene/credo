@@ -1,26 +1,30 @@
 defmodule Credo.Check.Consistency.ParameterPatternMatching do
-  @moduledoc """
-  When capturing a parameter using pattern matching you can either put the name before or after the value
-  i.e.
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    explanations: [
+      check: """
+      When capturing a parameter using pattern matching you can either put the parameter name before or after the value
+      i.e.
 
-    def parse({:ok, values} = pair)
+          def parse({:ok, values} = pair)
 
-  or
+      or
 
-    def parse(pair = {:ok, values})
+          def parse(pair = {:ok, values})
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
+      Neither of these is better than the other, but it seems a good idea not to mix the two patterns in the same codebase.
 
-  @explanation [check: @moduledoc]
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """
+    ]
 
   @collector Credo.Check.Consistency.ParameterPatternMatching.Collector
 
-  use Credo.Check, run_on_all: true, base_priority: :high
-
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  @impl true
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 

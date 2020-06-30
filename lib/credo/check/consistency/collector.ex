@@ -47,7 +47,7 @@ defmodule Credo.Check.Consistency.Collector do
   `find_locations_not_matching/2`, and `issue_formatter`.
   """
 
-  alias Credo.Execution.Issues
+  alias Credo.Execution.ExecutionIssues
   alias Credo.Issue
   alias Credo.SourceFile
 
@@ -135,29 +135,50 @@ defmodule Credo.Check.Consistency.Collector do
   end
 
   def find_issues(source_files, collector, params, issue_formatter) do
-    frequencies_per_file =
-      Enum.map(source_files, fn file ->
-        {file, collector.collect_matches(file, params)}
-      end)
+    # IO.puts("#{collector}: find_issues 1")
 
-    frequencies = total_frequencies(frequencies_per_file)
+    frequencies_per_source_file =
+      source_files
+      |> Enum.map(&Task.async(fn -> {&1, collector.collect_matches(&1, params)} end))
+      |> Enum.map(&Task.await(&1, :infinity))
+
+    # IO.puts("#{collector}: find_issues 2")
+
+    frequencies = total_frequencies(frequencies_per_source_file)
 
     if map_size(frequencies) > 0 do
       {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
 
-      frequencies_per_file
-      |> files_with_issues(most_frequent_match)
-      |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
+      # x =
+      #   frequencies_per_source_file
+      #   |> source_files_with_issues(most_frequent_match)
+
+      # IO.puts("--- going into issue formatter #{inspect(issue_formatter)}")
+
+      # x
+      # |> Enum.flat_map(&issue_formatter.(most_frequent_match, &1, params))
+
+      # IO.puts("#{collector}: find_issues 3")
+
+      result =
+        frequencies_per_source_file
+        |> source_files_with_issues(most_frequent_match)
+        |> Enum.map(&Task.async(fn -> issue_formatter.(most_frequent_match, &1, params) end))
+        |> Enum.flat_map(&Task.await(&1, :infinity))
+
+      # IO.puts("#{collector}: find_issues 4")
+
+      result
     else
       []
     end
   end
 
-  def append_issue_via_issue_service(%Issue{filename: filename} = issue, exec) do
-    Issues.append(exec, %SourceFile{filename: filename}, issue)
+  def append_issue_via_issue_service(%Issue{} = issue, exec) do
+    ExecutionIssues.append(exec, issue)
   end
 
-  defp files_with_issues(frequencies_per_file, most_frequent_match) do
+  defp source_files_with_issues(frequencies_per_file, most_frequent_match) do
     Enum.reduce(frequencies_per_file, [], fn {filename, stats}, acc ->
       unexpected_matches = Map.keys(stats) -- [most_frequent_match]
 

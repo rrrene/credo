@@ -1,9 +1,42 @@
 defmodule Credo.CLI.OptionsTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
   alias Credo.CLI.Options
 
   @command_names ["cmd1", "cmd2", "cmd3"]
   @fixture_name "options"
+  @switches [
+    all_priorities: :boolean,
+    all: :boolean,
+    checks: :string,
+    config_name: :string,
+    config_file: :string,
+    color: :boolean,
+    crash_on_error: :boolean,
+    debug: :boolean,
+    mute_exit_status: :boolean,
+    format: :string,
+    help: :boolean,
+    ignore_checks: :string,
+    ignore: :string,
+    min_priority: :string,
+    only: :string,
+    read_from_stdin: :boolean,
+    strict: :boolean,
+    verbose: :boolean,
+    version: :boolean
+  ]
+  @aliases [
+    a: :all,
+    A: :all_priorities,
+    c: :checks,
+    C: :config_name,
+    d: :debug,
+    h: :help,
+    i: :ignore_checks,
+    v: :version
+  ]
+
+  doctest Credo.CLI.Options
 
   defp fixture_path(name) do
     Path.join([File.cwd!(), "test", "fixtures", name])
@@ -15,7 +48,7 @@ defmodule Credo.CLI.OptionsTest do
 
   defp parse(args) do
     dir = fixture_path(@fixture_name)
-    Options.parse(args, dir, @command_names, [])
+    Options.parse(args, dir, @command_names, [], @switches, @aliases)
   end
 
   defp switches(args), do: parse(args).switches
@@ -34,18 +67,17 @@ defmodule Credo.CLI.OptionsTest do
     assert expected == switches(args)
   end
 
-  test "switches: it should not work w/ a string given for a number" do
-    args = String.split("--min-priority=abc --version")
-    expected = %{version: true}
-
-    assert expected == switches(args)
-  end
-
   test "switches: it should convert min_priority high to 10" do
     args = String.split("--min-priority=high --version")
     expected = %{version: true, min_priority: 10}
 
     assert expected == switches(args)
+  end
+
+  test "switches: it should not work w/ an arbitrary string given for a number" do
+    args = String.split("--min-priority=abc --version")
+
+    assert_raise RuntimeError, fn -> switches(args) end
   end
 
   test "switches: it should convert min_priority normal to 1" do
@@ -71,9 +103,8 @@ defmodule Credo.CLI.OptionsTest do
 
   test "switches: it should reject float min_priority" do
     args = String.split("--min-priority=-1234.12 --version")
-    expected = %{version: true}
 
-    assert expected == switches(args)
+    assert_raise RuntimeError, fn -> switches(args) end
   end
 
   test "command: it should work w/o command" do

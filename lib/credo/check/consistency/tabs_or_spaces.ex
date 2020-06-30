@@ -1,25 +1,28 @@
 defmodule Credo.Check.Consistency.TabsOrSpaces do
-  @moduledoc """
-  Tabs should be used consistently.
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    tags: [:formatter],
+    explanations: [
+      check: """
+      Tabs should be used consistently.
 
-  NOTE: This check does not verify the indentation depth, but checks whether
-  or not soft/hard tabs are used consistently across all source files.
+      NOTE: This check does not verify the indentation depth, but checks whether
+      or not soft/hard tabs are used consistently across all source files.
 
-  It is very common to use 2 spaces wide soft-tabs, but that is not a strict
-  requirement and you can use hard-tabs if you like that better.
+      It is very common to use 2 spaces wide soft-tabs, but that is not a strict
+      requirement and you can use hard-tabs if you like that better.
 
-  While this is not necessarily a concern for the correctness of your code,
-  you should use a consistent style throughout your codebase.
-  """
-
-  @explanation [check: @moduledoc]
+      While this is not necessarily a concern for the correctness of your code,
+      you should use a consistent style throughout your codebase.
+      """
+    ]
 
   @collector Credo.Check.Consistency.TabsOrSpaces.Collector
 
-  use Credo.Check, run_on_all: true, base_priority: :high
-
   @doc false
-  def run(source_files, exec, params \\ []) when is_list(source_files) do
+  @impl true
+  def run_on_all_source_files(exec, source_files, params) do
     @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
   end
 

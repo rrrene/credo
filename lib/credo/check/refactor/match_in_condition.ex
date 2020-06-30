@@ -1,51 +1,51 @@
 defmodule Credo.Check.Refactor.MatchInCondition do
-  @moduledoc """
-  Pattern matching should only ever be used for simple assignments
-  inside `if` and `unless` clauses.
+  use Credo.Check,
+    explanations: [
+      check: """
+      Pattern matching should only ever be used for simple assignments
+      inside `if` and `unless` clauses.
 
-  While this fine:
+      While this fine:
 
-      # okay, simple wildcard assignment:
+          # okay, simple wildcard assignment:
 
-      if contents = File.read!("foo.txt") do
-        do_something()
-      end
+          if contents = File.read!("foo.txt") do
+            do_something()
+          end
 
-  the following should be avoided, since it mixes a pattern match with a
-  condition and do/else blocks.
+      the following should be avoided, since it mixes a pattern match with a
+      condition and do/else blocks.
 
-      # considered too "complex":
+          # considered too "complex":
 
-      if {:ok, contents} = File.read("foo.txt") do
-        do_something()
-      end
+          if {:ok, contents} = File.read("foo.txt") do
+            do_something()
+          end
 
-      # also considered "complex":
+          # also considered "complex":
 
-      if allowed? && ( contents = File.read!("foo.txt") ) do
-        do_something()
-      end
+          if allowed? && ( contents = File.read!("foo.txt") ) do
+            do_something()
+          end
 
-  If you want to match for something and execute another block otherwise,
-  consider using a `case` statement:
+      If you want to match for something and execute another block otherwise,
+      consider using a `case` statement:
 
-      case File.read("foo.txt") do
-        {:ok, contents} ->
-          do_something()
-        _ ->
-          do_something_else()
-      end
+          case File.read("foo.txt") do
+            {:ok, contents} ->
+              do_something()
+            _ ->
+              do_something_else()
+          end
 
-  """
-
-  @explanation [check: @moduledoc]
+      """
+    ]
 
   @condition_ops [:if, :unless]
 
-  use Credo.Check
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
@@ -56,6 +56,8 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, issues}
   end
 
+  # TODO: consider for experimental check front-loader (ast)
+  # NOTE: we have to exclude the cases matching the above
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
       # remove do/else blocks

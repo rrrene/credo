@@ -1,5 +1,5 @@
 defmodule Credo.Check.Design.TagFIXMETest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Design.TagFIXME
 
@@ -18,7 +18,8 @@ defmodule Credo.Check.Design.TagFIXMETest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -38,7 +39,8 @@ defmodule Credo.Check.Design.TagFIXMETest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report an issue when lower case" do
@@ -51,7 +53,8 @@ defmodule Credo.Check.Design.TagFIXMETest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a couple of issues" do
@@ -72,7 +75,8 @@ defmodule Credo.Check.Design.TagFIXMETest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check, fn issues ->
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
       assert 3 == Enum.count(issues)
     end)
   end

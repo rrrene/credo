@@ -1,4 +1,6 @@
 defmodule Credo.CLI.Output.Formatter.JSON do
+  @moduledoc false
+
   alias Credo.CLI.Output.UI
   alias Credo.Issue
 
@@ -10,18 +12,18 @@ defmodule Credo.CLI.Output.Formatter.JSON do
   end
 
   def print_map(map) do
-    UI.puts(Poison.encode!(map, pretty: true))
+    UI.puts(Jason.encode!(map, pretty: true))
   end
 
-  def to_json(
-        %Issue{
-          check: check,
-          category: category,
-          message: message,
-          filename: filename,
-          priority: priority
-        } = issue
-      ) do
+  defp to_json(
+         %Issue{
+           check: check,
+           category: category,
+           message: message,
+           filename: filename,
+           priority: priority
+         } = issue
+       ) do
     check_name =
       check
       |> to_string()

@@ -1,32 +1,33 @@
 defmodule Credo.Check.Readability.ModuleNames do
-  @moduledoc """
-  Module names are always written in PascalCase in Elixir.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      Module names are always written in PascalCase in Elixir.
 
-      # PascalCase
+          # PascalCase
 
-      defmodule MyApp.WebSearchController do
-        # ...
-      end
+          defmodule MyApp.WebSearchController do
+            # ...
+          end
 
-      # not PascalCase
+          # not PascalCase
 
-      defmodule MyApp.Web_searchController do
-        # ...
-      end
+          defmodule MyApp.Web_searchController do
+            # ...
+          end
 
-  Like all `Readability` issues, this one is not a technical concern.
-  But you can improve the odds of other reading and liking your code by making
-  it easier to follow.
-  """
-
-  @explanation [check: @moduledoc]
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of other reading and liking your code by making
+      it easier to follow.
+      """
+    ]
 
   alias Credo.Code.Name
 
-  use Credo.Check, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
@@ -53,7 +54,7 @@ defmodule Credo.Check.Readability.ModuleNames do
     end
   end
 
-  def issues_for_name(name, meta, issues, issue_meta) do
+  defp issues_for_name(name, meta, issues, issue_meta) do
     all_pascal_case? =
       name
       |> to_string

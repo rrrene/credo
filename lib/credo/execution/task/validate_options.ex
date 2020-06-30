@@ -1,4 +1,6 @@
 defmodule Credo.Execution.Task.ValidateOptions do
+  @moduledoc false
+
   use Credo.Execution.Task
 
   alias Credo.CLI.Options
@@ -14,6 +16,7 @@ defmodule Credo.Execution.Task.ValidateOptions do
     end
   end
 
+  @spec error(Credo.Execution.t(), keyword()) :: no_return
   def error(exec, _opts) do
     UI.use_colors(exec)
 
@@ -24,12 +27,12 @@ defmodule Credo.Execution.Task.ValidateOptions do
   end
 
   defp print_argument(name) do
-    UI.warn([:red, "Unknown argument: #{name}"])
+    UI.warn([:red, "** (credo) Unknown argument: #{name}"])
   end
 
   defp print_switch({name, _value}), do: print_switch(name)
 
   defp print_switch(name) do
-    UI.warn([:red, "Unknown switch: #{name}"])
+    UI.warn([:red, "** (credo) Unknown switch: #{name}"])
   end
 end

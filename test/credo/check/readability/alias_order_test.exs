@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.AliasOrderTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.AliasOrder
 
@@ -17,14 +17,14 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias Credo.CLI.Sorter
 
       alias Credo.Check
-      alias Credo.Check.CodeHelper
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
       alias Credo.Issue
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation for independent blocks of alpha-ordered aliases" do
@@ -39,7 +39,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation for multi-aliases when they are alpha-ordered" do
@@ -57,7 +58,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should work with __MODULE__" do
@@ -71,7 +73,49 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should work with multi-alias" do
+    """
+    defmodule Test do
+      alias Detroit.Learnables.Learnable
+      alias DetroitWeb.{ContainerCell, WizardNavigationCell, Zzzzz}
+      alias DetroitWeb.Course.Subject.{CompletionCell, HeaderCell, TableCell}
+
+      alias Detroit.Abc
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should work with an intersecting `require`" do
+    """
+    defmodule Test do
+      alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
+      alias OMG.API.Utxo
+      require Utxo
+      alias OMG.Watcher.Repo
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should work with multi alias syntax" do
+    """
+    defmodule Test do
+      alias MyApp.Accounts.{Organization, User, UserOrganization}
+      alias MyApp.Repo
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -87,7 +131,20 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with as option" do
+    """
+    defmodule CredoSampleModule do
+      alias App.Module2
+      alias App.Module1, as: Module3
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with alias groups" do
@@ -102,7 +159,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with multi-alias" do
@@ -124,7 +182,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation with multi-alias /2" do
@@ -142,6 +201,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

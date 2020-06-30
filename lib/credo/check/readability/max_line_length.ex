@@ -1,55 +1,57 @@
 defmodule Credo.Check.Readability.MaxLineLength do
-  @moduledoc """
-  Checks for the length of lines.
+  use Credo.Check,
+    base_priority: :low,
+    tags: [:formatter],
+    param_defaults: [
+      max_length: 120,
+      ignore_definitions: true,
+      ignore_heredocs: true,
+      ignore_specs: false,
+      ignore_strings: true,
+      ignore_urls: true
+    ],
+    explanations: [
+      check: """
+      Checks for the length of lines.
 
-  Ignores function definitions and (multi-)line strings by default.
-  """
-
-  @explanation [
-    check: @moduledoc,
-    params: [
-      max_length: "The maximum number of characters a line may consist of.",
-      ignore_definitions: "Set to `true` to ignore lines including function definitions.",
-      ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
-      ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs"
+      Ignores function definitions and (multi-)line strings by default.
+      """,
+      params: [
+        max_length: "The maximum number of characters a line may consist of.",
+        ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+        ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
+        ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
+        ignore_urls: "Set to `true` to ignore lines that contain urls."
+      ]
     ]
-  ]
-  @default_params [
-    max_length: 120,
-    ignore_definitions: true,
-    ignore_specs: false,
-    ignore_strings: true
-  ]
-
-  @def_ops [:def, :defp, :defmacro]
-
-  use Credo.Check, base_priority: :low
 
   alias Credo.Code.Heredocs
   alias Credo.Code.Strings
 
+  @def_ops [:def, :defp, :defmacro]
+  @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
+
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    max_length = Params.get(params, :max_length, @default_params)
+    max_length = Params.get(params, :max_length, __MODULE__)
 
-    ignore_definitions = Params.get(params, :ignore_definitions, @default_params)
+    ignore_definitions = Params.get(params, :ignore_definitions, __MODULE__)
 
-    ignore_specs = Params.get(params, :ignore_specs, @default_params)
-    ignore_strings = Params.get(params, :ignore_strings, @default_params)
-    # TODO v1.0: this should be two different params
-    ignore_heredocs = ignore_strings
+    ignore_specs = Params.get(params, :ignore_specs, __MODULE__)
+    ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
+    ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
+    ignore_urls = Params.get(params, :ignore_urls, __MODULE__)
 
     definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
-    source = SourceFile.source(source_file)
-
     source =
       if ignore_heredocs do
-        Heredocs.replace_with_spaces(source, "")
+        Heredocs.replace_with_spaces(source_file, "")
       else
-        source
+        SourceFile.source(source_file)
       end
 
     lines = Credo.Code.to_lines(source)
@@ -57,25 +59,26 @@ defmodule Credo.Check.Readability.MaxLineLength do
     lines_for_comparison =
       if ignore_strings do
         source
-        |> Strings.replace_with_spaces("")
+        |> Strings.replace_with_spaces("", " ", source_file.filename)
         |> Credo.Code.to_lines()
       else
         lines
       end
 
-    Enum.reduce(lines, [], fn {line_no, line}, issues ->
-      {_, line_for_comparison} = Enum.at(lines_for_comparison, line_no - 1)
+    lines_for_comparison =
+      if ignore_urls do
+        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ @url_regex end)
+      else
+        lines_for_comparison
+      end
 
+    Enum.reduce(lines_for_comparison, [], fn {line_no, line_for_comparison}, issues ->
       if String.length(line_for_comparison) > max_length do
-        if refute_issue?(
-             line_no,
-             definitions,
-             ignore_definitions,
-             specs,
-             ignore_specs
-           ) do
+        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
           issues
         else
+          {_, line} = Enum.at(lines, line_no - 1)
+
           [issue_for(line_no, max_length, line, issue_meta) | issues]
         end
       else
@@ -84,6 +87,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     end)
   end
 
+  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp find_definitions({unquote(op), meta, arguments} = ast, definitions)
          when is_list(arguments) do
@@ -95,8 +99,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  defp find_specs({:spec, meta, arguments} = ast, specs)
-       when is_list(arguments) do
+  # TODO: consider for experimental check front-loader (ast)
+  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end
 
@@ -104,13 +108,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, specs}
   end
 
-  defp refute_issue?(
-         line_no,
-         definitions,
-         ignore_definitions,
-         specs,
-         ignore_specs
-       ) do
+  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
     ignore_definitions? =
       if ignore_definitions do
         Enum.member?(definitions, line_no)

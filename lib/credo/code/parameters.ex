@@ -49,7 +49,7 @@ defmodule Credo.Code.Parameters do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp get_param_name({:::, _, [var, _type]}) do
+  defp get_param_name({:"::", _, [var, _type]}) do
     get_param_name(var)
   end
 

@@ -1,44 +1,50 @@
 defmodule Credo.Check.Readability.PreferUnquotedAtoms do
-  @moduledoc """
-  Prefer unquoted atoms unless quotes are necessary.
-  This is helpful because a quoted atom can be easily mistaken for a string.
+  use Credo.Check,
+    run_on_all: true,
+    base_priority: :high,
+    elixir_version: "< 1.7.0-dev",
+    explanations: [
+      check: """
+      Prefer unquoted atoms unless quotes are necessary.
+      This is helpful because a quoted atom can be easily mistaken for a string.
 
-      # prefered
-      :x
-      [x: 1]
-      %{x: 1}
+          # prefered
 
-      # NOT preferred
-      :"x"
-      ["x": 1]
-      %{"x": 1}
+          :x
+          [x: 1]
+          %{x: 1}
 
-  The primary case where this can become an issue is when using atoms or
-  strings for keys in a Map or Keyword list.
+          # NOT preferred
 
-  For example, this:
+          :"x"
+          ["x": 1]
+          %{"x": 1}
 
-      %{"x": 1}
+      The primary case where this can become an issue is when using atoms or
+      strings for keys in a Map or Keyword list.
 
-  Can easily be mistaken for this:
+      For example, this:
 
-      %{"x" => 1}
+          %{"x": 1}
 
-  Because a string key cannot be used to access a value with the equivalent
-  atom key, this can lead to subtle bugs which are hard to discover.
+      Can easily be mistaken for this:
 
-  Like all `Readability` issues, this one is not a technical concern.
-  The code will behave identical in both ways.
-  """
+          %{"x" => 1}
 
-  @explanation [check: @moduledoc]
+      Because a string key cannot be used to access a value with the equivalent
+      atom key, this can lead to subtle bugs which are hard to discover.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      The code will behave identical in both ways.
+      """
+    ]
 
   @token_types [:atom_unsafe, :kw_identifier_unsafe]
 
-  use Credo.Check, run_on_all: true, base_priority: :high
-
   @doc false
-  def run(source_file, params \\ []) do
+  @impl true
+  # TODO: consider for experimental check front-loader (tokens)
+  def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
@@ -77,7 +83,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   end
 
   defp safe_atom_name(token) when is_binary(token) do
-    :elixir_tokenizer.tokenize(':#{token}', 1, [])
+    ':#{token}'
+    |> :elixir_tokenizer.tokenize(1, [])
     |> safe_atom_name(token)
   end
 

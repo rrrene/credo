@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.ExceptionNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.ExceptionNames
 
@@ -13,7 +13,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report correct behaviour (same suffix)" do
@@ -32,7 +33,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report correct behaviour (same prefix)" do
@@ -51,7 +53,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report correct behaviour (only one exception class)" do
@@ -68,7 +71,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should report a violation for different naming schemes" do
@@ -87,7 +91,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> assert_issue(@described_check, fn issue ->
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
       assert "UndefinedResponse" == issue.trigger
       assert 1 == issue.line_no
     end)
@@ -112,7 +117,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for different naming schemes (prefixes)" do
@@ -136,7 +142,8 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should not report (prefixes)" do
@@ -157,6 +164,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
       """
     ]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end

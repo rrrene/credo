@@ -1,31 +1,32 @@
 defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
+  @moduledoc false
+
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Check.CodeHelper
-  alias Credo.Code
-
   @regex [
-    with_space: ~r/[^\?]([\{\[\(]\s+\S|\S\s+[\)\]\}])/,
-    without_space: ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/
+    with_space: ~r/[^\?]([\{\[\(]\s+\S|\S\s+[\)\]\}]])/,
+    without_space: ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/,
+    without_space_allow_empty_enums: ~r/[^\?](?!\{\}|\[\])([\{\[\(]\S|\S[\)\]\}])/
   ]
 
   def collect_matches(source_file, _params) do
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
-    |> Code.to_lines()
+    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
+    |> Credo.Code.to_lines()
     |> Enum.reduce(%{}, &spaces/2)
   end
 
-  def find_locations_not_matching(expected, source_file) do
+  def find_locations_not_matching(expected, source_file, allow_empty_enums) do
     actual =
       case expected do
+        :with_space when allow_empty_enums == true -> :without_space_allow_empty_enums
         :with_space -> :without_space
         :without_space -> :with_space
       end
 
     source_file
-    |> CodeHelper.clean_charlists_strings_sigils_and_comments("")
-    |> Code.to_lines()
+    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
+    |> Credo.Code.to_lines()
     |> List.foldr([], &locate(actual, &1, &2))
   end
 

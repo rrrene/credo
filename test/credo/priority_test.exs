@@ -1,7 +1,41 @@
 defmodule Credo.PriorityTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Priority
+
+  test "it should return 0 for nil" do
+    assert 0 == Priority.to_integer(nil)
+  end
+
+  test "it should return numbers" do
+    assert 42 == Priority.to_integer(42)
+    assert -42 == Priority.to_integer(-42)
+  end
+
+  test "it should return numbers given as binaries" do
+    assert -42 == Priority.to_integer("-42")
+  end
+
+  test "it should look up aliases given as binaries" do
+    assert is_number(Priority.to_integer("normal"))
+    assert is_number(Priority.to_integer("high"))
+    assert Priority.to_integer("normal") != assert(Priority.to_integer("high"))
+  end
+
+  test "it should look up aliases given as atoms" do
+    assert is_number(Priority.to_integer(:normal))
+    assert is_number(Priority.to_integer(:high))
+    assert Priority.to_integer(:normal) != assert(Priority.to_integer(:high))
+  end
+
+  test "it should raise for strings" do
+    assert_raise(RuntimeError, fn -> Priority.to_integer("-123.32") end)
+  end
+
+  test "it should raise when the lookup fails" do
+    assert_raise(RuntimeError, fn -> Priority.to_integer("foobar") end)
+    assert_raise(RuntimeError, fn -> Priority.to_integer(:foobar) end)
+  end
 
   test "it should NOT report expected code 2" do
     source_file =

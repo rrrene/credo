@@ -1,7 +1,9 @@
 defmodule Credo.Issue do
-  @doc """
+  @moduledoc """
   `Issue` structs represent all issues found during the code analysis.
   """
+
+  @type t :: %__MODULE__{}
 
   defstruct check: nil,
             category: nil,
@@ -19,6 +21,4 @@ defmodule Credo.Issue do
             # optional: the name of the module, macro or
             #  function where the issue was found
             scope: nil
-
-  @type t :: module
 end

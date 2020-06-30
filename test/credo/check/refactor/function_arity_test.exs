@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.FunctionArityTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.FunctionArity
 
@@ -16,7 +16,8 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report a violation if defp's are ignored" do
@@ -28,7 +29,8 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check, ignore_defp: true)
+    |> run_check(@described_check, ignore_defp: true)
+    |> refute_issues()
   end
 
   #
@@ -44,7 +46,8 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for :unless" do
@@ -56,6 +59,7 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check, max_arity: 4)
+    |> run_check(@described_check, max_arity: 4)
+    |> assert_issue()
   end
 end

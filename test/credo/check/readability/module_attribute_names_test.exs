@@ -1,5 +1,5 @@
 defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Readability.ModuleAttributeNames
 
@@ -14,7 +14,8 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT fail on a dynamic attribute" do
@@ -28,7 +29,23 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT fail when redefining the @ operator" do
+    """
+    defmodule CredoSampleModule do
+      defmacro @{_, _, _} do
+        quote do
+          # some_code_here
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -42,6 +59,7 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

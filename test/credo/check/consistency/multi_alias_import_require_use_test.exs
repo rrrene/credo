@@ -1,5 +1,5 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
 
@@ -26,7 +26,8 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
   test "it should not report errors when the multi syntax is used consistently" do
     [@multi]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -36,12 +37,14 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
   test "it should report errors when the multi and single syntaxes are mixed" do
     [@single, @multi]
     |> to_source_files
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should not report errors when the single syntax is used consistently" do
     [@single]
     |> to_source_files
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 end

@@ -1,5 +1,5 @@
 defmodule Credo.Code.ScopeTest do
-  use Credo.TestHelper
+  use Credo.Test.Case
 
   alias Credo.Code.Scope
 
@@ -180,5 +180,37 @@ defmodule Credo.Code.ScopeTest do
   test "it should report the correct mod_name" do
     assert "Credo.Sample" == Scope.mod_name("Credo.Sample.foobar")
     assert "Credo.Sample" == Scope.mod_name("Credo.Sample")
+  end
+
+  test "it should give a list of scope names" do
+    {:ok, ast} =
+      """
+      # some_file.ex
+      defmodule AliasTest do
+        def test do
+          [
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a,
+            :a
+          ]
+
+          Any.Thing.test()
+        end
+      end
+      """
+      |> Code.string_to_quoted()
+
+    assert {:def, "AliasTest.test"} == Scope.name(ast, line: 21)
   end
 end

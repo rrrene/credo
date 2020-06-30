@@ -1,5 +1,296 @@
 # Changelog
 
+## 1.4.0
+
+- Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
+
+- Add support for explaining checks (in addition to issues), i.e.
+
+      $ mix credo explain Credo.Check.Design.AliasUsage
+
+- Add support for tags on checks
+
+  Checks can now declare tags via the `__using__` macro, i.e.
+
+      defmodule MyCheck do
+        use Credo.Check, tags: [:foo]
+
+        def run(%SourceFile{} = source_file, params) do
+          #
+        end
+      end
+
+  Tags can be used via the CLI switch `--checks-with[out]-tag`:
+
+      # Only run checks tagged `:foo` during analysis
+      $ mix credo --checks-with-tag foo
+
+      # Exclude all checks tagged `:foo` from analysis
+      $ mix credo --checks-without-tag foo
+
+- Add validation of check params in config
+
+  If a param is not found, Credo checks for mispellings and suggests corrections:
+
+      $ mix credo
+      ** (config) Credo.Check.Design.AliasUsage: unknown param `fi_called_more_often_than`. Did you mean `if_called_more_often_than`?
+
+- Add auto-generated check docs
+- Add new documentation on Hex with [extra guides](https://hexdocs.pm/credo/1.4.0/overview.html) and [CHANGELOG](https://hexdocs.pm/credo/1.4.0/changelog.html)
+
+## 1.3.2
+
+- Support non-ascii characters in variable names
+- Fix false positive in `Credo.Check.Readability.ParenthesesOnZeroArityDefs`
+
+## 1.3.1
+
+- Fix new check (`Credo.Check.Readability.StrictModuleLayout`)
+- Ignore module attributes in UnsafeToAtom
+
+## 1.3.0
+
+- Enable `Credo.Check.Readability.UnnecessaryAliasExpansion` check by default
+- Fix bugs when removing heredocs and charlists from sources
+- Fix false positive on TrailingWhiteSpace
+- Add `ignore: [:fun1, :fun2]` param to all `UnusedOperation*` checks; to ignore unused `Enum.reduce/3` operations, use
+
+      {Credo.Check.Warning.UnusedEnumOperation, [ignore: [:reduce]]},
+
+### New switch to re-enable disabled checks
+
+Use `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`. This comes in handy when using checks on a case-by-case basis
+
+As with other check-related switches, `pattern` is a comma-delimted list of patterns:
+
+    $ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation
+
+Of course, we can have the same effect by choosing the pattern less explicitly:
+
+    $ mix credo info --enable-disabled-checks specs,double
+
+### New API for custom checks
+
+> This deprecates the mandatory use of `@explanation` and `@default_params` module attributes for checks.
+
+Before `v1.3` you had to define module attributes named `@explanation` and `@default_params` before calling
+`use Credo.Check`.
+
+Now you can pass `:explanations` (plural) and `:param_defaults` options directly to `use Credo.Check`.
+
+```elixir
+defmodule MyCheck do
+  use Credo.Check,
+    category: :warning,
+    base_priority: :high,
+    param_defaults: [param1: 42, param2: "offline"],
+    explanations: [
+      check: "...",
+      params: [
+        param1: "Your favorite number",
+        param2: "Online/Offline mode"
+      ]
+    ]
+
+  def run(%SourceFile{} = source_file, params) do
+    #
+  end
+end
+```
+
+Please note that these options
+are also **just a convenience** to implement the functions specified by the  `Credo.Check` behaviour.
+You can alternatively implement the respective functions yourself:
+
+```elixir
+defmodule MyCheck do
+  use Credo.Check
+
+  def category, do: :warning
+
+  def base_priority, do: :high
+
+  def explanations do
+    [
+      check: "...",
+      params: [
+        param1: "Your favorite number",
+        param2: "Online/Offline mode"
+      ]
+    ]
+  end
+
+  def param_defaults, do: [param1: 42, param2: "offline"]
+
+  def run(%SourceFile{} = source_file, params) do
+    #
+  end
+end
+```
+
+### New checks
+
+- `Credo.Check.Readability.StrictModuleLayout`
+- `Credo.Check.Readability.WithCustomTaggedTuple`
+- `Credo.Check.Warning.LeakyEnvironment`
+- `Credo.Check.Warning.UnsafeExec`
+
+## 1.2.3
+
+- Fix performance bottleneck in `Credo.Service.ETSTableHelper`
+
+## 1.2.2
+
+- Fix token interpretation of Floats
+
+## 1.2.1
+
+- Actually enable the new check (`Credo.Check.Warning.MixEnv`)
+
+## 1.2.0
+
+- Commands can now have their own pipelines, so that plugins can extend them.
+- Add pipelines to `SuggestCommand` and `ListCommand`
+- `Credo.Plugin.append_task/4` and `Credo.Plugin.prepend_task/4` let you append/prepend tasks to Command's pipelines.
+- Validate options given to `use Credo.Check`
+- Fix `TrailingWhiteSpace` check on Windows
+- Fix `MultiAlias` to work with submodule expansion
+- Fix `UnusedVariableNames` bug
+- Fix `Heredocs.replace_with_spaces/5` bug
+- Fix `InterpolationHelper.replace_interpolations/2` bug
+- Fix crash in `AliasAs` check when __MODULE__ is aliased
+- Fix speed pitfall in `Scope.name/2`
+- New config option: `parse_timeout`
+- Improved default settings for umbrella apps
+
+### New checks
+
+- `Credo.Check.Warning.MixEnv`
+
+## 1.1.5
+
+- Add JSON output to `categories` and `explain` commands
+- Include number of executed checks in summary
+- Fix wrong trigger in `SinglePipe`
+
+## 1.1.4
+
+- Fix name parsing bug in `UnusedVariableNames`
+- Fix bug when redefining operators in `FunctionNames`
+- Fix false positive in `Specs`
+
+## 1.1.3
+
+- Improve warning message about skipped checks
+- Fix false positive in `FunctionNames`
+- Fix typespec in `IssueMeta`
+- Add `AliasAs` check to list of optional checks
+
+## 1.1.2
+
+- Fix bug in `Heredocs` regarding indentation
+- Fix bug in `FunctionNames` when using `unquote/1` in guards
+- Fix bug in `FunctionNames` when defining `sigil_` functions for uppercase sigils
+
+## 1.1.1
+
+- Fix incompatibilities between Elixir 1.9, `Credo.Code.Token` and  `Credo.Code.InterpolationHelper`
+- Fix error in `Heredocs` with certain UTF-8 chars
+- New param for `ParenthesesOnZeroArityDefs`: use `[parens: true]` to force presence of parentheses on zero arity defs
+
+## 1.1.0
+
+- Credo now requires Elixir 1.5 and Erlang/OTP 19
+- Fix false negative in `DuplicatedCode`
+- `PipeChainStart` has been made opt-in
+
+### Plugin Support
+
+Credo now supports plugins that run alongside Credo's own analysis. While Credo provided the ability to write custom checks since `v0.4.0`, users can now access the complete toolset of Credo to create their own commands, require compilation, run external tools and still include the results in Credo's standard report.
+
+Please refer to Credo's [README](https://github.com/rrrene/credo#plugins) as well as the [Credo Demo Plugin](https://github.com/rrrene/credo_demo_plugin) for further information on how to get started.
+
+### New checks
+
+- Credo.Check.Refactor.WithClauses
+
+## 1.0.5
+
+- Fix bug due to commented-out heredocs
+- Fix variable explanation for `VariableRebinding` check
+- Add `MultiAlias` check to experimental checks
+
+## 1.0.4
+
+- Ignore heredocs in `RedundantBlankLines`
+- Fix bug in `StringSigils`
+- Minor refactorings
+
+## 1.0.3
+
+- Fix bug in `Name.full/1`
+- Fix bug in `UI.truncate/2`
+- Disable `LazyLogging` for Elixir >= 1.7
+- Add UnnecessaryAliasExpansion check to experimental checks
+
+## 1.0.2
+
+- Fix false positive in `MapInto`
+- Disable `MapInto` for Elixir 1.8 and higher
+- Ensure issues are sorted by filename, line number and column number
+- Warn about ineffective check filter patterns
+- Add `ModuleDependencies` check to experimental checks
+
+## 1.0.1
+
+- Compilation warnings for Elixir 1.8
+- Fix `StringSigils` to not crash with strings containing non-UTF8 characters
+
+## 1.0.0
+
+- Improve documentation
+- Add error handling for malformed config files
+- Write all warnings to `:stderr`
+- Fix false positive for charlists in PipeChainStart
+- Remove deprecated --one-line switch
+- Deactivate checks `DuplicatedCode` and `DoubleBooleanNegation` by default
+
+### BREAKING CHANGES
+
+These changes concern people writing their own checks for Credo.
+
+- `Credo.Check.CodeHelper` was removed. Please use the corresponding functions inside the `Credo.Code` namespace.
+
+## 0.10.2
+
+- Fix bug in AliasOrder
+
+## 0.10.1
+
+- Fixed "unnecessary atom quotes" compiler warning during analysis
+- Handle timeouts when reading source files
+- Ignore function calls for OperationOnSameValues
+- Do not treat `|>` as an operator in SpaceAroundOperators
+- Fix AliasOrder bug for multi alias statements
+- Fix multiple false positives for SpaceAroundOperators
+- ... and lots of important little fixes to issue messages, docs and the like!
+
+## 0.10.0
+
+- Switch `poison` for `jason`
+- Add command-line switch to load a custom configuration file (`--config-file`)
+- Add a debug report in HTML format when running Credo using `--debug`
+- Add `node_modules/` to default file excludes
+- Add `:ignore_urls` param for MaxLineLength
+- Report violation for `not` as well as `!` in Refactor.NegatedConditionWithElse
+- Fix false positive on LargeNumbers
+- Fix NegatedConditionWithElse for `not/2` as well
+- Disable PreferUnquotedAtoms for Elixir >= 1.7.0
+
+### New checks
+
+- Credo.Check.Refactor.MapInto
+
 ## 0.9.3
 
 - Fix bug in Scope
