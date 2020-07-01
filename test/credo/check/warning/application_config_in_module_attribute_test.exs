@@ -1,7 +1,7 @@
-defmodule Credo.Check.Warning.ApplicationConfigAttributeTest do
+defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Warning.ApplicationConfigAttribute
+  @described_check Credo.Check.Warning.ApplicationConfigInModuleAttribute
 
   #
   # cases NOT raising issues

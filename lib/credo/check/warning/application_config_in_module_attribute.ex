@@ -1,4 +1,4 @@
-defmodule Credo.Check.Warning.ApplicationConfigAttribute do
+defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
   use Credo.Check,
     base_priority: :high,
     tags: [:controversial],
