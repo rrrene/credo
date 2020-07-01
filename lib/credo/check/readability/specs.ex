@@ -44,7 +44,8 @@ defmodule Credo.Check.Readability.Specs do
   end
 
   defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs)
-       when is_list(args) do
+       when is_list(args) or is_nil(args) do
+    args = with nil <- args, do: []
     {ast, [{name, length(args)} | specs]}
   end
 
@@ -84,7 +85,9 @@ defmodule Credo.Check.Readability.Specs do
          specs,
          issue_meta
        )
-       when is_list(args) do
+       when is_list(args) or is_nil(args) do
+    args = with nil <- args, do: []
+
     if {name, length(args)} in specs do
       {ast, issues}
     else
