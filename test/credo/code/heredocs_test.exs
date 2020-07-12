@@ -51,6 +51,24 @@ defmodule Credo.Code.HeredocsTest do
     assert source == result
   end
 
+  test "it should work with nested heredocs" do
+    source = """
+    defmodule HereDocDemo do
+      @doc ~S'''
+      José suggested using an outer sigil so the inner sigil was more normal in the documentation
+
+        ~E\"\"\"
+        but Credo didn't like it at all
+        \"\"\"
+      '''
+      def demo, do: :ok
+    end
+    """
+
+    result = source |> Heredocs.replace_with_spaces()
+    assert source == result
+  end
+
   test "it should return the source without string literals 3" do
     source = """
     x =   "↑ ↗ →"
