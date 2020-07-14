@@ -1,4 +1,4 @@
-# Credo ![CI Tests](https://github.com/rrrene/credo/workflows/CI%20Tests/badge.svg) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo)
+# Credo ![[CI Tests](https://github.com/rrrene/credo/workflows/CI%20Tests/badge.svg)](https://github.com/rrrene/credo/actions?query=branch%3Amaster) [![Inline docs](https://inch-ci.org/github/rrrene/credo.svg?branch=master)](https://inch-ci.org/github/rrrene/credo)
 
 Credo is a static code analysis tool for the Elixir language with a focus on teaching and code consistency.
 
