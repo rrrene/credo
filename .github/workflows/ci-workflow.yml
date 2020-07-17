@@ -39,3 +39,14 @@ jobs:
 
       - run: ./test/smoke_test.sh
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.4')"
+
+  check_formatted:
+    runs-on: ubuntu-latest
+    name: "[${{matrix.otp}}/${{matrix.elixir}}] Check formatted [OTP/Elixir]"
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - uses: actions/setup-elixir@v1.3
+        with:
+          otp-version: 23
+          elixir-version: 1.10.4
+    - run: mix format --check-formatted
