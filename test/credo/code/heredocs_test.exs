@@ -65,8 +65,20 @@ defmodule Credo.Code.HeredocsTest do
     end
     """
 
-    result = source |> Heredocs.replace_with_spaces()
-    assert source == result
+    expected = """
+    defmodule HereDocDemo do
+      @doc ~S'''
+      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+      @@@@@@@
+      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      @@@@@
+      '''
+      def demo, do: :ok
+    end
+    """
+
+    assert expected == Heredocs.replace_with_spaces(source, "@")
   end
 
   test "it should return the source without string literals 3" do
