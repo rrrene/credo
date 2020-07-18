@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.SinglePipeTest do
+defmodule Credo.Check.Readability.BlockPipeTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Readability.ExprPipe
+  @described_check Credo.Check.Readability.BlockPipe
 
   #
   # cases NOT raising issues
@@ -87,6 +87,25 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> assert_issue()
   end
 
+  test "it should report a violation for try" do
+    """
+    defmodule CredoSampleModule do
+
+      def some_fun do
+        some_val 
+        |> try do 
+              raise "oops"
+            rescue
+              e in RuntimeError -> e
+          end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation for multiple violations" do
     """
     defmodule CredoSampleModule do
@@ -109,6 +128,13 @@ defmodule Credo.Check.Readability.SinglePipeTest do
            else 
             :that
            end
+        
+        some_val 
+        |> try do 
+              raise "oops"
+            rescue
+              e in RuntimeError -> e
+          end
       end
     end
     """

@@ -1,10 +1,10 @@
-defmodule Credo.Check.Readability.ExprPipe do
+defmodule Credo.Check.Readability.BlockPipe do
   use Credo.Check,
     base_priority: :high,
     tags: [:controversial],
     explanations: [
       check: """
-      Pipes (`|>`) should not be used with case, if, or unless expressions.
+      Pipes (`|>`) should not be used with blocks.
 
       The code in this example ...
 
@@ -36,10 +36,10 @@ defmodule Credo.Check.Readability.ExprPipe do
           |> contains_nested_list?()
 
 
-      Piping to expressions is harder to read because it may obscure intention, increase cognitive load on the 
+      Piping to blocks is harder to read because it may obscure intention, increase cognitive load on the 
       reader, and suprising to the reader per not following basic syntax principles set forth by all other 
-      expressions. Instead, prefer introducing variables to your code or new functions when it may be a sign that 
-      your function is getting too big and/or has too many concerns. 
+      blocks. Instead, prefer introducing variables to your code or new functions when it may be a sign that 
+      your function is getting too complicated and/or has too many concerns. 
 
       Like all `Readability` issues, this one is not a technical concern, but you can improve the odds of others reading
       and understanding the intent of your code by making it easier to follow. 
@@ -57,8 +57,7 @@ defmodule Credo.Check.Readability.ExprPipe do
     issues
   end
 
-  defp traverse({:|>, meta, [_, {expr, _, _}]} = ast, {true, issues}, issue_meta)
-       when expr in [:case, :if, :unless] do
+  defp traverse({:|>, meta, [_, {_, _, [[{:do, _} | _]]}]} = ast, {true, issues}, issue_meta) do
     {
       ast,
       {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
@@ -72,7 +71,7 @@ defmodule Credo.Check.Readability.ExprPipe do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Use a variable or create a new function instead of piping to a case, if, or unless expression",
+      message: "Use a variable or create a new function instead of piping to a block",
       trigger: trigger,
       line_no: line_no
     )
