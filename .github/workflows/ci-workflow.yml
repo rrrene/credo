@@ -15,6 +15,11 @@ jobs:
       matrix:
         otp: [20.3, 21.3, 22.2]
         elixir: [1.5.3, 1.6.6, 1.7.2, 1.8.2, 1.9.4, 1.10.4]
+        exclude:
+          - otp: 21.3
+            elixir: 1.5.3
+          - otp: 22.2
+            elixir: 1.5.3
     steps:
       - uses: actions/checkout@v2
         if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.4')"
