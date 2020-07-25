@@ -75,7 +75,7 @@ defmodule Credo.CLI.Filename do
       iex> Credo.CLI.Filename.with("test/file.exs", %{:line_no => 1, :column => 2})
       "test/file.exs:1:2"
   """
-  def with(filename, params) do
-    filename <> pos_suffix(params[:line_no], params[:column])
+  def with(filename, opts) do
+    filename <> pos_suffix(opts[:line_no], opts[:column])
   end
 end

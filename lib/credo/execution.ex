@@ -252,8 +252,27 @@ defmodule Credo.Execution do
 
   defp match_tags(_tuple, [], default_for_empty), do: default_for_empty
 
-  defp match_tags({check, _params}, tags, _default_for_empty) do
-    Enum.any?(tags, &Enum.member?(check.tags, &1))
+  defp match_tags({check, params}, tags, _default_for_empty) do
+    tags_for_check = tags_for_check(check, params)
+
+    Enum.any?(tags, &Enum.member?(tags_for_check, &1))
+  end
+
+  @doc """
+  Returns the tags for a given `check` and its `params`.
+  """
+  def tags_for_check(check, params)
+
+  def tags_for_check(check, nil), do: check.tags
+  def tags_for_check(check, []), do: check.tags
+
+  def tags_for_check(check, params) when is_list(params) do
+    params
+    |> Credo.Check.Params.tags(check)
+    |> Enum.flat_map(fn
+      :__initial__ -> check.tags
+      tag -> [tag]
+    end)
   end
 
   @doc """

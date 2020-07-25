@@ -49,8 +49,13 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
         {_check, false} ->
           true
 
-        {check, opts} ->
-          Credo.Priority.to_integer(opts[:priority] || check.base_priority) < below_priority
+        {check, params} ->
+          priority =
+            params
+            |> Credo.Check.Params.priority(check)
+            |> Credo.Priority.to_integer()
+
+          priority < below_priority
       end)
 
     %Execution{exec | checks: checks}

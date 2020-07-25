@@ -99,6 +99,11 @@ defmodule Credo.Check do
   @callback elixir_version() :: String.t()
 
   @doc """
+  Returns the exit status for the check.
+  """
+  @callback exit_status() :: integer
+
+  @doc """
   Returns the explanations for the check and params as a keyword list.
   """
   @callback explanations() :: Keyword.t()
@@ -133,6 +138,7 @@ defmodule Credo.Check do
   }
 
   alias Credo.Check
+  alias Credo.Check.Params
   alias Credo.Code.Scope
   alias Credo.Issue
   alias Credo.IssueMeta
@@ -202,6 +208,21 @@ defmodule Credo.Check do
         end
       end
 
+    def_exit_status =
+      if opts[:exit_status] do
+        quote do
+          @impl true
+          def exit_status do
+            unquote(opts[:exit_status])
+          end
+        end
+      else
+        quote do
+          @impl true
+          def exit_status, do: Credo.Check.to_exit_status(category())
+        end
+      end
+
     def_run_on_all? =
       if opts[:run_on_all] do
         quote do
@@ -261,6 +282,7 @@ defmodule Credo.Check do
       unquote(def_base_priority)
       unquote(def_category)
       unquote(def_elixir_version)
+      unquote(def_exit_status)
       unquote(def_run_on_all?)
       unquote(def_param_defaults)
       unquote(def_explanations)
@@ -271,8 +293,6 @@ defmodule Credo.Check do
         Check.format_issue(
           issue_meta,
           issue_options,
-          category(),
-          base_priority(),
           __MODULE__
         )
       end
@@ -509,10 +529,6 @@ defmodule Credo.Check do
     end
   end
 
-  def builtin_param_names do
-    [:priority, :__priority__, :exit_status, :__exit_status__]
-  end
-
   def explanation_for(nil, _), do: nil
   def explanation_for(keywords, key), do: keywords[key]
 
@@ -529,15 +545,23 @@ defmodule Credo.Check do
   - `:exit_status`  Sets the issue's exit_status.
   - `:severity`     Sets the issue's severity.
   """
-  def format_issue(issue_meta, opts, issue_category, issue_base_priority, check) do
+  def format_issue(issue_meta, opts, check) do
+    params = IssueMeta.params(issue_meta)
+    issue_category = Params.category(params, check)
+    issue_base_priority = Params.priority(params, check)
+
+    format_issue(issue_meta, opts, issue_category, issue_base_priority, check)
+  end
+
+  @doc false
+  def format_issue(issue_meta, opts, issue_category, issue_priority, check) do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
 
-    priority =
-      Priority.to_integer(params[:__priority__] || params[:priority] || issue_base_priority)
+    priority = Priority.to_integer(issue_priority)
 
-    exit_status =
-      Check.to_exit_status(params[:__exit_status__] || params[:exit_status] || issue_category)
+    exit_status_or_category = Params.exit_status(params, check) || issue_category
+    exit_status = Check.to_exit_status(exit_status_or_category)
 
     line_no = opts[:line_no]
     trigger = opts[:trigger]
@@ -674,7 +698,7 @@ defmodule Credo.Check do
     to_exit_status(@base_category_exit_status_map[atom])
   end
 
-  def to_exit_status(value), do: value
+  def to_exit_status(value) when is_number(value), do: value
 
   @doc false
   def defined?(check)

@@ -30,8 +30,8 @@ defmodule Credo.CLI.Command.Info.Output.Default do
     """
     #{basic_info(info)}
     Configuration:
-      Checks:#{Enum.map(info["config"]["checks"], &list_entry/1)}
       Files:#{Enum.map(info["config"]["files"], &list_entry/1)}
+      Checks:#{Enum.map(info["config"]["checks"], &list_entry/1)}
     """
     |> String.trim()
   end

@@ -4,6 +4,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
   use Credo.Execution.Task
 
   alias Credo.Check
+  alias Credo.Check.Params
   alias Credo.CLI.Output.UI
 
   def call(exec, _opts) do
@@ -27,7 +28,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   defp warn_if_check_params_invalid({check, params}) do
     if Check.defined?(check) do
-      valid_param_names = check.param_names ++ Credo.Check.builtin_param_names()
+      valid_param_names = check.param_names ++ Params.builtin_param_names()
       check = check |> to_string |> String.to_existing_atom()
 
       Enum.each(params, fn {param_name, _param_value} ->
