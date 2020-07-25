@@ -13,7 +13,7 @@ defmodule Credo.CLI do
   def main(argv \\ []) do
     Credo.Application.start(nil, nil)
 
-    {options, argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
+    {options, _argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
 
     if options[:watch] do
       Credo.Watcher.run(argv)

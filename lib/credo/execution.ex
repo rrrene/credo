@@ -499,7 +499,6 @@ defmodule Credo.Execution do
   def run_pipeline(%__MODULE__{} = initial_exec, pipeline_key)
       when is_atom(pipeline_key) and not is_nil(pipeline_key) do
     pipeline_key
-    |> IO.inspect(label: "pipeline_key")
 
     initial_pipeline = get_pipeline(initial_exec, pipeline_key)
 
