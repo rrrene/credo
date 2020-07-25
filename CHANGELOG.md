@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.5.0
+
+- Add support for "dynamic" tagging for checks via `.credo.exs`
+
+      # Overwrite all tags for `FooCheck`
+      {FooCheck, [tags: [:__initial__, :my_tag]]}
+
+      # Add tags for `FooCheck`
+      {SomeCredoCheck, [tags: [:__initial__, :my_tag]]}
+
+  Tags can be used via the CLI switch `--checks-with[out]-tag`:
+
+      # Only run checks tagged `:my_tag` during analysis
+      $ mix credo --checks-with-tag my_tag
+
+      # Exclude all checks tagged `:my_tag` from analysis
+      $ mix credo --checks-without-tag my_tag
+
+
 ## 1.4.0
 
 - Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
