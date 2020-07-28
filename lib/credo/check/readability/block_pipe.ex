@@ -2,6 +2,9 @@ defmodule Credo.Check.Readability.BlockPipe do
   use Credo.Check,
     base_priority: :high,
     tags: [:controversial],
+    param_defaults: [
+      exclude: []
+    ],
     explanations: [
       check: """
       Pipes (`|>`) should not be used with blocks.
@@ -11,7 +14,7 @@ defmodule Credo.Check.Readability.BlockPipe do
           list
           |> Enum.take(5)
           |> Enum.sort()
-          |> case do 
+          |> case do
             [[_h|_t]|_] -> true
             _ -> false
           end
@@ -22,7 +25,7 @@ defmodule Credo.Check.Readability.BlockPipe do
                                |> Enum.take(5)
                                |> Enum.sort()
 
-          case maybe_nested_lists do 
+          case maybe_nested_lists do
             [[_h|_t]|_] = true
             _->  false
           end
@@ -37,34 +40,45 @@ defmodule Credo.Check.Readability.BlockPipe do
 
 
       Piping to blocks may be harder to read because it can be said that it obscures intentions
-      and increases cognitive load on the reader. Instead, prefer introducing variables to your code or 
+      and increases cognitive load on the reader. Instead, prefer introducing variables to your code or
       new functions when it may be a sign that your function is getting too complicated and/or has too many concerns.
 
       Like all `Readability` issues, this one is not a technical concern, but you can improve the odds of others reading
-      and understanding the intent of your code by making it easier to follow. 
-      """
+      and understanding the intent of your code by making it easier to follow.
+      """,
+      params: [
+        exclude: "Do not raise an issue for these macros and functions."
+      ]
     ]
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
+    excluded_functions = Params.get(params, :exclude, __MODULE__)
+
     issue_meta = IssueMeta.for(source_file, params)
 
-    {_continue, issues} =
-      Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), {true, []})
-
-    issues
+    Credo.Code.prewalk(
+      source_file,
+      &traverse(&1, &2, excluded_functions, issue_meta)
+    )
   end
 
-  defp traverse({:|>, meta, [_, {_, _, [[{:do, _} | _]]}]} = ast, {true, issues}, issue_meta) do
-    {
-      ast,
-      {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
-    }
+  defp traverse(
+         {:|>, meta, [_, {function, _, [[{:do, _} | _]]}]} = ast,
+         issues,
+         excluded_functions,
+         issue_meta
+       ) do
+    if Enum.member?(excluded_functions, function) do
+      {ast, issues}
+    else
+      {nil, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
+    end
   end
 
-  defp traverse(ast, {_, issues}, _issue_meta) do
-    {ast, {true, issues}}
+  defp traverse(ast, issues, _excluded_functions, _issue_meta) do
+    {ast, issues}
   end
 
   defp issue_for(issue_meta, line_no, trigger) do

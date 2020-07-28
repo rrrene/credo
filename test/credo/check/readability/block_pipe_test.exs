@@ -30,6 +30,23 @@ defmodule Credo.Check.Readability.BlockPipeTest do
     |> refute_issues()
   end
 
+  test "it should NOT report ignored functions or macros" do
+    """
+    defmodule CredoSampleModule do
+      def some_fun do
+        some_val
+        |> case do
+          :this -> :that
+          :that -> :this
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, exclude: [:case])
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
