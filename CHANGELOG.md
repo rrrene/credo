@@ -10,7 +10,7 @@
       # Add tags for `FooCheck`
       {SomeCredoCheck, [tags: [:__initial__, :my_tag]]}
 
-  Tags can be used via the CLI switch `--checks-with[out]-tag`:
+  Tags can then be used as usual, via the CLI switch `--checks-with[out]-tag`:
 
       # Only run checks tagged `:my_tag` during analysis
       $ mix credo --checks-with-tag my_tag
