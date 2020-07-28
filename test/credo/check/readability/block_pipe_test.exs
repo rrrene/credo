@@ -13,9 +13,10 @@ defmodule Credo.Check.Readability.BlockPipeTest do
       use ExUnit.Case
 
       def some_fun do
-        var = some_val
-        |> do_something
-        |> do_something_else
+        var =
+          some_val
+          |> do_something
+          |> do_something_else
 
         case var do
           :this -> :that
@@ -36,10 +37,9 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   test "it should report a violation for case" do
     """
     defmodule CredoSampleModule do
-
       def some_fun do
-        some_val 
-        |> case do 
+        some_val
+        |> case do
           :this -> :that
           :that -> :this
         end
@@ -54,14 +54,13 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   test "it should report a violation for if" do
     """
     defmodule CredoSampleModule do
-
       def some_fun do
-        some_val 
-        |> if do 
-            :this
-          else 
-            :that
-          end
+        some_val
+        |> if do
+          :this
+        else
+          :that
+        end
       end
     end
     """
@@ -73,12 +72,11 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   test "it should report a violation for unless" do
     """
     defmodule CredoSampleModule do
-
       def some_fun do
-        some_val 
-        |> unless do 
-            :this
-          end
+        some_val
+        |> unless do
+          :this
+        end
       end
     end
     """
@@ -90,14 +88,13 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   test "it should report a violation for try" do
     """
     defmodule CredoSampleModule do
-
       def some_fun do
-        some_val 
-        |> try do 
-              raise "oops"
-            rescue
-              e in RuntimeError -> e
-          end
+        some_val
+        |> try do
+          raise "oops"
+        rescue
+          e in RuntimeError -> e
+        end
       end
     end
     """
@@ -109,32 +106,31 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   test "it should report a violation for multiple violations" do
     """
     defmodule CredoSampleModule do
-
       def some_fun do
-        some_val 
+        some_val
         |> case do
-            :this -> :that
-            :that -> :this
-          end
-
-        some_val 
-        |> unless do 
-            :this
-          end
+          :this -> :that
+          :that -> :this
+        end
 
         some_val
-        |> if do 
-            :this
-           else 
-            :that
-           end
-        
-        some_val 
-        |> try do 
-              raise "oops"
-            rescue
-              e in RuntimeError -> e
-          end
+        |> unless do
+          :this
+        end
+
+        some_val
+        |> if do
+          :this
+        else
+          :that
+        end
+
+        some_val
+        |> try do
+          raise "oops"
+        rescue
+          e in RuntimeError -> e
+        end
       end
     end
     """
