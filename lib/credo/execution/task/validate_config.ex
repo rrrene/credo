@@ -10,8 +10,46 @@ defmodule Credo.Execution.Task.ValidateConfig do
   def call(exec, _opts) do
     exec
     |> validate_checks()
+    |> validate_only_checks()
+    |> validate_ignore_checks()
     |> remove_missing_checks()
     |> inspect_config_if_debug()
+  end
+
+  defp validate_only_checks(%Execution{only_checks: only_checks} = exec)
+       when is_list(only_checks) do
+    if Enum.any?(only_checks, &(&1 == "")) do
+      UI.warn([
+        :red,
+        "** (config) Including all checks, since an empty string was given as a pattern: #{
+          inspect(only_checks)
+        }"
+      ])
+    end
+
+    exec
+  end
+
+  defp validate_only_checks(exec) do
+    exec
+  end
+
+  defp validate_ignore_checks(%Execution{ignore_checks: ignore_checks} = exec)
+       when is_list(ignore_checks) do
+    if Enum.any?(ignore_checks, &(&1 == "")) do
+      UI.warn([
+        :red,
+        "** (config) Ignoring all checks, since an empty string was given as a pattern: #{
+          inspect(ignore_checks)
+        }"
+      ])
+    end
+
+    exec
+  end
+
+  defp validate_ignore_checks(exec) do
+    exec
   end
 
   defp validate_checks(%Execution{checks: checks} = exec) do
