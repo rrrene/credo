@@ -4,6 +4,8 @@ defmodule Credo.ConfigBuilder do
   alias Credo.ConfigFile
   alias Credo.Execution
 
+  @pattern_split_regex ~r/,\s*/
+
   def parse(exec) do
     options = exec.cli_options
 
@@ -231,7 +233,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_enable_disabled_checks
 
   defp add_switch_enable_disabled_checks(exec, %{enable_disabled_checks: check_pattern}) do
-    %Execution{exec | enable_disabled_checks: String.split(check_pattern, ",")}
+    %Execution{exec | enable_disabled_checks: String.split(check_pattern, @pattern_split_regex)}
   end
 
   defp add_switch_enable_disabled_checks(exec, _), do: exec
@@ -247,7 +249,7 @@ defmodule Credo.ConfigBuilder do
     new_config = %Execution{
       exec
       | strict: true,
-        only_checks: String.split(check_pattern, ",")
+        only_checks: String.split(check_pattern, @pattern_split_regex)
     }
 
     Execution.set_strict(new_config)
@@ -263,7 +265,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_ignore(exec, %{ignore_checks: ignore_pattern}) do
-    %Execution{exec | ignore_checks: String.split(ignore_pattern, ",")}
+    %Execution{exec | ignore_checks: String.split(ignore_pattern, @pattern_split_regex)}
   end
 
   defp add_switch_ignore(exec, _), do: exec
