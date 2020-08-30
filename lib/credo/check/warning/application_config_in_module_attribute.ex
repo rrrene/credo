@@ -56,6 +56,10 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
     end
   end
 
+  defp traverse_attribute(_ast) do
+    nil
+  end
+
   defp get_forbidden_call(
          {{:., _, [{:__aliases__, _, [:Application]}, :fetch_env]}, _meta, _args} = ast,
          _acc
