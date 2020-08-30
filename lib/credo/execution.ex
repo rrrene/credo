@@ -142,6 +142,17 @@ defmodule Credo.Execution do
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
+  @doc "Builds an Execution struct for a re-run with the the given `argv`, noting to just analyse the `files_that_changed`."
+  def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
+    previous_exec.argv
+    |> build()
+    |> put_rerun(previous_exec, files_that_changed)
+  end
+
+  def build(argv, files_that_changed) when is_list(files_that_changed) do
+    build(argv)
+  end
+
   @doc "Builds an Execution struct for the the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
@@ -159,16 +170,6 @@ defmodule Credo.Execution do
     |> put_builtin_command("suggest", Credo.CLI.Command.Suggest.SuggestCommand)
     |> put_builtin_command("version", Credo.CLI.Command.Version)
     |> start_servers()
-  end
-
-  def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
-    previous_exec.argv
-    |> build()
-    |> put_rerun(previous_exec, files_that_changed)
-  end
-
-  def build(argv, files_that_changed) when is_list(files_that_changed) do
-    build(argv)
   end
 
   @doc false
