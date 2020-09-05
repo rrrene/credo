@@ -499,8 +499,6 @@ defmodule Credo.Execution do
   @doc false
   def run_pipeline(%__MODULE__{} = initial_exec, pipeline_key)
       when is_atom(pipeline_key) and not is_nil(pipeline_key) do
-    pipeline_key
-
     initial_pipeline = get_pipeline(initial_exec, pipeline_key)
 
     Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, exec_inside_pipeline ->
