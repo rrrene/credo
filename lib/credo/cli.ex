@@ -4,37 +4,36 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
-  alias Credo.Execution.Task.WriteDebugReport
 
   @doc """
   Runs Credo with the given `argv` and exits the process.
 
-  See `run/1` if you want to run Credo programmatically.
+  See `Credo.run/1` if you want to run Credo programmatically.
   """
   def main(argv \\ []) do
     Credo.Application.start(nil, nil)
 
-    argv
-    |> run()
-    |> halt_if_exit_status_assigned()
+    {options, _argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
+
+    if options[:watch] do
+      run_to_watch(argv)
+    else
+      run_to_halt(argv)
+    end
   end
 
-  @doc """
-  Runs Credo with the given `argv` and returns its final `Credo.Execution` struct.
+  defp run_to_watch(argv) do
+    Credo.Watcher.run(argv)
 
-  Example:
+    receive do
+      _ -> nil
+    end
+  end
 
-      iex> exec = Credo.CLI.run(["--only", "Readability"])
-      iex> issues = Credo.Execution.get_issues(exec)
-      iex> Enum.count(issues) > 0
-      true
-
-  """
-  def run(argv) do
+  defp run_to_halt(argv) do
     argv
-    |> Execution.build()
-    |> Execution.run()
-    |> WriteDebugReport.call([])
+    |> Credo.run()
+    |> halt_if_exit_status_assigned()
   end
 
   defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do

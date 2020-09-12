@@ -6,6 +6,7 @@ defmodule Credo.Check.RunnerExperimental do
 
   alias Credo.CLI.Output.UI
   alias Credo.Execution
+  alias Credo.Execution.ExecutionTiming
 
   @doc """
   Runs all checks on all source files (according to the config).
@@ -25,8 +26,8 @@ defmodule Credo.Check.RunnerExperimental do
   end
 
   defp run_check(%Execution{debug: true} = exec, {check, params}) do
-    Execution.ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
-    |> Execution.ExecutionTiming.append(exec, task: exec.current_task, check: check)
+    ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
+    |> ExecutionTiming.append(exec, task: exec.current_task, check: check)
   end
 
   defp run_check(exec, {check, params}) do
@@ -35,6 +36,15 @@ defmodule Credo.Check.RunnerExperimental do
 
   defp do_run_check(exec, {check, params}) do
     source_files = Execution.get_source_files(exec)
+
+    source_files =
+      if params[:__included__] do
+        Enum.filter(source_files, fn source_file ->
+          Enum.member?(params[:__included__], source_file.filename)
+        end)
+      else
+        source_files
+      end
 
     try do
       check.run_on_all_source_files(exec, source_files, params)
