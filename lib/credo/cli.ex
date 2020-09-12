@@ -16,16 +16,24 @@ defmodule Credo.CLI do
     {options, _argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
 
     if options[:watch] do
-      Credo.Watcher.run(argv)
-
-      receive do
-        _ -> nil
-      end
+      run_to_watch(argv)
     else
-      argv
-      |> Credo.run()
-      |> halt_if_exit_status_assigned()
+      run_to_halt(argv)
     end
+  end
+
+  defp run_to_watch(argv) do
+    Credo.Watcher.run(argv)
+
+    receive do
+      _ -> nil
+    end
+  end
+
+  defp run_to_halt(argv) do
+    argv
+    |> Credo.run()
+    |> halt_if_exit_status_assigned()
   end
 
   defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do
