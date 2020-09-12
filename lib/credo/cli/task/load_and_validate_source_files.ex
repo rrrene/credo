@@ -17,8 +17,10 @@ defmodule Credo.CLI.Task.LoadAndValidateSourceFiles do
     Output.complain_about_invalid_source_files(Map.get(source_files, :invalid, []))
     Output.complain_about_timed_out_source_files(Map.get(source_files, :timed_out, []))
 
+    valid_source_files = Map.get(source_files, :valid, [])
+
     exec
-    |> put_source_files(Map.get(source_files, :valid, []))
+    |> put_source_files(valid_source_files)
     |> put_assign("credo.time.source_files", time_load)
   end
 end
