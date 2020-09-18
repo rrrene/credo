@@ -22,6 +22,7 @@ defmodule Credo.Execution do
               color: :boolean,
               crash_on_error: :boolean,
               debug: :boolean,
+              diff_with: :string,
               enable_disabled_checks: :string,
               mute_exit_status: :boolean,
               format: :string,
@@ -59,21 +60,22 @@ defmodule Credo.Execution do
             strict: false,
 
             # options, set by the command line
-            min_priority: 0,
-            help: false,
-            version: false,
-            verbose: false,
             all: false,
-            format: nil,
-            enable_disabled_checks: nil,
-            only_checks: nil,
-            only_checks_tags: [],
-            ignore_checks: nil,
-            ignore_checks_tags: [],
             crash_on_error: true,
-            mute_exit_status: false,
-            read_from_stdin: false,
+            diff_with: nil,
+            enable_disabled_checks: nil,
+            format: nil,
+            help: false,
+            ignore_checks_tags: [],
+            ignore_checks: nil,
             max_concurrent_check_runs: nil,
+            min_priority: 0,
+            mute_exit_status: false,
+            only_checks_tags: [],
+            only_checks: nil,
+            read_from_stdin: false,
+            verbose: false,
+            version: false,
 
             # state, which is accessed and changed over the course of Credo's execution
             pipeline_map: %{},
@@ -158,6 +160,7 @@ defmodule Credo.Execution do
     %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
     |> put_pipeline(__MODULE__, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
+    |> put_builtin_command("diff", Credo.CLI.Command.Diff.DiffCommand)
     |> put_builtin_command("explain", Credo.CLI.Command.Explain.ExplainCommand)
     |> put_builtin_command("gen.check", Credo.CLI.Command.GenCheck)
     |> put_builtin_command("gen.config", Credo.CLI.Command.GenConfig)

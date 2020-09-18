@@ -12,6 +12,8 @@ mix credo --strict --enable-disabled-checks . --mute-exit-status
 mix credo --debug --mute-exit-status
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
+mix credo diff HEAD^ --mute-exit-status
+mix credo diff v1.4.0 --mute-exit-status
 
 # explain issues
 mix credo test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status
