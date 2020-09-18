@@ -5,7 +5,7 @@
 - Add support for "dynamic" tagging for checks via `.credo.exs`
 
       # Overwrite all tags for `FooCheck`
-      {FooCheck, [tags: [:__initial__, :my_tag]]}
+      {FooCheck, [tags: [:my_tag]]}
 
       # Add tags for `FooCheck`
       {SomeCredoCheck, [tags: [:__initial__, :my_tag]]}
@@ -18,6 +18,18 @@
       # Exclude all checks tagged `:my_tag` from analysis
       $ mix credo --checks-without-tag my_tag
 
+### New switch to enable file watcher
+
+You can now ask Credo to re-run on file changes:
+
+      $ mix credo --watch
+
+### New `diff` command
+
+You can now ask Credo to only report changes in files that were changed since a given Git ref:
+
+      $ mix credo diff HEAD^
+      $ mix credo diff master
 
 ## 1.4.0
 
