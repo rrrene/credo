@@ -6,7 +6,7 @@ defmodule Credo.ExplainTest do
   @fixture_example_code_with_location "test/fixtures/example_code/clean_redux.ex:1:11"
 
   test "it should explain an issue using a filename with location" do
-    exec = Credo.CLI.run([@fixture_example_code_with_location])
+    exec = Credo.run([@fixture_example_code_with_location])
     _issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "explain"
@@ -15,7 +15,7 @@ defmodule Credo.ExplainTest do
   end
 
   test "it should explain an issue using explain command" do
-    exec = Credo.CLI.run(["explain", @fixture_example_code_with_location])
+    exec = Credo.run(["explain", @fixture_example_code_with_location])
     _issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "explain"
@@ -24,7 +24,7 @@ defmodule Credo.ExplainTest do
   end
 
   test "it should explain a check using explain command" do
-    exec = Credo.CLI.run(["explain", @fixture_example_code_with_location])
+    exec = Credo.run(["explain", @fixture_example_code_with_location])
     _issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "explain"

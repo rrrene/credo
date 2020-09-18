@@ -22,6 +22,12 @@ defmodule Credo.CLI do
     end
   end
 
+  @doc false
+  @deprecated "Use Credo.run/1 instead"
+  def run(argv) do
+    Credo.run(argv)
+  end
+
   defp run_to_watch(argv) do
     Credo.Watcher.run(argv)
 

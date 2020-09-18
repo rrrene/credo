@@ -18,7 +18,7 @@ defmodule Credo do
 
   Example:
 
-      iex> exec = Credo.CLI.run(["--only", "Readability"])
+      iex> exec = Credo.run(["--only", "Readability"])
       iex> issues = Credo.Execution.get_issues(exec)
       iex> Enum.count(issues) > 0
       true

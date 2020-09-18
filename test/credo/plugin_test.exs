@@ -9,7 +9,7 @@ defmodule Credo.PluginTest do
 
   test "it should use ExamplePlugin's default config" do
     File.cd!(@integration_path, fn ->
-      exec = Credo.CLI.run(["example", "--config-file", ".credo.exs"])
+      exec = Credo.run(["example", "--config-file", ".credo.exs"])
 
       {checks, _only_matching, _ignore_matching} = Execution.checks(exec)
 
@@ -18,25 +18,25 @@ defmodule Credo.PluginTest do
   end
 
   test "it should run example command when example command is given" do
-    exec = Credo.CLI.run([@integration_path, "example"])
+    exec = Credo.run([@integration_path, "example"])
 
     assert "Hello World!" == Execution.get_assign(exec, "example_plugin.hello")
   end
 
   test "it should run example command as default command" do
-    exec = Credo.CLI.run([@integration_path])
+    exec = Credo.run([@integration_path])
 
     assert "Hello World!" == Execution.get_assign(exec, "example_plugin.hello")
   end
 
   test "it should accept --world CLI switch" do
-    exec = Credo.CLI.run([@integration_path, "--world", "mars"])
+    exec = Credo.run([@integration_path, "--world", "mars"])
 
     assert "Hello MARS!" == Execution.get_assign(exec, "example_plugin.hello")
   end
 
   test "it should accept -W CLI switch" do
-    exec = Credo.CLI.run([@integration_path, "-W", "mars"])
+    exec = Credo.run([@integration_path, "-W", "mars"])
 
     assert "Hello MARS!" == Execution.get_assign(exec, "example_plugin.hello")
   end

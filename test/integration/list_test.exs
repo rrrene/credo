@@ -6,7 +6,7 @@ defmodule Credo.ListTest do
   @fixture_example_code "test/fixtures/example_code"
 
   test "it should NOT report issues using list command" do
-    exec = Credo.CLI.run(["list", @fixture_example_code])
+    exec = Credo.run(["list", @fixture_example_code])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "list"
@@ -14,7 +14,7 @@ defmodule Credo.ListTest do
   end
 
   test "it should NOT report issues using list command (using --strict)" do
-    exec = Credo.CLI.run(["list", "--strict", @fixture_example_code])
+    exec = Credo.run(["list", "--strict", @fixture_example_code])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "list"
