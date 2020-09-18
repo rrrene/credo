@@ -40,7 +40,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   def git_diff_commits(exec) do
-    exec.diff_with || "HEAD"
+    List.first(exec.cli_options.args) || "HEAD"
   end
 
   defmodule GetGitDiff do

@@ -21,7 +21,7 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
       "Example: ",
       :olive,
       :faint,
-      "$ mix credo diff lib/**/*.ex --diff-with HEAD"
+      "$ mix credo diff lib/**/*.ex HEAD"
     ]
 
     options = """
@@ -36,7 +36,6 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
           --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
           --config-file             Use the given config file
       -C, --config-name             Use the given config instead of "default"
-          --diff-with               Use the given ref or range of commits instead of "HEAD"
           --enable-disabled-checks  Re-enable disabled checks that match the given strings
           --files-included          Only include these files (accepts globs, can be used multiple times)
           --files-excluded          Exclude these files (accepts globs, can be used multiple times)
