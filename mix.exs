@@ -112,7 +112,10 @@ defmodule Credo.Mixfile do
   end
 
   def application do
-    [mod: {Credo.Application, []}, applications: [:bunt, :logger, :inets]]
+    [
+      mod: {Credo.Application, []},
+      extra_applications: [:bunt, :logger, :inets, :crypto, :file_system, :jason]
+    ]
   end
 
   defp deps do

@@ -321,7 +321,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
       outer_color,
       check_name,
       check.explanations()[:params],
-      check.param_defaults
+      check.param_defaults()
     )
   end
 
