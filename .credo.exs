@@ -95,7 +95,6 @@
         #
         {Credo.Check.Readability.AliasOrder, []},
         {Credo.Check.Readability.FunctionNames, []},
-        {Credo.Check.Readability.ImplTrue, []},
         {Credo.Check.Readability.LargeNumbers, []},
         {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 120]},
         {Credo.Check.Readability.ModuleAttributeNames, []},
@@ -159,15 +158,16 @@
         #
         # Controversial and experimental checks (opt-in, just replace `false` with `[]`)
         #
-        {Credo.Check.Readability.StrictModuleLayout, false},
         {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Consistency.UnusedVariableNames, false},
         {Credo.Check.Design.DuplicatedCode, false},
         {Credo.Check.Readability.AliasAs, false},
-        {Credo.Check.Readability.MultiAlias, false},
-        {Credo.Check.Readability.Specs, false},
-        {Credo.Check.Readability.SinglePipe, false},
         {Credo.Check.Readability.BlockPipe, false},
+        {Credo.Check.Readability.ImplTrue, false},
+        {Credo.Check.Readability.MultiAlias, false},
+        {Credo.Check.Readability.SinglePipe, false},
+        {Credo.Check.Readability.Specs, false},
+        {Credo.Check.Readability.StrictModuleLayout, false},
         {Credo.Check.Readability.WithCustomTaggedTuple, false},
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
