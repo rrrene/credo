@@ -2,6 +2,8 @@
 
 ## 1.5.0
 
+- Refactor check runner (much faster now for common scenarios)
+- Add name of check to message when printing issues with `--verbose`
 - Add support for "dynamic" tagging for checks via `.credo.exs`
 
       # Overwrite all tags for `FooCheck`
@@ -30,6 +32,12 @@ You can now ask Credo to only report changes in files that were changed since a 
 
       $ mix credo diff HEAD^
       $ mix credo diff master
+
+### New checks
+
+- `Credo.Check.Readability.ImplTrue`
+- `Credo.Check.Warning.ApplicationConfigInModuleAttribute`
+- `Credo.Check.Readability.BlockPipe`
 
 ## 1.4.0
 
