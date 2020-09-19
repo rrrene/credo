@@ -351,7 +351,7 @@ defmodule Credo.Check do
               UI.warn("Error while running #{__MODULE__} on #{source_file.filename}")
 
               if exec.crash_on_error do
-                reraise error, System.stacktrace()
+                reraise error, __STACKTRACE__
               else
                 []
               end

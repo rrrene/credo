@@ -53,7 +53,7 @@ defmodule Credo.Check.RunnerExperimental do
         warn_about_failed_run(check, source_files)
 
         if exec.crash_on_error do
-          reraise error, System.stacktrace()
+          reraise error, __STACKTRACE__
         else
           []
         end
