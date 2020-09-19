@@ -724,7 +724,10 @@ defmodule Credo.Check do
     binary |> String.to_atom() |> defined?()
   end
 
-  def defined?(atom) when is_atom(atom) do
-    Credo.Backports.Code.ensure_compiled?(atom)
+  def defined?(module) when is_atom(module) do
+    case Code.ensure_compiled(module) do
+      {:module, _} -> true
+      {:error, _} -> false
+    end
   end
 end

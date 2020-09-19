@@ -29,7 +29,6 @@ defmodule Credo.Check.Readability.ImplTrue do
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    IO.inspect(source_file.filename, label: "checking")
 
     source_file
     |> Heredocs.replace_with_spaces()

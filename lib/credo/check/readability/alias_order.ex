@@ -65,7 +65,7 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp traverse_groups(group, acc, issue_meta) do
     group
-    |> Credo.Backports.Enum.chunk_every(2, 1)
+    |> Enum.chunk_every(2, 1)
     |> Enum.reduce_while(nil, &process_group/2)
     |> case do
       nil ->
