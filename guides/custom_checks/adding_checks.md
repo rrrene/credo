@@ -278,4 +278,4 @@ defmodule MyProject.Checks.RejectModuleAttributes do
 end
 ```
 
-Next, let's see how we can [write tests for our custom check!](testing.html)
+Next, let's see how we can [write tests for our custom check!](testing_checks.html)
