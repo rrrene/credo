@@ -65,12 +65,37 @@ defmodule Credo.Check do
   It has to return a list of found issues.
   """
 
+  @doc """
+  Runs the current check on all `source_files` by calling `run_on_source_file/3`.
+
+  If you are developing a check that has to run on all source files, you can overwrite `run_on_all_source_files/3`:
+
+      defmodule MyCheck do
+        use Credo.Check
+
+        def run_on_all_source_files(exec, source_files, params) do
+          issues =
+            source_files
+            |> do_something_crazy()
+            |> do_something_crazier()
+
+          append_issues_and_timings(exec, issues)
+
+          :ok
+        end
+      end
+
+  Check out Credo's checks from the consistency category for examples of these kinds of checks.
+  """
   @callback run_on_all_source_files(
               exec :: Credo.Execution.t(),
               source_files :: list(Credo.SourceFile.t()),
               params :: Keyword.t()
             ) :: :ok
 
+  @doc """
+  Runs the current check on a single `source_file` and appends the resulting issues to the current `exec`.
+  """
   @callback run_on_source_file(
               exec :: Credo.Execution.t(),
               source_file :: Credo.SourceFile.t(),
@@ -554,8 +579,7 @@ defmodule Credo.Check do
 
   - `:priority`     Sets the issue's priority.
   - `:trigger`      Sets the issue's trigger.
-  - `:line_no`      Sets the issue's line number.
-                      Tries to find `column` if `:trigger` is supplied.
+  - `:line_no`      Sets the issue's line number. Tries to find `column` if `:trigger` is supplied.
   - `:column`       Sets the issue's column.
   - `:exit_status`  Sets the issue's exit_status.
   - `:severity`     Sets the issue's severity.
