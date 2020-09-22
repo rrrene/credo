@@ -8,6 +8,9 @@ defmodule Credo.ExsLoader do
       {:ok, ast} ->
         {:ok, process_exs(ast)}
 
+      {:error, {line_meta, message, trigger}} when is_list(line_meta) ->
+        {:error, {line_meta[:line], message, trigger}}
+
       {:error, value} ->
         {:error, value}
     end
@@ -20,6 +23,10 @@ defmodule Credo.ExsLoader do
   rescue
     error ->
       case error do
+        %SyntaxError{description: "syntax error before: " <> trigger, line: line_meta}
+        when is_list(line_meta) ->
+          {:error, {line_meta[:line], "syntax error before: ", trigger}}
+
         %SyntaxError{description: "syntax error before: " <> trigger, line: line_no} ->
           {:error, {line_no, "syntax error before: ", trigger}}
 

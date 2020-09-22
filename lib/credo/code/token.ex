@@ -34,13 +34,8 @@ defmodule Credo.Code.Token do
   """
   def position(token)
 
-  if Version.match?(System.version(), ">= 1.6.0-rc") do
-    # Elixir >= 1.6.0
-    defdelegate position(token), to: __MODULE__.PositionHelper
-  else
-    # Elixir <= 1.5.x
-    defdelegate position(token), to: __MODULE__.ElixirPre1_6_0
-  end
+  # Elixir >= 1.6.0
+  defdelegate position(token), to: __MODULE__.PositionHelper
 
   defmodule PositionHelper do
     @moduledoc false
@@ -71,6 +66,13 @@ defmodule Credo.Code.Token do
     end
 
     def position({:atom_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
+      position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+    end
+
+    # Elixir >= 1.10.0 tuple syntax
+    def position(
+          {:sigil, {line_no, col_start, nil}, _, atom_or_charlist, _list, _number, _binary}
+        ) do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
     end
 
@@ -240,6 +242,16 @@ defmodule Credo.Code.Token do
       Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
     end
 
+    # Elixir >= 1.11
+    defp convert_to_col_end(
+           _,
+           _,
+           {:sigil, {line_no, col_start, nil}, _, list, _list, _number, _binary}
+         )
+         when is_list(list) do
+      Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
+    end
+
     defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, value, _, _}) do
       {line_no, to_col_end(col_start, value), nil}
     end
@@ -259,39 +271,5 @@ defmodule Credo.Code.Token do
     def to_col_end(col_start, value, add \\ 0) do
       col_start + String.length(to_string(value)) + add
     end
-  end
-
-  # credo:disable-for-next-line Credo.Check.Readability.ModuleNames
-  defmodule ElixirPre1_6_0 do
-    @moduledoc false
-
-    alias Credo.Code.Token
-    alias Credo.Code.Token.PositionHelper
-
-    @doc false
-    def position(token) do
-      position(token, Token.eol?(token))
-    end
-
-    def position(token, true) do
-      {line_no, col_start, col_end_pre_160} = do_position(token)
-
-      {_line_no, _col_start, line_no_end, col_end} = PositionHelper.position(token)
-
-      {line_no, col_start, line_no_end, max(col_end, col_end_pre_160)}
-    end
-
-    def position(token, false) do
-      {line_no, col_start, col_end} = do_position(token)
-
-      {line_no, col_start, line_no, col_end}
-    end
-
-    defp do_position({_, pos, _, _, _, _}), do: pos
-    defp do_position({_, pos, _, _, _}), do: pos
-    defp do_position({_, pos, _, _}), do: pos
-    defp do_position({_, pos, _}), do: pos
-    defp do_position({pos, list}) when is_list(list), do: pos
-    defp do_position({atom, pos}) when is_atom(atom), do: pos
   end
 end
