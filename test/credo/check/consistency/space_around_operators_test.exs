@@ -196,16 +196,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  if Version.match?(System.version(), ">= 1.6.0-rc") do
-    @with_spaces6 """
-    assert -24 == MyModule.fun
-    assert MyModule.fun !=  -24
-    ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
-    """
-  else
-    @with_spaces6 """
-    """
-  end
+  @with_spaces6 """
+  assert -24 == MyModule.fun
+  assert MyModule.fun !=  -24
+  ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
+  """
 
   @with_spaces7 """
   defmodule AlwaysNoSpacesInBinaryTypespecTest do
