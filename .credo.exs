@@ -163,6 +163,7 @@
         {Credo.Check.Design.DuplicatedCode, false},
         {Credo.Check.Readability.AliasAs, false},
         {Credo.Check.Readability.BlockPipe, false},
+        {Credo.Check.Readability.CapitalizedComments, false},
         {Credo.Check.Readability.ImplTrue, false},
         {Credo.Check.Readability.MultiAlias, false},
         {Credo.Check.Readability.SinglePipe, false},

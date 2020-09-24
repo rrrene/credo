@@ -31,7 +31,7 @@ defmodule Credo.Check do
       ```
 
   - `:param_defaults` Sets the default values for the check's params (e.g. `[param1: 42, param2: "offline"]`)
-  - `:run_on_all`     Sets whether the check runs on all source files at once or each source file separatly.
+  - `:run_on_all`     Sets whether the check runs on all source files at once or each source file separately.
   - `:tags`           Sets the tags for this check (list of atoms, e.g. `[:tag1, :tag2]`)
 
   Please also note that these options to `use Credo.Check` are just a convenience to implement the `Credo.Check`
@@ -141,7 +141,7 @@ defmodule Credo.Check do
   # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: list()
 
   @doc """
-  Returns wether or not this check runs on all source files.
+  Returns whether or not this check runs on all source files.
   """
   @callback run_on_all?() :: boolean
 
