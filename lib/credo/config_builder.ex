@@ -80,11 +80,11 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_format(switches)
     |> add_switch_help(switches)
     |> add_switch_ignore(switches)
-    |> add_switch_min_priority(switches)
     |> add_switch_mute_exit_status(switches)
     |> add_switch_only(switches)
     |> add_switch_read_from_stdin(switches)
     |> add_switch_strict(switches)
+    |> add_switch_min_priority(switches)
     |> add_switch_verbose(switches)
     |> add_switch_version(switches)
   end
