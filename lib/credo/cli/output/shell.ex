@@ -22,6 +22,12 @@ defmodule Credo.CLI.Output.Shell do
     GenServer.call(__MODULE__, {:use_colors, use_colors})
   end
 
+  def supress_output(callback_fn) do
+    GenServer.call(__MODULE__, {:supress_output, true})
+    callback_fn.()
+    GenServer.call(__MODULE__, {:supress_output, false})
+  end
+
   @doc "Like `puts/1`, but writes to `:stderr`."
   def warn(value) do
     GenServer.call(__MODULE__, {:warn, value})
@@ -30,7 +36,13 @@ defmodule Credo.CLI.Output.Shell do
   # callbacks
 
   def init(_) do
-    {:ok, %{use_colors: true}}
+    {:ok, %{use_colors: true, supress_output: false}}
+  end
+
+  def handle_call({:supress_output, supress_output}, _from, current_state) do
+    new_state = Map.put(current_state, :supress_output, supress_output)
+
+    {:reply, nil, new_state}
   end
 
   def handle_call({:use_colors, use_colors}, _from, current_state) do
@@ -39,13 +51,25 @@ defmodule Credo.CLI.Output.Shell do
     {:reply, nil, new_state}
   end
 
-  def handle_call({:puts, value}, _from, %{use_colors: true} = current_state) do
+  def handle_call({:puts, _value}, _from, %{supress_output: true} = current_state) do
+    {:reply, nil, current_state}
+  end
+
+  def handle_call(
+        {:puts, value},
+        _from,
+        %{use_colors: true, supress_output: false} = current_state
+      ) do
     do_puts(value)
 
     {:reply, nil, current_state}
   end
 
-  def handle_call({:puts, value}, _from, %{use_colors: false} = current_state) do
+  def handle_call(
+        {:puts, value},
+        _from,
+        %{use_colors: false, supress_output: false} = current_state
+      ) do
     value
     |> remove_colors()
     |> do_puts()
@@ -53,13 +77,25 @@ defmodule Credo.CLI.Output.Shell do
     {:reply, nil, current_state}
   end
 
-  def handle_call({:warn, value}, _from, %{use_colors: true} = current_state) do
+  def handle_call({:warn, _value}, _from, %{supress_output: true} = current_state) do
+    {:reply, nil, current_state}
+  end
+
+  def handle_call(
+        {:warn, value},
+        _from,
+        %{use_colors: true, supress_output: false} = current_state
+      ) do
     do_warn(value)
 
     {:reply, nil, current_state}
   end
 
-  def handle_call({:warn, value}, _from, %{use_colors: false} = current_state) do
+  def handle_call(
+        {:warn, value},
+        _from,
+        %{use_colors: false, supress_output: false} = current_state
+      ) do
     value
     |> remove_colors()
     |> do_warn()

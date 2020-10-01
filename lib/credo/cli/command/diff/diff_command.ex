@@ -19,7 +19,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       prepare_analysis: [
         {Task.PrepareChecksToRun, []}
       ],
-      print_before_analysis: [
+      print_previous_analysis: [
         {__MODULE__.GetGitDiff, []},
         {__MODULE__.PrintBeforeInfo, []}
       ],
@@ -39,7 +39,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   def call(%Execution{help: true} = exec, _opts), do: DiffOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
-  def git_diff_commits(exec) do
+  def git_diff_git_ref_or_range(exec) do
     List.first(exec.cli_options.args) || "HEAD"
   end
 
@@ -47,34 +47,87 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     use Credo.Execution.Task
 
     alias Credo.CLI.Command.Diff.DiffCommand
+    alias Credo.CLI.Output.Shell
 
     def call(exec, _opts) do
-      commits = DiffCommand.git_diff_commits(exec)
-      output = run_git_diff(exec.cli_options.path, commits)
-      filenames = String.split(output, "\n")
+      git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
 
-      Execution.put_assign(exec, "credo.diff.filenames", filenames)
+      previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, git_ref_or_range)
+
+      git_ref_candidate = List.first(exec.cli_options.args)
+
+      previous_argv =
+        case Enum.take(exec.argv, 2) do
+          ["diff", ^git_ref_candidate] ->
+            [previous_dirname] ++ Enum.slice(exec.argv, 2..-1) ++ ["--strict"]
+
+          ["diff"] ->
+            [previous_dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
+        end
+
+      parent_pid = self()
+
+      spawn(fn ->
+        Shell.supress_output(fn ->
+          previous_exec = Credo.run(previous_argv)
+
+          send(parent_pid, {:previous_exec, previous_exec})
+        end)
+      end)
+
+      receive do
+        {:previous_exec, previous_exec} ->
+          Execution.put_assign(exec, "credo.diff.previous_exec", previous_exec)
+      end
     end
 
-    defp run_git_diff(path, commits_or_commit_range) do
-      {output, 0} = System.cmd("git", ["diff", commits_or_commit_range, "--name-only"], cd: path)
+    defp run_git_clone_and_checkout(path, git_ref) do
+      now = DateTime.utc_now() |> to_string |> String.replace(~r/\D/, "")
+      dirname = "credo-diff-#{now}"
+      tmp_dirname = Path.join(System.tmp_dir!(), dirname)
 
-      String.trim(output)
+      {_output, 0} =
+        System.cmd("git", ["clone", ".", tmp_dirname], cd: path, stderr_to_stdout: true)
+
+      {_output, 0} =
+        System.cmd("git", ["checkout", git_ref], cd: tmp_dirname, stderr_to_stdout: true)
+
+      tmp_dirname
     end
   end
 
   defmodule FilterIssuesBasedOnFilenames do
     use Credo.Execution.Task
 
+    alias Credo.Issue
+
     def call(exec, _opts) do
-      filenames = Execution.get_assign(exec, "credo.diff.filenames")
+      previous_issues =
+        exec
+        |> Execution.get_assign("credo.diff.previous_exec")
+        |> Execution.get_issues()
 
       issues =
         exec
         |> Execution.get_issues()
-        |> Enum.filter(&Enum.member?(filenames, &1.filename))
+        |> Enum.filter(&new_issue?(&1, previous_issues))
 
       Execution.set_issues(exec, issues)
+    end
+
+    defp new_issue?(issue, previous_issues) when is_list(previous_issues) do
+      !Enum.any?(previous_issues, &same_issue?(issue, &1))
+    end
+
+    defp same_issue?(current_issue, %Issue{} = previous_issue) do
+      # current_issue.filename == previous_issue.filename &&
+
+      current_issue.line_no == previous_issue.line_no &&
+        current_issue.column == previous_issue.column &&
+        current_issue.category == previous_issue.category &&
+        current_issue.message == previous_issue.message &&
+        current_issue.trigger == previous_issue.trigger &&
+        current_issue.scope == previous_issue.scope
     end
   end
 
@@ -95,17 +148,17 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
 
     # TODO: is this the canonical way to include the "default" format?
     defp print_diff_file_count(%Execution{format: nil} = exec) do
-      commits = DiffCommand.git_diff_commits(exec)
-      filenames_count = exec |> Execution.get_assign("credo.diff.filenames") |> Enum.count()
+      git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
+      # filenames_count = exec |> Execution.get_assign("credo.diff.filenames") |> Enum.count()
 
-      file_label =
-        if filenames_count == 1 do
-          "1 file"
-        else
-          "#{filenames_count} files"
-        end
+      # file_label =
+      #   if filenames_count == 1 do
+      #     "1 file"
+      #   else
+      #     "#{filenames_count} files"
+      #   end
 
-      UI.puts([:faint, "Considering #{file_label} (diffing with `#{commits}`) ..."])
+      UI.puts([:faint, "Diffing with `#{git_ref_or_range}` ..."])
     end
 
     defp print_diff_file_count(_exec), do: nil

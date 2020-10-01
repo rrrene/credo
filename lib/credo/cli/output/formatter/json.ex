@@ -21,7 +21,8 @@ defmodule Credo.CLI.Output.Formatter.JSON do
            category: category,
            message: message,
            filename: filename,
-           priority: priority
+           priority: priority,
+           scope: scope
          } = issue
        ) do
     check_name =
@@ -43,7 +44,8 @@ defmodule Credo.CLI.Output.Formatter.JSON do
       "column_end" => column_end,
       "trigger" => issue.trigger,
       "message" => message,
-      "priority" => priority
+      "priority" => priority,
+      "scope" => scope
     }
   end
 end
