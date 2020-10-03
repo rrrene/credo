@@ -4,10 +4,11 @@ defmodule Credo.Application do
   use Application
 
   @worker_modules [
+    Credo.CLI.Output.CaptureIO,
     Credo.CLI.Output.Shell,
-    Credo.Service.SourceFileScopes,
     Credo.Service.SourceFileAST,
     Credo.Service.SourceFileLines,
+    Credo.Service.SourceFileScopes,
     Credo.Service.SourceFileSource
   ]
 
