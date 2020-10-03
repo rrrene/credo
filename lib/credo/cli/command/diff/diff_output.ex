@@ -2,10 +2,10 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
   @moduledoc false
 
   use Credo.CLI.Output.FormatDelegator,
-    default: Credo.CLI.Command.Suggest.Output.Default,
-    flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
-    oneline: Credo.CLI.Command.Suggest.Output.Oneline,
-    json: Credo.CLI.Command.Suggest.Output.Json
+    default: Credo.CLI.Command.Diff.Output.Default,
+    flycheck: Credo.CLI.Command.Diff.Output.FlyCheck,
+    oneline: Credo.CLI.Command.Diff.Output.Oneline,
+    json: Credo.CLI.Command.Diff.Output.Json
 
   alias Credo.CLI.Output.UI
 

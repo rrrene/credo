@@ -6,7 +6,6 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   @shortdoc "Suggest code objects to look at next (based on git-diff)"
 
   alias Credo.CLI.Command.Diff.DiffOutput
-  alias Credo.CLI.Command.Suggest.SuggestOutput
   alias Credo.CLI.Task
   alias Credo.Execution
 
@@ -50,6 +49,13 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     alias Credo.CLI.Output.Shell
 
     def call(exec, _opts) do
+      case Execution.get_assign(exec, "credo.diff.previous_exec") do
+        %Execution{} -> exec
+        _ -> run_credo_and_store_resulting_execution(exec)
+      end
+    end
+
+    def run_credo_and_store_resulting_execution(exec) do
       git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
 
       previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, git_ref_or_range)
@@ -132,36 +138,17 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   end
 
   defmodule PrintBeforeInfo do
-    use Credo.Execution.Task
+    @moduledoc false
 
-    alias Credo.CLI.Command.Diff.DiffCommand
-    alias Credo.CLI.Output.UI
+    use Credo.Execution.Task
 
     def call(exec, _opts) do
       source_files = Execution.get_source_files(exec)
 
-      SuggestOutput.print_before_info(source_files, exec)
-      print_diff_file_count(exec)
+      DiffOutput.print_before_info(source_files, exec)
 
       exec
     end
-
-    # TODO: is this the canonical way to include the "default" format?
-    defp print_diff_file_count(%Execution{format: nil} = exec) do
-      git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
-      # filenames_count = exec |> Execution.get_assign("credo.diff.filenames") |> Enum.count()
-
-      # file_label =
-      #   if filenames_count == 1 do
-      #     "1 file"
-      #   else
-      #     "#{filenames_count} files"
-      #   end
-
-      UI.puts([:faint, "Diffing with `#{git_ref_or_range}` ..."])
-    end
-
-    defp print_diff_file_count(_exec), do: nil
   end
 
   defmodule PrintResultsAndSummary do
@@ -175,7 +162,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       time_load = Execution.get_assign(exec, "credo.time.source_files")
       time_run = Execution.get_assign(exec, "credo.time.run_checks")
 
-      SuggestOutput.print_after_info(source_files, exec, time_load, time_run)
+      DiffOutput.print_after_info(source_files, exec, time_load, time_run)
 
       exec
     end
