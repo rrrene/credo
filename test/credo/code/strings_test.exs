@@ -85,6 +85,7 @@ defmodule Credo.Code.StringsTest do
     x = ~S[text]
     x = ~S{text}
     x = ~S<text>
+    x = to_string('text') <> "text"
     ?" # <-- this is not a string
     """
 
@@ -104,6 +105,7 @@ defmodule Credo.Code.StringsTest do
     x = ~S[    ]
     x = ~S{    }
     x = ~S<    >
+    x = to_string('text') <> "    "
     ?" # <-- this is not a string
     """
 

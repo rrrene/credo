@@ -145,7 +145,7 @@ defmodule Credo.Code.Strings do
   defp parse_charlist(str, acc, replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
 
-    parse_comment(t, acc <> h, replacement)
+    parse_charlist(t, acc <> h, replacement)
   end
 
   #
