@@ -4,6 +4,7 @@ defmodule Credo.CLI do
   """
 
   alias Credo.Execution
+  alias Credo.CLI.Output.CaptureIO
 
   @doc """
   Runs Credo with the given `argv` and exits the process.
@@ -12,6 +13,8 @@ defmodule Credo.CLI do
   """
   def main(argv \\ []) do
     Credo.Application.start(nil, nil)
+
+    CaptureIO.initialize()
 
     {options, _argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
 

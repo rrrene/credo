@@ -129,7 +129,7 @@ defmodule Credo.Code do
   end
 
   def to_tokens(source, filename \\ "nofilename") when is_binary(source) do
-    {_output, {:ok, return_value}} =
+    {_captured_output, tokens} =
       CaptureIO.capture_stderr(fn ->
         result =
           source
@@ -147,7 +147,7 @@ defmodule Credo.Code do
         end
       end)
 
-    return_value
+    tokens
   end
 
   @doc """
