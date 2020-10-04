@@ -27,7 +27,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       ],
       filter_issues: [
         {Task.SetRelevantIssues, []},
-        {__MODULE__.FilterIssuesBasedOnFilenames, []}
+        {__MODULE__.FilterIssues, []}
       ],
       print_after_analysis: [
         {__MODULE__.PrintResultsAndSummary, []}
@@ -56,16 +56,17 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     end
 
     def run_credo_and_store_resulting_execution(exec) do
-      git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
+      previous_git_ref = DiffCommand.git_diff_git_ref_or_range(exec)
 
-      previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, git_ref_or_range)
-
-      git_ref_candidate = List.first(exec.cli_options.args)
+      previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, previous_git_ref)
 
       previous_argv =
         case Enum.take(exec.argv, 2) do
-          ["diff", ^git_ref_candidate] ->
+          ["diff", ^previous_git_ref] ->
             [previous_dirname] ++ Enum.slice(exec.argv, 2..-1) ++ ["--strict"]
+
+          ["diff", _] ->
+            [previous_dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
 
           ["diff"] ->
             [previous_dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
@@ -83,7 +84,10 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
 
       receive do
         {:previous_exec, previous_exec} ->
-          Execution.put_assign(exec, "credo.diff.previous_exec", previous_exec)
+          exec
+          |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
+          |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
+          |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
       end
     end
 
@@ -102,27 +106,49 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     end
   end
 
-  defmodule FilterIssuesBasedOnFilenames do
+  defmodule FilterIssues do
     use Credo.Execution.Task
 
     alias Credo.Issue
 
     def call(exec, _opts) do
+      issues = get_old_new_and_fixed_issues(exec)
+
+      Execution.set_issues(exec, issues)
+    end
+
+    defp get_old_new_and_fixed_issues(exec) do
+      current_issues = Execution.get_issues(exec)
+
       previous_issues =
         exec
         |> Execution.get_assign("credo.diff.previous_exec")
         |> Execution.get_issues()
 
-      issues =
-        exec
-        |> Execution.get_issues()
-        |> Enum.filter(&new_issue?(&1, previous_issues))
+      # in previous_issues, in current_issues
+      old_issues = Enum.filter(previous_issues, &old_issue?(&1, current_issues))
 
-      Execution.set_issues(exec, issues)
+      # in previous_issues, not in current_issues
+      fixed_issues = previous_issues -- old_issues
+
+      # not in previous_issues, in current_issues
+      new_issues = Enum.filter(current_issues, &new_issue?(&1, previous_issues))
+
+      old_issues = Enum.map(old_issues, fn issue -> %Issue{issue | diff_marker: :old} end)
+
+      # TODO: we have to rewrite the filename to make it look like the file is in the current dir instead of the generated tmp dir
+      fixed_issues = Enum.map(fixed_issues, fn issue -> %Issue{issue | diff_marker: :fixed} end)
+      new_issues = Enum.map(new_issues, fn issue -> %Issue{issue | diff_marker: :new} end)
+
+      List.flatten([fixed_issues, old_issues, new_issues])
     end
 
-    defp new_issue?(issue, previous_issues) when is_list(previous_issues) do
-      !Enum.any?(previous_issues, &same_issue?(issue, &1))
+    defp new_issue?(current_issue, previous_issues) when is_list(previous_issues) do
+      !Enum.any?(previous_issues, &same_issue?(current_issue, &1))
+    end
+
+    defp old_issue?(previous_issue, current_issues) when is_list(current_issues) do
+      Enum.any?(current_issues, &same_issue?(previous_issue, &1))
     end
 
     defp same_issue?(current_issue, %Issue{} = previous_issue) do

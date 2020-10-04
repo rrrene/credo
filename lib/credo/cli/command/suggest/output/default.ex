@@ -131,7 +131,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       [
         UI.edge(color),
         :faint,
-        " ...  (#{not_shown} more, use `-a` to show them)"
+        " ...  (#{not_shown} more, use `--all` to show them)"
       ]
       |> UI.puts()
     end

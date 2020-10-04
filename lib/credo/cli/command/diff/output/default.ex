@@ -2,9 +2,9 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
   @moduledoc false
 
   alias Credo.CLI.Command.Diff.DiffCommand
+  alias Credo.CLI.Command.Diff.DiffSummary
   alias Credo.CLI.Filename
   alias Credo.CLI.Output
-  alias Credo.CLI.Output.Summary
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
   alias Credo.Execution
@@ -77,14 +77,16 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
     issues = Execution.get_issues(exec)
 
+    issues_to_display = Enum.filter(issues, &(&1.diff_marker == :new))
+
     categories =
-      issues
+      issues_to_display
       |> Enum.map(& &1.category)
       |> Enum.uniq()
 
     issue_map =
       Enum.into(categories, %{}, fn category ->
-        {category, issues |> Enum.filter(&(&1.category == category))}
+        {category, Enum.filter(issues_to_display, &(&1.category == category))}
       end)
 
     source_file_map = Enum.into(source_files, %{}, &{&1.filename, &1})
@@ -101,8 +103,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       )
     end)
 
-    source_files
-    |> Summary.print(exec, time_load, time_run)
+    DiffSummary.print(source_files, exec, time_load, time_run)
   end
 
   defp print_issues_for_category(
@@ -128,6 +129,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     UI.puts()
 
     [
+      diff_marker(1, color),
       :bright,
       "#{color}_background" |> String.to_atom(),
       color,
@@ -138,9 +140,10 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     ]
     |> UI.puts()
 
-    color
-    |> UI.edge()
-    |> UI.puts()
+    UI.puts([
+      diff_marker(2, color),
+      UI.edge(color)
+    ])
 
     print_issues(issues, source_file_map, exec, term_width)
 
@@ -148,9 +151,10 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       not_shown = Enum.count(issues) - per_category(exec)
 
       [
+        diff_marker(),
         UI.edge(color),
         :faint,
-        " ...  (#{not_shown} more, use `-a` to show them)"
+        " ...  (#{not_shown} other new issues, use `--all` to show them)"
       ]
       |> UI.puts()
     end
@@ -158,10 +162,12 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
   defp print_issues(issues, source_file_map, exec, term_width) do
     count = per_category(exec)
+    sort_weight = %{old: 2, fixed: 1, new: 0}
 
     issues
     |> Enum.sort_by(fn issue ->
-      {issue.priority, issue.severity, issue.filename, issue.line_no}
+      {sort_weight[issue.diff_marker], issue.priority, issue.severity, issue.filename,
+       issue.line_no}
     end)
     |> Enum.reverse()
     |> Enum.take(count)
@@ -195,8 +201,23 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
          %Execution{format: _, verbose: verbose} = exec,
          term_width
        ) do
-    outer_color = Output.check_color(issue)
-    inner_color = Output.issue_color(issue)
+    new_issue? = issue.diff_marker == :new
+    fixed_issue? = issue.diff_marker == :fixed
+
+    outer_color =
+      if new_issue? do
+        Output.check_color(issue)
+      else
+        [Output.check_color(issue), :faint]
+      end
+
+    inner_color =
+      if new_issue? do
+        Output.issue_color(issue)
+      else
+        [Output.issue_color(issue), :faint]
+      end
+
     message_color = outer_color
     filename_color = :default_color
 
@@ -217,6 +238,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     message
     |> UI.wrap_at(term_width - @indent)
     |> print_issue_message(
+      issue,
       check,
       outer_color,
       message_color,
@@ -224,11 +246,25 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       priority
     )
 
+    location =
+      if fixed_issue? do
+        git_ref = Execution.get_assign(exec, "credo.diff.previous_git_ref")
+        previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
+
+        relative_filename =
+          filename |> String.replace(previous_dirname, "") |> String.replace(~r/^[\/\\]/, "")
+
+        "(git:#{git_ref}) #{relative_filename}"
+      else
+        to_string(filename)
+      end
+
     [
+      diff_marker(issue.diff_marker),
       UI.edge(outer_color, @indent),
       filename_color,
       :faint,
-      filename |> to_string,
+      location,
       :default_color,
       :faint,
       Filename.pos_suffix(issue.line_no, issue.column),
@@ -240,15 +276,23 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     ]
     |> UI.puts()
 
-    if exec.verbose do
+    if exec.verbose && issue.diff_marker == :new do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
-      UI.puts_edge([outer_color, :faint])
+      [
+        diff_marker(issue.diff_marker),
+        UI.edge([
+          outer_color,
+          :faint
+        ])
+      ]
+      |> UI.puts()
     end
   end
 
   defp print_issue_message(
          [first_line | other_lines],
+         issue,
          check,
          outer_color,
          message_color,
@@ -256,6 +300,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
          priority
        ) do
     [
+      diff_marker(issue.diff_marker),
       UI.edge(outer_color),
       outer_color,
       tag_style,
@@ -270,14 +315,25 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     |> UI.puts()
 
     other_lines
-    |> Enum.each(&print_issue_message(&1, outer_color, message_color))
+    |> Enum.each(&print_issue_message(&1, issue, outer_color, message_color))
   end
 
-  defp print_issue_message("", _outer_color, _message_color) do
+  defp print_issue_message(
+         "",
+         _issue,
+         _outer_color,
+         _message_color
+       ) do
   end
 
-  defp print_issue_message(message, outer_color, message_color) do
+  defp print_issue_message(
+         message,
+         issue,
+         outer_color,
+         message_color
+       ) do
     [
+      diff_marker(issue.diff_marker),
       UI.edge(outer_color),
       outer_color,
       String.duplicate(" ", @indent - 3),
@@ -309,11 +365,11 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     raw_line = SourceFile.line_at(source_file, issue.line_no)
     line = String.trim(raw_line)
 
-    [outer_color, :faint]
-    |> UI.edge()
+    [diff_marker(issue.diff_marker), UI.edge([outer_color, :faint])]
     |> UI.puts()
 
     [
+      diff_marker(issue.diff_marker),
       UI.edge([outer_color, :faint]),
       :cyan,
       :faint,
@@ -352,6 +408,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       end
 
     [
+      diff_marker(issue.diff_marker),
       UI.edge([outer_color, :faint], @indent),
       inner_color,
       String.duplicate(" ", x),
@@ -359,5 +416,29 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       String.duplicate("^", w)
     ]
     |> UI.puts()
+  end
+
+  defp diff_marker() do
+    [:faint, "  ", :reset, ""]
+  end
+
+  defp diff_marker(1, color) do
+    [color, :faint, "  ", :reset, ""]
+  end
+
+  defp diff_marker(2, color) do
+    [color, :faint, "  ", :reset, ""]
+  end
+
+  defp diff_marker(:new) do
+    [:green, :bright, "+ ", :reset, ""]
+  end
+
+  defp diff_marker(:old) do
+    [:faint, "~ ", :reset, ""]
+  end
+
+  defp diff_marker(:fixed) do
+    [:faint, "✔ ", :reset, ""]
   end
 end
