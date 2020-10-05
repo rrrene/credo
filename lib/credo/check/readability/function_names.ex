@@ -60,6 +60,16 @@ defmodule Credo.Check.Readability.FunctionNames do
          when op in [:def, :defmacro] do
       {ast, issues}
     end
+
+    defp traverse(
+           {op, _op_meta,
+            [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
+           issues,
+           _issue_meta
+         )
+         when op in [:def, :defmacro] do
+      {ast, issues}
+    end
   end
 
   # TODO: consider for experimental check front-loader (ast)
@@ -81,6 +91,7 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
 
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta) do
+      IO.inspect(ast)
       {ast, issues_for_definition(arguments, issues, issue_meta)}
     end
   end

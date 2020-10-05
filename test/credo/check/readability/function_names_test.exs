@@ -66,6 +66,9 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     defmacro sigil_U({:<<>>, _, [string]}, []) do
       # ...
     end
+    defmacro sigil_U({:<<>>, _, [string]}, []) when is_binary(string) do
+      # ...
+    end
     """
     |> to_source_file
     |> run_check(@described_check)
