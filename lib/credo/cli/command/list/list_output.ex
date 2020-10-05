@@ -18,41 +18,48 @@ defmodule Credo.CLI.Command.List.ListOutput do
     """
 
     example = [
-      "Example: ",
+      "Examples:\n",
       :olive,
-      :faint,
-      "$ mix credo list lib/**/*.ex --format oneline"
+      "  $ mix credo list --format json\n",
+      "  $ mix credo list lib/**/*.ex --only consistency --all\n",
+      "  $ mix credo list --checks-without-tag formatter --checks-without-tag controversial"
     ]
 
-    options = """
+    options =
+      """
 
-    Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
+      Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
-    List options:
-      -a, --all                     Show all issues
-      -A, --all-priorities          Show all issues including low priority ones
-      -c, --checks                  Only include checks that match the given strings
-          --checks-with-tag         Only include checks that match the given tag (can be used multiple times)
-          --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
-          --config-file             Use the given config file
-      -C, --config-name             Use the given config instead of "default"
-          --enable-disabled-checks  Re-enable disabled checks that match the given strings
-          --files-included          Only include these files (accepts globs, can be used multiple times)
-          --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-          --format                  Display the list in a specific format (json,flycheck,oneline)
-      -i, --ignore-checks           Ignore checks that match the given strings
-          --ignore                  Alias for --ignore-checks
-          --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
-          --mute-exit-status        Exit with status zero even if there are issues
-          --only                    Alias for --checks
-          --strict                  Alias for --all-priorities
+      List options:
+        -a, --all                     Show all issues
+        -A, --all-priorities          Show all issues including low priority ones
+        -c, --checks                  Only include checks that match the given strings
+            --checks-with-tag         Only include checks that match the given tag (can be used multiple times)
+            --checks-without-tag      Ignore checks that match the given tag (can be used multiple times)
+            --config-file             Use the given config file
+        -C, --config-name             Use the given config instead of "default"
+            --enable-disabled-checks  Re-enable disabled checks that match the given strings
+            --files-included          Only include these files (accepts globs, can be used multiple times)
+            --files-excluded          Exclude these files (accepts globs, can be used multiple times)
+            --format                  Display the list in a specific format (json,flycheck,oneline)
+        -i, --ignore-checks           Ignore checks that match the given strings
+            --ignore                  Alias for --ignore-checks
+            --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+            --mute-exit-status        Exit with status zero even if there are issues
+            --only                    Alias for --checks
+            --strict                  Alias for --all-priorities
 
-    General options:
-          --[no-]color              Toggle colored output
-      -v, --version                 Show version
-      -h, --help                    Show this help
-    """
+      General options:
+            --[no-]color              Toggle colored output
+        -v, --version                 Show version
+        -h, --help                    Show this help
 
+      Feedback:
+        Open an issue here: https://github.com/rrrene/credo/issues
+      """
+      |> String.trim_trailing()
+
+    UI.puts()
     UI.puts(usage)
     UI.puts(description)
     UI.puts(example)

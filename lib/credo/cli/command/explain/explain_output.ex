@@ -20,31 +20,33 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
     """
 
     example = [
-      "Example: ",
+      "Examples:\n",
       :olive,
-      :faint,
-      "$ mix credo explain lib/foo/bar.ex:13:6"
+      "  $ mix credo explain lib/foo/bar.ex:13:6\n",
+      "  $ mix credo explain lib/foo/bar.ex:13:6 --format json\n",
+      "  $ mix credo explain Credo.Check.Refactor.Nesting"
     ]
 
-    example2 = [
-      "         ",
-      :olive,
-      :faint,
-      "$ mix credo explain Credo.Check.Refactor.Nesting"
-    ]
+    options =
+      """
 
-    options = """
+      Explain options:
+            --format            Display the list in a specific format (json,flycheck,oneline)
 
-    General options:
-          --[no-]color        Toggle colored output
-      -v, --version           Show version
-      -h, --help              Show this help
-    """
+      General options:
+            --[no-]color        Toggle colored output
+        -v, --version           Show version
+        -h, --help              Show this help
 
+      Feedback:
+        Open an issue here: https://github.com/rrrene/credo/issues
+      """
+      |> String.trim_trailing()
+
+    UI.puts()
     UI.puts(usage)
     UI.puts(description)
     UI.puts(example)
-    UI.puts(example2)
     UI.puts(options)
 
     exec
