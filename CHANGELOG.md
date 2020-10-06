@@ -2,6 +2,7 @@
 
 ## 1.5.0
 
+- Credo now requires Elixir 1.7 or newer
 - Refactor check runner (much faster now for common scenarios)
 - Add param `allow_acronyms` to check `Credo.Check.Readability.FunctionNames`
 - Add name of check to message when printing issues with `--verbose`
@@ -33,6 +34,10 @@ You can now ask Credo to only report changes in files that were changed since a 
 
       $ mix credo diff HEAD^
       $ mix credo diff master
+
+You can, of course, combine this with the new `--watch` switch to iteratively fix issues that have come up since the last release:
+
+      $ mix credo diff v1.4.0 --watch
 
 ### New checks
 
