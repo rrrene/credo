@@ -66,25 +66,29 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   defp warn_if_check_params_invalid({check, params}) do
     if Check.defined?(check) do
-      valid_param_names = check.param_names ++ Params.builtin_param_names()
-      check = check |> to_string |> String.to_existing_atom()
+      do_warn_if_check_params_invalid({check, params})
+    end
+  end
 
-      Enum.each(params, fn {param_name, _param_value} ->
-        unless Enum.member?(valid_param_names, param_name) do
-          candidate = find_best_match(valid_param_names, param_name)
+  defp do_warn_if_check_params_invalid({check, params}) do
+    valid_param_names = check.param_names ++ Params.builtin_param_names()
+    check = check |> to_string |> String.to_existing_atom()
 
-          warning =
-            if candidate do
-              "** (config) #{check_name(check)}: unknown param `#{param_name}`. Did you mean `#{
-                candidate
-              }`?"
-            else
-              "** (config) #{check_name(check)}: unknown param `#{param_name}`."
-            end
+    Enum.each(params, fn {param_name, _param_value} ->
+      unless Enum.member?(valid_param_names, param_name) do
+        candidate = find_best_match(valid_param_names, param_name)
+        warning = warning_message_for(check, param_name, candidate)
 
-          UI.warn([:red, warning])
-        end
-      end)
+        UI.warn([:red, warning])
+      end
+    end)
+  end
+
+  defp warning_message_for(check, param_name, candidate) do
+    if candidate do
+      "** (config) #{check_name(check)}: unknown param `#{param_name}`. Did you mean `#{candidate}`?"
+    else
+      "** (config) #{check_name(check)}: unknown param `#{param_name}`."
     end
   end
 

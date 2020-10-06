@@ -527,19 +527,19 @@ defmodule Credo.Check do
   defp deprecated_def_default_params(env) do
     default_params = Module.get_attribute(env.module, :default_params)
 
-    if not is_nil(default_params) do
+    if is_nil(default_params) do
+      if not Module.defines?(env.module, {:param_defaults, 0}) do
+        quote do
+          @impl true
+          def param_defaults, do: []
+        end
+      end
+    else
       # deprecated - remove once we ditch @default_params
       quote do
         @impl true
         def param_defaults do
           @default_params
-        end
-      end
-    else
-      if not Module.defines?(env.module, {:param_defaults, 0}) do
-        quote do
-          @impl true
-          def param_defaults, do: []
         end
       end
     end
