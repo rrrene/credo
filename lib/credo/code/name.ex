@@ -103,6 +103,22 @@ defmodule Credo.Code.Name do
     String.match?(name, ~r/^[[:lower:][:digit:]\_\?\!]+$/u)
   end
 
+  def snake_case?(name, true) do
+    snake_case?(name) || snake_case_with_acronyms?(name)
+  end
+
+  def snake_case?(name, _) do
+    snake_case?(name)
+  end
+
+  defp snake_case_with_acronyms?(name) do
+    name
+    |> String.split("_")
+    |> Enum.all?(fn part ->
+      String.match?(part, ~r/^([[:lower:][:digit:]]+|[[:upper:][:digit:]]+)$/u)
+    end)
+  end
+
   def no_case?(name) do
     String.match?(name, ~r/^[^a-zA-Z0-9]+$/)
   end

@@ -17,6 +17,16 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report acronyms in module names" do
+    """
+    defmodule CredoHTTPModule do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report if module name cannot be determinated" do
     """
     defmacro foo(quoted_module) do

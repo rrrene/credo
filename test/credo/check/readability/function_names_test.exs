@@ -91,6 +91,24 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation when acronyms are allowed" do
+    """
+    def clean_HTTP_url(0), do: :ok
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow_acronyms: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when acronyms are allowed /2" do
+    """
+    def clean_HTTP2_url(0), do: :ok
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow_acronyms: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -229,6 +247,15 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     def credoSampleFunction(1), do: :ok
     def credoSampleFunction(2), do: :ok
     def credoSampleFunction(_), do: :ok
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /15" do
+    """
+    def clean_HTTP_url(0), do: :ok
     """
     |> to_source_file
     |> run_check(@described_check)
