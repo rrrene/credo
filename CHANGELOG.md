@@ -3,6 +3,7 @@
 ## 1.5.0
 
 - Refactor check runner (much faster now for common scenarios)
+- Add param `allow_acronyms` to check `Credo.Check.Readability.FunctionNames`
 - Add name of check to message when printing issues with `--verbose`
 - Add support for "dynamic" tagging for checks via `.credo.exs`
 
