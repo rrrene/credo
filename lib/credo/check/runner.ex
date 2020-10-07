@@ -1,4 +1,4 @@
-defmodule Credo.Check.RunnerExperimental do
+defmodule Credo.Check.Runner do
   @moduledoc false
 
   # This module is responsible for running checks based on the context represented
