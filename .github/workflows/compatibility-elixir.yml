@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - release/*
 
 jobs:
   test_on_source:
@@ -11,33 +12,30 @@ jobs:
     name: "[${{matrix.otp}}/${{matrix.elixir}}] Elixir ${{matrix.repo_branch}} source code analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
-        otp: [20.3, 21.3, 22.2]
-        elixir: [1.6.6, 1.7.2, 1.8.2, 1.9.4, 1.10.0]
+        otp: [20.3, 21.3, 22.2, 23]
+        elixir: [1.7.4, 1.8.2, 1.9.4, 1.10.4, 1.11.0]
+        exclude:
+          - otp: 23
+            elixir: 1.7.4
+          - otp: 23
+            elixir: 1.8.2
+          - otp: 23
+            elixir: 1.9.4
+          - otp: 20.3
+            elixir: 1.10.4
+          - otp: 20.3
+            elixir: 1.11.0
         repo_url: ["https://github.com/elixir-lang/elixir.git"]
         repo_branch: ["v1.10", "master"]
     steps:
-      - uses: actions/checkout@v2
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-      - uses: actions/setup-elixir@v1
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
+      - uses: actions/checkout@v2.3.1
+      - uses: actions/setup-elixir@v1.3
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-
       - run: mix deps.get
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
       - run: mix deps.compile
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
       - run: mix compile
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
       - run: mkdir -p tmp
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
       - run: git clone ${{matrix.repo_url}} tmp/${{matrix.repo_branch}} --depth=1 --branch ${{matrix.repo_branch}}
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
-
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
-        if: "!(matrix.otp == '20.3' && matrix.elixir == '1.10.0')"
