@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+
+- Ensure compatibility with Elixir 1.11.0
+
 ## 1.4.0
 
 - Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
