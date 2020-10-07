@@ -115,18 +115,35 @@ defmodule Credo.Check.Runner do
     {issues, nil}
   end
 
-  defp do_run_check_on_source_files({check, params}, source_files, exec) do
-    try do
-      check.run(source_files, exec, params)
-    rescue
-      error ->
-        warn_about_failed_run(check, source_files)
+  if Version.match?(System.version(), ">= 1.7.0-rc") do
+    defp do_run_check_on_source_files({check, params}, source_files, exec) do
+      try do
+        check.run(source_files, exec, params)
+      rescue
+        error ->
+          warn_about_failed_run(check, source_files)
 
-        if exec.crash_on_error do
-          reraise error, System.stacktrace()
-        else
-          []
-        end
+          if exec.crash_on_error do
+            reraise error, __STACKTRACE__
+          else
+            []
+          end
+      end
+    end
+  else
+    defp do_run_check_on_source_files({check, params}, source_files, exec) do
+      try do
+        check.run(source_files, exec, params)
+      rescue
+        error ->
+          warn_about_failed_run(check, source_files)
+
+          if exec.crash_on_error do
+            reraise error, System.stacktrace()
+          else
+            []
+          end
+      end
     end
   end
 
@@ -163,18 +180,35 @@ defmodule Credo.Check.Runner do
     {issues, nil}
   end
 
-  defp do_run_check_on_single_source_file({check, params}, source_file, exec) do
-    try do
-      check.run(source_file, params)
-    rescue
-      error ->
-        warn_about_failed_run(check, source_file)
+  if Version.match?(System.version(), ">= 1.7.0-rc") do
+    defp do_run_check_on_single_source_file({check, params}, source_file, exec) do
+      try do
+        check.run(source_file, params)
+      rescue
+        error ->
+          warn_about_failed_run(check, source_file)
 
-        if exec.crash_on_error do
-          reraise error, System.stacktrace()
-        else
-          []
-        end
+          if exec.crash_on_error do
+            reraise error, __STACKTRACE__
+          else
+            []
+          end
+      end
+    end
+  else
+    defp do_run_check_on_single_source_file({check, params}, source_file, exec) do
+      try do
+        check.run(source_file, params)
+      rescue
+        error ->
+          warn_about_failed_run(check, source_file)
+
+          if exec.crash_on_error do
+            reraise error, System.stacktrace()
+          else
+            []
+          end
+      end
     end
   end
 
