@@ -72,6 +72,17 @@ defmodule Credo.Code.InterpolationHelper do
 
   if Version.match?(System.version(), ">= 1.6.0-rc") do
     #
+    # Elixir >= 1.11.0
+    #
+    defp map_interpolations(
+           {:sigil, {_line_no, _col_start, nil}, _, list, _empty_list, nil, _another_binary} =
+             token,
+           source
+         ) do
+      handle_atom_string_or_sigil(token, list, source)
+    end
+
+    #
     # Elixir >= 1.6.0
     #
 

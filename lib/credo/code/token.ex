@@ -74,6 +74,13 @@ defmodule Credo.Code.Token do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
     end
 
+    # Elixir >= 1.10.0 tuple syntax
+    def position(
+          {:sigil, {line_no, col_start, nil}, _, atom_or_charlist, _list, _number, _binary}
+        ) do
+      position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+    end
+
     # Elixir >= 1.9.0 tuple syntax
     def position({{line_no, col_start, nil}, {_line_no2, _col_start2, nil}, atom_or_charlist}) do
       position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
@@ -236,6 +243,16 @@ defmodule Credo.Code.Token do
     end
 
     defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, list, _, _})
+         when is_list(list) do
+      Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
+    end
+
+    # Elixir >= 1.11
+    defp convert_to_col_end(
+           _,
+           _,
+           {:sigil, {line_no, col_start, nil}, _, list, _list, _number, _binary}
+         )
          when is_list(list) do
       Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
     end
