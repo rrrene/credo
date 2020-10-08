@@ -37,13 +37,17 @@ defmodule Credo.Check.Refactor.CondStatements do
 
   # TODO: consider for experimental check front-loader (ast)
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
-    count =
+    conditions =
       arguments
       |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
-      |> Enum.count()
 
-    if count <= 2 do
+    count = Enum.count(conditions)
+
+    should_be_written_as_if_else_block? =
+      count <= 2 && contains_always_matching_condition?(conditions)
+
+    if should_be_written_as_if_else_block? do
       {ast, issues ++ [issue_for(issue_meta, meta[:line], :cond)]}
     else
       {ast, issues}
@@ -52,6 +56,19 @@ defmodule Credo.Check.Refactor.CondStatements do
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
+  end
+
+  defp contains_always_matching_condition?(conditions) do
+    Enum.any?(conditions, fn
+      {:->, _meta, [[{name, _meta2, nil}], _args]} when is_atom(name) ->
+        name |> to_string |> String.starts_with?("_")
+
+      {:->, _meta, [[true], _args]} ->
+        true
+
+      _ ->
+        false
+    end)
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
