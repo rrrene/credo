@@ -11,12 +11,15 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
       deployed context.
 
       This check analyzes all of the module attributes present within a module,
-      and validates that there are no unsafe calls. Unsafe calls include:
-        - `Application.fetch_env/2`
-        - `Application.fetch_env!/2`
-        - `Application.get_all_env/1`
-        - `Application.get_env/3`
-        - `Application.get_env/2`
+      and validates that there are no unsafe calls.
+
+      These unsafe calls include:
+
+      - `Application.fetch_env/2`
+      - `Application.fetch_env!/2`
+      - `Application.get_all_env/1`
+      - `Application.get_env/3`
+      - `Application.get_env/2`
 
       As of Elixir 1.10 you can leverage `Application.compile_env/3` and
       `Application.compile_env!/2` if you wish to set configuration at
