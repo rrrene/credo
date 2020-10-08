@@ -107,8 +107,19 @@ defmodule Credo.Execution do
       {Credo.Execution.Task.ParseOptions, []}
     ],
     initialize_plugins: [
-      # This is where plugins can put their hooks to initialize themselves based on
-      # the params given in the config as well as in their own command line switches.
+      # This is where plugins can "put" their hooks using `Credo.Plugin.append_task/3`
+      # to initialize themselves based on the params given in the config as well as
+      # in their own command line switches.
+      #
+      # Example:
+      #
+      #     defmodule CredoDemoPlugin do
+      #       import Credo.Plugin
+      #
+      #       def init(exec) do
+      #         append_task(exec, :initialize_plugins, CredoDemoPlugin.SetDiffAsDefaultCommand)
+      #       end
+      #     end
     ],
     validate_cli_options: [
       {Credo.Execution.Task.ValidateOptions, []}
