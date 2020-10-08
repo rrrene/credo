@@ -78,9 +78,13 @@ Please note that these params do not "override" the top-level config, but are ap
 
 ### New checks
 
-- `Credo.Check.Readability.ImplTrue`
-- `Credo.Check.Warning.ApplicationConfigInModuleAttribute`
+These new checks can now be enabled:
+
 - `Credo.Check.Readability.BlockPipe`
+- `Credo.Check.Readability.ImplTrue`
+- `Credo.Check.Readability.SeparateAliasRequire`
+
+Additionally, `Credo.Check.Warning.ApplicationConfigInModuleAttribute` is a new check which warns about reading environment variables into module attributes at compile-time and is enabled by default.
 
 ## 1.4.0
 
