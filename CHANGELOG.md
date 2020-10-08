@@ -39,6 +39,43 @@ You can, of course, combine this with the new `--watch` switch to iteratively fi
 
       $ mix credo diff v1.4.0 --watch
 
+### New general check param `:files`
+
+You can now include/exclude specific files or patterns for specific checks.
+
+The syntax is the same as for the top-level `:files` key:
+
+```elixir
+# check included for Elixir files in lib/ only
+{Credo.Check.Consistency.ExceptionNames, files: %{included: ["lib/**/*.ex"]}},
+
+# check excluded for a specific file
+{Credo.Check.Warning.IExPry, files: %{excluded: ["lib/debug_server.ex"]}},
+
+# check included for all Elixir script files, but excluded for test scripts
+{Credo.Check.Warning.IoInspect, files: %{included: ["**/*.exs"], excluded: ["**/*_test.exs"]}},
+```
+
+This means that you can now also include/exclude specific files or patterns for your custom checks **by default**.
+
+The syntax is the same as with all other check params:
+
+```elixir
+defmodule MyApp.Check.SomethingAboutTests do
+  use Credo.Check,
+    base_priority: :normal,
+    explanations: [
+      check: """
+      ...
+      """
+    ],
+    param_defaults: [
+      files: %{included: ["**/*_test.exs"]}}
+    ]
+```
+
+Please note that these params do not "override" the top-level config, but are applied to the result of the top-level config's resolution.
+
 ### New checks
 
 - `Credo.Check.Readability.ImplTrue`

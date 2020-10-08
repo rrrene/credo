@@ -68,6 +68,20 @@ defmodule Credo.Check.Params do
   end
 
   @doc false
+  def files_excluded(params, check_mod) do
+    files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
+
+    files[:excluded]
+  end
+
+  @doc false
+  def files_included(params, check_mod) do
+    files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
+
+    files[:included]
+  end
+
+  @doc false
   def priority(params, check_mod) do
     params[:__priority__] || params[:priority] || check_mod.base_priority
   end

@@ -49,6 +49,10 @@ defmodule Credo.Sources do
     |> read_files(parse_timeout)
   end
 
+  def find(nil) do
+    []
+  end
+
   def find(paths) when is_list(paths) do
     Enum.flat_map(paths, &find/1)
   end

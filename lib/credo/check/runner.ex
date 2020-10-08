@@ -4,6 +4,7 @@ defmodule Credo.Check.Runner do
   # This module is responsible for running checks based on the context represented
   # by the current `Credo.Execution`.
 
+  alias Credo.Check.Params
   alias Credo.CLI.Output.UI
   alias Credo.Execution
   alias Credo.Execution.ExecutionTiming
@@ -35,16 +36,17 @@ defmodule Credo.Check.Runner do
   end
 
   defp do_run_check(exec, {check, params}) do
-    source_files = Execution.get_source_files(exec)
+    rerun_files_that_changed = List.wrap(params[:__rerun_files_that_changed__])
+
+    files_included = params |> Params.files_included(check) |> Credo.Sources.find()
+    files_excluded = params |> Params.files_excluded(check) |> Credo.Sources.find()
 
     source_files =
-      if params[:__included__] do
-        Enum.filter(source_files, fn source_file ->
-          Enum.member?(params[:__included__], source_file.filename)
-        end)
-      else
-        source_files
-      end
+      exec
+      |> Execution.get_source_files()
+      |> filter_source_files(rerun_files_that_changed)
+      |> filter_source_files(files_included)
+      |> reject_source_files(files_excluded)
 
     try do
       check.run_on_all_source_files(exec, source_files, params)
@@ -58,6 +60,26 @@ defmodule Credo.Check.Runner do
           []
         end
     end
+  end
+
+  defp filter_source_files(source_files, []) do
+    source_files
+  end
+
+  defp filter_source_files(source_files, files_included) do
+    Enum.filter(source_files, fn source_file ->
+      Enum.member?(files_included, Path.expand(source_file.filename))
+    end)
+  end
+
+  defp reject_source_files(source_files, []) do
+    source_files
+  end
+
+  defp reject_source_files(source_files, files_excluded) do
+    Enum.reject(source_files, fn source_file ->
+      Enum.member?(files_excluded, Path.expand(source_file.filename))
+    end)
   end
 
   defp warn_about_failed_run(check, %Credo.SourceFile{} = source_file) do

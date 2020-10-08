@@ -107,7 +107,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
           if check.category == :consistency do
             {check, params}
           else
-            {check, Keyword.put(params, :__included__, files_that_changed)}
+            {check, Keyword.put(params, :__rerun_files_that_changed__, files_that_changed)}
           end
         end)
 
