@@ -12,7 +12,7 @@ defmodule Credo.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      test_coverage: [tool: Coverex.Task],
+      test_coverage: [tool: ExCoveralls],
       name: "Credo",
       description: "A static code analysis tool with a focus on code consistency and teaching.",
       package: package(),
@@ -124,6 +124,7 @@ defmodule Credo.Mixfile do
       {:bunt, "~> 0.2.0"},
       {:jason, "~> 1.0"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.10", only: :test},
       {:inch_ex, "~> 0.1", only: [:dev, :test], runtime: false}
     ]
   end
