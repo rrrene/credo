@@ -6,8 +6,9 @@ defmodule Credo.Code.Sigils do
   alias Credo.Code.InterpolationHelper
   alias Credo.SourceFile
 
-  @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
-  @sigil_delimiters [
+  alphabet = ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+
+  sigil_delimiters = [
     {"(", ")"},
     {"[", "]"},
     {"{", "}"},
@@ -18,17 +19,22 @@ defmodule Credo.Code.Sigils do
     {"\"", "\""},
     {"'", "'"}
   ]
-  @all_sigil_chars Enum.flat_map(@alphabet, fn a ->
-                     [a, String.upcase(a)]
-                   end)
-  @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
-  @removable_sigils @sigil_delimiters
-                    |> Enum.flat_map(fn {b, e} ->
-                      Enum.flat_map(@all_sigil_starts, fn start ->
-                        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
-                      end)
-                    end)
-                    |> Enum.uniq()
+
+  all_sigil_chars =
+    Enum.flat_map(alphabet, fn a ->
+      [a, String.upcase(a)]
+    end)
+
+  all_sigil_starts = Enum.map(all_sigil_chars, fn c -> "~#{c}" end)
+
+  removable_sigils =
+    sigil_delimiters
+    |> Enum.flat_map(fn {b, e} ->
+      Enum.flat_map(all_sigil_starts, fn start ->
+        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
+      end)
+    end)
+    |> Enum.uniq()
 
   @doc """
   Replaces all characters inside all sigils with the equivalent amount of
@@ -51,7 +57,7 @@ defmodule Credo.Code.Sigils do
     acc
   end
 
-  for {sigil_start, sigil_end} <- @removable_sigils do
+  for {sigil_start, sigil_end} <- removable_sigils do
     defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
       parse_removable_sigil(
         t,
@@ -181,7 +187,7 @@ defmodule Credo.Code.Sigils do
   # Sigils
   #
 
-  for {_sigil_start, sigil_end} <- @removable_sigils do
+  for {_sigil_start, sigil_end} <- removable_sigils do
     defp parse_removable_sigil("", acc, unquote(sigil_end), _replacement) do
       acc
     end

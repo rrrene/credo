@@ -6,8 +6,9 @@ defmodule Credo.Code.Heredocs do
   alias Credo.Code.InterpolationHelper
   alias Credo.SourceFile
 
-  @alphabet ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
-  @sigil_delimiters [
+  alphabet = ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+
+  sigil_delimiters = [
     {"(", ")"},
     {"[", "]"},
     {"{", "}"},
@@ -17,30 +18,36 @@ defmodule Credo.Code.Heredocs do
     {"\"", "\""},
     {"'", "'"}
   ]
-  @all_sigil_chars Enum.flat_map(@alphabet, fn a ->
-                     [a, String.upcase(a)]
-                   end)
-  @all_sigil_starts Enum.map(@all_sigil_chars, fn c -> "~#{c}" end)
 
-  @non_removable_normal_sigils @sigil_delimiters
-                               |> Enum.flat_map(fn {b, e} ->
-                                 Enum.flat_map(@all_sigil_starts, fn start ->
-                                   [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
-                                 end)
-                               end)
-                               |> Enum.uniq()
+  all_sigil_chars =
+    Enum.flat_map(alphabet, fn a ->
+      [a, String.upcase(a)]
+    end)
 
-  @removable_heredoc_sigil_delimiters [
+  all_sigil_starts = Enum.map(all_sigil_chars, fn c -> "~#{c}" end)
+
+  non_removable_normal_sigils =
+    sigil_delimiters
+    |> Enum.flat_map(fn {b, e} ->
+      Enum.flat_map(all_sigil_starts, fn start ->
+        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
+      end)
+    end)
+    |> Enum.uniq()
+
+  removable_heredoc_sigil_delimiters = [
     {"\"\"\"", "\"\"\""},
     {"'''", "'''"}
   ]
-  @removable_heredoc_sigils @removable_heredoc_sigil_delimiters
-                            |> Enum.flat_map(fn {b, e} ->
-                              Enum.flat_map(@all_sigil_starts, fn start ->
-                                [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
-                              end)
-                            end)
-                            |> Enum.uniq()
+
+  removable_heredoc_sigils =
+    removable_heredoc_sigil_delimiters
+    |> Enum.flat_map(fn {b, e} ->
+      Enum.flat_map(all_sigil_starts, fn start ->
+        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
+      end)
+    end)
+    |> Enum.uniq()
 
   @doc """
   Replaces all characters inside heredocs
@@ -64,7 +71,7 @@ defmodule Credo.Code.Heredocs do
     acc
   end
 
-  for {sigil_start, sigil_end} <- @removable_heredoc_sigils do
+  for {sigil_start, sigil_end} <- removable_heredoc_sigils do
     defp parse_code(
            <<unquote(sigil_start)::utf8, t::binary>>,
            acc,
@@ -83,7 +90,7 @@ defmodule Credo.Code.Heredocs do
     end
   end
 
-  for {sigil_start, sigil_end} <- @non_removable_normal_sigils do
+  for {sigil_start, sigil_end} <- non_removable_normal_sigils do
     defp parse_code(
            <<unquote(sigil_start)::utf8, t::binary>>,
            acc,
@@ -210,7 +217,7 @@ defmodule Credo.Code.Heredocs do
   # "Normal" Sigils (e.g. `~S"..."` or `~s(...)`)
   #
 
-  for {_sigil_start, sigil_end} <- @non_removable_normal_sigils do
+  for {_sigil_start, sigil_end} <- non_removable_normal_sigils do
     defp parse_non_removable_normal_sigil(
            "",
            acc,
@@ -302,7 +309,7 @@ defmodule Credo.Code.Heredocs do
   # Removable Sigils (e.g. `~S"""`)
   #
 
-  for {_sigil_start, sigil_end} <- @removable_heredoc_sigils do
+  for {_sigil_start, sigil_end} <- removable_heredoc_sigils do
     defp parse_removable_heredoc_sigil(
            "",
            acc,

@@ -6,7 +6,7 @@ defmodule Credo.Code.Strings do
   alias Credo.Code.InterpolationHelper
   alias Credo.SourceFile
 
-  @string_sigil_delimiters [
+  string_sigil_delimiters = [
     {"(", ")"},
     {"[", "]"},
     {"{", "}"},
@@ -15,16 +15,21 @@ defmodule Credo.Code.Strings do
     {"\"", "\""},
     {"'", "'"}
   ]
-  @heredocs__sigil_delimiters [
+
+  heredocs__sigil_delimiters = [
     {"'''", "'''"},
     {~s("""), ~s(""")}
   ]
-  @all_string_sigils Enum.flat_map(@string_sigil_delimiters, fn {b, e} ->
-                       [{"~s#{b}", e}, {"~S#{b}", e}]
-                     end)
-  @all_heredocs_sigils Enum.flat_map(@heredocs__sigil_delimiters, fn {b, e} ->
-                         [{"~s#{b}", e}, {"~S#{b}", e}]
-                       end)
+
+  all_string_sigils =
+    Enum.flat_map(string_sigil_delimiters, fn {b, e} ->
+      [{"~s#{b}", e}, {"~S#{b}", e}]
+    end)
+
+  all_heredocs_sigils =
+    Enum.flat_map(heredocs__sigil_delimiters, fn {b, e} ->
+      [{"~s#{b}", e}, {"~S#{b}", e}]
+    end)
 
   # TODO v1.0: this should not remove heredocs, since
   #             there is a separate module for that
@@ -50,7 +55,7 @@ defmodule Credo.Code.Strings do
     acc
   end
 
-  for {sigil_start, sigil_end} <- @all_heredocs_sigils do
+  for {sigil_start, sigil_end} <- all_heredocs_sigils do
     defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
       parse_heredoc(
         t,
@@ -69,7 +74,7 @@ defmodule Credo.Code.Strings do
     parse_heredoc(t, acc <> ~s('''), replacement, ~s('''))
   end
 
-  for {sigil_start, sigil_end} <- @all_string_sigils do
+  for {sigil_start, sigil_end} <- all_string_sigils do
     defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
       parse_string_sigil(
         t,
@@ -198,7 +203,7 @@ defmodule Credo.Code.Strings do
   # Sigils
   #
 
-  for {_sigil_start, sigil_end} <- @all_string_sigils do
+  for {_sigil_start, sigil_end} <- all_string_sigils do
     defp parse_string_sigil("", acc, unquote(sigil_end), _replacement) do
       acc
     end
