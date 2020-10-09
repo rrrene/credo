@@ -14,7 +14,6 @@ defmodule Credo.Code do
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
 
-  alias Credo.CLI.Output.CaptureIO
   alias Credo.SourceFile
 
   defmodule ParserError do
@@ -129,25 +128,20 @@ defmodule Credo.Code do
   end
 
   def to_tokens(source, filename \\ "nofilename") when is_binary(source) do
-    {_captured_output, tokens} =
-      CaptureIO.capture_stderr(fn ->
-        result =
-          source
-          |> String.to_charlist()
-          |> :elixir_tokenizer.tokenize(1, file: filename)
+    result =
+      source
+      |> String.to_charlist()
+      |> :elixir_tokenizer.tokenize(1, file: filename)
 
-        case result do
-          # Elixir < 1.6
-          {_, _, _, tokens} ->
-            tokens
+    case result do
+      # Elixir < 1.6
+      {_, _, _, tokens} ->
+        tokens
 
-          # Elixir >= 1.6
-          {:ok, tokens} ->
-            tokens
-        end
-      end)
-
-    tokens
+      # Elixir >= 1.6
+      {:ok, tokens} ->
+        tokens
+    end
   end
 
   @doc """
