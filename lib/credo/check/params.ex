@@ -50,6 +50,8 @@ defmodule Credo.Check.Params do
       :__category__,
       :exit_status,
       :__exit_status__,
+      :files,
+      :__files__,
       :priority,
       :__priority__,
       :tags,
