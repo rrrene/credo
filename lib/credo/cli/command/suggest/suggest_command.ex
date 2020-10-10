@@ -5,6 +5,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   @shortdoc "Suggest code objects to look at next (default)"
 
+  alias Credo.Check.Params
   alias Credo.CLI.Command.Suggest.SuggestOutput
   alias Credo.CLI.Task
   alias Credo.Execution
@@ -107,7 +108,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
           if check.category == :consistency do
             {check, params}
           else
-            {check, Keyword.put(params, :__rerun_files_that_changed__, files_that_changed)}
+            {check, Params.put_rerun_files_that_changed(params, files_that_changed)}
           end
         end)
 

@@ -3,10 +3,10 @@ defmodule Credo.ListTest do
 
   @moduletag slow: :integration
 
-  @fixture_example_code "test/fixtures/example_code"
+  @fixture_integration_test_config "test/fixtures/integration_test_config"
 
   test "it should NOT report issues using list command" do
-    exec = Credo.run(["list", @fixture_example_code])
+    exec = Credo.run(["list", @fixture_integration_test_config])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "list"
@@ -14,7 +14,7 @@ defmodule Credo.ListTest do
   end
 
   test "it should NOT report issues using list command (using --strict)" do
-    exec = Credo.run(["list", "--strict", @fixture_example_code])
+    exec = Credo.run(["list", "--strict", @fixture_integration_test_config])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "list"

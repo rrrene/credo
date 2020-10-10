@@ -44,6 +44,16 @@ defmodule Credo.Check.Params do
   end
 
   @doc false
+  def get_rerun_files_that_changed(params) do
+    List.wrap(params[:__rerun_files_that_changed__])
+  end
+
+  @doc false
+  def put_rerun_files_that_changed(params, files_that_changed) do
+    Keyword.put(params, :__rerun_files_that_changed__, files_that_changed)
+  end
+
+  @doc false
   def builtin_param_names do
     [
       :category,
@@ -73,14 +83,14 @@ defmodule Credo.Check.Params do
   def files_excluded(params, check_mod) do
     files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
 
-    files[:excluded]
+    List.wrap(files[:excluded])
   end
 
   @doc false
   def files_included(params, check_mod) do
     files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
 
-    files[:included]
+    List.wrap(files[:included])
   end
 
   @doc false

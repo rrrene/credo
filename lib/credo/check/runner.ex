@@ -36,17 +36,21 @@ defmodule Credo.Check.Runner do
   end
 
   defp do_run_check(exec, {check, params}) do
-    rerun_files_that_changed = List.wrap(params[:__rerun_files_that_changed__])
+    rerun_files_that_changed = Params.get_rerun_files_that_changed(params)
 
-    files_included = params |> Params.files_included(check) |> Credo.Sources.find()
-    files_excluded = params |> Params.files_excluded(check) |> Credo.Sources.find()
+    files_included = Params.files_included(params, check)
+    files_excluded = Params.files_excluded(params, check)
+
+    found_relevant_files =
+      exec
+      |> Execution.get_path()
+      |> Credo.Sources.find_in_dir(files_included, files_excluded)
 
     source_files =
       exec
       |> Execution.get_source_files()
       |> filter_source_files(rerun_files_that_changed)
-      |> filter_source_files(files_included)
-      |> reject_source_files(files_excluded)
+      |> filter_source_files(found_relevant_files)
 
     try do
       check.run_on_all_source_files(exec, source_files, params)
@@ -69,16 +73,6 @@ defmodule Credo.Check.Runner do
   defp filter_source_files(source_files, files_included) do
     Enum.filter(source_files, fn source_file ->
       Enum.member?(files_included, Path.expand(source_file.filename))
-    end)
-  end
-
-  defp reject_source_files(source_files, []) do
-    source_files
-  end
-
-  defp reject_source_files(source_files, files_excluded) do
-    Enum.reject(source_files, fn source_file ->
-      Enum.member?(files_excluded, Path.expand(source_file.filename))
     end)
   end
 

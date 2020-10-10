@@ -2,6 +2,8 @@ defmodule Credo.SourcesTest do
   use ExUnit.Case
   @moduletag slow: :disk_io
 
+  @fixture_integration_test_config "test/fixtures/integration_test_config"
+
   test "it finds all files inside directories recursively" do
     exec = %Credo.Execution{files: %{excluded: [], included: ["lib/mix"]}}
 
@@ -219,5 +221,43 @@ defmodule Credo.SourcesTest do
       |> Enum.map(& &1.filename)
 
     assert files |> Enum.count() > 0
+  end
+
+  test "it finds in dir with binary path" do
+    dir = @fixture_integration_test_config
+
+    expected =
+      ["#{dir}/clean.ex", "#{dir}/clean_redux.ex"]
+      |> Enum.map(&Path.expand/1)
+
+    assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], [])
+  end
+
+  test "it finds in dir and excludes given files" do
+    dir = @fixture_integration_test_config
+
+    expected =
+      ["#{dir}/clean_redux.ex"]
+      |> Enum.map(&Path.expand/1)
+
+    assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], ["clean.ex"])
+  end
+
+  test "it finds in dir and includes given files" do
+    dir = @fixture_integration_test_config
+
+    expected =
+      ["#{dir}/clean.ex"]
+      |> Enum.map(&Path.expand/1)
+
+    assert expected == Credo.Sources.find_in_dir(dir, ["clean.ex"], [])
+  end
+
+  test "it finds in dir and excludes given regex patterns" do
+    dir = @fixture_integration_test_config
+
+    expected = []
+
+    assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], [~r/.ex$/])
   end
 end
