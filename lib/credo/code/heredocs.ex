@@ -35,6 +35,8 @@ defmodule Credo.Code.Heredocs do
     end)
     |> Enum.uniq()
 
+  non_removable_normal_sigil_ends = Enum.map(sigil_delimiters, &elem(&1, 1))
+
   removable_heredoc_sigil_delimiters = [
     {"\"\"\"", "\"\"\""},
     {"'''", "'''"}
@@ -48,6 +50,8 @@ defmodule Credo.Code.Heredocs do
       end)
     end)
     |> Enum.uniq()
+
+  removable_heredoc_sigil_ends = Enum.map(removable_heredoc_sigil_delimiters, &elem(&1, 1))
 
   @doc """
   Replaces all characters inside heredocs
@@ -217,7 +221,7 @@ defmodule Credo.Code.Heredocs do
   # "Normal" Sigils (e.g. `~S"..."` or `~s(...)`)
   #
 
-  for {_sigil_start, sigil_end} <- non_removable_normal_sigils do
+  for sigil_end <- non_removable_normal_sigil_ends do
     defp parse_non_removable_normal_sigil(
            "",
            acc,
@@ -309,7 +313,7 @@ defmodule Credo.Code.Heredocs do
   # Removable Sigils (e.g. `~S"""`)
   #
 
-  for {_sigil_start, sigil_end} <- removable_heredoc_sigils do
+  for sigil_end <- removable_heredoc_sigil_ends do
     defp parse_removable_heredoc_sigil(
            "",
            acc,

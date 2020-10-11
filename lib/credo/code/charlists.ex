@@ -16,7 +16,7 @@ defmodule Credo.Code.Charlists do
     {"'", "'"}
   ]
 
-  heredocs__sigil_delimiters = [
+  heredocs_sigil_delimiters = [
     {"'''", "'''"},
     {~s("""), ~s(""")}
   ]
@@ -26,8 +26,10 @@ defmodule Credo.Code.Charlists do
       [{"~s#{b}", e}, {"~S#{b}", e}]
     end)
 
+  all_string_sigil_ends = Enum.map(string_sigil_delimiters, &elem(&1, 1))
+
   all_heredocs_sigils =
-    Enum.flat_map(heredocs__sigil_delimiters, fn {b, e} ->
+    Enum.flat_map(heredocs_sigil_delimiters, fn {b, e} ->
       [{"~s#{b}", e}, {"~S#{b}", e}]
     end)
 
@@ -195,7 +197,7 @@ defmodule Credo.Code.Charlists do
   # Sigils
   #
 
-  for {_sigil_start, sigil_end} <- all_string_sigils do
+  for sigil_end <- all_string_sigil_ends do
     defp parse_string_sigil("", acc, unquote(sigil_end), _replacement) do
       acc
     end

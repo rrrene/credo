@@ -27,6 +27,8 @@ defmodule Credo.Code.Sigils do
 
   all_sigil_starts = Enum.map(all_sigil_chars, fn c -> "~#{c}" end)
 
+  removable_sigil_ends = Enum.map(sigil_delimiters, &elem(&1, 1))
+
   removable_sigils =
     sigil_delimiters
     |> Enum.flat_map(fn {b, e} ->
@@ -187,7 +189,7 @@ defmodule Credo.Code.Sigils do
   # Sigils
   #
 
-  for {_sigil_start, sigil_end} <- removable_sigils do
+  for sigil_end <- removable_sigil_ends do
     defp parse_removable_sigil("", acc, unquote(sigil_end), _replacement) do
       acc
     end
