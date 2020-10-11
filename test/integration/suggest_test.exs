@@ -29,6 +29,12 @@ defmodule Credo.SuggestTest do
     assert issues == []
   end
 
+  test "it should halt on integration_test_config fixture (using --foo)" do
+    exec = Credo.run(["--foo"])
+
+    assert exec.halted == true
+  end
+
   test "it should NOT report issues on integration_test_config fixture (using --strict)" do
     exec = Credo.run(["--strict", @fixture_integration_test_config])
     issues = Credo.Execution.get_issues(exec)
