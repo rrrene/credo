@@ -53,6 +53,30 @@ defmodule Credo.SuggestTest do
     assert issues == []
   end
 
+  test "it should report issues using suggest command (using --all)" do
+    exec = Credo.run(["suggest", "--all", "module", @fixture_integration_test_config])
+    issues = Credo.Execution.get_issues(exec)
+
+    assert exec.cli_options.command == "suggest"
+    assert issues != []
+  end
+
+  test "it should NOT report issues using suggest command (using --only)" do
+    exec = Credo.run(["suggest", "--only", "module", @fixture_integration_test_config])
+    issues = Credo.Execution.get_issues(exec)
+
+    assert exec.cli_options.command == "suggest"
+    assert issues == []
+  end
+
+  test "it should NOT report issues using suggest command (using --ignore)" do
+    exec = Credo.run(["suggest", "--ignore", "module", @fixture_integration_test_config])
+    issues = Credo.Execution.get_issues(exec)
+
+    assert exec.cli_options.command == "suggest"
+    assert issues == []
+  end
+
   test "it should NOT report issues using suggest command (using --format json)" do
     exec = Credo.run(["suggest", "--format", "json", @fixture_integration_test_config])
     issues = Credo.Execution.get_issues(exec)
