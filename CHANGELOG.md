@@ -70,7 +70,7 @@ defmodule MyApp.Check.SomethingAboutTests do
       """
     ],
     param_defaults: [
-      files: %{included: ["**/*_test.exs"]}}
+      files: %{included: ["**/*_test.exs"]}
     ]
 ```
 
