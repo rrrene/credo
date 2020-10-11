@@ -16,7 +16,7 @@ defmodule Credo.Code.Strings do
     {"'", "'"}
   ]
 
-  heredocs__sigil_delimiters = [
+  heredocs_sigil_delimiters = [
     {"'''", "'''"},
     {~s("""), ~s(""")}
   ]
@@ -27,7 +27,7 @@ defmodule Credo.Code.Strings do
     end)
 
   all_heredocs_sigils =
-    Enum.flat_map(heredocs__sigil_delimiters, fn {b, e} ->
+    Enum.flat_map(heredocs_sigil_delimiters, fn {b, e} ->
       [{"~s#{b}", e}, {"~S#{b}", e}]
     end)
 
