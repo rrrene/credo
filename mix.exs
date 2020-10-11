@@ -13,13 +13,13 @@ defmodule Credo.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.html": :test],
+      preferred_cli_env: [coveralls: :test, "coveralls.html": :test, "test.fast": :test],
       name: "Credo",
       description: "A static code analysis tool with a focus on code consistency and teaching.",
       package: package(),
       source_url: "https://github.com/rrrene/credo",
-      # The main page in the docs
-      docs: docs()
+      docs: docs(),
+      aliases: aliases()
     ]
   end
 
@@ -127,6 +127,12 @@ defmodule Credo.Mixfile do
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
       {:inch_ex, "~> 0.1", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      "test.fast": "test --exclude slow"
     ]
   end
 end
