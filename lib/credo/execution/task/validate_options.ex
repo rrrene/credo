@@ -23,7 +23,7 @@ defmodule Credo.Execution.Task.ValidateOptions do
     Enum.each(exec.cli_options.unknown_args, &print_argument/1)
     Enum.each(exec.cli_options.unknown_switches, &print_switch/1)
 
-    System.halt(1)
+    put_assign(exec, "credo.exit_status", 1)
   end
 
   defp print_argument(name) do
