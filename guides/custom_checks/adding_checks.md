@@ -109,7 +109,7 @@ Traversal of the AST is done via `Credo.Code.prewalk/2`, which is a light wrappe
 
 You can use `Code.string_to_quoted!/1` to look at the AST structure for code snippets:
 
-```elixir  
+```elixir
 iex> Code.string_to_quoted!("@my_attribute 23")
 {:@, [line: 1], [{:my_attribute, [line: 1], [23]}]}
 ```
@@ -124,7 +124,7 @@ defmodule MyProject.Checks.RejectModuleAttributes do
   use Credo.Check, param_defaults: [reject: [:checkdoc]]
 
   def run(source_file, params \\ []) do
-    # To get a parameter, we use `Params.get/3`, which returns the given parameter from the config 
+    # To get a parameter, we use `Params.get/3`, which returns the given parameter from the config
     # or the default we registered above:
     reject = Params.get(params, :reject, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)

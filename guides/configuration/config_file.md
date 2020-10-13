@@ -14,24 +14,17 @@ You can use `mix credo gen.config` to generate a complete example configuration.
         included: ["lib/", "src/", "web/", "apps/"],
         excluded: []
       },
+      plugins: [],
+      requires: [],
+      strict: false,
+      parse_timeout: 5000,
+      color: true,
       checks: [
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority
         # Priority values are: `low`, `normal`, `high`, `higher`
         {Credo.Check.Design.AliasUsage, priority: :low},
-
-        # For others you can also set parameters
-        {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
-
-        # You can also customize the exit_status of each check.
-        # If you don't want TODO comments to cause `mix credo` to fail, just
-        # set this value to 0 (zero).
-        {Credo.Check.Design.TagTODO, exit_status: 2},
-
-        # To deactivate a check:
-        # Put `false` as second element:
-        {Credo.Check.Design.TagFIXME, false},
 
         # ... several checks omitted for readability ...
       ]
@@ -40,7 +33,9 @@ You can use `mix credo gen.config` to generate a complete example configuration.
 }
 ```
 
-## Using different configurations in the same file
+## Config Keys
+
+### `:name`
 
 Credo configs are given names. The default configuration is named `default`.
 
@@ -83,6 +78,130 @@ mix credo --config-name spring-cleaning
 ```
 
 to run the custom configuration we added.
+
+
+### `:files`
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      files: %{
+        included: ["mix.exs", "lib/", "src/", "web/", "apps/"],
+        excluded: ["test/"]
+      },
+      # checks etc.
+    }
+  ]
+}
+```
+
+The `:files` map can have two fields:
+
+- `:included` contains a list of files, directories and globs (as in `"**/*_test.exs"`)
+- `:excluded` contains a list of files, directories, globs (as in `"**/*_test.exs"`) and regular expressions (as in `~r"/_build/"`)
+
+
+### `:plugins`
+
+Configures plugin modules that Credo should load at start up (*defaults to `[]`*).
+
+This is needed to [enable and configure plugins](plugins.html) in the analysis.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      plugins: [
+        {CredoDemoPlugin, []}
+      ],
+      # files, checks etc.
+    }
+  ]
+}
+```
+
+
+### `:requires`
+
+Configures Elixir source files that Credo should require at start up (*defaults to `[]`*).
+
+This is needed to [add local custom checks](adding_checks.html) in the analysis.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      requires: ["lib/check/my_check.ex"],
+      # files, checks etc.
+    }
+  ]
+}
+```
+
+
+### `:strict`
+
+Set to `true` to enable low priority checks (*defaults to `false`*).
+
+This is equivalent to using the `--strict` CLI switch.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      strict: true,
+      # files, checks etc.
+    }
+  ]
+}
+```
+
+
+### `:parse_timeout`
+
+Configures a timeout for parsing source files in milliseconds (*defaults to 5000 milliseconds*).
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      parse_timeout: 60_000,
+      # files, checks etc.
+    }
+  ]
+}
+```
+
+
+### `:color`
+
+Set to `false` to disable colored output (*defaults to `true`*).
+
+This is equivalent to using the `--no-color` CLI switch.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      color: false,
+      # files, checks etc.
+    }
+  ]
+}
+```
 
 
 ## Using a specific configuration file
