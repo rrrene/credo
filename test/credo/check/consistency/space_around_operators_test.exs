@@ -93,6 +93,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         <<102::unsigned-big-integer-size(8), rest::binary>>
         <<102::unsigned-big-integer-8, rest::binary>>
         <<102::signed-little-float-8, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+        <<min_ver::size(16)-unsigned-integer-little, rest::binary>>
+
         <<102::8-integer-big-unsigned, rest::binary>>
         <<102, rest::binary>>
         << valsize :: 32-unsigned, rest::binary >>

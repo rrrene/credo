@@ -29,7 +29,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   defp traverse_tokens(tokens, callback, acc) do
     tokens
-    |> skip_specs_types_and_capture
+    |> skip_specs_types_captures_and_binary_patterns()
     |> case do
       [prev | [current | [next | rest]]] ->
         acc =
@@ -46,7 +46,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     end
   end
 
-  defp skip_specs_types_and_capture([{:at_op, {line, _, _}, :@} | tokens]) do
+  defp skip_specs_types_captures_and_binary_patterns([{:at_op, {line, _, _}, :@} | tokens]) do
     case tokens do
       # @spec - drop whole line
       [{:identifier, _, :spec} | tokens] ->
@@ -61,17 +61,23 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
     end
   end
 
-  defp skip_specs_types_and_capture([{:capture_op, _, _} | tokens]) do
+  defp skip_specs_types_captures_and_binary_patterns([{:capture_op, _, _} | tokens]) do
     drop_while_in_fun_capture(tokens)
   end
 
   # When quoting &//2 (which captures the / operator via &fun_name/2), the
   # {:capture_op, _, :&} token becomes an {:identifier, _, :&} token ...
-  defp skip_specs_types_and_capture([{:identifier, _, :&} | [{:identifier, _, :/} | tokens]]) do
+  defp skip_specs_types_captures_and_binary_patterns([
+         {:identifier, _, :&} | [{:identifier, _, :/} | tokens]
+       ]) do
     drop_while_in_fun_capture(tokens)
   end
 
-  defp skip_specs_types_and_capture(tokens), do: tokens
+  defp skip_specs_types_captures_and_binary_patterns([{:"<<", _} | tokens]) do
+    drop_while_in_binary_pattern(tokens)
+  end
+
+  defp skip_specs_types_captures_and_binary_patterns(tokens), do: tokens
 
   defp drop_while_on_line(tokens, line) do
     Enum.drop_while(tokens, fn
@@ -121,6 +127,16 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
       _ ->
         false
+    end)
+  end
+
+  defp drop_while_in_binary_pattern(tokens) do
+    Enum.drop_while(tokens, fn
+      :">>" ->
+        false
+
+      _ ->
+        true
     end)
   end
 
