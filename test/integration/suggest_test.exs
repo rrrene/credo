@@ -2,6 +2,7 @@ defmodule Credo.SuggestTest do
   use Credo.Test.Case
 
   @moduletag slow: :integration
+  @moduletag timeout: 300_000
 
   @fixture_integration_test_config "test/fixtures/integration_test_config"
 

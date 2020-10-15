@@ -2,6 +2,7 @@ defmodule Credo.ExplainTest do
   use Credo.Test.Case
 
   @moduletag slow: :integration
+  @moduletag timeout: 300_000
 
   @fixture_integration_test_config_with_location "test/fixtures/integration_test_config/clean_redux.ex:1:11"
 
