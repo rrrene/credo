@@ -1,8 +1,19 @@
-# Config file .credo.exs
+# .credo.exs
 
-Credo is configured via a file called `.credo.exs`. This file can live in your project's `config/` or root folder, both is fine.
+Credo is configured via a file called `.credo.exs`.
 
 You can use `mix credo gen.config` to generate a complete example configuration.
+
+```shell
+$ mix credo gen.config
+* creating .credo.exs
+```
+
+This file can live in your project's `config/` or root folder, both is fine.
+
+## Config Keys
+
+Credo's config is a plain `.exs` file, no magic here. It contains a map with a single key (`:configs`), which contains a list of maps that represent the individual configs (most of the time, it's just one, named "default").
 
 ```elixir
 # .credo.exs or config/.credo.exs
@@ -20,26 +31,30 @@ You can use `mix credo gen.config` to generate a complete example configuration.
       parse_timeout: 5000,
       color: true,
       checks: [
-        {Credo.Check.Consistency.TabsOrSpaces},
-
-        # For some checks, like AliasUsage, you can only customize the priority
-        # Priority values are: `low`, `normal`, `high`, `higher`
         {Credo.Check.Design.AliasUsage, priority: :low},
-
-        # ... several checks omitted for readability ...
+        # ... other checks omitted for readability ...
       ]
     }
   ]
 }
 ```
 
-## Config Keys
+The config keys available are:
+
+- [`:name`](#name)
+- [`:checks`](#checks)
+- [`:color`](#color)
+- [`:files`](#files)
+- [`:parse_timeout`](#parse_timeout)
+- [`:plugins`](#plugins)
+- [`:requires`](#requires)
+- [`:strict`](#strict)
 
 ### `:name`
 
 Credo configs are given names. The default configuration is named `default`.
 
-You can specify which config to use on the command line:
+You can specify which config to use on the command line (again, `default` is run by ... default):
 
 ```shell
 mix credo --config-name <NAME_OF_CONFIG>
@@ -125,6 +140,15 @@ This is needed to [enable and configure plugins](plugins.html) in the analysis.
 }
 ```
 
+All plugins are configured using a two-element tuple:
+
+```elixir
+{MyApp.PluginModule, params}
+```
+
+- `MyApp.PluginModule` - the module representing the plugin to be configured
+- `params` - can be either `false` (to disable the plugin) or a keyword list of parameters (to configure the plugin)
+
 
 ### `:requires`
 
@@ -202,6 +226,38 @@ This is equivalent to using the `--no-color` CLI switch.
   ]
 }
 ```
+
+
+### `:checks`
+
+Configures plugin modules that Credo should load at start up (*defaults to `[]`*).
+
+This is needed to [enable and configure checks](checks.html) in the analysis.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: [
+        {Credo.Check.Consistency.TabsOrSpaces, false},
+        {Credo.Check.Design.AliasUsage, priority: :low},
+      ],
+      # files etc.
+    }
+  ]
+}
+```
+
+All checks are configured using a two-element tuple:
+
+```elixir
+{MyApp.CheckModule, params}
+```
+
+- `MyApp.CheckModule` - the module representing the check to be configured
+- `params` - can be either `false` (to disable the check) or a keyword list of parameters (to configure the check)
 
 
 ## Using a specific configuration file
