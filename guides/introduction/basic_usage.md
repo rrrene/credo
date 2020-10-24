@@ -161,11 +161,15 @@ By default, only issues with a positive priority are part of the report (↑ ↗
 
 Example usage:
 
-    $ mix credo                         # display standard report
-    $ mix credo suggest                 # same thing, since it's the default command
-    $ mix credo --all --format=json     # include low priority issues, output as JSON
+```shell
+$ mix credo                         # display standard report
+$ mix credo suggest                 # same thing, since it's the default command
+$ mix credo --strict --format=json  # include low priority issues, output as JSON
 
-    $ mix credo suggest --help          # more options
+$ mix credo suggest --help          # more options
+```
+
+[Learn more ...](suggest_command.html).
 
 
 ### list
@@ -174,26 +178,31 @@ Example usage:
 
 Example usage:
 
-    $ mix credo list                      # show issues grouped by file
-    $ mix credo list --format oneline     # show issues grouped by file, one issue per line
-    $ mix credo list --format oneline -a  # same thing, include low priority issues
+```shell
+$ mix credo list                      # show issues grouped by file
+$ mix credo list --format oneline     # show issues grouped by file, one issue per line
+$ mix credo list --format oneline -a  # same thing, include low priority issues
 
-    $ mix credo list --help               # more options
+$ mix credo list --help               # more options
+```
+
+[Learn more ...](list_command.html).
 
 
 ### explain
 
 `explain` allows you to dig deeper into an issue, by showing you details about the issue and the reasoning by it being reported. To be convenient, you can just copy-paste the `filename:line_number:column` string from the report behind the Credo command to check it out.
 
-*Credits:* This is inspired by how you can snap the info from failed tests behind `mix test`.
-
 Example usage:
 
-    $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
-    $ mix credo explain lib/my_app/server.ex:10:24  # same thing
+```shell
+$ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
+$ mix credo explain lib/my_app/server.ex:10:24  # same thing
+```
 
-There are no additional options.
+*Credit where credit is due:* This is inspired by how you can snap the info from failed tests behind `mix test`.
 
+[Learn more ...](explain_command.html).
 
 
 ### categories
@@ -209,9 +218,11 @@ There are no additional options.
 
 Example usage:
 
-    $ mix credo info
-    $ mix credo info --verbose
-    $ mix credo info --verbose --format=json
+```shell
+$ mix credo info
+$ mix credo info --verbose
+$ mix credo info --verbose --format=json
+```
 
 ### Further reading
 

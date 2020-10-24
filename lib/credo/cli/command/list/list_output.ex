@@ -54,8 +54,11 @@ defmodule Credo.CLI.Command.List.ListOutput do
         -v, --version                 Show version
         -h, --help                    Show this help
 
-      Feedback:
-        Open an issue here: https://github.com/rrrene/credo/issues
+      Find advanced usage instructions and more examples here:
+        https://hexdocs.pm/credo/list_command.html
+
+      Give feedback and open an issue here:
+        https://github.com/rrrene/credo/issues
       """
       |> String.trim_trailing()
 

@@ -49,6 +49,12 @@ defmodule Credo.Mixfile do
       "guides/introduction/exit_statuses.md",
       "guides/introduction/mix_tasks.md",
 
+      # Commands
+
+      "guides/commands/suggest_command.md",
+      "guides/commands/explain_command.md",
+      "guides/commands/list_command.md",
+
       # Plugins
 
       "guides/custom_checks/adding_checks.md",
@@ -70,6 +76,7 @@ defmodule Credo.Mixfile do
     [
       Introduction: ~r/guides\/introduction\/.?/,
       Configuration: ~r/guides\/configuration\//,
+      Commands: ~r/guides\/commands\//,
       "Custom Checks": ~r/guides\/custom_checks\//,
       Plugins: ~r/guides\/plugins\//
     ]
