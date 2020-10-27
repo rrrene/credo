@@ -49,6 +49,7 @@ defmodule Credo.CLI.Command.Diff.DiffSummary do
 
     UI.puts([
       "Changes between ",
+      :faint,
       :cyan,
       git_ref,
       :reset,
