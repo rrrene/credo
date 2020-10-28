@@ -6,7 +6,6 @@
 ## Examples
 
 ```bash
-# display standard report
 $ mix credo
 $ mix credo suggest                 # same thing, since it's the default command
 $ mix credo --strict --format=json  # include low priority issues, output as JSON
