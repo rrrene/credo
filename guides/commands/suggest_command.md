@@ -1,10 +1,7 @@
 
 # mix credo suggest
 
-`suggest` suggests issues to fix in your code, but it cuts the list to a digestable count.
-It is the default command of Credo.
-
-If you want to see the full list, use the `--all`  switch.
+`suggest` suggests issues to fix in your code.
 
 ## Examples
 
