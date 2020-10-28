@@ -25,7 +25,7 @@ Default values for the checks are based on their category:
 
 Let's see what this means using an example:
 
-```shell
+```bash
 $ mix credo
 
 [...snip...]

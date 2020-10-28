@@ -2,7 +2,7 @@
 
 After incuding Credo in a project's dependencies (see [Installation](installation.html)), there are a number of built-in mix tasks available:
 
-```shell
+```bash
 $ mix help | grep -i credo
 mix credo                 # Run code analysis (use `--help` for options)
 mix credo.gen.check       # Generate a new custom check for Credo

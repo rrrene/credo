@@ -194,13 +194,13 @@ end
 
 You can now use Credo's `explain` command ...
 
-```shell
+```bash
 $ mix credo explain MyProject.Checks.RejectModuleAttributes
 ```
 
 ... to show a description of your new check:
 
-```shell
+```bash
   MyProject.Checks.MyIExPry
 ┃ 
 ┃   [R] Category: readability 

@@ -15,6 +15,7 @@ Use `--format` to format the output in one of the following formats:
 - `--format flycheck` for [Flycheck](http://www.flycheck.org/) output
 - `--format json` for [JSON](https://www.json.org/) output
 
+Additionally, you can deactivate the output's coloring by using `--no-color`.
 
 ### Only run some checks
 
@@ -102,13 +103,16 @@ Use the `--all-priorities` switch to include low priority issues in the output (
 
 Most configuration options are also available as command line switches.
 
-```shell
+```bash
 ➜ mix credo suggest --help
 Usage: mix credo suggest [paths] [options]
 
 Suggests objects from every category that Credo thinks can be improved.
 
-Example: $ mix credo suggest lib/**/*.ex --only consistency --format json
+Examples:
+  $ mix credo suggest --format json
+  $ mix credo suggest lib/**/*.ex --only consistency --all
+  $ mix credo suggest --checks-without-tag formatter --checks-without-tag controversial
 
 Arrows (↑ ↗ → ↘ ↓) hint at the importance of an issue.
 
@@ -135,6 +139,12 @@ General options:
       --[no-]color              Toggle colored output
   -v, --version                 Show version
   -h, --help                    Show this help
+
+Find advanced usage instructions and more examples here:
+  https://hexdocs.pm/credo/suggest_command.html
+
+Give feedback and open an issue here:
+  https://github.com/rrrene/credo/issues
 ```
 
 Some of these are not available as configuration options in `.credo.exs`:

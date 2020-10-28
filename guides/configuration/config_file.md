@@ -4,7 +4,7 @@ Credo is configured via a file called `.credo.exs`.
 
 You can use `mix credo gen.config` to generate a complete example configuration.
 
-```shell
+```bash
 $ mix credo gen.config
 * creating .credo.exs
 ```
@@ -56,7 +56,7 @@ Credo configs are given names. The default configuration is named `default`.
 
 You can specify which config to use on the command line (again, `default` is run by ... default):
 
-```shell
+```bash
 mix credo --config-name <NAME_OF_CONFIG>
 ```
 
@@ -88,7 +88,7 @@ We can exclude the directory from our `default` config and add another config fo
 
 Now you can use
 
-```shell
+```bash
 mix credo --config-name spring-cleaning
 ```
 
@@ -264,7 +264,7 @@ All checks are configured using a two-element tuple:
 
 You can tell Creod to use a specific config file anywhere in the file system:
 
-```shell
+```bash
 mix credo --config-file <PATH_TO_CONFIG_FILE>
 ```
 
@@ -277,7 +277,7 @@ Credo traverses the filesystem's folder structure upwards to find additional con
 
 Consider the following directory structure:
 
-```shell
+```bash
 /
   home/
     rrrene/
@@ -298,7 +298,7 @@ Please not that, as mentioned above, Credo's config can also resive in a `config
 
 Given this directory structure:
 
-```shell
+```bash
 /
   home/
     rrrene/

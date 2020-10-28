@@ -2,7 +2,7 @@
 
 To run credo in the current project, **just type**:
 
-```shell
+```bash
 $ mix credo
 ```
 
@@ -10,13 +10,13 @@ This will run the code analysis and suggest places to edit your code.
 
 If you want to enforce a style guide and need a more traditional linting experience, try
 
-```shell
+```bash
 $ mix credo --strict
 ```
 
 You will get output like this:
 
-```shell
+```bash
 ┃  Refactoring opportunities
 ┃ 
 ┃ [F] ↗ Avoid negated conditions in if-else blocks.
@@ -28,13 +28,13 @@ You will get output like this:
 Since Credo is all about teaching people, you can find out more about that particular entry.
 Just copy the `<filename>:<line-number>[:column]` combo into the command:
 
-```shell
+```bash
 $ mix credo lib/credo/check.ex:306
 ```
 
 The result is an explanation of the issue:
 
-```shell
+```bash
 ┃ 
 ┃   [F] Category: refactor 
 ┃    ↗  Priority: high 
@@ -89,7 +89,7 @@ The result is an explanation of the issue:
 
 Credo can also provide the output of every command as JSON:
 
-```shell
+```bash
 $ mix credo lib/credo/check.ex:306 --format json
 {
   "explanations": [
@@ -161,7 +161,7 @@ By default, only issues with a positive priority are part of the report (↑ ↗
 
 Example usage:
 
-```shell
+```bash
 $ mix credo                         # display standard report
 $ mix credo suggest                 # same thing, since it's the default command
 $ mix credo --strict --format=json  # include low priority issues, output as JSON
@@ -178,7 +178,7 @@ $ mix credo suggest --help          # more options
 
 Example usage:
 
-```shell
+```bash
 $ mix credo list                      # show issues grouped by file
 $ mix credo list --format oneline     # show issues grouped by file, one issue per line
 $ mix credo list --format oneline -a  # same thing, include low priority issues
@@ -195,7 +195,7 @@ $ mix credo list --help               # more options
 
 Example usage:
 
-```shell
+```bash
 $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
 $ mix credo explain lib/my_app/server.ex:10:24  # same thing
 ```
@@ -218,7 +218,7 @@ There are no additional options.
 
 Example usage:
 
-```shell
+```bash
 $ mix credo info
 $ mix credo info --verbose
 $ mix credo info --verbose --format=json

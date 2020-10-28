@@ -14,7 +14,7 @@ end
 
 And run:
 
-```shell
+```bash
 $ mix deps.get
 ```
 
