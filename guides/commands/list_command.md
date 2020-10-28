@@ -1,4 +1,3 @@
-
 # mix credo list
 
 `list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.

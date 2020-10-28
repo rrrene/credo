@@ -1,4 +1,3 @@
-
 # mix credo suggest
 
 `suggest` suggests issues to fix in your code.
