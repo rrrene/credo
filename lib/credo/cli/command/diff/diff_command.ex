@@ -95,11 +95,12 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       now = DateTime.utc_now() |> to_string |> String.replace(~r/\D/, "")
       dirname = "credo-diff-#{now}"
       tmp_dirname = Path.join(System.tmp_dir!(), dirname)
+      if !File.exists?(tmp_dirname), do: File.mkdir!(tmp_dirname)
 
-      {_output, 0} =
+      {_output, _value} =
         System.cmd("git", ["clone", ".", tmp_dirname], cd: path, stderr_to_stdout: true)
 
-      {_output, 0} =
+      {_output, _value} =
         System.cmd("git", ["checkout", git_ref], cd: tmp_dirname, stderr_to_stdout: true)
 
       tmp_dirname
