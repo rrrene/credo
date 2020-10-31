@@ -93,16 +93,38 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
 
     defp run_git_clone_and_checkout(path, git_ref) do
       now = DateTime.utc_now() |> to_string |> String.replace(~r/\D/, "")
-      dirname = "credo-diff-#{now}"
-      tmp_dirname = Path.join(System.tmp_dir!(), dirname)
+      tmp_clone_dir = Path.join(System.tmp_dir!(), "credo-diff-#{now}")
+      git_root_path = git_root_path(path)
+      current_dir = Path.expand(".")
+      tmp_working_dir = tmp_working_dir(tmp_clone_dir, git_root_path, current_dir)
 
       {_output, 0} =
-        System.cmd("git", ["clone", ".", tmp_dirname], cd: path, stderr_to_stdout: true)
+        System.cmd("git", ["clone", git_root_path, tmp_clone_dir],
+          cd: path,
+          stderr_to_stdout: true
+        )
 
       {_output, 0} =
-        System.cmd("git", ["checkout", git_ref], cd: tmp_dirname, stderr_to_stdout: true)
+        System.cmd("git", ["checkout", git_ref], cd: tmp_clone_dir, stderr_to_stdout: true)
 
-      tmp_dirname
+      tmp_working_dir
+    end
+
+    defp git_root_path(path) do
+      {output, 0} =
+        System.cmd("git", ["rev-parse", "--show-toplevel"], cd: path, stderr_to_stdout: true)
+
+      String.trim(output)
+    end
+
+    defp tmp_working_dir(tmp_clone_dir, git_root_is_current_dir, git_root_is_current_dir) do
+      tmp_clone_dir
+    end
+
+    defp tmp_working_dir(tmp_clone_dir, git_root_path, current_dir) do
+      subdir_to_run_credo_in = Path.relative_to(current_dir, git_root_path)
+
+      Path.join(tmp_clone_dir, subdir_to_run_credo_in)
     end
   end
 
