@@ -230,9 +230,7 @@ This is equivalent to using the `--no-color` CLI switch.
 
 ### `:checks`
 
-Configures plugin modules that Credo should load at start up (*defaults to `[]`*).
-
-This is needed to [enable and configure checks](checks.html) in the analysis.
+Configures check modules that Credo should load at start up (*defaults to `[]`*).
 
 ```elixir
 # .credo.exs
@@ -242,7 +240,7 @@ This is needed to [enable and configure checks](checks.html) in the analysis.
       name: "default",
       checks: [
         {Credo.Check.Consistency.TabsOrSpaces, false},
-        {Credo.Check.Design.AliasUsage, priority: :low},
+        {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2},
       ],
       # files etc.
     }
@@ -250,14 +248,7 @@ This is needed to [enable and configure checks](checks.html) in the analysis.
 }
 ```
 
-All checks are configured using a two-element tuple:
-
-```elixir
-{MyApp.CheckModule, params}
-```
-
-- `MyApp.CheckModule` - the module representing the check to be configured
-- `params` - can be either `false` (to disable the check) or a keyword list of parameters (to configure the check)
+Read more about [check configuration](check_params.html) and [adding custom checks](adding_checks.html).
 
 
 ## Using a specific configuration file

@@ -65,6 +65,7 @@ defmodule Credo.Mixfile do
       "guides/configuration/config_file.md",
       "guides/configuration/cli_switches.md",
       "guides/configuration/config_comments.md",
+      "guides/configuration/check_params.md",
 
       # Plugins
 
