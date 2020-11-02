@@ -1,7 +1,7 @@
-defmodule Credo.Check.Warning.TestExsTest do
+defmodule Credo.Check.Warning.WrongTestFileExtensionTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Warning.TestExs
+  @described_check Credo.Check.Warning.WrongTestFileExtension
 
   #
   # cases NOT raising issues
@@ -9,7 +9,7 @@ defmodule Credo.Check.Warning.TestExsTest do
 
   test "it should NOT report test files that end with _test.exs" do
     """
-    defmodule Credo.Check.Warning.TestExsTest do
+    defmodule Credo.Check.Warning.WrongTestFileExtensionTest do
       test "some test" do
         assert true
       end
@@ -22,7 +22,7 @@ defmodule Credo.Check.Warning.TestExsTest do
 
   test "it should NOT report excluded files" do
     """
-    defmodule Credo.Check.Warning.TestExsTest do
+    defmodule Credo.Check.Warning.WrongTestFileExtensionTest do
       test "some test" do
         assert true
       end
@@ -39,7 +39,7 @@ defmodule Credo.Check.Warning.TestExsTest do
 
   test "it should report test files that end with _test.ex" do
     """
-    defmodule Credo.Check.Warning.TestExsTest do
+    defmodule Credo.Check.Warning.WrongTestFileExtensionTest do
       test "some test" do
         assert true
       end
