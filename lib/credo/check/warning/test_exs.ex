@@ -1,7 +1,7 @@
 defmodule Credo.Check.Warning.TestExs do
   use Credo.Check,
     base_priority: :high,
-    param_defaults: [excluded_paths: []],
+    param_defaults: [included: ["test/**/*_test.ex"]],
     explanations: [
       check: """
       Invoking mix test from the command line will run the tests in each file
@@ -10,7 +10,6 @@ defmodule Credo.Check.Warning.TestExs do
       (from the `ex_unit` docs)
 
       This check ensures that test files are not ending with `.ex` (which would cause them to be skipped).
-
       """,
       params: [
         excluded_paths: "List of paths or regex to exclude from this check"
@@ -43,7 +42,7 @@ defmodule Credo.Check.Warning.TestExs do
         issue_for(issue_meta)
         |> List.wrap()
 
-      :else ->
+      true ->
         []
     end
   end
