@@ -38,6 +38,6 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
     )
   end
 
-  defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
   defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
+  defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
 end
