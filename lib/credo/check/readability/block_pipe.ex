@@ -26,7 +26,7 @@ defmodule Credo.Check.Readability.BlockPipe do
                                |> Enum.sort()
 
           case maybe_nested_lists do
-            [[_h|_t]|_] = true
+            [[_h|_t]|_] -> true
             _->  false
           end
 
