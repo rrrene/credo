@@ -70,6 +70,11 @@ defmodule Credo.Sources do
 
       iex> Sources.find_in_dir("/home/rrrene/elixir", ["*.ex"], [~r/messy/])
   """
+  def find_in_dir(working_dir, included, excluded)
+
+  def find_in_dir(working_dir, [], excluded),
+    do: find_in_dir(working_dir, [Path.join(@default_sources_glob)], excluded)
+
   def find_in_dir(working_dir, included, excluded) do
     included_patterns = convert_globs_to_local_paths(working_dir, included)
     excluded_patterns = convert_globs_to_local_paths(working_dir, excluded)
