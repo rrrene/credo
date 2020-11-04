@@ -227,40 +227,40 @@ defmodule Credo.SourcesTest do
     dir = @fixture_integration_test_config
 
     expected =
-      ["#{dir}/clean.ex", "#{dir}/clean_redux.ex"]
+      ["#{dir}/lib/clean.ex"]
       |> Enum.map(&Path.expand/1)
 
-    assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], [])
+    assert expected == Credo.Sources.find_in_dir(dir, ["lib/*.ex"], [])
   end
 
   test "it finds in dir and excludes given files" do
     dir = @fixture_integration_test_config
 
     expected =
-      ["#{dir}/clean_redux.ex"]
+      ["#{dir}/lib/clean/clean_redux.ex", "#{dir}/lib/clean/dirty.ex"]
       |> Enum.map(&Path.expand/1)
 
-    assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], ["clean.ex"])
+    assert expected == Credo.Sources.find_in_dir(dir, ["lib/**/*.ex"], ["lib/clean.ex"])
   end
 
   test "it finds in dir and excludes given files /2" do
     dir = @fixture_integration_test_config
 
     expected =
-      ["#{dir}/clean_redux.ex"]
+      ["#{dir}/lib/clean/clean_redux.ex"]
       |> Enum.map(&Path.expand/1)
 
-    assert expected == Credo.Sources.find_in_dir(dir, [], ["clean.ex"])
+    assert expected == Credo.Sources.find_in_dir(dir, [], ["lib/clean.ex", "lib/clean/dirty.ex"])
   end
 
   test "it finds in dir and includes given files" do
     dir = @fixture_integration_test_config
 
     expected =
-      ["#{dir}/clean.ex"]
+      ["#{dir}/lib/clean.ex"]
       |> Enum.map(&Path.expand/1)
 
-    assert expected == Credo.Sources.find_in_dir(dir, ["clean.ex"], [])
+    assert expected == Credo.Sources.find_in_dir(dir, ["lib/clean.ex"], [])
   end
 
   test "it finds in dir and excludes given regex patterns" do
