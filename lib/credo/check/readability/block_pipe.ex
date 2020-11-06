@@ -21,23 +21,22 @@ defmodule Credo.Check.Readability.BlockPipe do
 
       ... should be refactored to look like this:
 
-          maybe_nested_lists = list
-                               |> Enum.take(5)
-                               |> Enum.sort()
+          maybe_nested_lists =
+            list
+            |> Enum.take(5)
+            |> Enum.sort()
 
           case maybe_nested_lists do
-            [[_h|_t]|_] -> true
-            _->  false
+            [[_h | _t] | _] -> true
+            _ -> false
           end
 
-
-      ... or create a new function
+      ... or create a new function:
 
           list
           |> Enum.take(5)
           |> Enum.sort()
           |> contains_nested_list?()
-
 
       Piping to blocks may be harder to read because it can be said that it obscures intentions
       and increases cognitive load on the reader. Instead, prefer introducing variables to your code or
