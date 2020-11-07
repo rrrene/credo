@@ -306,4 +306,3 @@ For project `foo/`, the contents of `/home/rrrene/projects/foo/config/.credo.exs
 
 This works great for umbrella projects, where you can have individual `.credo.exs` files for each app and/or a global one in the umbrella's `config/` or root folder.
 This way, you can enable/disable settings on a per-app basis.
-

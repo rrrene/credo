@@ -15,7 +15,7 @@ defmodule Credo.Check.Readability.BlockPipe do
           |> Enum.take(5)
           |> Enum.sort()
           |> case do
-            [[_h|_t]|_] -> true
+            [[_h | _t] | _] -> true
             _ -> false
           end
 

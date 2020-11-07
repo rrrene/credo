@@ -27,7 +27,7 @@ defmodule Credo.Mixfile do
     [
       source_ref: "v#{@version}",
       main: "overview",
-      logo: "assets/logo.png",
+      logo: "assets/credo-logo-with-trail.png",
       extra_section: "GUIDES",
       assets: "guides/assets",
       formatters: ["html"],

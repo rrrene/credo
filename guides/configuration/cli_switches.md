@@ -17,6 +17,18 @@ Use `--format` to format the output in one of the following formats:
 
 Additionally, you can deactivate the output's coloring by using `--no-color`.
 
+
+### Watch & re-run analysis on file changes
+
+Use `--watch` to watch for file changes and re-run the analysis.
+
+```bash
+mix credo --watch
+mix credo list --only readability --watch
+mix credo diff v1.4.0 --watch
+```
+
+
 ### Only run some checks
 
 To run only a subset of checks, you can use the `--checks` or the `-c` alias (also aliased as `--only`).

@@ -1,8 +1,12 @@
 # Check Parameters
 
+Checks are configured using parameters (short: params).
+
+There are custom params for each check and a set of [general params](#general-params) that work for all checks.
+
 ## Configuration
 
-Checks are configured in [Credo's configuration file](config_file.html):
+Checks and their params are configured in [Credo's configuration file](config_file.html):
 
 ```elixir
 # .credo.exs
@@ -69,6 +73,8 @@ Overwrites a custom exit status for the check
 {Credo.Check.Warning.IoInspect, exit_status: 0}
 ```
 
+Read more on [exit status in Credo](exit_statuses.html).
+
 ### `:files`
 
 Controls which files the check runs on.
@@ -94,6 +100,12 @@ Please note that these params do not "override" the top-level config, but are ap
 
 Overwrites the priority of the check
 
+```elixir
+{Credo.Check.Warning.IoInspect, priority: :low}
+```
+
+Available priorities are: `:low`, `:normal`, `:high` and `:higher`.
+
 ### `:tags`
 
 Overwrites or appends the tags of the check
@@ -106,7 +118,7 @@ Overwrites or appends the tags of the check
 {MyApp.CheckModule, tags: [:__initial__, :my_tag]}
 ```
 
-Tags can then be used as usual, via the CLI switch `--checks-with[out]-tag`:
+Tags can then be used to include or exclude checks from the analysis:
 
 ```bash
 # Only run checks tagged `:my_tag` during analysis

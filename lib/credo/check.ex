@@ -366,7 +366,7 @@ defmodule Credo.Check do
         do_run_on_source_file(exec, source_file, params)
       end
 
-      def do_run_on_source_file(exec, source_file, params) do
+      defp do_run_on_source_file(exec, source_file, params) do
         issues =
           try do
             run(source_file, params)
@@ -468,7 +468,7 @@ defmodule Credo.Check do
 
     params_doc =
       if params == [] do
-        "*There are no parameters for this check.*"
+        "*There are no specific parameters for this check.*"
       else
         param_explanation =
           Enum.map(params, fn {key, value} ->
@@ -496,7 +496,6 @@ defmodule Credo.Check do
 
         #{param_explanation}
 
-        Parameters can be configured via the `.credo.exs` config file.
         """
       end
 
@@ -511,6 +510,9 @@ defmodule Credo.Check do
 
     #{params_doc}
 
+    Like with all checks, [general params](check_params.html) can be applied.
+
+    Parameters can be configured via the [`.credo.exs` config file](config_file.html).
     """
   end
 
