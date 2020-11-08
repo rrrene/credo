@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1
+
+- Fix bug in `diff` command when run on a subdirectory of a Git repository
+- Fix bug in new general param `:files` when excluding files
+
 ## 1.5.0
 
 - Credo now requires Elixir 1.7 or newer
