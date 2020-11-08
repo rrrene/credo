@@ -48,9 +48,33 @@ defmodule Credo.BuildInfo do
   end
 
   defp git_branch do
-    case System.cmd("git", ["rev-parse", "--abbrev-ref", "HEAD"]) do
-      {output, 0} -> String.trim(output)
+    case System.cmd("git", ["branch"]) do
+      {output, 0} -> git_branch(output)
       {_, _} -> nil
+    end
+  end
+
+  defp git_branch(output) do
+    line_with_active_branch =
+      output
+      |> String.split("\n")
+      |> Enum.find(fn
+        "* " <> _ -> true
+        _ -> false
+      end)
+
+    case line_with_active_branch do
+      "* (HEAD detached at origin/" <> remote_branch_name ->
+        String.replace(remote_branch_name, ~r/\)$/, "")
+
+      "* (HEAD detached at " <> branch_name ->
+        String.replace(branch_name, ~r/\)$/, "")
+
+      "* " <> branch_name ->
+        branch_name
+
+      _ ->
+        nil
     end
   end
 
@@ -70,8 +94,13 @@ defmodule Credo.BuildInfo do
 
   defp git_dirty? do
     case System.cmd("git", ["status", "--short"]) do
-      {output, 0} -> String.trim(output) != ""
+      {output, 0} -> output |> String.trim() |> git_dirty?()
       {_, _} -> nil
     end
   end
+
+  defp git_dirty?(""), do: false
+  # Hex puts a `.fetch` file in the working dir when downloading deps via git
+  defp git_dirty?("?? .fetch"), do: false
+  defp git_dirty?(_), do: true
 end
