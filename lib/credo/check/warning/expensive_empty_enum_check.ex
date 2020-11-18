@@ -31,7 +31,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
                               _,
                               _
                             }
-  @length_pattern quote do: {:length, _, _}
+  @length_pattern quote do: {:length, _, [_]}
   @comparisons [
     {@enum_count_pattern, 0},
     {0, @enum_count_pattern},
