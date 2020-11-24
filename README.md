@@ -41,6 +41,7 @@ Some IDEs and editors are able to run Credo in the background and mark issues in
 * [IntelliJ Elixir](https://github.com/KronicDeth/intellij-elixir#credo) - Elixir plugin for JetBrains IDEs (IntelliJ IDEA, Rubymine, PHPStorm, PyCharm, etc)
 * [linter-elixir-credo](https://atom.io/packages/linter-elixir-credo) - Package for Atom editor (by @smeevil)
 * [Elixir Linter (Credo)]([https://](https://marketplace.visualstudio.com/items?itemName=pantajoe.vscode-elixir-credo)) - VSCode extension (by @pantajoe)
+* [ElixirLinter](https://marketplace.visualstudio.com/items?itemName=iampeterbanjo.elixirlinter) - VSCode plugin (by @iampeterbanjo, NO LONGER MAINTAINED)
 * [flycheck](https://www.flycheck.org/en/latest/languages.html#elixir) - Emacs syntax checking extension
 
 ### Automated Code Review
