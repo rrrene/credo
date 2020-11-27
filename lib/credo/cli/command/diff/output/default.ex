@@ -136,7 +136,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       " ",
       Output.foreground_color(color),
       :normal,
-      " #{title}" |> String.pad_trailing(term_width - 1)
+      " #{title}" |> String.pad_trailing(term_width - 3)
     ]
     |> UI.puts()
 
