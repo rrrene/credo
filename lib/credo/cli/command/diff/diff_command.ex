@@ -38,8 +38,34 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   def call(%Execution{help: true} = exec, _opts), do: DiffOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
-  def git_diff_git_ref_or_range(exec) do
-    List.first(exec.cli_options.args) || "HEAD"
+  def previous_ref(exec) do
+    given_first_arg = List.first(exec.cli_options.args)
+
+    if git_present?() do
+      potential_git_ref = given_first_arg || "HEAD"
+
+      if git_ref_exists?(potential_git_ref) do
+        {:git, potential_git_ref}
+      else
+        {:path, potential_git_ref}
+      end
+    else
+      # no git?
+    end
+  end
+
+  defp git_present?() do
+    case System.cmd("git", ["--help"], stderr_to_stdout: true) do
+      {_output, 0} -> true
+      {_output, _} -> false
+    end
+  end
+
+  defp git_ref_exists?(git_ref) do
+    case System.cmd("git", ["show", git_ref], stderr_to_stdout: true) do
+      {_output, 0} -> true
+      {_output, _} -> false
+    end
   end
 
   defmodule GetGitDiff do
@@ -56,22 +82,39 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     end
 
     def run_credo_and_store_resulting_execution(exec) do
-      previous_git_ref = DiffCommand.git_diff_git_ref_or_range(exec)
+      case DiffCommand.previous_ref(exec) do
+        {:git, git_ref} -> run_credo_on_git_ref(exec, git_ref)
+        {:path, path} -> run_credo_on_path_ref(exec, path)
+      end
+    end
 
-      previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, previous_git_ref)
+    def run_credo_on_git_ref(exec, git_ref) do
+      previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, git_ref)
 
+      run_credo_on_dir(exec, previous_dirname, git_ref)
+    end
+
+    def run_credo_on_path_ref(exec, path) do
+      run_credo_on_dir(exec, path, path)
+    end
+
+    def run_credo_on_dir(exec, dirname, previous_git_ref) do
       previous_argv =
         case Enum.take(exec.argv, 2) do
           ["diff", ^previous_git_ref] ->
-            [previous_dirname] ++ Enum.slice(exec.argv, 2..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 2..-1) ++ ["--strict"]
 
           ["diff", _] ->
-            [previous_dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
 
           ["diff"] ->
-            [previous_dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
         end
 
+      run_credo(exec, previous_git_ref, dirname, previous_argv)
+    end
+
+    def run_credo(exec, previous_git_ref, previous_dirname, previous_argv) do
       parent_pid = self()
 
       spawn(fn ->
@@ -84,11 +127,15 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
 
       receive do
         {:previous_exec, previous_exec} ->
-          exec
-          |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
-          |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
-          |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
+          store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
       end
+    end
+
+    defp store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
+      exec
+      |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
+      |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
+      |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
     end
 
     defp run_git_clone_and_checkout(path, git_ref) do

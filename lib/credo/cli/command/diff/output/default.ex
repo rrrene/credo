@@ -33,7 +33,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
   @doc "Called before the analysis is run."
   def print_before_info(source_files, exec) do
-    git_ref_or_range = DiffCommand.git_diff_git_ref_or_range(exec)
+    {_, git_ref_or_range} = DiffCommand.previous_ref(exec)
 
     case Enum.count(source_files) do
       0 ->
