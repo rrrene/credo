@@ -96,6 +96,7 @@ defmodule Credo.Execution do
 
   @type t :: %__MODULE__{}
 
+  @execution_pipeline_key __MODULE__
   @execution_pipeline [
     __pre__: [
       {Credo.Execution.Task.AppendDefaultConfig, []},
@@ -169,7 +170,7 @@ defmodule Credo.Execution do
     max_concurrent_check_runs = System.schedulers_online()
 
     %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
-    |> put_pipeline(__MODULE__, @execution_pipeline)
+    |> put_pipeline(@execution_pipeline_key, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
     |> put_builtin_command("diff", Credo.CLI.Command.Diff.DiffCommand)
     |> put_builtin_command("explain", Credo.CLI.Command.Explain.ExplainCommand)
@@ -539,7 +540,7 @@ defmodule Credo.Execution do
 
   @doc false
   def prepend_task(exec, plugin_mod, nil, group_name, task_tuple) do
-    prepend_task(exec, plugin_mod, __MODULE__, group_name, task_tuple)
+    prepend_task(exec, plugin_mod, @execution_pipeline_key, group_name, task_tuple)
   end
 
   def prepend_task(exec, plugin_mod, pipeline_key, group_name, task_mod) when is_atom(task_mod) do
