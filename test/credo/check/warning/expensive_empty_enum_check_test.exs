@@ -155,4 +155,40 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should not report when checking if a variable called length is 0" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        length = 0
+        if length == 0 do
+          "is 0"
+        else
+          "something else"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should not report when checking if a variable called length is 0 backwards" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        length = 0
+        if 0 == length do
+          "is 0"
+        else
+          "something else"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
