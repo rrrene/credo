@@ -224,10 +224,19 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 
   test "it should NOT report a violation for an excluded function call /4" do
     """
-    :crypto.hash(:md5, "test") |> Base.encode16(case: :lower)
+    :crypto.hash(:md5, "test")
+    |> Base.encode16(case: :lower)
+
+    some_fun(5)
+    |> to_something()
+
+    Module.some_other_fun(5)
+    |> to_something()
     """
     |> to_source_file
-    |> run_check(@described_check, excluded_functions: ~w(:crypto.hash))
+    |> run_check(@described_check,
+      excluded_functions: ~w(:crypto.hash some_fun Module.some_other_fun)
+    )
     |> refute_issues()
   end
 
