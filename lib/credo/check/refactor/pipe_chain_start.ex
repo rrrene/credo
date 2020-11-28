@@ -31,6 +31,24 @@ defmodule Credo.Check.Refactor.PipeChainStart do
       ]
     ]
 
+  @elixir_custom_operators [
+    :<-,
+    :|||,
+    :&&&,
+    :<<<,
+    :>>>,
+    :<<~,
+    :~>>,
+    :<~,
+    :~>,
+    :<~>,
+    :<|>,
+    :^^^,
+    :+++,
+    :---,
+    :~~~
+  ]
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -98,11 +116,20 @@ defmodule Credo.Check.Refactor.PipeChainStart do
         :||,
         :-,
         :for,
-        :with,
-        :<-
+        :with
       ] do
     defp valid_chain_start?(
            {unquote(atom), _meta, _arguments},
+           _excluded_functions,
+           _excluded_argument_types
+         ) do
+      true
+    end
+  end
+
+  for operator <- @elixir_custom_operators do
+    defp valid_chain_start?(
+           {unquote(operator), _meta, _arguments},
            _excluded_functions,
            _excluded_argument_types
          ) do

@@ -137,6 +137,28 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 
   test "it should NOT report expected code /2" do
     ~S"""
+    defmodule CredoTest do
+      defmacro a ~> b do
+        quote do
+          unquote(a) |> unquote(b)
+        end
+      end
+
+      def test do
+        1
+        |> Kernel.*(2)
+        ~> Kernel.*(2)
+        |> Kernel.*(2)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues
+  end
+
+  test "it should NOT report expected code /3" do
+    ~S"""
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         jobs = Stream.repeatedly(fn ->
