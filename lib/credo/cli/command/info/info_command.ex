@@ -1,9 +1,8 @@
 defmodule Credo.CLI.Command.Info.InfoCommand do
   @moduledoc false
 
-  @shortdoc "Show useful debug information"
-
-  use Credo.CLI.Command
+  use Credo.CLI.Command,
+    short_description: "Show useful debug information"
 
   alias Credo.CLI.Command.Info.InfoOutput
   alias Credo.CLI.Task

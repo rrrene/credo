@@ -1,9 +1,8 @@
 defmodule Credo.CLI.Command.Diff.DiffCommand do
   @moduledoc false
 
-  use Credo.CLI.Command
-
-  @shortdoc "Suggest code objects to look at next (based on git-diff)"
+  use Credo.CLI.Command,
+    short_description: "Suggest code objects to look at next (based on git-diff)"
 
   alias Credo.CLI.Command.Diff.DiffOutput
   alias Credo.CLI.Output.UI

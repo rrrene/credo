@@ -1,9 +1,7 @@
 defmodule Credo.CLI.Command.Version do
   @moduledoc false
 
-  @shortdoc "Show Credo's version number"
-
-  use Credo.CLI.Command
+  use Credo.CLI.Command, short_description: "Show Credo's version number"
 
   alias Credo.CLI.Output.Formatter.JSON
   alias Credo.CLI.Output.UI

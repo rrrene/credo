@@ -1,13 +1,11 @@
 defmodule Credo.CLI.Command.Help do
   @moduledoc false
 
-  @shortdoc "Show this help message"
-
   @ljust 12
   @starting_order ~w(suggest explain)
   @ending_order ~w(help)
 
-  use Credo.CLI.Command
+  use Credo.CLI.Command, short_description: "Show this help message"
 
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
@@ -41,17 +39,17 @@ defmodule Credo.CLI.Command.Help do
     |> Enum.each(fn name ->
       module = Execution.get_command(exec, name)
 
-      name2 =
+      padded_name =
         name
         |> to_string
         |> String.pad_trailing(@ljust)
 
-      case List.keyfind(module.__info__(:attributes), :shortdoc, 0) do
-        {:shortdoc, [shortdesc]} ->
-          UI.puts("  " <> name2 <> shortdesc)
+      case module.short_description do
+        nil ->
+          UI.puts("  #{padded_name}")
 
-        _ ->
-          UI.puts("  " <> name2)
+        short_description ->
+          UI.puts("  #{padded_name}#{short_description}")
       end
     end)
 

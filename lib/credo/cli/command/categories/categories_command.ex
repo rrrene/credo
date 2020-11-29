@@ -1,9 +1,8 @@
 defmodule Credo.CLI.Command.Categories.CategoriesCommand do
   @moduledoc false
 
-  @shortdoc "Show and explain all issue categories"
-
-  use Credo.CLI.Command
+  use Credo.CLI.Command,
+    short_description: "Show and explain all issue categories"
 
   alias Credo.CLI.Command.Categories.CategoriesOutput
 

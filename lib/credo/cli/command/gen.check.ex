@@ -1,12 +1,11 @@
 defmodule Credo.CLI.Command.GenCheck do
   @moduledoc false
 
-  @shortdoc "Create a new custom check"
-
   @check_template_filename ".template.check.ex"
   @default_check_template_file File.read!(@check_template_filename)
 
-  use Credo.CLI.Command
+  use Credo.CLI.Command,
+    short_description: "Create a new custom check"
 
   alias Credo.CLI.Output.UI
 

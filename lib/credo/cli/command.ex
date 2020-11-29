@@ -18,12 +18,33 @@ defmodule Credo.CLI.Command do
 
   @type t :: module
 
+  @valid_use_opts [
+    :short_description
+  ]
+
   @doc false
-  defmacro __using__(_opts) do
+  defmacro __using__(opts \\ []) do
+    Enum.each(opts, fn
+      {key, _name} when key not in @valid_use_opts ->
+        raise "Could not find key `#{key}` in #{inspect(@valid_use_opts)}"
+
+      _ ->
+        nil
+    end)
+
+    def_short_description =
+      if opts[:short_description] do
+        quote do
+          @impl true
+          def short_description, do: unquote(opts[:short_description])
+        end
+      end
+
     quote do
+      @before_compile Credo.CLI.Command
       @behaviour Credo.CLI.Command
 
-      Module.register_attribute(__MODULE__, :shortdoc, persist: true)
+      unquote(def_short_description)
 
       @deprecated "Use Credo.Execution.Task.run/2 instead"
       defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
@@ -54,6 +75,39 @@ defmodule Credo.CLI.Command do
     end
   end
 
-  @doc "Runs the Command."
+  @doc false
+  defmacro __before_compile__(env) do
+    quote do
+      unquote(deprecated_def_short_description(env))
+    end
+  end
+
+  defp deprecated_def_short_description(env) do
+    shortdoc = Module.get_attribute(env.module, :shortdoc)
+
+    if is_nil(shortdoc) do
+      if not Module.defines?(env.module, {:short_description, 0}) do
+        quote do
+          @impl true
+          def short_description, do: nil
+        end
+      end
+    else
+      # deprecated - remove once we ditch @shortdoc
+      if not Module.defines?(env.module, {:short_description, 0}) do
+        quote do
+          @impl true
+          def short_description do
+            @shortdoc
+          end
+        end
+      end
+    end
+  end
+
+  @doc "Runs the Command"
   @callback call(exec :: Credo.Execution.t(), opts :: list()) :: Credo.Execution.t()
+
+  @doc "Returns a short, one-line description of what the command does"
+  @callback short_description() :: String.t()
 end

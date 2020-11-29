@@ -1,9 +1,8 @@
 defmodule Credo.CLI.Command.Suggest.SuggestCommand do
   @moduledoc false
 
-  use Credo.CLI.Command
-
-  @shortdoc "Suggest code objects to look at next (default)"
+  use Credo.CLI.Command,
+    short_description: "Suggest code objects to look at next (default)"
 
   alias Credo.Check.Params
   alias Credo.CLI.Command.Suggest.SuggestOutput
