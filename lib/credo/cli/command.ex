@@ -25,6 +25,7 @@ defmodule Credo.CLI.Command do
 
       Module.register_attribute(__MODULE__, :shortdoc, persist: true)
 
+      @deprecated "Use Credo.Execution.Task.run/2 instead"
       defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
 
       @doc """
