@@ -9,43 +9,12 @@ defmodule Credo.Execution do
   """
   defstruct argv: [],
             cli_options: nil,
+            # TODO: these initial switches should also be %Credo.CLI.Switch{} struct
             cli_switches: [
-              all_priorities: :boolean,
-              all: :boolean,
-              files_included: :keep,
-              files_excluded: :keep,
-              checks_with_tag: :keep,
-              checks_without_tag: :keep,
-              checks: :string,
-              config_name: :string,
-              config_file: :string,
-              color: :boolean,
-              crash_on_error: :boolean,
               debug: :boolean,
-              enable_disabled_checks: :string,
-              mute_exit_status: :boolean,
-              format: :string,
-              help: :boolean,
-              ignore_checks: :string,
-              ignore: :string,
-              min_priority: :string,
-              only: :string,
-              read_from_stdin: :boolean,
-              strict: :boolean,
-              verbose: :boolean,
-              version: :boolean,
-              watch: :boolean
+              color: :boolean
             ],
-            cli_aliases: [
-              a: :all,
-              A: :all_priorities,
-              c: :checks,
-              C: :config_name,
-              d: :debug,
-              h: :help,
-              i: :ignore_checks,
-              v: :version
-            ],
+            cli_aliases: [D: :debug],
             cli_switch_plugin_param_converters: [],
 
             # config
@@ -59,11 +28,15 @@ defmodule Credo.Execution do
             strict: false,
 
             # options, set by the command line
+            format: nil,
+            help: false,
+            verbose: false,
+            version: false,
+
+            # options, that are kept here for legacy reasons
             all: false,
             crash_on_error: true,
             enable_disabled_checks: nil,
-            format: nil,
-            help: false,
             ignore_checks_tags: [],
             ignore_checks: nil,
             max_concurrent_check_runs: nil,
@@ -72,8 +45,6 @@ defmodule Credo.Execution do
             only_checks_tags: [],
             only_checks: nil,
             read_from_stdin: false,
-            verbose: false,
-            version: false,
 
             # state, which is accessed and changed over the course of Credo's execution
             pipeline_map: %{},
@@ -120,6 +91,18 @@ defmodule Credo.Execution do
       #       end
       #     end
     ],
+    pre_determine_command: [
+      {Credo.Execution.Task.DetermineCommand, []}
+    ],
+    pre_set_default_command: [
+      {Credo.Execution.Task.SetDefaultCommand, []}
+    ],
+    initialize_command: [
+      {Credo.Execution.Task.InitializeCommand, []}
+    ],
+    parse_cli_options_final: [
+      {Credo.Execution.Task.ParseOptions, []}
+    ],
     validate_cli_options: [
       {Credo.Execution.Task.ValidateOptions, []}
     ],
@@ -127,10 +110,10 @@ defmodule Credo.Execution do
       {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
     ],
     determine_command: [
-      {Credo.Execution.Task.DetermineCommand, []}
+      # {Credo.Execution.Task.DetermineCommand, []}
     ],
     set_default_command: [
-      {Credo.Execution.Task.SetDefaultCommand, []}
+      # {Credo.Execution.Task.SetDefaultCommand, []}
     ],
     resolve_config: [
       {Credo.Execution.Task.UseColors, []},
@@ -334,7 +317,7 @@ defmodule Credo.Execution do
 
   def get_command(exec, name) do
     Map.get(exec.commands, name) ||
-      raise ~S'Command not found: "#{name}"\n\nRegistered commands: #{
+      raise ~s'Command not found: "#{inspect(name)}"\n\nRegistered commands: #{
               inspect(exec.commands, pretty: true)
             }'
   end
@@ -344,7 +327,6 @@ defmodule Credo.Execution do
     commands = Map.put(exec.commands, name, command_mod)
 
     %__MODULE__{exec | commands: commands}
-    |> init_command(command_mod)
   end
 
   @doc false
@@ -598,12 +580,6 @@ defmodule Credo.Execution do
 
   defp put_builtin_command(exec, name, command_mod) do
     put_command(exec, Credo, name, command_mod)
-  end
-
-  defp init_command(exec, command_mod) do
-    exec
-    |> command_mod.init()
-    |> ensure_execution_struct("#{command_mod}.init/1")
   end
 
   @doc ~S"""

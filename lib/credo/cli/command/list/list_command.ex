@@ -2,7 +2,8 @@ defmodule Credo.CLI.Command.List.ListCommand do
   @moduledoc false
 
   use Credo.CLI.Command,
-    short_description: "List all issues grouped by files"
+    short_description: "List all issues grouped by files",
+    cli_switches: Credo.CLI.Command.Suggest.SuggestCommand.cli_switches()
 
   alias Credo.CLI.Command.List.ListOutput
   alias Credo.CLI.Filter

@@ -7,8 +7,7 @@ defmodule Credo.Execution.Task.DetermineCommand do
   alias Credo.Execution
 
   def call(exec, _opts) do
-    exec
-    |> determine_command(exec.cli_options)
+    determine_command(exec, exec.cli_options)
   end
 
   # `--help` given

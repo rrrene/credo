@@ -19,7 +19,8 @@ defmodule Credo.CLI.Command do
   @type t :: module
 
   @valid_use_opts [
-    :short_description
+    :short_description,
+    :cli_switches
   ]
 
   @doc false
@@ -40,11 +41,22 @@ defmodule Credo.CLI.Command do
         end
       end
 
+    def_cli_switches =
+      quote do
+        @impl true
+        def cli_switches do
+          unquote(opts[:cli_switches])
+          |> List.wrap()
+          |> Enum.map(&Credo.CLI.Switch.ensure/1)
+        end
+      end
+
     quote do
       @before_compile Credo.CLI.Command
       @behaviour Credo.CLI.Command
 
       unquote(def_short_description)
+      unquote(def_cli_switches)
 
       @deprecated "Use Credo.Execution.Task.run/2 instead"
       defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
@@ -110,4 +122,6 @@ defmodule Credo.CLI.Command do
 
   @doc "Returns a short, one-line description of what the command does"
   @callback short_description() :: String.t()
+
+  @callback cli_switches() :: [Map.t()]
 end

@@ -27,16 +27,31 @@ defmodule Credo.CLI.Options do
       %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{friend: ["bob", "eve"]}, unknown_args: [], unknown_switches: []}
 
   """
-  def parse(argv, current_dir, command_names, ignored_args, switches_definition, aliases) do
+  def parse(
+        argv,
+        current_dir,
+        command_names,
+        given_command_name,
+        ignored_args,
+        switches_definition,
+        aliases
+      ) do
     argv
     |> OptionParser.parse(strict: switches_definition, aliases: aliases)
-    |> parse_result(current_dir, command_names, ignored_args, switches_definition)
+    |> parse_result(
+      current_dir,
+      command_names,
+      given_command_name,
+      ignored_args,
+      switches_definition
+    )
   end
 
   defp parse_result(
          {switches_keywords, args, unknown_switches_keywords},
          current_dir,
          command_names,
+         given_command_name,
          ignored_args,
          switches_definition
        ) do
@@ -65,7 +80,7 @@ defmodule Credo.CLI.Options do
       |> Map.merge(switches_with_lists_as_map)
 
     %__MODULE__{
-      command: command,
+      command: command || given_command_name,
       path: path,
       args: unknown_args,
       switches: switches,

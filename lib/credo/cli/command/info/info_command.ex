@@ -2,7 +2,8 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
   @moduledoc false
 
   use Credo.CLI.Command,
-    short_description: "Show useful debug information"
+    short_description: "Show useful debug information",
+    cli_switches: Credo.CLI.Command.Suggest.SuggestCommand.cli_switches()
 
   alias Credo.CLI.Command.Info.InfoOutput
   alias Credo.CLI.Task

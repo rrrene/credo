@@ -1,13 +1,37 @@
 defmodule Credo.CLI.Command.Suggest.SuggestCommand do
   @moduledoc false
 
-  use Credo.CLI.Command,
-    short_description: "Suggest code objects to look at next (default)"
-
   alias Credo.Check.Params
   alias Credo.CLI.Command.Suggest.SuggestOutput
+  alias Credo.CLI.Switch
   alias Credo.CLI.Task
   alias Credo.Execution
+
+  use Credo.CLI.Command,
+    short_description: "Suggest code objects to look at next (default)",
+    cli_switches: [
+      Switch.boolean("all_priorities", alias: :A),
+      Switch.boolean("all", alias: :a),
+      Switch.boolean("crash_on_error"),
+      Switch.keep("files_included"),
+      Switch.keep("files_excluded"),
+      Switch.keep("checks_with_tag"),
+      Switch.keep("checks_without_tag"),
+      Switch.string("checks", alias: :c),
+      Switch.string("config_name", alias: :C),
+      Switch.string("config_file"),
+      Switch.string("enable_disabled_checks"),
+      Switch.boolean("mute_exit_status"),
+      Switch.string("format"),
+      Switch.boolean("help", alias: :h),
+      Switch.string("ignore_checks"),
+      Switch.string("ignore"),
+      Switch.string("only"),
+      Switch.boolean("read_from_stdin"),
+      Switch.boolean("strict"),
+      Switch.boolean("verbose"),
+      Switch.boolean("watch")
+    ]
 
   def init(exec) do
     Execution.put_pipeline(exec, __MODULE__,

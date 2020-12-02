@@ -2,7 +2,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   @moduledoc false
 
   use Credo.CLI.Command,
-    short_description: "Show code object and explain why it is/might be an issue"
+    short_description: "Show code object and explain why it is/might be an issue",
+    cli_switches: Credo.CLI.Command.Suggest.SuggestCommand.cli_switches()
 
   alias Credo.Check
   alias Credo.Execution

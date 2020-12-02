@@ -1,10 +1,15 @@
 defmodule Credo.CLI.Command.Categories.CategoriesCommand do
   @moduledoc false
 
-  use Credo.CLI.Command,
-    short_description: "Show and explain all issue categories"
-
   alias Credo.CLI.Command.Categories.CategoriesOutput
+  alias Credo.CLI.Switch
+
+  use Credo.CLI.Command,
+    short_description: "Show and explain all issue categories",
+    cli_switches: [
+      Switch.string("format"),
+      Switch.boolean("help", alias: :h)
+    ]
 
   @categories [
     %{
