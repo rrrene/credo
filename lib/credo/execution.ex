@@ -22,7 +22,6 @@ defmodule Credo.Execution do
               color: :boolean,
               crash_on_error: :boolean,
               debug: :boolean,
-              diff_with: :string,
               enable_disabled_checks: :string,
               mute_exit_status: :boolean,
               format: :string,
@@ -62,7 +61,6 @@ defmodule Credo.Execution do
             # options, set by the command line
             all: false,
             crash_on_error: true,
-            diff_with: nil,
             enable_disabled_checks: nil,
             format: nil,
             help: false,
