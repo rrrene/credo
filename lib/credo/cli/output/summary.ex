@@ -44,6 +44,34 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts()
 
     print_priority_hint(exec)
+
+    UI.puts("""
+
+    That's a lot of issue to deal with at once.
+
+    You can use `diff` to only show the issues that were introduced on this branch.
+
+        mix credo diff master
+
+    You can use `diff` to only show the issues that were introduced since a certain tag or commit:
+
+        # latest tag seems to be `v1.5.1`
+        mix credo diff v1.5.1
+
+    Lastly, you can compare your working dir against this point in time
+
+        # use the current datetime
+        mix credo diff --since "2020-12-01 19:58:09"
+
+        # use the current HEAD of master
+        mix credo diff 879742a
+
+    Every project is different, especially when it comes to introducing code analysis.
+
+    It should not be about following any "best practice", the linter actually has to be helping you.
+
+    Try the commands above in a second terminal to see which one is working for this project!
+    """)
   end
 
   defp count_checks(exec) do
