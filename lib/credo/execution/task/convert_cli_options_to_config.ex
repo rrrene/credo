@@ -15,6 +15,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
   def halt_on_error({:error, error}, exec) do
     exec
     |> Execution.put_assign("#{__MODULE__}.error", error)
+    |> Execution.put_assign("credo.exit_status", 128)
     |> Execution.halt()
   end
 
