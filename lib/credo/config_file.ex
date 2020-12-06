@@ -16,7 +16,10 @@ defmodule Credo.ConfigFile do
 
   alias Credo.Execution
 
-  defstruct files: nil,
+  defstruct origin: nil,
+            filename: nil,
+            config_name_found?: nil,
+            files: nil,
             color: true,
             checks: nil,
             requires: [],
@@ -64,9 +67,40 @@ defmodule Credo.ConfigFile do
 
     Execution.get_config_files(exec)
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
-    |> merge
+    |> ensure_any_config_found(config_name)
+    |> merge()
     |> add_given_directory_to_files(dir)
     |> ensure_values_present()
+  end
+
+  defp ensure_any_config_found(list, config_name) do
+    config_not_found =
+      Enum.all?(list, fn
+        {:ok, %__MODULE__{config_name_found?: false}} -> true
+        _ -> false
+      end)
+
+    if config_not_found do
+      filenames_as_list =
+        list
+        |> Enum.map(fn
+          {:ok, %__MODULE__{origin: :file, filename: filename}} -> "  * #{filename}\n"
+          _ -> nil
+        end)
+        |> Enum.reject(&is_nil/1)
+
+      message =
+        """
+        Given config name #{inspect(config_name)} does not exist in any config file:
+
+        #{filenames_as_list}
+        """
+        |> String.trim()
+
+      {:error, {:config_name_not_found, message}}
+    else
+      list
+    end
   end
 
   defp relevant_config_files(dir) do
@@ -91,6 +125,9 @@ defmodule Credo.ConfigFile do
   defp ensure_values_present({:ok, config}) do
     # TODO: config.check_for_updates is deprecated, but should not lead to a validation error
     config = %__MODULE__{
+      origin: config.origin,
+      filename: config.filename,
+      config_name_found?: config.config_name_found?,
       checks: config.checks,
       color: merge_boolean(@default_color, config.color),
       files: %{
@@ -130,10 +167,10 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {_origin, filename, exs_string}, safe) do
+  defp from_exs(dir, config_name, {origin, filename, exs_string}, safe) do
     case Credo.ExsLoader.parse(exs_string, safe) do
       {:ok, data} ->
-        {:ok, from_data(data, dir, config_name)}
+        from_data(data, dir, filename, origin, config_name)
 
       {:error, {line_no, description, trigger}} ->
         {:error, {:badconfig, filename, line_no, description, trigger}}
@@ -143,13 +180,18 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp from_data(data, dir, config_name) do
+  defp from_data(data, dir, filename, origin, config_name) do
     data =
       data[:configs]
       |> List.wrap()
       |> Enum.find(&(&1[:name] == config_name))
 
-    %__MODULE__{
+    config_name_found? = not is_nil(data)
+
+    config_file = %__MODULE__{
+      origin: origin,
+      filename: filename,
+      config_name_found?: config_name_found?,
       checks: checks_from_data(data),
       color: data[:color],
       files: files_from_data(data, dir),
@@ -158,6 +200,8 @@ defmodule Credo.ConfigFile do
       requires: data[:requires] || [],
       strict: data[:strict]
     }
+
+    {:ok, config_file}
   end
 
   defp files_from_data(data, dir) do
@@ -210,6 +254,9 @@ defmodule Credo.ConfigFile do
     merge(tail, base)
   end
 
+  # bubble up errors from parsing the config so we can deal with them at the top-level
+  def merge({:error, _} = error), do: error
+
   def merge([], config), do: config
 
   def merge([other | tail], base) do
@@ -218,7 +265,7 @@ defmodule Credo.ConfigFile do
     merge(tail, new_base)
   end
 
-  # bubble up errors from parsing the config so we can deal with it at the top-level
+  # bubble up errors from parsing the config so we can deal with them at the top-level
   def merge({:error, _} = a, _), do: a
   def merge(_, {:error, _} = a), do: a
 

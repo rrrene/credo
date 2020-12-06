@@ -65,6 +65,11 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
     UI.warn("")
   end
 
+  defp puts_error_message({:config_name_not_found, message}) do
+    UI.warn([:red, "** (config) #{message}"])
+    UI.warn("")
+  end
+
   defp puts_error_message(error) do
     IO.warn("Execution halted during #{__MODULE__}! Unrecognized error: #{inspect(error)}")
   end
