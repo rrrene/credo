@@ -97,4 +97,4 @@ jobs:
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile
-      - run: echo "test ${{matrix.project.name}} ${{matrix.project.repo}}"
+      - run: bash test/run_on_project.sh ${{matrix.project.repo}} ${{matrix.project.name}}
