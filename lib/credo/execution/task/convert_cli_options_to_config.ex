@@ -13,9 +13,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
   end
 
   def halt_on_error({:error, error}, exec) do
-    exec
-    |> Execution.put_assign("#{__MODULE__}.error", error)
-    |> Execution.halt()
+    Execution.halt(exec, error)
   end
 
   def halt_on_error(exec, _) do
@@ -24,7 +22,7 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
 
   def error(exec, _opts) do
     exec
-    |> Execution.get_assign("#{__MODULE__}.error")
+    |> Execution.get_halt_message()
     |> puts_error_message()
 
     exec

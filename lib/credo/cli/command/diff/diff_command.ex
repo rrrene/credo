@@ -6,6 +6,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   @shortdoc "Suggest code objects to look at next (based on git-diff)"
 
   alias Credo.CLI.Command.Diff.DiffOutput
+  alias Credo.CLI.Output.UI
   alias Credo.CLI.Task
   alias Credo.Execution
 
@@ -81,6 +82,19 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       end
     end
 
+    def error(exec, _opts) do
+      exec
+      |> Execution.get_halt_message()
+      |> puts_error_message()
+
+      exec
+    end
+
+    defp puts_error_message(halt_message) do
+      UI.warn([:red, "** (diff) ", halt_message])
+      UI.warn("")
+    end
+
     def run_credo_and_store_resulting_execution(exec) do
       case DiffCommand.previous_ref(exec) do
         {:git, git_ref} -> run_credo_on_git_ref(exec, git_ref)
@@ -132,10 +146,32 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     end
 
     defp store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
-      exec
-      |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
-      |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
-      |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
+      if previous_exec.halted do
+        halt_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+      else
+        exec
+        |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
+        |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
+        |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
+      end
+    end
+
+    defp halt_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
+      message =
+        case Execution.get_halt_message(previous_exec) do
+          {:config_name_not_found, message} -> message
+          halt_message -> inspect(halt_message)
+        end
+
+      Execution.halt(
+        exec,
+        [
+          :bright,
+          "Running Credo on `#{previous_git_ref}` (checked out to #{previous_dirname}) resulted in the following error:\n\n",
+          :faint,
+          message
+        ]
+      )
     end
 
     defp run_git_clone_and_checkout(path, git_ref) do

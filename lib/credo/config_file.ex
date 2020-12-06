@@ -90,11 +90,17 @@ defmodule Credo.ConfigFile do
         |> Enum.reject(&is_nil/1)
 
       message =
-        """
-        Given config name #{inspect(config_name)} does not exist in any config file:
+        case filenames_as_list do
+          [] ->
+            "Given config name #{inspect(config_name)} does not exist."
 
-        #{filenames_as_list}
-        """
+          filenames_as_list ->
+            """
+            Given config name #{inspect(config_name)} does not exist in any config file:
+
+            #{filenames_as_list}
+            """
+        end
         |> String.trim()
 
       {:error, {:config_name_not_found, message}}
