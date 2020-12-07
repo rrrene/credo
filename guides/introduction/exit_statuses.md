@@ -17,11 +17,14 @@ This way you can reason about the encountered issues right from the exit status.
 
 Default values for the checks are based on their category:
 
-    consistency:  1
-    design:       2
-    readability:  4
-    refactor:     8
-    warning:     16
+    consistency:         1
+    design:              2
+    readability:         4
+    refactor:            8
+    warning:             16
+    <custom category>:   32
+    <custom category>:   64
+    runtime errors:      128 (and above)
 
 Let's see what this means using an example:
 
