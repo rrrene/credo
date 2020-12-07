@@ -492,6 +492,22 @@ defmodule Credo.Execution do
     %__MODULE__{exec | halted: true}
   end
 
+  @doc false
+  def halt(exec, halt_message) do
+    %__MODULE__{exec | halted: true}
+    |> put_halt_message(halt_message)
+  end
+
+  @doc false
+  def get_halt_message(exec) do
+    get_assign(exec, "credo.halt_message")
+  end
+
+  @doc false
+  def put_halt_message(exec, halt_message) do
+    put_assign(exec, "credo.halt_message", halt_message)
+  end
+
   # Task tracking
 
   @doc false
