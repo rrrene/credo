@@ -9,10 +9,12 @@ defmodule Credo.Check.Warning.SpecWithStruct do
 
       It is preferable to define and use `MyModule.t()` instead of `%MyModule{}` in specs.
 
-      Avoid:
+      Example:
+
+          # preferred
           @spec a_function(%MyModule{}) :: any
 
-      Prefer:
+          # NOT preferred
           @spec a_function(MyModule.t()) :: any
       """
     ]
@@ -24,7 +26,9 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:spec, meta, args}, issues, issue_meta) do
+  # `::` and `when` are used in specs
+  defp traverse({:spec, meta, [{atom, _, _} | _] = args}, issues, issue_meta)
+       when atom in ~w(:: when)a do
     case Macro.prewalk(args, nil, &find_structs/2) do
       {ast, nil} ->
         {ast, issues}

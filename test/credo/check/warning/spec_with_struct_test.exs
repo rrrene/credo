@@ -6,7 +6,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
   @my_struct_module """
   defmodule MyApp.MyStruct do
     @type t :: %__MODULE__{id: integer, name: String.t()}
-    defstruct [:id, name]
+    defstruct [:id, :name]
   end
   """
 
@@ -145,6 +145,40 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
       end
       """,
       @my_struct_module,
+      @a_struct_module
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report an issue for functions, macros, or variables named spec" do
+    [
+      """
+      defmodule IgnoredFunction do
+        def spec(%AStruct{}) do
+          "okay"
+        end
+
+        def spec(arg) when arg == %AStruct{} do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule IgnoredMacro do
+        defmacro spec(arg) do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule IgnoredVariable do
+        def spec(id) do
+          spec = %AStruct{id: id}
+        end
+      end
+      """,
       @a_struct_module
     ]
     |> to_source_files()
