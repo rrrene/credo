@@ -12,10 +12,10 @@ defmodule Credo.Check.Warning.SpecWithStruct do
       Example:
 
           # preferred
-          @spec a_function(%MyModule{}) :: any
+          @spec a_function(MyModule.t()) :: any
 
           # NOT preferred
-          @spec a_function(MyModule.t()) :: any
+          @spec a_function(%MyModule{}) :: any
       """
     ]
 
