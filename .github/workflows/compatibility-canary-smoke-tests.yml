@@ -1,0 +1,100 @@
+name: "Compatibility: Canary Smoke Tests"
+on:
+  push:
+    branches:
+      - master
+      - release/*
+
+jobs:
+  test_on_new_project:
+    runs-on: ubuntu-latest
+    name: "[${{matrix.project.name}}]"
+    strategy:
+      matrix:
+        project:
+          # Community projects
+          -  name: elixirscript
+             repo: https://github.com/elixirscript/elixirscript.git
+
+          -  name: guardian
+             repo: https://github.com/ueberauth/guardian.git
+
+          -  name: distillery
+             repo: https://github.com/bitwalker/distillery.git
+
+          -  name: timex
+             repo: https://github.com/bitwalker/timex.git
+
+          -  name: jason
+             repo: https://github.com/michalmuskala/jason.git
+
+          -  name: ex_machina
+             repo: https://github.com/thoughtbot/ex_machina.git
+
+          -  name: graphql
+             repo: https://github.com/graphql-elixir/graphql.git
+
+          -  name: absinthe
+             repo: https://github.com/absinthe-graphql/absinthe.git
+
+          -  name: poison
+             repo: https://github.com/devinus/poison.git
+
+          -  name: mox
+             repo: https://github.com/dashbitco/mox.git
+
+          -  name: benchee
+             repo: https://github.com/PragTob/benchee.git
+
+          # Elixir
+          -  name: elixir
+             repo: https://github.com/elixir-lang/elixir.git
+
+          -  name: ex_doc
+             repo: https://github.com/elixir-lang/ex_doc.git
+
+          -  name: flow
+             repo: https://github.com/elixir-lang/flow.git
+
+          -  name: gettext
+             repo: https://github.com/elixir-lang/gettext.git
+
+          -  name: gen_stage
+             repo: https://github.com/elixir-lang/gen_stage.git
+
+          -  name: ecto
+             repo: https://github.com/elixir-ecto/ecto.git
+
+          -  name: plug
+             repo: https://github.com/elixir-plug/plug.git
+
+          # Phoenix
+          -  name: phoenix
+             repo: https://github.com/phoenixframework/phoenix.git
+
+          -  name: phoenix_html
+             repo: https://github.com/phoenixframework/phoenix_html.git
+
+          -  name: phoenix_pubsub
+             repo: https://github.com/phoenixframework/phoenix_pubsub.git
+
+          -  name: phoenix_ecto
+             repo: https://github.com/phoenixframework/phoenix_ecto.git
+
+          -  name: phoenix_live_reload
+             repo: https://github.com/phoenixframework/phoenix_live_reload.git
+
+          # Nerves
+          -  name: nerves
+             repo: https://github.com/nerves-project/nerves.git
+
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: 23
+          elixir-version: 1.11.2
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile
+      - run: bash test/run_on_project.sh ${{matrix.project.repo}} ${{matrix.project.name}}

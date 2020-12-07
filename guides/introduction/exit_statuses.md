@@ -3,6 +3,8 @@
 Credo fails with an exit status != 0 if it shows any issues.
 This enables shell based pipeline workflows (e.g. on CI systems) which test Credo compliance.
 
+## Issue Statuses
+
 The exit status of each check is used to construct a bit map of the types of issues which were encountered by or-ing them together to produce the final result:
 
 ```elixir
@@ -17,11 +19,11 @@ This way you can reason about the encountered issues right from the exit status.
 
 Default values for the checks are based on their category:
 
-    consistency:  1
-    design:       2
-    readability:  4
-    refactor:     8
-    warning:     16
+    consistency:          1
+    design:               2
+    readability:          4
+    refactor:             8
+    warning:              16
 
 Let's see what this means using an example:
 
@@ -37,3 +39,26 @@ $ echo $?
 So an exit status of `12` tells you that you have only Readability Issues (`4`) and Refactoring Opportunities (`8`), but e.g. no Warnings.
 
 Naturally, custom checks and plugins can provide their own exit statuses.
+
+```bash
+<custom category>:    32
+<custom category>:    64
+```
+
+## Actual & Custom Errors
+
+To also allow for actual errors, an exit status of `>= 128` signals something went wrong during analysis itself.
+
+These status codes do not follow the bitwise notation described above:
+
+```bash
+Generic Credo error:  128
+Credo Config errors:  129-131
+Reserved errors:      132-191
+```
+
+Naturally, plugins can provide their own exit statuses.
+
+```bash
+<custom errors>:      192-255
+```
