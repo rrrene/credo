@@ -60,6 +60,8 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       {_output, 0} -> true
       {_output, _} -> false
     end
+  rescue
+    _ -> false
   end
 
   defp git_ref_exists?(git_ref) do
