@@ -1,6 +1,9 @@
 defmodule Credo.Check.Readability.Specs do
   use Credo.Check,
     tags: [:controversial],
+    param_defaults: [
+      include_defp: false
+    ],
     explanations: [
       check: """
       Functions, callbacks and macros need typespecs.
@@ -24,7 +27,10 @@ defmodule Credo.Check.Readability.Specs do
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
-      """
+      """,
+      params: [
+        include_defp: "Include private functions."
+      ]
     ]
 
   @doc false
@@ -53,15 +59,15 @@ defmodule Credo.Check.Readability.Specs do
     {ast, [:impl | specs]}
   end
 
-  defp find_specs({:def, meta, [{:when, _, def_ast} | _]}, [:impl | specs]) do
-    find_specs({:def, meta, def_ast}, [:impl | specs])
+  defp find_specs({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | specs]) when keyword in [:def, :defp] do
+    find_specs({keyword, meta, def_ast}, [:impl | specs])
   end
 
-  defp find_specs({:def, _, [{name, _, nil}, _]} = ast, [:impl | specs]) do
+  defp find_specs({keyword, _, [{name, _, nil}, _]} = ast, [:impl | specs]) when keyword in [:def, :defp] do
     {ast, [{name, 0} | specs]}
   end
 
-  defp find_specs({:def, _, [{name, _, args}, _]} = ast, [:impl | specs]) do
+  defp find_specs({keyword, _, [{name, _, args}, _]} = ast, [:impl | specs]) when keyword in [:def, :defp] do
     {ast, [{name, length(args)} | specs]}
   end
 
@@ -71,24 +77,25 @@ defmodule Credo.Check.Readability.Specs do
 
   # TODO: consider for experimental check front-loader (ast)
   defp traverse(
-         {:def, meta, [{:when, _, def_ast} | _]},
+         {keyword, meta, [{:when, _, def_ast} | _]},
          issues,
          specs,
          issue_meta
-       ) do
-    traverse({:def, meta, def_ast}, issues, specs, issue_meta)
+       ) when keyword in [:def, :defp] do
+    traverse({keyword, meta, def_ast}, issues, specs, issue_meta)
   end
 
   defp traverse(
-         {:def, meta, [{name, _, args} | _]} = ast,
+         {keyword, meta, [{name, _, args} | _]} = ast,
          issues,
          specs,
          issue_meta
        )
        when is_list(args) or is_nil(args) do
     args = with nil <- args, do: []
+    keywords = get_keywords(issue_meta)
 
-    if {name, length(args)} in specs do
+    if keyword not in keywords or {name, length(args)} in specs do
       {ast, issues}
     else
       {ast, [issue_for(issue_meta, meta[:line], name) | issues]}
@@ -106,5 +113,13 @@ defmodule Credo.Check.Readability.Specs do
       trigger: trigger,
       line_no: line_no
     )
+  end
+
+  defp get_keywords(issue_meta) do
+    include_defp = issue_meta |> IssueMeta.params() |> Params.get(:include_defp, __MODULE__)
+    case include_defp do
+      true -> [:def, :defp]
+      _ -> [:def]
+    end
   end
 end

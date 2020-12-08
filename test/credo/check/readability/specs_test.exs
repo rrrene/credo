@@ -32,7 +32,7 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
-  test "it should NOT report private functions" do
+  test "it should NOT report private functions by default" do
     """
     defmodule CredoTypespecTest do
       @spec foo(integer) :: integer
@@ -44,6 +44,35 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> to_source_file()
     |> run_check(@described_check)
     |> refute_issues()
+  end
+
+  test "it should NOT report private functions with specs when enabled" do
+    """
+    defmodule CredoTypespecTest do
+      @spec foo(integer) :: integer
+      def foo(a), do: a
+
+      @spec foo(integer) :: integer
+      defp foo(a), do: a
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, include_defp: true)
+    |> refute_issues()
+  end
+
+  test "it should report specs on private functions when enabled" do
+    """
+    defmodule CredoTypespecTest do
+      @spec foo(integer) :: integer
+      def foo(a), do: a
+
+      defp foo(a, b), do: a + b
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, include_defp: true)
+    |> assert_issue()
   end
 
   test "it should report functions without specs" do
