@@ -59,15 +59,18 @@ defmodule Credo.Check.Readability.Specs do
     {ast, [:impl | specs]}
   end
 
-  defp find_specs({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | specs]) when keyword in [:def, :defp] do
+  defp find_specs({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | specs])
+       when keyword in [:def, :defp] do
     find_specs({keyword, meta, def_ast}, [:impl | specs])
   end
 
-  defp find_specs({keyword, _, [{name, _, nil}, _]} = ast, [:impl | specs]) when keyword in [:def, :defp] do
+  defp find_specs({keyword, _, [{name, _, nil}, _]} = ast, [:impl | specs])
+       when keyword in [:def, :defp] do
     {ast, [{name, 0} | specs]}
   end
 
-  defp find_specs({keyword, _, [{name, _, args}, _]} = ast, [:impl | specs]) when keyword in [:def, :defp] do
+  defp find_specs({keyword, _, [{name, _, args}, _]} = ast, [:impl | specs])
+       when keyword in [:def, :defp] do
     {ast, [{name, length(args)} | specs]}
   end
 
@@ -81,7 +84,8 @@ defmodule Credo.Check.Readability.Specs do
          issues,
          specs,
          issue_meta
-       ) when keyword in [:def, :defp] do
+       )
+       when keyword in [:def, :defp] do
     traverse({keyword, meta, def_ast}, issues, specs, issue_meta)
   end
 
@@ -93,9 +97,8 @@ defmodule Credo.Check.Readability.Specs do
        )
        when is_list(args) or is_nil(args) do
     args = with nil <- args, do: []
-    keywords = get_keywords(issue_meta)
 
-    if keyword not in keywords or {name, length(args)} in specs do
+    if keyword not in enabled_keywords(issue_meta) or {name, length(args)} in specs do
       {ast, issues}
     else
       {ast, [issue_for(issue_meta, meta[:line], name) | issues]}
@@ -115,9 +118,11 @@ defmodule Credo.Check.Readability.Specs do
     )
   end
 
-  defp get_keywords(issue_meta) do
-    include_defp = issue_meta |> IssueMeta.params() |> Params.get(:include_defp, __MODULE__)
-    case include_defp do
+  defp enabled_keywords(issue_meta) do
+    issue_meta
+    |> IssueMeta.params()
+    |> Params.get(:include_defp, __MODULE__)
+    |> case do
       true -> [:def, :defp]
       _ -> [:def]
     end
