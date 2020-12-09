@@ -42,9 +42,12 @@ defmodule Credo.BuildInfo do
   end
 
   defp git_present? do
-    {_, exit_status} = System.cmd("git", ["--help"])
-
-    exit_status == 0
+    try do
+      {_, exit_status} = System.cmd("git", ["--help"])
+      exit_status == 0
+    rescue
+      _ -> false
+    end
   end
 
   defp git_branch do
