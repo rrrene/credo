@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.3
+
+- Fix bug in `diff` and `version` command when `git` is not installed
+
 ## 1.5.2
 
 - Fix output bug in `diff` command
