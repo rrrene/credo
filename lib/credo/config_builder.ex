@@ -71,7 +71,6 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_color(switches)
     |> add_switch_crash_on_error(switches)
     |> add_switch_debug(switches)
-    |> add_switch_diff_with(switches)
     |> add_switch_enable_disabled_checks(switches)
     |> add_switch_files_excluded(switches)
     |> add_switch_files_included(switches)
@@ -148,14 +147,6 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_debug(exec, _), do: exec
-
-  # add_switch_diff_with
-
-  defp add_switch_diff_with(exec, %{diff_with: diff_with}) do
-    %Execution{exec | diff_with: diff_with}
-  end
-
-  defp add_switch_diff_with(exec, _), do: exec
 
   # add_switch_strict
 
