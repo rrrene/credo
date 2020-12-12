@@ -106,7 +106,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     |> assert_issue()
   end
 
-  test "it should report multiple issues" do
+  test "it should report multiple issues in separate specs" do
     [
       """
       defmodule Offender do
@@ -117,6 +117,24 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
         @spec g(a_struct :: %AStruct{}) :: any
         def g(_) do
+          "oops"
+        end
+      end
+      """,
+      @my_struct_module,
+      @a_struct_module
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> assert_issues()
+  end
+
+  test "it should report multiple issues in a single spec" do
+    [
+      """
+      defmodule Offender do
+        @spec f(a_struct :: %AStruct{}, my_struct :: %MyApp.MyStruct{}) :: any
+        def f(_, _) do
           "oops"
         end
       end

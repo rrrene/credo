@@ -19,6 +19,8 @@ defmodule Credo.Check.Warning.SpecWithStruct do
       """
     ]
 
+  alias Credo.Code.Name
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -26,21 +28,24 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # `::` and `when` are used in specs
-  defp traverse({:spec, meta, [{atom, _, _} | _] = args}, issues, issue_meta)
-       when atom in ~w(:: when)a do
-    case Macro.prewalk(args, nil, &find_structs/2) do
-      {ast, nil} ->
+  defp traverse({:@, meta, [{:spec, _, args}]}, issues, issue_meta) do
+    case Macro.prewalk(args, [], &find_structs/2) do
+      {ast, []} ->
         {ast, issues}
 
-      {ast, struct} ->
-        options = [
-          message: "Struct %#{struct}{} found in @spec",
-          trigger: struct,
-          line_no: meta[:line]
-        ]
+      {ast, structs} ->
+        issues =
+          Enum.reduce(structs, issues, fn curr, acc ->
+            options = [
+              message: "Struct %#{curr}{} found in @spec",
+              trigger: "%#{curr}{}",
+              line_no: meta[:line]
+            ]
 
-        {ast, [format_issue(issue_meta, options) | issues]}
+            [format_issue(issue_meta, options) | acc]
+          end)
+
+        {ast, issues}
     end
   end
 
@@ -48,8 +53,8 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     {ast, issues}
   end
 
-  defp find_structs({:%, _, [{:__aliases__, _, modules} | _]} = ast, _acc) do
-    {ast, Enum.join(modules, ".")}
+  defp find_structs({:%, _, [{:__aliases__, _, _} = aliases | _]} = ast, acc) do
+    {ast, [Name.full(aliases) | acc]}
   end
 
   defp find_structs(ast, acc) do
