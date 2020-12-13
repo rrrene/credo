@@ -9,4 +9,12 @@ Example usage:
     $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
     $ mix credo explain lib/my_app/server.ex:10:24  # same thing
 
-There are no additional options.
+## Command Line Switches
+
+### `--format`
+
+Display the explanation in a specific format (json)
+
+```bash
+$ mix credo explain lib/my_app/server.ex:10:24 --format json
+```

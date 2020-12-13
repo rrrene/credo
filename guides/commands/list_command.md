@@ -1,6 +1,8 @@
 # mix credo list
 
-`list` also suggests issues, but it groups them by file and does NOT cut the list to a certain count.
+`list` suggests issues, grouping them by file and NOT limitting the list to a certain count.
+
+## Examples
 
 Example usage:
 
@@ -9,3 +11,7 @@ Example usage:
     $ mix credo list --format oneline -a  # same thing, include low priority issues
 
     $ mix credo list --help               # more options
+
+## Command Line Switches
+
+The command line switches are identical to [command line switches of the `suggest` command](suggest_command.html#command-line-switches).
