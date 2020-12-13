@@ -128,7 +128,7 @@ $ mix credo --files-excluded ./test/**/*.exs
 
 ### `--format`
 
-Display the list in a specific format (json,flycheck,oneline)
+Display the list in a specific format (json, flycheck, or oneline)
 
 ```bash
 $ mix credo --format json

@@ -71,7 +71,7 @@ You can use partial names to quickly exclude checks. `mix credo --ignore namered
 
 Use `--enable-disabled-checks [pattern]` to re-enable checks that were disabled in the config using `{CheckModule, false}`. This comes in handy when using checks on a case-by-case basis
 
-As with other check-related switches, `pattern` is a comma-delimted list of patterns:
+As with other check-related switches, `pattern` is a comma-delimited list of patterns:
 
 ```bash
 $ mix credo info --enable-disabled-checks Credo.Check.Readability.Specs,Credo.Check.Refactor.DoubleBooleanNegation

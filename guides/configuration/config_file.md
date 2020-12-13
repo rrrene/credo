@@ -253,7 +253,7 @@ Read more about [check configuration](check_params.html) and [adding custom chec
 
 ## Using a specific configuration file
 
-You can tell Creod to use a specific config file anywhere in the file system:
+You can tell Credo to use a specific config file anywhere in the file system:
 
 ```bash
 mix credo --config-file <PATH_TO_CONFIG_FILE>
@@ -285,7 +285,7 @@ For project `foo/`, the contents of `/home/rrrene/projects/foo/.credo.exs` are m
 
 For project `bar/`, the contents of `/home/rrrene/.credo.exs` and Credo's default config are relevant.
 
-Please not that, as mentioned above, Credo's config can also resive in a `config/` subdirectory at every step of the way.
+Please note that, as mentioned above, Credo's config can also reside in a `config/` subdirectory at every step of the way.
 
 Given this directory structure:
 
