@@ -39,7 +39,7 @@ The available command line switches are:
 
 ### `--all`
 
-Shows all issues for each category.
+Show all issues for each category.
 
 By default, Credo's report is limited to 5 issues per category.
 
@@ -145,7 +145,7 @@ $ mix credo --ignore readability
 
 ### `--ignore`
 
-Alias for --ignore-checks
+Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore)
 
 ### `--min-priority`
 
