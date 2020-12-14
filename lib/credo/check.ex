@@ -140,7 +140,7 @@ defmodule Credo.Check do
   # @callback run(source_file :: Credo.SourceFile.t, params :: Keyword.t) :: list()
 
   @doc """
-  Returns wether or not this check runs on all source files.
+  Returns whether or not this check runs on all source files.
   """
   @callback run_on_all?() :: boolean
 

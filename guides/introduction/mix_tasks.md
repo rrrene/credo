@@ -1,6 +1,6 @@
 # Mix Tasks
 
-After incuding Credo in a project's dependencies (see [Installation](installation.html)), there are a number of built-in mix tasks available:
+After including Credo in a project's dependencies (see [Installation](installation.html)), there are a number of built-in mix tasks available:
 
 ```bash
 $ mix help | grep -i credo
