@@ -12,16 +12,16 @@ defmodule Credo.Execution.Task.DetermineCommand do
 
   # `--help` given
   defp determine_command(
-         %Execution{help: true} = exec,
-         %Options{command: nil} = options
+         exec,
+         %Options{command: nil, switches: %{help: true}} = options
        ) do
     set_command_and_path(exec, options, "help", options.path)
   end
 
   # `--version` given
   defp determine_command(
-         %Execution{version: true} = exec,
-         %Options{command: nil} = options
+         exec,
+         %Options{command: nil, switches: %{version: true}} = options
        ) do
     set_command_and_path(exec, options, "version", options.path)
   end

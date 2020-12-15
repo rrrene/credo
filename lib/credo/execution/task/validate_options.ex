@@ -20,19 +20,22 @@ defmodule Credo.Execution.Task.ValidateOptions do
   def error(exec, _opts) do
     UI.use_colors(exec)
 
-    Enum.each(exec.cli_options.unknown_args, &print_argument/1)
-    Enum.each(exec.cli_options.unknown_switches, &print_switch/1)
+    Enum.each(exec.cli_options.unknown_args, &print_argument(exec, &1))
+    Enum.each(exec.cli_options.unknown_switches, &print_switch(exec, &1))
 
     put_assign(exec, "credo.exit_status", 1)
   end
 
-  defp print_argument(name) do
-    UI.warn([:red, "** (credo) Unknown argument: #{name}"])
+  defp print_argument(exec, name) do
+    UI.warn([
+      :red,
+      "** (credo) Unknown argument for `#{exec.cli_options.command}` command: #{name}"
+    ])
   end
 
-  defp print_switch({name, _value}), do: print_switch(name)
+  defp print_switch(exec, {name, _value}), do: print_switch(exec, name)
 
-  defp print_switch(name) do
-    UI.warn([:red, "** (credo) Unknown switch: #{name}"])
+  defp print_switch(exec, name) do
+    UI.warn([:red, "** (credo) Unknown switch for `#{exec.cli_options.command}` command: #{name}"])
   end
 end

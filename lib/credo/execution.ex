@@ -101,7 +101,7 @@ defmodule Credo.Execution do
       {Credo.Execution.Task.InitializeCommand, []}
     ],
     parse_cli_options_final: [
-      {Credo.Execution.Task.ParseOptions, []}
+      {Credo.Execution.Task.ParseOptions, use_strict_parser: true}
     ],
     validate_cli_options: [
       {Credo.Execution.Task.ValidateOptions, []}

@@ -30,10 +30,11 @@ defmodule Credo.CLI.Switch do
 
   defp from_keywords(name, keywords) when is_atom(name) or is_binary(name) do
     name = String.to_atom(to_string(name))
+    type = keywords[:type] || :string
 
     keywords =
       keywords
-      |> Keyword.put(:type, :string)
+      |> Keyword.put(:type, type)
       |> Keyword.put(:name, name)
 
     struct(__MODULE__, keywords)

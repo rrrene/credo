@@ -14,6 +14,28 @@ defmodule Credo.CLI.Options do
             unknown_switches: [],
             unknown_args: []
 
+  @deprecated "Options.parse/7 is deprecated, use Options.parse/8 instead"
+  def parse(
+        argv,
+        current_dir,
+        command_names,
+        given_command_name,
+        ignored_args,
+        switches_definition,
+        aliases
+      ) do
+    parse(
+      true,
+      argv,
+      current_dir,
+      command_names,
+      given_command_name,
+      ignored_args,
+      switches_definition,
+      aliases
+    )
+  end
+
   @doc """
   Returns a `Options` struct for the given parameters.
 
@@ -28,6 +50,7 @@ defmodule Credo.CLI.Options do
 
   """
   def parse(
+        true,
         argv,
         current_dir,
         command_names,
@@ -44,6 +67,27 @@ defmodule Credo.CLI.Options do
       given_command_name,
       ignored_args,
       switches_definition
+    )
+  end
+
+  def parse(
+        false,
+        argv,
+        current_dir,
+        command_names,
+        given_command_name,
+        ignored_args,
+        switches_definition,
+        aliases
+      ) do
+    argv
+    |> OptionParser.parse(switches: switches_definition, aliases: aliases)
+    |> parse_result(
+      current_dir,
+      command_names,
+      given_command_name,
+      ignored_args,
+      []
     )
   end
 

@@ -5,11 +5,17 @@ defmodule Credo.CLI.Command.Help do
   @starting_order ~w(suggest explain)
   @ending_order ~w(help)
 
-  use Credo.CLI.Command, short_description: "Show this help message"
-
   alias Credo.CLI.Output.UI
   alias Credo.CLI.Sorter
+  alias Credo.CLI.Switch
   alias Credo.Execution
+
+  use Credo.CLI.Command,
+    short_description: "Show this help message",
+    cli_switches: [
+      Switch.string("format"),
+      Switch.boolean("help", alias: :h)
+    ]
 
   @doc false
   def call(exec, _opts) do
