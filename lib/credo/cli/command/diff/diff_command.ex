@@ -32,6 +32,9 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       ],
       print_after_analysis: [
         {__MODULE__.PrintResultsAndSummary, []}
+      ],
+      filter_issues_for_exit_status: [
+        {__MODULE__.FilterIssuesForExitStatus, []}
       ]
     )
   end
@@ -298,6 +301,24 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       DiffOutput.print_after_info(source_files, exec, time_load, time_run)
 
       exec
+    end
+  end
+
+  defmodule FilterIssuesForExitStatus do
+    @moduledoc false
+
+    use Credo.Execution.Task
+
+    def call(exec, _opts) do
+      issues =
+        exec
+        |> Execution.get_issues()
+        |> Enum.filter(fn
+          %Credo.Issue{diff_marker: :new} -> true
+          _ -> false
+        end)
+
+      Execution.set_issues(exec, issues)
     end
   end
 end
