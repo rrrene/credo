@@ -175,6 +175,7 @@ defmodule Credo.Check do
     :base_priority,
     :category,
     :elixir_version,
+    :exit_status,
     :explanations,
     :param_defaults,
     :run_on_all,
