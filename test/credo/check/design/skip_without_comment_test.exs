@@ -8,12 +8,18 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     defmodule CredoSampleModuleTest do
       alias ExUnit.Case
 
-      # Some comment
+      # Happy case: Some comment
       @tag :skip
       test "foo" do
         :ok
       end
 
+      # Some comment
+      @tag :skip
+      # another comment, shouldn't matter
+      test "foo2" do
+        :ok
+      end
     end
     """
     |> to_source_file("foo_test.exs")
@@ -30,7 +36,6 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
       test "foo" do
         :ok
       end
-
     end
     """
     |> to_source_file("foo.ex")
@@ -38,6 +43,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     |> refute_issues()
   end
 
+  @tag :skip
   test "it should report a violation" do
     """
     defmodule CredoSampleModuleTest do
@@ -47,7 +53,6 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
       test "foo" do
         :ok
       end
-
     end
     """
     |> to_source_file("foo_test.exs")
