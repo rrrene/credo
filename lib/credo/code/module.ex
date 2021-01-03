@@ -1,7 +1,7 @@
 defmodule Credo.Code.Module do
   @moduledoc """
   This module provides helper functions to analyse modules, return the defined
-  funcions or module attributes.
+  functions or module attributes.
   """
 
   alias Credo.Code

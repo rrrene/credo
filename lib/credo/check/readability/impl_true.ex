@@ -11,13 +11,13 @@ defmodule Credo.Check.Readability.ImplTrue do
       Instead of:
 
           @impl true
-          def my_funcion() do
+          def my_function() do
             ...
 
       use:
 
           @impl MyBehaviour
-          def my_funcion() do
+          def my_function() do
             ...
 
       """
