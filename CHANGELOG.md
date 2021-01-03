@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.6.0
+
+- ...
+
+### New checks
+
+- `Credo.Check.Design.SkipTestWithoutComment`
+- `Credo.Check.Readability.PipeIntoAnonymousFunctions`
+- `Credo.Check.Refactor.MapJoin`
+
+## 1.5.4
+
+- Fix bug where `:exit_status` was not a valid option for `use Credo.Check`
+- Fix bug where `mix credo diff` exited with a non-zero exit status even if no issues were shown
+- `mix credo diff` now fails with an error if the given `ref` was not found
+
 ## 1.5.3
 
 - Fix bug in `diff` and `version` command when `git` is not installed

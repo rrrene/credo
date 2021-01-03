@@ -32,6 +32,9 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       ],
       print_after_analysis: [
         {__MODULE__.PrintResultsAndSummary, []}
+      ],
+      filter_issues_for_exit_status: [
+        {__MODULE__.FilterIssuesForExitStatus, []}
       ]
     )
   end
@@ -42,16 +45,24 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   def previous_ref(exec) do
     given_first_arg = List.first(exec.cli_options.args)
 
+    previous_ref_as_git_ref(given_first_arg) ||
+      previous_ref_as_path(given_first_arg) ||
+      {:error, "given ref is not a Git ref or local path: #{given_first_arg}"}
+  end
+
+  def previous_ref_as_git_ref(given_first_arg) do
     if git_present?() do
       potential_git_ref = given_first_arg || "HEAD"
 
       if git_ref_exists?(potential_git_ref) do
         {:git, potential_git_ref}
-      else
-        {:path, potential_git_ref}
       end
-    else
-      # no git?
+    end
+  end
+
+  def previous_ref_as_path(potential_path) do
+    if File.exists?(potential_path) do
+      {:path, potential_path}
     end
   end
 
@@ -101,6 +112,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       case DiffCommand.previous_ref(exec) do
         {:git, git_ref} -> run_credo_on_git_ref(exec, git_ref)
         {:path, path} -> run_credo_on_path_ref(exec, path)
+        {:error, error} -> Execution.halt(exec, error)
       end
     end
 
@@ -298,6 +310,24 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       DiffOutput.print_after_info(source_files, exec, time_load, time_run)
 
       exec
+    end
+  end
+
+  defmodule FilterIssuesForExitStatus do
+    @moduledoc false
+
+    use Credo.Execution.Task
+
+    def call(exec, _opts) do
+      issues =
+        exec
+        |> Execution.get_issues()
+        |> Enum.filter(fn
+          %Credo.Issue{diff_marker: :new} -> true
+          _ -> false
+        end)
+
+      Execution.set_issues(exec, issues)
     end
   end
 end
