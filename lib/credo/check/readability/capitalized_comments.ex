@@ -2,15 +2,10 @@ defmodule Credo.Check.Readability.CapitalizedComments do
   @moduledoc false
 
   use Credo.Check,
-    base_priority: :high,
     category: :readability,
-    tags: [:controversial],
+    tags: [:experimental],
     param_defaults: [
-      non_capitalized_sentence: ~r/\# [a-z]\S+ \S+/,
-      capitalized_sentence_without_end: ~r/\# [`|"|'|0-9|A-Z]+.*[^.?!]$/,
-      comment_sentence_without_end: ~r/\# \S+.*[^.?!]$/,
-      excluded_paths: [],
-      excluded_files: []
+      rules: []
     ],
     explanations: [
       check: """
@@ -29,98 +24,102 @@ defmodule Credo.Check.Readability.CapitalizedComments do
 
       Valid comments examples:
 
-        # This is a valid single line comment.
+          # This is a valid single line comment.
 
-        # This is valid multi
-        # line comments.
-        # Yup and valid.
+          # This is valid multi
+          # line comments.
+          # Yup and valid.
 
-        # `code` block.
+          # `code` block.
 
-        # "Wow", this is also allowed.
+          # "Wow", this is also allowed.
 
-        # 'xox', also valid.
+          # 'xox', also valid.
 
-        # 9 is also valid.
+          # 9 is also valid.
 
-        # Is this also valid?
-        # - yes!
+          # Is this also valid?
+          # - yes!
       """,
       params: [
-        excluded_paths: "A list of paths to exclude",
-        excluded_files: "A list of files to exclude",
-        non_capitalized_sentence: "Regex to match non-capitalized sentence.",
-        capitalized_sentence_without_end: "Regex to match capitalized sentence without end.",
-        comment_sentence_without_end: "Regex to match any comment sentence without end."
+        rules: ""
       ]
     ]
 
   @doc false
   def run(source_file, params \\ []) do
-    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
-    excluded_files = Params.get(params, :excluded_files, __MODULE__)
+    lines =
+      source_file
+      |> Credo.Code.clean_charlists_strings_and_sigils()
+      |> Credo.Code.to_lines()
 
-    if Enum.member?(excluded_files, source_file.filename) or
-         String.starts_with?(source_file.filename, excluded_paths) do
-      []
+    issue_meta = IssueMeta.for(source_file, params)
+    rules = Params.get(params, :rules, __MODULE__)
+
+    {_, all_comments} = Enum.reduce(lines, {[], []}, &extract_comment_blocks/2)
+
+    all_comments =
+      Enum.map(all_comments, fn
+        [] ->
+          nil
+
+        comments ->
+          {first_line_no, _} = Enum.at(comments, 0)
+
+          comment =
+            Enum.map_join(comments, "\n", fn {_line_no, line} ->
+              String.replace(line, ~r/^(\s*#\s?)/, "")
+            end)
+
+          {first_line_no, comment}
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    IO.inspect(all_comments)
+
+    all_comments
+    |> Enum.map(fn {first_line_no, line} ->
+      Enum.find_value(rules, fn rule ->
+        issue_or_nil(first_line_no, line, rule, issue_meta)
+      end)
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp extract_comment_blocks({line_no, line}, {current_comments, all_comments}) do
+    if String.match?(line, ~r/^\s*#/) do
+      previous_line_no = line_no - 1
+
+      case List.last(current_comments) do
+        {^previous_line_no, _} -> {current_comments ++ [{line_no, line}], all_comments}
+        _ -> {[{line_no, line}], all_comments ++ [current_comments]}
+      end
     else
-      lines = SourceFile.lines(source_file)
-
-      issue_meta = IssueMeta.for(source_file, params)
-
-      {_, issues} = Enum.reduce(lines, {:single, []}, &process_line(&1, &2, issue_meta, params))
-
-      issues
+      {current_comments, all_comments}
     end
   end
 
-  defp process_line({line_no, line}, {comment_type, issues}, issue_meta, params) do
-    case comment_type do
-      :single -> process_single_comment(issues, issue_meta, line_no, line, params)
-      :multiline -> process_multiline_comment(issues, issue_meta, line_no, line, params)
+  defp issue_or_nil(first_line_no, line, rule, issue_meta) do
+    if_match_given = rule[:if_match] && String.match?(line, rule[:if_match])
+    unless_match_given = rule[:unless_match] && !String.match?(line, rule[:unless_match])
+
+    if if_match_given || unless_match_given do
+      case Regex.run(rule[:require_match], line) do
+        nil ->
+          issue_for(issue_meta, first_line_no, line, rule[:message])
+
+        _value ->
+          nil
+      end
     end
   end
 
-  defp process_single_comment(issues, issue_meta, line_no, line, params) do
-    cond do
-      run_regex(line, :capitalized_sentence_without_end, params) != nil ->
-        {:multiline, issues}
-
-      run_regex(line, :non_capitalized_sentence, params) != nil ->
-        [match | _] = run_regex(line, :non_capitalized_sentence, params)
-        {:single, add_to_issues(issues, issue_meta, line_no, match)}
-
-      true ->
-        {:single, issues}
-    end
-  end
-
-  defp process_multiline_comment(issues, _issue_meta, _line_no, line, params) do
-    case run_regex(line, :comment_sentence_without_end, params) do
-      nil -> {:single, issues}
-      _ -> {:multiline, issues}
-    end
-  end
-
-  defp add_to_issues(issues, issue_meta, line_no, match) do
-    match
-    |> build_message()
-    |> issue_for(issue_meta, line_no, match)
-    |> List.wrap()
-    |> Kernel.++(issues)
-  end
-
-  defp run_regex(line, regex_identifier, params) do
-    params
-    |> Params.get(regex_identifier, __MODULE__)
-    |> Regex.run(line)
-  end
-
-  defp build_message(match),
-    do:
-      "Non-capitalized beginning of comment found: \"#{match}\". Comments longer than one word must be capitalized"
-
-  defp issue_for(message, issue_meta, line_no, trigger) do
-    format_issue(issue_meta, message: message, line_no: line_no, trigger: trigger)
+  defp issue_for(issue_meta, line_no, trigger, message) do
+    format_issue(
+      issue_meta,
+      message: "Comment does not match required format (#{message})",
+      line_no: line_no,
+      trigger: trigger
+    )
   end
 end
