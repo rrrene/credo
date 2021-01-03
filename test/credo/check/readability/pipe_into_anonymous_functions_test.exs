@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.PipesToAnonymousFunctionsTest do
-  use Credo.TestHelper
+defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
+  use Credo.Test.Case
 
-  @described_check Credo.Check.Readability.PipesToAnonymousFunctions
+  @described_check Credo.Check.Readability.PipeIntoAnonymousFunctions
 
   #
   # cases NOT raising issues
@@ -20,7 +20,8 @@ defmodule Credo.Check.Readability.PipesToAnonymousFunctionsTest do
     end
     """
     |> to_source_file
-    |> refute_issues(@described_check)
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   #
@@ -40,7 +41,8 @@ defmodule Credo.Check.Readability.PipesToAnonymousFunctionsTest do
     end
     """
     |> to_source_file
-    |> assert_issue(@described_check)
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 
   test "it should report a violation for multiple violations" do
@@ -56,6 +58,7 @@ defmodule Credo.Check.Readability.PipesToAnonymousFunctionsTest do
     end
     """
     |> to_source_file
-    |> assert_issues(@described_check)
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.MapJoinTest do
       def some_function(p1, p2, p3, p4, p5) do
         [:a, :b, :c]
         |> Enum.sort()
-        |> Enum.map(&inspect/1)
+        |> Enum.map(fn x -> inspect(x) end)
         |> Enum.join(", ")
       end
     end
