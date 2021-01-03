@@ -44,34 +44,126 @@ defmodule Credo.CLI.Output.Summary do
     UI.puts()
 
     print_priority_hint(exec)
+    print_first_run_hint(exec)
+  end
 
-    UI.puts("""
+  defp latest_tag do
+    case System.cmd("git", ~w"describe --tags --abbrev=0") do
+      {output, 0} -> String.trim(output)
+      _ -> nil
+    end
+  end
 
-    That's a lot of issue to deal with at once.
+  defp default_branch do
+    remote_name = default_remote_name()
 
-    You can use `diff` to only show the issues that were introduced on this branch.
+    case System.cmd("git", ~w"symbolic-ref refs/remotes/#{remote_name}/HEAD") do
+      {output, 0} -> Regex.run(~r"refs/remotes/#{remote_name}/(.+)$", output) |> Enum.at(1)
+      _ -> nil
+    end
+  end
 
-        mix credo diff master
+  defp default_remote_name do
+    "origin"
+  end
 
-    You can use `diff` to only show the issues that were introduced since a certain tag or commit:
+  defp latest_commit_on_default_branch do
+    case System.cmd("git", ~w"rev-parse --short #{default_remote_name()}/#{default_branch()}") do
+      {output, 0} -> String.trim(output)
+      _ -> nil
+    end
+  end
 
-        # latest tag seems to be `v1.5.1`
-        mix credo diff v1.5.1
+  defp now do
+    "2020-12-01 19:58:09"
 
-    Lastly, you can compare your working dir against this point in time
+    Calendar.strftime(DateTime.utc_now(), "%Y-%m-%d")
+  end
 
-        # use the current datetime
-        mix credo diff --since "2020-12-01 19:58:09"
+  defp print_first_run_hint(_exec) do
+    term_width = Output.term_columns()
+    now = now()
+    default_branch = default_branch()
+    latest_commit_on_default_branch = latest_commit_on_default_branch()
+    latest_tag = latest_tag()
 
-        # use the current HEAD of master
-        mix credo diff 879742a
+    headline = " 8< "
+    bar = String.pad_leading("", div(term_width - String.length(headline), 2), "-")
 
-    Every project is different, especially when it comes to introducing code analysis.
+    UI.puts()
+    UI.puts()
+    UI.puts([:magenta, :bright, "#{bar} 8< #{bar}"])
+    UI.puts()
+    UI.puts()
 
-    It should not be about following any "best practice", the linter actually has to be helping you.
+    UI.puts([
+      :reset,
+      :orange,
+      """
+      # Where to start?
+      """,
+      :reset,
+      """
 
-    Try the commands above in a second terminal to see which one is working for this project!
-    """)
+      That's a lot of issues to deal with at once.
+      """,
+      """
+
+      You can use `diff` to only show the issues that were introduced on this branch:
+      """,
+      :cyan,
+      """
+
+          mix credo diff #{default_branch}
+
+      """,
+      :reset,
+      :orange,
+      """
+      ## Compare to a point in history
+      """,
+      :reset,
+      """
+
+      You can use `diff` to only show the issues that were introduced after a certain tag or commit:
+
+      """,
+      :cyan,
+      "    mix credo diff #{latest_tag} ",
+      :faint,
+      "             # use the latest tag",
+      "\n\n",
+      :reset,
+      :cyan,
+      "    mix credo diff #{latest_commit_on_default_branch}",
+      :faint,
+      "             # use the current HEAD of master",
+      "\n\n",
+      :reset,
+      """
+      Lastly, you can compare your working dir against this point in time:
+
+      """,
+      :cyan,
+      "    mix credo diff --since #{now}",
+      :faint,
+      "  # use the current time",
+      "\n\n",
+      :reset,
+      :orange,
+      """
+      ## Every project is different
+      """,
+      :reset,
+      """
+
+      This is true, especially when it comes to introducing code analysis to an existing codebase.
+      Doing so should not be about following any "best practice" in particular, it should be about
+      helping you to get to know the ropes and make the changes you want.
+      """
+    ])
+
+    UI.puts("Try the options outlined above to see which one is working for this project!")
   end
 
   defp count_checks(exec) do
