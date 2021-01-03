@@ -4,6 +4,12 @@
 
 - ...
 
+### Exit Status
+
+- Credo succeeds with an exit status of 0 (like any other program).
+- Credo fails with an exit status between 1 and 127 if it shows any issues.
+- Exit statuses above or equal to 128 indicate an actual runtime error during analysis itself.
+
 ### New checks
 
 - `Credo.Check.Design.SkipTestWithoutComment`

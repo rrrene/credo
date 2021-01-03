@@ -467,6 +467,16 @@ defmodule Credo.Execution do
     %__MODULE__{exec | results: Map.put(exec.results, name, value)}
   end
 
+  @doc false
+  def put_exit_status(exec, exit_status) do
+    put_assign(exec, "credo.exit_status", exit_status)
+  end
+
+  @doc false
+  def get_exit_status(exec) do
+    get_assign(exec, "credo.exit_status", 0)
+  end
+
   # Halt
 
   @doc "Halts further execution of the pipeline."

@@ -10,7 +10,7 @@ defmodule Credo.Execution.Task.AssignExitStatusForIssues do
       |> get_issues()
       |> to_exit_status()
 
-    put_assign(exec, "credo.exit_status", exit_status)
+    put_exit_status(exec, exit_status)
   end
 
   # Converts the return value of a Command.run() call into an exit_status

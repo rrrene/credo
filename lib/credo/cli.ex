@@ -48,7 +48,7 @@ defmodule Credo.CLI do
 
   defp halt_if_exit_status_assigned(exec) do
     exec
-    |> Execution.get_assign("credo.exit_status", 0)
+    |> Execution.get_exit_status()
     |> halt_if_failed()
   end
 

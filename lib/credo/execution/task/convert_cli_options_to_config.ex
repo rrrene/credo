@@ -6,18 +6,12 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
   alias Credo.ConfigBuilder
   alias Credo.CLI.Output.UI
 
+  @exit_status Credo.CLI.ExitStatus.config_parser_error()
+
   def call(exec, _opts) do
     exec
     |> ConfigBuilder.parse()
     |> halt_on_error(exec)
-  end
-
-  def halt_on_error({:error, error}, exec) do
-    Execution.halt(exec, error)
-  end
-
-  def halt_on_error(exec, _) do
-    exec
   end
 
   def error(exec, _opts) do
@@ -25,6 +19,14 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
     |> Execution.get_halt_message()
     |> puts_error_message()
 
+    put_exit_status(exec, @exit_status)
+  end
+
+  defp halt_on_error({:error, error}, exec) do
+    Execution.halt(exec, error)
+  end
+
+  defp halt_on_error(exec, _) do
     exec
   end
 

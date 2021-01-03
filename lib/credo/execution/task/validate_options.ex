@@ -6,6 +6,8 @@ defmodule Credo.Execution.Task.ValidateOptions do
   alias Credo.CLI.Options
   alias Credo.CLI.Output.UI
 
+  @exit_status Credo.CLI.ExitStatus.config_loaded_but_invalid()
+
   def call(exec, _opts) do
     case exec.cli_options do
       %Options{unknown_args: [], unknown_switches: []} ->
@@ -23,7 +25,7 @@ defmodule Credo.Execution.Task.ValidateOptions do
     Enum.each(exec.cli_options.unknown_args, &print_argument(exec, &1))
     Enum.each(exec.cli_options.unknown_switches, &print_switch(exec, &1))
 
-    put_assign(exec, "credo.exit_status", 1)
+    put_exit_status(exec, @exit_status)
   end
 
   defp print_argument(exec, name) do

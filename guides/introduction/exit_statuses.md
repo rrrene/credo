@@ -1,6 +1,11 @@
 # Exit Status
 
-Credo fails with an exit status != 0 if it shows any issues.
+Credo succeeds with an exit status of 0 (like any other program).
+
+Credo fails with an exit status between 1 and 127 if it shows any issues.
+
+Exit statuses above or equal to 128 indicate an actual runtime error during analysis itself.
+
 This enables shell based pipeline workflows (e.g. on CI systems) which test Credo compliance.
 
 ## Issue Statuses
@@ -49,7 +54,7 @@ Naturally, custom checks and plugins can provide their own exit statuses.
 
 To also allow for actual errors, an exit status of `>= 128` signals something went wrong during analysis itself.
 
-These status codes do not follow the bitwise notation described above:
+Since one cannot combine these, they do not follow the bitwise notation described above:
 
 ```bash
 Generic Credo error:  128

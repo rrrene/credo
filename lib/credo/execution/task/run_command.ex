@@ -5,10 +5,16 @@ defmodule Credo.Execution.Task.RunCommand do
 
   alias Credo.Execution
 
+  @exit_status Credo.CLI.ExitStatus.generic_error()
+
   def call(exec, opts) do
     command_name = Execution.get_command_name(exec)
     command_mod = Execution.get_command(exec, command_name)
 
     command_mod.call(exec, opts)
+  end
+
+  def error(exec, _opts) do
+    put_exit_status(exec, @exit_status)
   end
 end
