@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0
+
+- ...
+
+### New checks
+
+- `Credo.Check.Design.SkipTestWithoutComment`
+- `Credo.Check.Readability.PipeIntoAnonymousFunctions`
+- `Credo.Check.Refactor.MapJoin`
+
 ## 1.5.4
 
 - Fix bug where `:exit_status` was not a valid option for `use Credo.Check`
