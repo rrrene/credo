@@ -91,10 +91,10 @@ defmodule Credo.Execution do
       #       end
       #     end
     ],
-    pre_determine_command: [
+    determine_command: [
       {Credo.Execution.Task.DetermineCommand, []}
     ],
-    pre_set_default_command: [
+    set_default_command: [
       {Credo.Execution.Task.SetDefaultCommand, []}
     ],
     initialize_command: [
@@ -108,12 +108,6 @@ defmodule Credo.Execution do
     ],
     convert_cli_options_to_config: [
       {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
-    ],
-    determine_command: [
-      # {Credo.Execution.Task.DetermineCommand, []}
-    ],
-    set_default_command: [
-      # {Credo.Execution.Task.SetDefaultCommand, []}
     ],
     resolve_config: [
       {Credo.Execution.Task.UseColors, []},
