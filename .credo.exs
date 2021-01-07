@@ -129,6 +129,11 @@
         {Credo.Check.Refactor.Nesting, []},
         {Credo.Check.Refactor.UnlessWithElse, []},
         {Credo.Check.Refactor.WithClauses, []},
+        {Credo.Check.Refactor.FilterFilter, []},
+        {Credo.Check.Refactor.FilterReject, []},
+        {Credo.Check.Refactor.MapMap, []},
+        {Credo.Check.Refactor.RejectFilter, []},
+        {Credo.Check.Refactor.RejectReject, []},
 
         #
         ## Warnings
