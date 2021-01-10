@@ -1,4 +1,4 @@
-defmodule EnumHelpers do
+defmodule Credo.Check.Refactor.EnumHelpers do
   def traverse(
         ast =
           {{:., _, [{:__aliases__, meta, [:Enum]}, second]}, _,
