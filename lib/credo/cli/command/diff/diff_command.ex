@@ -130,13 +130,13 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
       previous_argv =
         case Enum.take(exec.argv, 2) do
           ["diff", ^previous_git_ref] ->
-            [dirname] ++ Enum.slice(exec.argv, 2..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 2..-1)
 
           ["diff", _] ->
-            [dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 1..-1)
 
           ["diff"] ->
-            [dirname] ++ Enum.slice(exec.argv, 1..-1) ++ ["--strict"]
+            [dirname] ++ Enum.slice(exec.argv, 1..-1)
         end
 
       run_credo(exec, previous_git_ref, dirname, previous_argv)
