@@ -1,6 +1,8 @@
 defmodule Credo.DiffTest do
   use Credo.Test.Case
 
+  alias Credo.Test.IntegrationTest
+
   @moduletag slow: :integration
   @moduletag timeout: 300_000
 
@@ -40,7 +42,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues on --help" do
-    exec = Credo.run(["diff", "--help"])
+    exec = IntegrationTest.run(["diff", "--help"])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -48,7 +50,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues on fixture" do
-    exec = Credo.run(["diff", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -56,7 +58,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues on fixture (using --debug)" do
-    exec = Credo.run(["diff", "--debug", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--debug", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -64,13 +66,13 @@ defmodule Credo.DiffTest do
   end
 
   test "it should halt on fixture (using --foo)" do
-    exec = Credo.run(["diff", "--foo"])
+    exec = IntegrationTest.run(["diff", "--foo"])
 
     assert exec.halted == true
   end
 
   test "it should NOT report issues on fixture (using --strict)" do
-    exec = Credo.run(["diff", "--strict", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--strict", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -78,7 +80,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues using diff command" do
-    exec = Credo.run(["diff", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -86,7 +88,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues using diff command (using --strict)" do
-    exec = Credo.run(["diff", "--strict", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--strict", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -94,7 +96,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues using diff command (using --only)" do
-    exec = Credo.run(["diff", "--only", "module", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--only", "module", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -102,7 +104,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues using diff command (using --ignore)" do
-    exec = Credo.run(["diff", "--ignore", "module", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--ignore", "module", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
@@ -110,7 +112,7 @@ defmodule Credo.DiffTest do
   end
 
   test "it should NOT report issues using diff command (using --format json)" do
-    exec = Credo.run(["diff", "--format", "json", @fixture_integration_cloned_repo])
+    exec = IntegrationTest.run(["diff", "--format", "json", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "diff"
