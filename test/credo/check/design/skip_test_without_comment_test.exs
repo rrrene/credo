@@ -27,22 +27,6 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     |> refute_issues()
   end
 
-  test "it should NOT report non-test files" do
-    """
-    defmodule CredoSampleModuleTest do
-      alias ExUnit.Case
-
-      @tag :skip
-      test "foo" do
-        :ok
-      end
-    end
-    """
-    |> to_source_file("foo.ex")
-    |> run_check(@described_check)
-    |> refute_issues()
-  end
-
   @tag :skip
   test "it should report a violation" do
     """
