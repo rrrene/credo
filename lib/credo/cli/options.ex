@@ -38,19 +38,9 @@ defmodule Credo.CLI.Options do
 
   @doc """
   Returns a `Options` struct for the given parameters.
-
-      iex> Credo.CLI.Options.parse(["alice", "--debug"], ".", ["alice", "bob", "eve"], [], [debug: :boolean], [])
-      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{debug: true}, unknown_args: [], unknown_switches: []}
-
-      iex> Credo.CLI.Options.parse(["alice", "--friend", "bob", "--friend", "eve"], ".", ["alice", "bob", "eve"], [], [friend: :keep], [])
-      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{friend: ["bob", "eve"]}, unknown_args: [], unknown_switches: []}
-
-      iex> Credo.CLI.Options.parse(["alice", "--friend", "bob", "--friend", "eve"], ".", ["alice", "bob", "eve"], [], [friend: [:string, :keep]], [])
-      %Credo.CLI.Options{args: [], command: "alice", path: ".", switches: %{friend: ["bob", "eve"]}, unknown_args: [], unknown_switches: []}
-
   """
   def parse(
-        true,
+        true = _strict_parser,
         argv,
         current_dir,
         command_names,

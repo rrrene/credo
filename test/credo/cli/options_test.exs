@@ -1,5 +1,6 @@
 defmodule Credo.CLI.OptionsTest do
   use Credo.Test.Case
+
   alias Credo.CLI.Options
 
   @command_names ["cmd1", "cmd2", "cmd3"]
@@ -48,7 +49,7 @@ defmodule Credo.CLI.OptionsTest do
 
   defp parse(args) do
     dir = fixture_path(@fixture_name)
-    Options.parse(args, dir, @command_names, [], @switches, @aliases)
+    Options.parse(true, args, dir, @command_names, nil, [], @switches, @aliases)
   end
 
   defp switches(args), do: parse(args).switches
