@@ -44,8 +44,10 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   def run_credo_on_dir(exec, dirname, previous_git_ref) do
+    first_two_args = Enum.take(exec.argv, 2)
+
     previous_argv =
-      case Enum.take(exec.argv, 2) do
+      case first_two_args do
         ["diff", ^previous_git_ref] ->
           [dirname] ++ Enum.slice(exec.argv, 2..-1)
 
