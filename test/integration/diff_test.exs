@@ -93,14 +93,6 @@ defmodule Credo.DiffTest do
     assert issues == []
   end
 
-  test "it should report issues using diff command (using --all)" do
-    exec = Credo.run(["diff", "--all", "module", @fixture_integration_cloned_repo])
-    issues = Credo.Execution.get_issues(exec)
-
-    assert exec.cli_options.command == "diff"
-    assert issues != []
-  end
-
   test "it should NOT report issues using diff command (using --only)" do
     exec = Credo.run(["diff", "--only", "module", @fixture_integration_cloned_repo])
     issues = Credo.Execution.get_issues(exec)
