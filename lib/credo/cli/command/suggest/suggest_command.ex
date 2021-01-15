@@ -18,8 +18,6 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.keep("checks_with_tag"),
       Switch.keep("checks_without_tag"),
       Switch.string("checks", alias: :c),
-      Switch.string("config_name", alias: :C),
-      Switch.string("config_file"),
       Switch.string("enable_disabled_checks"),
       Switch.boolean("mute_exit_status"),
       Switch.string("format"),

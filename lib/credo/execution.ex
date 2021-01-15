@@ -12,9 +12,11 @@ defmodule Credo.Execution do
             # TODO: these initial switches should also be %Credo.CLI.Switch{} struct
             cli_switches: [
               debug: :boolean,
-              color: :boolean
+              color: :boolean,
+              config_name: :string,
+              config_file: :string
             ],
-            cli_aliases: [D: :debug],
+            cli_aliases: [C: :config_name, D: :debug],
             cli_switch_plugin_param_converters: [],
 
             # config
