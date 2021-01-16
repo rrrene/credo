@@ -1,10 +1,12 @@
 defmodule Credo.HelpTest do
   use Credo.Test.Case
 
+  alias Credo.Test.IntegrationTest
+
   @moduletag slow: :integration
 
   test "it should NOT report issues on --help" do
-    exec = Credo.run(["--help"])
+    exec = IntegrationTest.run(["--help"])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "help"
