@@ -71,12 +71,12 @@ defmodule Credo.Execution do
   @execution_pipeline [
     __pre__: [
       {Credo.Execution.Task.AppendDefaultConfig, []},
-      {Credo.Execution.Task.ParseOptions, []},
+      {Credo.Execution.Task.ParseOptions, parser_mode: :preliminary},
       {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
       {Credo.Execution.Task.InitializePlugins, []}
     ],
     parse_cli_options: [
-      {Credo.Execution.Task.ParseOptions, []}
+      {Credo.Execution.Task.ParseOptions, parser_mode: :preliminary}
     ],
     initialize_plugins: [
       # This is where plugins can "put" their hooks using `Credo.Plugin.append_task/3`
@@ -103,7 +103,7 @@ defmodule Credo.Execution do
       {Credo.Execution.Task.InitializeCommand, []}
     ],
     parse_cli_options_final: [
-      {Credo.Execution.Task.ParseOptions, use_strict_parser: true}
+      {Credo.Execution.Task.ParseOptions, parser_mode: :strict}
     ],
     validate_cli_options: [
       {Credo.Execution.Task.ValidateOptions, []}

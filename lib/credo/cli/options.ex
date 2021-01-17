@@ -40,7 +40,7 @@ defmodule Credo.CLI.Options do
   Returns a `Options` struct for the given parameters.
   """
   def parse(
-        true = _strict_parser,
+        true = _use_strict_parser?,
         argv,
         current_dir,
         command_names,
@@ -61,7 +61,7 @@ defmodule Credo.CLI.Options do
   end
 
   def parse(
-        false,
+        false = _use_strict_parser?,
         argv,
         current_dir,
         command_names,

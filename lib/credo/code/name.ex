@@ -76,7 +76,7 @@ defmodule Credo.Code.Name do
   end
 
   def full({name, _, arguments}) when is_atom(name) and is_list(arguments) do
-    arg_list = Enum.map(arguments, ", ", &full/1)
+    arg_list = Enum.map_join(arguments, ", ", &full/1)
 
     "#{full(name)}(#{arg_list})"
   end
