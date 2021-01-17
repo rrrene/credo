@@ -131,7 +131,6 @@
         {Credo.Check.Refactor.UnlessWithElse, []},
         {Credo.Check.Refactor.WithClauses, []},
         {Credo.Check.Refactor.FilterFilter, []},
-        {Credo.Check.Refactor.MapMap, []},
         {Credo.Check.Refactor.RejectReject, []},
 
         #
@@ -182,6 +181,7 @@
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.DoubleBooleanNegation, false},
         {Credo.Check.Refactor.FilterReject, false},
+        {Credo.Check.Refactor.MapMap, false},
         {Credo.Check.Refactor.ModuleDependencies, false},
         {Credo.Check.Refactor.NegatedIsNil, false},
         {Credo.Check.Refactor.PipeChainStart, false},
