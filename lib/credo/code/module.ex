@@ -278,9 +278,7 @@ defmodule Credo.Code.Module do
   def name(ast)
 
   def name({:defmodule, _, [{:__aliases__, _, name_list}, _]}) do
-    name_list
-    |> Enum.map(&name/1)
-    |> Enum.join(".")
+    Enum.map_join(name_list, ".", &name/1)
   end
 
   def name({:__MODULE__, _meta, nil}), do: "__MODULE__"

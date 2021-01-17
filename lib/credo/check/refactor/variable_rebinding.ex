@@ -58,8 +58,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       ast
       |> Enum.map(&find_assignments/1)
       |> List.flatten()
-      |> Enum.filter(&(&1 != nil))
-      |> Enum.filter(&only_variables/1)
+      |> Enum.filter(&only_variables(&1))
       |> Enum.reject(&bang_sigil(&1, opt[:allow_bang]))
 
     duplicates =
@@ -130,8 +129,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   defp find_variables(map) when is_map(map) do
     map
     |> Enum.into([])
-    |> Enum.map(fn {_, value} -> value end)
-    |> Enum.map(&find_variables/1)
+    |> Enum.map(fn {_, value} -> find_variables(value) end)
     |> List.flatten()
     |> Enum.uniq_by(&get_variable_name/1)
   end
@@ -149,6 +147,8 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp get_variable_name({name, _line}), do: name
   defp get_variable_name(nil), do: nil
+
+  defp only_variables(nil), do: false
 
   defp only_variables({name, _}) do
     name

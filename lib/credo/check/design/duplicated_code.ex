@@ -243,11 +243,9 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp issue_for(issue_meta, this_node, other_nodes, nodes_threshold, params) do
     if Enum.count(other_nodes) >= nodes_threshold - 1 do
       filenames =
-        other_nodes
-        |> Enum.map(fn other_node ->
+        Enum.map_join(other_nodes, ", ", fn other_node ->
           "#{other_node.filename}:#{line_no_for(other_node.node)}"
         end)
-        |> Enum.join(", ")
 
       node_mass = this_node.mass
       line_no = line_no_for(this_node.node)

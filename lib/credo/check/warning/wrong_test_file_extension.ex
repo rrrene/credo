@@ -21,13 +21,12 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    cond do
-      matches?(filename, @test_files_with_ex_ending_regex) ->
-        issue_for(issue_meta)
-        |> List.wrap()
-
-      true ->
-        []
+    if matches?(filename, @test_files_with_ex_ending_regex) do
+      issue_meta
+      |> issue_for()
+      |> List.wrap()
+    else
+      []
     end
   end
 

@@ -1,4 +1,6 @@
 defmodule Credo.Test.Assertions do
+  @moduledoc false
+
   import ExUnit.Assertions
 
   def assert_trigger(issue, trigger)

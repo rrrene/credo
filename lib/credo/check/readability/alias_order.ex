@@ -186,9 +186,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   defp find_alias_groups(ast, aliases), do: {ast, aliases}
 
   defp mod_name(mod_list) do
-    mod_list
-    |> Enum.map(&to_string/1)
-    |> Enum.join(".")
+    Enum.map_join(mod_list, ".", &to_string/1)
   end
 
   defp compare_name(value) do
