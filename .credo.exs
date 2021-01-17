@@ -131,9 +131,7 @@
         {Credo.Check.Refactor.UnlessWithElse, []},
         {Credo.Check.Refactor.WithClauses, []},
         {Credo.Check.Refactor.FilterFilter, []},
-        {Credo.Check.Refactor.FilterReject, []},
         {Credo.Check.Refactor.MapMap, []},
-        {Credo.Check.Refactor.RejectFilter, []},
         {Credo.Check.Refactor.RejectReject, []},
 
         #
@@ -169,8 +167,8 @@
         #
         {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Consistency.UnusedVariableNames, false},
-        {Credo.Check.Design.SkipTestWithoutComment, false},
         {Credo.Check.Design.DuplicatedCode, false},
+        {Credo.Check.Design.SkipTestWithoutComment, false},
         {Credo.Check.Readability.AliasAs, false},
         {Credo.Check.Readability.BlockPipe, false},
         {Credo.Check.Readability.ImplTrue, false},
@@ -183,9 +181,11 @@
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.DoubleBooleanNegation, false},
+        {Credo.Check.Refactor.FilterReject, false},
         {Credo.Check.Refactor.ModuleDependencies, false},
         {Credo.Check.Refactor.NegatedIsNil, false},
         {Credo.Check.Refactor.PipeChainStart, false},
+        {Credo.Check.Refactor.RejectFilter, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.LeakyEnvironment, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},

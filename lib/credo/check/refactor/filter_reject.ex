@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.FilterReject do
   use Credo.Check,
+    tags: [:controversial],
     explanations: [
       check: """
       One `Enum.filter/2` is more efficient than `Enum.filter/2 |> Enum.reject/2`.
