@@ -20,6 +20,9 @@ defmodule Credo.Check.Refactor.MapInto do
       The reason for this is performance, because the separate calls to
       `Enum.map/2` and `Enum.into/2` require two iterations whereas
       `Enum.into/3` only requires one.
+
+      **NOTE**: This check is only avaible in Elixir < 1.8 since performance
+      improvements have since made this check obsolete.
       """
     ]
 
