@@ -31,7 +31,7 @@ defmodule Credo.Check.Refactor.MapMap do
     issue_meta = IssueMeta.for(source_file, params)
 
     message = "One `Enum.map/2` is more efficient than `Enum.map/2 |> Enum.map/2`"
-    trigger = "map_map"
+    trigger = "|>"
 
     Credo.Code.prewalk(
       source_file,

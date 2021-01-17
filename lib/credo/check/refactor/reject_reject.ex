@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.RejectReject do
     issue_meta = IssueMeta.for(source_file, params)
 
     message = "One `Enum.reject/2` is more efficient than `Enum.reject/2 |> Enum.reject/2`"
-    trigger = "reject_reject"
+    trigger = "|>"
 
     Credo.Code.prewalk(
       source_file,
