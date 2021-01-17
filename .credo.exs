@@ -113,6 +113,7 @@
         {Credo.Check.Readability.TrailingWhiteSpace, []},
         {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
         {Credo.Check.Readability.VariableNames, []},
+        {Credo.Check.Readability.WithSingleClause, []},
 
         #
         ## Refactoring Opportunities

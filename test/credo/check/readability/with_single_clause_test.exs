@@ -1,7 +1,7 @@
-defmodule Credo.Check.Refactor.WithClausesTest do
+defmodule Credo.Check.Readability.WithSingleClauseTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Refactor.WithClauses
+  @described_check Credo.Check.Readability.WithSingleClause
 
   #
   # cases NOT raising issues
@@ -53,26 +53,16 @@ defmodule Credo.Check.Refactor.WithClausesTest do
   # cases raising issues
   #
 
-  test "it should report a violation if the with doesn't start with <- clauses" do
+  test "it should report a violation for a single <- clause if there's an else branch" do
     """
-    def some_function(parameter1, parameter2) do
-      with IO.puts("not a <- clause"),
-           :ok <- parameter1 do
-        parameter2
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue()
-  end
-
-  test "it should report a violation if the with doesn't end with <- clauses" do
-    """
-    def some_function(parameter1, parameter2) do
-      with :ok <- parameter1,
-           IO.puts("not a <- clause") do
-        parameter2
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        with :ok <- parameter1 do
+          parameter2
+        else
+          :error ->
+            :error
+        end
       end
     end
     """

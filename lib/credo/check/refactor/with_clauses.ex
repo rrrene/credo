@@ -6,76 +6,40 @@ defmodule Credo.Check.Refactor.WithClauses do
       `with` statements are useful when you need to chain a sequence
       of pattern matches, stopping at the first one that fails.
 
-      However, there are a few cases where a `with` can be used incorrectly.
+      But sometimes, we go a little overboard with them (pun intended).
 
-      ## Starting or ending with non-pattern-matching clauses
-
-      If the `with` starts or ends with clauses that are not `<-` clauses,
-      then those clauses should be moved either outside of the `with` (if
-      they're the first ones) or inside the body of the `with` (if they're the
-      last ones). For example look at this code:
+      If the first or last clause in a `with` statement is not a `<-` clause,
+      it still compiles and works, but is not really utilizing what the `with`
+      macro provides and can be misleading.
 
           with ref = make_ref(),
                {:ok, user} <- User.create(ref),
+               :ok <- send_email(user),
                Logger.debug("Created user: #{inspect(user)}") do
             user
           end
+
+      Here, both the first and last clause are actually not matching anything.
+
+      If we move them outside of the `with` (the first ones) or inside the body
+      of the `with` (the last ones), the code becomes more focused and .
 
       This `with` should be refactored like this:
 
           ref = make_ref()
 
-          with {:ok, user} <- User.create(ref) do
+          with {:ok, user} <- User.create(ref),
+               :ok <- send_email(user) do
             Logger.debug("Created user: #{inspect(user)}")
             user
           end
-
-      # Using only one pattern matching clause with `else`
-
-      If the `with` has a single pattern matching clause and no `else`
-      branch, it means that if the clause doesn't match than the whole
-      `with` will return the value of that clause. However, if that
-      `with` has also an `else` clause, then you're using `with` exactly
-      like a `case` and a `case` should be used instead. Take this code:
-
-          with {:ok, user} <- User.create(make_ref()) do
-            user
-          else
-            {:error, :db_down} ->
-              raise "DB is down!"
-
-            {:error, reason} ->
-              raise "error: #{inspect(reason)}"
-          end
-
-      It can be rewritten with a clearer use of `case`:
-
-          case User.create(make_ref()) do
-            {:ok, user} ->
-              user
-
-            {:error, :db_down} ->
-              raise "DB is down!"
-
-            {:error, reason} ->
-              raise "error: #{inspect(reason)}"
-          end
-
-      Like all `Readability` issues, this one is not a technical concern.
-      But you can improve the odds of others reading and liking your code by making
-      it easier to follow.
-      """,
-      params: []
+      """
     ]
 
   alias Credo.Code
 
-  @message_only_one_pattern_clause "`with` contains only one <- clause and an `else` " <>
-                                     "branch, use a `case` instead"
-  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, " <>
-                                      "move the non-pattern <- clauses outside of the `with`"
-  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move " <>
-                                     "the non-pattern <- clauses inside the body of the `with`"
+  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`"
+  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`"
 
   @doc false
   @impl true
@@ -97,7 +61,7 @@ defmodule Credo.Check.Refactor.WithClauses do
     {maybe_clauses, [maybe_body]} = Enum.split(clauses_and_body, -1)
 
     if Keyword.keyword?(maybe_body) and Keyword.has_key?(maybe_body, :do) do
-      {ast, issues_for_with(maybe_clauses, maybe_body, meta[:line], issue_meta) ++ issues}
+      {ast, issues_for_with(maybe_clauses, meta[:line], issue_meta) ++ issues}
     else
       {ast, issues}
     end
@@ -107,20 +71,9 @@ defmodule Credo.Check.Refactor.WithClauses do
     {ast, issues}
   end
 
-  defp issues_for_with(clauses, body, line, issue_meta) do
-    issue_if_one_pattern_clause_with_else(clauses, body, line, issue_meta) ++
-      issue_if_not_starting_with_pattern_clause(clauses, line, issue_meta) ++
+  defp issues_for_with(clauses, line, issue_meta) do
+    issue_if_not_starting_with_pattern_clause(clauses, line, issue_meta) ++
       issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta)
-  end
-
-  defp issue_if_one_pattern_clause_with_else(clauses, body, line, issue_meta) do
-    pattern_clauses_count = Enum.count(clauses, &match?({:<-, _, _}, &1))
-
-    if pattern_clauses_count <= 1 and Keyword.has_key?(body, :else) do
-      [format_issue(issue_meta, message: @message_only_one_pattern_clause, line_no: line)]
-    else
-      []
-    end
   end
 
   defp issue_if_not_starting_with_pattern_clause(
