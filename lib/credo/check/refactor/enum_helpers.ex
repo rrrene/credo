@@ -1,8 +1,7 @@
 defmodule Credo.Check.Refactor.EnumHelpers do
   def traverse(
-        ast =
-          {{:., _, [{:__aliases__, meta, [:Enum]}, second]}, _,
-           [{{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}, _]},
+        {{:., _, [{:__aliases__, meta, [:Enum]}, second]}, _,
+         [{{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}, _]} = ast,
         issues,
         issue_meta,
         message,
@@ -16,12 +15,11 @@ defmodule Credo.Check.Refactor.EnumHelpers do
   end
 
   def traverse(
-        ast =
-          {:|>, meta,
-           [
-             {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _},
-             {{:., _, [{:__aliases__, _, [:Enum]}, second]}, _, _}
-           ]},
+        {:|>, meta,
+         [
+           {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _},
+           {{:., _, [{:__aliases__, _, [:Enum]}, second]}, _, _}
+         ]} = ast,
         issues,
         issue_meta,
         message,
@@ -35,12 +33,11 @@ defmodule Credo.Check.Refactor.EnumHelpers do
   end
 
   def traverse(
-        ast =
-          {{:., meta, [{:__aliases__, _, [:Enum]}, second]}, _,
-           [
-             {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}]},
-             _
-           ]},
+        {{:., meta, [{:__aliases__, _, [:Enum]}, second]}, _,
+         [
+           {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}]},
+           _
+         ]} = ast,
         issues,
         issue_meta,
         message,
@@ -54,16 +51,15 @@ defmodule Credo.Check.Refactor.EnumHelpers do
   end
 
   def traverse(
-        ast =
-          {:|>, meta,
-           [
-             {:|>, _,
-              [
-                _,
-                {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}
-              ]},
-             {{:., _, [{:__aliases__, _, [:Enum]}, second]}, _, _}
-           ]},
+        {:|>, meta,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}
+            ]},
+           {{:., _, [{:__aliases__, _, [:Enum]}, second]}, _, _}
+         ]} = ast,
         issues,
         issue_meta,
         message,
