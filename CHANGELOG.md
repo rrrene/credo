@@ -126,6 +126,10 @@ These new checks can now be enabled:
 
 Additionally, `Credo.Check.Warning.ApplicationConfigInModuleAttribute` is a new check which warns about reading environment variables into module attributes at compile-time and is enabled by default.
 
+## 1.4.1
+
+- Ensure compatibility with Elixir 1.11.0
+
 ## 1.4.0
 
 - Credo's schema for pre-release names changes: There is now a `.` after the `rc` like in many other Elixir projects.
