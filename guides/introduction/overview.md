@@ -12,15 +12,15 @@ Contrary to the aforementioned tools, Credo puts a strong emphasis on teaching a
 
 To get started, you might want to check out these guides:
 
-* [Installation](installation.html)
-* [Basic usage](basic_usage.html)
-* [Configuration via `.credo.exs`](config_file.html)
+* [Installation](installation.md)
+* [Basic usage](basic_usage.md)
+* [Configuration via `.credo.exs`](config_file.md)
 
 Once you are familiar with the basics, look into these topics:
 
-* [Adding custom checks](adding_checks.html)
-* [Testing custom checks](testing_checks.html)
-* [Plugins](plugins.html)
+* [Adding custom checks](adding_checks.md)
+* [Testing custom checks](testing_checks.md)
+* [Plugins](plugins.md)
 
 Any incorrect or unclear information in these docs should be considered a bug.
 In case you find something, you can help maintaining these docs by [filing an issue on GitHub](https://github.com/rrrene/credo/issues) and/or opening a pull request.

@@ -36,6 +36,7 @@ The available command line switches are:
 - [`--mute-exit-status`](#mute-exit-status)
 - [`--only`](#only)
 - [`--strict`](#strict)
+- [`--verbose`](#verbose)
 
 ### `--all`
 
@@ -174,3 +175,21 @@ Alias for [`--checks`](#checks-aliased-as-only)
 ### `--strict`
 
 Alias for [`--all-priorities`](#all-priorities-aliased-as-strict)
+
+### `--verbose`
+
+Additionally print the check and the source code that raised the issue
+
+```bash
+$ mix credo --verbose
+
+# ...
+
+┃
+┃ [W] ↗ There should be no calls to IO.inspect/1. [Credo.Check.Warning.IoInspect]
+┃       lib/foo/bar.ex:121:6 #(Foo.Bar.run)
+┃
+┃       |> IO.inspect(label: "Arguments given")
+┃          ^^^^^^^^^^
+┃
+```

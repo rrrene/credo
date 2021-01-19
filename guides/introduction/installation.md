@@ -7,7 +7,7 @@ Add `:credo` as a dependency to your project's `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
+    {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
   ]
 end
 ```
@@ -17,4 +17,3 @@ And run:
 ```bash
 $ mix deps.get
 ```
-
