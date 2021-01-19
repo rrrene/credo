@@ -190,7 +190,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
 
     message =
       if verbose do
-        message <> " (" <> inspect(check) <> ")"
+        message <> " [" <> inspect(check) <> "]"
       else
         message
       end
