@@ -49,6 +49,34 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report functions starting with `_` (only variables)" do
+    [
+      """
+      defmodule Credo.SampleOne do
+        defmodule Foo do
+          def __some_function__(var1, var2) do
+          end
+
+          def bar(x1, x2, x3), do: nil
+          def bar2(x1, x2, x3), do: nil
+          def bar3(x1, x2, x3), do: nil
+          def bar4(x1, x2, x3), do: nil
+          def bar5(x1, x2, x3), do: nil
+        end
+      end
+      """,
+      """
+      defmodule Credo.SampleTwo do
+        def _some_other_function(var1, var2) do
+        end
+      end
+      """
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should report a violation for different naming schemes (expects anonymous)" do
     [
       """
