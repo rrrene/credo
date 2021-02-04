@@ -31,7 +31,7 @@ defmodule Credo.BuildInfo do
   end
 
   defp git_info do
-    if git_present?() do
+    if in_git_work_tree?() do
       %{
         commit: git_commit(),
         branch: git_branch(),
@@ -41,9 +41,11 @@ defmodule Credo.BuildInfo do
     end
   end
 
-  defp git_present? do
+  defp in_git_work_tree? do
     try do
-      {_, exit_status} = System.cmd("git", ["--help"])
+      {_, exit_status} =
+        System.cmd("git", ["rev-parse", "--is-inside-work-tree"], stderr_to_stdout: true)
+
       exit_status == 0
     rescue
       _ -> false
