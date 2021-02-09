@@ -296,7 +296,7 @@ defmodule Credo.Execution do
 
   @doc false
   def get_path(exec) do
-    exec.cli_options.path
+    Path.expand(exec.cli_options.path)
   end
 
   # Commands
@@ -480,7 +480,7 @@ defmodule Credo.Execution do
     %__MODULE__{exec | halted: true}
   end
 
-  @doc false
+  @doc "Halts further execution of the pipeline using the given `halt_message`."
   def halt(exec, halt_message) do
     %__MODULE__{exec | halted: true}
     |> put_halt_message(halt_message)

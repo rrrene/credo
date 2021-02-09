@@ -9,6 +9,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
   alias Credo.CLI.Filename
+  alias Credo.CLI.Output.UI
   alias Credo.CLI.Task
   alias Credo.Issue
   alias Credo.SourceFile
@@ -16,6 +17,9 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   def init(exec) do
     exec
     |> Execution.put_pipeline(__MODULE__.ExplainIssue,
+      validate_given_location: [
+        {__MODULE__.ExplainIssuePreCheck, []}
+      ],
       load_and_validate_source_files: [
         {Task.LoadAndValidateSourceFiles, []}
       ],
@@ -84,6 +88,47 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
         explanation_for_issue: check.explanation,
         priority: check.base_priority
       }
+    end
+  end
+
+  defmodule ExplainIssuePreCheck do
+    alias Credo.CLI.Command.Explain.ExplainCommand
+
+    def call(exec, _opts) do
+      filename_with_location = ExplainCommand.get_filename_from_args(exec)
+      working_dir = Execution.get_path(exec)
+
+      filename =
+        filename_with_location
+        |> String.split(":")
+        |> List.first()
+        |> Path.expand()
+
+      if path_contains_file?(working_dir, filename) do
+        exec
+      else
+        Execution.halt(exec, """
+        Given location is not part of the working dir.
+
+          Location:     #{filename_with_location}
+          Working dir:  #{working_dir}
+        """)
+      end
+    end
+
+    def error(exec, _opts) do
+      halt_message = Execution.get_halt_message(exec)
+
+      UI.warn([:red, "** (explain) ", halt_message])
+
+      exec
+    end
+
+    defp path_contains_file?(path, filename) do
+      case Path.relative_to(filename, path) do
+        ^filename -> false
+        _ -> true
+      end
     end
   end
 
