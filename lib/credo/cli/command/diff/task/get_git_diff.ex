@@ -34,7 +34,8 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   def run_credo_on_git_ref(exec, git_ref) do
-    previous_dirname = run_git_clone_and_checkout(exec.cli_options.path, git_ref)
+    working_dir = Execution.get_path(exec)
+    previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
     run_credo_on_dir(exec, previous_dirname, git_ref)
   end
