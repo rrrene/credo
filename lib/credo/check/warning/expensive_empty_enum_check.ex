@@ -15,6 +15,12 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
           list == []
 
+
+      For Enum.count/2: Checking if an enum doesn't contain specific elements should
+      be done by using
+
+          not Enum.any?(enum, condition)
+
       """
     ]
 
@@ -62,7 +68,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "#{trigger} is expensive. Prefer Enum.empty?/1 or list == []",
+      message: "#{trigger} is expensive. Prefer Enum.empty?/1 or list == [] or `not Enum.any?/2`",
       trigger: trigger,
       line_no: line_no
     )
