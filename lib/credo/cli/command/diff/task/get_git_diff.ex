@@ -35,7 +35,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   defp run_credo_on_git_ref(exec, git_ref) do
-    working_dir = Execution.get_path(exec)
+    working_dir = Execution.working_dir(exec)
     previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
     run_credo_on_dir(exec, previous_dirname, git_ref)
@@ -50,7 +50,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         )
 
       git_ref ->
-        working_dir = Execution.get_path(exec)
+        working_dir = Execution.working_dir(exec)
         previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
         run_credo_on_dir(exec, previous_dirname, git_ref)
@@ -88,7 +88,9 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
 
     spawn(fn ->
       Shell.supress_output(fn ->
-        previous_exec = Credo.run(previous_argv)
+        argv = previous_argv ++ ["--working-dir", previous_dirname]
+
+        previous_exec = Credo.run(argv)
 
         send(parent_pid, {:previous_exec, previous_exec})
       end)
@@ -109,9 +111,9 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     exec =
       perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
 
-    exec
-    |> Execution.get_assign("credo.diff.previous_dirname")
-    |> IO.inspect()
+    previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
+    require Logger
+    Logger.debug("Git ref checked out to: #{previous_dirname}")
 
     exec
   end

@@ -14,7 +14,8 @@ defmodule Credo.Execution do
               debug: :boolean,
               color: :boolean,
               config_name: :string,
-              config_file: :string
+              config_file: :string,
+              working_dir: :string
             ],
             cli_aliases: [C: :config_name, D: :debug],
             cli_switch_plugin_param_converters: [],
@@ -295,7 +296,13 @@ defmodule Credo.Execution do
   def set_strict(exec), do: exec
 
   @doc false
+  @deprecated "Use `Execution.working_dir/1` instead"
   def get_path(exec) do
+    exec.cli_options.path
+  end
+
+  @doc false
+  def working_dir(exec) do
     Path.expand(exec.cli_options.path)
   end
 
