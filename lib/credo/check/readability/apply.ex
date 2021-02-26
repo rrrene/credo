@@ -14,9 +14,7 @@ defmodule Credo.Check.Readability.Apply do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    source_file
-    |> Code.prewalk(&traverse(&1, &2, IssueMeta.for(source_file, params)))
-    |> Enum.reverse()
+    Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
   end
 
   defp traverse(ast, issues, issue_meta) do
