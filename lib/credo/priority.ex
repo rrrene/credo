@@ -37,6 +37,17 @@ defmodule Credo.Priority do
     @priority_names_map[to_string(key)] || raise "Got an invalid priority: #{inspect(key)}"
   end
 
+  def to_atom(priority) when is_number(priority) do
+    cond do
+      priority in 20..999 -> :higher
+      priority in 10..19 -> :high
+      priority in 0..9 -> :normal
+      priority in -10..-1 -> :low
+      priority in -999..-11 -> :ignore
+      true -> nil
+    end
+  end
+
   def scope_priorities(%SourceFile{} = source_file) do
     line_count =
       source_file
