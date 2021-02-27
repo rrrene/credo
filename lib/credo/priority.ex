@@ -39,14 +39,15 @@ defmodule Credo.Priority do
 
   def to_atom(priority) when is_number(priority) do
     cond do
-      priority in 20..999 -> :higher
+      priority > 19 -> :higher
       priority in 10..19 -> :high
       priority in 0..9 -> :normal
       priority in -10..-1 -> :low
-      priority in -999..-11 -> :ignore
-      true -> nil
+      priority < -10 -> :ignore
     end
   end
+
+  def to_atom(_), do: nil
 
   def scope_priorities(%SourceFile{} = source_file) do
     line_count =
