@@ -116,7 +116,7 @@ defmodule Credo.Sources do
   defp include(files, [path | remaining_paths]) do
     include_paths =
       path
-      |> recurse_path
+      |> recurse_path()
       |> Enum.into(MapSet.new())
 
     files

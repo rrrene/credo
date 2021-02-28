@@ -8,7 +8,24 @@
 
 - Credo succeeds with an exit status of 0 (like any other program).
 - Credo fails with an exit status between 1 and 127 if it shows any issues.
-- Exit statuses above or equal to 128 indicate an actual runtime error during analysis itself.
+- Exit statuses above or equal to 128 indicate an Elixir runtime error during analysis itself.
+
+### Working Directory
+
+Up until now, Credo provided the ability to analyse files and directories anywhere on disk by simply typing
+
+```bash
+# BEFORE (now deprecated):
+mix credo ../other-elixir-project/
+```
+
+This was not really documented and not really supported very well, resulting in most people not really utilizing it and instead running Credo from the root of their project using `mix credo`.
+
+Now there is `--working-dir`, which allows users to define their working directory explicitly:
+
+```bash
+mix credo --working-dir ../other-elixir-project/
+```
 
 ### New checks
 

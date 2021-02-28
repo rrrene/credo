@@ -69,7 +69,7 @@ defmodule Credo.ConfigFile do
     |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
     |> ensure_any_config_found(config_name)
     |> merge()
-    |> add_given_directory_to_files(dir)
+    |> map_ok_files()
     |> ensure_values_present()
   end
 
@@ -332,38 +332,22 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp add_given_directory_to_files({:error, _} = error, _dir) do
+  defp map_ok_files({:error, _} = error) do
     error
   end
 
-  defp add_given_directory_to_files({:ok, %__MODULE__{files: files} = config}, dir) do
+  defp map_ok_files({:ok, %__MODULE__{files: files} = config}) do
     files = %{
       included:
         files[:included]
         |> List.wrap()
-        |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq(),
       excluded:
         files[:excluded]
         |> List.wrap()
-        |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq()
     }
 
     {:ok, %__MODULE__{config | files: files}}
   end
-
-  defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
-    if File.dir?(dir) do
-      if dir == "." || file_or_glob =~ ~r/^\// do
-        file_or_glob
-      else
-        Path.join(dir, file_or_glob)
-      end
-    else
-      dir
-    end
-  end
-
-  defp add_directory_to_file(regex, _), do: regex
 end
