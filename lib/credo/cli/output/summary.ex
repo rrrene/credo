@@ -79,7 +79,7 @@ defmodule Credo.CLI.Output.Summary do
     |> Calendar.strftime("%Y-%m-%d")
   end
 
-  defp print_first_run_hint(_exec) do
+  defp print_first_run_hint(%Execution{cli_options: %{switches: %{first_run: true}}}) do
     term_width = Output.term_columns()
     now = now()
     default_branch = default_branch()
@@ -164,6 +164,8 @@ defmodule Credo.CLI.Output.Summary do
 
     UI.puts("Try the options outlined above to see which one is working for this project!")
   end
+
+  defp print_first_run_hint(exec), do: exec
 
   defp count_checks(exec) do
     {result, _only_matching, _ignore_matching} = Execution.checks(exec)
