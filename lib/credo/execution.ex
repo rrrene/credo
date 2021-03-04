@@ -362,6 +362,8 @@ defmodule Credo.Execution do
   end
 
   @doc false
+  def put_cli_switch_alias(exec, _plugin_mod, _name, nil), do: exec
+
   def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
     %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
   end
