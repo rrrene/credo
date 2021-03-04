@@ -75,9 +75,8 @@ defmodule Credo.CLI.Output.Summary do
   end
 
   defp now do
-    "2020-12-01 19:58:09"
-
-    Calendar.strftime(DateTime.utc_now(), "%Y-%m-%d")
+    DateTime.utc_now()
+    |> Calendar.strftime("%Y-%m-%d")
   end
 
   defp print_first_run_hint(_exec) do
@@ -137,7 +136,7 @@ defmodule Credo.CLI.Output.Summary do
       :cyan,
       "    mix credo diff #{latest_commit_on_default_branch}",
       :faint,
-      "             # use the current HEAD of master",
+      "             # use the current HEAD of #{default_branch()}",
       "\n\n",
       :reset,
       """

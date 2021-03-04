@@ -20,6 +20,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.string("checks", alias: :c),
       Switch.string("enable_disabled_checks"),
       Switch.boolean("mute_exit_status"),
+      Switch.boolean("first_run"),
       Switch.string("format"),
       Switch.boolean("help", alias: :h),
       Switch.string("ignore_checks"),
