@@ -20,9 +20,9 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
     example = [
       "Examples:\n",
       :olive,
-      "  $ mix credo diff lib/**/*.ex HEAD\n",
       "  $ mix credo diff v1.4.0\n",
-      "  $ mix credo diff main"
+      "  $ mix credo diff main\n",
+      "  $ mix credo diff --from-git-ref HEAD --files-included \"lib/**/*.ex\""
     ]
 
     options =
@@ -42,11 +42,14 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
             --files-included          Only include these files (accepts globs, can be used multiple times)
             --files-excluded          Exclude these files (accepts globs, can be used multiple times)
             --format                  Display the list in a specific format (json,flycheck,oneline)
+            --from-dir                Diff from the given directory
+            --from-git-ref            Diff from the given Git ref
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
             --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
             --mute-exit-status        Exit with status zero even if there are issues
             --only                    Alias for --checks
+            --since                   Diff from the given point in time (using Git)
             --strict                  Alias for --all-priorities
 
       General options:
