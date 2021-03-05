@@ -24,6 +24,17 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   # cases raising issues
   #
 
+  test "it should report on inline fully qualified usage" do
+    """
+    defmodule CredoSampleModule do
+      def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, @opts)
+    |> assert_issue()
+  end
+
   test "it should report on aliases" do
     """
     defmodule CredoSampleModule do
@@ -53,17 +64,6 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     defmodule CredoSampleModule do
       import CredoSampleModule.ForbiddenModule, only: [another_function: 0]
       def some_function, do: another_function()
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check, @opts)
-    |> assert_issue()
-  end
-
-  test "it should report on inline usage" do
-    """
-    defmodule CredoSampleModule do
-      def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
     end
     """
     |> to_source_file
