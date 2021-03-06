@@ -19,6 +19,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
         [
           Switch.string("from_dir"),
           Switch.string("from_git_ref"),
+          Switch.boolean("show_kept"),
           Switch.string("since")
         ]
 
