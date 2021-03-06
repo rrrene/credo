@@ -18,7 +18,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
       |> Execution.get_issues()
 
     # in previous_issues, in current_issues
-    old_issues = Enum.filter(previous_issues, &old_issue?(&1, current_issues))
+    old_issues = Enum.filter(current_issues, &old_issue?(&1, previous_issues))
 
     # in previous_issues, not in current_issues
     fixed_issues = previous_issues -- old_issues

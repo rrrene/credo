@@ -77,7 +77,14 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
     issues = Execution.get_issues(exec)
 
-    issues_to_display = Enum.filter(issues, &(&1.diff_marker == :new))
+    filtered_diff_markers =
+      if exec.cli_options.switches[:show_kept] do
+        [:new, :old]
+      else
+        [:new]
+      end
+
+    issues_to_display = Enum.filter(issues, &Enum.member?(filtered_diff_markers, &1.diff_marker))
 
     categories =
       issues_to_display

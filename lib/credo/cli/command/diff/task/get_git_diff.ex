@@ -76,6 +76,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         _, {argv, "--from-git-ref"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-dir"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--since"} -> {Enum.slice(argv, 1..-2), nil}
+        "--show-kept", {argv, _last_arg} -> {argv, nil}
         ^previous_git_ref, {argv, _last_arg} -> {argv, nil}
         arg, {argv, _last_arg} -> {argv ++ [arg], arg}
       end)
