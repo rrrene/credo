@@ -250,13 +250,23 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
     location =
       if fixed_issue? do
-        git_ref = Execution.get_assign(exec, "credo.diff.previous_git_ref")
+        given_ref = Execution.get_assign(exec, "credo.diff.given_ref")
         previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
 
-        relative_filename =
-          filename |> String.replace(previous_dirname, "") |> String.replace(~r/^[\/\\]/, "")
+        case given_ref do
+          {:path, path} ->
+            relative_filename = String.replace(filename, previous_dirname, "")
 
-        "(git:#{git_ref}) #{relative_filename}"
+            "(dir:#{path}) #{relative_filename}"
+
+          _ ->
+            git_ref = Execution.get_assign(exec, "credo.diff.previous_git_ref")
+
+            relative_filename =
+              filename |> String.replace(previous_dirname, "") |> String.replace(~r/^[\/\\]/, "")
+
+            "(git:#{git_ref}) #{relative_filename}"
+        end
       else
         to_string(filename)
       end
