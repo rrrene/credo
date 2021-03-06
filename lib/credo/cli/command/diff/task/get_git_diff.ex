@@ -27,21 +27,28 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
 
   defp run_credo_and_store_resulting_execution(exec) do
     case DiffCommand.previous_ref(exec) do
-      {:git, git_ref} -> run_credo_on_git_ref(exec, git_ref)
-      {:git_datetime, datetime} -> run_credo_on_datetime(exec, datetime)
-      {:path, path} -> run_credo_on_path_ref(exec, path)
-      {:error, error} -> Execution.halt(exec, error)
+      {:git, git_ref} ->
+        run_credo_on_git_ref(exec, git_ref, {:git, git_ref})
+
+      {:git_datetime, datetime} ->
+        run_credo_on_datetime(exec, datetime, {:git_datetime, datetime})
+
+      {:path, path} ->
+        run_credo_on_path_ref(exec, path, {:path, path})
+
+      {:error, error} ->
+        Execution.halt(exec, error)
     end
   end
 
-  defp run_credo_on_git_ref(exec, git_ref) do
+  defp run_credo_on_git_ref(exec, git_ref, given_ref) do
     working_dir = Execution.working_dir(exec)
     previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
-    run_credo_on_dir(exec, previous_dirname, git_ref)
+    run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
   end
 
-  defp run_credo_on_datetime(exec, datetime) do
+  defp run_credo_on_datetime(exec, datetime, given_ref) do
     case get_git_ref_for_datetime(datetime) do
       nil ->
         Execution.halt(
@@ -53,7 +60,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         working_dir = Execution.working_dir(exec)
         previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
-        run_credo_on_dir(exec, previous_dirname, git_ref)
+        run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
     end
   end
 
@@ -64,11 +71,11 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     end
   end
 
-  defp run_credo_on_path_ref(exec, path) do
-    run_credo_on_dir(exec, path, path)
+  defp run_credo_on_path_ref(exec, path, given_ref) do
+    run_credo_on_dir(exec, path, path, given_ref)
   end
 
-  defp run_credo_on_dir(exec, dirname, previous_git_ref) do
+  defp run_credo_on_dir(exec, dirname, previous_git_ref, given_ref) do
     {previous_argv, _last_arg} =
       exec.argv
       |> Enum.slice(1..-1)
@@ -82,10 +89,10 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         arg, {argv, _last_arg} -> {argv ++ [arg], arg}
       end)
 
-    run_credo(exec, previous_git_ref, dirname, previous_argv)
+    run_credo(exec, previous_git_ref, dirname, previous_argv, given_ref)
   end
 
-  defp run_credo(exec, previous_git_ref, previous_dirname, previous_argv) do
+  defp run_credo(exec, previous_git_ref, previous_dirname, previous_argv, given_ref) do
     parent_pid = self()
 
     spawn(fn ->
@@ -100,7 +107,13 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
 
     receive do
       {:previous_exec, previous_exec} ->
-        store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+        store_resulting_execution(
+          exec,
+          previous_git_ref,
+          previous_dirname,
+          previous_exec,
+          given_ref
+        )
     end
   end
 
@@ -108,10 +121,17 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         %Execution{debug: true} = exec,
         previous_git_ref,
         previous_dirname,
-        previous_exec
+        previous_exec,
+        given_ref
       ) do
     exec =
-      perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+      perform_store_resulting_execution(
+        exec,
+        previous_git_ref,
+        previous_dirname,
+        previous_exec,
+        given_ref
+      )
 
     previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
     require Logger
@@ -124,16 +144,30 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
         exec,
         previous_git_ref,
         previous_dirname,
-        previous_exec
+        previous_exec,
+        given_ref
       ) do
-    perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+    perform_store_resulting_execution(
+      exec,
+      previous_git_ref,
+      previous_dirname,
+      previous_exec,
+      given_ref
+    )
   end
 
-  defp perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
+  defp perform_store_resulting_execution(
+         exec,
+         previous_git_ref,
+         previous_dirname,
+         previous_exec,
+         given_ref
+       ) do
     if previous_exec.halted do
       halt_execution(exec, previous_git_ref, previous_dirname, previous_exec)
     else
       exec
+      |> Execution.put_assign("credo.diff.given_ref", given_ref)
       |> Execution.put_assign("credo.diff.previous_git_ref", previous_git_ref)
       |> Execution.put_assign("credo.diff.previous_dirname", previous_dirname)
       |> Execution.put_assign("credo.diff.previous_exec", previous_exec)
