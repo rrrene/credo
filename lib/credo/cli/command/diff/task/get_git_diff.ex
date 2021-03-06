@@ -25,49 +25,72 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     UI.warn("")
   end
 
-  def run_credo_and_store_resulting_execution(exec) do
+  defp run_credo_and_store_resulting_execution(exec) do
     case DiffCommand.previous_ref(exec) do
       {:git, git_ref} -> run_credo_on_git_ref(exec, git_ref)
+      {:git_datetime, datetime} -> run_credo_on_datetime(exec, datetime)
       {:path, path} -> run_credo_on_path_ref(exec, path)
       {:error, error} -> Execution.halt(exec, error)
     end
   end
 
-  def run_credo_on_git_ref(exec, git_ref) do
-    working_dir = Execution.get_path(exec)
+  defp run_credo_on_git_ref(exec, git_ref) do
+    working_dir = Execution.working_dir(exec)
     previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
     run_credo_on_dir(exec, previous_dirname, git_ref)
   end
 
-  def run_credo_on_path_ref(exec, path) do
+  defp run_credo_on_datetime(exec, datetime) do
+    case get_git_ref_for_datetime(datetime) do
+      nil ->
+        Execution.halt(
+          exec,
+          "could not determine Git ref for datetime: #{datetime}"
+        )
+
+      git_ref ->
+        working_dir = Execution.working_dir(exec)
+        previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
+
+        run_credo_on_dir(exec, previous_dirname, git_ref)
+    end
+  end
+
+  defp get_git_ref_for_datetime(datetime) do
+    case System.cmd("git", ["rev-list", "--reverse", "--after", datetime, "HEAD"]) do
+      {output, 0} -> output |> String.split(~r/\n/) |> List.first()
+      _ -> nil
+    end
+  end
+
+  defp run_credo_on_path_ref(exec, path) do
     run_credo_on_dir(exec, path, path)
   end
 
-  def run_credo_on_dir(exec, dirname, previous_git_ref) do
-    first_two_args = Enum.take(exec.argv, 2)
-
-    previous_argv =
-      case first_two_args do
-        ["diff", ^previous_git_ref] ->
-          [dirname] ++ Enum.slice(exec.argv, 2..-1)
-
-        ["diff", _] ->
-          [dirname] ++ Enum.slice(exec.argv, 1..-1)
-
-        ["diff"] ->
-          [dirname] ++ Enum.slice(exec.argv, 1..-1)
-      end
+  defp run_credo_on_dir(exec, dirname, previous_git_ref) do
+    {previous_argv, _last_arg} =
+      exec.argv
+      |> Enum.slice(1..-1)
+      |> Enum.reduce({[], nil}, fn
+        _, {argv, "--from-git-ref"} -> {Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--from-dir"} -> {Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--since"} -> {Enum.slice(argv, 1..-2), nil}
+        ^previous_git_ref, {argv, _last_arg} -> {argv, nil}
+        arg, {argv, _last_arg} -> {argv ++ [arg], arg}
+      end)
 
     run_credo(exec, previous_git_ref, dirname, previous_argv)
   end
 
-  def run_credo(exec, previous_git_ref, previous_dirname, previous_argv) do
+  defp run_credo(exec, previous_git_ref, previous_dirname, previous_argv) do
     parent_pid = self()
 
     spawn(fn ->
       Shell.supress_output(fn ->
-        previous_exec = Credo.run(previous_argv)
+        argv = previous_argv ++ ["--working-dir", previous_dirname]
+
+        previous_exec = Credo.run(argv)
 
         send(parent_pid, {:previous_exec, previous_exec})
       end)
@@ -79,7 +102,32 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     end
   end
 
-  defp store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
+  def store_resulting_execution(
+        %Execution{debug: true} = exec,
+        previous_git_ref,
+        previous_dirname,
+        previous_exec
+      ) do
+    exec =
+      perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+
+    previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
+    require Logger
+    Logger.debug("Git ref checked out to: #{previous_dirname}")
+
+    exec
+  end
+
+  def store_resulting_execution(
+        exec,
+        previous_git_ref,
+        previous_dirname,
+        previous_exec
+      ) do
+    perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec)
+  end
+
+  defp perform_store_resulting_execution(exec, previous_git_ref, previous_dirname, previous_exec) do
     if previous_exec.halted do
       halt_execution(exec, previous_git_ref, previous_dirname, previous_exec)
     else

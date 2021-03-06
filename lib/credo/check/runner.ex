@@ -46,7 +46,7 @@ defmodule Credo.Check.Runner do
         []
       else
         exec
-        |> Execution.get_path()
+        |> Execution.working_dir()
         |> Credo.Sources.find_in_dir(files_included, files_excluded)
       end
 

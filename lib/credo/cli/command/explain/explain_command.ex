@@ -96,7 +96,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
     def call(exec, _opts) do
       filename_with_location = ExplainCommand.get_filename_from_args(exec)
-      working_dir = Execution.get_path(exec)
+      working_dir = Execution.working_dir(exec)
 
       filename =
         filename_with_location
