@@ -30,6 +30,9 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
       {:git, git_ref} ->
         run_credo_on_git_ref(exec, git_ref, {:git, git_ref})
 
+      {:git_merge_base, git_merge_base} ->
+        run_credo_on_git_merge_base(exec, git_merge_base, {:git_merge_base, git_merge_base})
+
       {:git_datetime, datetime} ->
         run_credo_on_datetime(exec, datetime, {:git_datetime, datetime})
 
@@ -46,6 +49,24 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
     run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
+  end
+
+  defp run_credo_on_git_merge_base(exec, git_merge_base, given_ref) do
+    # git merge-base master HEAD
+    case System.cmd("git", ["merge-base", git_merge_base, "HEAD"], stderr_to_stdout: true) do
+      {output, 0} ->
+        git_ref = String.trim(output)
+        working_dir = Execution.working_dir(exec)
+        previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
+
+        run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
+
+      {output, _} ->
+        Execution.halt(
+          exec,
+          "Could not determine merge base for `#{git_merge_base}`: #{inspect(output)}"
+        )
+    end
   end
 
   defp run_credo_on_datetime(exec, datetime, given_ref) do
@@ -80,6 +101,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
       exec.argv
       |> Enum.slice(1..-1)
       |> Enum.reduce({[], nil}, fn
+        _, {argv, "--from-git-merge-base"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-git-ref"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-dir"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--since"} -> {Enum.slice(argv, 1..-2), nil}
