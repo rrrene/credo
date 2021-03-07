@@ -19,6 +19,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
         [
           Switch.string("from_dir"),
           Switch.string("from_git_ref"),
+          Switch.string("from_git_merge_base"),
           Switch.boolean("show_fixed"),
           Switch.boolean("show_kept"),
           Switch.string("since")
@@ -69,6 +70,10 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
         previous_ref_as_git_ref(given_git_ref) ||
           {:error, "given value is not a Git ref: #{given_git_ref}"}
 
+      %{from_git_merge_base: given_git_merge_base} ->
+        previous_ref_as_git_merge_base(given_git_merge_base) ||
+          {:error, "given value is not a Git ref: #{given_git_merge_base}"}
+
       _ ->
         given_first_arg = List.first(exec.cli_options.args)
 
@@ -98,6 +103,16 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     if git_present?() do
       if git_ref_exists?(potential_git_ref) do
         {:git, potential_git_ref}
+      end
+    else
+      {:error, "could not run `git`"}
+    end
+  end
+
+  def previous_ref_as_git_merge_base(potential_git_ref) do
+    if git_present?() do
+      if git_ref_exists?(potential_git_ref) do
+        {:git_merge_base, potential_git_ref}
       end
     else
       {:error, "could not run `git`"}
