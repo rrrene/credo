@@ -60,6 +60,34 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     |> assert_issue()
   end
 
+  test "it should report a violation (piped)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        parameter
+        |> String.to_atom()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation (start of pipe)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        String.to_atom(parameter)
+        |> IO.inspect()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation /2" do
     """
     defmodule CredoSampleModule do
@@ -73,11 +101,67 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     |> assert_issue()
   end
 
+  test "it should report a violation /2 (piped)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        parameter
+        |> List.to_atom()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /2 (start of pipe)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        List.to_atom(parameter)
+        |> IO.inspect()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation /3" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter) do
         Module.concat(__MODULE__, parameter)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /3 (piped)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        __MODULE__
+        |> Module.concat(parameter)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /3 (start of pipe)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        Module.concat(__MODULE__, parameter)
+        |> IO.inspect
       end
     end
     """
@@ -112,11 +196,67 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     |> assert_issue()
   end
 
+  test "it should report a violation /5 (piped)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        parameter
+        |> :erlang.list_to_atom()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /5 (start of pipe)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        :erlang.list_to_atom(parameter)
+        |> IO.inspect()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation /6" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter) do
         :erlang.binary_to_atom(parameter, :utf8)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /6 (piped)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        parameter
+        |> :erlang.binary_to_atom(:utf8)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /6 (start of pipe)" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        :erlang.binary_to_atom(parameter, :utf8)
+        |> IO.inspect()
       end
     end
     """

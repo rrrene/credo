@@ -47,6 +47,29 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     {nil, issues}
   end
 
+  defp traverse({:|>, _loc, _args} = ast, issues, _issue_meta) do
+    unpiped = Macro.unpipe(ast)
+
+    case Macro.unpipe(ast) do
+      [first | rest] ->
+        unpiped =
+          Enum.map(rest, fn
+            # adds the "previous" argument so we can track the correct
+            # arity
+            {{{:., loc, call}, meta, args}, pos} ->
+              {{{:., loc, call}, meta, List.insert_at(args, pos, :previous)}, pos}
+
+            ast ->
+              ast
+          end)
+
+        {[first | unpiped], issues}
+
+      ast ->
+        {ast, issues}
+    end
+  end
+
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       {bad, suggestion} ->
