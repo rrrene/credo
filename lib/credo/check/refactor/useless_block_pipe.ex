@@ -22,8 +22,6 @@ defmodule Credo.Check.Refactor.UselessBlockPipe do
             1 -> :one
             _ -> :many
           end
-
-      This check is not needed when `BlockPipe` check is active.
       """
     ]
 
@@ -35,14 +33,24 @@ defmodule Credo.Check.Refactor.UselessBlockPipe do
     Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
   end
 
+  defp traverse(ast, {false, issues}, _issue_meta) do
+    {ast, issues}
+  end
+
   defp traverse(ast, issues, issue_meta) do
     case issue(ast, issue_meta) do
       nil -> {ast, issues}
+
+      false -> {ast, {false, issues}}
+
       issue -> {ast, [issue | issues]}
     end
   end
 
-  defp issue({:|>, meta, [arg, {marker, _case_meta, _case_args}]}, issue_meta) when marker in [:case, :if] do
+  defp issue({:|>, _, [{:|>, _, [{:|>, _, _} | _]} | _]}, _), do: false
+
+  defp issue({:|>, meta, [arg, {marker, _case_meta, _case_args}]}, issue_meta)
+       when marker in [:case, :if] do
     if issue?(arg), do: issue_for(issue_meta, meta[:line]), else: nil
   end
 

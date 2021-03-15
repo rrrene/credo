@@ -42,7 +42,27 @@ defmodule Credo.Check.Refactor.UselessBlockPipeTest do
     |> refute_issues()
   end
 
-  test "it should report violation for useless single pipes when included" do
+  test "it should NOT report violation for longer pipes" do
+    """
+    defmodule Test do
+      def some_function(arg) do
+        arg
+        |> do_something()
+        |> case do
+          :this -> :that
+          :that -> :this
+        end
+        |> to_string()
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+
+  test "it should report violation for useless single pipes" do
     """
     defmodule Test do
       def some_function(arg) do
@@ -55,7 +75,7 @@ defmodule Credo.Check.Refactor.UselessBlockPipeTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, include: :single)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -69,25 +89,6 @@ defmodule Credo.Check.Refactor.UselessBlockPipeTest do
           :this -> :that
           :that -> :this
         end
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue()
-  end
-
-  test "it should report violation for useless pipes to case with function and further pipe" do
-    """
-    defmodule Test do
-      def some_function(arg) do
-        arg
-        |> do_something()
-        |> case do
-          :this -> :that
-          :that -> :this
-        end
-        |> to_string()
       end
     end
     """
