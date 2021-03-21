@@ -108,7 +108,7 @@ list of `issues` found, which makes it convenient  to check for the issues prope
     """
     |> to_source_file()
     |> run_check(RejectModuleAttributes)
-    |> assert_issue(fn issues -> assert Enum.count(issues) == 3 end)
+    |> assert_issues(fn issues -> assert Enum.count(issues) == 3 end)
 
 ### Testing checks that analyse multiple source files
 
