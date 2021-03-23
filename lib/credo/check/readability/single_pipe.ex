@@ -86,7 +86,9 @@ defmodule Credo.Check.Readability.SinglePipe do
     {ast, {false, issues}}
   end
 
-  # single pipe, left operand is 0-arity foreign function, zero arity functions allowed
+  # single pipe, zero arity functions allowed, covers 2 cases
+  # - left operand is 0-arity foreign function
+  # - left operand is anonymous function
   defp traverse({:|>, _, [{fun, _, []}, _]} = ast, {true, issues}, _, true) when is_atom(fun) do
     {ast, {false, issues}}
   end

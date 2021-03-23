@@ -73,6 +73,12 @@ defmodule Credo.Check.Readability.SinglePipeTest do
           OtherModule.foo() |> bar()
           foo() |> OtherModule.bar()
           foo() |> bar()
+
+          foo_anonymous = fn ->
+            nil
+          end
+
+          foo_anonymous.() |> bar()
         end
 
         def foo(), do: nil
@@ -97,6 +103,12 @@ defmodule Credo.Check.Readability.SinglePipeTest do
         OtherModule.foo() |> bar()
         foo() |> OtherModule.bar()
         foo() |> bar()
+
+        foo_anonymous = fn ->
+          nil
+        end
+
+        foo_anonymous.() |> bar()
       end
 
       def foo(), do: nil
