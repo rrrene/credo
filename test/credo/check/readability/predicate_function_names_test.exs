@@ -19,6 +19,18 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code with arity on function" do
+    """
+    def valid?(a) do
+    end
+    defp has_attachment?(a) do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
