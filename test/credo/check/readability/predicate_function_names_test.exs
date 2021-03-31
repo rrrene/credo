@@ -44,4 +44,24 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> run_check(@described_check)
     |> assert_issues()
   end
+
+  test "it should report a violation with arity" do
+    """
+    def is_valid?(a) do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with arity /2" do
+    """
+    def is_valid(a) do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
