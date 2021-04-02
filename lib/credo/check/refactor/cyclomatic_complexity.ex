@@ -42,15 +42,16 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
     max_complexity = Params.get(params, :max_complexity, __MODULE__)
+    ignore_guards = Params.get(params, :ignore_guards, __MODULE__)
 
     Credo.Code.prewalk(
       source_file,
-      &traverse(&1, &2, issue_meta, max_complexity)
+      &traverse(&1, &2, issue_meta, max_complexity, ignore_guards)
     )
   end
 
   # exception for `__using__` macros
-  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
+  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _, _) do
     {ast, issues}
   end
 
@@ -58,10 +59,24 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   # NOTE: see above how we want to exclude certain front-loads
   for op <- @def_ops do
     defp traverse(
+           {unquote(op), meta, [{:when, _, [head | _guards]} | body] = _arguments},
+           issues,
+           issue_meta,
+           max_complexity,
+           true = _ignore_guards
+         ) do
+      ast = {unquote(op), meta, [head | body]}
+      traverse(ast, issues, issue_meta, max_complexity, false)
+    end
+  end
+
+  for op <- @def_ops do
+    defp traverse(
            {unquote(op), meta, arguments} = ast,
            issues,
            issue_meta,
-           max_complexity
+           max_complexity,
+           _ignore_guards
          )
          when is_list(arguments) do
       complexity =
@@ -91,7 +106,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     end
   end
 
-  defp traverse(ast, issues, _source_file, _max_complexity) do
+  defp traverse(ast, issues, _source_file, _max_complexity, _ignore_guards) do
     {ast, issues}
   end
 
