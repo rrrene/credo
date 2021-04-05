@@ -17,6 +17,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def usually_no_space_before?({:flt, _, _}, {_, _, :-}, _), do: false
   def usually_no_space_before?(_, {_, _, :-}, _), do: true
   def usually_no_space_before?(_, {_, _, :..}, _), do: true
+  def usually_no_space_before?(_, {_, _, :"//"}, _), do: true
   def usually_no_space_before?(_, _, _), do: false
 
   @doc """
@@ -40,6 +41,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def usually_no_space_after?({_, _, :..}, {_, _, :-}, _), do: true
   def usually_no_space_after?(_, {_, _, :-}, _), do: false
   def usually_no_space_after?(_, {_, _, :..}, _), do: true
+  def usually_no_space_after?(_, {_, _, :"//"}, _), do: true
   def usually_no_space_after?(_, _, _), do: false
 
   def operator?({:comp_op, _, _}), do: true
