@@ -185,10 +185,6 @@ defmodule Credo.Code.InterpolationHelper do
        ) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
-    {line_no, col_start, line_no_end, col_end}
-
-    # |> IO.inspect()
-
     col_end =
       if line_no_end > line_no && col_end == 1 do
         # This means we encountered :eol and jumped in the next line.
