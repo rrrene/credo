@@ -185,6 +185,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     for prio < -999..0 do
       # something
     end
+
+    for prio < 1..10//2 do
+      # something
+    end
+
+    for prio < 10..1//-2 do
+      # something
+    end
   end
   """
   @with_spaces5 """
