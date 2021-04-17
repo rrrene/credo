@@ -26,10 +26,6 @@ defmodule Credo.CLI.Output.Summary do
     nil
   end
 
-  def print(_source_files, %Execution{format: "github"}, _time_load, _time_run) do
-    nil
-  end
-
   def print(_source_files, %Execution{format: "oneline"}, _time_load, _time_run) do
     nil
   end
