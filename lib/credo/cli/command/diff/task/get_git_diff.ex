@@ -101,6 +101,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
       exec.argv
       |> Enum.slice(1..-1)
       |> Enum.reduce({[], nil}, fn
+        _, {argv, "--working-dir"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-git-merge-base"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-git-ref"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-dir"} -> {Enum.slice(argv, 1..-2), nil}
@@ -214,16 +215,16 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     )
   end
 
-  defp run_git_clone_and_checkout(path, git_ref) do
+  defp run_git_clone_and_checkout(working_dir, git_ref) do
     now = DateTime.utc_now() |> to_string |> String.replace(~r/\D/, "")
     tmp_clone_dir = Path.join(System.tmp_dir!(), "credo-diff-#{now}")
-    git_root_path = git_root_path(path)
-    current_dir = Path.expand(".")
+    git_root_path = git_root_path(working_dir)
+    current_dir = working_dir
     tmp_working_dir = tmp_working_dir(tmp_clone_dir, git_root_path, current_dir)
 
     {_output, 0} =
       System.cmd("git", ["clone", git_root_path, tmp_clone_dir],
-        cd: path,
+        cd: working_dir,
         stderr_to_stdout: true
       )
 
