@@ -48,8 +48,6 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   end
 
   defp traverse({:|>, _loc, _args} = ast, issues, _issue_meta) do
-    unpiped = Macro.unpipe(ast)
-
     case Macro.unpipe(ast) do
       [first | rest] ->
         unpiped =
