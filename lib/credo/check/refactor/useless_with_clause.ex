@@ -7,7 +7,7 @@ defmodule Credo.Check.Refactor.UselessWithClause do
       of pattern matches, stopping at the first one that fails.
 
       If the `match` of the last clause in a with equal to the expression in the
-      body, the code should be refactored.
+      in its body, the code should be refactored to remove the redundant expression.
 
       This should be refactored:
 
