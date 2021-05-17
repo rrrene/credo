@@ -47,16 +47,22 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     {nil, issues}
   end
 
-  defp traverse({:|>, loc, args}, issues, _issue_meta) do
-    {args, _} = Enum.reduce(args, {[], first?: true}, &mark_as_in_pipe/2)
-    ast = {:|>, loc, Enum.reverse(args)}
-    {ast, issues}
+  defp traverse(
+         {:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast,
+         issues,
+         issue_meta
+       ) do
+    case get_forbidden_pipe(call, args) do
+      {bad, suggestion} ->
+        {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
+
+      nil ->
+        {ast, issues}
+    end
   end
 
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
-    in_pipe? = Keyword.get(meta, :in_pipe?, false)
-
-    case get_forbidden_call(call, args, in_pipe?: in_pipe?) do
+    case get_forbidden_call(call, args) do
       {bad, suggestion} ->
         {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
 
@@ -69,72 +75,31 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     {ast, issues}
   end
 
-  defp mark_as_in_pipe({:|>, loc, args}, {acc, first?: first?}) do
-    {args, first?: first?} = Enum.reduce(args, {[], first?: first?}, &mark_as_in_pipe/2)
-    {[{:|>, loc, args} | acc], first?: first?}
-  end
-
-  defp mark_as_in_pipe({{:., call_meta, call}, meta, args}, {acc, first?: first?}) do
-    call_meta = Keyword.put(call_meta, :in_pipe?, not first?)
-    meta = Keyword.put(meta, :in_pipe?, not first?)
-    {[{{:., call_meta, call}, meta, args} | acc], first?: false}
-  end
-
-  defp mark_as_in_pipe({x, meta, args}, {acc, first?: first?}) do
-    {[{x, Keyword.put(meta, :in_pipe?, not first?), args} | acc], first?: false}
-  end
-
-  defp mark_as_in_pipe(ast, {acc, first?: first?}), do: {[ast | acc], first?: first?}
-
-  defp get_forbidden_call([:erlang, :list_to_atom], [_], in_pipe?: false) do
+  defp get_forbidden_call([:erlang, :list_to_atom], [_]) do
     {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
   end
 
-  defp get_forbidden_call([:erlang, :list_to_atom], [], in_pipe?: true) do
-    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
-  end
-
-  defp get_forbidden_call([:erlang, :binary_to_atom], [_, _], in_pipe?: false) do
+  defp get_forbidden_call([:erlang, :binary_to_atom], [_, _]) do
     {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
   end
 
-  defp get_forbidden_call([:erlang, :binary_to_atom], [_], in_pipe?: true) do
-    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
-  end
-
-  defp get_forbidden_call([{:__aliases__, _, [:String]}, :to_atom], [_], in_pipe?: false) do
+  defp get_forbidden_call([{:__aliases__, _, [:String]}, :to_atom], [_]) do
     {"String.to_atom/1", "String.to_existing_atom/1"}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:String]}, :to_atom], [], in_pipe?: true) do
-    {"String.to_atom/1", "String.to_existing_atom/1"}
-  end
-
-  defp get_forbidden_call([{:__aliases__, _, [:List]}, :to_atom], [_], in_pipe?: false) do
+  defp get_forbidden_call([{:__aliases__, _, [:List]}, :to_atom], [_]) do
     {"List.to_atom/1", "List.to_existing_atom/1"}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:List]}, :to_atom], [], in_pipe?: true) do
-    {"List.to_atom/1", "List.to_existing_atom/1"}
-  end
-
-  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_], in_pipe?: false) do
+  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_]) do
     {"Module.concat/1", "Module.safe_concat/1"}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [], in_pipe?: true) do
-    {"Module.concat/1", "Module.safe_concat/1"}
-  end
-
-  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_, _], in_pipe?: false) do
+  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_, _]) do
     {"Module.concat/2", "Module.safe_concat/2"}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_], in_pipe?: true) do
-    {"Module.concat/2", "Module.safe_concat/2"}
-  end
-
-  defp get_forbidden_call([{:__aliases__, _, [:Jason]}, decode], args, _in_pipe?)
+  defp get_forbidden_call([{:__aliases__, _, [:Jason]}, decode], args)
        when decode in [:decode, :decode!] do
     args
     |> Enum.any?(fn arg -> Keyword.keyword?(arg) and Keyword.get(arg, :keys) == :atoms end)
@@ -145,7 +110,31 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     end
   end
 
-  defp get_forbidden_call(_, _, _) do
+  defp get_forbidden_call(_, _) do
+    nil
+  end
+
+  defp get_forbidden_pipe([:erlang, :list_to_atom], []) do
+    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([:erlang, :binary_to_atom], [_]) do
+    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:String]}, :to_atom], []) do
+    {"String.to_atom/1", "String.to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:List]}, :to_atom], []) do
+    {"List.to_atom/1", "List.to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:Module]}, :concat], []) do
+    {"Module.concat/1", "Module.safe_concat/1"}
+  end
+
+  defp get_forbidden_pipe(_, _) do
     nil
   end
 
