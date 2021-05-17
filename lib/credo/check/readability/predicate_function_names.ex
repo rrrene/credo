@@ -77,7 +77,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
   defp issues_for_definition(op, body, issues, issue_meta) do
     case Enum.at(body, 0) do
-      {name, meta, nil} ->
+      {name, meta, _} ->
         issues_for_name(op, name, meta, issues, issue_meta)
 
       _ ->
