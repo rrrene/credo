@@ -1,4 +1,4 @@
-defmodule Credo.Check.Refactor.UselessWithClauseTest do
+defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.UselessWithClause
