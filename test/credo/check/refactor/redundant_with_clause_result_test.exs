@@ -1,7 +1,7 @@
 defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Refactor.UselessWithClause
+  @described_check Credo.Check.Refactor.RedundantWithClauseResult
 
   #
   # cases NOT raising issues
@@ -66,7 +66,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
   # cases raising issues
   #
 
-  test "it should report a violation if the last clause is useless" do
+  test "it should report a violation if the last clause is redundant" do
     """
     def some_function(parameter1, parameter2) do
       with :ok <- parameter1,
@@ -78,7 +78,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the last clause in `with` is useless"
+      assert issue.message == "the last clause in `with` is redundant"
     end)
   end
 
@@ -94,11 +94,11 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the last clause in `with` is useless"
+      assert issue.message == "the last clause in `with` is redundant"
     end)
   end
 
-  test "it should report a violation if the with is useless" do
+  test "it should report a violation if the with is redundant" do
     """
     def some_function(parameter) do
       with {:ok, val} <- do_something(parameter) do
@@ -109,7 +109,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the `with` statement is useless"
+      assert issue.message == "the `with` statement is redundant"
     end)
   end
 end
