@@ -33,6 +33,15 @@ mix credo --working-dir ../other-elixir-project/
 - `Credo.Check.Readability.PipeIntoAnonymousFunctions`
 - `Credo.Check.Refactor.MapJoin`
 
+## 1.5.6
+
+- Ensure compatibility with Elixir 1.12
+
+## 1.5.5
+
+- Fix bug where compilation warnings are shown if compilation directory is not part of a Git work tree
+- Fix bug in `mix credo diff` where too many issues are reported because
+
 ## 1.5.4
 
 - Fix bug where `:exit_status` was not a valid option for `use Credo.Check`
