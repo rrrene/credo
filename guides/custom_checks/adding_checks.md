@@ -202,29 +202,29 @@ $ mix credo explain MyProject.Checks.RejectModuleAttributes
 
 ```bash
   MyProject.Checks.MyIExPry
-┃ 
-┃   [R] Category: readability 
-┃    ↗  Priority: high 
-┃ 
+┃
+┃   [R] Category: readability
+┃    ↗  Priority: high
+┃
 ┃    __ WHY IT MATTERS
-┃ 
+┃
 ┃       Look, sometimes the policies for names of module attributes change.
 ┃       We want to make sure that all module attributes adhere to the newest standards of ACME Corp.
-┃       
+┃
 ┃       We do not want to discuss this policy, we just want to stop you from using the old
 ┃       module attributes :)
-┃ 
+┃
 ┃    __ CONFIGURATION OPTIONS
-┃ 
+┃
 ┃       To configure this check, use this tuple
-┃ 
+┃
 ┃         {MyProject.Checks.RejectModuleAttributes, <params>}
-┃ 
+┃
 ┃       with <params> being false or any combination of these keywords:
-┃ 
+┃
 ┃         reject:                Names of module attributes that are no longer allowed
 ┃                                (defaults to [])
-┃ 
+┃
 
 ```
 
@@ -278,4 +278,4 @@ defmodule MyProject.Checks.RejectModuleAttributes do
 end
 ```
 
-Next, let's see how we can [write tests for our custom check!](testing_checks.html)
+Next, let's see how we can [write tests for our custom check!](./testing_checks.md)

@@ -6,7 +6,7 @@ There are custom params for each check and a set of [general params](#general-pa
 
 ## Configuration
 
-Checks and their params are configured in [Credo's configuration file](config_file.html):
+Checks and their params are configured in [Credo's configuration file](./config_file.md):
 
 ```elixir
 # .credo.exs
@@ -30,7 +30,7 @@ All checks are configured using a two-element tuple:
 {MyApp.CheckModule, params}
 ```
 
-`MyApp.CheckModule` is the module representing the check to be configured ([read more about custom checks](adding_checks.html)).
+`MyApp.CheckModule` is the module representing the check to be configured ([read more about custom checks](../custom_checks/adding_checks.md)).
 
 `params` can be either `false`, to disable the check ...
 
@@ -73,7 +73,7 @@ Overwrites a custom exit status for the check
 {Credo.Check.Warning.IoInspect, exit_status: 0}
 ```
 
-Read more on [exit status in Credo](exit_statuses.html).
+Read more on [exit status in Credo](../introduction/exit_statuses.md).
 
 ### `:files`
 

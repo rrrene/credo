@@ -86,5 +86,5 @@ $ mix credo lib/foo/bar.ex:306 --format json
 
 If you are interested in more ways to configure Credo, continue reading in the following sections:
 
-* [CLI switches](cli_switches.html)
-* [Configuration file](config_file.html)
+* [CLI switches](../configuration/cli_switches.md)
+* [Configuration file](../configuration/config_file.md)
