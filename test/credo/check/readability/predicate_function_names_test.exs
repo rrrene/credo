@@ -19,18 +19,6 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report expected code with arity on function" do
-    """
-    def valid?(a) do
-    end
-    defp has_attachment?(a) do
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> refute_issues()
-  end
-
   #
   # cases raising issues
   #
@@ -55,25 +43,5 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()
-  end
-
-  test "it should report a violation with arity" do
-    """
-    def is_valid?(a) do
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue()
-  end
-
-  test "it should report a violation with arity /2" do
-    """
-    def is_valid(a) do
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue()
   end
 end
