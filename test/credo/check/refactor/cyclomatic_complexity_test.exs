@@ -251,20 +251,4 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     |> assert_issue()
     |> assert_trigger(:foobar)
   end
-
-  test "it ignores cyclomatic complexity of guards when ignore_guards is true" do
-    """
-    defmodule CredoTest do
-    defp foobar(%{a: a, b: b, c: c, d: d, e: e, f: f,
-                  g: g, h: h, i: i, j: j}
-    ) when is_atom(a) and is_atom(b) and is_atom(c) and is_atom(d) and
-    is_atom(e) and is_atom(f) and is_atom(g) and is_atom(h) and is_atom(j) do
-      {a, b, c, d, e, f, g, h, i, j}
-    end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check, max_complexity: 4, ignore_guards: true)
-    |> refute_issues()
-  end
 end
