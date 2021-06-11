@@ -11,7 +11,7 @@ Using this module will:
 * import all the functions from this module
 * make the test case `:async` by default (use `async: false` to opt out of this behaviour)
 
-Let's test the `RejectModuleAttributes` check that we implemented in [Adding custom checks](adding_checks.html).
+Let's test the `RejectModuleAttributes` check that we implemented in [Adding custom checks](./adding_checks.md).
 
 ### Basic custom check tests
 
@@ -57,7 +57,7 @@ We can (and should) also test the params of our check by passing them to `run_ch
       use Credo.Test.Case
 
       alias MyProject.Checks.RejectModuleAttributes
-      
+
       # ...
 
       test "it should NOT report code that includes default rejected module attribute names when a custom set of rejected names is provided" do
