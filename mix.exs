@@ -55,7 +55,7 @@ defmodule Credo.Mixfile do
       "guides/commands/explain_command.md",
       "guides/commands/list_command.md",
 
-      # Plugins
+      # Checks
 
       "guides/custom_checks/adding_checks.md",
       "guides/custom_checks/testing_checks.md",
@@ -69,7 +69,8 @@ defmodule Credo.Mixfile do
 
       # Plugins
 
-      "guides/plugins/plugins.md"
+      "guides/plugins/using_plugins.md",
+      "guides/plugins/creating_plugins.md"
     ]
   end
 
