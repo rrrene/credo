@@ -1,6 +1,6 @@
 # Creating Plugins
 
-A plugin is basically just a module that provides an `init/1` callback.
+A plugin is basically just a module that provides an `init/1` callback, taking a `Credo.Execution` struct as its only parameter.
 
 ```elixir
 defmodule CredoDemoPlugin do
