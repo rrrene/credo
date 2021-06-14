@@ -308,7 +308,12 @@ defmodule Credo.Execution do
 
   # Commands
 
-  @doc "Returns the name of the command, which should be run by the given execution."
+  @doc """
+  Returns the name of the command, which should be run by the given execution.
+
+      Credo.Execution.get_command_name(exec)
+      # => "suggest"
+  """
   def get_command_name(exec) do
     exec.cli_options.command
   end
@@ -318,11 +323,15 @@ defmodule Credo.Execution do
     Map.keys(exec.commands)
   end
 
+  @doc """
+  Returns the `Credo.CLI.Command` module for the given `name`.
+
+      Credo.Execution.get_command(exec, "explain")
+      # => Credo.CLI.Command.Explain.ExplainCommand
+  """
   def get_command(exec, name) do
     Map.get(exec.commands, name) ||
-      raise ~s'Command not found: "#{inspect(name)}"\n\nRegistered commands: #{
-              inspect(exec.commands, pretty: true)
-            }'
+      raise ~s'Command not found: "#{inspect(name)}"\n\nRegistered commands: #{inspect(exec.commands, pretty: true)}'
   end
 
   @doc false
@@ -348,10 +357,20 @@ defmodule Credo.Execution do
 
   # Plugin params
 
+  @doc """
+  Returns the `Credo.Plugin` module's param value.
+
+      Credo.Execution.get_command(exec, CredoDemoPlugin, "foo")
+      # => nil
+
+      Credo.Execution.get_command(exec, CredoDemoPlugin, "foo", 42)
+      # => 42
+  """
   def get_plugin_param(exec, plugin_mod, param_name) do
     exec.plugins[plugin_mod][param_name]
   end
 
+  @doc false
   def put_plugin_param(exec, plugin_mod, param_name, param_value) do
     plugins =
       Keyword.update(exec.plugins, plugin_mod, [], fn list ->
@@ -394,19 +413,32 @@ defmodule Credo.Execution do
 
   # Assigns
 
-  @doc "Returns the assign with the given `name` for the given `exec` struct (or return the given `default` value)."
+  @doc """
+  Returns the assign with the given `name` for the given `exec` struct (or return the given `default` value).
+
+      Credo.Execution.get_assign(exec, "foo")
+      # => nil
+
+      Credo.Execution.get_assign(exec, "foo", 42)
+      # => 42
+  """
   def get_assign(exec, name, default \\ nil) do
     Map.get(exec.assigns, name, default)
   end
 
-  @doc "Puts the given `value` with the given `name` as assign into the given `exec` struct."
+  @doc """
+  Puts the given `value` with the given `name` as assign into the given `exec` struct and returns the struct.
+
+      Credo.Execution.put_assign(exec, "foo", 42)
+      # => %Credo.Execution{...}
+  """
   def put_assign(exec, name, value) do
     %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
   # Config Files
 
-  @doc "Returns all config files for the given `exec` struct."
+  @doc false
   def get_config_files(exec) do
     Credo.Execution.ExecutionConfigFiles.get(exec)
   end
@@ -422,12 +454,18 @@ defmodule Credo.Execution do
 
   # Source Files
 
-  @doc "Returns all source files for the given `exec` struct."
+  @doc """
+  Returns all source files for the given `exec` struct.
+
+      Credo.Execution.get_source_files(exec)
+      # => [%SourceFile<lib/my_project.ex>,
+      #     %SourceFile<lib/credo/my_project/foo.ex>]
+  """
   def get_source_files(exec) do
     Credo.Execution.ExecutionSourceFiles.get(exec)
   end
 
-  @doc "Puts the given `source_files` into the given `exec` struct."
+  @doc false
   def put_source_files(exec, source_files) do
     ExecutionSourceFiles.put(exec, source_files)
 
@@ -436,7 +474,9 @@ defmodule Credo.Execution do
 
   # Issues
 
-  @doc "Returns all issues for the given `exec` struct."
+  @doc """
+  Returns all issues for the given `exec` struct.
+  """
   def get_issues(exec) do
     exec
     |> ExecutionIssues.to_map()
@@ -444,14 +484,18 @@ defmodule Credo.Execution do
     |> List.flatten()
   end
 
-  @doc "Returns all issues for the given `exec` struct that relate to the given `filename`."
+  @doc """
+  Returns all issues for the given `exec` struct that relate to the given `filename`.
+  """
   def get_issues(exec, filename) do
     exec
     |> ExecutionIssues.to_map()
     |> Map.get(filename, [])
   end
 
-  @doc "Sets the issues for the given `exec` struct, overwriting any existing issues."
+  @doc """
+  Sets the issues for the given `exec` struct, overwriting any existing issues.
+  """
   def set_issues(exec, issues) do
     ExecutionIssues.set(exec, issues)
 
@@ -460,12 +504,25 @@ defmodule Credo.Execution do
 
   # Results
 
-  @doc "Returns the result with the given `name` for the given `exec` struct (or return the given `default` value)."
+  @doc """
+  Returns the result with the given `name` for the given `exec` struct (or return the given `default` value).
+
+      Credo.Execution.get_result(exec, "foo")
+      # => nil
+
+      Credo.Execution.get_result(exec, "foo", 42)
+      # => 42
+  """
   def get_result(exec, name, default \\ nil) do
     Map.get(exec.results, name, default)
   end
 
-  @doc "Puts the given `value` with the given `name` as result into the given `exec` struct."
+  @doc """
+  Puts the given `value` with the given `name` as result into the given `exec` struct.
+
+      Credo.Execution.put_result(exec, "foo", 42)
+      # => %Credo.Execution{...}
+  """
   def put_result(exec, name, value) do
     %__MODULE__{exec | results: Map.put(exec.results, name, value)}
   end
@@ -602,7 +659,7 @@ defmodule Credo.Execution do
 
       exec
       |> mod.init()
-      |> Execution.ensure_execution_struct("#{mod}.init/1")
+      |> Credo.Execution.ensure_execution_struct("#{mod}.init/1")
   """
   def ensure_execution_struct(value, fun_name)
 
