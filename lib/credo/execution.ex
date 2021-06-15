@@ -574,21 +574,7 @@ defmodule Credo.Execution do
     run_pipeline(exec, __MODULE__)
   end
 
-  @doc false
-  def run_pipeline(%__MODULE__{} = initial_exec, pipeline_key)
-      when is_atom(pipeline_key) and not is_nil(pipeline_key) do
-    initial_pipeline = get_pipeline(initial_exec, pipeline_key)
-
-    Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, exec_inside_pipeline ->
-      outer_pipeline = get_pipeline(exec_inside_pipeline, pipeline_key)
-
-      task_group = outer_pipeline[group_name]
-
-      Enum.reduce(task_group, exec_inside_pipeline, fn {task_mod, opts}, exec_inside_task_group ->
-        Credo.Execution.Task.run(task_mod, exec_inside_task_group, opts)
-      end)
-    end)
-  end
+  # Pipelines
 
   @doc false
   defp get_pipeline(exec, pipeline_key) do
@@ -598,10 +584,55 @@ defmodule Credo.Execution do
     end
   end
 
+  @doc """
+  Puts a given `pipeline` in `exec` under `pipeline_key`.
+
+  A pipeline is a keyword list of named groups. Each named group is a list of `Credo.Execution.Task` modules:
+
+      Execution.put_pipeline(exec, :my_pipeline_key,
+        load_things: [ MyProject.LoadThings ],
+        run_analysis: [ MyProject.Run ],
+        print_results: [ MyProject.PrintResults ]
+      )
+
+  A named group can also be a list of two-element tuples, consisting of a `Credo.Execution.Task` module and a
+  keyword list of options, which are passed to the Task module's `call/2` function:
+
+      Execution.put_pipeline(exec, :my_pipeline_key,
+        load_things: [ {MyProject.LoadThings, []} ],
+        run_analysis: [ {MyProject.Run, [foo: "bar"]} ],
+        print_results: [ {MyProject.PrintResults, []} ]
+      )
+  """
   def put_pipeline(exec, pipeline_key, pipeline) do
     new_pipelines = Map.put(exec.pipeline_map, pipeline_key, pipeline)
 
     %__MODULE__{exec | pipeline_map: new_pipelines}
+  end
+
+  @doc """
+  Runs the pipeline with the given `pipeline_key` and returns the result `Credo.Execution` struct.
+
+      Execution.run_pipeline(exec, :my_pipeline_key)
+      # => %Credo.Execution{...}
+  """
+  def run_pipeline(%__MODULE__{} = initial_exec, pipeline_key)
+      when is_atom(pipeline_key) and not is_nil(pipeline_key) do
+    initial_pipeline = get_pipeline(initial_exec, pipeline_key)
+
+    Enum.reduce(initial_pipeline, initial_exec, fn {group_name, _list}, exec_inside_pipeline ->
+      outer_pipeline = get_pipeline(exec_inside_pipeline, pipeline_key)
+
+      task_group = outer_pipeline[group_name]
+
+      Enum.reduce(task_group, exec_inside_pipeline, fn
+        {task_mod, opts}, exec_inside_task_group ->
+          Credo.Execution.Task.run(task_mod, exec_inside_task_group, opts)
+
+        task_mod, exec_inside_task_group when is_atom(task_mod) ->
+          Credo.Execution.Task.run(task_mod, exec_inside_task_group, [])
+      end)
+    end)
   end
 
   @doc false
@@ -648,6 +679,7 @@ defmodule Credo.Execution do
     put_pipeline(exec, pipeline_key, pipeline)
   end
 
+  @doc false
   defp put_builtin_command(exec, name, command_mod) do
     put_command(exec, Credo, name, command_mod)
   end

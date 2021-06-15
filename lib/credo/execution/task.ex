@@ -17,16 +17,26 @@ defmodule Credo.Execution.Task do
       alias Credo.Execution
 
       def call(%Execution{halted: false} = exec, opts) do
+        call(exec)
+      end
+
+      def call(%Execution{halted: false} = exec) do
         exec
       end
 
       def error(exec, _opts) do
+        error(exec)
+      end
+
+      def error(exec) do
         IO.warn("Execution halted during #{__MODULE__}!")
 
         exec
       end
 
+      defoverridable call: 1
       defoverridable call: 2
+      defoverridable error: 1
       defoverridable error: 2
     end
   end
