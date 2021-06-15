@@ -35,27 +35,13 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   def init(exec) do
     Execution.put_pipeline(exec, __MODULE__,
-      load_and_validate_source_files: [
-        {Task.LoadAndValidateSourceFiles, []}
-      ],
-      prepare_analysis: [
-        {Task.PrepareChecksToRun, []}
-      ],
-      __manipulate_config_if_rerun__: [
-        {__MODULE__.ManipulateConfigIfRerun, []}
-      ],
-      print_before_analysis: [
-        {__MODULE__.PrintBeforeInfo, []}
-      ],
-      run_analysis: [
-        {Task.RunChecks, []}
-      ],
-      filter_issues: [
-        {Task.SetRelevantIssues, []}
-      ],
-      print_after_analysis: [
-        {__MODULE__.PrintResultsAndSummary, []}
-      ]
+      load_and_validate_source_files: [Task.LoadAndValidateSourceFiles],
+      prepare_analysis: [Task.PrepareChecksToRun],
+      __manipulate_config_if_rerun__: [__MODULE__.ManipulateConfigIfRerun],
+      print_before_analysis: [__MODULE__.PrintBeforeInfo],
+      run_analysis: [Task.RunChecks],
+      filter_issues: [Task.SetRelevantIssues],
+      print_after_analysis: [__MODULE__.PrintResultsAndSummary]
     )
   end
 
@@ -67,7 +53,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
     use Credo.Execution.Task
 
-    def call(exec, _opts) do
+    def call(exec) do
       source_files = Execution.get_source_files(exec)
 
       SuggestOutput.print_before_info(source_files, exec)
@@ -81,7 +67,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
     use Credo.Execution.Task
 
-    def call(exec, _opts) do
+    def call(exec) do
       source_files = Execution.get_source_files(exec)
 
       time_load = Execution.get_assign(exec, "credo.time.source_files")
