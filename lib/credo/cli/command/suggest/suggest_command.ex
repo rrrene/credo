@@ -108,7 +108,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       # all checks on `files_that_changed`
       # consistency checks on all files
 
-      Execution.set_issues(exec, issues_to_keep)
+      Execution.put_issues(exec, issues_to_keep)
     end
 
     def modify_config_to_only_include_needed_checks(%Credo.Execution{} = exec, files_that_changed) do

@@ -1,6 +1,6 @@
 defmodule Credo.Execution do
   @moduledoc """
-  Every run of Credo is configured via a `Execution` struct, which is created and
+  Every run of Credo is configured via an `Execution` struct, which is created and
   manipulated via the `Credo.Execution` module.
   """
 
@@ -71,14 +71,12 @@ defmodule Credo.Execution do
   @execution_pipeline_key __MODULE__
   @execution_pipeline [
     __pre__: [
-      {Credo.Execution.Task.AppendDefaultConfig, []},
+      Credo.Execution.Task.AppendDefaultConfig,
       {Credo.Execution.Task.ParseOptions, parser_mode: :preliminary},
-      {Credo.Execution.Task.ConvertCLIOptionsToConfig, []},
-      {Credo.Execution.Task.InitializePlugins, []}
+      Credo.Execution.Task.ConvertCLIOptionsToConfig,
+      Credo.Execution.Task.InitializePlugins
     ],
-    parse_cli_options: [
-      {Credo.Execution.Task.ParseOptions, parser_mode: :preliminary}
-    ],
+    parse_cli_options: [{Credo.Execution.Task.ParseOptions, parser_mode: :preliminary}],
     initialize_plugins: [
       # This is where plugins can "put" their hooks using `Credo.Plugin.append_task/3`
       # to initialize themselves based on the params given in the config as well as
@@ -94,37 +92,16 @@ defmodule Credo.Execution do
       #       end
       #     end
     ],
-    determine_command: [
-      {Credo.Execution.Task.DetermineCommand, []}
-    ],
-    set_default_command: [
-      {Credo.Execution.Task.SetDefaultCommand, []}
-    ],
-    initialize_command: [
-      {Credo.Execution.Task.InitializeCommand, []}
-    ],
-    parse_cli_options_final: [
-      {Credo.Execution.Task.ParseOptions, parser_mode: :strict}
-    ],
-    validate_cli_options: [
-      {Credo.Execution.Task.ValidateOptions, []}
-    ],
-    convert_cli_options_to_config: [
-      {Credo.Execution.Task.ConvertCLIOptionsToConfig, []}
-    ],
-    resolve_config: [
-      {Credo.Execution.Task.UseColors, []},
-      {Credo.Execution.Task.RequireRequires, []}
-    ],
-    validate_config: [
-      {Credo.Execution.Task.ValidateConfig, []}
-    ],
-    run_command: [
-      {Credo.Execution.Task.RunCommand, []}
-    ],
-    halt_execution: [
-      {Credo.Execution.Task.AssignExitStatusForIssues, []}
-    ]
+    determine_command: [Credo.Execution.Task.DetermineCommand],
+    set_default_command: [Credo.Execution.Task.SetDefaultCommand],
+    initialize_command: [Credo.Execution.Task.InitializeCommand],
+    parse_cli_options_final: [{Credo.Execution.Task.ParseOptions, parser_mode: :strict}],
+    validate_cli_options: [Credo.Execution.Task.ValidateOptions],
+    convert_cli_options_to_config: [Credo.Execution.Task.ConvertCLIOptionsToConfig],
+    resolve_config: [Credo.Execution.Task.UseColors, Credo.Execution.Task.RequireRequires],
+    validate_config: [Credo.Execution.Task.ValidateConfig],
+    run_command: [Credo.Execution.Task.RunCommand],
+    halt_execution: [Credo.Execution.Task.AssignExitStatusForIssues]
   ]
 
   alias Credo.Execution.ExecutionConfigFiles
@@ -498,10 +475,15 @@ defmodule Credo.Execution do
   @doc """
   Sets the issues for the given `exec` struct, overwriting any existing issues.
   """
-  def set_issues(exec, issues) do
+  def put_issues(exec, issues) do
     ExecutionIssues.set(exec, issues)
 
     exec
+  end
+
+  @deprecated "Use put_issues/2 instead"
+  def set_issues(exec, issues) do
+    put_issues(exec, issues)
   end
 
   # Results
@@ -638,6 +620,8 @@ defmodule Credo.Execution do
   end
 
   @doc false
+  def prepend_task(exec, plugin_mod, pipeline_key, group_name, task_tuple)
+
   def prepend_task(exec, plugin_mod, nil, group_name, task_tuple) do
     prepend_task(exec, plugin_mod, @execution_pipeline_key, group_name, task_tuple)
   end
@@ -646,7 +630,6 @@ defmodule Credo.Execution do
     prepend_task(exec, plugin_mod, pipeline_key, group_name, {task_mod, []})
   end
 
-  @doc false
   def prepend_task(exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
     pipeline =
       exec
@@ -660,6 +643,8 @@ defmodule Credo.Execution do
   end
 
   @doc false
+  def append_task(exec, plugin_mod, pipeline_key, group_name, task_tuple)
+
   def append_task(exec, plugin_mod, nil, group_name, task_tuple) do
     append_task(exec, plugin_mod, __MODULE__, group_name, task_tuple)
   end
@@ -668,7 +653,6 @@ defmodule Credo.Execution do
     append_task(exec, plugin_mod, pipeline_key, group_name, {task_mod, []})
   end
 
-  @doc false
   def append_task(exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
     pipeline =
       exec

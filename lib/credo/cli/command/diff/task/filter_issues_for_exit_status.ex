@@ -12,6 +12,6 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssuesForExitStatus do
         _ -> false
       end)
 
-    Execution.set_issues(exec, issues)
+    Execution.put_issues(exec, issues)
   end
 end

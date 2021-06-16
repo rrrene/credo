@@ -4,32 +4,29 @@ defmodule Credo.Plugin do
 
   A plugin is basically just a module that provides an `init/1` callback.
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    def init(exec) do
-      # but what do we do here??
-      exec
-    end
-  end
-  ```
+      defmodule CredoDemoPlugin do
+        def init(exec) do
+          # but what do we do here??
+          exec
+        end
+      end
 
   The `Credo.Plugin` module provides a number of functions for extending Credo's core features.
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    @config_file File.read!(".credo.exs")
+      defmodule CredoDemoPlugin do
+        @config_file File.read!(".credo.exs")
 
-    import Credo.Plugin
+        import Credo.Plugin
 
-    def init(exec) do
-      exec
-      |> register_default_config(@config_file)
-      |> register_command("demo", CredoDemoPlugin.DemoCommand)
-      |> register_cli_switch(:castle, :string, :X)
-      |> prepend_task(:set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          exec
+          |> register_default_config(@config_file)
+          |> register_command("demo", CredoDemoPlugin.DemoCommand)
+          |> register_cli_switch(:castle, :string, :X)
+          |> prepend_task(:set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
+        end
+      end
+
   """
 
   require Credo.Execution
@@ -90,16 +87,14 @@ defmodule Credo.Plugin do
 
   Appending tasks to these steps is easy:
 
-  ```elixir
-  # credo_demo_plugin.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      append_task(exec, :set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          append_task(exec, :set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
+        end
+      end
 
   Note how `Credo.Plugin.append_task/3` takes two arguments after the `Credo.Execution` struct: the name of the group to be modified and the module that should be executed.
 
@@ -109,22 +104,20 @@ defmodule Credo.Plugin do
 
   The module appended to these groups should use `Credo.Execution.Task`:
 
-  ```elixir
-  # credo_demo_plugin/set_demo_as_default_command.ex
-  defmodule CredoDemoPlugin.SetDemoAsDefaultCommand do
-    use Credo.Execution.Task
+      # credo_demo_plugin/set_demo_as_default_command.ex
+      defmodule CredoDemoPlugin.SetDemoAsDefaultCommand do
+        use Credo.Execution.Task
 
-    alias Credo.CLI.Options
+        alias Credo.CLI.Options
 
-    def call(exec, _opts) do
-      set_command(exec, exec.cli_options.command || "demo")
-    end
+        def call(exec, _opts) do
+          set_command(exec, exec.cli_options.command || "demo")
+        end
 
-    defp set_command(exec, command) do
-      %Execution{exec | cli_options: %Options{exec.cli_options | command: command}}
-    end
-  end
-  ```
+        defp set_command(exec, command) do
+          %Execution{exec | cli_options: %Options{exec.cli_options | command: command}}
+        end
+      end
 
   This example would have the effect that typing `mix credo` would no longer run the built-in `Suggest` command, but rather our plugin's `Demo` command.
   """
@@ -139,16 +132,14 @@ defmodule Credo.Plugin do
 
   Appending tasks to these steps is easy:
 
-  ```elixir
-  # credo_demo_plugin.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      append_task(exec, Credo.CLI.Command.Suggest.SuggestCommand, :print_after_analysis, CredoDemoPlugin.WriteFile)
-    end
-  end
-  ```
+        def init(exec) do
+          append_task(exec, Credo.CLI.Command.Suggest.SuggestCommand, :print_after_analysis, CredoDemoPlugin.WriteFile)
+        end
+      end
 
   Note how `Credo.Plugin.append_task/4` takes three arguments after the `Credo.Execution` struct: the pipeline and the name of the group to be modified and the module that should be executed.
 
@@ -158,21 +149,19 @@ defmodule Credo.Plugin do
 
   The module appended to these groups should use `Credo.Execution.Task`:
 
-  ```elixir
-  # credo_demo_plugin/write_file.ex
-  defmodule CredoDemoPlugin.WriteFile do
-    use Credo.Execution.Task
+      # credo_demo_plugin/write_file.ex
+      defmodule CredoDemoPlugin.WriteFile do
+        use Credo.Execution.Task
 
-    alias Credo.CLI.Options
+        alias Credo.CLI.Options
 
-    def call(exec, _opts) do
-      issue_count = exec |> Execution.get_issues() |> Enum.count
-      File.write!("demo.json", ~q({"issue_count": \#{issue_count}}))
+        def call(exec, _opts) do
+          issue_count = exec |> Execution.get_issues() |> Enum.count
+          File.write!("demo.json", ~q({"issue_count": \#{issue_count}}))
 
-      exec
-    end
-  end
-  ```
+          exec
+        end
+      end
 
   This example would have the effect that running `mix credo suggest` would write the issue count in a JSON file.
   """
@@ -192,16 +181,14 @@ defmodule Credo.Plugin do
 
   Prepending tasks to these steps is easy:
 
-  ```elixir
-  # credo_demo_plugin.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      prepend_task(exec, :set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          prepend_task(exec, :set_default_command, CredoDemoPlugin.SetDemoAsDefaultCommand)
+        end
+      end
 
   Note how `Credo.Plugin.prepend_task/3` takes two arguments after the `Credo.Execution` struct: the name of the group to be modified and the module that should be executed.
 
@@ -211,22 +198,20 @@ defmodule Credo.Plugin do
 
   The module prepended to these groups should use `Credo.Execution.Task`:
 
-  ```elixir
-  # credo_demo_plugin/set_demo_as_default_command.ex
-  defmodule CredoDemoPlugin.SetDemoAsDefaultCommand do
-    use Credo.Execution.Task
+      # credo_demo_plugin/set_demo_as_default_command.ex
+      defmodule CredoDemoPlugin.SetDemoAsDefaultCommand do
+        use Credo.Execution.Task
 
-    alias Credo.CLI.Options
+        alias Credo.CLI.Options
 
-    def call(exec, _opts) do
-      set_command(exec, exec.cli_options.command || "demo")
-    end
+        def call(exec, _opts) do
+          set_command(exec, exec.cli_options.command || "demo")
+        end
 
-    defp set_command(exec, command) do
-      %Execution{exec | cli_options: %Options{exec.cli_options | command: command}}
-    end
-  end
-  ```
+        defp set_command(exec, command) do
+          %Execution{exec | cli_options: %Options{exec.cli_options | command: command}}
+        end
+      end
 
   This example would have the effect that typing `mix credo` would no longer run the built-in `Suggest` command, but rather our plugin's `Demo` command.
   """
@@ -241,16 +226,14 @@ defmodule Credo.Plugin do
 
   Prepending tasks to these steps is easy:
 
-  ```elixir
-  # credo_demo_plugin.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      prepend_task(exec, Credo.CLI.Command.Suggest.SuggestCommand, :print_after_analysis, CredoDemoPlugin.WriteFile)
-    end
-  end
-  ```
+        def init(exec) do
+          prepend_task(exec, Credo.CLI.Command.Suggest.SuggestCommand, :print_after_analysis, CredoDemoPlugin.WriteFile)
+        end
+      end
 
   Note how `Credo.Plugin.prepend_task/4` takes three arguments after the `Credo.Execution` struct: the pipeline and the name of the group to be modified and the module that should be executed.
 
@@ -260,21 +243,19 @@ defmodule Credo.Plugin do
 
   The module prepended to these groups should use `Credo.Execution.Task`:
 
-  ```elixir
-  # credo_demo_plugin/write_file.ex
-  defmodule CredoDemoPlugin.WriteFile do
-    use Credo.Execution.Task
+      # credo_demo_plugin/write_file.ex
+      defmodule CredoDemoPlugin.WriteFile do
+        use Credo.Execution.Task
 
-    alias Credo.CLI.Options
+        alias Credo.CLI.Options
 
-    def call(exec, _opts) do
-      issue_count = exec |> Execution.get_issues() |> Enum.count
-      File.write!("demo.json", ~q({"issue_count": \#{issue_count}}))
+        def call(exec, _opts) do
+          issue_count = exec |> Execution.get_issues() |> Enum.count
+          File.write!("demo.json", ~q({"issue_count": \#{issue_count}}))
 
-      exec
-    end
-  end
-  ```
+          exec
+        end
+      end
 
   This example would have the effect that running `mix credo suggest` would write the issue count in a JSON file.
   """
@@ -292,40 +273,34 @@ defmodule Credo.Plugin do
 
   For demo purposes, we are writing a command called `demo` (see `register_command/3`):
 
-  ```elixir
-  # credo_demo_plugin/demo_command.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin/demo_command.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      exec
-      |> register_command("demo", CredoDemoPlugin.DemoCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          exec
+          |> register_command("demo", CredoDemoPlugin.DemoCommand)
+        end
+      end
 
-  ```elixir
-  # credo_demo_plugin/demo_command.ex
-  defmodule CredoDemoPlugin.DemoCommand do
-    alias Credo.CLI.Output.UI
-    alias Credo.Execution
+      # credo_demo_plugin/demo_command.ex
+      defmodule CredoDemoPlugin.DemoCommand do
+        alias Credo.CLI.Output.UI
+        alias Credo.Execution
 
-    def call(exec, _) do
-      castle = Execution.get_plugin_param(exec, CredoDemoPlugin, :castle)
+        def call(exec, _) do
+          castle = Execution.get_plugin_param(exec, CredoDemoPlugin, :castle)
 
-      UI.puts("By the power of \#{castle}!")
+          UI.puts("By the power of \#{castle}!")
 
-      exec
-    end
-  end
-  ```
+          exec
+        end
+      end
 
   Since Plugins can be configured by params in `.credo.exs`, we can add the `:castle` param:
 
-  ```elixir
-  # .credo.exs
-  {CredoDemoPlugin, [castle: "Grayskull"]}
-  ```
+      # .credo.exs
+      {CredoDemoPlugin, [castle: "Grayskull"]}
 
   And get the following output:
 
@@ -343,17 +318,15 @@ defmodule Credo.Plugin do
 
   Registering a custom CLI switch for this is easy:
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      exec
-      |> register_command("demo", CredoDemoPlugin.DemoCommand)
-      |> register_cli_switch(:castle, :string, :X)
-    end
-  end
-  ```
+        def init(exec) do
+          exec
+          |> register_command("demo", CredoDemoPlugin.DemoCommand)
+          |> register_cli_switch(:castle, :string, :X)
+        end
+      end
 
   Every registered CLI switch is automatically converted into a plugin param of the same name, which is why we get the following output:
 
@@ -367,17 +340,15 @@ defmodule Credo.Plugin do
 
   Plugin authors can also provide a function to control the plugin param's name and value more granularly:
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      register_cli_switch(exec, :kastle, :string, :X, fn(switch_value) ->
-        {:castle, String.upcase(switch_value)}
-      end)
-    end
-  end
-  ```
+        def init(exec) do
+          register_cli_switch(exec, :kastle, :string, :X, fn(switch_value) ->
+            {:castle, String.upcase(switch_value)}
+          end)
+        end
+      end
 
   And get the following output:
 
@@ -407,32 +378,28 @@ defmodule Credo.Plugin do
 
   Commands are just modules with a call function and adding new commands is easy.
 
-  ```elixir
-  # credo_demo_plugin.ex
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      # credo_demo_plugin.ex
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      register_command(exec, "demo", CredoDemoPlugin.DemoCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          register_command(exec, "demo", CredoDemoPlugin.DemoCommand)
+        end
+      end
 
-  ```elixir
-  # credo_demo_plugin/demo_command.ex
-  defmodule CredoDemoPlugin.DemoCommand do
-    alias Credo.CLI.Output.UI
-    alias Credo.Execution
+      # credo_demo_plugin/demo_command.ex
+      defmodule CredoDemoPlugin.DemoCommand do
+        alias Credo.CLI.Output.UI
+        alias Credo.Execution
 
-    def call(exec, _) do
-      castle = Execution.get_plugin_param(exec, CredoDemoPlugin, :castle)
+        def call(exec, _) do
+          castle = Execution.get_plugin_param(exec, CredoDemoPlugin, :castle)
 
-      UI.puts("By the power of #{castle}!")
+          UI.puts("By the power of #{castle}!")
 
-      exec
-    end
-  end
-  ```
+          exec
+        end
+      end
 
   Users can use this command by typing
 
@@ -445,18 +412,15 @@ defmodule Credo.Plugin do
 
   Since commands are just modules with a call function, overriding existing commands is easy.
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    import Credo.Plugin
+      defmodule CredoDemoPlugin do
+        import Credo.Plugin
 
-    def init(exec) do
-      register_command(exec, "explain", CredoDemoPlugin.MyBetterExplainCommand)
-    end
-  end
-  ```
+        def init(exec) do
+          register_command(exec, "explain", CredoDemoPlugin.MyBetterExplainCommand)
+        end
+      end
 
   This example would have the effect that typing `mix credo lib/my_file.ex:42` would no longer run the built-in `Explain` command, but rather our plugin's `MyBetterExplain` command.
-
   """
   def register_command(%Execution{initializing_plugin: plugin_mod} = exec, name, command_mod) do
     Execution.put_command(exec, plugin_mod, name, command_mod)
@@ -467,17 +431,15 @@ defmodule Credo.Plugin do
 
   This registers the contents of a config file as default config, loading it after Credo's own default config but before the [config files loaded from the current working directory](config_file.html#transitive-configuration-files).
 
-  ```elixir
-  defmodule CredoDemoPlugin do
-    @config_file File.read!(".credo.exs")
+      defmodule CredoDemoPlugin do
+        @config_file File.read!(".credo.exs")
 
-    import Credo.Plugin
+        import Credo.Plugin
 
-    def init(exec) do
-      register_default_config(exec, @config_file)
-    end
-  end
-  ```
+        def init(exec) do
+          register_default_config(exec, @config_file)
+        end
+      end
   """
   def register_default_config(
         %Execution{initializing_plugin: plugin_mod} = exec,
