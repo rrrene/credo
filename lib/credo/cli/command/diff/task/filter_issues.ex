@@ -6,7 +6,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
   def call(exec, _opts) do
     issues = get_old_new_and_fixed_issues(exec)
 
-    Execution.set_issues(exec, issues)
+    Execution.put_issues(exec, issues)
   end
 
   defp get_old_new_and_fixed_issues(exec) do

@@ -1,7 +1,54 @@
 defmodule Credo.Execution.Task do
+  @moduledoc """
+  A Task is a step in a pipeline, which is given an `Credo.Execution` struct and must return one as well.
+
+  Tasks in a pipeline are only called if they are not "halted" (see `Credo.Execution.halt/2`).
+
+  It implements a `call/1` or `call/2` callback, which is called with the `Credo.Execution` struct
+  as first parameter (and the Task's options as the second in case of `call/2`).
+  """
   @type t :: module
 
+  @doc """
+  Is called by the pipeline and contains the Task's actual code.
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def call(exec) do
+          IO.inspect(exec)
+        end
+      end
+
+  The `call/2` functions receives an `exec` struct and must return a (modified) `Credo.Execution`.
+  """
+  @callback call(exec :: Credo.Execution.t()) :: Credo.Execution.t()
+
+  @doc """
+  Works like `call/1`, but receives the options, which are optional when registering the Task, as second argument.
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def call(exec, opts) do
+          IO.inspect(opts)
+
+          exec
+        end
+      end
+
+  """
   @callback call(exec :: Credo.Execution.t(), opts :: Keyword.t()) :: Credo.Execution.t()
+
+  @doc """
+  Gets called if `call` holds the execution via `Credo.Execution.halt/1` or `Credo.Execution.halt/2`.
+  """
+  @callback error(exec :: Credo.Execution.t()) :: Credo.Execution.t()
+
+  @doc """
+  Works like `error/1`, but receives the options, which were given during pipeline registration, as second argument.
+  """
+  @callback error(exec :: Credo.Execution.t(), opts :: Keyword.t()) :: Credo.Execution.t()
 
   require Logger
 
@@ -16,22 +63,26 @@ defmodule Credo.Execution.Task do
 
       alias Credo.Execution
 
-      def call(%Execution{halted: false} = exec, opts) do
-        call(exec)
-      end
-
+      @impl true
       def call(%Execution{halted: false} = exec) do
         exec
       end
 
-      def error(exec, _opts) do
-        error(exec)
+      @impl true
+      def call(%Execution{halted: false} = exec, opts) do
+        call(exec)
       end
 
+      @impl true
       def error(exec) do
         IO.warn("Execution halted during #{__MODULE__}!")
 
         exec
+      end
+
+      @impl true
+      def error(exec, _opts) do
+        error(exec)
       end
 
       defoverridable call: 1
@@ -41,18 +92,24 @@ defmodule Credo.Execution.Task do
     end
   end
 
-  @doc """
-  Runs a given `task` if the `Execution` wasn't halted and ensures that the
-  result is also an `Execution` struct.
-  """
+  @doc false
   def run(task, exec, opts \\ [])
 
   def run(task, %Credo.Execution{debug: true} = exec, opts) do
     run_with_timing(task, exec, opts)
   end
 
-  def run(task, exec, opts) do
+  def run(task, %Execution{} = exec, opts) do
     do_run(task, exec, opts)
+  end
+
+  def run(_task, exec, _opts) do
+    IO.warn(
+      "Expected second parameter of Task.run/3 to match %Credo.Execution{}, " <>
+        "got: #{inspect(exec)}"
+    )
+
+    exec
   end
 
   defp do_run(task, %Credo.Execution{halted: false} = exec, opts) do
@@ -74,16 +131,7 @@ defmodule Credo.Execution.Task do
     end
   end
 
-  defp do_run(_task, %Execution{} = exec, _opts) do
-    exec
-  end
-
   defp do_run(_task, exec, _opts) do
-    IO.warn(
-      "Expected second parameter of Task.run/3 to match %Credo.Execution{}, " <>
-        "got: #{inspect(exec)}"
-    )
-
     exec
   end
 
