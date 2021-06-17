@@ -22,11 +22,17 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
     %Execution{exec | config_comment_map: config_comment_map}
   end
 
+  defp enable_disabled_checks_if_applicable(%Execution{enable_disabled_checks: nil} = exec) do
+    exec
+  end
+
   defp enable_disabled_checks_if_applicable(exec) do
+    enable_disabled_checks_regexes = to_match_regexes(exec.enable_disabled_checks)
+
     checks =
       Enum.map(exec.checks, fn
         {check, false} ->
-          if matches?(to_string(check), to_match_regexes(exec.enable_disabled_checks)) do
+          if matches?(to_string(check), enable_disabled_checks_regexes) do
             {check, []}
           else
             {check, false}

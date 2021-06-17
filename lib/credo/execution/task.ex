@@ -7,6 +7,8 @@ defmodule Credo.Execution.Task do
   It implements a `call/1` or `call/2` callback, which is called with the `Credo.Execution` struct
   as first parameter (and the Task's options as the second in case of `call/2`).
   """
+
+  @typedoc false
   @type t :: module
 
   @doc """
@@ -20,7 +22,7 @@ defmodule Credo.Execution.Task do
         end
       end
 
-  The `call/2` functions receives an `exec` struct and must return a (modified) `Credo.Execution`.
+  The `call/1` functions receives an `exec` struct and must return a (modified) `Credo.Execution`.
   """
   @callback call(exec :: Credo.Execution.t()) :: Credo.Execution.t()
 
@@ -62,6 +64,7 @@ defmodule Credo.Execution.Task do
       import Credo.Execution
 
       alias Credo.Execution
+      alias Credo.CLI.Output.UI
 
       @impl true
       def call(%Execution{halted: false} = exec) do
@@ -75,7 +78,15 @@ defmodule Credo.Execution.Task do
 
       @impl true
       def error(exec) do
-        IO.warn("Execution halted during #{__MODULE__}!")
+        case Execution.get_halt_message(exec) do
+          "" <> halt_message ->
+            command_name = Execution.get_command_name(exec) || "credo"
+
+            UI.warn([:red, "** (#{command_name}) ", halt_message])
+
+          _ ->
+            IO.warn("Execution halted during #{__MODULE__}!")
+        end
 
         exec
       end

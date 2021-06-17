@@ -9,7 +9,6 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
   alias Credo.CLI.Filename
-  alias Credo.CLI.Output.UI
   alias Credo.CLI.Task
   alias Credo.Issue
   alias Credo.SourceFile
@@ -69,6 +68,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainCheck do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
@@ -92,6 +93,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainIssuePreCheck do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
@@ -116,13 +119,13 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
       end
     end
 
-    def error(exec, _opts) do
-      halt_message = Execution.get_halt_message(exec)
+    # def error(exec, _opts) do
+    #   halt_message = Execution.get_halt_message(exec)
 
-      UI.warn([:red, "** (explain) ", halt_message])
+    #   UI.warn([:red, "** (explain) ", halt_message])
 
-      exec
-    end
+    #   exec
+    # end
 
     defp path_contains_file?(path, filename) do
       case Path.relative_to(filename, path) do
@@ -133,6 +136,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainIssue do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
