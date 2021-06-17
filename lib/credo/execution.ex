@@ -1,11 +1,11 @@
 defmodule Credo.Execution do
   @moduledoc """
-  Every run of Credo is configured via an `Execution` struct, which is created and
+  Every run of Credo is configured via an `Credo.Execution` struct, which is created and
   manipulated via the `Credo.Execution` module.
   """
 
   @doc """
-  The `Execution` struct is created and manipulated via the `Credo.Execution` module.
+  The `Credo.Execution` struct is created and manipulated via the `Credo.Execution` module.
   """
   defstruct argv: [],
             cli_options: nil,
@@ -66,6 +66,7 @@ defmodule Credo.Execution do
             results: %{},
             config_comment_map: %{}
 
+  @typedoc false
   @type t :: %__MODULE__{}
 
   @execution_pipeline_key __MODULE__
@@ -109,17 +110,6 @@ defmodule Credo.Execution do
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
-  @doc "Builds an Execution struct for a re-run with the the given `argv`, noting to just analyse the `files_that_changed`."
-  def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
-    previous_exec.argv
-    |> build()
-    |> put_rerun(previous_exec, files_that_changed)
-  end
-
-  def build(argv, files_that_changed) when is_list(files_that_changed) do
-    build(argv)
-  end
-
   @doc "Builds an Execution struct for the the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
@@ -137,6 +127,17 @@ defmodule Credo.Execution do
     |> put_builtin_command("suggest", Credo.CLI.Command.Suggest.SuggestCommand)
     |> put_builtin_command("version", Credo.CLI.Command.Version)
     |> start_servers()
+  end
+
+  @doc false
+  def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
+    previous_exec.argv
+    |> build()
+    |> put_rerun(previous_exec, files_that_changed)
+  end
+
+  def build(argv, files_that_changed) when is_list(files_that_changed) do
+    build(argv)
   end
 
   @doc false
@@ -295,7 +296,13 @@ defmodule Credo.Execution do
     exec.cli_options.command
   end
 
-  @doc "Returns all valid command names."
+  @doc """
+  Returns all valid command names.
+
+      Credo.Execution.get_valid_command_names(exec)
+      # => ["categories", "diff", "explain", "gen.check", "gen.config", "help", "info",
+      #     "list", "suggest", "version"]
+  """
   def get_valid_command_names(exec) do
     Map.keys(exec.commands)
   end
@@ -359,6 +366,20 @@ defmodule Credo.Execution do
 
   # CLI switches
 
+  @doc """
+  Returns the value for the given `switch_name`.
+
+      Credo.Execution.get_given_cli_switch(exec, "foo")
+      # => "bar"
+  """
+  def get_given_cli_switch(exec, switch_name) do
+    if Map.has_key?(exec.cli_options.switches, switch_name) do
+      {:ok, exec.cli_options.switches[switch_name]}
+    else
+      :error
+    end
+  end
+
   @doc false
   def put_cli_switch(exec, _plugin_mod, name, type) do
     %__MODULE__{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
@@ -380,14 +401,6 @@ defmodule Credo.Execution do
       | cli_switch_plugin_param_converters:
           exec.cli_switch_plugin_param_converters ++ [converter_tuple]
     }
-  end
-
-  def get_given_cli_switch(exec, switch_name) do
-    if Map.has_key?(exec.cli_options.switches, switch_name) do
-      {:ok, exec.cli_options.switches[switch_name]}
-    else
-      :error
-    end
   end
 
   # Assigns
@@ -481,6 +494,7 @@ defmodule Credo.Execution do
     exec
   end
 
+  @doc false
   @deprecated "Use put_issues/2 instead"
   def set_issues(exec, issues) do
     put_issues(exec, issues)
@@ -523,12 +537,43 @@ defmodule Credo.Execution do
 
   # Halt
 
-  @doc "Halts further execution of the pipeline."
+  @doc """
+  Halts further execution of the pipeline meaning all subsequent steps are skipped.
+
+  The `error` callback is called for the current Task.
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def call(exec) do
+          Execution.halt(exec)
+        end
+
+        def error(exec) do
+          IO.puts("Execution has been halted!")
+
+          exec
+        end
+      end
+  """
   def halt(exec) do
     %__MODULE__{exec | halted: true}
   end
 
-  @doc "Halts further execution of the pipeline using the given `halt_message`."
+  @doc """
+  Halts further execution of the pipeline using the given `halt_message`.
+
+  The `error` callback is called for the current Task.
+  If the callback is not implemented, Credo outputs the given `halt_message`.
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def call(exec) do
+          Execution.halt(exec, "Execution has been halted!")
+        end
+      end
+  """
   def halt(exec, halt_message) do
     %__MODULE__{exec | halted: true}
     |> put_halt_message(halt_message)
