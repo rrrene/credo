@@ -684,7 +684,7 @@ defmodule Credo.Execution do
         value -> value
       end)
 
-    put_pipeline(exec, __MODULE__, pipeline)
+    put_pipeline(exec, pipeline_key, pipeline)
   end
 
   @doc false
