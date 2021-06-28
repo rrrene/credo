@@ -119,4 +119,22 @@ defmodule Credo.PriorityTest do
 
     assert expected == Priority.scope_priorities(source_file)
   end
+
+  describe "Credo.Priority.to_atom/1" do
+    test "it should convert integers edge cases to the correct priority" do
+      %{
+        -100 => :ignore,
+        -10 => :low,
+        -1 => :low,
+        0 => :normal,
+        9 => :normal,
+        10 => :high,
+        19 => :high,
+        20 => :higher
+      }
+      |> Enum.each(fn {i, priority} ->
+        assert Priority.to_atom(i) == priority
+      end)
+    end
+  end
 end
