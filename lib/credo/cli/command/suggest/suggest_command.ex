@@ -33,7 +33,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
     ]
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
+    Execution.put_pipeline(exec, "suggest",
       load_and_validate_source_files: [Task.LoadAndValidateSourceFiles],
       prepare_analysis: [Task.PrepareChecksToRun],
       __manipulate_config_if_rerun__: [__MODULE__.ManipulateConfigIfRerun],

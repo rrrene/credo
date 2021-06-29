@@ -11,7 +11,7 @@ defmodule Credo.CLI.Command.List.ListCommand do
   alias Credo.Execution
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
+    Execution.put_pipeline(exec, "list",
       load_and_validate_source_files: [
         {Task.LoadAndValidateSourceFiles, []}
       ],

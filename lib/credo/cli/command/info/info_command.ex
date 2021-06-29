@@ -10,7 +10,7 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
   alias Credo.Execution
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
+    Execution.put_pipeline(exec, "info",
       load_and_validate_source_files: [
         {Task.LoadAndValidateSourceFiles, []}
       ],
