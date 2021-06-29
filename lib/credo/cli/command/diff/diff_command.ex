@@ -26,7 +26,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
         ]
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
+    Execution.put_pipeline(exec, "diff",
       load_and_validate_source_files: [
         {Task.LoadAndValidateSourceFiles, []}
       ],

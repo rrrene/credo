@@ -70,6 +70,12 @@ defmodule Credo.Execution do
   @type t :: %__MODULE__{}
 
   @execution_pipeline_key __MODULE__
+  @execution_pipeline_key_backwards_compatibility_map %{
+    Credo.CLI.Command.Diff.DiffCommand => "diff",
+    Credo.CLI.Command.List.ListCommand => "list",
+    Credo.CLI.Command.Suggest.SuggestCommand => "suggest",
+    Credo.CLI.Command.Info.InfoCommand => "info"
+  }
   @execution_pipeline [
     __pre__: [
       Credo.Execution.Task.AppendDefaultConfig,
@@ -323,6 +329,7 @@ defmodule Credo.Execution do
     commands = Map.put(exec.commands, name, command_mod)
 
     %__MODULE__{exec | commands: commands}
+    |> command_mod.init()
   end
 
   @doc false
@@ -607,9 +614,17 @@ defmodule Credo.Execution do
 
   @doc false
   defp get_pipeline(exec, pipeline_key) do
-    case exec.pipeline_map[pipeline_key] do
+    case exec.pipeline_map[get_pipeline_key(exec, pipeline_key)] do
       nil -> raise "Could not find execution pipeline for '#{pipeline_key}'"
       pipeline -> pipeline
+    end
+  end
+
+  @doc false
+  defp get_pipeline_key(exec, pipeline_key) do
+    case exec.pipeline_map[pipeline_key] do
+      nil -> @execution_pipeline_key_backwards_compatibility_map[pipeline_key]
+      _ -> pipeline_key
     end
   end
 
@@ -684,7 +699,7 @@ defmodule Credo.Execution do
         value -> value
       end)
 
-    put_pipeline(exec, pipeline_key, pipeline)
+    put_pipeline(exec, get_pipeline_key(exec, pipeline_key), pipeline)
   end
 
   @doc false
@@ -707,12 +722,14 @@ defmodule Credo.Execution do
         value -> value
       end)
 
-    put_pipeline(exec, pipeline_key, pipeline)
+    put_pipeline(exec, get_pipeline_key(exec, pipeline_key), pipeline)
   end
 
   @doc false
   defp put_builtin_command(exec, name, command_mod) do
-    put_command(exec, Credo, name, command_mod)
+    exec
+    |> command_mod.init()
+    |> put_command(Credo, name, command_mod)
   end
 
   @doc ~S"""
