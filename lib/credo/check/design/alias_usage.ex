@@ -174,7 +174,7 @@ defmodule Credo.Check.Design.AliasUsage do
         {ast, issues}
 
       true ->
-        trigger = Enum.join(mod_list, ".")
+        trigger = Credo.Code.Name.full(mod_list)
 
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
@@ -216,8 +216,8 @@ defmodule Credo.Check.Design.AliasUsage do
   # Returns true if mod_list and any dependent module would result in the same alias
   # since they share the same last name.
   defp conflicting_with_other_modules?(mod_list, mod_deps) do
-    last_name = Credo.Code.Name.last(mod_list)
     full_name = Credo.Code.Name.full(mod_list)
+    last_name = Credo.Code.Name.last(mod_list)
 
     (mod_deps -- [full_name])
     |> Enum.filter(&(Credo.Code.Name.parts_count(&1) > 1))
@@ -228,6 +228,10 @@ defmodule Credo.Check.Design.AliasUsage do
   defp tuple?(t) when is_tuple(t), do: true
   defp tuple?(_), do: false
 
+  defp filter_issues_if_called_more_often_than(issues, 0) do
+    issues
+  end
+
   defp filter_issues_if_called_more_often_than(issues, count) do
     issues
     |> Enum.reduce(%{}, fn issue, memo ->
@@ -235,13 +239,12 @@ defmodule Credo.Check.Design.AliasUsage do
 
       Map.put(memo, issue.trigger, [issue | list])
     end)
-    |> Enum.filter(fn {_, value} ->
-      length(value) > count
+    |> Enum.filter(fn {_trigger, issues} ->
+      length(issues) > count
     end)
-    |> Enum.map(fn {_, value} ->
-      value
+    |> Enum.flat_map(fn {_trigger, issues} ->
+      issues
     end)
-    |> List.flatten()
   end
 
   defp filter_issues_if_nested_deeper_than(issues, count) do
