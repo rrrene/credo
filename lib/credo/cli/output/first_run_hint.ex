@@ -106,17 +106,24 @@ defmodule Credo.CLI.Output.FirstRunHint do
     latest_commit_on_default_branch = latest_commit_on_default_branch(working_dir)
     latest_tag = latest_tag(working_dir)
 
+    current_branch = current_branch(working_dir)
+
+    if current_branch != default_branch do
+      UI.puts([
+        :reset,
+        """
+        You can use `diff` to only show the issues that were introduced on this branch:
+        """,
+        :cyan,
+        """
+
+            mix credo diff #{default_branch}
+
+        """
+      ])
+    end
+
     UI.puts([
-      :reset,
-      """
-      You can use `diff` to only show the issues that were introduced on this branch:
-      """,
-      :cyan,
-      """
-
-          mix credo diff #{default_branch}
-
-      """,
       :reset,
       :orange,
       """
@@ -150,7 +157,7 @@ defmodule Credo.CLI.Output.FirstRunHint do
       :cyan,
       String.pad_trailing("    mix credo diff --since #{now}", @command_padding),
       :faint,
-      "# use the current time",
+      "# use the current date",
       "\n"
     ])
   end
@@ -162,11 +169,18 @@ defmodule Credo.CLI.Output.FirstRunHint do
     end
   end
 
+  defp current_branch(working_dir) do
+    case System.cmd("git", ~w"rev-parse --abbrev-ref HEAD", cd: working_dir) do
+      {output, 0} -> String.trim(output)
+      _ -> nil
+    end
+  end
+
   defp default_branch(working_dir) do
     remote_name = default_remote_name(working_dir)
 
     case System.cmd("git", ~w"symbolic-ref refs/remotes/#{remote_name}/HEAD", cd: working_dir) do
-      {output, 0} -> Regex.run(~r"refs/remotes/#{remote_name}/(.+)$", output) |> Enum.at(1)
+      {output, 0} -> ~r"refs/remotes/#{remote_name}/(.+)$" |> Regex.run(output) |> Enum.at(1)
       _ -> nil
     end
   end
