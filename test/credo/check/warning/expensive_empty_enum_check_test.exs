@@ -105,7 +105,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue()
   end
 
-  test "it should report when checking if Enum.count is 0" do
+  test "it should report when checking if Enum.count/1 is 0" do
     """
     defmodule CredoSampleModule do
       def some_function(enum) do
@@ -119,10 +119,10 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue -> assert issue.message =~ "Enum.empty" end)
   end
 
-  test "it should report when checking if Enum.count is 0 backwards" do
+  test "it should report when checking if Enum.count/1 is 0 backwards" do
     """
     defmodule CredoSampleModule do
       def some_function(enum) do
@@ -136,7 +136,41 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue -> assert issue.message =~ "Enum.empty" end)
+  end
+
+  test "it should report when checking if Enum.count/2 is 0" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        if Enum.count(some_list, &is_nil/1) == 0 do
+          "empty"
+        else
+          "not empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue -> assert issue.message =~ "Enum.any" end)
+  end
+
+  test "it should report when checking if Enum.count/2 is 0 backwards" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        if 0 == Enum.count(enum, &is_nil/1) do
+          "empty"
+        else
+          "not empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue -> assert issue.message =~ "Enum.any" end)
   end
 
   test "it should report when checking if length is 0 with triple-equals" do
