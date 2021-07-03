@@ -74,7 +74,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
       nil ->
         Execution.halt(
           exec,
-          "could not determine Git ref for datetime: #{datetime}"
+          "could not determine Git ref for datetime (try an earlier date): #{datetime}"
         )
 
       git_ref ->
@@ -87,8 +87,16 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
 
   defp get_git_ref_for_datetime(datetime) do
     case System.cmd("git", ["rev-list", "--reverse", "--after", datetime, "HEAD"]) do
-      {output, 0} -> output |> String.split(~r/\n/) |> List.first()
-      _ -> nil
+      {"", 0} ->
+        nil
+
+      {output, 0} ->
+        output
+        |> String.split(~r/\n/)
+        |> List.first()
+
+      _ ->
+        nil
     end
   end
 
