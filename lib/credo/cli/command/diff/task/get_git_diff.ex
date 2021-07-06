@@ -127,7 +127,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
     parent_pid = self()
 
     spawn(fn ->
-      Shell.supress_output(fn ->
+      Shell.suppress_output(fn ->
         argv = previous_argv ++ ["--working-dir", previous_dirname]
 
         previous_exec = Credo.run(argv)
