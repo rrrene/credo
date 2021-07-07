@@ -146,6 +146,43 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation when module is not included with only parameter" do
+    """
+    defmodule Test do
+      def just_an_example do
+        Credo.Foo.Bar.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: ~r/^Other.+$/)
+    |> refute_issues()
+
+    """
+    defmodule Test do
+      def just_an_example do
+        Credo.Foo.Bar.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: [~r/^Other.+$/])
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation when module is included in only parameter but is also in excluded_namespaces" do
+    """
+    defmodule Test do
+      def just_an_example do
+        Credo.Foo.Bar.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: ~r/^Credo.+$/, excluded_namespaces: ["Credo"])
+    |> refute_issues()
+  end
+
   test "it should work with __MODULE__" do
     """
     defmodule Test do
@@ -207,6 +244,38 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> to_source_file
     |> run_check(@described_check, if_called_more_often_than: 1)
     |> assert_issues()
+  end
+
+  test "it should report violation when module is included in only parameter" do
+    """
+    defmodule Test do
+      def fun1 do
+        Credo.Foo.Bar.call
+      end
+
+      def fun1 do
+        Other.Foo.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: ~r/^Credo.+$/)
+    |> assert_issue()
+
+    """
+    defmodule Test do
+      def fun1 do
+        Credo.Foo.Bar.call
+      end
+
+      def fun1 do
+        Other.Foo.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: [~r/^Credo.+$/])
+    |> assert_issue()
   end
 
   #
