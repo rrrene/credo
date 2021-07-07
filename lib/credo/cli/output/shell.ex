@@ -22,10 +22,10 @@ defmodule Credo.CLI.Output.Shell do
     GenServer.call(__MODULE__, {:use_colors, use_colors})
   end
 
-  def supress_output(callback_fn) do
-    GenServer.call(__MODULE__, {:supress_output, true})
+  def suppress_output(callback_fn) do
+    GenServer.call(__MODULE__, {:suppress_output, true})
     callback_fn.()
-    GenServer.call(__MODULE__, {:supress_output, false})
+    GenServer.call(__MODULE__, {:suppress_output, false})
   end
 
   @doc "Like `puts/1`, but writes to `:stderr`."
@@ -36,11 +36,11 @@ defmodule Credo.CLI.Output.Shell do
   # callbacks
 
   def init(_) do
-    {:ok, %{use_colors: true, supress_output: false}}
+    {:ok, %{use_colors: true, suppress_output: false}}
   end
 
-  def handle_call({:supress_output, supress_output}, _from, current_state) do
-    new_state = Map.put(current_state, :supress_output, supress_output)
+  def handle_call({:suppress_output, suppress_output}, _from, current_state) do
+    new_state = Map.put(current_state, :suppress_output, suppress_output)
 
     {:reply, nil, new_state}
   end
@@ -51,14 +51,14 @@ defmodule Credo.CLI.Output.Shell do
     {:reply, nil, new_state}
   end
 
-  def handle_call({:puts, _value}, _from, %{supress_output: true} = current_state) do
+  def handle_call({:puts, _value}, _from, %{suppress_output: true} = current_state) do
     {:reply, nil, current_state}
   end
 
   def handle_call(
         {:puts, value},
         _from,
-        %{use_colors: true, supress_output: false} = current_state
+        %{use_colors: true, suppress_output: false} = current_state
       ) do
     do_puts(value)
 
@@ -68,7 +68,7 @@ defmodule Credo.CLI.Output.Shell do
   def handle_call(
         {:puts, value},
         _from,
-        %{use_colors: false, supress_output: false} = current_state
+        %{use_colors: false, suppress_output: false} = current_state
       ) do
     value
     |> remove_colors()
@@ -77,14 +77,14 @@ defmodule Credo.CLI.Output.Shell do
     {:reply, nil, current_state}
   end
 
-  def handle_call({:warn, _value}, _from, %{supress_output: true} = current_state) do
+  def handle_call({:warn, _value}, _from, %{suppress_output: true} = current_state) do
     {:reply, nil, current_state}
   end
 
   def handle_call(
         {:warn, value},
         _from,
-        %{use_colors: true, supress_output: false} = current_state
+        %{use_colors: true, suppress_output: false} = current_state
       ) do
     do_warn(value)
 
@@ -94,7 +94,7 @@ defmodule Credo.CLI.Output.Shell do
   def handle_call(
         {:warn, value},
         _from,
-        %{use_colors: false, supress_output: false} = current_state
+        %{use_colors: false, suppress_output: false} = current_state
       ) do
     value
     |> remove_colors()
