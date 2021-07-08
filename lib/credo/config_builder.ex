@@ -260,6 +260,11 @@ defmodule Credo.ConfigBuilder do
     Execution.set_strict(new_config)
   end
 
+  # this catches a `--ignore-checks/ignore` without an argument after it
+  defp add_switch_only(exec, %{ignore_checks: true}) do
+    exec
+  end
+
   defp add_switch_only(exec, _), do: exec
 
   # add_switch_ignore
@@ -267,11 +272,6 @@ defmodule Credo.ConfigBuilder do
   # exclude/ignore certain checks
   defp add_switch_ignore(exec, %{ignore: ignore}) do
     add_switch_ignore(exec, %{ignore_checks: ignore})
-  end
-
-  # this catches a `--ignore-checks/ignore` without an argument after it
-  defp add_switch_only(exec, %{ignore_checks: true}) do
-    exec
   end
 
   defp add_switch_ignore(exec, %{ignore_checks: ignore_pattern}) do
