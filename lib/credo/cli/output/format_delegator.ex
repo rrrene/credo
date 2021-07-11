@@ -8,6 +8,7 @@ defmodule Credo.CLI.Output.FormatDelegator do
       use Credo.CLI.Output.FormatDelegator,
         default: Credo.CLI.Command.Suggest.Output.Default,
         flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
+        github: Credo.CLI.Command.Suggest.Output.GitHub,
         oneline: Credo.CLI.Command.Suggest.Output.Oneline,
         json: Credo.CLI.Command.Suggest.Output.Json
 

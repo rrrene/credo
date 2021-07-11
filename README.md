@@ -44,6 +44,10 @@ Some IDEs and editors are able to run Credo in the background and mark issues in
 * [flycheck](https://www.flycheck.org/en/latest/languages.html#elixir) - Emacs syntax checking extension
 * [kakoune](https://github.com/mawww/kakoune/wiki/Lint#elixir) - Config for linting support in Kakoune editor
 
+### Continuous Integration
+
+* [GitHub Actions](https://docs.github.com/actions) - runs workflows within GitHub repositories (run `mix credo --format github` to create checks)
+
 ### Automated Code Review
 
 * [Codacy](https://www.codacy.com/) - checks your code from style to security, duplication, complexity, and also integrates with coverage.

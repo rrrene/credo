@@ -4,6 +4,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
   use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.List.Output.Default,
     flycheck: Credo.CLI.Command.List.Output.FlyCheck,
+    github: Credo.CLI.Command.List.Output.GitHub,
     oneline: Credo.CLI.Command.List.Output.Oneline,
     json: Credo.CLI.Command.List.Output.Json
 
@@ -41,7 +42,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
             --enable-disabled-checks  Re-enable disabled checks that match the given strings
             --files-included          Only include these files (accepts globs, can be used multiple times)
             --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-            --format                  Display the list in a specific format (json,flycheck,oneline)
+            --format                  Display the list in a specific format (json,flycheck,github,oneline)
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
             --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
