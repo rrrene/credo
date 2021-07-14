@@ -10,16 +10,9 @@ defmodule Credo.Execution.Task.AppendExtraConfig do
 
   def call(exec, _opts) do
     case System.get_env(@extra_config_env_name) do
-      nil ->
-        exec
-
-      "" ->
-        exec
-
-      value ->
-        exec = Execution.append_config_file(exec, {@origin_extra_config, nil, value})
-
-        exec
+      nil -> exec
+      "" -> exec
+      value -> Execution.append_config_file(exec, {@origin_extra_config, nil, value})
     end
   end
 end
