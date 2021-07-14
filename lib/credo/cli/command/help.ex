@@ -28,7 +28,7 @@ defmodule Credo.CLI.Command.Help do
   def print_banner do
     banner()
     |> String.split("")
-    |> Enum.flat_map(fn x -> [color_for(x), char_for(x)] end)
+    |> Enum.flat_map(fn char -> [color_for(char), char_for(char)] end)
     |> UI.puts()
 
     UI.puts()
