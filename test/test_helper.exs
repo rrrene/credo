@@ -20,12 +20,20 @@ defmodule Credo.Test.IntegrationTest do
     parent = self()
 
     spawn(fn ->
-      ExUnit.CaptureLog.capture_log(fn ->
-        ExUnit.CaptureIO.capture_io(fn ->
-          exec = Credo.run(argv)
-          send(parent, {:exec, exec})
+      doit = fn ->
+        exec = Credo.run(argv)
+        send(parent, {:exec, exec})
+      end
+
+      if System.get_env("DEBUG") do
+        doit.()
+      else
+        ExUnit.CaptureLog.capture_log(fn ->
+          ExUnit.CaptureIO.capture_io(fn ->
+            doit.()
+          end)
         end)
-      end)
+      end
     end)
 
     receive do

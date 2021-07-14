@@ -270,7 +270,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   # this catches a `--ignore-checks/ignore` without an argument after it
-  defp add_switch_only(exec, %{ignore_checks: true}) do
+  defp add_switch_ignore(exec, %{ignore_checks: true}) do
     exec
   end
 

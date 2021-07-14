@@ -11,7 +11,7 @@ defmodule Credo.PluginTest do
 
   test "it should use ExamplePlugin's default config" do
     File.cd!(@integration_path, fn ->
-      exec = IntegrationTest.run(["example", "--config-file", ".credo.exs"])
+      exec = IntegrationTest.run(["example", "--config-file", ".credo.exs", "-D"])
 
       {checks, _only_matching, _ignore_matching} = Execution.checks(exec)
 

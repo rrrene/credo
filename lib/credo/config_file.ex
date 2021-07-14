@@ -232,11 +232,9 @@ defmodule Credo.ConfigFile do
 
   defp checks_from_data(data) do
     case data[:checks] do
-      checks when is_list(checks) ->
-        checks
-
-      _ ->
-        []
+      checks when is_list(checks) -> checks
+      %{} = checks -> checks
+      _ -> []
     end
   end
 
@@ -301,12 +299,59 @@ defmodule Credo.ConfigFile do
   defp merge_parse_timeout(_base, timeout) when is_integer(timeout), do: timeout
   defp merge_parse_timeout(base, _), do: base
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
-    base = normalize_check_tuples(checks_base)
-    other = normalize_check_tuples(checks_other)
+  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other})
+      when is_list(checks_base) and is_list(checks_other) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: %{extra: checks_other}}
 
-    Keyword.merge(base, other)
+    merge_checks(base, other)
   end
+
+  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{
+        checks: %{extra: _} = checks_map_other
+      })
+      when is_list(checks_base) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: checks_map_other}
+
+    merge_checks(base, other)
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: checks_other
+      })
+      when is_list(checks_base) and is_list(checks_other) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: %{extra: checks_other}}
+
+    merge_checks(base, other)
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{extra: checks_other_enabled} = checks_other
+      })
+      when is_list(checks_base) and is_list(checks_other_enabled) do
+    base = normalize_check_tuples(checks_base)
+    other = normalize_check_tuples(checks_other_enabled)
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled)
+    }
+  end
+
+  def merge_checks(%__MODULE__{checks: _checks_base}, %__MODULE__{
+        checks: %{enabled: checks_other_enabled} = checks_other
+      })
+      when is_list(checks_other_enabled) do
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled)
+    }
+  end
+
+  #
 
   def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
@@ -323,6 +368,15 @@ defmodule Credo.ConfigFile do
 
   defp normalize_check_tuple({name}), do: {name, []}
   defp normalize_check_tuple(tuple), do: tuple
+
+  defp disable_check_tuples(nil), do: []
+
+  defp disable_check_tuples(list) when is_list(list) do
+    Enum.map(list, &disable_check_tuple/1)
+  end
+
+  defp disable_check_tuple({name}), do: {name, false}
+  defp disable_check_tuple({name, _params}), do: {name, false}
 
   defp join_default_files_if_directory(dir) do
     if File.dir?(dir) do
