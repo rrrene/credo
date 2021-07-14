@@ -79,6 +79,7 @@ defmodule Credo.Execution do
   @execution_pipeline [
     __pre__: [
       Credo.Execution.Task.AppendDefaultConfig,
+      Credo.Execution.Task.AppendExtraConfig,
       {Credo.Execution.Task.ParseOptions, parser_mode: :preliminary},
       Credo.Execution.Task.ConvertCLIOptionsToConfig,
       Credo.Execution.Task.InitializePlugins
