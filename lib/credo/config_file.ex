@@ -13,6 +13,7 @@ defmodule Credo.ConfigFile do
   @default_parse_timeout 5000
   @default_strict false
   @default_color true
+  @valid_checks_keys ~w(enabled disabled extra)a
 
   alias Credo.Execution
 
@@ -198,7 +199,7 @@ defmodule Credo.ConfigFile do
       origin: origin,
       filename: filename,
       config_name_found?: config_name_found?,
-      checks: checks_from_data(data),
+      checks: checks_from_data(data, filename),
       color: data[:color],
       files: files_from_data(data, dir),
       parse_timeout: data[:parse_timeout],
@@ -230,11 +231,56 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp checks_from_data(data) do
+  defp checks_from_data(data, filename) do
     case data[:checks] do
-      checks when is_list(checks) -> checks
-      %{} = checks -> checks
-      _ -> []
+      checks when is_list(checks) ->
+        checks
+
+      %{} = checks ->
+        do_warn_if_check_params_invalid(checks, filename)
+
+        checks
+
+      _ ->
+        []
+    end
+  end
+
+  defp do_warn_if_check_params_invalid(checks, filename) do
+    Enum.each(checks, fn
+      {key, _name} when key not in @valid_checks_keys ->
+        candidate = find_best_match(@valid_checks_keys, key)
+        warning = warning_message_for(filename, key, candidate)
+
+        Credo.CLI.Output.UI.warn([:red, warning])
+
+      _ ->
+        nil
+    end)
+  end
+
+  defp warning_message_for(filename, param_name, candidate) do
+    if candidate do
+      "** (config) #{filename}: unknown key `#{inspect(param_name)}` for config field `:checks`. Did you mean `#{inspect(candidate)}`?"
+    else
+      "** (config) #{filename}: unknown key `#{inspect(param_name)}` for config field `:checks`."
+    end
+  end
+
+  defp find_best_match(candidates, given, threshold \\ 0.8) do
+    given_string = to_string(given)
+
+    {jaro_distance, candidate} =
+      candidates
+      |> Enum.map(fn candidate_name ->
+        distance = String.jaro_distance(given_string, to_string(candidate_name))
+        {distance, candidate_name}
+      end)
+      |> Enum.sort()
+      |> List.last()
+
+    if jaro_distance > threshold do
+      candidate
     end
   end
 
