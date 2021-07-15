@@ -248,9 +248,9 @@ defmodule Credo.ConfigFile do
 
   defp do_warn_if_check_params_invalid(checks, filename) do
     Enum.each(checks, fn
-      {key, _name} when key not in @valid_checks_keys ->
-        candidate = find_best_match(@valid_checks_keys, key)
-        warning = warning_message_for(filename, key, candidate)
+      {checks_key, _name} when checks_key not in @valid_checks_keys ->
+        candidate = find_best_match(@valid_checks_keys, checks_key)
+        warning = warning_message_for(filename, checks_key, candidate)
 
         Credo.CLI.Output.UI.warn([:red, warning])
 
@@ -259,11 +259,11 @@ defmodule Credo.ConfigFile do
     end)
   end
 
-  defp warning_message_for(filename, param_name, candidate) do
+  defp warning_message_for(filename, checks_key, candidate) do
     if candidate do
-      "** (config) #{filename}: unknown key `#{inspect(param_name)}` for config field `:checks`. Did you mean `#{inspect(candidate)}`?"
+      "** (config) #{filename}: unknown key `#{inspect(checks_key)}` for config field `:checks`. Did you mean `#{inspect(candidate)}`?"
     else
-      "** (config) #{filename}: unknown key `#{inspect(param_name)}` for config field `:checks`."
+      "** (config) #{filename}: unknown key `#{inspect(checks_key)}` for config field `:checks`."
     end
   end
 
