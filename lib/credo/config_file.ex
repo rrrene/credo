@@ -261,9 +261,9 @@ defmodule Credo.ConfigFile do
 
   defp warning_message_for(filename, checks_key, candidate) do
     if candidate do
-      "** (config) #{filename}: unknown key `#{inspect(checks_key)}` for config field `:checks`. Did you mean `#{inspect(candidate)}`?"
+      "** (config) #{filename}: config field `:checks` contains unknown key `#{inspect(checks_key)}`. Did you mean `#{inspect(candidate)}`?"
     else
-      "** (config) #{filename}: unknown key `#{inspect(checks_key)}` for config field `:checks`."
+      "** (config) #{filename}: config field `:checks` contains unknown key `#{inspect(checks_key)}`."
     end
   end
 
