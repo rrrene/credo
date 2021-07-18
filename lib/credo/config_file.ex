@@ -345,10 +345,10 @@ defmodule Credo.ConfigFile do
   defp merge_parse_timeout(_base, timeout) when is_integer(timeout), do: timeout
   defp merge_parse_timeout(base, _), do: base
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other})
-      when is_list(checks_base) and is_list(checks_other) do
-    base = %__MODULE__{checks: %{enabled: checks_base}}
-    other = %__MODULE__{checks: %{extra: checks_other}}
+  def merge_checks(%__MODULE__{checks: checks_list_base}, %__MODULE__{checks: checks_list_other})
+      when is_list(checks_list_base) and is_list(checks_list_other) do
+    base = %__MODULE__{checks: %{enabled: checks_list_base}}
+    other = %__MODULE__{checks: %{extra: checks_list_other}}
 
     merge_checks(base, other)
   end
@@ -363,11 +363,11 @@ defmodule Credo.ConfigFile do
     merge_checks(base, other)
   end
 
-  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_list_base}}, %__MODULE__{
         checks: checks_other
       })
-      when is_list(checks_base) and is_list(checks_other) do
-    base = %__MODULE__{checks: %{enabled: checks_base}}
+      when is_list(checks_list_base) and is_list(checks_other) do
+    base = %__MODULE__{checks: %{enabled: checks_list_base}}
     other = %__MODULE__{checks: %{extra: checks_other}}
 
     merge_checks(base, other)
@@ -395,6 +395,17 @@ defmodule Credo.ConfigFile do
     %{
       enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled)
     }
+  end
+
+  # this def catches all the cases where no valid key was found in `checks_map_other`
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{}
+      })
+      when is_list(checks_base) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: []}
+
+    merge_checks(base, other)
   end
 
   #
