@@ -70,19 +70,16 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   defp run_credo_on_datetime(exec, datetime, given_ref) do
-    case get_git_ref_for_datetime(datetime) do
-      nil ->
-        Execution.halt(
-          exec,
-          "could not determine Git ref for datetime (try an earlier date): #{datetime}"
-        )
+    git_ref =
+      case get_git_ref_for_datetime(datetime) do
+        nil -> "HEAD"
+        git_ref -> git_ref
+      end
 
-      git_ref ->
-        working_dir = Execution.working_dir(exec)
-        previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
+    working_dir = Execution.working_dir(exec)
+    previous_dirname = run_git_clone_and_checkout(working_dir, git_ref)
 
-        run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
-    end
+    run_credo_on_dir(exec, previous_dirname, git_ref, given_ref)
   end
 
   defp get_git_ref_for_datetime(datetime) do

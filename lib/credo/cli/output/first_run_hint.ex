@@ -164,9 +164,9 @@ defmodule Credo.CLI.Output.FirstRunHint do
 
   defp latest_tag(working_dir) do
     case System.cmd("git", ~w"rev-list --tags --max-count=1", cd: working_dir) do
-      {output, 0} ->
-        case System.cmd("git", ~w"describe --tags #{output}", cd: working_dir) do
-          {output2, 0} -> String.trim(output2)
+      {latest_tag_sha1, 0} ->
+        case System.cmd("git", ~w"describe --tags #{latest_tag_sha1}", cd: working_dir) do
+          {tagname, 0} -> String.trim(tagname)
           _ -> nil
         end
 
