@@ -5,6 +5,7 @@ defmodule Credo.CLI.Output.FirstRunHint do
 
   @lots_of_issue_threshold 30
   @command_padding 40
+  @category_count 5
 
   def call(exec) do
     term_width = Output.term_columns()
@@ -24,7 +25,7 @@ defmodule Credo.CLI.Output.FirstRunHint do
     readability_issue_count =
       issues |> Enum.filter(&(&1.category == :readability)) |> Enum.count()
 
-    relative_issue_count_per_category = div(issue_count, 5)
+    relative_issue_count_per_category = div(issue_count, @category_count)
 
     mostly_readability_issues =
       readability_issue_count >= div(@lots_of_issue_threshold, 2) &&
@@ -85,6 +86,7 @@ defmodule Credo.CLI.Output.FirstRunHint do
       :reset,
       :orange,
       """
+
       ## Every project is different
       """,
       :reset,
@@ -93,10 +95,10 @@ defmodule Credo.CLI.Output.FirstRunHint do
       This is true, especially when it comes to introducing code analysis to an existing codebase.
       Doing so should not be about following any "best practice" in particular, it should be about
       helping you to get to know the ropes and make the changes you want.
+
+      Try the options outlined above to see which one is working for this project!
       """
     ])
-
-    UI.puts("Try the options outlined above to see which one is working for this project!")
   end
 
   defp print_lots_of_issues(exec) do
