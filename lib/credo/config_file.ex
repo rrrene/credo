@@ -1,5 +1,5 @@
 defmodule Credo.ConfigFile do
-  @doc """
+  @moduledoc """
   `ConfigFile` structs represent all loaded and merged config files in a run.
   """
 
@@ -175,7 +175,7 @@ defmodule Credo.ConfigFile do
   end
 
   defp from_exs(dir, config_name, {origin, filename, exs_string}, safe) do
-    case Credo.ExsLoader.parse(exs_string, safe) do
+    case Credo.ExsLoader.parse(exs_string, filename, safe) do
       {:ok, data} ->
         from_data(data, dir, filename, origin, config_name)
 
