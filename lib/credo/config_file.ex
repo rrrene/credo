@@ -67,7 +67,7 @@ defmodule Credo.ConfigFile do
     exec = Enum.reduce(config_files, exec, &Execution.append_config_file(&2, &1))
 
     Execution.get_config_files(exec)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
+    |> Enum.map(&from_exs(exec, dir, config_name || @default_config_name, &1, safe))
     |> ensure_any_config_found(config_name)
     |> merge()
     |> map_ok_files()
@@ -174,8 +174,8 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {origin, filename, exs_string}, safe) do
-    case Credo.ExsLoader.parse(exs_string, filename, safe) do
+  defp from_exs(exec, dir, config_name, {origin, filename, exs_string}, safe) do
+    case Credo.ExsLoader.parse(exs_string, filename, exec, safe) do
       {:ok, data} ->
         from_data(data, dir, filename, origin, config_name)
 

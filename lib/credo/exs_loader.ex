@@ -1,9 +1,9 @@
 defmodule Credo.ExsLoader do
   @moduledoc false
 
-  def parse(exs_string, filename, safe \\ false)
+  def parse(exs_string, filename, exec, safe \\ false)
 
-  def parse(exs_string, filename, true) do
+  def parse(exs_string, filename, _exec, true) do
     case Code.string_to_quoted(exs_string, file: filename) do
       {:ok, ast} ->
         {:ok, process_exs(ast)}
@@ -16,8 +16,8 @@ defmodule Credo.ExsLoader do
     end
   end
 
-  def parse(exs_string, filename, false) do
-    {result, _binding} = Code.eval_string(exs_string, [], file: filename || "nofile")
+  def parse(exs_string, filename, exec, false) do
+    {result, _binding} = Code.eval_string(exs_string, [exec: exec], file: filename || "nofile")
 
     {:ok, result}
   rescue
