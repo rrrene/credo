@@ -36,6 +36,10 @@ defmodule Credo.CLI.Command.Info.Output.Default do
     |> String.trim()
   end
 
+  defp list_entry(%{"name" => name}) do
+    "\n    - #{name}"
+  end
+
   defp list_entry(name) do
     "\n    - #{name}"
   end
