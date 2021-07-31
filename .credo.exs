@@ -132,7 +132,7 @@
         {Credo.Check.Refactor.WithClauses, []},
         {Credo.Check.Refactor.FilterFilter, []},
         {Credo.Check.Refactor.RejectReject, []},
-        {Credo.Check.Refactor.UselessWithClause, []},
+        {Credo.Check.Refactor.RedundantWithClauseResult, []},
 
         #
         ## Warnings
