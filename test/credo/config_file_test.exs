@@ -398,6 +398,42 @@ defmodule Credo.ConfigFileTest do
     assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
   end
 
+  test "merge_checks works for map syntax %{} /6" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []},
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        disabled: [
+          {Credo.Check.Consistency.Tabs, []}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do
     dirs = ConfigFile.relevant_directories(".")
 

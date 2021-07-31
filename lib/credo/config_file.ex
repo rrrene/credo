@@ -373,19 +373,6 @@ defmodule Credo.ConfigFile do
     merge_checks(base, other)
   end
 
-  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
-        checks: %{extra: checks_other_enabled} = checks_other
-      })
-      when is_list(checks_base) and is_list(checks_other_enabled) do
-    base = normalize_check_tuples(checks_base)
-    other = normalize_check_tuples(checks_other_enabled)
-    disabled = disable_check_tuples(checks_other[:disabled])
-
-    %{
-      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled)
-    }
-  end
-
   def merge_checks(%__MODULE__{checks: _checks_base}, %__MODULE__{
         checks: %{enabled: checks_other_enabled} = checks_other
       })
@@ -394,6 +381,19 @@ defmodule Credo.ConfigFile do
 
     %{
       enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled)
+    }
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{} = checks_other
+      })
+      when is_list(checks_base) do
+    base = normalize_check_tuples(checks_base)
+    other = normalize_check_tuples(checks_other[:extra])
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled)
     }
   end
 
