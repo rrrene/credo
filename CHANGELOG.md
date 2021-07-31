@@ -2,7 +2,9 @@
 
 ## 1.6.0
 
-- ...
+- Credo changes from supporting the last 5 minor Elixir versions to the last 6 to be compatible with [Elixir's support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
+- `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
+- `Credo.Check.Design.AliasUsage` now supports `:only`
 
 ### Pinning Checks in a Project's Config
 
@@ -103,6 +105,7 @@ mix credo --working-dir ../other-elixir-project/
 - `Credo.Check.Design.SkipTestWithoutComment`
 - `Credo.Check.Readability.PipeIntoAnonymousFunctions`
 - `Credo.Check.Refactor.MapJoin`
+- `Credo.Check.Refactor.RedundantWithClauseResult`
 
 ## 1.5.6
 
