@@ -29,25 +29,11 @@ defmodule Credo.Check.Readability.SinglePipe do
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
-
-      Piping 0-arity functions might be considered a valid exception to this rule
-
-      This example ...
-
-        my_function()
-        |> my_other_function()
-
-      ...could be considered easier to read than ...
-
-        my_other_function(my_function())
-
-      Because of this, the check can optionally ignore such cases (see configuration options).
       """,
       params: [
-        allow_0_arity_functions: "Piping local or foreign 0-arity functions is allowed."
+        allow_0_arity_functions: "Allow 0-arity functions"
       ]
     ]
-
 
   @doc false
   @impl true
@@ -55,8 +41,6 @@ defmodule Credo.Check.Readability.SinglePipe do
     issue_meta = IssueMeta.for(source_file, params)
 
     allow_0_arity_functions = Params.get(params, :allow_0_arity_functions, __MODULE__)
-
-
 
     {_continue, issues} =
       Credo.Code.prewalk(
@@ -68,12 +52,10 @@ defmodule Credo.Check.Readability.SinglePipe do
     issues
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _, _) do
     {ast, {false, issues}}
   end
 
-  # single pipe, with zero arity functions not allowed
   defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta, false) do
     {
       ast,
@@ -81,19 +63,14 @@ defmodule Credo.Check.Readability.SinglePipe do
     }
   end
 
-  # single pipe, left operand is 0-arity local function, zero arity functions allowed
   defp traverse({:|>, _, [{{:., _, _}, _, []}, _]} = ast, {true, issues}, _, true) do
     {ast, {false, issues}}
   end
 
-  # single pipe, zero arity functions allowed, covers 2 cases
-  # - left operand is 0-arity foreign function
-  # - left operand is anonymous function
   defp traverse({:|>, _, [{fun, _, []}, _]} = ast, {true, issues}, _, true) when is_atom(fun) do
     {ast, {false, issues}}
   end
 
-  # single-pipe, left operand is not a function
   defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta, true) do
     {
       ast,
