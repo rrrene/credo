@@ -19,6 +19,46 @@ defmodule Credo.Check.Readability.UnnecessaryAliasExpansionTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation /2" do
+    """
+    defmodule MyMacro do
+      defmacro my_macro do
+        quote do
+          defmodule MySubmodule do
+            alias alias!(MyAliasedModule)
+
+            def test do
+              IO.puts(MyAliasedModule)
+            end
+          end
+        end
+      end
+
+      defmacro my_dsl(do: block) do
+        quote do
+          alias __MODULE__.MyAliasedModule
+
+          defmodule MyAliasedModule do
+          end
+
+          unquote(block)
+        end
+      end
+    end
+
+    defmodule MyModule do
+      import MyMacro
+
+      my_dsl do
+        my_macro
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
