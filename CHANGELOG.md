@@ -60,6 +60,24 @@ Credo 1.6 adds this option to explicitly say which checks are enabled on your pr
       ]
     }
 
+You can now go the other way as well and disable checks explicitly while keeping their params instead of replacing them with `false`:
+
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: %{
+            disabled: [
+              # this means that `LargeNumbers` is disabled for this project
+              {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+            ]
+          }
+        }
+      ]
+    }
+
+This has the added benefit that, when re-enabled via [`--enable-disabled-checks`](suggest_command.html#enable-disabled-checks), the check is enabled with its customized params.
+
 [Credo configs are transitive](config_file.html#transitive-configuration-files) in nature, so what about a situation where you want to pin checks for an umbrella, but overwrite individual checks in a child app? You can use the `:extra` option:
 
     # my_umbrella/.credo.exs
