@@ -242,6 +242,52 @@ defmodule Credo.CodeTest do
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
   end
 
+  test "it should NOT report expected code on clean_charlists_strings_and_sigils /3" do
+    expected = ~S"""
+    defmodule Domain do
+      def create_domain(name, as, check \\ nil) do
+        execute(
+          "CREATE DOMAIN         AS                                          ",
+          "DROP DOMAIN        "
+        )
+      end
+
+      def create_enum(name, enums) do
+        execute(
+          "CREATE TYPE         AS ENUM(                                                   )",
+          "DROP TYPE        "
+        )
+      end
+
+      def execute(_, _), do: nil
+    end
+    """
+
+    source_file =
+      ~S"""
+      defmodule Domain do
+        def create_domain(name, as, check \\ nil) do
+          execute(
+            "CREATE DOMAIN #{name} AS #{as} #{if check, do: "CHECK (#{check})"}",
+            "DROP DOMAIN #{name}"
+          )
+        end
+
+        def create_enum(name, enums) do
+          execute(
+            "CREATE TYPE #{name} AS ENUM(#{enums |> Enum.map(&"'#{&1}'") |> Enum.join(", ")})",
+            "DROP TYPE #{name}"
+          )
+        end
+
+        def execute(_, _), do: nil
+      end
+      """
+      |> to_source_file
+
+    assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
+  end
+
   @tag slow: :disk_io
   test "it should produce valid code" do
     example_code = File.read!("test/fixtures/example_code/clean.ex")
