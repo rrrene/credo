@@ -35,7 +35,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
     message = """
     Unused variables should be named consistently.
     It seems your strategy is to give them meaningful names (eg. `_foo`)
-    but `#{trigger}` does not follow that convention."
+    but `#{trigger}` does not follow that convention.
     """
 
     to_one_line(message)
