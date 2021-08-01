@@ -123,7 +123,6 @@
           {Credo.Check.Refactor.CyclomaticComplexity, []},
           {Credo.Check.Refactor.FunctionArity, []},
           {Credo.Check.Refactor.LongQuoteBlocks, []},
-          # {Credo.Check.Refactor.MapInto, []},
           {Credo.Check.Refactor.MatchInCondition, []},
           {Credo.Check.Refactor.MapJoin, []},
           {Credo.Check.Refactor.NegatedConditionsInUnless, []},
@@ -163,36 +162,39 @@
           # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
 
           #
-          # Controversial and experimental checks (opt-in, just replace `false` with `[]`)
+          # Controversial and experimental checks (opt-in, just move the check to `:enabled`
+          #   and be sure to use `mix credo --strict` to see low priority checks)
           #
-          # {Credo.Check.Warning.LazyLogging, []},
-          {Credo.Check.Warning.MixEnv, false},
-          {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
-          {Credo.Check.Consistency.UnusedVariableNames, false},
-          {Credo.Check.Design.DuplicatedCode, false},
-          {Credo.Check.Design.SkipTestWithoutComment, false},
-          {Credo.Check.Readability.AliasAs, false},
-          {Credo.Check.Readability.BlockPipe, false},
-          {Credo.Check.Readability.ImplTrue, false},
-          {Credo.Check.Readability.MultiAlias, false},
-          {Credo.Check.Readability.SeparateAliasRequire, false},
-          {Credo.Check.Readability.SinglePipe, false},
-          {Credo.Check.Readability.Specs, false},
-          {Credo.Check.Readability.StrictModuleLayout, false},
-          {Credo.Check.Readability.WithCustomTaggedTuple, false},
-          {Credo.Check.Refactor.ABCSize, false},
-          {Credo.Check.Refactor.AppendSingleItem, false},
-          {Credo.Check.Refactor.DoubleBooleanNegation, false},
-          {Credo.Check.Refactor.FilterReject, false},
-          {Credo.Check.Refactor.MapMap, false},
-          {Credo.Check.Refactor.ModuleDependencies, false},
-          {Credo.Check.Refactor.NegatedIsNil, false},
-          {Credo.Check.Refactor.PipeChainStart, false},
-          {Credo.Check.Refactor.RejectFilter, false},
-          {Credo.Check.Refactor.VariableRebinding, false},
-          {Credo.Check.Warning.LeakyEnvironment, false},
-          {Credo.Check.Warning.MapGetUnsafePass, false},
-          {Credo.Check.Warning.UnsafeToAtom, false}
+          {Credo.Check.Consistency.MultiAliasImportRequireUse, []},
+          {Credo.Check.Consistency.UnusedVariableNames, []},
+          {Credo.Check.Design.DuplicatedCode, []},
+          {Credo.Check.Design.SkipTestWithoutComment, []},
+          {Credo.Check.Readability.AliasAs, []},
+          {Credo.Check.Readability.BlockPipe, []},
+          {Credo.Check.Readability.ImplTrue, []},
+          {Credo.Check.Readability.MultiAlias, []},
+          {Credo.Check.Readability.SeparateAliasRequire, []},
+          {Credo.Check.Readability.SinglePipe, []},
+          {Credo.Check.Readability.Specs, []},
+          {Credo.Check.Readability.StrictModuleLayout, []},
+          {Credo.Check.Readability.WithCustomTaggedTuple, []},
+          {Credo.Check.Refactor.ABCSize, []},
+          {Credo.Check.Refactor.AppendSingleItem, []},
+          {Credo.Check.Refactor.DoubleBooleanNegation, []},
+          {Credo.Check.Refactor.FilterReject, []},
+          {Credo.Check.Refactor.MapMap, []},
+          {Credo.Check.Refactor.ModuleDependencies, []},
+          {Credo.Check.Refactor.NegatedIsNil, []},
+          {Credo.Check.Refactor.PipeChainStart, []},
+          {Credo.Check.Refactor.RejectFilter, []},
+          {Credo.Check.Refactor.VariableRebinding, []},
+          {Credo.Check.Warning.LazyLogging, []},
+          {Credo.Check.Warning.LeakyEnvironment, []},
+          {Credo.Check.Warning.MapGetUnsafePass, []},
+          {Credo.Check.Warning.MixEnv, []},
+          {Credo.Check.Warning.UnsafeToAtom, []}
+
+          # {Credo.Check.Refactor.MapInto, []},
 
           #
           # Custom checks can be created using `mix credo.gen.check`.
