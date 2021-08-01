@@ -5,6 +5,7 @@
 - Credo changes from supporting the last 5 minor Elixir versions to the last 6 to be compatible with [Elixir's support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
 - `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
 - `Credo.Check.Design.AliasUsage` now supports `:only`
+- Credo now fails with an error message if a plugin module can not be initialized
 
 ### New Diff Options
 
