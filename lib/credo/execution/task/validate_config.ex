@@ -133,9 +133,12 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   defp inspect_config_if_debug(exec), do: exec
 
-  defp remove_missing_checks(%Execution{checks: %{enabled: checks}} = exec) do
-    checks = Enum.filter(checks, &Check.defined?/1)
+  defp remove_missing_checks(
+         %Execution{checks: %{enabled: enabled_checks, disabled: disabled_checks}} = exec
+       ) do
+    enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
+    disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
-    %Execution{exec | checks: checks}
+    %Execution{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
   end
 end
