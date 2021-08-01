@@ -9,7 +9,6 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
   alias Credo.CLI.Filename
-  alias Credo.CLI.Output.UI
   alias Credo.CLI.Task
   alias Credo.Issue
   alias Credo.SourceFile
@@ -69,6 +68,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainCheck do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
@@ -92,11 +93,13 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainIssuePreCheck do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
       filename_with_location = ExplainCommand.get_filename_from_args(exec)
-      working_dir = Execution.get_path(exec)
+      working_dir = Execution.working_dir(exec)
 
       filename =
         filename_with_location
@@ -116,13 +119,13 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
       end
     end
 
-    def error(exec, _opts) do
-      halt_message = Execution.get_halt_message(exec)
+    # def error(exec, _opts) do
+    #   halt_message = Execution.get_halt_message(exec)
 
-      UI.warn([:red, "** (explain) ", halt_message])
+    #   UI.warn([:red, "** (explain) ", halt_message])
 
-      exec
-    end
+    #   exec
+    # end
 
     defp path_contains_file?(path, filename) do
       case Path.relative_to(filename, path) do
@@ -133,6 +136,8 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   defmodule ExplainIssue do
+    use Credo.Execution.Task
+
     alias Credo.CLI.Command.Explain.ExplainCommand
 
     def call(exec, _opts) do
@@ -143,8 +148,6 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
       filename
       |> String.split(":")
       |> print_result(source_files, exec)
-
-      exec
     end
 
     def print_result([filename], source_files, exec) do
@@ -158,13 +161,19 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
     def print_result([filename, line_no, column], source_files, exec) do
       source_file = Enum.find(source_files, &(&1.filename == filename))
 
-      explanations =
-        exec
-        |> Execution.get_issues(source_file.filename)
-        |> filter_issues(line_no, column)
-        |> Enum.map(&cast_to_explanation(&1, source_file))
+      if source_file do
+        explanations =
+          exec
+          |> Execution.get_issues(source_file.filename)
+          |> filter_issues(line_no, column)
+          |> Enum.map(&cast_to_explanation(&1, source_file))
 
-      Output.print_after_info(explanations, exec, line_no, column)
+        Output.print_after_info(explanations, exec, line_no, column)
+
+        exec
+      else
+        Execution.halt(exec, "Could not find source file: #{filename}")
+      end
     end
 
     defp cast_to_explanation(issue, source_file) do

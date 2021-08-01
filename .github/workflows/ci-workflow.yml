@@ -31,12 +31,12 @@ jobs:
       - uses: actions/checkout@v2.3.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile --warnings-as-errors
-      - run: mix test
+      - run: mix test.fast
       - run: ./test/smoke_test.sh

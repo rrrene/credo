@@ -1,6 +1,8 @@
 defmodule Credo.ExsLoaderTest do
   use ExUnit.Case
 
+  @exec %Credo.Execution{}
+
   test "Credo.Execution.parse_exs should work" do
     exs_string = """
       %{combine: {:hex, :combine, "0.5.2"},
@@ -27,8 +29,8 @@ defmodule Credo.ExsLoaderTest do
       ]
     }
 
-    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, true)
-    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, false)
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, "testfile.ex", @exec, true)
+    assert {:ok, expected} == Credo.ExsLoader.parse(exs_string, "testfile.ex", @exec, false)
   end
 
   test "Credo.Execution.parse_exs should return error tuple" do
@@ -51,7 +53,7 @@ defmodule Credo.ExsLoaderTest do
 
     expected = {:error, {9, "syntax error before: ", "checks"}}
 
-    assert expected == Credo.ExsLoader.parse(exs_string, true)
-    assert expected == Credo.ExsLoader.parse(exs_string, false)
+    assert expected == Credo.ExsLoader.parse(exs_string, "testfile.ex", @exec, true)
+    assert expected == Credo.ExsLoader.parse(exs_string, "testfile.ex", @exec, false)
   end
 end

@@ -123,7 +123,7 @@ The `:files` map can have two fields:
 
 Configures plugin modules that Credo should load at start up (*defaults to `[]`*).
 
-This is needed to [enable and configure plugins](plugins.html) in the analysis.
+This is needed to [enable and configure plugins](../plugins/plugins.md) in the analysis.
 
 ```elixir
 # .credo.exs
@@ -154,7 +154,7 @@ All plugins are configured using a two-element tuple:
 
 Configures Elixir source files that Credo should require at start up (*defaults to `[]`*).
 
-This is needed to [add local custom checks](adding_checks.html) in the analysis.
+This is needed to [add local custom checks](../custom_checks/adding_checks.md) in the analysis.
 
 ```elixir
 # .credo.exs
@@ -248,7 +248,7 @@ Configures check modules that Credo should load at start up (*defaults to `[]`*)
 }
 ```
 
-Read more about [check configuration](check_params.html) and [adding custom checks](adding_checks.html).
+Read more about [check configuration](./check_params.md) and [adding custom checks](../custom_checks/adding_checks.md).
 
 
 ## Using a specific configuration file

@@ -17,30 +17,32 @@ $ mix credo suggest --checks-without-tag formatter --checks-without-tag controve
 
 ## Command Line Switches
 
-The available command line switches are:
+| Name, shorthand   | Description  |
+|-------------------|-----------------------------------------------------------------------------------|
+| [`--all`](#all), [`-a`](#all) | Show all issues for each category |
+| [`--all-priorities`](#all-priorities-aliased-as-strict), [`-A`](#all-priorities-aliased-as-strict) | Show all issues including low priority ones |
+| [`--checks`](#checks-aliased-as-only) | Only include checks that match the given comma-seperated patterns |
+| [`--checks-with-tag`](#checks-with-tag) | Only include checks that match the given tag |
+| [`--checks-without-tag`](#checks-without-tag) | Ignore checks that match the given tag |
+| [`--config-file`](#config-file) | Use the given config file as Credo's config |
+| [`--config-name`](#config-name) | Use the given config instead of "default" |
+| [`--enable-disabled-checks`](#enable-disabled-checks) | Re-enable disabled checks that match the given comma-seperated patterns |
+| [`--files-included`](#files-included) | Only include these files |
+| [`--files-excluded`](#files-excluded) | Exclude these files |
+| [`--format`](#format) | Display the list in a specific format (json, flycheck, or oneline) |
+| [`--ignore-checks`](#ignore-checks-aliased-as-ignore) | Ignore checks that match the given comma-seperated patterns |
+| [`--ignore`](#ignore) | Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore) |
+| [`--min-priority`](#min-priority) | Minimum priority to show issues |
+| [`--mute-exit-status`](#mute-exit-status) | Exit with status zero even if there are issues |
+| [`--only`](#only) | Alias for [`--checks`](#checks-aliased-as-only) |
+| [`--strict`](#strict) | Alias for [`--all-priorities`](#all-priorities-aliased-as-strict) |
+| [`--verbose`](#verbose) | Additionally print the check and the source code that raised the issue |
 
-- [`--all`](#all)
-- [`--all-priorities`](#all-priorities-aliased-as-strict)
-- [`--checks`](#checks-aliased-as-only)
-- [`--checks-with-tag`](#checks-with-tag)
-- [`--checks-without-tag`](#checks-without-tag)
-- [`--config-file`](#config-file)
-- [`--config-name`](#config-name)
-- [`--enable-disabled-checks`](#enable-disabled-checks)
-- [`--files-included`](#files-included)
-- [`--files-excluded`](#files-excluded)
-- [`--format`](#format)
-- [`--ignore-checks`](#ignore-checks-aliased-as-ignore)
-- [`--ignore`](#ignore)
-- [`--min-priority`](#min-priority)
-- [`--mute-exit-status`](#mute-exit-status)
-- [`--only`](#only)
-- [`--strict`](#strict)
-- [`--verbose`](#verbose)
+## Descriptions
 
 ### `--all`
 
-Show all issues for each category.
+Show all issues for each category
 
 By default, Credo's report is limited to 5 issues per category.
 
@@ -60,11 +62,20 @@ $ mix credo --strict
 
 ### `--checks` (aliased as `--only`)
 
-Only include checks that match the given strings
+Only include checks that match the given comma-seperated patterns
 
 ```bash
-# Runs only checks where the name matches "readability" (case-insensitive), e.g. `Credo.Check.Readability.ModuleDoc`
-$ mix credo --only readability
+# Run only checks where the name matches "readability" or "space" (case-insensitive),
+# e.g. `Credo.Check.Readability.ModuleDoc` or `Credo.Check.Consistency.SpaceAroundOperators`
+$ mix credo --only readability,space
+```
+
+The patterns are also compiled using `Regex.compile/2`, which allows for more complex queries:
+
+```bash
+# Run only checks where the name matches "readability" and "space"
+# (case-insensitive), e.g. `Credo.Check.Readability.SpaceAfterCommas`
+$ mix credo --only readability.+space
 ```
 
 ### `--checks-with-tag`
@@ -85,7 +96,7 @@ $ mix credo --checks-without-tag formatter
 
 ### `--config-file`
 
-Use the given config file as Credo's config.
+Use the given config file as Credo's config
 
 ```bash
 $ mix credo --config-file ./path/to/credo.exs
@@ -103,12 +114,23 @@ $ mix credo --config-name special-ci-config
 
 ### `--enable-disabled-checks`
 
-Re-enable disabled checks that match the given strings
+Re-enable disabled checks that match the given comma-seperated patterns
 
 ```bash
-# Enable all previously disabled checks where the name matches "readability"
-# (case-insensitive), e.g. `Credo.Check.Readability.ModuleDoc`
-$ mix credo --enable-disabled-checks readability
+# Enable all disabled checks where the name matches "readability" or "space" (case-insensitive),
+# e.g. `Credo.Check.Readability.ModuleDoc` or `Credo.Check.Consistency.SpaceAroundOperators`
+$ mix credo --enable-disabled-checks readability,space
+```
+
+The patterns are also compiled using `Regex.compile/2`, which allows for more complex queries:
+
+```bash
+# Enable all previously disabled checks where the name matches "readability" and "space"
+# (case-insensitive), e.g. `Credo.Check.Readability.SpaceAfterCommas`
+$ mix credo --enable-disabled-checks readability.+space
+
+# Enable *all* disabled checks by simply using:
+$ mix credo --enable-disabled-checks .+
 ```
 
 ### `--files-included`
@@ -137,11 +159,20 @@ $ mix credo --format json
 
 ### `--ignore-checks` (aliased as `--ignore`)
 
-Ignore checks that match the given strings
+Ignore checks that match the given comma-seperated patterns
 
 ```bash
-# Ignore checks where the name matches "readability" (case-insensitive), e.g. `Credo.Check.Readability.ModuleDoc`
-$ mix credo --ignore readability
+# Ignore checks where the name matches "readability" or "space" (case-insensitive),
+# e.g. `Credo.Check.Readability.ModuleDoc` or `Credo.Check.Consistency.SpaceAroundOperators`
+$ mix credo --ignore readability,space
+```
+
+The patterns are also compiled using `Regex.compile/2`, which allows for more complex queries:
+
+```bash
+# Ignore checks where the name matches "readability" and "space"
+# (case-insensitive), e.g. `Credo.Check.Readability.SpaceAfterCommas`
+$ mix credo --ignore readability.+space
 ```
 
 ### `--ignore`

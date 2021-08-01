@@ -11,10 +11,10 @@ defmodule Credo.Execution.Task.InitializeCommand do
   end
 
   defp init_command(exec, command_mod) do
-    exec =
-      exec
-      |> command_mod.init()
-      |> Execution.ensure_execution_struct("#{command_mod}.init/1")
+    # exec =
+    #   exec
+    #   |> command_mod.init()
+    #   |> Execution.ensure_execution_struct("#{command_mod}.init/1")
 
     exec =
       command_mod

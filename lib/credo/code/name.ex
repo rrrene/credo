@@ -59,6 +59,10 @@ defmodule Credo.Code.Name do
     name
   end
 
+  def full(name) when is_integer(name) do
+    to_string(name)
+  end
+
   def full({name, _, nil}) when is_atom(name) do
     full(name)
   end

@@ -76,9 +76,15 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group([{_, _mod_list_first, a}, {line_no, mod_list_second, b}], _)
+  defp process_group([{line_no, mod_list_second, a}, {_line_no, _mod_list_second, b}], _)
        when a > b do
-    issue_opts = issue_opts(line_no, mod_list_second)
+    module =
+      case mod_list_second do
+        {base, _} -> base
+        value -> value
+      end
+
+    issue_opts = issue_opts(line_no, module, module)
 
     {:halt, issue_opts}
   end
@@ -86,11 +92,11 @@ defmodule Credo.Check.Readability.AliasOrder do
   defp process_group([{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}], _) do
     issue_opts =
       cond do
-        inner_group_order_issue(mod_list_first) ->
-          issue_opts(line_no1, mod_list_first)
+        issue = inner_group_order_issue(line_no1, mod_list_first) ->
+          issue
 
-        inner_group_order_issue(mod_list_second) ->
-          issue_opts(line_no2, mod_list_second)
+        issue = inner_group_order_issue(line_no2, mod_list_second) ->
+          issue
 
         true ->
           nil
@@ -104,14 +110,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   end
 
   defp process_group([{line_no1, mod_list_first, _}], _) do
-    issue_opts =
-      if inner_group_order_issue(mod_list_first) do
-        issue_opts(line_no1, mod_list_first)
-      else
-        nil
-      end
-
-    if issue_opts do
+    if issue_opts = inner_group_order_issue(line_no1, mod_list_first) do
       {:halt, issue_opts}
     else
       {:cont, nil}
@@ -120,21 +119,31 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp process_group(_, _), do: {:cont, nil}
 
-  defp inner_group_order_issue({_base, []}), do: nil
+  defp inner_group_order_issue(_line_no, {_base, []}), do: nil
 
-  defp inner_group_order_issue({_base, mod_list}) do
-    mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
+  defp inner_group_order_issue(line_no, {base, mod_list}) do
+    downcased_mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
+    sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
 
-    mod_list != Enum.sort(mod_list)
+    if downcased_mod_list != sorted_downcased_mod_list do
+      trigger =
+        downcased_mod_list
+        |> Enum.with_index()
+        |> Enum.find_value(fn {downcased_mod_entry, index} ->
+          if downcased_mod_entry != Enum.at(sorted_downcased_mod_list, index) do
+            Enum.at(mod_list, index)
+          end
+        end)
+
+      issue_opts(line_no, [base, trigger], trigger)
+    end
   end
 
-  defp issue_opts(line_no, mod_list) do
-    {base, _} = mod_list
-
+  defp issue_opts(line_no, module, trigger) do
     %{
       line_no: line_no,
-      trigger: base,
-      module: base
+      trigger: trigger,
+      module: module
     }
   end
 

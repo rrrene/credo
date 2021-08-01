@@ -3,6 +3,7 @@ defmodule Credo.Sources do
   This module is used to find and read all source files for analysis.
   """
 
+  alias Credo.Execution
   alias Credo.SourceFile
 
   @default_sources_glob ~w(** *.{ex,exs})
@@ -21,19 +22,19 @@ defmodule Credo.Sources do
   """
   def find(exec)
 
-  def find(%Credo.Execution{read_from_stdin: true, files: %{included: [filename]}}) do
+  def find(%Execution{read_from_stdin: true, files: %{included: [filename]}}) do
     filename
     |> source_file_from_stdin()
     |> List.wrap()
   end
 
-  def find(%Credo.Execution{read_from_stdin: true}) do
+  def find(%Execution{read_from_stdin: true}) do
     @stdin_filename
     |> source_file_from_stdin()
     |> List.wrap()
   end
 
-  def find(%Credo.Execution{files: files, parse_timeout: parse_timeout}) do
+  def find(%Execution{files: files, parse_timeout: parse_timeout} = exec) do
     parse_timeout =
       if is_nil(parse_timeout) do
         :infinity
@@ -41,9 +42,14 @@ defmodule Credo.Sources do
         parse_timeout
       end
 
+    working_dir = Execution.working_dir(exec)
+
+    included_patterns = convert_globs_to_local_paths(working_dir, files.included)
+    excluded_patterns = convert_globs_to_local_paths(working_dir, files.excluded)
+
     MapSet.new()
-    |> include(files.included)
-    |> exclude(files.excluded)
+    |> include(included_patterns)
+    |> exclude(excluded_patterns)
     |> Enum.sort()
     |> Enum.take(max_file_count())
     |> read_files(parse_timeout)
@@ -110,7 +116,7 @@ defmodule Credo.Sources do
   defp include(files, [path | remaining_paths]) do
     include_paths =
       path
-      |> recurse_path
+      |> recurse_path()
       |> Enum.into(MapSet.new())
 
     files

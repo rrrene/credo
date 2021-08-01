@@ -12,7 +12,8 @@ defmodule Credo.Check.Design.AliasUsage do
                           Stream String StringIO Supervisor System Task Time
                           Tuple URI Version],
       if_nested_deeper_than: 0,
-      if_called_more_often_than: 0
+      if_called_more_often_than: 0,
+      only: nil
     ],
     explanations: [
       check: """
@@ -49,7 +50,11 @@ defmodule Credo.Check.Design.AliasUsage do
         excluded_lastnames: "List of lastnames to be excluded for this check.",
         if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
         if_called_more_often_than:
-          "Only raise an issue if a module is called more often than this."
+          "Only raise an issue if a module is called more often than this.",
+        only: """
+          Regex or a list of regexes that specifies which modules to include for this check.
+          `excluded_namespaces` and `excluded_lastnames` take precendence over this parameter.
+        """
       ]
     ]
 
@@ -68,8 +73,10 @@ defmodule Credo.Check.Design.AliasUsage do
 
     if_called_more_often_than = Params.get(params, :if_called_more_often_than, __MODULE__)
 
+    only = Params.get(params, :only, __MODULE__)
+
     source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames))
+    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only))
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end
@@ -79,7 +86,8 @@ defmodule Credo.Check.Design.AliasUsage do
          issues,
          issue_meta,
          excluded_namespaces,
-         excluded_lastnames
+         excluded_lastnames,
+         only
        ) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
@@ -93,6 +101,7 @@ defmodule Credo.Check.Design.AliasUsage do
           issue_meta,
           excluded_namespaces,
           excluded_lastnames,
+          only,
           aliases,
           mod_deps
         )
@@ -106,13 +115,14 @@ defmodule Credo.Check.Design.AliasUsage do
          issues,
          _source_file,
          _excluded_namespaces,
-         _excluded_lastnames
+         _excluded_lastnames,
+         _only
        ) do
     {ast, issues}
   end
 
   # Ignore module attributes
-  defp find_issues({:@, _, _}, issues, _, _, _, _, _) do
+  defp find_issues({:@, _, _}, issues, _, _, _, _, _, _) do
     {nil, issues}
   end
 
@@ -120,6 +130,7 @@ defmodule Credo.Check.Design.AliasUsage do
   defp find_issues(
          {:., _, [{:__aliases__, _, _}, :{}]} = ast,
          issues,
+         _,
          _,
          _,
          _,
@@ -137,6 +148,7 @@ defmodule Credo.Check.Design.AliasUsage do
          _,
          _,
          _,
+         _,
          _
        )
        when is_list(mod_list) do
@@ -149,6 +161,7 @@ defmodule Credo.Check.Design.AliasUsage do
          issue_meta,
          excluded_namespaces,
          excluded_lastnames,
+         only,
          aliases,
          mod_deps
        )
@@ -167,6 +180,9 @@ defmodule Credo.Check.Design.AliasUsage do
       ) ->
         {ast, issues}
 
+      excluded_with_only?(mod_list, only) ->
+        {ast, issues}
+
       conflicting_with_aliases?(mod_list, aliases) ->
         {ast, issues}
 
@@ -174,13 +190,13 @@ defmodule Credo.Check.Design.AliasUsage do
         {ast, issues}
 
       true ->
-        trigger = Enum.join(mod_list, ".")
+        trigger = Credo.Code.Name.full(mod_list)
 
         {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end
 
-  defp find_issues(ast, issues, _, _, _, _, _) do
+  defp find_issues(ast, issues, _, _, _, _, _, _) do
     {ast, issues}
   end
 
@@ -196,6 +212,17 @@ defmodule Credo.Check.Design.AliasUsage do
     last_name = Credo.Code.Name.last(mod_list)
 
     Enum.member?(excluded_namespaces, first_name) || Enum.member?(excluded_lastnames, last_name)
+  end
+
+  defp excluded_with_only?(_mod_list, nil), do: false
+
+  defp excluded_with_only?(mod_list, only) when is_list(only) do
+    Enum.any?(only, &excluded_with_only?(mod_list, &1))
+  end
+
+  defp excluded_with_only?(mod_list, %Regex{} = only) do
+    name = Credo.Code.Name.full(mod_list)
+    !String.match?(name, only)
   end
 
   # Returns true if mod_list and alias_name would result in the same alias
@@ -216,8 +243,8 @@ defmodule Credo.Check.Design.AliasUsage do
   # Returns true if mod_list and any dependent module would result in the same alias
   # since they share the same last name.
   defp conflicting_with_other_modules?(mod_list, mod_deps) do
-    last_name = Credo.Code.Name.last(mod_list)
     full_name = Credo.Code.Name.full(mod_list)
+    last_name = Credo.Code.Name.last(mod_list)
 
     (mod_deps -- [full_name])
     |> Enum.filter(&(Credo.Code.Name.parts_count(&1) > 1))
@@ -228,6 +255,10 @@ defmodule Credo.Check.Design.AliasUsage do
   defp tuple?(t) when is_tuple(t), do: true
   defp tuple?(_), do: false
 
+  defp filter_issues_if_called_more_often_than(issues, 0) do
+    issues
+  end
+
   defp filter_issues_if_called_more_often_than(issues, count) do
     issues
     |> Enum.reduce(%{}, fn issue, memo ->
@@ -235,13 +266,12 @@ defmodule Credo.Check.Design.AliasUsage do
 
       Map.put(memo, issue.trigger, [issue | list])
     end)
-    |> Enum.filter(fn {_, value} ->
-      length(value) > count
+    |> Enum.filter(fn {_trigger, issues} ->
+      length(issues) > count
     end)
-    |> Enum.map(fn {_, value} ->
-      value
+    |> Enum.flat_map(fn {_trigger, issues} ->
+      issues
     end)
-    |> List.flatten()
   end
 
   defp filter_issues_if_nested_deeper_than(issues, count) do

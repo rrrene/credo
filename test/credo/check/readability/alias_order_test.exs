@@ -132,7 +132,9 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Credo.CLI.Sorter"
+    end)
   end
 
   test "it should report a violation with as option" do
@@ -144,7 +146,9 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "App.Module2"
+    end)
   end
 
   test "it should report a violation with alias groups" do
@@ -160,7 +164,9 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "App.Module2"
+    end)
   end
 
   test "it should report a violation with multi-alias" do
@@ -183,10 +189,26 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Sorter"
+    end)
   end
 
   test "it should report a violation with multi-alias /2" do
+    """
+    defmodule CredoSampleModule do
+      alias Surface.Components.Form
+      alias Surface.Components.Form.{DateInput, TextInput, TextArea}
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "TextInput"
+    end)
+  end
+
+  test "it should report a violation with multi-alias /3" do
     """
     defmodule CredoSampleModule do
       alias App.CLI.{Bar,Baz}
@@ -202,6 +224,8 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Sorter"
+    end)
   end
 end

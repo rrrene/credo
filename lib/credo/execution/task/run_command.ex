@@ -15,6 +15,9 @@ defmodule Credo.Execution.Task.RunCommand do
   end
 
   def error(exec, _opts) do
-    put_exit_status(exec, @exit_status)
+    case get_exit_status(exec) do
+      0 -> put_exit_status(exec, @exit_status)
+      _ -> exec
+    end
   end
 end

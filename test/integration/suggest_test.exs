@@ -63,11 +63,11 @@ defmodule Credo.SuggestTest do
   end
 
   test "it should report issues using suggest command (using --all)" do
-    exec = IntegrationTest.run(["suggest", "--all", "module", @fixture_integration_test_config])
+    exec = IntegrationTest.run(["suggest", "--all", @fixture_integration_test_config])
     issues = Credo.Execution.get_issues(exec)
 
     assert exec.cli_options.command == "suggest"
-    assert issues != []
+    assert issues == []
   end
 
   test "it should NOT report issues using suggest command (using --only)" do

@@ -90,7 +90,9 @@ defmodule Credo.CLI.Options do
          switches_definition
        ) do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
-    {command, path, unknown_args} = split_args(args, current_dir, command_names)
+
+    {command, path, unknown_args} =
+      split_args(args, current_dir, command_names, switches_keywords[:working_dir])
 
     {switches_keywords, extra_unknown_switches} = patch_switches(switches_keywords)
 
@@ -112,6 +114,13 @@ defmodule Credo.CLI.Options do
       switches_keywords
       |> Enum.into(%{})
       |> Map.merge(switches_with_lists_as_map)
+
+    {path, switches} =
+      if File.dir?(path) do
+        {path, switches}
+      else
+        {current_dir, Map.put(switches, :files_included, [path])}
+      end
 
     %__MODULE__{
       command: command || given_command_name,
@@ -148,13 +157,17 @@ defmodule Credo.CLI.Options do
     end
   end
 
-  defp split_args([], current_dir, _) do
+  defp split_args([], current_dir, _, nil) do
     {path, unknown_args} = extract_path([], current_dir)
 
     {nil, path, unknown_args}
   end
 
-  defp split_args([head | tail] = args, current_dir, command_names) do
+  defp split_args([], _current_dir, _, given_working_dir) do
+    {nil, given_working_dir, []}
+  end
+
+  defp split_args([head | tail] = args, current_dir, command_names, nil) do
     if Enum.member?(command_names, head) do
       {path, unknown_args} = extract_path(tail, current_dir)
 
@@ -163,6 +176,14 @@ defmodule Credo.CLI.Options do
       {path, unknown_args} = extract_path(args, current_dir)
 
       {nil, path, unknown_args}
+    end
+  end
+
+  defp split_args([head | tail] = args, _current_dir, command_names, given_working_dir) do
+    if Enum.member?(command_names, head) do
+      {head, given_working_dir, tail}
+    else
+      {nil, given_working_dir, args}
     end
   end
 
