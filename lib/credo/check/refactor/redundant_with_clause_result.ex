@@ -57,7 +57,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   end
 
   defp split(clauses_and_body) do
-    case Block.do_block?(clauses_and_body) do
+    case Block.do_block?(clauses_and_body) and not Block.else_block?(clauses_and_body) do
       false ->
         :error
 

@@ -51,6 +51,23 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> refute_issues()
   end
 
+  test "it should NOT report if an else block is present" do
+    """
+    def some_function(parameter1, parameter2) do
+      with :ok <- parameter1,
+           :ok <- parameter2 do
+        :ok
+      else
+        _ -> :error
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+
   test "it shouldn't check calls to functions called \"with\"" do
     """
     def some_function(parameter1, parameter2) do
