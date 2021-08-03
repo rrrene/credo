@@ -10,7 +10,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
   alias Credo.CLI.Output.UI
 
   def print_help(exec) do
-    usage = ["Usage: ", :olive, "mix credo suggest [paths] [options]"]
+    usage = ["Usage: ", :olive, "mix credo suggest [options]"]
 
     description = """
 

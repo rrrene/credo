@@ -10,7 +10,7 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
   alias Credo.CLI.Output.UI
 
   def print_help(exec) do
-    usage = ["Usage: ", :olive, "mix credo diff [paths] [options]"]
+    usage = ["Usage: ", :olive, "mix credo diff [options]"]
 
     description = """
 
