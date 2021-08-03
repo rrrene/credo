@@ -74,7 +74,8 @@ defmodule Credo.CLI.Output.FirstRunHint do
         :reset,
         """
 
-        You can probably just fix the issues above in one go.
+        This is looking pretty already! You can probably just fix the issues above in one go.
+
         """,
         readability_hint
       ])
@@ -92,9 +93,9 @@ defmodule Credo.CLI.Output.FirstRunHint do
       :reset,
       """
 
-      This is true, especially when it comes to introducing code analysis to an existing codebase.
-      Doing so should not be about following any "best practice" in particular, it should be about
-      helping you to get to know the ropes and make the changes you want.
+      Introducing code analysis to an existing codebase should not be about following any
+      "best practice" in particular, it should be about helping you to get to know the ropes
+      and make the changes you want.
 
       Try the options outlined above to see which one is working for this project!
       """
@@ -135,13 +136,20 @@ defmodule Credo.CLI.Output.FirstRunHint do
       """
 
       Alternatively, you can use `diff` to only show the issues that were introduced after a certain tag or commit:
+      """
+    ])
 
-      """,
-      :cyan,
-      String.pad_trailing("    mix credo diff #{latest_tag} ", @command_padding),
-      :faint,
-      "# use the latest tag",
-      "\n\n",
+    if latest_tag do
+      UI.puts([
+        :cyan,
+        String.pad_trailing("    mix credo diff #{latest_tag} ", @command_padding),
+        :faint,
+        "# use the latest tag",
+        "\n"
+      ])
+    end
+
+    UI.puts([
       :reset,
       :cyan,
       String.pad_trailing(
@@ -166,6 +174,9 @@ defmodule Credo.CLI.Output.FirstRunHint do
 
   defp latest_tag(working_dir) do
     case System.cmd("git", ~w"rev-list --tags --max-count=1", cd: working_dir) do
+      {"", 0} ->
+        nil
+
       {latest_tag_sha1, 0} ->
         case System.cmd("git", ~w"describe --tags #{latest_tag_sha1}", cd: working_dir) do
           {tagname, 0} -> String.trim(tagname)
