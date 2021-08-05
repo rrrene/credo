@@ -56,7 +56,8 @@ defmodule Credo.ConfigFileTest do
         {Credo.Check.Consistency.ExceptionNames},
         {Credo.Check.Consistency.LineEndings},
         {Credo.Check.Consistency.Tabs}
-      ]
+      ],
+      disabled: []
     }
   }
 
@@ -74,7 +75,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Design.AliasUsage, []},
           {Credo.Check.Design.TagFIXME, []},
           {Credo.Check.Design.TagTODO, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -95,7 +97,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Consistency.ExceptionNames, []},
           {Credo.Check.Consistency.LineEndings, []},
           {Credo.Check.Consistency.Tabs, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -116,7 +119,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Consistency.ExceptionNames, []},
           {Credo.Check.Consistency.LineEndings, []},
           {Credo.Check.Consistency.Tabs, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -137,7 +141,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Consistency.ExceptionNames, []},
           {Credo.Check.Consistency.LineEndings, []},
           {Credo.Check.Consistency.Tabs, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -158,7 +163,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Consistency.ExceptionNames, []},
           {Credo.Check.Consistency.LineEndings, []},
           {Credo.Check.Consistency.Tabs, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -182,7 +188,8 @@ defmodule Credo.ConfigFileTest do
           {Credo.Check.Design.AliasUsage, []},
           {Credo.Check.Design.TagFIXME, []},
           {Credo.Check.Design.TagTODO, []}
-        ]
+        ],
+        disabled: []
       }
     }
 
@@ -211,6 +218,7 @@ defmodule Credo.ConfigFileTest do
     }
 
     expected = %{
+      disabled: [],
       enabled: [
         {Credo.Check.Consistency.ExceptionNames, []},
         {Credo.Check.Consistency.LineEndings, []},
@@ -256,6 +264,9 @@ defmodule Credo.ConfigFileTest do
         {Credo.Check.Design.TagFIXME, []},
         {Credo.Check.Design.TagTODO, []},
         {Credo.Check.Consistency.Tabs, false}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.Tabs, []}
       ]
     }
 
@@ -283,6 +294,7 @@ defmodule Credo.ConfigFileTest do
     }
 
     expected = %{
+      disabled: [],
       enabled: [
         {Credo.Check.Consistency.ExceptionNames, []},
         {Credo.Check.Consistency.LineEndings, []},
@@ -317,6 +329,7 @@ defmodule Credo.ConfigFileTest do
     }
 
     expected = %{
+      disabled: [],
       enabled: [
         {Credo.Check.Consistency.ExceptionNames, []},
         {Credo.Check.Consistency.LineEndings, []},
@@ -353,6 +366,7 @@ defmodule Credo.ConfigFileTest do
     }
 
     expected = %{
+      disabled: [],
       enabled: [
         {Credo.Check.Design.AliasUsage, []},
         {Credo.Check.Design.TagFIXME, []},
@@ -385,6 +399,7 @@ defmodule Credo.ConfigFileTest do
     }
 
     expected = %{
+      disabled: [],
       enabled: [
         {Credo.Check.Consistency.ExceptionNames, []},
         {Credo.Check.Consistency.LineEndings, []},
@@ -415,7 +430,7 @@ defmodule Credo.ConfigFileTest do
     other = %ConfigFile{
       checks: %{
         disabled: [
-          {Credo.Check.Consistency.Tabs, []}
+          {Credo.Check.Consistency.Tabs, [force: :tabs]}
         ]
       }
     }
@@ -428,6 +443,9 @@ defmodule Credo.ConfigFileTest do
         {Credo.Check.Design.TagFIXME, []},
         {Credo.Check.Design.TagTODO, []},
         {Credo.Check.Consistency.Tabs, false}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.Tabs, [force: :tabs]}
       ]
     }
 

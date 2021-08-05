@@ -10,7 +10,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
   alias Credo.CLI.Output.UI
 
   def print_help(exec) do
-    usage = ["Usage: ", :olive, "mix credo list [paths] [options]"]
+    usage = ["Usage: ", :olive, "mix credo list [options]"]
 
     description = """
 
@@ -21,7 +21,7 @@ defmodule Credo.CLI.Command.List.ListOutput do
       "Examples:\n",
       :olive,
       "  $ mix credo list --format json\n",
-      "  $ mix credo list lib/**/*.ex --only consistency --all\n",
+      "  $ mix credo list \"lib/**/*.ex\" --only consistency --all\n",
       "  $ mix credo list --checks-without-tag formatter --checks-without-tag controversial"
     ]
 
