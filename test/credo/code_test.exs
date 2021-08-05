@@ -247,15 +247,15 @@ defmodule Credo.CodeTest do
     defmodule Domain do
       def create_domain(name, as, check \\ nil) do
         execute(
-          "CREATE DOMAIN         AS                                          ",
-          "DROP DOMAIN        "
+          "                                                                  ",
+          "                   "
         )
       end
 
       def create_enum(name, enums) do
         execute(
-          "CREATE TYPE         AS ENUM(                                                   )",
-          "DROP TYPE        "
+          "                                                                                ",
+          "                 "
         )
       end
 
