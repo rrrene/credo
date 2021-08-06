@@ -242,6 +242,7 @@ defmodule Credo.CodeTest do
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
   end
 
+  @tag needs_elixir: "1.9.0"
   test "it should NOT report expected code on clean_charlists_strings_and_sigils /3" do
     expected = ~S"""
     defmodule Domain do

@@ -26,6 +26,7 @@ defmodule Credo.Code.InterpolationHelperTest do
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_positions []
 
+  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character" do
     source = ~S"""
     def fun() do
@@ -42,6 +43,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character /3" do
     source = ~S"""
     def fun() do
@@ -58,6 +60,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
+  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character /4" do
     source = ~S'''
     def fun() do
