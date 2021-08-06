@@ -26,7 +26,62 @@ defmodule Credo.Code.InterpolationHelperTest do
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_positions []
 
+  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character" do
+    source = ~S"""
+    def fun() do
+      "x #{if check, do: "CHECK (#{check})"} y"
+    end
+    """
+
+    expected = ~S"""
+    def fun() do
+      "x $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ y"
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.9.0"
+  test "should replace string interpolations with given character /3" do
+    source = ~S"""
+    def fun() do
+      ~s"x #{if check, do: "CHECK (#{check})"} y"
+    end
+    """
+
+    expected = ~S"""
+    def fun() do
+      ~s"x $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ y"
+    end
+    """
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  @tag needs_elixir: "1.9.0"
+  test "should replace string interpolations with given character /4" do
+    source = ~S'''
+    def fun() do
+      """
+      x #{if check, do: "CHECK (#{check})"} y
+      """
+    end
+    '''
+
+    expected = ~S'''
+    def fun() do
+      """
+      x $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ y
+      """
+    end
+    '''
+
+    assert expected == InterpolationHelper.replace_interpolations(source, "$")
+  end
+
+  test "should replace string interpolations in binary with given character " do
     source = ~S"""
     def fun() do
       a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
@@ -58,7 +113,7 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "")
   end
 
-  test "should replace string interpolations with given character /3" do
+  test "should replace string interpolations in binaries with given character /3" do
     source = ~S"""
     case category_count(issues, category) do
       0 -> []
