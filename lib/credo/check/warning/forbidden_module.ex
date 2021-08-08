@@ -15,7 +15,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       but direct usage of the `Ecto.Adapters.SQL.query/4` function, and related functions, may
       cause issues when using Ecto's dynamic repositories.
       """,
-      params: [modules: "Modules that must not be used."]
+      params: [modules: "List of Modules or {Module, \"Error message\"} Tuples that must not be used."]
     ]
 
   alias Credo.Code
@@ -49,20 +49,20 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   defp found_module?(_, _), do: false
 
-  defp issue_for(issue_meta, line_no, module, forbidden_modules) do
+  defp issue_for(issue_meta, line_no, module, modules_param) do
     trigger = module |> Code.Module.name()
 
     format_issue(
       issue_meta,
-      message: message(forbidden_modules, module, "The `#{trigger}` module is not allowed."),
+      message: message(modules_param, module, "The `#{trigger}` module is not allowed."),
       trigger: trigger,
       line_no: line_no
     )
   end
 
-  defp message(forbidden_modules, module, default) do
-    with true <- Keyword.keyword?(forbidden_modules),
-         value when not is_nil(value) <- Keyword.get(forbidden_modules, module) do
+  defp message(modules_param, module, default) do
+    with true <- Keyword.keyword?(modules_param),
+         value when not is_nil(value) <- Keyword.get(modules_param, module) do
       value
     else
       _ -> default
