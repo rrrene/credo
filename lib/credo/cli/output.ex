@@ -4,17 +4,9 @@ defmodule Credo.CLI.Output do
   """
 
   @category_tag_map %{"refactor" => "F"}
-  @priority_values_map [
-    higher: [color: :red, arrow: "\u2191"],
-    high: [color: :red, arrow: "\u2197"],
-    normal: [color: :yellow, arrow: "\u2192"],
-    low: [color: :blue, arrow: "\u2198"],
-    ignore: [color: :magenta, arrow: "\u2193"]
-  ]
 
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.Issue
   alias Credo.Priority
 
   def check_tag(category, in_parens \\ true)
@@ -79,15 +71,16 @@ defmodule Credo.CLI.Output do
       :red
 
   """
-  def issue_color(%Issue{priority: priority} = issue) when is_number(priority) do
-    %Issue{issue | priority: Priority.to_atom(priority)} |> issue_color()
+  def issue_color(issue_or_priority) do
+    case Priority.to_atom(issue_or_priority) do
+      :higher -> :red
+      :high -> :red
+      :normal -> :yellow
+      :low -> :blue
+      :ignore -> :magenta
+      _ -> "?"
+    end
   end
-
-  def issue_color(%Issue{priority: priority}) when is_atom(priority) do
-    get_in(@priority_values_map, [priority, :color]) || "?"
-  end
-
-  def issue_color(_), do: "?"
 
   @doc """
   Returns a suitable arrow for a given priority.
@@ -98,16 +91,19 @@ defmodule Credo.CLI.Output do
       iex> Credo.CLI.Output.priority_arrow(10)
       "↗"
 
+      iex> Credo.CLI.Output.priority_arrow(%Credo.Issue{priority: 10})
+      "↗"
   """
-  def priority_arrow(priority) when is_number(priority) do
-    priority |> Priority.to_atom() |> priority_arrow()
+  def priority_arrow(issue_or_priority) do
+    case Priority.to_atom(issue_or_priority) do
+      :higher -> "\u2191"
+      :high -> "\u2197"
+      :normal -> "\u2192"
+      :low -> "\u2198"
+      :ignore -> "\u2193"
+      _ -> "?"
+    end
   end
-
-  def priority_arrow(priority) when is_atom(priority) do
-    get_in(@priority_values_map, [priority, :arrow]) || "?"
-  end
-
-  def priority_arrow(_), do: "?"
 
   @doc """
   Returns a suitable name for a given priority.
@@ -118,16 +114,20 @@ defmodule Credo.CLI.Output do
       iex> Credo.CLI.Output.priority_name(1)
       "normal"
 
+      iex> Credo.CLI.Output.priority_name(%Credo.Issue{priority: 1})
+      "normal"
+
   """
-  def priority_name(priority) when is_number(priority) do
-    priority |> Priority.to_atom() |> priority_name()
+  def priority_name(issue_or_priority) do
+    case Priority.to_atom(issue_or_priority) do
+      :higher -> "higher"
+      :high -> "high"
+      :normal -> "normal"
+      :low -> "low"
+      :ignore -> "ignore"
+      _ -> "?"
+    end
   end
-
-  def priority_name(priority) when is_atom(priority) do
-    if Keyword.has_key?(@priority_values_map, priority), do: priority |> to_string(), else: "?"
-  end
-
-  def priority_name(_), do: "?"
 
   @doc """
   Returns a suitable foreground color for a given `background_color`.

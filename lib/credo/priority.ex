@@ -37,6 +37,8 @@ defmodule Credo.Priority do
     @priority_names_map[to_string(key)] || raise "Got an invalid priority: #{inspect(key)}"
   end
 
+  def to_atom(priority)
+
   def to_atom(priority) when is_number(priority) do
     cond do
       priority > 19 -> :higher
@@ -46,6 +48,10 @@ defmodule Credo.Priority do
       priority < -10 -> :ignore
     end
   end
+
+  def to_atom(%{priority: priority}), do: to_atom(priority)
+
+  def to_atom(priority) when is_atom(priority), do: priority
 
   def to_atom(_), do: nil
 
