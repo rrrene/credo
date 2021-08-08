@@ -27,9 +27,14 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     Code.prewalk(source_file, &traverse(&1, &2, modules, IssueMeta.for(source_file, params)))
   end
 
-  defp traverse(ast = {:__aliases__, meta, module}, issues, forbidden_modules, issue_meta) do
-    if Enum.member?(forbidden_modules, Module.concat(module)) do
-      {ast, [issue_for(issue_meta, meta[:line], module) | issues]}
+  defp traverse(ast = {:__aliases__, meta, modules}, issues, modules_param, issue_meta) do
+    module = Module.concat(modules)
+
+    forbidden_modules =
+      if Keyword.keyword?(modules_param), do: Keyword.keys(modules_param), else: modules_param
+
+    if found_module?(forbidden_modules, module) do
+      {ast, [issue_for(issue_meta, meta[:line], module, modules_param) | issues]}
     else
       {ast, issues}
     end
@@ -37,14 +42,30 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   defp traverse(ast, issues, _, _), do: {ast, issues}
 
-  defp issue_for(issue_meta, line_no, module) do
-    trigger = module |> Module.concat() |> Code.Module.name()
+  defp found_module?(forbidden_modules, module)
+       when is_list(forbidden_modules) and is_atom(module) do
+    Enum.member?(forbidden_modules, module)
+  end
+
+  defp found_module?(_, _), do: false
+
+  defp issue_for(issue_meta, line_no, module, forbidden_modules) do
+    trigger = module |> Code.Module.name()
 
     format_issue(
       issue_meta,
-      message: "The `#{trigger}` module is not allowed.",
+      message: message(forbidden_modules, module, "The `#{trigger}` module is not allowed."),
       trigger: trigger,
       line_no: line_no
     )
+  end
+
+  defp message(forbidden_modules, module, default) do
+    with true <- Keyword.keyword?(forbidden_modules),
+         value when not is_nil(value) <- Keyword.get(forbidden_modules, module) do
+      value
+    else
+      _ -> default
+    end
   end
 end

@@ -70,4 +70,24 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> run_check(@described_check, @opts)
     |> assert_issue()
   end
+
+  test "it should display a custom message" do
+    opts = [
+      modules: [{CredoSampleModule.ForbiddenModule, "jesus, team, please stop using this!!!!!"}]
+    ]
+
+    """
+    defmodule CredoSampleModule do
+      def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, opts)
+    |> assert_issue(fn issue ->
+      assert issue.message ==
+               opts
+               |> Keyword.get(:modules)
+               |> Keyword.get(CredoSampleModule.ForbiddenModule)
+    end)
+  end
 end
