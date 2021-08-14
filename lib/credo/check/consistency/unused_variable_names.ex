@@ -27,13 +27,6 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
   end
 
   defp issues_for(expected, source_file, params) do
-    expected =
-      case params[:force] do
-        nil -> expected
-        "" <> value -> String.to_atom(value)
-        value when is_atom(value) -> value
-      end
-
     issue_meta = IssueMeta.for(source_file, params)
     issue_locations = @collector.find_locations_not_matching(expected, source_file)
 
