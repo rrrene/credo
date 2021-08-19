@@ -2,14 +2,20 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    param_defaults: [
+      force: nil
+    ],
     explanations: [
       check: """
       Elixir allows us to use `_` as a name for variables that are not meant to be
       used. But it’s a common practice to give these variables meaningful names
-      anyway (`_user` instead of `_`), but some people prefer to name them all `_`.
+      anyway (`_user` instead of `_`), but some people prefer to name them all anonymously (`_`).
 
       A single style should be present in the same codebase.
-      """
+      """,
+      params: [
+        force: "Force a choice, values can be `:meaningful` or `:anonymous`."
+      ]
     ]
 
   @collector Credo.Check.Consistency.UnusedVariableNames.Collector
@@ -35,7 +41,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames do
     message = """
     Unused variables should be named consistently.
     It seems your strategy is to give them meaningful names (eg. `_foo`)
-    but `#{trigger}` does not follow that convention."
+    but `#{trigger}` does not follow that convention.
     """
 
     to_one_line(message)

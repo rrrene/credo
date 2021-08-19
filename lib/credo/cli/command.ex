@@ -9,14 +9,59 @@ defmodule Credo.CLI.Command do
       defmodule HelloWorldCommand do
         use Credo.CLI.Command
 
+        alias Credo.CLI.Output.UI
+
         def call(_exec, _opts) do
-          Credo.CLI.Output.UI.puts([:yellow, "Hello ", :orange, "World"])
+          UI.puts([:yellow, "Hello ", :orange, "World"])
         end
       end
 
   """
 
+  @typedoc false
   @type t :: module
+
+  @doc """
+  Is called when a Command is invoked.
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def call(exec) do
+          IO.inspect(exec)
+        end
+      end
+
+  The `call/1` functions receives an `exec` struct and must return a (modified) `Credo.Execution`.
+  """
+  @callback call(exec :: Credo.Execution.t()) :: Credo.Execution.t()
+
+  @doc """
+  Is called when a Command is initialized.
+
+  The `init/1` functions receives an `exec` struct and must return a (modified) `Credo.Execution`.
+
+  This can be used to initialize Execution pipelines for the current Command:
+
+      defmodule FooTask do
+        use Credo.Execution.Task
+
+        def init(exec) do
+          Execution.put_pipeline(exec, __MODULE__,
+            run_my_thing: [
+              {RunMySpecialThing, []}
+            ],
+            filter_results: [
+              {FilterResults, []}
+            ],
+            print_results: [
+              {PrintResultsAndSummary, []}
+            ]
+          )
+        end
+      end
+  """
+  @callback init(exec :: Credo.Execution.t()) :: Credo.Execution.t()
 
   @valid_use_opts [
     :short_description,
@@ -61,29 +106,16 @@ defmodule Credo.CLI.Command do
       @deprecated "Use Credo.Execution.Task.run/2 instead"
       defp run_task(exec, task), do: Credo.Execution.Task.run(task, exec)
 
-      @doc """
-      Initializes the command.
-
-      This can be used to initialize execution pipelines for the current command:
-
-          def init(exec) do
-            Execution.put_pipeline(exec, __MODULE__,
-              run_my_thing: [
-                {RunMySpecialThing, []}
-              ],
-              filter_results: [
-                {FilterResults, []}
-              ],
-              print_results: [
-                {PrintResultsAndSummary, []}
-              ]
-            )
-          end
-
-      """
+      @doc false
+      @impl true
       def init(exec), do: exec
 
+      @doc false
+      @impl true
+      def call(exec), do: exec
+
       defoverridable init: 1
+      defoverridable call: 1
     end
   end
 

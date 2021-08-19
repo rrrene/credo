@@ -2,19 +2,157 @@
 
 ## 1.6.0
 
-- ...
+- Credo changes from supporting the last 5 minor Elixir versions to the last 6 to be compatible with [Elixir's support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
+- `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
+- `Credo.Check.Design.AliasUsage` now supports `:only`
+- Credo now fails with an error message if a plugin module can not be initialized
+
+### New Diff Options
+
+`mix credo diff` is often used when developing on a branch and comparing that branch with a base branch.
+
+Let's illustrate this with the following example:
+
+```text
+(feature-a)                        J---K---L
+                                  /         \
+(master)          base---A---B---C---D---E---F
+                              \
+(current branch)               X---Y---Z
+```
+
+- `mix credo diff --from-git-ref master` (same as `mix credo diff master`) - this will compare the current branch to the current state of the given ref (commit `F` in the example above)
+- `mix credo diff --from-git-merge-base master` - this will compare the current branch to the point where the current branch was branched off of the given ref (commit `B` in the example above)
+
+There is also `--from-dir` which you can use to compare the current dir to another dir, thus decoupling the `diff` command from Git, e.g. `mix credo diff --from-dir ../credo_v1_5_6`
+
+### Pinning Checks in a Project's Config
+
+Credo's config always had one caveat: Your configuration settings are merged with the default config, without you having any chance of knowing what the default config is without (except by generating a fresh one via `mix credo.gen.config`).
+
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: [
+            # this configures `LargeNumbers` and all other checks are still enabled
+            {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+          ]
+        }
+      ]
+    }
+
+This adds an additional problem: When checks are added to the default config, they are also added for you, because there is no way to explicitly say, which checks should run.
+
+Credo 1.6 adds this option to explicitly say which checks are enabled on your project by changing the `:checks` key in the config from a `List` to a `Map` with an `:enabled` key:
+
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: %{
+            enabled: [
+              # this means that only `LargeNumbers` will run for this project
+              {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+            ]
+          }
+        }
+      ]
+    }
+
+You can now go the other way as well and disable checks explicitly while keeping their params instead of replacing them with `false`:
+
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: %{
+            disabled: [
+              # this means that `LargeNumbers` is disabled for this project
+              {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+            ]
+          }
+        }
+      ]
+    }
+
+This has the added benefit that, when re-enabled via [`--enable-disabled-checks`](suggest_command.html#enable-disabled-checks), the check is enabled with its customized params.
+
+[Credo configs are transitive](config_file.html#transitive-configuration-files) in nature, so what about a situation where you want to pin checks for an umbrella, but overwrite individual checks in a child app? You can use the `:extra` option:
+
+    # my_umbrella/.credo.exs
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: %{
+            enabled: [
+              {Credo.Check.Readability.LargeNumbers, []}
+            ]
+          }
+        }
+      ]
+    }
+
+    # my_umbrella/apps/my_app2/.credo.exs
+    %{
+      configs: [
+        %{
+          name: "default",
+          checks: %{
+            extra: [
+              # this means that the checks config from the parent applies,
+              # only `LargeNumbers` being configured differently for this project
+              {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+            ]
+          }
+        }
+      ]
+    }
+
+Of course, the "old" way of specifying a list of checks still works.
 
 ### Exit Status
 
 - Credo succeeds with an exit status of 0 (like any other program).
-- Credo fails with an exit status between 1 and 127 if it shows any issues.
-- Exit statuses above or equal to 128 indicate an actual runtime error during analysis itself.
+- Credo fails with an [exit status between 1 and 127](exit_statuses.html#issue-statuses) if it shows any issues.
+- [Exit statuses above or equal to 128](exit_statuses.html#actual-custom-errors) indicate an Elixir runtime error during analysis itself.
+
+Before Credo 1.6 it was unclear which exit status "ranges" where intended for which kind of error.
+For example, we are not enforcing the ranges for issue errors or plugin errors, but this change gives an official guideline to these considerations.
+
+### Working Directory
+
+Up until now, Credo provided the ability to analyse files and directories anywhere on disk by simply typing
+
+```bash
+# BEFORE (now deprecated):
+mix credo ../other-elixir-project/
+```
+
+This was not really documented and not really supported very well, resulting in most people not really utilizing it and instead running Credo from the root of their project using `mix credo`.
+
+Now there is `--working-dir`, which allows users to define their working directory explicitly:
+
+```bash
+mix credo --working-dir ../other-elixir-project/
+```
 
 ### New checks
 
 - `Credo.Check.Design.SkipTestWithoutComment`
 - `Credo.Check.Readability.PipeIntoAnonymousFunctions`
 - `Credo.Check.Refactor.MapJoin`
+- `Credo.Check.Refactor.RedundantWithClauseResult`
+
+## 1.5.6
+
+- Ensure compatibility with Elixir 1.12
+
+## 1.5.5
+
+- Fix bug where compilation warnings are shown if compilation directory is not part of a Git work tree
+- Fix bug in `mix credo diff` where too many issues are reported because
 
 ## 1.5.4
 

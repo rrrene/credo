@@ -28,7 +28,7 @@ defmodule Credo.CLI.Command.Help do
   def print_banner do
     banner()
     |> String.split("")
-    |> Enum.flat_map(fn x -> [color_for(x), x] end)
+    |> Enum.flat_map(fn char -> [color_for(char), char_for(char)] end)
     |> UI.puts()
 
     UI.puts()
@@ -72,24 +72,54 @@ defmodule Credo.CLI.Command.Help do
     UI.puts(example)
   end
 
-  def color_for("#"), do: [:faint]
-  def color_for("\\"), do: :olive
-  def color_for("/"), do: :olive
-  def color_for("L"), do: :olive
+  def color_for("#"), do: [:reset, :darkgreen]
+  def color_for(";"), do: [:reset, :faint, :green]
+  def color_for("~"), do: [:reset, :bright, :green]
+  def color_for(":"), do: [:reset, :faint, :yellow]
+  def color_for("="), do: [:reset, :bright, :yellow]
+  def color_for("-"), do: [:reset, :faint, :red]
+  def color_for("["), do: [:reset, :bright, :red]
+  def color_for("M"), do: [:reset, :blue]
+  def color_for(","), do: [:reset, :color235]
   def color_for(_), do: [:reset, :white]
 
+  # ~w(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
+
+  def char_for(" "), do: " "
+  def char_for("\n"), do: "\n"
+  def char_for("#"), do: "▇"
+  def char_for(";"), do: "▇"
+  def char_for("~"), do: "▇"
+  def char_for(":"), do: "▇"
+  def char_for("="), do: "▇"
+  def char_for("-"), do: "▇"
+  def char_for("["), do: "▇"
+  def char_for("M"), do: "▇"
+  def char_for(","), do: "▅"
+  def char_for(v), do: v
+
   def banner do
-    output = """
-    #   ____                    __
-    #  /\\  _`\\                 /\\ \\
-    #  \\ \\ \\/\\_\\  _ __    __   \\_\\ \\    ___
-    #   \\ \\ \\/_/_/\\`'__\\/'__`\\ /'_` \\  / __`\\
-    #    \\ \\ \\L\\ \\ \\ \\//\\  __//\\ \\L\\ \\/\\ \\L\\ \\
-    #     \\ \\____/\\ \\_\\\\ \\____\\ \\___,_\\ \\____/
-    #      \\/___/  \\/_/ \\/____/\\/__,_ /\\/___/
-    #
     """
 
-    String.trim(output)
+                        #######################     #####    ###
+                        #######################,,,,,#####,,, ###
+                           ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                   ~~~~~~~~~~~~~~~~~,,,~~~~~~~~,,,~~~,,,,,,,,,,,
+             ;;;;;;~~~~~~~~~~~~~~~~~,,,~~~~~~~~,,,~~~,,,,,,,,,,,
+             ;;;;;;;;;;;;;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      ::::::::::::::::::::,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      :::::===================,,,==========,,,==,,,,,,,,,,,,,,,,
+           ===================,,,==========,,,==,,,,,,,,,,,,,,,,
+                          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+          ----------------,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+          -------[[[[[[[[[[[[[[[[[[[[[[[,,,[[,,,[[[[[[,,,,,,,,,,
+                 [[[[[[[[[[[[[[[[[[[[[[[,,,[[,,,[[[[[[,,,,,,,,,,
+                          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                           ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                        MMMMMMMMMMMMMMMMMMMMMMM,,,,MMMMM,,,, MMM
+                        MMMMMMMMMMMMMMMMMMMMMMM    MMMMM     MMM
+    """
   end
 end

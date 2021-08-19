@@ -10,7 +10,7 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
   alias Credo.Execution
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
+    Execution.put_pipeline(exec, "info",
       load_and_validate_source_files: [
         {Task.LoadAndValidateSourceFiles, []}
       ],
@@ -42,16 +42,25 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
           "erlang" => System.otp_release()
         },
         "config" => %{
+          "plugins" => plugins(exec),
           "checks" => checks(exec),
           "files" => files(exec)
         }
       }
     end
 
+    defp plugins(exec) do
+      Enum.map(exec.plugins, fn {name, params} ->
+        %{"name" => name, "params" => Enum.into(params, %{})}
+      end)
+    end
+
     defp checks(exec) do
       {checks, _only_matching, _ignore_matching} = Execution.checks(exec)
 
-      Enum.map(checks, fn {name, _} -> name end)
+      Enum.map(checks, fn {name, params} ->
+        %{"name" => name, "params" => Enum.into(params, %{})}
+      end)
     end
 
     defp files(exec) do

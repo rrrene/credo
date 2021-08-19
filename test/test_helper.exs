@@ -1,7 +1,7 @@
 ExUnit.start()
 
 check_version =
-  ~w(1.6.5 1.7.0)
+  ~w(1.6.5 1.7.0 1.9.0)
   |> Enum.reduce([], fn version, acc ->
     # allow -dev versions so we can test before the Elixir release.
     if System.version() |> Version.match?("< #{version}-dev") do
@@ -20,12 +20,20 @@ defmodule Credo.Test.IntegrationTest do
     parent = self()
 
     spawn(fn ->
-      ExUnit.CaptureLog.capture_log(fn ->
-        ExUnit.CaptureIO.capture_io(fn ->
-          exec = Credo.run(argv)
-          send(parent, {:exec, exec})
+      doit = fn ->
+        exec = Credo.run(argv)
+        send(parent, {:exec, exec})
+      end
+
+      if System.get_env("DEBUG") do
+        doit.()
+      else
+        ExUnit.CaptureLog.capture_log(fn ->
+          ExUnit.CaptureIO.capture_io(fn ->
+            doit.()
+          end)
         end)
-      end)
+      end
     end)
 
     receive do

@@ -6,7 +6,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
   def call(exec, _opts) do
     issues = get_old_new_and_fixed_issues(exec)
 
-    Execution.set_issues(exec, issues)
+    Execution.put_issues(exec, issues)
   end
 
   defp get_old_new_and_fixed_issues(exec) do
@@ -18,7 +18,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
       |> Execution.get_issues()
 
     # in previous_issues, in current_issues
-    old_issues = Enum.filter(previous_issues, &old_issue?(&1, current_issues))
+    old_issues = Enum.filter(current_issues, &old_issue?(&1, previous_issues))
 
     # in previous_issues, not in current_issues
     fixed_issues = previous_issues -- old_issues
@@ -32,7 +32,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
     fixed_issues = Enum.map(fixed_issues, fn issue -> %Issue{issue | diff_marker: :fixed} end)
     new_issues = Enum.map(new_issues, fn issue -> %Issue{issue | diff_marker: :new} end)
 
-    List.flatten([fixed_issues, old_issues, new_issues])
+    List.flatten([new_issues, fixed_issues, old_issues])
   end
 
   defp new_issue?(current_issue, previous_issues) when is_list(previous_issues) do

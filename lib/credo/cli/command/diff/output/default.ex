@@ -74,10 +74,12 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
   @doc "Called after the analysis has run."
   def print_after_info(source_files, exec, time_load, time_run) do
     term_width = Output.term_columns()
+    filtered_diff_markers = filtered_diff_markers(exec)
 
-    issues = Execution.get_issues(exec)
-
-    issues_to_display = Enum.filter(issues, &(&1.diff_marker == :new))
+    issues_to_display =
+      exec
+      |> Execution.get_issues()
+      |> Enum.filter(&Enum.member?(filtered_diff_markers, &1.diff_marker))
 
     categories =
       issues_to_display
@@ -162,7 +164,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
   defp print_issues(issues, source_file_map, exec, term_width) do
     count = per_category(exec)
-    sort_weight = %{old: 2, fixed: 1, new: 0}
+    sort_weight = %{fixed: 0, old: 1, new: 2}
 
     issues
     |> Enum.sort_by(fn issue ->
@@ -248,13 +250,23 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
     location =
       if fixed_issue? do
-        git_ref = Execution.get_assign(exec, "credo.diff.previous_git_ref")
+        given_ref = Execution.get_assign(exec, "credo.diff.given_ref")
         previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
 
-        relative_filename =
-          filename |> String.replace(previous_dirname, "") |> String.replace(~r/^[\/\\]/, "")
+        case given_ref do
+          {:path, path} ->
+            relative_filename = String.replace(filename, previous_dirname, "")
 
-        "(git:#{git_ref}) #{relative_filename}"
+            "(dir:#{path}) #{relative_filename}"
+
+          _ ->
+            git_ref = Execution.get_assign(exec, "credo.diff.previous_git_ref")
+
+            relative_filename =
+              filename |> String.replace(previous_dirname, "") |> String.replace(~r/^[\/\\]/, "")
+
+            "(git:#{git_ref}) #{relative_filename}"
+        end
       else
         to_string(filename)
       end
@@ -416,6 +428,23 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       String.duplicate("^", w)
     ]
     |> UI.puts()
+  end
+
+  defp filtered_diff_markers(exec) do
+    filtered_diff_markers = [:new]
+
+    filtered_diff_markers =
+      if exec.cli_options.switches[:show_kept] do
+        filtered_diff_markers ++ [:old]
+      else
+        filtered_diff_markers
+      end
+
+    if exec.cli_options.switches[:show_fixed] do
+      filtered_diff_markers ++ [:fixed]
+    else
+      filtered_diff_markers
+    end
   end
 
   defp diff_marker() do

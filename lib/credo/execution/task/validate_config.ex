@@ -21,9 +21,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     if Enum.any?(only_checks, &(&1 == "")) do
       UI.warn([
         :red,
-        "** (config) Including all checks, since an empty string was given as a pattern: #{
-          inspect(only_checks)
-        }"
+        "** (config) Including all checks, since an empty string was given as a pattern: #{inspect(only_checks)}"
       ])
     end
 
@@ -39,9 +37,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     if Enum.any?(ignore_checks, &(&1 == "")) do
       UI.warn([
         :red,
-        "** (config) Ignoring all checks, since an empty string was given as a pattern: #{
-          inspect(ignore_checks)
-        }"
+        "** (config) Ignoring all checks, since an empty string was given as a pattern: #{inspect(ignore_checks)}"
       ])
     end
 
@@ -52,7 +48,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
   end
 
-  defp validate_checks(%Execution{checks: checks} = exec) do
+  defp validate_checks(%Execution{checks: %{enabled: checks}} = exec) do
     Enum.each(checks, fn check_tuple ->
       warn_if_check_missing(check_tuple)
       warn_if_check_params_invalid(check_tuple)
@@ -137,9 +133,12 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   defp inspect_config_if_debug(exec), do: exec
 
-  defp remove_missing_checks(%Execution{checks: checks} = exec) do
-    checks = Enum.filter(checks, &Check.defined?/1)
+  defp remove_missing_checks(
+         %Execution{checks: %{enabled: enabled_checks, disabled: disabled_checks}} = exec
+       ) do
+    enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
+    disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
-    %Execution{exec | checks: checks}
+    %Execution{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
   end
 end

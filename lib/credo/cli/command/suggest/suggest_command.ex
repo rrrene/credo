@@ -19,6 +19,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.keep("checks_without_tag"),
       Switch.string("checks", alias: :c),
       Switch.string("enable_disabled_checks"),
+      Switch.string("min_priority"),
       Switch.boolean("mute_exit_status"),
       Switch.string("format"),
       Switch.boolean("help", alias: :h),
@@ -32,28 +33,14 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
     ]
 
   def init(exec) do
-    Execution.put_pipeline(exec, __MODULE__,
-      load_and_validate_source_files: [
-        {Task.LoadAndValidateSourceFiles, []}
-      ],
-      prepare_analysis: [
-        {Task.PrepareChecksToRun, []}
-      ],
-      __manipulate_config_if_rerun__: [
-        {__MODULE__.ManipulateConfigIfRerun, []}
-      ],
-      print_before_analysis: [
-        {__MODULE__.PrintBeforeInfo, []}
-      ],
-      run_analysis: [
-        {Task.RunChecks, []}
-      ],
-      filter_issues: [
-        {Task.SetRelevantIssues, []}
-      ],
-      print_after_analysis: [
-        {__MODULE__.PrintResultsAndSummary, []}
-      ]
+    Execution.put_pipeline(exec, "suggest",
+      load_and_validate_source_files: [Task.LoadAndValidateSourceFiles],
+      prepare_analysis: [Task.PrepareChecksToRun],
+      __manipulate_config_if_rerun__: [__MODULE__.ManipulateConfigIfRerun],
+      print_before_analysis: [__MODULE__.PrintBeforeInfo],
+      run_analysis: [Task.RunChecks],
+      filter_issues: [Task.SetRelevantIssues],
+      print_after_analysis: [__MODULE__.PrintResultsAndSummary]
     )
   end
 
@@ -65,7 +52,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
     use Credo.Execution.Task
 
-    def call(exec, _opts) do
+    def call(exec) do
       source_files = Execution.get_source_files(exec)
 
       SuggestOutput.print_before_info(source_files, exec)
@@ -79,7 +66,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
     use Credo.Execution.Task
 
-    def call(exec, _opts) do
+    def call(exec) do
       source_files = Execution.get_source_files(exec)
 
       time_load = Execution.get_assign(exec, "credo.time.source_files")
@@ -120,7 +107,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       # all checks on `files_that_changed`
       # consistency checks on all files
 
-      Execution.set_issues(exec, issues_to_keep)
+      Execution.put_issues(exec, issues_to_keep)
     end
 
     def modify_config_to_only_include_needed_checks(%Credo.Execution{} = exec, files_that_changed) do

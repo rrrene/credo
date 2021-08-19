@@ -262,6 +262,33 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
+  if(Version.match?(System.version(), ">= 1.12.0-rc")) do
+    # Elixir >= 1.12.0
+    #
+    test "it should not report issues if spaces are used everywhere /2" do
+      [
+        @with_spaces,
+        @with_spaces2,
+        @with_spaces3,
+        @with_spaces4,
+        """
+        defmodule OtherModule3_0 do
+          for prio < 1..10//2 do
+            # something
+          end
+
+          for prio < 10..1//-2 do
+            # something
+          end
+        end
+        """
+      ]
+      |> to_source_files()
+      |> run_check(@described_check)
+      |> refute_issues()
+    end
+  end
+
   test "it should not report issues if spaces are used everywhere in a single file" do
     [
       @with_spaces5

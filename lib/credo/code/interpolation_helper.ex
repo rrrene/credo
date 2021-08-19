@@ -130,7 +130,7 @@ defmodule Credo.Code.InterpolationHelper do
 
     # TODO: this seems to be wrong. the closing """ determines the
     #       indentation, not the first line of the heredoc.
-    padding_in_first_line = determine_padding_at_start_of_line(first_line_in_heredoc)
+    padding_in_first_line = determine_heredoc_padding_at_start_of_line(first_line_in_heredoc)
 
     list
     |> find_interpolations(source)
@@ -144,6 +144,14 @@ defmodule Credo.Code.InterpolationHelper do
 
   # Elixir < 1.9.0
   #
+  defp find_interpolations(
+         {{line_no, col_start, nil}, {line_no_end, col_end, nil}, list} = _token,
+         _source
+       )
+       when is_list(list) do
+    {line_no, col_start, line_no_end, col_end + 1}
+  end
+
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
@@ -185,10 +193,6 @@ defmodule Credo.Code.InterpolationHelper do
        ) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
-    {line_no, col_start, line_no_end, col_end}
-
-    # |> IO.inspect()
-
     col_end =
       if line_no_end > line_no && col_end == 1 do
         # This means we encountered :eol and jumped in the next line.
@@ -210,8 +214,6 @@ defmodule Credo.Code.InterpolationHelper do
     # -1 to remove the accounted-for `}`
     padding = max(padding - 1, 0)
 
-    # IO.inspect(padding, label: "padding")
-
     {line_no, col_start, line_no_end, col_end + padding}
   end
 
@@ -219,7 +221,18 @@ defmodule Credo.Code.InterpolationHelper do
     nil
   end
 
-  defp determine_padding_at_start_of_line(line, regex \\ ~r/^\s+/) do
+  if Version.match?(System.version(), ">= 1.12.0-rc") do
+    # Elixir >= 1.12.0
+    #
+    defp determine_heredoc_padding_at_start_of_line(_line), do: 0
+  else
+    # Elixir < 1.12.0
+    #
+    defp determine_heredoc_padding_at_start_of_line(line),
+      do: determine_padding_at_start_of_line(line, ~r/^\s+/)
+  end
+
+  defp determine_padding_at_start_of_line(line, regex) do
     regex
     |> Regex.run(line)
     |> List.wrap()

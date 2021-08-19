@@ -146,13 +146,13 @@ defmodule Credo.CLI.OptionsTest do
     args = String.split("foo.ex --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert expand_path("foo.ex") == options.path
+    assert expand_path("") == options.path
   end
 
   test "path: it should work w/ glob" do
     args = String.split("src/**/*.ex --strict --version")
     options = parse(args)
     assert is_nil(options.command)
-    assert "src/**/*.ex" == options.path
+    assert ["src/**/*.ex"] == options.switches.files_included
   end
 end

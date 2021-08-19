@@ -1,5 +1,5 @@
 defmodule Credo.ConfigFile do
-  @doc """
+  @moduledoc """
   `ConfigFile` structs represent all loaded and merged config files in a run.
   """
 
@@ -13,6 +13,7 @@ defmodule Credo.ConfigFile do
   @default_parse_timeout 5000
   @default_strict false
   @default_color true
+  @valid_checks_keys ~w(enabled disabled extra)a
 
   alias Credo.Execution
 
@@ -66,10 +67,10 @@ defmodule Credo.ConfigFile do
     exec = Enum.reduce(config_files, exec, &Execution.append_config_file(&2, &1))
 
     Execution.get_config_files(exec)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
+    |> Enum.map(&from_exs(exec, dir, config_name || @default_config_name, &1, safe))
     |> ensure_any_config_found(config_name)
     |> merge()
-    |> add_given_directory_to_files(dir)
+    |> map_ok_files()
     |> ensure_values_present()
   end
 
@@ -173,8 +174,8 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {origin, filename, exs_string}, safe) do
-    case Credo.ExsLoader.parse(exs_string, safe) do
+  defp from_exs(exec, dir, config_name, {origin, filename, exs_string}, safe) do
+    case Credo.ExsLoader.parse(exs_string, filename, exec, safe) do
       {:ok, data} ->
         from_data(data, dir, filename, origin, config_name)
 
@@ -198,7 +199,7 @@ defmodule Credo.ConfigFile do
       origin: origin,
       filename: filename,
       config_name_found?: config_name_found?,
-      checks: checks_from_data(data),
+      checks: checks_from_data(data, filename),
       color: data[:color],
       files: files_from_data(data, dir),
       parse_timeout: data[:parse_timeout],
@@ -230,13 +231,56 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp checks_from_data(data) do
+  defp checks_from_data(data, filename) do
     case data[:checks] do
       checks when is_list(checks) ->
         checks
 
+      %{} = checks ->
+        do_warn_if_check_params_invalid(checks, filename)
+
+        checks
+
       _ ->
         []
+    end
+  end
+
+  defp do_warn_if_check_params_invalid(checks, filename) do
+    Enum.each(checks, fn
+      {checks_key, _name} when checks_key not in @valid_checks_keys ->
+        candidate = find_best_match(@valid_checks_keys, checks_key)
+        warning = warning_message_for(filename, checks_key, candidate)
+
+        Credo.CLI.Output.UI.warn([:red, warning])
+
+      _ ->
+        nil
+    end)
+  end
+
+  defp warning_message_for(filename, checks_key, candidate) do
+    if candidate do
+      "** (config) #{filename}: config field `:checks` contains unknown key `#{inspect(checks_key)}`. Did you mean `#{inspect(candidate)}`?"
+    else
+      "** (config) #{filename}: config field `:checks` contains unknown key `#{inspect(checks_key)}`."
+    end
+  end
+
+  defp find_best_match(candidates, given, threshold \\ 0.8) do
+    given_string = to_string(given)
+
+    {jaro_distance, candidate} =
+      candidates
+      |> Enum.map(fn candidate_name ->
+        distance = String.jaro_distance(given_string, to_string(candidate_name))
+        {distance, candidate_name}
+      end)
+      |> Enum.sort()
+      |> List.last()
+
+    if jaro_distance > threshold do
+      candidate
     end
   end
 
@@ -301,12 +345,72 @@ defmodule Credo.ConfigFile do
   defp merge_parse_timeout(_base, timeout) when is_integer(timeout), do: timeout
   defp merge_parse_timeout(base, _), do: base
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{checks: checks_other}) do
-    base = normalize_check_tuples(checks_base)
-    other = normalize_check_tuples(checks_other)
+  def merge_checks(%__MODULE__{checks: checks_list_base}, %__MODULE__{checks: checks_list_other})
+      when is_list(checks_list_base) and is_list(checks_list_other) do
+    base = %__MODULE__{checks: %{enabled: checks_list_base}}
+    other = %__MODULE__{checks: %{extra: checks_list_other}}
 
-    Keyword.merge(base, other)
+    merge_checks(base, other)
   end
+
+  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{
+        checks: %{extra: _} = checks_map_other
+      })
+      when is_list(checks_base) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: checks_map_other}
+
+    merge_checks(base, other)
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_list_base}}, %__MODULE__{
+        checks: checks_other
+      })
+      when is_list(checks_list_base) and is_list(checks_other) do
+    base = %__MODULE__{checks: %{enabled: checks_list_base}}
+    other = %__MODULE__{checks: %{extra: checks_other}}
+
+    merge_checks(base, other)
+  end
+
+  def merge_checks(%__MODULE__{checks: _checks_base}, %__MODULE__{
+        checks: %{enabled: checks_other_enabled} = checks_other
+      })
+      when is_list(checks_other_enabled) do
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled),
+      disabled: checks_other[:disabled] || []
+    }
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{} = checks_other
+      })
+      when is_list(checks_base) do
+    base = normalize_check_tuples(checks_base)
+    other = normalize_check_tuples(checks_other[:extra])
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled),
+      disabled: checks_other[:disabled] || []
+    }
+  end
+
+  # this def catches all the cases where no valid key was found in `checks_map_other`
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{}
+      })
+      when is_list(checks_base) do
+    base = %__MODULE__{checks: %{enabled: checks_base}}
+    other = %__MODULE__{checks: []}
+
+    merge_checks(base, other)
+  end
+
+  #
 
   def merge_files(%__MODULE__{files: files_base}, %__MODULE__{files: files_other}) do
     %{
@@ -324,6 +428,15 @@ defmodule Credo.ConfigFile do
   defp normalize_check_tuple({name}), do: {name, []}
   defp normalize_check_tuple(tuple), do: tuple
 
+  defp disable_check_tuples(nil), do: []
+
+  defp disable_check_tuples(list) when is_list(list) do
+    Enum.map(list, &disable_check_tuple/1)
+  end
+
+  defp disable_check_tuple({name}), do: {name, false}
+  defp disable_check_tuple({name, _params}), do: {name, false}
+
   defp join_default_files_if_directory(dir) do
     if File.dir?(dir) do
       Path.join(dir, @default_files_included)
@@ -332,38 +445,22 @@ defmodule Credo.ConfigFile do
     end
   end
 
-  defp add_given_directory_to_files({:error, _} = error, _dir) do
+  defp map_ok_files({:error, _} = error) do
     error
   end
 
-  defp add_given_directory_to_files({:ok, %__MODULE__{files: files} = config}, dir) do
+  defp map_ok_files({:ok, %__MODULE__{files: files} = config}) do
     files = %{
       included:
         files[:included]
         |> List.wrap()
-        |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq(),
       excluded:
         files[:excluded]
         |> List.wrap()
-        |> Enum.map(&add_directory_to_file(&1, dir))
         |> Enum.uniq()
     }
 
     {:ok, %__MODULE__{config | files: files}}
   end
-
-  defp add_directory_to_file(file_or_glob, dir) when is_binary(file_or_glob) do
-    if File.dir?(dir) do
-      if dir == "." || file_or_glob =~ ~r/^\// do
-        file_or_glob
-      else
-        Path.join(dir, file_or_glob)
-      end
-    else
-      dir
-    end
-  end
-
-  defp add_directory_to_file(regex, _), do: regex
 end

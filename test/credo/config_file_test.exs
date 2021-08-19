@@ -51,11 +51,14 @@ defmodule Credo.ConfigFileTest do
     files: %{
       included: ["lib/**/*.exs"]
     },
-    checks: [
-      {Credo.Check.Consistency.ExceptionNames},
-      {Credo.Check.Consistency.LineEndings},
-      {Credo.Check.Consistency.Tabs}
-    ]
+    checks: %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames},
+        {Credo.Check.Consistency.LineEndings},
+        {Credo.Check.Consistency.Tabs}
+      ],
+      disabled: []
+    }
   }
 
   test "merge works" do
@@ -64,14 +67,17 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/", "src/", "web/"],
         excluded: []
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []},
-        {Credo.Check.Design.AliasUsage, []},
-        {Credo.Check.Design.TagFIXME, []},
-        {Credo.Check.Design.TagTODO, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []},
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -86,11 +92,14 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/", "src/", "web/"],
         excluded: ["lib/**/*_test.exs"]
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -105,11 +114,14 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/**/*.exs"],
         excluded: ["lib/**/*_test.exs"]
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -124,11 +136,14 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/", "src/", "web/"],
         excluded: []
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -143,11 +158,14 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/**/*.exs"],
         excluded: []
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -162,14 +180,17 @@ defmodule Credo.ConfigFileTest do
         included: ["lib/", "src/", "web/"],
         excluded: ["lib/**/*_test.exs"]
       },
-      checks: [
-        {Credo.Check.Consistency.ExceptionNames, []},
-        {Credo.Check.Consistency.LineEndings, []},
-        {Credo.Check.Consistency.Tabs, []},
-        {Credo.Check.Design.AliasUsage, []},
-        {Credo.Check.Design.TagFIXME, []},
-        {Credo.Check.Design.TagTODO, []}
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []},
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []}
+        ],
+        disabled: []
+      }
     }
 
     assert_sorted_equality(
@@ -196,14 +217,237 @@ defmodule Credo.ConfigFileTest do
       ]
     }
 
-    expected = [
-      {Credo.Check.Consistency.ExceptionNames, []},
-      {Credo.Check.Consistency.LineEndings, []},
-      {Credo.Check.Design.AliasUsage, []},
-      {Credo.Check.Design.TagFIXME, []},
-      {Credo.Check.Design.TagTODO, []},
-      {Credo.Check.Consistency.Tabs, false}
-    ]
+    expected = %{
+      disabled: [],
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /1" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        extra: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []}
+        ],
+        disabled: [
+          {Credo.Check.Consistency.Tabs, []}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.Tabs, []}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /2" do
+    base = %ConfigFile{
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Consistency.Tabs, []}
+      ]
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        extra: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Consistency.Tabs, false}
+        ]
+      }
+    }
+
+    expected = %{
+      disabled: [],
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /3" do
+    base = %ConfigFile{
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Consistency.Tabs, []}
+      ]
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        extra: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Consistency.Tabs, false}
+        ]
+      }
+    }
+
+    expected = %{
+      disabled: [],
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /4" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Consistency.Tabs, false}
+        ]
+      }
+    }
+
+    expected = %{
+      disabled: [],
+      enabled: [
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /5" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: [
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    expected = %{
+      disabled: [],
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /6" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []},
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        disabled: [
+          {Credo.Check.Consistency.Tabs, [force: :tabs]}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.Tabs, [force: :tabs]}
+      ]
+    }
 
     assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
   end
