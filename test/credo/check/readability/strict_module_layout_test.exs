@@ -57,6 +57,26 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       |> refute_issues
     end
 
+    test "no errors are reported on surface import calls" do
+      """
+      defmodule HygeiaWeb.ImportLive.Header do
+        @moduledoc false
+
+        use HygeiaWeb, :surface_live_component
+
+        alias Hygeia.ImportContext.Import
+        alias Hygeia.ImportContext.Import.Type
+        alias HygeiaWeb.UriActiveContext
+        alias Surface.Components.LiveRedirect
+
+        prop import, :map, required: true
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check)
+      |> refute_issues
+    end
+
     test "shortdoc must appear before moduledoc" do
       [issue] =
         """

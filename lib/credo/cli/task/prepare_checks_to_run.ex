@@ -29,25 +29,24 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   defp enable_disabled_checks_if_applicable(exec) do
     enable_disabled_checks_regexes = to_match_regexes(exec.enable_disabled_checks)
 
-    checks =
-      Enum.map(exec.checks, fn
-        {check, false} ->
+    enable_disabled_checks =
+      Enum.map(exec.checks.disabled, fn
+        {check, params} ->
           if matches?(to_string(check), enable_disabled_checks_regexes) do
-            {check, []}
+            {check, params}
           else
             {check, false}
           end
-
-        {check, params} ->
-          {check, params}
       end)
 
-    %Execution{exec | checks: checks}
+    checks = Keyword.merge(exec.checks.enabled, enable_disabled_checks)
+
+    %Execution{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
   end
 
   defp exclude_low_priority_checks(exec, below_priority) do
     checks =
-      Enum.reject(exec.checks, fn
+      Enum.reject(exec.checks.enabled, fn
         # deprecated
         {check} ->
           Credo.Priority.to_integer(check.base_priority) < below_priority
@@ -64,17 +63,19 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
           priority < below_priority
       end)
 
-    %Execution{exec | checks: checks}
+    %Execution{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
   end
 
   defp exclude_checks_based_on_elixir_version(exec) do
     elixir_version = System.version()
+    skipped_checks = Enum.reject(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
+    checks = Enum.filter(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
 
-    skipped_checks = Enum.reject(exec.checks, &matches_requirement?(&1, elixir_version))
-
-    checks = Enum.filter(exec.checks, &matches_requirement?(&1, elixir_version))
-
-    %Execution{exec | checks: checks, skipped_checks: skipped_checks}
+    %Execution{
+      exec
+      | checks: %{enabled: checks, disabled: exec.checks.disabled},
+        skipped_checks: skipped_checks
+    }
   end
 
   defp matches_requirement?({check, _}, elixir_version) do

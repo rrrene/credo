@@ -61,6 +61,21 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation with :allow_tagged_tuples" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        if {:foo, value} = parameter1 do
+          do_something
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow_tagged_tuples: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -80,7 +95,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 2" do
+  test "it should report a violation /2" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -92,6 +107,21 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
           end
         else
           {scope_name, prio}
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /3" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        if condition? && {:ok, value} = parameter1 do
+          do_something
         end
       end
     end

@@ -143,7 +143,16 @@ defmodule Credo.Check.Consistency.Collector do
     frequencies = total_frequencies(frequencies_per_source_file)
 
     if map_size(frequencies) > 0 do
-      {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
+      most_frequent_match =
+        case params[:force] do
+          nil ->
+            {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
+
+            most_frequent_match
+
+          value ->
+            value
+        end
 
       result =
         frequencies_per_source_file

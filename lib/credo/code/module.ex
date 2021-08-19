@@ -375,8 +375,8 @@ defmodule Credo.Code.Module do
   defp analyze(state, {:@, meta, _}),
     do: add_module_element(state, :module_attribute, meta)
 
-  defp analyze(state, {clause, meta, _})
-       when clause in ~w/use import alias require defstruct/a,
+  defp analyze(state, {clause, meta, args})
+       when clause in ~w/use import alias require defstruct/a and is_list(args),
        do: add_module_element(state, clause, meta)
 
   defp analyze(state, {clause, meta, definition})
