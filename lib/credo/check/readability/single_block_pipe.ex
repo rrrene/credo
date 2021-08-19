@@ -1,4 +1,4 @@
-defmodule Credo.Check.Refactor.SingleBlockPipe do
+defmodule Credo.Check.Readability.SingleBlockPipe do
   use Credo.Check,
     base_priority: :high,
     explanations: [

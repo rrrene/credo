@@ -1,4 +1,4 @@
-defmodule Credo.Check.Refactor.SingleBlockPipeTest do
+defmodule Credo.Check.Readability.SingleBlockPipeTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Refactor.SingleBlockPipe

@@ -115,6 +115,7 @@
           {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
           {Credo.Check.Readability.VariableNames, []},
           {Credo.Check.Readability.WithSingleClause, []},
+          {Credo.Check.Readability.SingleBlockPipe, []},
 
           #
           ## Refactoring Opportunities
@@ -133,7 +134,6 @@
           {Credo.Check.Refactor.FilterFilter, []},
           {Credo.Check.Refactor.RejectReject, []},
           {Credo.Check.Refactor.RedundantWithClauseResult, []},
-          {Credo.Check.Refactor.SingleBlockPipe, []},
 
           #
           ## Warnings
