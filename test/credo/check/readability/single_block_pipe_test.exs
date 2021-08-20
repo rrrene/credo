@@ -1,7 +1,7 @@
 defmodule Credo.Check.Readability.SingleBlockPipeTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Refactor.SingleBlockPipe
+  @described_check Credo.Check.Readability.SingleBlockPipe
 
   test "it should NOT report violation for valid pipes" do
     """
