@@ -3,6 +3,9 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
     run_on_all: true,
     base_priority: :high,
     tags: [:formatter],
+    param_defaults: [
+      force: nil
+    ],
     explanations: [
       check: """
       Tabs should be used consistently.
@@ -15,7 +18,10 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
 
       While this is not necessarily a concern for the correctness of your code,
       you should use a consistent style throughout your codebase.
-      """
+      """,
+      params: [
+        force: "Force a choice, values can be `:spaces` or `:tabs`."
+      ]
     ]
 
   @collector Credo.Check.Consistency.TabsOrSpaces.Collector

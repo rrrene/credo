@@ -2,6 +2,9 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
   use Credo.Check,
     run_on_all: true,
     base_priority: :high,
+    param_defaults: [
+      force: nil
+    ],
     explanations: [
       check: """
       When capturing a parameter using pattern matching you can either put the parameter name before or after the value
@@ -17,7 +20,10 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching do
 
       While this is not necessarily a concern for the correctness of your code,
       you should use a consistent style throughout your codebase.
-      """
+      """,
+      params: [
+        force: "Force a choice, values can be `:after` or `:before`."
+      ]
     ]
 
   @collector Credo.Check.Consistency.ParameterPatternMatching.Collector
