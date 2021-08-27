@@ -3,6 +3,9 @@ defmodule Credo.Check.Consistency.LineEndings do
     run_on_all: true,
     base_priority: :high,
     tags: [:formatter],
+    param_defaults: [
+      force: nil
+    ],
     explanations: [
       check: """
       Windows and Linux/macOS systems use different line-endings in files.
@@ -11,7 +14,10 @@ defmodule Credo.Check.Consistency.LineEndings do
 
       While this is not necessarily a concern for the correctness of your code,
       you should use a consistent style throughout your codebase.
-      """
+      """,
+      params: [
+        force: "Force a choice, values can be `:unix` or `:windows`."
+      ]
     ]
 
   @collector Credo.Check.Consistency.LineEndings.Collector
