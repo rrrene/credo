@@ -1,6 +1,6 @@
 defmodule Credo.Check.Readability.SingleBlockPipe do
   use Credo.Check,
-    base_priority: :high,
+    tags: [:controversial],
     explanations: [
       check: """
       A single pipe (`|>`) should not be used to pipe into blocks.
@@ -23,8 +23,8 @@ defmodule Credo.Check.Readability.SingleBlockPipe do
             _ -> :many
           end
 
-        When you want to dissalow piping into blocks at all, use
-        `Credo.Check.Readability.BlockPipe`.
+      If you want to disallow piping into blocks all together, use
+      `Credo.Check.Readability.BlockPipe`.
       """
     ]
 
@@ -43,9 +43,7 @@ defmodule Credo.Check.Readability.SingleBlockPipe do
   defp traverse(ast, issues, issue_meta) do
     case issue(ast, issue_meta) do
       nil -> {ast, issues}
-
       false -> {ast, {false, issues}}
-
       issue -> {ast, [issue | issues]}
     end
   end
