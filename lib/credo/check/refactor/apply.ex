@@ -1,11 +1,24 @@
-defmodule Credo.Check.Readability.Apply do
+defmodule Credo.Check.Refactor.Apply do
   use Credo.Check,
     base_priority: :low,
     explanations: [
       check: """
-      If the number of arguments and the function name are known at compile time,
-      prefer `module.function(arg_1, arg_2, ..., arg_n)` as it is clearer than
-      `apply(module, :function, [arg_1, arg_2, ..., arg_n])`.
+      Prefer calling functions directly if the number of arguments is known
+      at compile time instead of using `apply/2` and `apply/3`.
+
+      Example:
+
+          # preferred
+
+          fun.(arg_1, arg_2, ..., arg_n)
+
+          module.function(arg_1, arg_2, ..., arg_n)
+
+          # NOT preferred
+
+          apply(fun, [arg_1, arg_2, ..., arg_n])
+
+          apply(module, :function, [arg_1, arg_2, ..., arg_n])
       """
     ]
 
@@ -33,7 +46,7 @@ defmodule Credo.Check.Readability.Apply do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Avoid `apply/3` when the number of arguments is known",
+      message: "Avoid `apply/2` and `apply/3` when the number of arguments is known",
       line_no: line_no
     )
   end

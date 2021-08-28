@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.ApplyTest do
+defmodule Credo.Check.Refactor.ApplyTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Readability.Apply
+  @described_check Credo.Check.Refactor.Apply
 
   test "it should NOT report violation for apply/2" do
     """
