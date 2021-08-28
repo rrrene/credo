@@ -9,12 +9,10 @@ defmodule Credo.Check.Readability.Apply do
       """
     ]
 
-  alias Credo.Code
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
   end
 
   defp traverse(ast, issues, issue_meta) do
@@ -35,7 +33,7 @@ defmodule Credo.Check.Readability.Apply do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Avoid apply when the number of arguments is known",
+      message: "Avoid `apply/3` when the number of arguments is known",
       line_no: line_no
     )
   end

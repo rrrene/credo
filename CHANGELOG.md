@@ -2,7 +2,7 @@
 
 ## 1.6.0
 
-- Credo changes from supporting the last 5 minor Elixir versions to the last 6 to be compatible with [Elixir's support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
+- Credo changes from supporting the last 5 minor Elixir versions to the last 6, to be compatible with [Elixir's own support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
 - `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
 - `Credo.Check.Design.AliasUsage` now supports `:only`
 - Credo now fails with an error message if a plugin module can not be initialized
@@ -80,14 +80,14 @@ There is also `--from-dir` which you can use to compare the current dir to anoth
 
 ### Pinning Checks in a Project's Config
 
-Credo's config always had one caveat: Your configuration settings are merged with the default config, without you having any chance of knowing what the default config is without (except by generating a fresh one via `mix credo.gen.config`).
+Credo's config always had one caveat: Your configuration settings are merged with the default config, without you having any chance of knowing what the default config is (except by generating a fresh one via `mix credo.gen.config`).
 
     %{
       configs: [
         %{
           name: "default",
           checks: [
-            # this configures `LargeNumbers` and all other checks are still enabled
+            # this configures `LargeNumbers` and all default checks are still enabled
             {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
           ]
         }
