@@ -7,6 +7,58 @@
 - `Credo.Check.Design.AliasUsage` now supports `:only`
 - Credo now fails with an error message if a plugin module can not be initialized
 
+### First Run Mode
+
+Credo 1.6 features a new mode, designed to be run everytime you introduce Credo to an existing codebase.
+
+```bash
+mix credo --first-run
+```
+
+This offers a couple of suggestions on how to introduce Credo to your workflow/CI.
+
+All of these suggestions are contextualized and project-specific, here's an example when running it on Credo's codebase:
+
+```bash
+-------------------------------------- 8< --------------------------------------
+
+
+# Where to start?
+
+That's a lot of issues to deal with at once.
+
+While not recommended, you could simply start ignoring issues for the time being:
+
+    mix credo --ignore readability      # exclude checks matching a given phrase
+
+You can use `diff` to only show the issues that were introduced on this branch:
+
+    mix credo diff master
+
+
+## Compare to a point in history
+
+Alternatively, you can use `diff` to only show the issues that were introduced after
+a certain tag or commit:
+
+    mix credo diff v1.5.6               # use the latest tag
+
+    mix credo diff e0d84ba9             # use the current HEAD of master
+
+Lastly, you can compare your working dir against this point in time:
+
+    mix credo diff --since 2021-08-28   # use the current date
+
+
+## Every project is different
+
+Introducing code analysis to an existing codebase should not be about following any
+"best practice" in particular, it should be about helping you to get to know the ropes
+and make the changes you want.
+
+Try the options outlined above to see which one is working for this project!
+```
+
 ### New Diff Options
 
 `mix credo diff` is often used when developing on a branch and comparing that branch with a base branch.
@@ -111,60 +163,6 @@ This has the added benefit that, when re-enabled via [`--enable-disabled-checks`
     }
 
 Of course, the "old" way of specifying a list of checks still works.
-
-### First Run Mode
-
-Credo 1.6 features a new mode, designed to be run everytime you introduce Credo to an existing codebase.
-
-```bash
-mix credo --first-run
-```
-
-This offers a couple of suggestions on how to introduce Credo to your workflow/CI.
-
-All of these suggestions are contextualized and project-specific, here's an example when running it on Credo's codebase:
-
-```bash
--------------------------------------- 8< --------------------------------------
-
-
-# Where to start?
-
-That's a lot of issues to deal with at once.
-
-While not recommended, you could simply start ignoring issues for the time being:
-
-    mix credo --ignore readability      # exclude checks matching a given phrase
-
-You can use `diff` to only show the issues that were introduced on this branch:
-
-    mix credo diff master
-
-
-## Compare to a point in history
-
-Alternatively, you can use `diff` to only show the issues that were introduced after
-a certain tag or commit:
-
-    mix credo diff v1.5.6               # use the latest tag
-
-    mix credo diff e0d84ba9             # use the current HEAD of master
-
-Lastly, you can compare your working dir against this point in time:
-
-    mix credo diff --since 2021-08-28   # use the current date
-
-
-## Every project is different
-
-Introducing code analysis to an existing codebase should not be about following any
-"best practice" in particular, it should be about helping you to get to know the ropes
-and make the changes you want.
-
-Try the options outlined above to see which one is working for this project!
-```
-
-
 
 ### Exit Status
 
