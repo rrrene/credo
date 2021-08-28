@@ -169,7 +169,7 @@ defmodule Credo.Execution do
   end
 
   def checks(%__MODULE__{
-        checks: checks,
+        checks: %{enabled: checks},
         only_checks: only_checks,
         only_checks_tags: only_checks_tags,
         ignore_checks: ignore_checks,

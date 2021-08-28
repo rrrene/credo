@@ -138,7 +138,7 @@ $ mix credo --enable-disabled-checks .+
 Only include these files (accepts globs, can be used multiple times)
 
 ```bash
-$ mix credo --files-included ./lib/**/*.ex --files-included ./src/**/*.ex
+$ mix credo --files-included "./lib/**/*.ex" --files-included "./src/**/*.ex"
 ```
 
 ### `--files-excluded`
@@ -146,7 +146,7 @@ $ mix credo --files-included ./lib/**/*.ex --files-included ./src/**/*.ex
 Exclude these files (accepts globs, can be used multiple times)
 
 ```bash
-$ mix credo --files-excluded ./test/**/*.exs
+$ mix credo --files-excluded "./test/**/*.exs"
 ```
 
 ### `--format`

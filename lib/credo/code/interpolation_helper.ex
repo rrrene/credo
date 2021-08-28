@@ -144,6 +144,14 @@ defmodule Credo.Code.InterpolationHelper do
 
   # Elixir < 1.9.0
   #
+  defp find_interpolations(
+         {{line_no, col_start, nil}, {line_no_end, col_end, nil}, list} = _token,
+         _source
+       )
+       when is_list(list) do
+    {line_no, col_start, line_no_end, col_end + 1}
+  end
+
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
@@ -205,8 +213,6 @@ defmodule Credo.Code.InterpolationHelper do
 
     # -1 to remove the accounted-for `}`
     padding = max(padding - 1, 0)
-
-    # IO.inspect(padding, label: "padding")
 
     {line_no, col_start, line_no_end, col_end + padding}
   end

@@ -1,5 +1,5 @@
 defmodule Credo.ConfigFile do
-  @doc """
+  @moduledoc """
   `ConfigFile` structs represent all loaded and merged config files in a run.
   """
 
@@ -67,7 +67,7 @@ defmodule Credo.ConfigFile do
     exec = Enum.reduce(config_files, exec, &Execution.append_config_file(&2, &1))
 
     Execution.get_config_files(exec)
-    |> Enum.map(&from_exs(dir, config_name || @default_config_name, &1, safe))
+    |> Enum.map(&from_exs(exec, dir, config_name || @default_config_name, &1, safe))
     |> ensure_any_config_found(config_name)
     |> merge()
     |> map_ok_files()
@@ -174,8 +174,8 @@ defmodule Credo.ConfigFile do
     for path <- paths, do: Path.join(path, @config_filename)
   end
 
-  defp from_exs(dir, config_name, {origin, filename, exs_string}, safe) do
-    case Credo.ExsLoader.parse(exs_string, safe) do
+  defp from_exs(exec, dir, config_name, {origin, filename, exs_string}, safe) do
+    case Credo.ExsLoader.parse(exs_string, filename, exec, safe) do
       {:ok, data} ->
         from_data(data, dir, filename, origin, config_name)
 
@@ -373,19 +373,6 @@ defmodule Credo.ConfigFile do
     merge_checks(base, other)
   end
 
-  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
-        checks: %{extra: checks_other_enabled} = checks_other
-      })
-      when is_list(checks_base) and is_list(checks_other_enabled) do
-    base = normalize_check_tuples(checks_base)
-    other = normalize_check_tuples(checks_other_enabled)
-    disabled = disable_check_tuples(checks_other[:disabled])
-
-    %{
-      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled)
-    }
-  end
-
   def merge_checks(%__MODULE__{checks: _checks_base}, %__MODULE__{
         checks: %{enabled: checks_other_enabled} = checks_other
       })
@@ -393,7 +380,22 @@ defmodule Credo.ConfigFile do
     disabled = disable_check_tuples(checks_other[:disabled])
 
     %{
-      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled)
+      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled),
+      disabled: checks_other[:disabled] || []
+    }
+  end
+
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+        checks: %{} = checks_other
+      })
+      when is_list(checks_base) do
+    base = normalize_check_tuples(checks_base)
+    other = normalize_check_tuples(checks_other[:extra])
+    disabled = disable_check_tuples(checks_other[:disabled])
+
+    %{
+      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled),
+      disabled: checks_other[:disabled] || []
     }
   end
 

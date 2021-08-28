@@ -1,10 +1,10 @@
 defmodule Credo.ExsLoader do
   @moduledoc false
 
-  def parse(exs_string, safe \\ false)
+  def parse(exs_string, filename, exec, safe \\ false)
 
-  def parse(exs_string, true) do
-    case Code.string_to_quoted(exs_string) do
+  def parse(exs_string, filename, _exec, true) do
+    case Code.string_to_quoted(exs_string, file: filename) do
       {:ok, ast} ->
         {:ok, process_exs(ast)}
 
@@ -16,8 +16,13 @@ defmodule Credo.ExsLoader do
     end
   end
 
-  def parse(exs_string, false) do
-    {result, _binding} = Code.eval_string(exs_string)
+  def parse(exs_string, filename, exec, false) when is_atom(filename) do
+    parse(exs_string, "mod:#{filename}", exec, false)
+  end
+
+  def parse(exs_string, filename, exec, false) when is_binary(filename) do
+    {result, _binding} =
+      Code.eval_string(exs_string, [exec: exec], file: to_string(filename) || "nofile")
 
     {:ok, result}
   rescue

@@ -115,6 +115,13 @@ defmodule Credo.CLI.Options do
       |> Enum.into(%{})
       |> Map.merge(switches_with_lists_as_map)
 
+    {path, switches} =
+      if File.dir?(path) do
+        {path, switches}
+      else
+        {current_dir, Map.put(switches, :files_included, [path])}
+      end
+
     %__MODULE__{
       command: command || given_command_name,
       path: path,
