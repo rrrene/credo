@@ -175,6 +175,7 @@
           {Credo.Check.Readability.ImplTrue, []},
           {Credo.Check.Readability.MultiAlias, []},
           {Credo.Check.Readability.SeparateAliasRequire, []},
+          {Credo.Check.Readability.SingleBlockPipe, []},
           {Credo.Check.Readability.SinglePipe, []},
           {Credo.Check.Readability.Specs, []},
           {Credo.Check.Readability.StrictModuleLayout, []},
