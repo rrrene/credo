@@ -197,6 +197,7 @@ mix credo --working-dir ../other-elixir-project/
 - `Credo.Check.Readability.PipeIntoAnonymousFunctions`
 - `Credo.Check.Readability.SingleFunctionToBlockPipe`
 - `Credo.Check.Refactor.Apply`
+- `Credo.Check.Refactor.IoPuts`
 - `Credo.Check.Refactor.MapJoin`
 - `Credo.Check.Refactor.RedundantWithClauseResult`
 
