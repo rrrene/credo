@@ -1,12 +1,14 @@
 defmodule Credo.Check.Refactor.IoPuts do
   use Credo.Check,
-    base_priority: :high,
+    tags: [:controversial],
     explanations: [
       check: """
-      While calls to IO.puts might appear in some parts of production code,
-      most calls to this function are added during debugging sessions.
+      Prefer using Logger statements over using `IO.puts/1`.
 
-      Consider using Logger statements instead, to benefit from its many features.
+      This is a situational check.
+
+      As such, it might be a great help for e.g. Phoenix projects, but
+      a clear mismatch for CLI projects.
       """
     ]
 
