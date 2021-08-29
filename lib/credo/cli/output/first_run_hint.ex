@@ -222,7 +222,11 @@ defmodule Credo.CLI.Output.FirstRunHint do
   end
 
   defp now do
-    DateTime.utc_now()
-    |> Calendar.strftime("%Y-%m-%d")
+    %{year: year, month: month, day: day} = DateTime.utc_now()
+
+    "#{year}-#{pad(month)}-#{pad(day)}"
   end
+
+  defp pad(number) when number < 10, do: "0#{number}"
+  defp pad(number), do: to_string(number)
 end
