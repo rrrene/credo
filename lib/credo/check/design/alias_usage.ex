@@ -52,8 +52,9 @@ defmodule Credo.Check.Design.AliasUsage do
         if_called_more_often_than:
           "Only raise an issue if a module is called more often than this.",
         only: """
-          Regex or a list of regexes that specifies which modules to include for this check.
-          `excluded_namespaces` and `excluded_lastnames` take precendence over this parameter.
+        Regex or a list of regexes that specifies which modules to include for this check.
+
+        `excluded_namespaces` and `excluded_lastnames` take precendence over this parameter.
         """
       ]
     ]
@@ -76,7 +77,9 @@ defmodule Credo.Check.Design.AliasUsage do
     only = Params.get(params, :only, __MODULE__)
 
     source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only))
+    |> Credo.Code.prewalk(
+      &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only)
+    )
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
   end

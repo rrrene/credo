@@ -3,6 +3,7 @@
 ## 1.6.0
 
 - Credo changes from supporting the last 5 minor Elixir versions to the last 6, to be compatible with [Elixir's own support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
+- Credo's docs now provide the ability to link specific check params, e.g.  [check out :max_length for MaxLineLength](/Credo.Check.Readability.MaxLineLength.html#module-max_length)
 - `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
 - `Credo.Check.Design.AliasUsage` now supports `:only`
 - Credo now fails with an error message if a plugin module can not be initialized
@@ -194,6 +195,8 @@ mix credo --working-dir ../other-elixir-project/
 
 - `Credo.Check.Design.SkipTestWithoutComment`
 - `Credo.Check.Readability.PipeIntoAnonymousFunctions`
+- `Credo.Check.Readability.SingleFunctionToBlockPipe`
+- `Credo.Check.Refactor.Apply`
 - `Credo.Check.Refactor.MapJoin`
 - `Credo.Check.Refactor.RedundantWithClauseResult`
 

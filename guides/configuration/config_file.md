@@ -123,7 +123,7 @@ The `:files` map can have two fields:
 
 Configures plugin modules that Credo should load at start up (*defaults to `[]`*).
 
-This is needed to [enable and configure plugins](../plugins/plugins.md) in the analysis.
+This is needed to [enable and configure plugins](../plugins/using_plugins.md) in the analysis.
 
 ```elixir
 # .credo.exs

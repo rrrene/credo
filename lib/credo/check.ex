@@ -477,17 +477,17 @@ defmodule Credo.Check do
 
             default_hint =
               if default_value do
-                """
-
-                    *Defaults to* `#{default_value}`
-                """
+                "*This parameter defaults to* `#{default_value}`."
               end
 
             value = value |> String.split("\n") |> Enum.map_join("\n", &"  #{&1}")
 
             """
-            - `#{key}`: #{value}
-              #{default_hint}
+            ### `:#{key}`
+
+            #{value}
+
+            #{default_hint}
 
             """
           end)
@@ -507,9 +507,11 @@ defmodule Credo.Check do
 
     #{check_doc}
 
-    ## Configuration parameters
+    ## Check-Specific Parameters
 
     #{params_doc}
+
+    ## General Parameters
 
     Like with all checks, [general params](check_params.html) can be applied.
 
