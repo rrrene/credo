@@ -156,8 +156,6 @@ defmodule Credo.Code.InterpolationHelper do
   defp find_interpolations({{_line_no, _col_start2, _}, _list} = token, source) do
     {line_no, col_start, line_no_end, col_end} = Token.position(token)
 
-    {line_no, col_start, line_no_end, col_end}
-
     col_end =
       if line_no_end > line_no && col_end == 1 do
         # This means we encountered :eol and jumped in the next line.
