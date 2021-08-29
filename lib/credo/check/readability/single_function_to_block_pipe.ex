@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.SingleBlockPipe do
+defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
   use Credo.Check,
     tags: [:controversial],
     explanations: [

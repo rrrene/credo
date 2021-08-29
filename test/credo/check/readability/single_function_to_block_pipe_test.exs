@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.SingleBlockPipeTest do
+defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Readability.SingleBlockPipe
+  @described_check Credo.Check.Readability.SingleFunctionToBlockPipe
 
   test "it should NOT report violation for valid pipes" do
     """
@@ -60,7 +60,6 @@ defmodule Credo.Check.Readability.SingleBlockPipeTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
-
 
   test "it should report violation for single pipes to block" do
     """
