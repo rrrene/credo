@@ -38,6 +38,10 @@ defmodule Credo.Check.Refactor.Apply do
   defp issue({:apply, meta, [_fun, args]}, issue_meta) when is_list(args),
     do: issue_for(issue_meta, meta[:line])
 
+  defp issue({:apply, _meta, [_module, {atom, _meta2, nil}, args]}, _issue_meta)
+       when is_atom(atom) and is_list(args),
+       do: nil
+
   defp issue({:apply, meta, [_module, _fun, args]}, issue_meta) when is_list(args),
     do: issue_for(issue_meta, meta[:line])
 
