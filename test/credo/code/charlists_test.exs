@@ -97,4 +97,23 @@ defmodule Credo.Code.CharlistsTest do
     assert result == result2, "Charlists.replace_with_spaces/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
+
+  @tag slow: :disk_io
+  test "it should produce valid code /5" do
+    example_code = File.read!("test/fixtures/example_code/browser.ex")
+
+    result =
+      example_code
+      |> to_source_file()
+      |> Charlists.replace_with_spaces(".", ".")
+
+    result2 =
+      result
+      |> Charlists.replace_with_spaces(".", ".")
+
+    assert match?({:ok, _}, Code.string_to_quoted(result)),
+           "Charlists.replace_with_spaces/2 should produce valid code"
+
+    assert result == result2, "Charlists.replace_with_spaces/2 should be idempotent"
+  end
 end

@@ -95,7 +95,7 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement)
+    parse_heredoc(t, acc <> ~s("""), replacement, ~s("""))
   end
 
   defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement) do
@@ -135,7 +135,7 @@ defmodule Credo.Code.Sigils do
   defp parse_charlist(str, acc, replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
 
-    parse_comment(t, acc <> h, replacement)
+    parse_charlist(t, acc <> h, replacement)
   end
 
   #
@@ -195,12 +195,44 @@ defmodule Credo.Code.Sigils do
     end
 
     defp parse_removable_sigil(
+           <<"\\"::utf8, s::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      {_h, t} = String.next_codepoint(s)
+
+      parse_removable_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
+    end
+
+    defp parse_removable_sigil(
+           # \\
            <<"\\\\"::utf8, t::binary>>,
            acc,
            unquote(sigil_end),
            replacement
          ) do
-      parse_removable_sigil(t, acc, unquote(sigil_end), replacement)
+      parse_removable_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
+    end
+
+    if sigil_end != "\"" do
+      defp parse_removable_sigil(
+             <<"\""::utf8, t::binary>>,
+             acc,
+             unquote(sigil_end),
+             replacement
+           ) do
+        parse_removable_sigil(t, acc <> replacement, unquote(sigil_end), replacement)
+      end
+    end
+
+    defp parse_removable_sigil(
+           <<"\\\\"::utf8, t::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      parse_removable_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
     end
 
     defp parse_removable_sigil(
@@ -254,28 +286,32 @@ defmodule Credo.Code.Sigils do
   # Heredocs
   #
 
-  defp parse_heredoc("", acc, _replacement) do
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do
+    parse_code(t, acc <> "\"\"\"", replacement)
+  end
+
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
+    parse_code(t, acc <> "\'\'\'", replacement)
+  end
+
+  defp parse_heredoc("", acc, _replacement, _delimiter) do
     acc
   end
 
-  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> "\\\\", replacement)
+  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc <> "\\\\", replacement, delimiter)
   end
 
-  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> "\\\"", replacement)
+  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc <> "\\\"", replacement, delimiter)
   end
 
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
-    parse_code(t, acc <> ~s("""), replacement)
+  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement, delimiter) do
+    parse_heredoc(t, acc <> "\n", replacement, delimiter)
   end
 
-  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> "\n", replacement)
-  end
-
-  defp parse_heredoc(str, acc, replacement) when is_binary(str) do
+  defp parse_heredoc(str, acc, replacement, delimiter) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
-    parse_heredoc(t, acc <> h, replacement)
+    parse_heredoc(t, acc <> h, replacement, delimiter)
   end
 end

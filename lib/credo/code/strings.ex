@@ -13,7 +13,8 @@ defmodule Credo.Code.Strings do
     {"<", ">"},
     {"|", "|"},
     {"\"", "\""},
-    {"'", "'"}
+    {"'", "'"},
+    {"/", "/"}
   ]
 
   heredocs_sigil_delimiters = [
@@ -32,9 +33,6 @@ defmodule Credo.Code.Strings do
     Enum.flat_map(heredocs_sigil_delimiters, fn {b, e} ->
       [{"~s#{b}", e}, {"~S#{b}", e}]
     end)
-
-  # TODO v1.0: this should not remove heredocs, since
-  #             there is a separate module for that
 
   @doc """
   Replaces all characters inside string literals and string sigils
@@ -216,7 +214,7 @@ defmodule Credo.Code.Strings do
            unquote(sigil_end),
            replacement
          ) do
-      parse_string_sigil(t, acc, unquote(sigil_end), replacement)
+      parse_string_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
     end
 
     defp parse_string_sigil(
@@ -225,7 +223,7 @@ defmodule Credo.Code.Strings do
            unquote(sigil_end),
            replacement
          ) do
-      parse_string_sigil(t, acc, unquote(sigil_end), replacement)
+      parse_string_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
     end
 
     defp parse_string_sigil(
@@ -260,12 +258,24 @@ defmodule Credo.Code.Strings do
   # Heredocs
   #
 
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, "" = replacement, "\"\"\"") do
+    parse_code(t, acc, replacement)
+  end
+
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do
-    parse_code(t, acc <> ~s("""), replacement)
+    acc = Regex.replace(~r/([#{replacement}]+)(\"\"\")\z/m, acc <> "\"\"\"", "\"\"\"")
+
+    parse_code(t, acc, replacement)
+  end
+
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, "" = replacement, "\'\'\'") do
+    parse_code(t, acc, replacement)
   end
 
   defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
-    parse_code(t, acc <> ~s('''), replacement)
+    acc = Regex.replace(~r/([#{replacement}]+)(\'\'\')\z/m, acc <> "\'\'\'", "\'\'\'")
+
+    parse_code(t, acc, replacement)
   end
 
   defp parse_heredoc("", acc, _replacement, _delimiter) do

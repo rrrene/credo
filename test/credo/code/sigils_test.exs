@@ -20,6 +20,10 @@ defmodule Credo.Code.SigilsTest do
     x = ~C{a b c}
     x = ~S<a b c>
     "~S( i am not a sigil! )"
+    '~S( i am not a sigil! )'
+    \"\"\"
+    ~S( i am not a sigil! )
+    \"\"\"
     """
 
     expected = """
@@ -38,9 +42,13 @@ defmodule Credo.Code.SigilsTest do
     x = ~C{     }
     x = ~S<     >
     "~S( i am not a sigil! )"
+    '~S( i am not a sigil! )'
+    \"\"\"
+    ~S( i am not a sigil! )
+    \"\"\"
     """
 
-    result = source |> Sigils.replace_with_spaces()
+    result = Sigils.replace_with_spaces(source)
     assert expected == result
   end
 
@@ -53,7 +61,22 @@ defmodule Credo.Code.SigilsTest do
     x = Regex.match?(~r/                         /, value)
     """
 
-    result = source |> Sigils.replace_with_spaces()
+    result = Sigils.replace_with_spaces(source)
+    assert expected == result
+  end
+
+  test "it should return the source without string literals 5" do
+    source = """
+    x = Regex.match?(~r/\\"/, value)
+    ~r{<>:"/\\\\\\?\\*}
+    """
+
+    expected = """
+    x = Regex.match?(~r/  /, value)
+    ~r{           }
+    """
+
+    result = Sigils.replace_with_spaces(source)
     assert expected == result
   end
 
@@ -61,6 +84,7 @@ defmodule Credo.Code.SigilsTest do
     source = """
     defmodule Credo.CLI.Command.List do
       defp print_help do
+        '\\'this is a charlist!'
         x = ~w(remove me)
         \"\"\"
         Arrows (↑ ↗ → ↘ ↓) hint at the importance of the object being looked at.
@@ -75,6 +99,7 @@ defmodule Credo.Code.SigilsTest do
     expected = """
     defmodule Credo.CLI.Command.List do
       defp print_help do
+        '\\'this is a charlist!'
         x = ~w(         )
         \"\"\"
         Arrows (↑ ↗ → ↘ ↓) hint at the importance of the object being looked at.
@@ -86,7 +111,7 @@ defmodule Credo.Code.SigilsTest do
     end
     """
 
-    result = source |> Sigils.replace_with_spaces()
+    result = Sigils.replace_with_spaces(source)
     assert expected == result
   end
 
@@ -221,6 +246,44 @@ defmodule Credo.Code.SigilsTest do
     result = Sigils.replace_with_spaces(example_code)
     result2 = Sigils.replace_with_spaces(result)
 
+    assert match?({:ok, _}, Code.string_to_quoted(result)),
+           "Sigils.replace_with_spaces/2 should produce valid code"
+
+    assert result == result2, "Sigils.replace_with_spaces/2 should be idempotent"
+  end
+
+  @tag slow: :disk_io
+  test "it should produce valid code /5" do
+    example_code = File.read!("test/fixtures/example_code/browser.ex")
+
+    result =
+      example_code
+      |> to_source_file()
+      |> Sigils.replace_with_spaces(".", ".")
+
+    result2 =
+      result
+      |> Sigils.replace_with_spaces(".", ".")
+
+    assert match?({:ok, _}, Code.string_to_quoted(result)),
+           "Sigils.replace_with_spaces/2 should produce valid code"
+
+    assert result == result2, "Sigils.replace_with_spaces/2 should be idempotent"
+  end
+
+  test "it should produce valid code /7" do
+    source = ~S"""
+    String.replace(string, ~r{<>:"/\\\?\*}, "")
+    """
+
+    expected = ~S"""
+    String.replace(string, ~r{           }, "")
+    """
+
+    result = Sigils.replace_with_spaces(source)
+    result2 = Sigils.replace_with_spaces(result)
+
+    assert result == expected
     assert result == result2, "Sigils.replace_with_spaces/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
