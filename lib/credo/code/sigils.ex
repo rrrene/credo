@@ -227,15 +227,6 @@ defmodule Credo.Code.Sigils do
     end
 
     defp parse_removable_sigil(
-           <<"\\\\"::utf8, t::binary>>,
-           acc,
-           unquote(sigil_end),
-           replacement
-         ) do
-      parse_removable_sigil(t, acc <> replacement <> replacement, unquote(sigil_end), replacement)
-    end
-
-    defp parse_removable_sigil(
            <<unquote("\\#{sigil_end}")::utf8, t::binary>>,
            acc,
            unquote(sigil_end),
