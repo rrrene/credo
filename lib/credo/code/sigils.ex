@@ -6,7 +6,33 @@ defmodule Credo.Code.Sigils do
   alias Credo.Code.InterpolationHelper
   alias Credo.SourceFile
 
-  alphabet = ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+  string_sigil_delimiters = [
+    {"(", ")"},
+    {"[", "]"},
+    {"{", "}"},
+    {"<", ">"},
+    {"|", "|"},
+    {"\"", "\""},
+    {"'", "'"},
+    {"/", "/"}
+  ]
+
+  heredocs_sigil_delimiters = [
+    {"'''", "'''"},
+    {~s("""), ~s(""")}
+  ]
+
+  all_string_sigils =
+    Enum.flat_map(string_sigil_delimiters, fn {b, e} ->
+      [{"~s#{b}", e}, {"~S#{b}", e}]
+    end)
+
+  all_heredocs_sigils =
+    Enum.flat_map(heredocs_sigil_delimiters, fn {b, e} ->
+      [{"~s#{b}", e}, {"~S#{b}", e}]
+    end)
+
+  alphabet = ~w(a b c d e f g h i j k l m n o p q r t u v w x y z)
 
   sigil_delimiters = [
     {"(", ")"},
@@ -59,17 +85,6 @@ defmodule Credo.Code.Sigils do
     acc
   end
 
-  for {sigil_start, sigil_end} <- removable_sigils do
-    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
-      parse_removable_sigil(
-        t,
-        acc <> unquote(sigil_start),
-        unquote(sigil_end),
-        replacement
-      )
-    end
-  end
-
   defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement) do
     parse_code(t, acc <> "\\\"", replacement)
   end
@@ -94,8 +109,45 @@ defmodule Credo.Code.Sigils do
     parse_comment(t, acc <> "#", replacement)
   end
 
+  for {sigil_start, sigil_end} <- removable_sigils do
+    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
+      parse_removable_sigil(
+        t,
+        acc <> unquote(sigil_start),
+        unquote(sigil_end),
+        replacement
+      )
+    end
+  end
+
+  for {sigil_start, sigil_end} <- all_heredocs_sigils do
+    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
+      parse_heredoc(
+        t,
+        acc <> unquote(sigil_start),
+        replacement,
+        unquote(sigil_end)
+      )
+    end
+  end
+
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
     parse_heredoc(t, acc <> ~s("""), replacement, ~s("""))
+  end
+
+  defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
+    parse_heredoc(t, acc <> ~s('''), replacement, ~s('''))
+  end
+
+  for {sigil_start, sigil_end} <- all_string_sigils do
+    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
+      parse_removable_sigil(
+        t,
+        acc <> unquote(sigil_start),
+        unquote(sigil_end),
+        replacement
+      )
+    end
   end
 
   defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement) do

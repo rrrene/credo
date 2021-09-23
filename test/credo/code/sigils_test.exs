@@ -240,6 +240,59 @@ defmodule Credo.Code.SigilsTest do
     assert expected == Sigils.replace_with_spaces(source, "")
   end
 
+  test "it should not heredocs" do
+    source = ~S'''
+    test "some test case" do
+      source = ~S"""
+      defmodule CredoSampleModule do
+        def escape_subsection(""), do: "\"\""
+
+        def escape_subsection(x) when is_binary(x) do
+          x
+          |> String.to_charlist()
+          |> escape_subsection_impl([])
+          |> Enum.reverse()
+          |> to_quoted_string()
+        end
+
+        defp to_quoted_string(s), do: ~s["test string"]
+
+        # git-config(1) lists the limited set of supported escape sequences
+        # (which is even more limited for subsection names than for values).
+
+        defp escape_subsection_impl([], reversed_result), do: reversed_result
+
+        defp escape_subsection_impl([0 | _], _reversed_result),
+          do: raise(ConfigInvalidError, "config subsection name contains byte 0x00")
+
+        defp escape_subsection_impl([?\n | _], _reversed_result),
+          do: raise(ConfigInvalidError, "config subsection name contains newline")
+
+        defp escape_subsection_impl([c | remainder], reversed_result)
+            when c == ?\\ or c == ?",
+            do: escape_subsection_impl(remainder, [c | [?\\ | reversed_result]])
+
+        defp escape_subsection_impl([c | remainder], reversed_result),
+          do: escape_subsection_impl(remainder, [c | reversed_result])
+
+      end
+      """
+
+      expected = source
+
+      assert expected == Heredocs.replace_with_spaces(source)
+    end
+    '''
+
+    result = Sigils.replace_with_spaces(source)
+    result2 = Sigils.replace_with_spaces(result)
+
+    assert match?({:ok, _}, Code.string_to_quoted(result)),
+           "Sigils.replace_with_spaces/2 should produce valid code"
+
+    assert result == result2, "Sigils.replace_with_spaces/2 should be idempotent"
+  end
+
   @tag slow: :disk_io
   test "it should produce valid code /2" do
     example_code = File.read!("test/fixtures/example_code/nested_escaped_heredocs.ex")

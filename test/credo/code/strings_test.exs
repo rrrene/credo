@@ -203,8 +203,6 @@ defmodule Credo.Code.StringsTest do
       |> to_source_file()
       |> Strings.replace_with_spaces(".", ".")
 
-    IO.puts(result)
-
     result2 =
       result
       |> Strings.replace_with_spaces(".", ".")

@@ -51,5 +51,5 @@ jobs:
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile --warnings-as-errors
-      - run: mix test.fast
+      - run: mix test.fast --include slow:disk_io
       - run: ./test/smoke_test.sh

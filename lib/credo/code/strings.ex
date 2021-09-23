@@ -34,6 +34,38 @@ defmodule Credo.Code.Strings do
       [{"~s#{b}", e}, {"~S#{b}", e}]
     end)
 
+  alphabet = ~w(a b c d e f g h i j k l m n o p q r t u v w x y z)
+
+  sigil_delimiters = [
+    {"(", ")"},
+    {"[", "]"},
+    {"{", "}"},
+    {"<", ">"},
+    {"|", "|"},
+    {"/", "/"},
+    {"\"\"\"", "\"\"\""},
+    {"\"", "\""},
+    {"'", "'"}
+  ]
+
+  all_sigil_chars =
+    Enum.flat_map(alphabet, fn a ->
+      [a, String.upcase(a)]
+    end)
+
+  all_sigil_starts = Enum.map(all_sigil_chars, fn c -> "~#{c}" end)
+
+  removable_sigil_ends = Enum.map(sigil_delimiters, &elem(&1, 1))
+
+  removable_sigils =
+    sigil_delimiters
+    |> Enum.flat_map(fn {b, e} ->
+      Enum.flat_map(all_sigil_starts, fn start ->
+        [{"#{start}#{b}", e}, {"#{start}#{b}", e}]
+      end)
+    end)
+    |> Enum.uniq()
+
   @doc """
   Replaces all characters inside string literals and string sigils
   with the equivalent amount of white-space.
@@ -53,6 +85,17 @@ defmodule Credo.Code.Strings do
 
   defp parse_code("", acc, _replacement) do
     acc
+  end
+
+  for {sigil_start, sigil_end} <- removable_sigils do
+    defp parse_code(<<unquote(sigil_start)::utf8, t::binary>>, acc, replacement) do
+      parse_removable_sigil(
+        t,
+        acc <> unquote(sigil_start),
+        unquote(sigil_end),
+        replacement
+      )
+    end
   end
 
   for {sigil_start, sigil_end} <- all_heredocs_sigils do
@@ -197,6 +240,92 @@ defmodule Credo.Code.Strings do
 
   defp parse_string_literal(<<_::utf8, t::binary>>, acc, replacement) do
     parse_string_literal(t, acc <> replacement, replacement)
+  end
+
+  #
+  # Non-String Sigils
+  #
+
+  for sigil_end <- removable_sigil_ends do
+    defp parse_removable_sigil("", acc, unquote(sigil_end), _replacement) do
+      acc
+    end
+
+    defp parse_removable_sigil(
+           <<"\\"::utf8, s::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      {h, t} = String.next_codepoint(s)
+
+      parse_removable_sigil(t, acc <> "\\" <> h, unquote(sigil_end), replacement)
+    end
+
+    defp parse_removable_sigil(
+           # \\
+           <<"\\\\"::utf8, t::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      parse_removable_sigil(t, acc <> "\\\\", unquote(sigil_end), replacement)
+    end
+
+    if sigil_end != "\"" do
+      defp parse_removable_sigil(
+             <<"\""::utf8, t::binary>>,
+             acc,
+             unquote(sigil_end),
+             replacement
+           ) do
+        parse_removable_sigil(t, acc <> "\"", unquote(sigil_end), replacement)
+      end
+    end
+
+    defp parse_removable_sigil(
+           <<unquote("\\#{sigil_end}")::utf8, t::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      parse_removable_sigil(
+        t,
+        acc <> unquote("\\#{sigil_end}"),
+        unquote(sigil_end),
+        replacement
+      )
+    end
+
+    defp parse_removable_sigil(
+           <<unquote(sigil_end)::utf8, t::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      parse_code(t, acc <> unquote(sigil_end), replacement)
+    end
+
+    defp parse_removable_sigil(
+           <<"\n"::utf8, t::binary>>,
+           acc,
+           unquote(sigil_end),
+           replacement
+         ) do
+      parse_removable_sigil(t, acc <> "\n", unquote(sigil_end), replacement)
+    end
+
+    defp parse_removable_sigil(
+           str,
+           acc,
+           unquote(sigil_end),
+           replacement
+         )
+         when is_binary(str) do
+      {h, t} = String.next_codepoint(str)
+
+      parse_removable_sigil(t, acc <> h, unquote(sigil_end), replacement)
+    end
   end
 
   #

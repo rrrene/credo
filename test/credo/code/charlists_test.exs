@@ -111,8 +111,12 @@ defmodule Credo.Code.CharlistsTest do
       result
       |> Charlists.replace_with_spaces(".", ".")
 
+    if not match?({:ok, _}, Code.string_to_quoted(result)) do
+      IO.puts(result)
+    end
+
     assert match?({:ok, _}, Code.string_to_quoted(result)),
-           "Charlists.replace_with_spaces/2 should produce valid code"
+           "Charlists.replace_with_spaces/2 should produce valid code #{inspect(Code.string_to_quoted(result))}"
 
     assert result == result2, "Charlists.replace_with_spaces/2 should be idempotent"
   end
