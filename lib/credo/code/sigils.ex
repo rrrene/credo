@@ -116,6 +116,10 @@ defmodule Credo.Code.Sigils do
   # Charlists
   #
 
+  defp parse_charlist("", acc, _replacement) do
+    acc
+  end
+
   defp parse_charlist(<<"\\\\"::utf8, t::binary>>, acc, replacement) do
     parse_charlist(t, acc <> "\\\\", replacement)
   end
