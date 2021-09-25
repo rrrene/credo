@@ -141,6 +141,10 @@ defmodule Credo.Code do
       # Elixir >= 1.6
       {:ok, tokens} ->
         tokens
+
+      # Elixir >= 1.13
+      {:ok, _, tokens} ->
+        tokens
     end
   end
 
