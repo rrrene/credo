@@ -47,7 +47,7 @@ defmodule Credo.CLI.Output.UITest do
   end
 
   test "truncate when max_length > ellipsis length and truncation required" do
-    # Even if the ellipsis is longer than the max lenght we should not
+    # Even if the ellipsis is longer than the max length we should not
     # truncate the ellipsis so the human reader doesn't have to figure out
     # that the "." they're seeing is part of a truncated "..."
     assert UI.truncate("hello", 1, "...") == "..."

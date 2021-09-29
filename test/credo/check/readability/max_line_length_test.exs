@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
-  test "it should NOT report expected code if function defintions are excluded" do
+  test "it should NOT report expected code if function definitions are excluded" do
     """
     defmodule CredoSampleModule do
       use ExUnit.Case

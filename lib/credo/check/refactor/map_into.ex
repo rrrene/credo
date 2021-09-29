@@ -1,5 +1,5 @@
 defmodule Credo.Check.Refactor.MapInto do
-  # only avaible in Elixir < 1.8 since performance improvements have since made this check obsolete
+  # only available in Elixir < 1.8 since performance improvements have since made this check obsolete
   use Credo.Check,
     base_priority: :high,
     elixir_version: "< 1.8.0",
@@ -21,7 +21,7 @@ defmodule Credo.Check.Refactor.MapInto do
       `Enum.map/2` and `Enum.into/2` require two iterations whereas
       `Enum.into/3` only requires one.
 
-      **NOTE**: This check is only avaible in Elixir < 1.8 since performance
+      **NOTE**: This check is only available in Elixir < 1.8 since performance
       improvements have since made this check obsolete.
       """
     ]

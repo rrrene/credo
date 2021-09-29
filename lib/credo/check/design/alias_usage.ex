@@ -54,7 +54,7 @@ defmodule Credo.Check.Design.AliasUsage do
         only: """
         Regex or a list of regexes that specifies which modules to include for this check.
 
-        `excluded_namespaces` and `excluded_lastnames` take precendence over this parameter.
+        `excluded_namespaces` and `excluded_lastnames` take precedence over this parameter.
         """
       ]
     ]
@@ -143,7 +143,7 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, issues}
   end
 
-  # Ignore alias containg an `unquote` call
+  # Ignore alias containing an `unquote` call
   defp find_issues(
          {:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast,
          issues,

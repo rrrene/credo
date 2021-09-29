@@ -45,4 +45,4 @@ mix credo -h
 
 
 echo ""
-echo "Smoke test succesful."
+echo "Smoke test successful."

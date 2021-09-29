@@ -39,8 +39,8 @@ defmodule Credo.Check.Design.TagHelper do
   defp traverse({:@, _, [{name, meta, [string]} | _]} = ast, issues, regex)
        when name in @doc_attribute_names and is_binary(string) do
     if string =~ regex do
-      trimed = String.trim_trailing(string)
-      {nil, issues ++ [{meta[:line], trimed, trimed}]}
+      trimmed = String.trim_trailing(string)
+      {nil, issues ++ [{meta[:line], trimmed, trimmed}]}
     else
       {ast, issues}
     end

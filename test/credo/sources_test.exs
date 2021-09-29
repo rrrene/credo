@@ -191,13 +191,13 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it find list of pathes" do
-    pathes =
+  test "it find list of paths" do
+    paths =
       ["lib/credo.ex", "lib/credo/cli.ex"]
       |> Enum.map(&Path.expand/1)
 
-    expected = pathes
-    assert expected == Credo.Sources.find(pathes)
+    expected = paths
+    assert expected == Credo.Sources.find(paths)
   end
 
   test "it finds with empty list path" do

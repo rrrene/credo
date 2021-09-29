@@ -3,7 +3,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
 
   @described_check Credo.Check.Design.SkipTestWithoutComment
 
-  test "it should NOT report when comment preceeds the tag" do
+  test "it should NOT report when comment precedes the tag" do
     """
     defmodule CredoSampleModuleTest do
       alias ExUnit.Case
