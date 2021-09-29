@@ -66,7 +66,7 @@ defmodule Xgit.Lib.Config do
   TO DO: https://github.com/elixir-git/xgit/issues/129
 
   PORTING NOTE: Xgit does not have explicit enum support, unlike jgit. There is very
-  little about the various `ConfigEnum` implementations that is sharable, so it did
+  little about the various `ConfigEnum` implementations that is shareable, so it did
   not seem worth it to port that mechanism. Xgit instead stores the enum values
   directly as strings. Some one-off modules may provide additional support for
   recognizing known strings or variants.

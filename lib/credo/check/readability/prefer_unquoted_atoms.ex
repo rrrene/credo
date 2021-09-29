@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
       Prefer unquoted atoms unless quotes are necessary.
       This is helpful because a quoted atom can be easily mistaken for a string.
 
-          # prefered
+          # preferred
 
           :x
           [x: 1]

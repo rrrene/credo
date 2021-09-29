@@ -15,7 +15,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
           |> Enum.each(&IO.puts/1)
 
       This will cause a `Protocol.UndefinedError`, since `nil` isn't `Enumerable`.
-      Often times while iterating over enumerables zero iterations is preferrable
+      Often times while iterating over enumerables zero iterations is preferable
       to being forced to deal with an exception. Had there been a `[]` default
       parameter this could have been averted.
 

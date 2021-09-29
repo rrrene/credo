@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report if module name cannot be determinated" do
+  test "it should NOT report if module name cannot be determined" do
     """
     defmacro foo(quoted_module) do
       {module, []} = Code.eval_quoted(quoted_module)

@@ -10,7 +10,7 @@
 
 ### First Run Mode
 
-Credo 1.6 features a new mode, designed to be run everytime you introduce Credo to an existing codebase.
+Credo 1.6 features a new mode, designed to be run every time you introduce Credo to an existing codebase.
 
 ```bash
 mix credo --first-run
@@ -1130,7 +1130,7 @@ Switched some checks to opt-in by default
 
 ## 0.2.5
 
-- Fix error occuring when a project has exactly one `defexception` module
+- Fix error occurring when a project has exactly one `defexception` module
 - Change the tag for Refactoring Opportunities from "[R]" to "[F]" (thx @rranelli)
 
 ## 0.2.4

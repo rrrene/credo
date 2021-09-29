@@ -77,14 +77,14 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
   # cases NOT raising issues
   #
 
-  test "it should NOT report issues when variable decalrations are consistently on the left side" do
+  test "it should NOT report issues when variable declarations are consistently on the left side" do
     [@var_left_map, @var_left_struct, @var_left_list]
     |> to_source_files
     |> run_check(@described_check)
     |> refute_issues()
   end
 
-  test "it should NOT report issues when variable decalrations are consistently on the right side" do
+  test "it should NOT report issues when variable declarations are consistently on the right side" do
     [@var_right_map, @var_right_struct, @var_right_list]
     |> to_source_files
     |> run_check(@described_check)
@@ -131,7 +131,7 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
     end)
   end
 
-  test "it should report issues when variable decalrations are inconsistent throughout sourcefiles" do
+  test "it should report issues when variable declarations are inconsistent throughout sourcefiles" do
     issues =
       [
         @var_right_map,
@@ -149,7 +149,7 @@ defmodule Credo.Check.Readability.ParameterPatternMatchingTest do
     assert 3 == Enum.count(issues)
   end
 
-  test "it should report issues when variable decalrations are inconsistent throughout sourcefiles (preffering left side)" do
+  test "it should report issues when variable declarations are inconsistent throughout sourcefiles (preffering left side)" do
     issues =
       [
         @var_right_map,

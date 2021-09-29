@@ -20,7 +20,7 @@ $ mix credo
 $ mix credo lib/my_app/server.ex:10:24          # show explanation for the issue
 ```
 
-Please note that you do *not* have to specifiy the `explain` command explicitly when using an issue location:
+Please note that you do *not* have to specify the `explain` command explicitly when using an issue location:
 
 ```bash
 $ mix credo lib/my_app/server.ex:10:24          # short-hand without `explain`

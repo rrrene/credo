@@ -118,7 +118,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     |> assert_issue()
   end
 
-  test "it should report violations with oneliners if used with parentheses" do
+  test "it should report violations with one-liners if used with parentheses" do
     """
     defmodule Mix.Tasks.Credo do
       def run(argv) do
