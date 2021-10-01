@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
-  test "it should NOT report violation for apply/4" do
+  test "it should NOT report violation for apply/3 when fun is a var" do
     """
     defmodule Test do
       def some_function(module, fun, arg1, arg2) do
@@ -42,11 +42,24 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation for apply/3 when fun is a function" do
+    ~S"""
+    defmodule Test do
+      def some_function(module, fun, arg1, arg2) do
+        apply(module, String.to_exisiting_atom("pre_#{fun}"), [arg1, arg2])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should report a violation for apply/2" do
     """
     defmodule Test do
-      def some_function(fun, arg1, arg2) do
-        apply(fun, [arg1, arg2])
+      def some_function(arg1, arg2) do
+        apply(:fun_name, [arg1, arg2])
       end
     end
     """
@@ -58,7 +71,7 @@ defmodule Credo.Check.Refactor.ApplyTest do
   test "it should report a violation for apply/3" do
     """
     defmodule Test do
-      def some_function(module, :fun_name, arg1, arg2) do
+      def some_function(module, arg1, arg2) do
         apply(module, :fun_name, [arg1, arg2])
       end
     end

@@ -35,23 +35,27 @@ defmodule Credo.Check.Refactor.Apply do
     end
   end
 
-  defp issue({:apply, meta, [_fun, args]}, issue_meta) when is_list(args),
-    do: issue_for(issue_meta, meta[:line])
+  defp issue({:apply, meta, [fun, args]}, issue_meta) do
+    do_issue(fun, args, meta, issue_meta)
+  end
 
-  defp issue({:apply, _meta, [_module, {atom, _meta2, nil}, args]}, _issue_meta)
-       when is_atom(atom) and is_list(args),
-       do: nil
-
-  defp issue({:apply, meta, [_module, _fun, args]}, issue_meta) when is_list(args),
-    do: issue_for(issue_meta, meta[:line])
+  defp issue({:apply, meta, [_module, fun, args]}, issue_meta) do
+    do_issue(fun, args, meta, issue_meta)
+  end
 
   defp issue(_ast, _issue_meta), do: nil
 
-  defp issue_for(issue_meta, line_no) do
+  defp do_issue(atom, list, meta, issue_meta) when is_atom(atom) and is_list(list) do
+    issue_for(meta, issue_meta)
+  end
+
+  defp do_issue(_atom, _list, _meta, _issue_meta), do: nil
+
+  defp issue_for(meta, issue_meta) do
     format_issue(
       issue_meta,
       message: "Avoid `apply/2` and `apply/3` when the number of arguments is known",
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end
