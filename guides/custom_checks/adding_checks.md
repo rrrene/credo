@@ -83,7 +83,7 @@ defmodule MyProject.Checks.RejectModuleAttributes do
   # This matches on the AST structure of module attributes.
   defp traverse({:@, _, [{name, meta, [_string]} | _]} = ast, issues, rejected_names, issue_meta) do
     if Enum.member?(rejected_names, name) do
-      {ast, issues ++ issue_for(name, meta[:line], issue_meta)}
+      {ast, issues ++ [issue_for(name, meta[:line], issue_meta)]}
     else
       {ast, issues}
     end
