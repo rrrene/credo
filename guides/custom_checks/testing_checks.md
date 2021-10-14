@@ -11,6 +11,17 @@ Using this module will:
 * import all the functions from this module
 * make the test case `:async` by default (use `async: false` to opt out of this behaviour)
 
+In `mix.exs`, add `:credo` in `extra_applications:`:
+
+```
+def application do
+  [
+     ...,
+     extra_applications: [:credo, ...]
+  ]
+end
+```
+
 Let's test the `RejectModuleAttributes` check that we implemented in [Adding custom checks](./adding_checks.md).
 
 ### Basic custom check tests
