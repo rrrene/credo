@@ -15,7 +15,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       but direct usage of the `Ecto.Adapters.SQL.query/4` function, and related functions, may
       cause issues when using Ecto's dynamic repositories.
       """,
-      params: [modules: "List of Modules or {Module, \"Error message\"} Tuples that must not be used."]
+      params: [
+        modules: "List of Modules or {Module, \"Error message\"} Tuples that must not be used."
+      ]
     ]
 
   alias Credo.Code
