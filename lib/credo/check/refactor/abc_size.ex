@@ -211,7 +211,7 @@ defmodule Credo.Check.Refactor.ABCSize do
          [a: a, b: b, c: c, var_names: var_names],
          excluded_functions
        )
-       when is_atom(fun_name) and fun_name not in @non_calls and is_list(arguments) do
+       when is_atom(fun_name) and not (fun_name in @non_calls) and is_list(arguments) do
     if Enum.member?(excluded_functions, to_string(fun_name)) do
       {nil, [a: a, b: b, c: c, var_names: var_names]}
     else

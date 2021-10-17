@@ -67,6 +67,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> refute_issues()
   end
 
+
   test "it shouldn't check calls to functions called \"with\"" do
     """
     def some_function(parameter1, parameter2) do

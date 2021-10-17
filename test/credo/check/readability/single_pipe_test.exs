@@ -137,4 +137,5 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> run_check(@described_check, allow_0_arity_functions: true)
     |> assert_issues()
   end
+
 end
