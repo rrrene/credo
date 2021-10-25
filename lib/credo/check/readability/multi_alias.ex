@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.MultiAlias do
 
   # TODO: consider for experimental check front-loader (ast)
   defp traverse(
-         {:alias, _, [{{_, _, [{:__aliases__, opts, base_alias}, :{}]}, _, [multi_alias | _]}]} =
+         {:alias, _, [{{_, _, [{:__aliases__, opts, _base_alias}, :{}]}, _, [multi_alias | _]}]} =
            ast,
          issues,
          issue_meta
@@ -41,23 +41,18 @@ defmodule Credo.Check.Readability.MultiAlias do
     {:__aliases__, _, module} = multi_alias
     module = Enum.join(module, ".")
 
-    new_issue = issue_for(issue_meta, Keyword.get(opts, :line), base_alias, module)
+    new_issue = issue_for(issue_meta, Keyword.get(opts, :line), module)
 
     {ast, [new_issue | issues]}
   end
 
   defp traverse(ast, issues, _issue_meta), do: {ast, issues}
 
-  defp issue_for(issue_meta, line_no, base_alias, trigger) do
-    module =
-      base_alias
-      |> Module.concat()
-      |> Module.concat(trigger)
-      |> inspect()
-
+  defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Avoid multi aliases to #{module}; consider removing.",
+      message:
+        "Avoid grouping aliases in '{ ... }'; please specify one fully-qualified alias per line.",
       trigger: trigger,
       line_no: line_no
     )
