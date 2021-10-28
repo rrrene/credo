@@ -36,20 +36,26 @@ defmodule Credo.Check.Refactor.Apply do
   end
 
   defp issue({:apply, meta, [fun, args]}, issue_meta) do
-    do_issue(fun, args, meta, issue_meta)
+    do_issue(:apply2, fun, args, meta, issue_meta)
   end
 
   defp issue({:apply, meta, [_module, fun, args]}, issue_meta) do
-    do_issue(fun, args, meta, issue_meta)
+    do_issue(:apply3, fun, args, meta, issue_meta)
   end
 
   defp issue(_ast, _issue_meta), do: nil
 
-  defp do_issue(atom, list, meta, issue_meta) when is_atom(atom) and is_list(list) do
+  defp do_issue(:apply2, {name, _meta, nil}, args, meta, issue_meta)
+       when is_atom(name) and is_list(args) do
     issue_for(meta, issue_meta)
   end
 
-  defp do_issue(_atom, _list, _meta, _issue_meta), do: nil
+  defp do_issue(:apply3, fun, args, meta, issue_meta)
+       when is_atom(fun) and is_list(args) do
+    issue_for(meta, issue_meta)
+  end
+
+  defp do_issue(_apply, _fun, _args, _meta, _issue_meta), do: nil
 
   defp issue_for(meta, issue_meta) do
     format_issue(
