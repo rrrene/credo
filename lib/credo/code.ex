@@ -128,12 +128,10 @@ defmodule Credo.Code do
   end
 
   def to_tokens(source, filename \\ "nofilename") when is_binary(source) do
-    result =
-      source
-      |> String.to_charlist()
-      |> :elixir_tokenizer.tokenize(1, file: filename)
-
-    case result do
+    source
+    |> String.to_charlist()
+    |> :elixir_tokenizer.tokenize(1, file: filename)
+    |> case do
       # Elixir < 1.6
       {_, _, _, tokens} ->
         tokens
@@ -143,7 +141,7 @@ defmodule Credo.Code do
         tokens
 
       # Elixir >= 1.13
-      {:ok, _, tokens} ->
+      {:ok, _, _, _, tokens} ->
         tokens
     end
   end
