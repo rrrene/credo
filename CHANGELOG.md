@@ -7,6 +7,7 @@
 - `Credo.Check.Readability.SinglePipe` now supports `:allow_0_arity_functions`
 - `Credo.Check.Design.AliasUsage` now supports `:only`
 - Credo now fails with an error message if a plugin module can not be initialized
+- Prepare compatibility with Elixir 1.13
 
 ### First Run Mode
 
@@ -200,15 +201,6 @@ mix credo --working-dir ../other-elixir-project/
 - `Credo.Check.Refactor.IoPuts`
 - `Credo.Check.Refactor.MapJoin`
 - `Credo.Check.Refactor.RedundantWithClauseResult`
-
-## 1.5.6
-
-- Ensure compatibility with Elixir 1.12
-
-## 1.5.5
-
-- Fix bug where compilation warnings are shown if compilation directory is not part of a Git work tree
-- Fix bug in `mix credo diff` where too many issues are reported because
 
 ## 1.5.6
 
