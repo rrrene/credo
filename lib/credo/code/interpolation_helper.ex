@@ -80,7 +80,6 @@ defmodule Credo.Code.InterpolationHelper do
     handle_heredoc(token, source)
   end
 
-
   #
   # Elixir >= 1.11.0
   #
@@ -130,7 +129,7 @@ defmodule Credo.Code.InterpolationHelper do
     handle_atom_string_or_sigil(token, list, source)
   end
 
-  defp map_interpolations(token, _source) do 
+  defp map_interpolations(_token, _source) do
     []
   end
 
@@ -167,7 +166,7 @@ defmodule Credo.Code.InterpolationHelper do
          _source
        )
        when is_list(list) do
-     {line_no, col_start, line_no_end, col_end + 1}
+    {line_no, col_start, line_no_end, col_end + 1}
   end
 
   # {{1, 25, 32}, [{:identifier, {1, 27, 31}, :name}]}
