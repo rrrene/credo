@@ -98,9 +98,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
   defp issues_for_call(attribute, call, meta, issue_meta, issues) do
     options = [
       message:
-        "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{
-          call
-        }",
+        "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
       trigger: call,
       line_no: meta[:line]
     ]

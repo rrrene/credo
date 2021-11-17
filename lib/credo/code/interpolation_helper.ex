@@ -71,6 +71,16 @@ defmodule Credo.Code.InterpolationHelper do
   end
 
   #
+  # Elixir >= 1.13.0
+  #
+  defp map_interpolations(
+         {:bin_heredoc, {_line_no, _col_start, _}, _, _list} = token,
+         source
+       ) do
+    handle_heredoc(token, source)
+  end
+
+  #
   # Elixir >= 1.11.0
   #
   defp map_interpolations(
@@ -119,7 +129,9 @@ defmodule Credo.Code.InterpolationHelper do
     handle_atom_string_or_sigil(token, list, source)
   end
 
-  defp map_interpolations(_, _source), do: []
+  defp map_interpolations(_token, _source) do
+    []
+  end
 
   defp handle_atom_string_or_sigil(_token, list, source) do
     find_interpolations(list, source)
@@ -136,6 +148,11 @@ defmodule Credo.Code.InterpolationHelper do
     |> find_interpolations(source)
     |> Enum.reject(&is_nil/1)
     |> add_to_col_start_and_end(padding_in_first_line)
+  end
+
+  # Elixir 1.13+
+  defp handle_heredoc({atom, {line_no, col_start, col_end}, _, list}, source) do
+    handle_heredoc({atom, {line_no, col_start, col_end}, list}, source)
   end
 
   defp find_interpolations(list, source) when is_list(list) do
