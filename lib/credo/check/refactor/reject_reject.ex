@@ -13,7 +13,7 @@ defmodule Credo.Check.Refactor.RejectReject do
       to look like this:
 
           Enum.reject(["a", "b", "c"], fn letter ->
-            String.contains?(letter, "x") && String.contains?(letter, "a")
+            String.contains?(letter, "x") || String.contains?(letter, "a")
           end)
 
       The reason for this is performance, because the two separate calls
