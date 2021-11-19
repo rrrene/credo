@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- Improve compatibility with Elixir 1.13 (based on v1.13.0-rc.1)
+
 ## 1.6.0
 
 - Credo changes from supporting the last 5 minor Elixir versions to the last 6, to be compatible with [Elixir's own support policy regarding bug fixes and security patches](https://hexdocs.pm/elixir/1.12/compatibility-and-deprecations.html)
