@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
 
       The reason for this is not a technical but a human one. The `else` in this
       case will be executed when the condition is met, which is the opposite of
-      what the wording seems to apply.
+      what the wording seems to imply.
       """
     ]
 
