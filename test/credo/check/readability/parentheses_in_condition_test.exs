@@ -29,6 +29,11 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
         if !allowed? == (something_in_parentheses == 42) do
           something
         end
+        if (5 - 4) in MapSet.new([1]) do
+          something
+        else
+          something_else
+        end
         unless (something_in_parentheses != 42) || allowed? do
           something
         end
