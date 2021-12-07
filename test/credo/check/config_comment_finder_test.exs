@@ -44,4 +44,29 @@ defmodule Credo.Check.ConfigCommentFinderTest do
     assert Enum.find(config_comments, &(&1.line_no == 11 && &1.line_no_end == 15))
     assert Enum.find(config_comments, &(&1.line_no == 18 && &1.line_no_end == 21))
   end
+
+  test "it finds config comments after sigils with heredoc delimiter" do
+    source_files =
+      [
+        """
+        defmodule MyModule do
+          def render do
+            ~F\"\"\"
+            \"\"\"
+          end
+
+          # credo:disable-for-next-line
+          def foo, do: :ok
+        end
+        """
+      ]
+      |> to_source_files
+
+    config_comments =
+      source_files
+      |> ConfigCommentFinder.run()
+      |> Enum.flat_map(fn {_filename, config_comments} -> config_comments end)
+
+    assert [%Credo.Check.ConfigComment{instruction: "disable-for-next-line", line_no: 7}] = config_comments
+  end
 end

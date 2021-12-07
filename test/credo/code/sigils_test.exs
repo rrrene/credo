@@ -340,4 +340,24 @@ defmodule Credo.Code.SigilsTest do
     assert result == result2, "Sigils.replace_with_spaces/2 should be idempotent"
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
+
+  test "it should not replace the remaining contents of the file with whitespace" do
+    source = "
+    ~F\"\"\"
+    \"\"\"
+
+    :ok
+    "
+
+    expected = "
+    ~F\"\"\"
+    \"\"\"
+
+    :ok
+    "
+
+    result = Sigils.replace_with_spaces(source)
+    assert result == expected
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
 end
