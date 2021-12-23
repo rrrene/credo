@@ -9,9 +9,9 @@ defmodule Credo.Check.Readability.PipePerLineTest do
       use ExUnit.Case
 
       def some_fun do
-        some_val
-        |> do_something()
-        |> do_something_else()
+        1
+        |> Integer.to_string()
+        |> String.to_integer()
       end
     end
     """
@@ -26,7 +26,7 @@ defmodule Credo.Check.Readability.PipePerLineTest do
       use ExUnit.Case
 
       def some_fun do
-        some_val |> do_something() |> do_something_else()
+        1 |> Integer.to_string() |> String.to_integer()
       end
     end
     """
@@ -41,8 +41,8 @@ defmodule Credo.Check.Readability.PipePerLineTest do
       use ExUnit.Case
 
       def some_fun do
-        some_val |> do_something() |> do_something_else()
-        1 |> baz() |> bar()
+        "1" |> String.to_integer() |> Integer.to_string()
+        1 |> Integer.to_string() |> String.to_integer()
       end
     end
     """
