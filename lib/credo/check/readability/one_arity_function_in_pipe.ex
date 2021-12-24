@@ -10,7 +10,6 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipe do
 
           # preferred
           some_string |> String.downcase() |> String.trim()
-      ```
       """
     ]
 
