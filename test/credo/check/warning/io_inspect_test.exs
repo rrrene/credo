@@ -63,4 +63,17 @@ defmodule Credo.Check.Warning.IoInspectTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report a violation /4" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        Elixir.IO.inspect parameter1 + parameter2
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
