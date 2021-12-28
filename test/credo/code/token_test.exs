@@ -171,6 +171,12 @@ defmodule Credo.Code.TokenTest do
       assert @heredoc_interpolations_position == position
     end
 
+    if Version.match?(System.version(), ">= 1.13.0") do
+      @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}
+    else
+      @kw_identifier_token {:kw_identifier_unsafe, {1, 3, nil}, ["some-atom-with-quotes"]}
+    end
+
     @tag needs_elixir: "1.7.0"
     test "should give correct token position for map" do
       source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
@@ -179,7 +185,7 @@ defmodule Credo.Code.TokenTest do
       expected = [
         {:%{}, {1, 1, nil}},
         {:"{", {1, 2, nil}},
-        {:kw_identifier_unsafe, {1, 3, nil}, ["some-atom-with-quotes"]},
+        @kw_identifier_token,
         {:bin_string, {1, 28, nil},
          [{{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, nil}, :filename}]}, " world"]},
         {:"}", {1, 47, nil}}
