@@ -46,7 +46,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     defmodule CredoSampleModule do
       def some_code do
-        Enum.shuffle(Enum.uniq())
+        Enum.uniq(some_list())
       end
     end
     """
@@ -78,6 +78,32 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     |> to_source_file()
     |> run_check(NestedFunctionCalls)
+    |> assert_issues()
+  end
+
+  test "it should report two nested functions calls when min_pipeline_length is set to one" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        Enum.uniq(some_list())
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls, min_pipeline_length: 1)
     |> assert_issue()
+  end
+
+  test "it should NOT report two nested functions calls with arguments when min_pipeline_length is set to three" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        Enum.shuffle(Enum.uniq([1,2,2,3,3]))
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls, min_pipeline_length: 3)
+    |> refute_issues()
   end
 end

@@ -13,12 +13,12 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
 
       The code in this example ...
 
-          Enum.shuffle(integers(3))
+          Enum.shuffle(Enum.uniq([1,2,3,3]))
 
       ... should be refactored to look like this:
 
-          3
-          |> integers()
+          [1,2,3,3]
+          |> Enum.uniq()
           |> Enum.shuffle()
 
       Nested function calls make the code harder to read. Instead, break the
