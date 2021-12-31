@@ -25,7 +25,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.string("format"),
       Switch.boolean("help", alias: :h),
       Switch.string("ignore_checks"),
-      Switch.string("ignore"),
+      Switch.string("ignore", alias: :i),
       Switch.string("only"),
       Switch.boolean("read_from_stdin"),
       Switch.boolean("strict"),
