@@ -97,6 +97,18 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     {ast, issues}
   end
 
+  defp valid_chain_start?(
+         {:__block__, _, [single_ast_node]},
+         excluded_functions,
+         excluded_argument_types
+       ) do
+    valid_chain_start?(
+      single_ast_node,
+      excluded_functions,
+      excluded_argument_types
+    )
+  end
+
   for atom <- [
         :%,
         :%{},
@@ -108,13 +120,17 @@ defmodule Credo.Check.Refactor.PipeChainStart do
         :{},
         :&,
         :<>,
+        :+,
         :++,
         :--,
         :&&,
         :||,
         :-,
         :for,
-        :with
+        :with,
+        :not,
+        :and,
+        :or
       ] do
     defp valid_chain_start?(
            {unquote(atom), _meta, _arguments},

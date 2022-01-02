@@ -157,6 +157,17 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> refute_issues
   end
 
+  test "should not report infix operators" do
+    """
+    (1 + 2) |> IO.puts
+    (not foo) |> IO.puts
+    (bar and foo) |> IO.puts
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_functions: ["+"])
+    |> refute_issues
+  end
+
   test "it should NOT report expected code /3" do
     ~S"""
     defmodule CredoSampleModule do
