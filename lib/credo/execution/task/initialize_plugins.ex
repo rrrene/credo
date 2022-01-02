@@ -12,7 +12,7 @@ defmodule Credo.Execution.Task.InitializePlugins do
   defp init_plugin(exec, {_mod, false}), do: exec
 
   defp init_plugin(exec, {mod, _params}) do
-    module_loaded? = function_exported?(mod, :__info__, 1)
+    module_loaded? = Code.ensure_loaded?(mod)
 
     if module_loaded? do
       exec
