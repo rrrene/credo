@@ -190,7 +190,17 @@ defmodule Credo.Code.StringsTest do
     result = Strings.replace_with_spaces(@example_code)
     result2 = Strings.replace_with_spaces(result)
 
-    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+    assert result == result2
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
+
+  @tag slow: :disk_io
+  @example_code2 File.read!("test/fixtures/example_code/large_heredoc.ex")
+  test "it should produce valid code /3" do
+    result = Strings.replace_with_spaces(@example_code2)
+    result2 = Strings.replace_with_spaces(result)
+
+    assert result == result2
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
 
@@ -207,6 +217,25 @@ defmodule Credo.Code.StringsTest do
       result
       |> Strings.replace_with_spaces(".", ".")
 
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+
+    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+  end
+
+  @tag slow: :disk_io
+  test "it should produce valid code with empty string as replacement /5" do
+    example_code = File.read!("test/fixtures/example_code/browser.ex")
+
+    result =
+      example_code
+      |> to_source_file()
+      |> Strings.replace_with_spaces("", "")
+
+    result2 =
+      result
+      |> Strings.replace_with_spaces("", "")
+
+    IO.puts(result)
     assert match?({:ok, _}, Code.string_to_quoted(result))
 
     assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"

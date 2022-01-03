@@ -388,7 +388,11 @@ defmodule Credo.Code.Strings do
   #
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, "" = replacement, "\"\"\"") do
-    parse_code(t, acc, replacement)
+    parse_code(t, acc <> "\"\"\"", replacement)
+  end
+
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, " " = replacement, "\"\"\"") do
+    parse_code(t, acc <> "\"\"\"", replacement)
   end
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do

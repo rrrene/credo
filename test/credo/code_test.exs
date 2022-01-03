@@ -335,6 +335,17 @@ defmodule Credo.CodeTest do
            "Credo.Code.clean_charlists_strings_and_sigils/1 should produce valid code"
   end
 
+  @tag slow: :disk_io
+  @tag timeout: 3000
+  @example_code2 File.read!("test/fixtures/example_code/large_heredoc.ex")
+  test "it should produce valid code /5" do
+    result = Credo.Code.clean_charlists_strings_sigils_and_comments(@example_code2)
+    result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
+
+    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+  end
+
   test "it should produce valid code /6" do
     source = ~S"""
     file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
