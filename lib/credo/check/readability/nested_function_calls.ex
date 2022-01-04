@@ -111,16 +111,6 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   # Module.function_call()
   defp valid_chain_start?({{:., _, _}, _, []}), do: true
 
-  # Elixir <= 1.8.0
-  # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
-  # we want to consider these charlists a valid pipe chain start
-  defp valid_chain_start?({{:., _, [String, :to_charlist]}, _, [{:<<>>, _, _}]}), do: true
-
-  # Elixir >= 1.8.0
-  # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
-  # we want to consider these charlists a valid pipe chain start
-  defp valid_chain_start?({{:., _, [List, :to_charlist]}, _, [[_ | _]]}), do: true
-
   # Kernel.to_string is invoked for string interpolation e.g. "string #{variable}"
   defp valid_chain_start?({{:., _, [Kernel, :to_string]}, _, _}), do: true
 

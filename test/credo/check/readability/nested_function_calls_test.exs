@@ -29,6 +29,58 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> refute_issues()
   end
 
+  test "it should NOT report char list interpolation" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        'Take 10 #{Enum.take([1,2,2,3,3], 10)}'
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for string concatenation" do
+    """
+    defmodule Test do
+      def test do
+        String.captialize("hello" <> "world")
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for ++" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        Enum.max([1,2,3] ++ [4,5,7])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for --" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        Enum.max([1,2,3] -- [4,5,7])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
   test "it should NOT report Access protocol lookups" do
     """
     defmodule CredoSampleModule do
