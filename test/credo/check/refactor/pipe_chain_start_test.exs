@@ -160,6 +160,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   test "should not report infix operators" do
     """
     (1 + 2) |> IO.puts
+    (1 * 2) |> IO.puts
+    (1 - 2) |> IO.puts
+    (1 / 2) |> IO.puts
+    (1 == 2) |> IO.puts
+    (1 > 2) |> IO.puts
+    (1 >= 2) |> IO.puts
+    (1 < 2) |> IO.puts
+    (1 <= 2) |> IO.puts
     (not foo) |> IO.puts
     (bar and foo) |> IO.puts
     """
