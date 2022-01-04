@@ -33,6 +33,8 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
       ]
     ]
 
+  alias Credo.Code.Name
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -56,13 +58,13 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   # A call with arguments
-  defp traverse({{:., _loc, _call}, meta, args} = ast, {_, issues}, issue_meta, min_pipeline_length) do
+  defp traverse({{:., _loc, call}, meta, args} = ast, {_, issues}, issue_meta, min_pipeline_length) do
     if valid_chain_start?(ast) do
       {ast, {min_pipeline_length, issues}}
     else
       case length_as_pipeline(args) + 1 do
         potential_pipeline_length when potential_pipeline_length >= min_pipeline_length ->
-          {ast, {min_pipeline_length, issues ++ [issue_for(issue_meta, meta[:line], "something")]}}
+          {ast, {min_pipeline_length, issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]}}
         _ ->
           {ast, {min_pipeline_length, issues}}
       end
