@@ -30,7 +30,7 @@ defmodule Credo.Check.Readability.PipePerLine do
     Credo.Code.to_tokens(source_file)
     |> Enum.filter(&filter_pipes/1)
     |> Enum.group_by(fn {_, {line, _, _}, :|>} -> line end)
-    |> Enum.filter(fn {_, tokens} -> length(tokens) > 1 end)
+    |> Enum.filter(&filter_tokens/1)
     |> Enum.map(fn {_, [{_, {line_no, column_no, _}, _} | _]} ->
       format_issue(
         issue_meta,
@@ -44,4 +44,7 @@ defmodule Credo.Check.Readability.PipePerLine do
 
   defp filter_pipes({:arrow_op, _, :|>}), do: true
   defp filter_pipes(_), do: false
+
+  defp filter_tokens({_, [_]}), do: false
+  defp filter_tokens({_, [_ | _]}), do: true
 end
