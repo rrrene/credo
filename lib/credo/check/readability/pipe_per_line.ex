@@ -1,6 +1,5 @@
 defmodule Credo.Check.Readability.PipePerLine do
   use Credo.Check,
-    base_priority: :high,
     category: :readability,
     explanations: [
       check: """
