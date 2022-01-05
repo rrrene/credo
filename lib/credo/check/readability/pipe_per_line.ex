@@ -56,4 +56,5 @@ defmodule Credo.Check.Readability.PipePerLine do
 
   defp filter_tokens({_, [_]}), do: false
   defp filter_tokens({_, [_ | _]}), do: true
+  defp filter_tokens(_), do: false
 end
