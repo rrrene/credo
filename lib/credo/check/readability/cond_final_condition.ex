@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.CondCatchallTrue do
+defmodule Credo.Check.Readability.CondFinalCondition do
   use Credo.Check,
     explanations: [
       check: """

@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.CondCatchallTrueTest do
+defmodule Credo.Check.Readability.CondFinalConditionTest do
   use Credo.Test.Case
 
-  alias Credo.Check.Readability.CondCatchallTrue
+  alias Credo.Check.Readability.CondFinalCondition
 
   test "it should NOT report conds with a last condition of true" do
     """
@@ -21,7 +21,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> refute_issues()
   end
 
@@ -40,7 +40,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> refute_issues()
   end
 
@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 
@@ -84,7 +84,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 
@@ -106,7 +106,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 
@@ -128,7 +128,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 
@@ -150,7 +150,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 
@@ -172,7 +172,7 @@ defmodule Credo.Check.Readability.CondCatchallTrueTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondCatchallTrue)
+    |> run_check(CondFinalCondition)
     |> assert_issue()
   end
 end
