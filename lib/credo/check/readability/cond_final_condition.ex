@@ -1,5 +1,8 @@
 defmodule Credo.Check.Readability.CondFinalCondition do
   use Credo.Check,
+    # Default to the value specified here:
+    # https://github.com/christopheradams/elixir_style_guide#true-as-last-condition
+    param_defaults: [final_condition_value: true],
     explanations: [
       check: """
       If a cond expresion ends in an "always true" statement. That last
@@ -21,7 +24,10 @@ defmodule Credo.Check.Readability.CondFinalCondition do
             x > y -> 0
             true -> 1
           end
-      """
+      """,
+      params: [
+        final_condition_value: "Set the expected value for the final condition"
+      ]
     ]
 
   @doc false
@@ -29,10 +35,12 @@ defmodule Credo.Check.Readability.CondFinalCondition do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    final_condition_value = Params.get(params, :final_condition_value, __MODULE__)
+
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, final_condition_value))
   end
 
-  defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
+  defp traverse({:cond, meta, arguments} = ast, issues, issue_meta, final_condition_value) do
     conditions =
       arguments
       |> Credo.Code.Block.do_block_for!()
@@ -40,31 +48,31 @@ defmodule Credo.Check.Readability.CondFinalCondition do
 
     if conditions
       |> List.last()
-      |> catchall_other_than_true?() do
+      |> catchall_other_than_value?(final_condition_value) do
       {ast, issues ++ [issue_for(issue_meta, meta[:line], :cond)]}
     else
       {ast, issues}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
+  defp traverse(ast, issues, _issue_meta, _min_pipeline_length) do
     {ast, issues}
   end
 
-  defp catchall_other_than_true?({:->, _meta, [[true], _args]}), do: false
+  defp catchall_other_than_value?({:->, _meta, [[value], _args]}, value), do: false
   # Integer literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, ['{', _args]}), do: true
+  defp catchall_other_than_value?({:->, _meta, ['{', _args]}, _value), do: true
   # Binary literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, [[binary], _args]}) when is_binary(binary), do: true
+  defp catchall_other_than_value?({:->, _meta, [[binary], _args]}, _value) when is_binary(binary), do: true
   # List literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, [[list], _args]}) when is_list(list), do: true
+  defp catchall_other_than_value?({:->, _meta, [[list], _args]}, _value) when is_list(list), do: true
   # Map literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, [[{:%{}, _meta2, []}], _args]}), do: true
+  defp catchall_other_than_value?({:->, _meta, [[{:%{}, _meta2, []}], _args]}, _value), do: true
   # Tuple literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, [[{:{}, _meta2, _values}], _args]}), do: true
+  defp catchall_other_than_value?({:->, _meta, [[{:{}, _meta2, _values}], _args]}, _value), do: true
   # Atom literal catch-all clause
-  defp catchall_other_than_true?({:->, _meta, [[name], _args]}) when is_atom(name), do: true
-  defp catchall_other_than_true?(_), do: false
+  defp catchall_other_than_value?({:->, _meta, [[name], _args]}, _value) when is_atom(name), do: true
+  defp catchall_other_than_value?(_clause, _value), do: false
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
