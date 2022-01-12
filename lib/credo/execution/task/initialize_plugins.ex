@@ -13,13 +13,21 @@ defmodule Credo.Execution.Task.InitializePlugins do
 
   defp init_plugin(exec, {mod, _params}) do
     module_loaded? = Code.ensure_loaded?(mod)
+    is_plugin? = function_exported?(mod, :init, 1)
 
     if module_loaded? do
-      exec
-      |> Execution.set_initializing_plugin(mod)
-      |> mod.init()
-      |> Execution.ensure_execution_struct("#{mod}.init/1")
-      |> Execution.set_initializing_plugin(nil)
+      if is_plugin? do
+        exec
+        |> Execution.set_initializing_plugin(mod)
+        |> mod.init()
+        |> Execution.ensure_execution_struct("#{mod}.init/1")
+        |> Execution.set_initializing_plugin(nil)
+      else
+        Execution.halt(
+          exec,
+          "Plugin module `#{Credo.Code.Module.name(mod)}` is not a valid plugin: does not implement expected behavior."
+        )
+      end
     else
       Execution.halt(
         exec,
