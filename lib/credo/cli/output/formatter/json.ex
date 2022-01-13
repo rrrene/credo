@@ -12,7 +12,36 @@ defmodule Credo.CLI.Output.Formatter.JSON do
   end
 
   def print_map(map) do
-    UI.puts(Jason.encode!(map, pretty: true))
+    map
+    |> sanitize()
+    |> Jason.encode!(pretty: true)
+    |> UI.puts()
+  end
+
+  def sanitize(term)
+      when is_atom(term) or is_number(term) or is_binary(term) do
+    term
+  end
+
+  def sanitize([]), do: []
+  def sanitize([h | t]), do: [sanitize(h) | sanitize(t)]
+
+  def sanitize(%Regex{} = regex), do: "~r/#{Regex.source(regex)}/"
+
+  def sanitize(%{} = term) do
+    Enum.into(term, %{}, fn {key, value} ->
+      {sanitize(key), sanitize(value)}
+    end)
+  end
+
+  def sanitize(term) when is_tuple(term) do
+    term
+    |> Tuple.to_list()
+    |> sanitize()
+  end
+
+  def sanitize(term) do
+    inspect(term)
   end
 
   def issue_to_json(
