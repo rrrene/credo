@@ -5,9 +5,9 @@ defmodule Credo.Check.Readability.CondFinalCondition do
     param_defaults: [final_condition_value: true],
     explanations: [
       check: """
-      If a cond expresion ends in an "always true" statement. That last
-      statement should be simply `true`. Other literal truthy values (such as
-      `:else`, `:always`, etc... aren't allowed.
+      If a cond expresion ends in an "always true" statement the statement
+      should be the literal `true`, or the literal value specified in this
+      check's `final_condition_value` parameter.
 
       Example:
 
