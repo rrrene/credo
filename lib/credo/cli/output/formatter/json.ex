@@ -26,7 +26,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
   def prepare_for_json([]), do: []
   def prepare_for_json([h | t]), do: [prepare_for_json(h) | prepare_for_json(t)]
 
-  def prepare_for_json(%Regex{} = regex), do: "~r/#{Regex.source(regex)}/"
+  def prepare_for_json(%Regex{} = regex), do: inspect(regex)
 
   def prepare_for_json(%{} = term) do
     Enum.into(term, %{}, fn {key, value} ->
