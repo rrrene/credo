@@ -7,8 +7,8 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
     assert JSON.print_map(%{"option" => ~r/foo/}) == nil
   end
 
-  test "sanitize/1 sanitizes values" do
-    assert JSON.sanitize(%{
+  test "prepare_for_json/1 converts values invalid in json" do
+    assert JSON.prepare_for_json(%{
              "bool" => true,
              "list" => ["a", %{"a" => "b", "b" => ~r/foo/}],
              "map" => %{"c" => "d", "e" => ["f", 8, ~r/foo/]},
