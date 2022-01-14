@@ -66,7 +66,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that is binary literal" do
+  test "it should report conds with a last condition that is a binary literal" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -88,7 +88,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that is integer literal" do
+  test "it should report conds with a last condition that is an integer literal" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -110,7 +110,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that is list literal" do
+  test "it should report conds with a last condition that is a list literal" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -132,7 +132,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that is tuple literal" do
+  test "it should report conds with a last condition that is a tuple literal" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -154,7 +154,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that is map literal" do
+  test "it should report conds with a last condition that is a map literal" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -176,7 +176,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should report conds that with a last condition that differ from config" do
+  test "it should report conds with a last condition that differ from the config" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
@@ -198,7 +198,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     |> assert_issue()
   end
 
-  test "it should NOT report conds that with a last condition that match config" do
+  test "it should NOT report conds with a last condition that match the config" do
     """
     defmodule CredoSampleModule do
       def cond_true(a) do
