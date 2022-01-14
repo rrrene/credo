@@ -1,6 +1,5 @@
 defmodule Credo.Check.Readability.BlockPipe do
   use Credo.Check,
-    base_priority: :high,
     tags: [:controversial],
     param_defaults: [
       exclude: []

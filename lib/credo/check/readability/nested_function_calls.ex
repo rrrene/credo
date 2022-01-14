@@ -1,6 +1,5 @@
 defmodule Credo.Check.Readability.NestedFunctionCalls do
   use Credo.Check,
-    base_priority: :high,
     tags: [:controversial],
     param_defaults: [min_pipeline_length: 2],
     explanations: [
@@ -58,13 +57,20 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   # A call with arguments
-  defp traverse({{:., _loc, call}, meta, args} = ast, {_, issues}, issue_meta, min_pipeline_length) do
+  defp traverse(
+         {{:., _loc, call}, meta, args} = ast,
+         {_, issues},
+         issue_meta,
+         min_pipeline_length
+       ) do
     if valid_chain_start?(ast) do
       {ast, {min_pipeline_length, issues}}
     else
       case length_as_pipeline(args) + 1 do
         potential_pipeline_length when potential_pipeline_length >= min_pipeline_length ->
-          {ast, {min_pipeline_length, issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]}}
+          {ast,
+           {min_pipeline_length, issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]}}
+
         _ ->
           {ast, {min_pipeline_length, issues}}
       end
@@ -77,12 +83,12 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   # Call with no arguments
-  defp length_as_pipeline([{{:., _loc, _call}, _meta, []}|_]) do
+  defp length_as_pipeline([{{:., _loc, _call}, _meta, []} | _]) do
     0
   end
 
   # Call with function call for first argument
-  defp length_as_pipeline([{{:., _loc, _call}, _meta, args} = call_ast|_]) do
+  defp length_as_pipeline([{{:., _loc, _call}, _meta, args} = call_ast | _]) do
     if valid_chain_start?(call_ast) do
       0
     else
