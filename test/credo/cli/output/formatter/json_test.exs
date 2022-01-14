@@ -4,7 +4,7 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
   alias Credo.CLI.Output.Formatter.JSON
 
   test "print_map/1 does not raise when map contains a regex" do
-    assert JSON.print_map(%{"option" => ~r/foo/}) == nil
+    JSON.print_map(%{"option" => ~r/foo/})
   end
 
   test "prepare_for_json/1 converts values invalid in json" do
