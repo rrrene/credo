@@ -30,7 +30,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
 
   def prepare_for_json(%{} = term) do
     Enum.into(term, %{}, fn {key, value} ->
-      {prepare_for_json(key), prepare_for_json(value)}
+      {prepare_key_for_json(key), prepare_for_json(value)}
     end)
   end
 
@@ -42,6 +42,14 @@ defmodule Credo.CLI.Output.Formatter.JSON do
 
   def prepare_for_json(term) do
     inspect(term)
+  end
+
+  defp prepare_key_for_json(k) when is_atom(k) or is_binary(k) or is_number(k) do
+    k
+  end
+
+  defp prepare_key_for_json(k) do
+    inspect(k)
   end
 
   def issue_to_json(

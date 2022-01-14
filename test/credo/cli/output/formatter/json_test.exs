@@ -15,7 +15,10 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
              "number" => 5,
              "regex" => ~r/foo/,
              "string" => "a",
-             "tuple" => {"a", 2, ~r/foo/}
+             "tuple" => {"a", 2, ~r/foo/},
+             :atom_key => 0,
+             {"tuple", "key"} => 1,
+             0 => 2
            }) == %{
              "bool" => true,
              "list" => ["a", %{"a" => "b", "b" => "~r/foo/"}],
@@ -23,7 +26,10 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
              "number" => 5,
              "regex" => "~r/foo/",
              "string" => "a",
-             "tuple" => ["a", 2, "~r/foo/"]
+             "tuple" => ["a", 2, "~r/foo/"],
+             :atom_key => 0,
+             "{\"tuple\", \"key\"}" => 1,
+             0 => 2
            }
   end
 end
