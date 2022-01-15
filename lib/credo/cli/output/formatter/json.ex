@@ -23,8 +23,7 @@ defmodule Credo.CLI.Output.Formatter.JSON do
     term
   end
 
-  def prepare_for_json([]), do: []
-  def prepare_for_json([h | t]), do: [prepare_for_json(h) | prepare_for_json(t)]
+  def prepare_for_json(term) when is_list(term), do: Enum.map(term, &prepare_for_json/1)
 
   def prepare_for_json(%Regex{} = regex), do: inspect(regex)
 
@@ -44,12 +43,12 @@ defmodule Credo.CLI.Output.Formatter.JSON do
     inspect(term)
   end
 
-  defp prepare_key_for_json(k) when is_atom(k) or is_binary(k) or is_number(k) do
-    k
+  defp prepare_key_for_json(key) when is_atom(key) or is_binary(key) or is_number(key) do
+    key
   end
 
-  defp prepare_key_for_json(k) do
-    inspect(k)
+  defp prepare_key_for_json(key) do
+    inspect(key)
   end
 
   def issue_to_json(

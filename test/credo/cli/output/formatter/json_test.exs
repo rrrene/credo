@@ -7,7 +7,7 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
     JSON.print_map(%{"option" => ~r/foo/})
   end
 
-  test "prepare_for_json/1 converts values invalid in json" do
+  test "prepare_for_json/1 converts keys and values invalid in json" do
     assert JSON.prepare_for_json(%{
              "bool" => true,
              "list" => ["a", %{"a" => "b", "b" => ~r/foo/}],
@@ -28,7 +28,7 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
              "string" => "a",
              "tuple" => ["a", 2, "~r/foo/"],
              :atom_key => 0,
-             "{\"tuple\", \"key\"}" => 1,
+             ~q({"tuple", "key"}) => 1,
              0 => 2
            }
   end
