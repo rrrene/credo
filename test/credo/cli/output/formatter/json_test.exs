@@ -28,7 +28,7 @@ defmodule Credo.CLI.Output.Formatter.JsonTest do
              "string" => "a",
              "tuple" => ["a", 2, "~r/foo/"],
              :atom_key => 0,
-             ~q({"tuple", "key"}) => 1,
+             ~s({"tuple", "key"}) => 1,
              0 => 2
            }
   end
