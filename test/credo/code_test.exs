@@ -336,7 +336,7 @@ defmodule Credo.CodeTest do
   end
 
   @tag slow: :disk_io
-  @tag timeout: 3000
+  @tag timeout: 10_000
   @example_code2 File.read!("test/fixtures/example_code/large_heredoc.ex")
   test "it should produce valid code /5" do
     result = Credo.Code.clean_charlists_strings_sigils_and_comments(@example_code2)
