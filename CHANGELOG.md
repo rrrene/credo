@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+
+- Bug fixes
+- Add `-i` as shorthand for `--ignore`
+
 ## 1.6.1
 
 - Improve compatibility with Elixir 1.13 (based on v1.13.0-rc.1)
