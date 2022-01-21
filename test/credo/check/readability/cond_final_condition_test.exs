@@ -1,7 +1,7 @@
 defmodule Credo.Check.Readability.CondFinalConditionTest do
   use Credo.Test.Case
 
-  alias Credo.Check.Readability.CondFinalCondition
+  @described_check Credo.Check.Readability.CondFinalCondition
 
   test "it should NOT report conds with a last condition of true" do
     """
@@ -21,7 +21,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -40,7 +40,29 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report conds with a last condition that match the config" do
+    """
+    defmodule CredoSampleModule do
+      def cond_true(a) do
+        cond do
+          a + 2 == 5 ->
+            "Nope"
+
+          a + 3 == 5 ->
+            "Uh, uh"
+
+          :else ->
+            "OK"
+        end
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, value: :else)
     |> refute_issues()
   end
 
@@ -62,7 +84,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -84,7 +106,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -106,7 +128,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -128,7 +150,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -150,7 +172,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -172,7 +194,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -194,29 +216,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     end
     """
     |> to_source_file()
-    |> run_check(CondFinalCondition, final_condition_value: :else)
+    |> run_check(@described_check, value: :else)
     |> assert_issue()
-  end
-
-  test "it should NOT report conds with a last condition that match the config" do
-    """
-    defmodule CredoSampleModule do
-      def cond_true(a) do
-        cond do
-          a + 2 == 5 ->
-            "Nope"
-
-          a + 3 == 5 ->
-            "Uh, uh"
-
-          :else ->
-            "OK"
-        end
-      end
-    end
-    """
-    |> to_source_file()
-    |> run_check(CondFinalCondition, final_condition_value: :else)
-    |> refute_issues()
   end
 end

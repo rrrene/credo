@@ -1,13 +1,14 @@
 defmodule Credo.Check.Readability.CondFinalCondition do
   use Credo.Check,
+    tags: [:controversial],
     # Default to the value specified here:
     # https://github.com/christopheradams/elixir_style_guide#true-as-last-condition
-    param_defaults: [final_condition_value: true],
+    param_defaults: [value: true],
     explanations: [
       check: """
       If a cond expresion ends in an "always true" statement the statement
       should be the literal `true`, or the literal value specified in this
-      check's `final_condition_value` parameter.
+      check's `value` parameter.
 
       Example:
 
@@ -24,9 +25,13 @@ defmodule Credo.Check.Readability.CondFinalCondition do
             x > y -> 0
             true -> 1
           end
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of other reading and liking your code by making
+      it easier to follow.
       """,
       params: [
-        final_condition_value: "Set the expected value for the final condition"
+        value: "Set the expected value for the final condition"
       ]
     ]
 
@@ -35,23 +40,23 @@ defmodule Credo.Check.Readability.CondFinalCondition do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    final_condition_value = Params.get(params, :final_condition_value, __MODULE__)
+    final_condition_value = Params.get(params, :value, __MODULE__)
 
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, final_condition_value))
   end
 
   defp traverse({:cond, meta, arguments} = ast, issues, issue_meta, final_condition_value) do
-    conditions =
+    last_cond_clause =
       arguments
       |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
-
-    if conditions
       |> List.last()
-      |> catchall_other_than_value?(final_condition_value) do
-      {ast, issues ++ [issue_for(issue_meta, meta[:line], :cond)]}
-    else
-      {ast, issues}
+
+    case is_catchall_clause_with_invalid_value?(last_cond_clause, final_condition_value) do
+      {true, other_literal} ->
+        {ast, issues ++ [issue_for(issue_meta, final_condition_value, meta[:line], other_literal)]}
+      _ ->
+        {ast, issues}
     end
   end
 
@@ -59,26 +64,46 @@ defmodule Credo.Check.Readability.CondFinalCondition do
     {ast, issues}
   end
 
-  defp catchall_other_than_value?({:->, _meta, [[value], _args]}, value), do: false
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, [[value], _args]}, value), do: false
   # Integer literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, ['{', _args]}, _value), do: true
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, ['{', _args]}, _value), do: {true, :integer}
   # Binary literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, [[binary], _args]}, _value) when is_binary(binary), do: true
-  # List literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, [[list], _args]}, _value) when is_list(list), do: true
-  # Map literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, [[{:%{}, _meta2, []}], _args]}, _value), do: true
-  # Tuple literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, [[{:{}, _meta2, _values}], _args]}, _value), do: true
-  # Atom literal catch-all clause
-  defp catchall_other_than_value?({:->, _meta, [[name], _args]}, _value) when is_atom(name), do: true
-  defp catchall_other_than_value?(_clause, _value), do: false
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, [[binary], _args]}, _value)
+       when is_binary(binary),
+       do: {true, binary}
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  # List literal catch-all clause
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, [[list], _args]}, _value)
+       when is_list(list),
+       do: {true, list}
+
+  # Map literal catch-all clause
+  defp is_catchall_clause_with_invalid_value?(
+         {:->, _meta, [[{:%{}, _meta2, _values}], _args]},
+         _value
+       ),
+       do: {true, :map}
+
+  # Tuple literal catch-all clause
+  defp is_catchall_clause_with_invalid_value?(
+         {:->, _meta, [[{:{}, _meta2, _values}], _args]},
+         _value
+       ),
+       do: {true, :tuple}
+
+  # Atom literal catch-all clause
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, [[name], _args]}, _value)
+       when is_atom(name),
+       do: {true, name}
+
+  # Any other cond clause expression
+  defp is_catchall_clause_with_invalid_value?(_clause, _value), do: false
+
+  defp issue_for(issue_meta, expected_value, line_no, trigger) do
     format_issue(
       issue_meta,
       message:
-      "Cond statements that end with an \"always true\" condition should use `true` instead of some other literal.",
+        "Cond statements that end with an \"always true\" condition should use `#{expected_value}` instead of some other literal.",
       trigger: trigger,
       line_no: line_no
     )
