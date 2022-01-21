@@ -56,6 +56,20 @@
     </thead>
   </table>
 
+  <h2>File Timings</h2>
+
+  <p>
+    This shows the accumulated timings for individual files.
+  </p>
+
+  <table class="timing-data js-timing-data-files-accumulated">
+    <thead>
+      <th>Time (ms)</th>
+      <th>Tags</th>
+      <th>Duration (ms)</th>
+    </thead>
+  </table>
+
   <script>
     let state;
     /*  */
@@ -75,7 +89,7 @@
         duration
       }) => [Math.floor((started_at - state.started_at) / 1000), JSON.stringify(tags), Math.floor(duration / 1000)]);
 
-    const checkTimingsAsObject =
+      const checkTimingsAsObject =
       state.timings
       .filter((x) => x.tags.check)
       .reduce((acc, val) => {
@@ -104,12 +118,47 @@
         duration
       }) => ["", JSON.stringify(tags), Math.floor(duration / 1000)]);
 
+    const fileTimingsAsObject =
+      state.timings
+      .filter((x) => x.tags.check)
+      .reduce((acc, val) => {
+        const tag_name = "filename"
+        const key = val.tags[tag_name];
+        if (!acc[key]) {
+          acc[key] = {
+            tags: {
+              accumulated: true
+            },
+            started_at: null,
+            duration: 0
+          };
+          acc[key]["tags"][tag_name] = val.tags[tag_name];
+        }
+        acc[key].duration += val.duration;
+
+        return acc;
+      }, Object.create(null));
+
+    const datasetFiles =
+      Object.values(fileTimingsAsObject)
+      .map(({
+        tags,
+        started_at,
+        duration
+      }) => ["", JSON.stringify(tags), Math.floor(duration / 1000)]);
+
     $(document).ready(function () {
       $('.js-timing-data-tasks').DataTable({
         data: datasetTasks
       });
       $('.js-timing-data-checks-accumulated').DataTable({
         data: datasetChecks,
+        "order": [
+          [2, "desc"]
+        ]
+      });
+      $('.js-timing-data-files-accumulated').DataTable({
+        data: datasetFiles,
         "order": [
           [2, "desc"]
         ]
