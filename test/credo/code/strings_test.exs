@@ -259,7 +259,6 @@ defmodule Credo.Code.StringsTest do
       result
       |> Strings.replace_with_spaces("", "")
 
-    IO.puts(result)
     assert match?({:ok, _}, Code.string_to_quoted(result))
 
     assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
