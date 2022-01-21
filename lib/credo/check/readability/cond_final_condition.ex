@@ -40,21 +40,21 @@ defmodule Credo.Check.Readability.CondFinalCondition do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    final_condition_value = Params.get(params, :value, __MODULE__)
+    config_catchall_value = Params.get(params, :value, __MODULE__)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, final_condition_value))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, config_catchall_value))
   end
 
-  defp traverse({:cond, meta, arguments} = ast, issues, issue_meta, final_condition_value) do
+  defp traverse({:cond, meta, arguments} = ast, issues, issue_meta, config_catchall_value) do
     last_cond_clause =
       arguments
       |> Credo.Code.Block.do_block_for!()
       |> List.wrap()
       |> List.last()
 
-    case is_catchall_clause_with_invalid_value?(last_cond_clause, final_condition_value) do
+    case is_catchall_clause_with_invalid_value?(last_cond_clause, config_catchall_value) do
       {true, other_literal} ->
-        {ast, issues ++ [issue_for(issue_meta, final_condition_value, meta[:line], other_literal)]}
+        {ast, issues ++ [issue_for(issue_meta, config_catchall_value, meta[:line], other_literal)]}
       _ ->
         {ast, issues}
     end
