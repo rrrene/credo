@@ -53,8 +53,10 @@ defmodule Credo.Check.Readability.CondFinalCondition do
       |> List.last()
 
     case is_catchall_clause_with_invalid_value?(last_cond_clause, config_catchall_value) do
-      {true, other_literal} ->
-        {ast, issues ++ [issue_for(issue_meta, config_catchall_value, meta[:line], other_literal)]}
+      {true, ast} ->
+        expression = Macro.to_string(ast)
+        {ast, issues ++ [issue_for(issue_meta, config_catchall_value, meta[:line], expression)]}
+
       _ ->
         {ast, issues}
     end
@@ -66,7 +68,10 @@ defmodule Credo.Check.Readability.CondFinalCondition do
 
   defp is_catchall_clause_with_invalid_value?({:->, _meta, [[value], _args]}, value), do: false
   # Integer literal catch-all clause
-  defp is_catchall_clause_with_invalid_value?({:->, _meta, ['{', _args]}, _value), do: {true, :integer}
+  defp is_catchall_clause_with_invalid_value?({:->, _meta, [[integer], _args]}, _value)
+       when is_integer(integer),
+       do: {true, integer}
+
   # Binary literal catch-all clause
   defp is_catchall_clause_with_invalid_value?({:->, _meta, [[binary], _args]}, _value)
        when is_binary(binary),
@@ -79,17 +84,17 @@ defmodule Credo.Check.Readability.CondFinalCondition do
 
   # Map literal catch-all clause
   defp is_catchall_clause_with_invalid_value?(
-         {:->, _meta, [[{:%{}, _meta2, _values}], _args]},
+         {:->, _meta, [[{:%{}, _meta2, _values} = ast], _args]},
          _value
        ),
-       do: {true, :map}
+       do: {true, ast}
 
   # Tuple literal catch-all clause
   defp is_catchall_clause_with_invalid_value?(
-         {:->, _meta, [[{:{}, _meta2, _values}], _args]},
+         {:->, _meta, [[{:{}, _meta2, _values} = ast], _args]},
          _value
        ),
-       do: {true, :tuple}
+       do: {true, ast}
 
   # Atom literal catch-all clause
   defp is_catchall_clause_with_invalid_value?({:->, _meta, [[name], _args]}, _value)

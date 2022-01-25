@@ -85,7 +85,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert ":else" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that is a binary literal" do
@@ -107,7 +109,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "\"else\"" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that is an integer literal" do
@@ -121,7 +125,7 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
           a + 3 == 5 ->
             "Uh, uh"
 
-          123 ->
+          12345 ->
             "OK"
         end
       end
@@ -129,7 +133,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "12345" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that is a list literal" do
@@ -151,7 +157,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "[:else]" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that is a tuple literal" do
@@ -173,7 +181,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "{:else}" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that is a map literal" do
@@ -195,7 +205,9 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "%{}" == trigger
+    end)
   end
 
   test "it should report conds with a last condition that differ from the config" do
@@ -217,6 +229,8 @@ defmodule Credo.Check.Readability.CondFinalConditionTest do
     """
     |> to_source_file()
     |> run_check(@described_check, value: :else)
-    |> assert_issue()
+    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
+      assert "true" == trigger
+    end)
   end
 end
