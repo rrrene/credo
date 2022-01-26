@@ -68,6 +68,30 @@ defmodule Credo.Code.StringsTest do
     assert expected == Strings.replace_with_spaces(source)
   end
 
+  test "it should work with custom sigils" do
+    source = ~S[
+      defmodule Foo do
+        custom =
+          ~X"""
+          """
+
+        literal = "anything"
+      end
+    ]
+
+    expected = ~S[
+      defmodule Foo do
+        custom =
+          ~X"""
+          """
+
+        literal = "        "
+      end
+    ]
+
+    assert expected == Strings.replace_with_spaces(source)
+  end
+
   test "it should return the source without string literals 3" do
     source = """
     x =   "↑ ↗ →"
