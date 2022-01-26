@@ -39,6 +39,21 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     |> refute_issues()
   end
 
+  test "it should NOT report when commas are in binaries" do
+    ~S[
+    defmodule SpaceMissingInBinary do
+      custom_sigil =
+        ~X"""
+        """
+
+      string = ","
+    end
+    ]
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report when commas have newlines" do
     """
     defmodule CredoSampleModule do
