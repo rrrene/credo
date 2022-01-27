@@ -52,6 +52,7 @@ defmodule Credo.Mixfile do
       # Commands
 
       "guides/commands/suggest_command.md",
+      "guides/commands/diff_command.md",
       "guides/commands/explain_command.md",
       "guides/commands/list_command.md",
 
