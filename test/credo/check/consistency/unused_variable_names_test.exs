@@ -29,6 +29,21 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report correct behaviour (only one unused variable, the other a special variable)" do
+    [
+      """
+      defmodule UnusedVariableModule do
+        defp a do
+          _ = __MODULE__
+        end
+      end
+      """
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report correct behaviour (only one unused variable)" do
     [
       """

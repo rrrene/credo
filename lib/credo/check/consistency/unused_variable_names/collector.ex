@@ -48,8 +48,15 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
 
   defp unused_variable_name?({:_, _, _}), do: true
 
-  defp unused_variable_name?({name, _, _}) when is_atom(name),
-    do: String.starts_with?(Atom.to_string(name), "_")
+  defp unused_variable_name?({name, _, _}) when is_atom(name) do
+    name
+    |> Atom.to_string()
+    |> unused_variable_name?()
+  end
+
+  defp unused_variable_name?("__" <> _rest), do: false
+
+  defp unused_variable_name?("_" <> _rest), do: true
 
   defp unused_variable_name?(_), do: false
 
