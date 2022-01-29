@@ -24,8 +24,46 @@
     <code>
       <%= File.cwd! %>
     </code> took
-    <%= @time_total %> ms (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
+    <strong><%= @time_total %> ms</strong> (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
   </p>
+
+  <h2>Timings</h2>
+  <p>
+    Please note that these are cumulative timings across all cores, therefore an individual file or check can account for more time than the overall time spent.
+  </p>
+
+  <table border="1" cellpadding="4">
+    <tr>
+      <th align=left valign=top rowspan="5">Slowest Files</th>
+      <%= for {filename, time} <- Enum.take(@file_timings, 5) do %>
+      <td></td>
+        <td><%= filename %></td>
+        <td align=right><%= floor(time / 1000) %> ms</td>
+      </tr>
+      <tr>
+      <% end %>
+    </tr>
+    <tr>
+      <th align=left valign=top rowspan="5">Slowest Checks</th>
+      <%= for {check, time} <- Enum.take(@check_timings, 5) do %>
+        <td><%= check %></td>
+        <td></td>
+        <td align=right><%= floor(time / 1000) %> ms</td>
+      </tr>
+      <tr>
+      <% end %>
+    </tr>
+    <tr>
+      <th align=left valign=top rowspan="5">Slowest Checks/Files</th>
+      <%= for {{check, filename}, time} <- Enum.take(@check_file_timings, 5) do %>
+        <td><%= check %></td>
+        <td><%= filename %></td>
+        <td align=right><%= floor(time / 1000) %> ms</td>
+      </tr>
+      <tr>
+      <% end %>
+    </tr>
+  </table>
 
   <div id="root"></div>
 
@@ -285,6 +323,10 @@
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
+    }
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      color: #c55953;
     }
 
     .timeline {

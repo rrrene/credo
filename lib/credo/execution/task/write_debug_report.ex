@@ -19,16 +19,56 @@ defmodule Credo.Execution.Task.WriteDebugReport do
     all_timings = ExecutionTiming.all(exec)
     started_at = ExecutionTiming.started_at(exec)
     ended_at = ExecutionTiming.ended_at(exec)
+    all_timings = timings_to_map(all_timings)
+
+    file_timings =
+      all_timings
+      |> Enum.reduce(%{}, fn element, acc ->
+        if filename = element.tags[:filename] do
+          Map.put(acc, filename, (acc[filename] || 0) + element.duration)
+        else
+          acc
+        end
+      end)
+      |> Enum.sort_by(&elem(&1, 1), :desc)
+
+    check_timings =
+      all_timings
+      |> Enum.reduce(%{}, fn element, acc ->
+        if check = element.tags[:check] do
+          Map.put(acc, check, (acc[check] || 0) + element.duration)
+        else
+          acc
+        end
+      end)
+      |> Enum.sort_by(&elem(&1, 1), :desc)
+
+    check_file_timings =
+      all_timings
+      |> Enum.reduce(%{}, fn element, acc ->
+        filename = element.tags[:filename]
+        check = element.tags[:check]
+
+        if filename && check do
+          Map.put(acc, {check, filename}, (acc[{check, filename}] || 0) + element.duration)
+        else
+          acc
+        end
+      end)
+      |> Enum.sort_by(&elem(&1, 1), :desc)
 
     assigns = [
       exec: exec,
       started_at: started_at,
       ended_at: ended_at,
       duration: ended_at - started_at,
-      all_timings: timings_to_map(all_timings),
       time_total: time_total,
       time_load: time_load,
-      time_run: time_run
+      time_run: time_run,
+      all_timings: all_timings,
+      file_timings: file_timings,
+      check_timings: check_timings,
+      check_file_timings: check_file_timings
     ]
 
     content = EEx.eval_string(@debug_template, assigns: assigns)
