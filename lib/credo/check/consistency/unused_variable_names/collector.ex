@@ -42,23 +42,29 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
         reduce_unused_variables(params, callback, param_acc)
 
       param_ast, param_acc ->
-        if unused_variable_name?(param_ast), do: callback.(param_ast, param_acc), else: param_acc
+        if unused_variable_ast?(param_ast) do
+          callback.(param_ast, param_acc)
+        else
+          param_acc
+        end
     end)
   end
 
-  defp unused_variable_name?({:_, _, _}), do: true
+  defp unused_variable_ast?({:_, _, _}), do: true
 
-  defp unused_variable_name?({name, _, _}) when is_atom(name) do
+  defp unused_variable_ast?({name, _, _}) when is_atom(name) do
     name
     |> Atom.to_string()
     |> unused_variable_name?()
   end
 
+  defp unused_variable_ast?(_), do: false
+
   defp unused_variable_name?("__" <> _rest), do: false
 
   defp unused_variable_name?("_" <> _rest), do: true
 
-  defp unused_variable_name?(_), do: false
+  defp unused_variable_name?(_rest), do: false
 
   defp record_unused_variable({:_, _, _}, acc), do: Map.update(acc, :anonymous, 1, &(&1 + 1))
   defp record_unused_variable(_, acc), do: Map.update(acc, :meaningful, 1, &(&1 + 1))
