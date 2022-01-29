@@ -2,13 +2,31 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Warning.ForbiddenModule
-  @opts modules: [CredoSampleModule.ForbiddenModule]
 
   #
   # cases NOT raising issues
   #
 
   test "it should NOT report with default params" do
+    """
+    defmodule CredoReplicateIssue do
+      alias __MODULE__.Module
+
+      def hello do
+        Module.hello()
+      end
+    end
+
+    defmodule CredoReplicateIssue.Module do
+      def hello, do: :world
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report with default params /2" do
     """
     defmodule CredoSampleModule do
       alias CredoSampleModule.ForbiddenModule
@@ -31,7 +49,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @opts)
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
@@ -43,7 +61,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @opts)
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
@@ -55,7 +73,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @opts)
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
@@ -67,27 +85,22 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @opts)
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
   test "it should display a custom message" do
-    opts = [
-      modules: [{CredoSampleModule.ForbiddenModule, "jesus, team, please stop using this!!!!!"}]
-    ]
-
     """
     defmodule CredoSampleModule do
       def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
     end
     """
     |> to_source_file
-    |> run_check(@described_check, opts)
+    |> run_check(@described_check, modules: [{CredoSampleModule.ForbiddenModule, "my message"}])
     |> assert_issue(fn issue ->
-      assert issue.message ==
-               opts
-               |> Keyword.get(:modules)
-               |> Keyword.get(CredoSampleModule.ForbiddenModule)
+      expected_message = "my message"
+
+      assert issue.message == expected_message
     end)
   end
 end
