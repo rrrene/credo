@@ -30,7 +30,8 @@ defmodule Credo.Execution.Task.WriteDebugReport do
           acc
         end
       end)
-      |> Enum.sort_by(&elem(&1, 1), :desc)
+      |> Enum.sort_by(&elem(&1, 1))
+      |> Enum.reverse()
 
     check_timings =
       all_timings
@@ -41,7 +42,8 @@ defmodule Credo.Execution.Task.WriteDebugReport do
           acc
         end
       end)
-      |> Enum.sort_by(&elem(&1, 1), :desc)
+      |> Enum.sort_by(&elem(&1, 1))
+      |> Enum.reverse()
 
     check_file_timings =
       all_timings
@@ -55,7 +57,8 @@ defmodule Credo.Execution.Task.WriteDebugReport do
           acc
         end
       end)
-      |> Enum.sort_by(&elem(&1, 1), :desc)
+      |> Enum.sort_by(&elem(&1, 1))
+      |> Enum.reverse()
 
     assigns = [
       exec: exec,
