@@ -396,7 +396,10 @@ defmodule Credo.Code.Strings do
   end
 
   defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do
-    acc = Regex.replace(~r/([#{replacement}]+)(\"\"\")\z/m, acc <> "\"\"\"", "\"\"\"")
+    acc =
+      Regex.replace(~r/(\n[#{replacement}]+)(\"\"\")\z/m, acc <> "\"\"\"", fn _, x ->
+        "\n#{String.pad_trailing("", String.length(x))}\"\"\""
+      end)
 
     parse_code(t, acc, replacement)
   end
@@ -406,7 +409,10 @@ defmodule Credo.Code.Strings do
   end
 
   defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
-    acc = Regex.replace(~r/([#{replacement}]+)(\'\'\')\z/m, acc <> "\'\'\'", "\'\'\'")
+    acc =
+      Regex.replace(~r/(\n[#{replacement}]+)(\'\'\')\z/m, acc <> "\'\'\'", fn _, x ->
+        "\n#{String.pad_trailing("", String.length(x))}\'\'\'"
+      end)
 
     parse_code(t, acc, replacement)
   end
