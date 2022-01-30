@@ -43,7 +43,7 @@
       <th align=left>Time (ms)</th>
     </tr>
     <tr>
-      <th align=left valign=top rowspan="5">Slowest Files</th>
+      <th align=left valign=top rowspan="<%= Enum.min([5, Enum.count(@file_timings)]) %>">Slowest Files</th>
       <%= for {filename, time} <- Enum.take(@file_timings, 5) do %>
       <td></td>
         <td><%= filename %></td>
@@ -53,7 +53,7 @@
       <% end %>
     </tr>
     <tr>
-      <th align=left valign=top rowspan="5">Slowest Checks</th>
+      <th align=left valign=top rowspan="<%= Enum.min([5, Enum.count(@check_timings)]) %>">Slowest Checks</th>
       <%= for {check, time} <- Enum.take(@check_timings, 5) do %>
         <td><%= check |> to_string() |> String.replace(~r/^Elixir./, "") %></td>
         <td></td>
@@ -63,7 +63,7 @@
       <% end %>
     </tr>
     <tr>
-      <th align=left valign=top rowspan="5">Slowest Checks/Files</th>
+      <th align=left valign=top rowspan="<%= Enum.min([5, Enum.count(@check_file_timings)]) %>">Slowest Checks/Files</th>
       <%= for {{check, filename}, time} <- Enum.take(@check_file_timings, 5) do %>
         <td><%= check |> to_string() |> String.replace(~r/^Elixir./, "") %></td>
         <td><%= filename %></td>
