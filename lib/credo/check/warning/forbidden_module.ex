@@ -93,6 +93,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   end
 
   defp message(forbidden_modules, module) do
-    Enum.find_value(forbidden_modules, fn {^module, message} -> message end)
+    Enum.find_value(forbidden_modules, fn
+      {^module, message} -> message
+      _ -> nil
+    end)
   end
 end
