@@ -142,7 +142,9 @@ defmodule Credo.Mixfile do
 
   defp aliases do
     [
-      "test.fast": "test --exclude slow"
+      test: "test --exclude slow --include slow:disk_io",
+      "test.fast": "test --exclude slow",
+      "test.slow": "test --include slow"
     ]
   end
 end
