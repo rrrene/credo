@@ -65,6 +65,18 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> assert_issue()
   end
 
+  test "it should report on grouped aliases" do
+    """
+    defmodule CredoSampleModule do
+      alias CredoSampleModule.{ForbiddenModule}
+      def some_function, do: ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
+    |> assert_issue()
+  end
+
   test "it should report on import" do
     """
     defmodule CredoSampleModule do
