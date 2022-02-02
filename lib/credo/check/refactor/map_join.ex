@@ -1,25 +1,29 @@
 defmodule Credo.Check.Refactor.MapJoin do
-  @moduledoc """
-  `Enum.map_join/3` is more efficient than `Enum.map/2 |> Enum.join/2`.
+  use Credo.Check,
+    base_priority: :high,
+    explanations: [
+      check: """
+      One `Enum.map/2` is more efficient than `Enum.map/2 |> Enum.map/2`.
 
-  This should be refactored:
+      This should be refactored:
 
-      [:a, :b, :c]
-      |> Enum.map(&inspect/1)
-      |> Enum.join(", ")
+          [:a, :b, :c]
+          |> Enum.map(&inspect/1)
+          |> Enum.map(&String.upcase/1)
 
-  to look like this:
+      to look like this:
 
-      Enum.map_join([:a, :b, :c], ", ", &inspect/1)
+          Enum.map([:a, :b, :c], fn letter ->
+            letter
+            |> inspect()
+            |> String.upcase()
+          end)
 
-  The reason for this is performance, because the separate calls to
-  `Enum.map/2` and `Enum.join/2` require two iterations whereas
-  `Enum.map_join/3` only requires one.
-  """
-
-  @explanation [check: @moduledoc]
-
-  use Credo.Check, base_priority: :high
+      The reason for this is performance, because the two separate calls
+      to `Enum.map/2` require two iterations whereas doing the functions
+      in the single `Enum.map/2` only requires one.
+      """
+    ]
 
   @doc false
   def run(source_file, params \\ []) do
