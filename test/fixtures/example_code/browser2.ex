@@ -1,5 +1,5 @@
 defmodule Wallaby.Browser do
-  @moduledoc ~S"""
+  @moduledoc ~S'''
   The Browser module is the entrypoint for interacting with a real browser.
 
   By default, action only work with elements that are visible to a real user.
@@ -101,7 +101,7 @@ defmodule Wallaby.Browser do
   assert page
   |> create_todo("Write Wallaby Documentation")
   |> todo_was_created?
-  """
+  '''
 
   alias Wallaby.CookieError
   alias Wallaby.Element
@@ -127,7 +127,7 @@ defmodule Wallaby.Browser do
 
   @default_max_wait_time 3_000
 
-  @doc """
+  @doc '''
   Attempts to synchronize with the browser. This is most often used to
   execute queries repeatedly until it either exceeds the time limit or
   returns a success.
@@ -139,7 +139,7 @@ defmodule Wallaby.Browser do
   our time. In practice we should eventually be able to query the DOM in a stable
   state. However, if this error does continue to occur it will cause wallaby to
   loop forever (or until the test is killed by exunit).
-  """
+  '''
   @type sync_result :: {:ok, any()} | {:error, any()}
   @spec retry((() -> sync_result), non_neg_integer()) :: sync_result()
 
@@ -163,7 +163,7 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Fills in an element identified by `query` with `value`.
 
   All inputs previously present in the input field will be overridden.
@@ -179,17 +179,17 @@ defmodule Wallaby.Browser do
   Currently, ChromeDriver only supports [BMP Unicode](http://www.unicode.org/roadmaps/bmp/) characters. Emojis are [SMP](https://www.unicode.org/roadmaps/smp/) characters and will be ignored by ChromeDriver.
 
   Using JavaScript is a known workaround for filling in fields with Emojis and other non-BMP characters.
-  """
+  '''
   @spec fill_in(parent, Query.t(), with: String.t()) :: parent
   def fill_in(parent, query, with: value) do
     parent
     |> find(query, &Element.fill_in(&1, with: value))
   end
 
-  # @doc """
+  # @doc '''
   # Clears an input field. Input elements are looked up by id, label text, or name.
   # The element can also be passed in directly.
-  # """
+  # '''
   @spec clear(parent, Query.t()) :: parent
 
   def clear(parent, query) do
@@ -197,14 +197,14 @@ defmodule Wallaby.Browser do
     |> find(query, &Element.clear/1)
   end
 
-  @doc """
+  @doc '''
   Attaches a file to a file input. Input elements are looked up by id, label text,
   or name.
 
   When dealing with Selenium server (especially a remote instance), the file
   must be uploaded to Selenium via `send_keys` recognizing a local file,
   else attaching a file fails.
-  """
+  '''
   @spec attach_file(parent, Query.t(), path: String.t()) :: parent
   def attach_file(parent, query, path: path) do
     case is_selenium?(parent) do
@@ -219,14 +219,14 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Takes a screenshot of the current window.
   Screenshots are saved to a "screenshots" directory in the same directory the
   tests are run in.
 
   Pass `[{:name, "some_name"}]` to specify the file name. Defaults to a timestamp.
   Pass `[{:log, true}]` to log the location of the screenshot to stdout. Defaults to false.
-  """
+  '''
   @type take_screenshot_opt :: {:name, String.t()} | {:log, boolean}
   @spec take_screenshot(parent, [take_screenshot_opt]) :: parent
 
@@ -261,7 +261,7 @@ defmodule Wallaby.Browser do
 
   defp remove_illegal_characters(string), do: String.replace(string, ~r{<>:"/\\\?\*}, "")
 
-  @doc """
+  @doc '''
   Gets the window handle of the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -288,7 +288,7 @@ defmodule Wallaby.Browser do
     assert "/home" == path
   end
   ```
-  """
+  '''
   @spec window_handle(session :: Session.t()) :: String.t()
   def window_handle(%{driver: driver} = session) do
     {:ok, handle} = driver.window_handle(session)
@@ -296,7 +296,7 @@ defmodule Wallaby.Browser do
     handle
   end
 
-  @doc """
+  @doc '''
   Gets the window handles of all available windows.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -315,7 +315,7 @@ defmodule Wallaby.Browser do
     assert 3 == length(path)
   end
   ```
-  """
+  '''
   @spec window_handles(session :: Session.t()) :: [String.t()]
   def window_handles(%{driver: driver} = session) do
     {:ok, handles} = driver.window_handles(session)
@@ -323,7 +323,7 @@ defmodule Wallaby.Browser do
     handles
   end
 
-  @doc """
+  @doc '''
   Focuses the window identified by the given handle.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -348,7 +348,7 @@ defmodule Wallaby.Browser do
     assert "/home" == path
   end
   ```
-  """
+  '''
   @spec focus_window(session :: Session.t(), window_handle :: String.t()) :: parent
   def focus_window(%{driver: driver} = session, window_handle) do
     {:ok, _} = driver.focus_window(session, window_handle)
@@ -356,7 +356,7 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Closes the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -380,7 +380,7 @@ defmodule Wallaby.Browser do
     assert original_handle == new_handle
   end
   ```
-  """
+  '''
   @spec close_window(session :: Session.t()) :: Session.t()
   def close_window(%{driver: driver} = session) do
     {:ok, _} = driver.close_window(session)
@@ -388,7 +388,7 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Gets the size of the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -408,7 +408,7 @@ defmodule Wallaby.Browser do
     assert height == 800
   end
   ```
-  """
+  '''
   @spec window_size(session :: Session.t()) :: %{
           String.t() => pos_integer,
           String.t() => pos_integer
@@ -419,7 +419,7 @@ defmodule Wallaby.Browser do
     size
   end
 
-  @doc """
+  @doc '''
   Sets the size of the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -438,7 +438,7 @@ defmodule Wallaby.Browser do
     assert height == 667
   end
   ```
-  """
+  '''
   @spec resize_window(session :: Session.t(), width :: pos_integer(), height :: pos_integer()) ::
           Session.t()
   def resize_window(%{driver: driver} = session, width, height) do
@@ -447,7 +447,7 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Maximizes the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -468,7 +468,7 @@ defmodule Wallaby.Browser do
     assert height == 1080
   end
   ```
-  """
+  '''
   @spec maximize_window(session :: Session.t()) :: Session.t()
   def maximize_window(%{driver: driver} = session) do
     {:ok, _} = driver.maximize_window(session)
@@ -476,7 +476,7 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Gets the position of the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -494,7 +494,7 @@ defmodule Wallaby.Browser do
     assert y == 200
   end
   ```
-  """
+  '''
   @spec window_position(session :: Session.t()) :: %{
           String.t() => pos_integer,
           String.t() => pos_integer
@@ -505,7 +505,7 @@ defmodule Wallaby.Browser do
     position
   end
 
-  @doc """
+  @doc '''
   Sets the position of the current window.
 
   The window is either an instance of a browser tab or another operating system window.
@@ -524,7 +524,7 @@ defmodule Wallaby.Browser do
     assert y == 500
   end
   ```
-  """
+  '''
   @spec move_window(session :: Session.t(), x :: pos_integer(), y :: pos_integer()) :: Session.t()
   def move_window(%{driver: driver} = session, x, y) do
     {:ok, _} = driver.set_window_position(session, x, y)
@@ -532,18 +532,18 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Changes the driver focus to the frame found by query.
-  """
+  '''
   @spec focus_frame(parent, Query.t()) :: parent
   def focus_frame(%{driver: driver} = session, %Query{} = query) do
     session
     |> find(query, &driver.focus_frame(session, &1))
   end
 
-  @doc """
+  @doc '''
   Changes the driver focus to the parent frame.
-  """
+  '''
   @spec focus_parent_frame(parent) :: parent
 
   def focus_parent_frame(%{driver: driver} = session) do
@@ -551,9 +551,9 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Changes the driver focus to the default (top level) frame.
-  """
+  '''
   @spec focus_default_frame(parent) :: parent
 
   def focus_default_frame(%{driver: driver} = session) do
@@ -561,9 +561,9 @@ defmodule Wallaby.Browser do
     session
   end
 
-  @doc """
+  @doc '''
   Gets the current url of the session
-  """
+  '''
   @spec current_url(parent) :: String.t()
 
   def current_url(%Session{driver: driver} = session) do
@@ -571,9 +571,9 @@ defmodule Wallaby.Browser do
     url
   end
 
-  @doc """
+  @doc '''
   Gets the current path of the session
-  """
+  '''
   @spec current_path(parent) :: String.t()
 
   def current_path(%Session{driver: driver} = session) do
@@ -581,9 +581,9 @@ defmodule Wallaby.Browser do
     path
   end
 
-  @doc """
+  @doc '''
   Gets the title for the current page
-  """
+  '''
   @spec page_title(parent) :: String.t()
 
   def page_title(%Session{driver: driver} = session) do
@@ -591,11 +591,11 @@ defmodule Wallaby.Browser do
     title
   end
 
-  @doc """
+  @doc '''
   Executes JavaScript synchronously, taking as arguments the script to execute,
   an optional list of arguments available in the script via `arguments`, and an
   optional callback function with the result of script execution as a parameter.
-  """
+  '''
   @spec execute_script(parent, String.t()) :: parent
   @spec execute_script(parent, String.t(), list) :: parent
   @spec execute_script(parent, String.t(), (binary() -> any())) :: parent
@@ -620,11 +620,11 @@ defmodule Wallaby.Browser do
     parent
   end
 
-  @doc """
+  @doc '''
   Executes asynchronous JavaScript, taking as arguments the script to execute,
   an optional list of arguments available in the script via `arguments`, and an
   optional callback function with the result of script execution as a parameter.
-  """
+  '''
   @spec execute_script_async(parent, String.t()) :: parent
   @spec execute_script_async(parent, String.t(), list) :: parent
   @spec execute_script_async(parent, String.t(), (binary() -> any())) :: parent
@@ -649,7 +649,7 @@ defmodule Wallaby.Browser do
     parent
   end
 
-  @doc """
+  @doc '''
   Sends a list of key strokes to active element. If strings are included
   then they are sent as individual keys. Special keys should be provided as a
   list of atoms, which are automatically converted into the corresponding key
@@ -668,7 +668,7 @@ defmodule Wallaby.Browser do
   Currently, ChromeDriver only supports [BMP Unicode](http://www.unicode.org/roadmaps/bmp/) characters. Emojis are [SMP](https://www.unicode.org/roadmaps/smp/) characters and will be ignored by ChromeDriver.
 
   Using JavaScript is a known workaround for filling in fields with Emojis and other non-BMP characters.
-  """
+  '''
   @spec send_keys(parent, Query.t(), Element.keys_to_send()) :: parent
   @spec send_keys(parent, Element.keys_to_send()) :: parent
 
@@ -692,9 +692,9 @@ defmodule Wallaby.Browser do
     parent
   end
 
-  @doc """
+  @doc '''
   Retrieves the source of the current page.
-  """
+  '''
   @spec page_source(parent) :: String.t()
 
   def page_source(%Session{driver: driver} = session) do
@@ -702,13 +702,13 @@ defmodule Wallaby.Browser do
     source
   end
 
-  @doc """
+  @doc '''
   Sets the value of an element. The allowed type for the value depends on the
   type of the element. The value may be:
   * a string of characters for a text element
   * :selected for a radio button, checkbox or select list option
   * :unselected for a checkbox
-  """
+  '''
   @spec set_value(parent, Query.t(), Element.value()) :: parent
 
   def set_value(parent, query, :selected) do
@@ -736,9 +736,9 @@ defmodule Wallaby.Browser do
     end)
   end
 
-  @doc """
+  @doc '''
   Clicks the mouse on the element returned by the query or at the current mouse cursor position.
-  """
+  '''
   @spec click(parent, :left | :middle | :right) :: parent
   @spec click(parent, Query.t()) :: parent
   def click(parent, button) when button in [:left, :middle, :right] do
@@ -753,9 +753,9 @@ defmodule Wallaby.Browser do
     |> find(query, &Element.click/1)
   end
 
-  @doc """
+  @doc '''
   Double-clicks left mouse button at the current mouse coordinates.
-  """
+  '''
   @spec double_click(parent) :: parent
   def double_click(parent) do
     case parent.driver.double_click(parent) do
@@ -764,9 +764,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
    Clicks and holds the given mouse button at the current mouse coordinates.
-  """
+  '''
   @spec button_down(parent, atom) :: parent
   def button_down(parent, button \\ :left) when button in [:left, :middle, :right] do
     case parent.driver.button_down(parent, button) do
@@ -775,9 +775,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
    Releases given previously held mouse button.
-  """
+  '''
   @spec button_up(parent, atom) :: parent
   def button_up(parent, button \\ :left) when button in [:left, :middle, :right] do
     case parent.driver.button_up(parent, button) do
@@ -786,18 +786,18 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Hovers over an element.
-  """
+  '''
   @spec hover(parent, Query.t()) :: parent
   def hover(parent, query) do
     parent
     |> find(query, &Element.hover/1)
   end
 
-  @doc """
+  @doc '''
   Moves mouse by an offset relative to current cursor position.
-  """
+  '''
   @spec move_mouse_by(parent, integer, integer) :: parent
   def move_mouse_by(parent, x_offset, y_offset) do
     case parent.driver.move_mouse_by(parent, x_offset, y_offset) do
@@ -806,9 +806,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Touches the screen at the given position.
-  """
+  '''
   @spec touch_down(parent, integer, integer) :: session
 
   def touch_down(parent, x, y) when is_integer(x) and is_integer(y) do
@@ -818,9 +818,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Touches and holds the element on its top-left corner plus an optional offset.
-  """
+  '''
   @spec touch_down(parent, Query.t(), integer, integer) :: session
 
   def touch_down(parent, query, x_offset \\ 0, y_offset \\ 0) do
@@ -828,9 +828,9 @@ defmodule Wallaby.Browser do
     |> find(query, &Element.touch_down(&1, x_offset, y_offset))
   end
 
-  @doc """
+  @doc '''
   Stops touching the screen.
-  """
+  '''
   @spec touch_up(parent) :: parent
 
   def touch_up(parent) do
@@ -840,9 +840,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Taps the element.
-  """
+  '''
   @spec tap(parent, Query.t()) :: session
 
   def tap(parent, query) do
@@ -850,9 +850,9 @@ defmodule Wallaby.Browser do
     |> find(query, &Element.tap/1)
   end
 
-  @doc """
+  @doc '''
   Moves the touch pointer (finger, stylus etc.) on the screen to the point determined by the given coordinates.
-  """
+  '''
   @spec touch_move(parent, non_neg_integer, non_neg_integer) :: parent
 
   def touch_move(parent, x, y) do
@@ -862,9 +862,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Scroll on the screen from the given element by the given offset using touch events.
-  """
+  '''
   @spec touch_scroll(parent, Query.t(), integer, integer) :: parent
 
   def touch_scroll(parent, query, x, y) do
@@ -872,11 +872,11 @@ defmodule Wallaby.Browser do
     |> find(query, &Element.touch_scroll(&1, x, y))
   end
 
-  @doc """
+  @doc '''
   Gets the Element's text value.
 
   If the element is not visible, the return value will be `""`.
-  """
+  '''
   @spec text(parent) :: String.t()
   @spec text(parent, Query.t()) :: String.t()
   def text(parent, query) do
@@ -891,9 +891,9 @@ defmodule Wallaby.Browser do
     |> Element.text()
   end
 
-  @doc """
+  @doc '''
   Gets the value of the elements attribute.
-  """
+  '''
   @spec attr(parent, Query.t(), String.t()) :: String.t() | nil
   def attr(parent, query, name) do
     parent
@@ -901,9 +901,9 @@ defmodule Wallaby.Browser do
     |> Element.attr(name)
   end
 
-  @doc """
+  @doc '''
   Checks if the element has been selected. Alias for checked?(element)
-  """
+  '''
   @spec selected?(parent, Query.t()) :: boolean()
   def selected?(parent, query) do
     parent
@@ -911,16 +911,16 @@ defmodule Wallaby.Browser do
     |> Element.selected?()
   end
 
-  @doc """
+  @doc '''
   Checks if the element is visible on the page
-  """
+  '''
   @spec visible?(parent, Query.t()) :: boolean()
   def visible?(parent, query) do
     parent
     |> has?(query)
   end
 
-  @doc """
+  @doc '''
   Finds a specific DOM element on the page based on a CSS selector. Blocks until
   it either finds the element or until the max time is reached. By default only
   1 element is expected to match the query. If more elements are present then a
@@ -931,7 +931,7 @@ defmodule Wallaby.Browser do
 
   By default finders only work with elements that would be visible to a real
   user.
-  """
+  '''
   @spec find(parent, Query.t(), (Element.t() -> any())) :: parent
   @spec find(parent, Query.t()) :: Element.t() | [Element.t()]
   @spec find(parent, String.t()) :: Element.t() | [Element.t()]
@@ -963,11 +963,11 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Finds all of the DOM elements that match the CSS selector. If no elements are
   found then an empty list is immediately returned. This is equivalent to calling
   `find(session, css("element", count: nil, minimum: 0))`.
-  """
+  '''
   @spec all(parent, Query.t()) :: [Element.t()]
   def all(parent, %Query{} = query) do
     find(
@@ -976,10 +976,10 @@ defmodule Wallaby.Browser do
     )
   end
 
-  @doc """
+  @doc '''
   Validates that the query returns a result. This can be used to define other
   types of matchers.
-  """
+  '''
   @spec has?(parent, Query.t()) :: boolean()
   def has?(parent, query) do
     case execute_query(parent, query) do
@@ -988,9 +988,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Matches the Element's value with the provided value.
-  """
+  '''
   @spec has_value?(parent, Query.t(), any()) :: boolean()
   @spec has_value?(Element.t(), any()) :: boolean()
   def has_value?(parent, query, value) do
@@ -1018,7 +1018,7 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Matches the parent's content with the provided text.
 
   Returns a boolean that indicates if the text was found.
@@ -1038,7 +1038,7 @@ defmodule Wallaby.Browser do
   |> visit("/")
   |> has_text?(Query.css(".login-button"), "Login")
   ```
-  """
+  '''
   @spec has_text?(parent, String.t()) :: boolean()
   @spec has_text?(parent, Query.t(), String.t()) :: boolean()
   def has_text?(parent, query, text) do
@@ -1072,7 +1072,7 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Matches the Element's content with the provided text and raises if not found.
 
   Returns the given `parent` if the assertion is correct so that it is easily
@@ -1093,7 +1093,7 @@ defmodule Wallaby.Browser do
   |> visit("/")
   |> assert_text(Query.css(".login-button"), "Login")
   ```
-  """
+  '''
   @spec assert_text(parent, String.t()) :: parent
   @spec assert_text(parent, Query.t(), String.t()) :: parent
   def assert_text(parent, query, text) when is_binary(text) do
@@ -1110,7 +1110,7 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Checks if `query` is present within `parent` and raises if not found.
 
   Returns the given `parent` if the assertion is correct so that it is easily
@@ -1121,7 +1121,7 @@ defmodule Wallaby.Browser do
       session
       |> visit("/")
       |> assert_has(Query.css(".login-button"))
-  """
+  '''
 
   defmacro assert_has(parent, query) do
     quote do
@@ -1152,7 +1152,7 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Checks if `query` is not present within `parent` and raises if it is found.
 
   Returns the given `parent` if the query is not found so that it is easily
@@ -1163,7 +1163,7 @@ defmodule Wallaby.Browser do
       session
       |> visit("/")
       |> refute_has(Query.css(".secret-admin-content"))
-  """
+  '''
   defmacro refute_has(parent, query) do
     quote do
       parent = unquote(parent)
@@ -1180,9 +1180,9 @@ defmodule Wallaby.Browser do
     end
   end
 
-  @doc """
+  @doc '''
   Searches for CSS on the page.
-  """
+  '''
   @spec has_css?(parent, Query.t(), String.t()) :: boolean()
   @spec has_css?(parent, String.t()) :: boolean()
   def has_css?(parent, query, css) when is_binary(css) do
@@ -1196,9 +1196,9 @@ defmodule Wallaby.Browser do
     |> has?(Query.css(css, count: :any))
   end
 
-  @doc """
+  @doc '''
   Searches for CSS that should not be on the page
-  """
+  '''
   @spec has_no_css?(parent, Query.t(), String.t()) :: boolean()
   @spec has_no_css?(parent, String.t()) :: boolean()
   def has_no_css?(parent, query, css) when is_binary(css) do
@@ -1212,11 +1212,11 @@ defmodule Wallaby.Browser do
     |> has?(Query.css(css, count: 0))
   end
 
-  @doc """
+  @doc '''
   Changes the current page to the provided route.
   Relative paths are appended to the provided base_url.
   Absolute paths do not use the base_url.
-  """
+  '''
   @spec visit(session, String.t()) :: session
   def visit(%Session{driver: driver} = session, path) do
     uri = URI.parse(path)
@@ -1259,7 +1259,7 @@ defmodule Wallaby.Browser do
     driver.blank_page?(session)
   end
 
-  @doc """
+  @doc '''
   Accepts one alert dialog, which must be triggered within the specified `fun`.
   Returns the message that was presented to the user. For example:
 
@@ -1268,12 +1268,12 @@ defmodule Wallaby.Browser do
     click(s, Query.link("Trigger alert"))
   end
   ```
-  """
+  '''
   def accept_alert(%Session{driver: driver} = session, fun) do
     driver.accept_alert(session, fun)
   end
 
-  @doc """
+  @doc '''
   Accepts one confirmation dialog, which must be triggered within the specified
   `fun`. Returns the message that was presented to the user. For example:
 
@@ -1282,12 +1282,12 @@ defmodule Wallaby.Browser do
     click(s, Query.link("Trigger confirm"))
   end
   ```
-  """
+  '''
   def accept_confirm(%Session{driver: driver} = session, fun) do
     driver.accept_confirm(session, fun)
   end
 
-  @doc """
+  @doc '''
   Dismisses one confirmation dialog, which must be triggered within the
   specified `fun`. Returns the message that was presented to the user. For
   example:
@@ -1297,12 +1297,12 @@ defmodule Wallaby.Browser do
     click(s, Query.link("Trigger confirm"))
   end
   ```
-  """
+  '''
   def dismiss_confirm(%Session{driver: driver} = session, fun) do
     driver.dismiss_confirm(session, fun)
   end
 
-  @doc """
+  @doc '''
   Accepts one prompt, which must be triggered within the specified `fun`. The
   `[with: value]` option allows to simulate user input for the prompt. If no
   value is provided, the default value that was passed to `window.prompt` will
@@ -1322,7 +1322,7 @@ defmodule Wallaby.Browser do
     click(s, Query.link("Trigger prompt"))
   end
   ```
-  """
+  '''
   def accept_prompt(%Session{} = session, fun) do
     do_accept_prompt(session, nil, fun)
   end
@@ -1335,7 +1335,7 @@ defmodule Wallaby.Browser do
     driver.accept_prompt(session, input_value, fun)
   end
 
-  @doc """
+  @doc '''
   Dismisses one prompt, which must be triggered within the specified `fun`.
   Returns the message that was presented to the user. For example:
 
@@ -1344,7 +1344,7 @@ defmodule Wallaby.Browser do
     click(s, Query.link("Trigger prompt"))
   end
   ```
-  """
+  '''
   def dismiss_prompt(%Session{driver: driver} = session, fun) do
     driver.dismiss_prompt(session, fun)
   end

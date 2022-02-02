@@ -247,8 +247,44 @@ defmodule Credo.Code.StringsTest do
   end
 
   @tag slow: :disk_io
+  test "it should produce valid code /6" do
+    example_code = File.read!("test/fixtures/example_code/browser2.ex")
+
+    result =
+      example_code
+      |> to_source_file()
+      |> Strings.replace_with_spaces(".", ".")
+
+    result2 =
+      result
+      |> Strings.replace_with_spaces(".", ".")
+
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+
+    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+  end
+
+  @tag slow: :disk_io
   test "it should produce valid code with empty string as replacement /5" do
     example_code = File.read!("test/fixtures/example_code/browser.ex")
+
+    result =
+      example_code
+      |> to_source_file()
+      |> Strings.replace_with_spaces("", "")
+
+    result2 =
+      result
+      |> Strings.replace_with_spaces("", "")
+
+    assert match?({:ok, _}, Code.string_to_quoted(result))
+
+    assert result == result2, "Strings.replace_with_spaces/2 should be idempotent"
+  end
+
+  @tag slow: :disk_io
+  test "it should produce valid code with empty string as replacement /6" do
+    example_code = File.read!("test/fixtures/example_code/browser2.ex")
 
     result =
       example_code

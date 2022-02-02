@@ -103,6 +103,7 @@ defmodule Credo.Code.Strings do
       parse_heredoc(
         t,
         acc <> unquote(sigil_start),
+        "",
         replacement,
         unquote(sigil_end)
       )
@@ -110,11 +111,11 @@ defmodule Credo.Code.Strings do
   end
 
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement, ~s("""))
+    parse_heredoc(t, acc <> ~s("""), "", replacement, ~s("""))
   end
 
   defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement, ~s('''))
+    parse_heredoc(t, acc <> ~s('''), "", replacement, ~s('''))
   end
 
   for {sigil_start, sigil_end} <- all_string_sigils do
@@ -387,57 +388,71 @@ defmodule Credo.Code.Strings do
   # Heredocs
   #
 
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, "" = replacement, "\"\"\"") do
-    parse_code(t, acc <> "\"\"\"", replacement)
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, heredoc_acc, "" = replacement, "\"\"\"") do
+    parse_code(t, acc <> heredoc_acc <> "\"\"\"", replacement)
   end
 
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, " " = replacement, "\"\"\"") do
-    parse_code(t, acc <> "\"\"\"", replacement)
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, heredoc_acc, " " = replacement, "\"\"\"") do
+    parse_code(t, acc <> heredoc_acc <> "\"\"\"", replacement)
   end
 
-  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, replacement, "\"\"\"") do
-    acc =
-      Regex.replace(~r/(\n[#{replacement}]+)(\"\"\")\z/m, acc <> "\"\"\"", fn _, x ->
-        "\n#{String.pad_trailing("", String.length(x))}\"\"\""
-      end)
+  defp parse_heredoc(<<"\"\"\""::utf8, t::binary>>, acc, heredoc_acc, replacement, "\"\"\"") do
+    heredoc_acc = heredoc_acc <> "\"\"\""
 
-    parse_code(t, acc, replacement)
+    heredoc_acc =
+      case Regex.run(~r/\n([#{replacement}]+)\"\"\"\z/m, heredoc_acc) do
+        [_, indent_string] ->
+          x = String.length(indent_string)
+          Regex.replace(~r/^(.{#{x}})/m, heredoc_acc, String.pad_trailing("", x))
+
+        _ ->
+          heredoc_acc
+      end
+
+    parse_code(t, acc <> heredoc_acc, replacement)
   end
 
-  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, "" = replacement, "\'\'\'") do
-    parse_code(t, acc, replacement)
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, heredoc_acc, "" = replacement, "\'\'\'") do
+    parse_code(t, acc <> heredoc_acc <> "\'\'\'", replacement)
   end
 
-  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, " " = replacement, "\'\'\'") do
-    parse_code(t, acc <> "\'\'\'", replacement)
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, heredoc_acc, " " = replacement, "\'\'\'") do
+    parse_code(t, acc <> heredoc_acc <> "\'\'\'", replacement)
   end
 
-  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
-    acc =
-      Regex.replace(~r/(\n[#{replacement}]+)(\'\'\')\z/m, acc <> "\'\'\'", fn _, x ->
-        "\n#{String.pad_trailing("", String.length(x))}\'\'\'"
-      end)
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, heredoc_acc, replacement, "\'\'\'") do
+    heredoc_acc = heredoc_acc <> "\'\'\'"
 
-    parse_code(t, acc, replacement)
+    heredoc_acc =
+      case Regex.run(~r/\n([#{replacement}]+)\'\'\'\z/m, heredoc_acc) do
+        [_, indent_string] ->
+          x = String.length(indent_string)
+          Regex.replace(~r/^(.{#{x}})/m, heredoc_acc, String.pad_trailing("", x))
+
+        _ ->
+          heredoc_acc
+      end
+
+    parse_code(t, acc <> heredoc_acc, replacement)
   end
 
-  defp parse_heredoc("", acc, _replacement, _delimiter) do
+  defp parse_heredoc("", acc, _heredoc_acc, _replacement, _delimiter) do
     acc
   end
 
-  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, replacement, delimiter) do
-    parse_heredoc(t, acc, replacement, delimiter)
+  defp parse_heredoc(<<"\\\\"::utf8, t::binary>>, acc, heredoc_acc, replacement, delimiter) do
+    parse_heredoc(t, acc, heredoc_acc, replacement, delimiter)
   end
 
-  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, replacement, delimiter) do
-    parse_heredoc(t, acc, replacement, delimiter)
+  defp parse_heredoc(<<"\\\""::utf8, t::binary>>, acc, heredoc_acc, replacement, delimiter) do
+    parse_heredoc(t, acc, heredoc_acc, replacement, delimiter)
   end
 
-  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, replacement, delimiter) do
-    parse_heredoc(t, acc <> "\n", replacement, delimiter)
+  defp parse_heredoc(<<"\n"::utf8, t::binary>>, acc, heredoc_acc, replacement, delimiter) do
+    parse_heredoc(t, acc, heredoc_acc <> "\n", replacement, delimiter)
   end
 
-  defp parse_heredoc(<<_::utf8, t::binary>>, acc, replacement, delimiter) do
-    parse_heredoc(t, acc <> replacement, replacement, delimiter)
+  defp parse_heredoc(<<_::utf8, t::binary>>, acc, heredoc_acc, replacement, delimiter) do
+    parse_heredoc(t, acc, heredoc_acc <> replacement, replacement, delimiter)
   end
 end
