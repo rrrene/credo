@@ -37,19 +37,46 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     Code.prewalk(source_file, &traverse(&1, &2, modules, IssueMeta.for(source_file, params)))
   end
 
-  defp traverse(ast = {:__aliases__, meta, modules}, issues, forbidden_modules, issue_meta) do
+  defp traverse(
+         {:alias, meta, [{{:., _, base_module_args}, _, module_args}]},
+         issues,
+         forbidden_modules,
+         issue_meta
+       ) do
+    forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
+
+    issue =
+      Enum.find_value(module_args, fn submodule ->
+        {:{}, base_modules} = List.pop_at(base_module_args, -1)
+        module = Name.full(base_modules ++ [submodule])
+
+        if found_module?(forbidden_module_names, module) do
+          issue_for(issue_meta, meta[:line], module, forbidden_modules)
+        end
+      end)
+
+    if issue do
+      {nil, [issue | issues]}
+    else
+      {nil, issues}
+    end
+  end
+
+  defp traverse({:__aliases__, meta, modules}, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
     forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
 
     if found_module?(forbidden_module_names, module) do
-      {ast, [issue_for(issue_meta, meta[:line], module, forbidden_modules) | issues]}
+      {nil, [issue_for(issue_meta, meta[:line], module, forbidden_modules) | issues]}
     else
-      {ast, issues}
+      {nil, issues}
     end
   end
 
-  defp traverse(ast, issues, _, _), do: {ast, issues}
+  defp traverse(ast, issues, _, _) do
+    {ast, issues}
+  end
 
   defp found_module?(forbidden_module_names, module) do
     Enum.member?(forbidden_module_names, module)

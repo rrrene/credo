@@ -7,7 +7,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   # cases NOT raising issues
   #
 
-  test "it should NOT report with default params" do
+  test "it should NOT report valid code" do
     """
     defmodule CredoReplicateIssue do
       alias __MODULE__.Module
@@ -26,10 +26,22 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> refute_issues()
   end
 
-  test "it should NOT report with default params /2" do
+  test "it should NOT report valid code /2" do
     """
     defmodule CredoSampleModule do
       alias CredoSampleModule.ForbiddenModule
+      def some_function, do: ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report valid code /3" do
+    """
+    defmodule CredoSampleModule do
+      alias CredoSampleModule.{Module1, ForbiddenModule, Module2}
       def some_function, do: ForbiddenModule.another_function()
     end
     """
@@ -57,6 +69,18 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     """
     defmodule CredoSampleModule do
       alias CredoSampleModule.ForbiddenModule
+      def some_function, do: ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
+    |> assert_issue()
+  end
+
+  test "it should report on multi aliases" do
+    """
+    defmodule CredoSampleModule do
+      alias CredoSampleModule.{Module1, ForbiddenModule, Module2}
       def some_function, do: ForbiddenModule.another_function()
     end
     """
@@ -98,9 +122,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> to_source_file
     |> run_check(@described_check, modules: [{CredoSampleModule.ForbiddenModule, "my message"}])
     |> assert_issue(fn issue ->
-      expected_message = "my message"
-
-      assert issue.message == expected_message
+      assert issue.message == "my message"
     end)
   end
 end
