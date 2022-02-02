@@ -408,6 +408,10 @@ defmodule Credo.Code.Strings do
     parse_code(t, acc, replacement)
   end
 
+  defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, " " = replacement, "\'\'\'") do
+    parse_code(t, acc <> "\'\'\'", replacement)
+  end
+
   defp parse_heredoc(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, "\'\'\'") do
     acc =
       Regex.replace(~r/(\n[#{replacement}]+)(\'\'\')\z/m, acc <> "\'\'\'", fn _, x ->
