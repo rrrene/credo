@@ -43,6 +43,7 @@ Some IDEs and editors are able to run Credo in the background and mark issues in
 * [Elixir Linter (Credo)](https://marketplace.visualstudio.com/items?itemName=pantajoe.vscode-elixir-credo) - VSCode extension (by @pantajoe)
 * [flycheck](https://www.flycheck.org/en/latest/languages.html#elixir) - Emacs syntax checking extension
 * [kakoune](https://github.com/mawww/kakoune/wiki/Lint#elixir) - Config for linting support in Kakoune editor
+* [Neovim via null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/lua/null-ls/builtins/diagnostics/credo.lua) - diagnostics builtin
 
 ### Automated Code Review
 
