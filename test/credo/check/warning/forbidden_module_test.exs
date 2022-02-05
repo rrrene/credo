@@ -65,6 +65,18 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> assert_issue()
   end
 
+  test "it should report on grouped aliases" do
+    """
+    defmodule CredoSampleModule do
+      alias CredoSampleModule.{AllowedModule, ForbiddenModule, ForbiddenModule2}
+      def some_function, do: ForbiddenModule.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2])
+    |> assert_issues()
+  end
+
   test "it should report on import" do
     """
     defmodule CredoSampleModule do
@@ -102,5 +114,17 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
 
       assert issue.message == expected_message
     end)
+  end
+
+  test "it should work with multiple forbidden modules" do
+    """
+    defmodule CredoSampleModule do
+      def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
+      def some_function2, do: CredoSampleModule.ForbiddenModule2.another_function()
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2])
+    |> assert_issues()
   end
 end

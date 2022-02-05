@@ -40,16 +40,41 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse(ast = {:__aliases__, meta, modules}, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
-    forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
+    issues = put_issue_if_forbidden(issues, issue_meta, meta[:line], module, forbidden_modules)
 
-    if found_module?(forbidden_module_names, module) do
-      {ast, [issue_for(issue_meta, meta[:line], module, forbidden_modules) | issues]}
-    else
-      {ast, issues}
-    end
+    {ast, issues}
+  end
+
+  defp traverse(
+         ast = {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]},
+         issues,
+         forbidden_modules,
+         issue_meta
+       ) do
+    modules =
+      Enum.map(aliases, fn {:__aliases__, meta, module} ->
+        {Name.full([base_alias, module]), meta[:line]}
+      end)
+
+    issues =
+      Enum.reduce(modules, issues, fn {module, line}, issues ->
+        put_issue_if_forbidden(issues, issue_meta, line, module, forbidden_modules)
+      end)
+
+    {ast, issues}
   end
 
   defp traverse(ast, issues, _, _), do: {ast, issues}
+
+  defp put_issue_if_forbidden(issues, issue_meta, line_no, module, forbidden_modules) do
+    forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
+
+    if found_module?(forbidden_module_names, module) do
+      [issue_for(issue_meta, line_no, module, forbidden_modules) | issues]
+    else
+      issues
+    end
+  end
 
   defp found_module?(forbidden_module_names, module) do
     Enum.member?(forbidden_module_names, module)
@@ -68,6 +93,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   end
 
   defp message(forbidden_modules, module) do
-    Enum.find_value(forbidden_modules, fn {^module, message} -> message end)
+    Enum.find_value(forbidden_modules, fn
+      {^module, message} -> message
+      _ -> nil
+    end)
   end
 end
