@@ -59,6 +59,21 @@ defmodule Credo.Check.Warning.MixEnvTest do
     |> refute_issues()
   end
 
+  test "it should NOT report on instance in module attributes" do
+    """
+    defmodule CredoSampleModule do
+      @myvar Mix.env() == :test
+
+      def test do
+        @myvar
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

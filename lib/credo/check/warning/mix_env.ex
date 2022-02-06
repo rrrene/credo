@@ -50,6 +50,18 @@ defmodule Credo.Check.Warning.MixEnv do
   defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
 
   defp traverse(
+         {:@, _,
+          [
+            {name, _, args}
+          ]},
+         issues,
+         _issue_meta
+       )
+       when is_atom(name) and is_list(args) do
+    {nil, issues}
+  end
+
+  defp traverse(
          {{:., _, [{:__aliases__, _, [:Mix]}, :env]}, meta, _arguments} = ast,
          issues,
          issue_meta
