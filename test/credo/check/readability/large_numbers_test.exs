@@ -44,6 +44,42 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
+  test "it should allow trailing digits if configured" do
+    """
+    def numbers do
+      Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, trailing_digits: 2)
+    |> refute_issues()
+  end
+
+  test "it should allow trailing digits if configured /2" do
+    """
+    def numbers do
+      Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
+      Money.to_string(Money.new(1_000_000_6789, :COP), fractional_unit: false)  # "$1'000.000.00"
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, trailing_digits: [2, 4])
+    |> refute_issues()
+  end
+
+  test "it should allow trailing digits if configured /3" do
+    """
+    def numbers do
+      Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
+      Money.to_string(Money.new(1_000_000_789, :COP), fractional_unit: false)  # "$1'000.000.00"
+      Money.to_string(Money.new(1_000_000_6789, :COP), fractional_unit: false)  # "$1'000.000.00"
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, trailing_digits: 2..4)
+    |> refute_issues()
+  end
+
   test "it should not complain about numbers in anon function calls" do
     """
       defmodule Demo.LargeNumberAnonWarning do
@@ -247,5 +283,17 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
+  end
+
+  test "it should report trailing digits which are not configured" do
+    """
+    def numbers do
+      Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
+      Money.to_string(Money.new(1_000_000_6789, :COP), fractional_unit: false)  # "$1'000.000.00"
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, trailing_digits: [3])
+    |> assert_issues()
   end
 end

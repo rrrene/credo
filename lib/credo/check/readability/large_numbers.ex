@@ -3,7 +3,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
     base_priority: :high,
     tags: [:formatter],
     param_defaults: [
-      only_greater_than: 9_999
+      only_greater_than: 9_999,
+      trailing_digits: []
     ],
     explanations: [
       check: """
@@ -20,7 +21,9 @@ defmodule Credo.Check.Readability.LargeNumbers do
       it easier to follow.
       """,
       params: [
-        only_greater_than: "The check only reports numbers greater than this."
+        only_greater_than: "The check only reports numbers greater than this.",
+        trailing_digits:
+          "The check allows for the given number of trailing digits (can be a number, range or list)"
       ]
     ]
 
@@ -30,10 +33,16 @@ defmodule Credo.Check.Readability.LargeNumbers do
     issue_meta = IssueMeta.for(source_file, params)
     min_number = Params.get(params, :only_greater_than, __MODULE__)
 
+    allowed_trailing_digits =
+      case Params.get(params, :trailing_digits, __MODULE__) do
+        %Range{} = value -> Enum.to_list(value)
+        value -> List.wrap(value)
+      end
+
     source_file
     |> Credo.Code.to_tokens()
     |> collect_number_tokens([], min_number)
-    |> find_issues([], issue_meta)
+    |> find_issues([], allowed_trailing_digits, issue_meta)
   end
 
   defp collect_number_tokens([], acc, _), do: acc
@@ -69,7 +78,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   defp number_token(_, _), do: nil
 
-  defp find_issues([], acc, _issue_meta) do
+  defp find_issues([], acc, _allowed_trailing_digits, _issue_meta) do
     acc
   end
 
@@ -77,57 +86,65 @@ defmodule Credo.Check.Readability.LargeNumbers do
   defp find_issues(
          [{:flt, {line_no, column1, number} = location, _} | t],
          acc,
+         allowed_trailing_digits,
          issue_meta
        ) do
-    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+    acc =
+      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
 
-    find_issues(t, acc, issue_meta)
+    find_issues(t, acc, allowed_trailing_digits, issue_meta)
   end
 
   # tuple for Elixir >= 1.6.0
   defp find_issues(
          [{:int, {line_no, column1, number} = location, _} | t],
          acc,
+         allowed_trailing_digits,
          issue_meta
        ) do
-    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+    acc =
+      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
 
-    find_issues(t, acc, issue_meta)
+    find_issues(t, acc, allowed_trailing_digits, issue_meta)
   end
 
   defp find_issues(
          [{:float, {line_no, column1, number} = location, _} | t],
          acc,
+         allowed_trailing_digits,
          issue_meta
        ) do
-    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+    acc =
+      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
 
-    find_issues(t, acc, issue_meta)
+    find_issues(t, acc, allowed_trailing_digits, issue_meta)
   end
 
   # tuple for Elixir <= 1.5.x
   defp find_issues(
          [{:number, {line_no, column1, _column2} = location, number} | t],
          acc,
+         allowed_trailing_digits,
          issue_meta
        ) do
-    acc = acc ++ find_issue(line_no, column1, location, number, issue_meta)
+    acc =
+      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
 
-    find_issues(t, acc, issue_meta)
+    find_issues(t, acc, allowed_trailing_digits, issue_meta)
   end
 
-  defp find_issue(line_no, column1, location, number, issue_meta) do
+  defp find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta) do
     source = source_fragment(location, issue_meta)
-    underscored_number = number_with_underscores(number, source)
+    underscored_versions = number_with_underscores(number, allowed_trailing_digits, source)
 
-    if decimal_in_source?(source) && source != underscored_number do
+    if decimal_in_source?(source) && not Enum.member?(underscored_versions, source) do
       [
         issue_for(
           issue_meta,
           line_no,
           column1,
           source,
-          underscored_number
+          underscored_versions
         )
       ]
     else
@@ -135,33 +152,55 @@ defmodule Credo.Check.Readability.LargeNumbers do
     end
   end
 
-  defp number_with_underscores(number, _) when is_integer(number) do
+  defp number_with_underscores(number, allowed_trailing_digits, _) when is_integer(number) do
     number
     |> to_string
-    |> add_underscores_to_number_string
+    |> add_underscores_to_number_string(allowed_trailing_digits)
   end
 
-  defp number_with_underscores(number, source_fragment) when is_number(number) do
+  defp number_with_underscores(number, allowed_trailing_digits, source_fragment)
+       when is_number(number) do
     case String.split(source_fragment, ".", parts: 2) do
       [num, decimal] ->
-        Enum.join([add_underscores_to_number_string(num), decimal], ".")
+        add_underscores_to_number_string(num, allowed_trailing_digits)
+        |> Enum.map(fn base -> Enum.join([base, decimal], ".") end)
 
       [num] ->
-        add_underscores_to_number_string(num)
+        add_underscores_to_number_string(num, allowed_trailing_digits)
     end
   end
 
-  defp add_underscores_to_number_string(string) do
-    string
-    |> String.reverse()
-    |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
-    |> String.reverse()
+  defp add_underscores_to_number_string(string, allowed_trailing_digits) do
+    without_trailing_digits =
+      string
+      |> String.reverse()
+      |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
+      |> String.reverse()
+
+    all_trailing_digit_versions =
+      Enum.map(allowed_trailing_digits, fn trailing_digits ->
+        if String.length(string) > trailing_digits do
+          base =
+            String.slice(string, 0..(-1 * trailing_digits - 1))
+            |> String.reverse()
+            |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
+            |> String.reverse()
+
+          trailing = String.slice(string, (-1 * trailing_digits)..-1)
+
+          "#{base}_#{trailing}"
+        end
+      end)
+
+    ([without_trailing_digits] ++ all_trailing_digit_versions)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
   end
 
   defp issue_for(issue_meta, line_no, column, trigger, expected) do
     format_issue(
       issue_meta,
-      message: "Large numbers should be written with underscores: #{expected}",
+      message: "Large numbers should be written with underscores: #{Enum.join(expected, " or ")}",
       line_no: line_no,
       column: column,
       trigger: trigger
