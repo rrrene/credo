@@ -18,6 +18,7 @@ defmodule Credo.Check.Warning.MixEnv do
   alias Credo.SourceFile
 
   @call_string "Mix.env"
+  @def_ops [:def, :defp, :defmacro]
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
@@ -49,19 +50,22 @@ defmodule Credo.Check.Warning.MixEnv do
   defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
   defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
 
-  defp traverse(
-         {:@, _,
-          [
-            {name, _, args}
-          ]},
-         issues,
-         _issue_meta
-       )
-       when is_atom(name) and is_list(args) do
-    {nil, issues}
+  for op <- @def_ops do
+    # catch variables named e.g. `defp`
+    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do
+      {ast, issues}
+    end
+
+    defp traverse({unquote(op), _, _body} = ast, issues, issue_meta) do
+      {ast, issues ++ Credo.Code.prewalk(ast, &traverse_defs(&1, &2, issue_meta))}
+    end
   end
 
-  defp traverse(
+  defp traverse(ast, issues, _issue_meta) do
+    {ast, issues}
+  end
+
+  defp traverse_defs(
          {{:., _, [{:__aliases__, _, [:Mix]}, :env]}, meta, _arguments} = ast,
          issues,
          issue_meta
@@ -69,7 +73,7 @@ defmodule Credo.Check.Warning.MixEnv do
     {ast, issues_for_call(meta, issues, issue_meta)}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
+  defp traverse_defs(ast, issues, _issue_meta) do
     {ast, issues}
   end
 

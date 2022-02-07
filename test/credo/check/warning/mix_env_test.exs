@@ -74,6 +74,27 @@ defmodule Credo.Check.Warning.MixEnvTest do
     |> refute_issues()
   end
 
+  test "it should NOT report outside of functions" do
+    """
+    defmodule CredoSampleModule do
+      @myvar Mix.env() == :test
+
+      if Mix.env() in [:dev, :test] do
+        import Phoenix.LiveDashboard.Router
+
+        scope "/" do
+          pipe_through :browser
+
+          live_dashboard "/dashboard", metrics: HelloWeb.Telemetry
+        end
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
