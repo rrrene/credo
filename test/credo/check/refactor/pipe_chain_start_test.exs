@@ -45,7 +45,6 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         ?@..@some_value
         |> IO.inspect
 
-
         bar = [3, 2, 1]
         |> tl
         |> Enum.join
@@ -149,6 +148,21 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> Kernel.*(2)
         ~> Kernel.*(2)
         |> Kernel.*(2)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues
+  end
+
+  test "it should NOT report stepped ranges" do
+    ~S"""
+    defmodule CredoTest do
+      def test do
+        1..limit//1
+        |> Enum.map(&convert_cell(cells, &1))
+        |> join_cells()
       end
     end
     """
