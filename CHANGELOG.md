@@ -6,6 +6,8 @@
 - Fix for false positive in `Credo.Check.Consistency.UnusedVariableNames`
 - Fix for false positive in `Credo.Check.Readability.SpaceAfterCommas`
 - Fix a bug in `Credo.Check.Warning.ForbiddenModule`
+- Fix a bug in `Credo.Check.Warning.MixEnv`
+- `Credo.Check.Readability.LargeNumbers` now supports `:trailing_digits`
 
 ## 1.6.2
 
