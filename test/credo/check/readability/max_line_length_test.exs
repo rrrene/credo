@@ -121,6 +121,25 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation if strings are excluded for heredocs /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def render(assigns) do
+        ~H"""
+        My render template
+        """
+      end
+
+      def long_string do
+        "This is a very long string that is after a ~H sigil, I would expect that it is ignored because I set the `ignore_strings` rule to be true."
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation with exec" do
     """
     defmodule CredoSampleModule do
