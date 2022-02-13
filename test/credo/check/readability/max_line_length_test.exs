@@ -155,6 +155,28 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation if regex are excluded for regex" do
+    ~S"""
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        opts =
+          TOMLConfigProvider.init(
+            "test/support/mysupercharts/fixture/config/#{platform()}/invalid_config.toml"
+          )
+
+        assert_raise ArgumentError,
+                     ~r<^Invalid configuration file "test/support/mysupercharts/fixture/config/(unix|win32)/invalid_config\.toml": %\{"locations" =\> \[%\{db: %\{hostname: \["can't be blank"\]\}\}, %\{\}\]\}$>,
+                     fn -> TOMLConfigProvider.load(@config, opts) end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

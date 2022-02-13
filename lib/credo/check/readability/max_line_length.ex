@@ -7,6 +7,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
       ignore_definitions: true,
       ignore_heredocs: true,
       ignore_specs: false,
+      ignore_sigils: true,
       ignore_strings: true,
       ignore_urls: true
     ],
@@ -20,6 +21,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
         max_length: "The maximum number of characters a line may consist of.",
         ignore_definitions: "Set to `true` to ignore lines including function definitions.",
         ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
+        ignore_sigils: "Set to `true` to ignore lines that are sigils, e.g. regular expressions.",
         ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
         ignore_urls: "Set to `true` to ignore lines that contain urls."
       ]
@@ -27,6 +29,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
 
   alias Credo.Code.Heredocs
   alias Credo.Code.Strings
+  alias Credo.Code.Sigils
 
   @def_ops [:def, :defp, :defmacro]
   @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
@@ -40,6 +43,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_definitions = Params.get(params, :ignore_definitions, __MODULE__)
 
     ignore_specs = Params.get(params, :ignore_specs, __MODULE__)
+    ignore_sigils = Params.get(params, :ignore_sigils, __MODULE__)
     ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
     ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
     ignore_urls = Params.get(params, :ignore_urls, __MODULE__)
@@ -52,6 +56,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
         Heredocs.replace_with_spaces(source_file, "")
       else
         SourceFile.source(source_file)
+      end
+
+    source =
+      if ignore_sigils do
+        Sigils.replace_with_spaces(source, "")
+      else
+        source
       end
 
     lines = Credo.Code.to_lines(source)
