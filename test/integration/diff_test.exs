@@ -28,19 +28,6 @@ defmodule Credo.DiffTest do
     :ok
   end
 
-  defp checkout(git_ref) do
-    {_, 0} =
-      System.cmd(
-        "git",
-        [
-          "checkout",
-          git_ref
-        ],
-        cd: @fixture_integration_cloned_repo,
-        stderr_to_stdout: true
-      )
-  end
-
   test "it should NOT report issues on --help" do
     exec = IntegrationTest.run(["diff", "--help"])
     issues = Credo.Execution.get_issues(exec)
