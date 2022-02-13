@@ -11,9 +11,19 @@ defmodule Credo.CLI.Command.GenCheck do
 
   @doc false
   def call(exec, _opts) do
-    exec.cli_options.args
-    |> List.first()
-    |> create_check_file
+    check_file =
+      case exec.cli_options do
+        %Credo.CLI.Options{args: [], switches: %{files_included: [single_file]}} ->
+          single_file
+
+        %Credo.CLI.Options{args: [single_file]} ->
+          single_file
+
+        _ ->
+          nil
+      end
+
+    create_check_file(check_file)
 
     exec
   end
