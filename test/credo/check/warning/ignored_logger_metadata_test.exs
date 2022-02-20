@@ -2,7 +2,6 @@ defmodule Core.Checks.LoggerMetadataTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Warning.IgnoredLoggerMetadata
-  @check_opts metadata_keys: [:account_id]
   @logger_functions ~w(alert critical debug emergency error info notice warn warning)a
 
   for fun <- @logger_functions do
@@ -17,7 +16,7 @@ defmodule Core.Checks.LoggerMetadataTest do
       end
       """
       |> to_source_file
-      |> run_check(@described_check, @check_opts)
+      |> run_check(@described_check, metadata_keys: [:account_id])
       |> refute_issues()
     end
   end
@@ -37,7 +36,7 @@ defmodule Core.Checks.LoggerMetadataTest do
       end
       """
       |> to_source_file
-      |> run_check(@described_check, @check_opts)
+      |> run_check(@described_check)
       |> refute_issues()
     end
   end
@@ -54,7 +53,7 @@ defmodule Core.Checks.LoggerMetadataTest do
       end
       """
       |> to_source_file
-      |> run_check(@described_check, @check_opts)
+      |> run_check(@described_check)
       |> assert_issue()
     end
   end
@@ -71,7 +70,7 @@ defmodule Core.Checks.LoggerMetadataTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @check_opts)
+    |> run_check(@described_check)
     |> assert_issues()
   end
 
@@ -87,7 +86,7 @@ defmodule Core.Checks.LoggerMetadataTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @check_opts)
+    |> run_check(@described_check, metadata_keys: [:account_id])
     |> refute_issues()
   end
 
@@ -102,7 +101,7 @@ defmodule Core.Checks.LoggerMetadataTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @check_opts)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -117,7 +116,7 @@ defmodule Core.Checks.LoggerMetadataTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @check_opts)
+    |> run_check(@described_check, metadata_keys: [:account_id])
     |> refute_issues()
   end
 
@@ -132,7 +131,7 @@ defmodule Core.Checks.LoggerMetadataTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, @check_opts)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 end
