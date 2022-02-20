@@ -3,8 +3,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     param_defaults: [max_complexity: 9],
     explanations: [
       check: """
-      Cyclomatic complexity is a software complexity metric closely correlated with
-      coding errors.
+      Cyclomatic complexity (CC) is a software complexity metric closely
+      correlated with coding errors.
 
       If a function feels like it's gotten too complex, it more often than not also
       has a high CC value. So, if anything, this is useful to convince team members
@@ -168,7 +168,8 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
-      message: "Function is too complex (CC is #{actual_value}, max is #{max_value}).",
+      message:
+        "Function is too complex (cyclomatic complexity is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)
