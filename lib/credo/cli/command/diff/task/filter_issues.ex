@@ -17,14 +17,16 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
       |> Execution.get_assign("credo.diff.previous_exec")
       |> Execution.get_issues()
 
+    previous_dirname = Execution.get_assign(exec, "credo.diff.previous_dirname")
+
     # in previous_issues, in current_issues
-    old_issues = Enum.filter(current_issues, &old_issue?(&1, previous_issues))
+    old_issues = Enum.filter(current_issues, &old_issue?(&1, previous_issues, previous_dirname))
 
     # in previous_issues, not in current_issues
     fixed_issues = previous_issues -- old_issues
 
     # not in previous_issues, in current_issues
-    new_issues = Enum.filter(current_issues, &new_issue?(&1, previous_issues))
+    new_issues = Enum.filter(current_issues, &new_issue?(&1, previous_issues, previous_dirname))
 
     old_issues = Enum.map(old_issues, fn issue -> %Issue{issue | diff_marker: :old} end)
 
@@ -35,18 +37,22 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
     List.flatten([new_issues, fixed_issues, old_issues])
   end
 
-  defp new_issue?(current_issue, previous_issues) when is_list(previous_issues) do
-    !Enum.any?(previous_issues, &same_issue?(current_issue, &1))
+  defp new_issue?(current_issue, previous_issues, previous_dirname)
+       when is_list(previous_issues) do
+    !Enum.any?(previous_issues, &same_issue?(current_issue, &1, previous_dirname))
   end
 
-  defp old_issue?(previous_issue, current_issues) when is_list(current_issues) do
-    Enum.any?(current_issues, &same_issue?(previous_issue, &1))
+  defp old_issue?(previous_issue, current_issues, previous_dirname)
+       when is_list(current_issues) do
+    Enum.any?(current_issues, &same_issue?(previous_issue, &1, previous_dirname))
   end
 
-  defp same_issue?(current_issue, %Issue{} = previous_issue) do
-    # current_issue.filename == previous_issue.filename &&
+  defp same_issue?(current_issue, %Issue{} = previous_issue, previous_dirname) do
+    same_file_or_same_line? =
+      current_issue.filename == Path.relative_to(previous_issue.filename, previous_dirname) ||
+        current_issue.line_no == previous_issue.line_no
 
-    current_issue.line_no == previous_issue.line_no &&
+    same_file_or_same_line? &&
       current_issue.column == previous_issue.column &&
       current_issue.category == previous_issue.category &&
       current_issue.message == previous_issue.message &&
