@@ -2,7 +2,7 @@ defmodule Core.Checks.LoggerMetadataTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Warning.IgnoredLoggerMetadata
-  @check_opts allowed_metadata: [:account_id], ignore: []
+  @check_opts metadata_keys: [:account_id]
   @logger_functions ~w(alert critical debug emergency error info notice warn warning)a
 
   for fun <- @logger_functions do

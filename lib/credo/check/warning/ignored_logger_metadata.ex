@@ -6,8 +6,8 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
     base_priority: :high,
     category: :warning,
     param_defaults: [
-      ignore: [:debug],
-      allowed_metadata: []
+      ignore_logger_functions: [],
+      metadata_keys: :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
     ],
     explanations: [
       check: """
@@ -25,10 +25,18 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
             format: "[$level] $message $metadata\n",
             metadata: [:error_code, :file]
 
+      That way your logs might then receive lines like this:
+
+          [error] We have a problem error_code=pc_load_letter file=lib/app.ex
       """,
       params: [
-        ignore: "Do not raise an issue for these Logger calls.",
-        allowed_metadata: "Do not raise an issue for these metadata keys"
+        ignore_logger_functions: "Do not raise an issue for these Logger functions.",
+        metadata_keys: """
+        Do not raise an issue for these Logger metadata keys.
+
+        By default, we assume the metadata keys listed under your `console`
+        backend.
+        """
       ]
     ]
 
@@ -91,39 +99,39 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
 
   defp find_issue(fun_name, arguments, meta, issue_meta) do
     params = IssueMeta.params(issue_meta)
-    ignored_functions = Params.get(params, :ignore, __MODULE__)
-    allowed_metadata = Params.get(params, :allowed_metadata, __MODULE__)
+    ignored_functions = Params.get(params, :ignore_logger_functions, __MODULE__)
+    metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
 
     unless Enum.member?(ignored_functions, fun_name) do
-      issue_for_call(fun_name, arguments, meta, issue_meta, allowed_metadata)
+      issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
     end
   end
 
-  defp issue_for_call(:metadata, [logger_metadata], meta, issue_meta, allowed_metadata) do
-    issue_for_call(logger_metadata, meta, issue_meta, allowed_metadata)
+  defp issue_for_call(:metadata, [logger_metadata], meta, issue_meta, metadata_keys) do
+    issue_for_call(logger_metadata, meta, issue_meta, metadata_keys)
   end
 
-  defp issue_for_call(:log, [_, _, logger_metadata], meta, issue_meta, allowed_metadata) do
-    issue_for_call(logger_metadata, meta, issue_meta, allowed_metadata)
+  defp issue_for_call(:log, [_, _, logger_metadata], meta, issue_meta, metadata_keys) do
+    issue_for_call(logger_metadata, meta, issue_meta, metadata_keys)
   end
 
-  defp issue_for_call(:log, [_, _], _meta, _issue_meta, _allowed_metadata) do
+  defp issue_for_call(:log, [_, _], _meta, _issue_meta, _metadata_keys) do
     nil
   end
 
-  defp issue_for_call(_fun_name, [_, logger_metadata] = _args, meta, issue_meta, allowed_metadata) do
-    issue_for_call(logger_metadata, meta, issue_meta, allowed_metadata)
+  defp issue_for_call(_fun_name, [_, logger_metadata] = _args, meta, issue_meta, metadata_keys) do
+    issue_for_call(logger_metadata, meta, issue_meta, metadata_keys)
   end
 
-  defp issue_for_call(_fun_name, _args, _meta, _issue_meta, _allowed_metadata) do
+  defp issue_for_call(_fun_name, _args, _meta, _issue_meta, _metadata_keys) do
     nil
   end
 
-  defp issue_for_call(logger_metadata, meta, issue_meta, allowed_metadata) do
+  defp issue_for_call(logger_metadata, meta, issue_meta, metadata_keys) do
     unless Keyword.keyword?(logger_metadata) and
              logger_metadata
              |> Keyword.keys()
-             |> Enum.all?(&(&1 in allowed_metadata)) do
+             |> Enum.all?(&(&1 in metadata_keys)) do
       issue_for(issue_meta, meta[:line])
     end
   end
