@@ -125,6 +125,22 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation when inside a catch" do
+    """
+    defmodule CredoSampleModule do
+      defp category_body(nil) do
+        throw [1, 2, 3, 4]
+      catch
+        values ->
+          List.delete_at(values, 2)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation when inside of assignment" do
     """
     defmodule CredoSampleModule do
