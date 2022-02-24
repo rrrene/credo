@@ -97,7 +97,8 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          when is_list(arguments) do
       # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
 
-      if last_call_in_do_block?(ast, candidate) || last_call_in_rescue_block?(ast, candidate) do
+      if last_call_in_do_block?(ast, candidate) || last_call_in_rescue_block?(ast, candidate) ||
+           last_call_in_catch_block?(ast, candidate) do
         {nil, :VERIFIED}
       else
         {nil, :FALSIFIED}
@@ -115,6 +116,13 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   defp last_call_in_rescue_block?(ast, candidate) do
     ast
     |> Block.calls_in_rescue_block()
+    |> List.last()
+    |> Credo.Code.contains_child?(candidate)
+  end
+
+  defp last_call_in_catch_block?(ast, candidate) do
+    ast
+    |> Block.calls_in_catch_block()
     |> List.last()
     |> Credo.Code.contains_child?(candidate)
   end

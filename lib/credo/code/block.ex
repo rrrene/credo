@@ -152,6 +152,51 @@ defmodule Credo.Code.Block do
   end
 
   @doc """
+  Returns true if the given `ast` has an catch block.
+  """
+  def catch_block?(ast) do
+    case catch_block_for(ast) do
+      {:ok, _block} ->
+        true
+
+      nil ->
+        false
+    end
+  end
+
+  @doc """
+  Returns the catch: block of a given AST node.
+  """
+  def catch_block_for!(ast) do
+    case catch_block_for(ast) do
+      {:ok, block} ->
+        block
+
+      nil ->
+        nil
+    end
+  end
+
+  @doc """
+  Returns a tuple {:ok, catch_block} or nil for a given AST node.
+  """
+  def catch_block_for({_atom, _meta, arguments}) when is_list(arguments) do
+    catch_block_for(arguments)
+  end
+
+  def catch_block_for(do: _do_block, catch: catch_block) do
+    {:ok, catch_block}
+  end
+
+  def catch_block_for(arguments) when is_list(arguments) do
+    Enum.find_value(arguments, &find_keyword(&1, :catch))
+  end
+
+  def catch_block_for(_) do
+    nil
+  end
+
+  @doc """
   Returns true if the given `ast` has an after block.
   """
   def after_block?(ast) do
@@ -233,6 +278,21 @@ defmodule Credo.Code.Block do
   def calls_in_rescue_block(arg) do
     arg
     |> rescue_block_for!
+    |> instructions_for
+  end
+
+  @doc """
+  Returns the children of the `catch` block of the given AST node.
+  """
+  def calls_in_catch_block({_op, _meta, arguments}) do
+    arguments
+    |> catch_block_for!
+    |> instructions_for
+  end
+
+  def calls_in_catch_block(arg) do
+    arg
+    |> catch_block_for!
     |> instructions_for
   end
 
