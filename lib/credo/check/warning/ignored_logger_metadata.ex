@@ -6,7 +6,7 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
     base_priority: :high,
     category: :warning,
     param_defaults: [
-      metadata_keys: :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
+      metadata_keys: []
     ],
     explanations: [
       check: """
@@ -98,7 +98,7 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
 
   defp find_issue(fun_name, arguments, meta, issue_meta) do
     params = IssueMeta.params(issue_meta)
-    metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
+    metadata_keys = find_metadata_keys(params)
 
     issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
   end
@@ -141,5 +141,15 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
       message: "Logger metadata will be ignored in production",
       line_no: line_no
     )
+  end
+
+  defp find_metadata_keys(params) do
+    metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
+
+    if metadata_keys == [] do
+      :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
+    else
+      metadata_keys
+    end
   end
 end
