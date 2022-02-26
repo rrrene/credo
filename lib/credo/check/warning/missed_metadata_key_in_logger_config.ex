@@ -1,4 +1,4 @@
-defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
+defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   @moduledoc """
   Check to avoid ignoring Logger metadata in your logger config
   """
