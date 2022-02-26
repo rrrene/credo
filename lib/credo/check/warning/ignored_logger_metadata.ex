@@ -6,7 +6,6 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
     base_priority: :high,
     category: :warning,
     param_defaults: [
-      ignore_logger_functions: [],
       metadata_keys: :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
     ],
     explanations: [
@@ -99,12 +98,9 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
 
   defp find_issue(fun_name, arguments, meta, issue_meta) do
     params = IssueMeta.params(issue_meta)
-    ignored_functions = Params.get(params, :ignore_logger_functions, __MODULE__)
     metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
 
-    unless Enum.member?(ignored_functions, fun_name) do
-      issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
-    end
+    issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
   end
 
   defp issue_for_call(:metadata, [logger_metadata], meta, issue_meta, metadata_keys) do
@@ -115,7 +111,7 @@ defmodule Credo.Check.Warning.IgnoredLoggerMetadata do
     issue_for_call(logger_metadata, meta, issue_meta, metadata_keys)
   end
 
-  defp issue_for_call(:log, [_, _], _meta, _issue_meta, _metadata_keys) do
+  defp issue_for_call(:log, _args, _meta, _issue_meta, _metadata_keys) do
     nil
   end
 
