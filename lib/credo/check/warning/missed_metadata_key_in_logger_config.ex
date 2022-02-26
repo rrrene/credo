@@ -124,23 +124,24 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   end
 
   defp issue_for_call(logger_metadata, meta, issue_meta, metadata_keys) do
-    unless Keyword.keyword?(logger_metadata) and
-             logger_metadata
-             |> Keyword.keys()
-             |> Enum.all?(&(&1 in metadata_keys)) do
-      issue_for(issue_meta, meta[:line])
+    if Keyword.keyword?(logger_metadata) do
+      case Keyword.drop(logger_metadata, metadata_keys) do
+        [] ->
+          nil
+
+        missed ->
+          issue_for(issue_meta, meta[:line], Keyword.keys(missed))
+      end
     end
   end
 
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]), do: true
   defp logger_import?(_), do: false
 
-  defp issue_for(issue_meta, line_no) do
-    format_issue(
-      issue_meta,
-      message: "Logger metadata will be ignored in production",
-      line_no: line_no
-    )
+  defp issue_for(issue_meta, line_no, missed_keys) do
+    message = "Logger metadata key #{Enum.join(missed_keys, ", ")} will be ignored in production"
+
+    format_issue(issue_meta, message: message, line_no: line_no)
   end
 
   defp find_metadata_keys(params) do
