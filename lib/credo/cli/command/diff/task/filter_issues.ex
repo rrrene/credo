@@ -23,7 +23,7 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
     old_issues = Enum.filter(current_issues, &old_issue?(&1, previous_issues, previous_dirname))
 
     # in previous_issues, not in current_issues
-    fixed_issues = previous_issues -- old_issues
+    fixed_issues = Enum.filter(previous_issues, &fixed_issue?(&1, current_issues, previous_dirname))
 
     # not in previous_issues, in current_issues
     new_issues = Enum.filter(current_issues, &new_issue?(&1, previous_issues, previous_dirname))
@@ -42,9 +42,14 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
     !Enum.any?(previous_issues, &same_issue?(current_issue, &1, previous_dirname))
   end
 
-  defp old_issue?(previous_issue, current_issues, previous_dirname)
+  defp old_issue?(current_issue, previous_issues, previous_dirname)
+       when is_list(previous_issues) do
+    Enum.any?(previous_issues, &same_issue?(current_issue, &1, previous_dirname))
+  end
+
+  defp fixed_issue?(previous_issue, current_issues, previous_dirname)
        when is_list(current_issues) do
-    Enum.any?(current_issues, &same_issue?(previous_issue, &1, previous_dirname))
+    !Enum.any?(current_issues, &same_issue?(&1, previous_issue, previous_dirname))
   end
 
   defp same_issue?(current_issue, %Issue{} = previous_issue, previous_dirname) do
