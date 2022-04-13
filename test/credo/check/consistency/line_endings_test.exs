@@ -24,15 +24,22 @@ defmodule Credo.Check.Readability.LineEndingsTest do
   end
   """
   @windows_line_endings """
-  defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n
+  defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend
   """
 
   #
   # cases NOT raising issues
   #
 
-  test "it should not report expected code" do
+  test "it should not report expected code for linux" do
     [@unix_line_endings, @unix_line_endings2]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> refute_issues
+  end
+
+  test "it should not report expected code for windows" do
+    [@windows_line_endings |> String.trim()]
     |> to_source_files
     |> run_check(@described_check)
     |> refute_issues
