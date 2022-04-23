@@ -257,7 +257,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn %Credo.Issue{message: message} ->
-      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.00001"
+      assert  ~r/[\d\._]+/ |> Regex.scan(message) |> List.flatten == ["9999", "10_000.00001"]
     end)
   end
 
@@ -270,7 +270,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn %Credo.Issue{message: message} ->
-      assert ~r/[\d\._]+/ |> Regex.run(message) |> hd == "10_000.000010"
+      assert  ~r/[\d\._]+/ |> Regex.scan(message) |> List.flatten === ["9999", "10_000.000010"]
     end)
   end
 
@@ -295,5 +295,19 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> to_source_file
     |> run_check(@described_check, trailing_digits: [3])
     |> assert_issues()
+  end
+
+  test "it should include configured `only_greater_than` values" do
+    only_greater_than = 1_000_000
+    """
+    def numbers do
+      1000001
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only_greater_than: only_greater_than)
+    |> assert_issue(fn %Credo.Issue{message: message} ->
+      assert  ~r/[\d\._]+/ |> Regex.scan(message) |> List.flatten == ["1000000", "1_000_001"]
+    end)
   end
 end
