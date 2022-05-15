@@ -31,9 +31,24 @@ defmodule Credo.Mixfile do
       extra_section: "GUIDES",
       assets: "guides/assets",
       formatters: ["html"],
+      nest_modules_by_prefix: nest_modules_by_prefix(),
       groups_for_modules: groups_for_modules(),
       extras: extras(),
       groups_for_extras: groups_for_extras()
+    ]
+  end
+
+  defp nest_modules_by_prefix do
+    [
+      Credo.Code,
+      Credo.Test,
+      Credo.Check,
+      Credo.Check.Design,
+      Credo.Check.Readability,
+      Credo.Check.Refactor,
+      Credo.Check.Warning,
+      Credo.Check.Consistency,
+      Credo.CLI
     ]
   end
 
