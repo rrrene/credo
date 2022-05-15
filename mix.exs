@@ -40,15 +40,11 @@ defmodule Credo.Mixfile do
 
   defp nest_modules_by_prefix do
     [
-      Credo.Code,
-      Credo.Test,
-      Credo.Check,
       Credo.Check.Design,
       Credo.Check.Readability,
       Credo.Check.Refactor,
       Credo.Check.Warning,
-      Credo.Check.Consistency,
-      Credo.CLI
+      Credo.Check.Consistency
     ]
   end
 
