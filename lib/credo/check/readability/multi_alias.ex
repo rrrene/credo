@@ -33,11 +33,11 @@ defmodule Credo.Check.Readability.MultiAlias do
 
   # TODO: consider for experimental check front-loader (ast)
   defp traverse(
-         {:alias, _, [{{_, _, [{:__aliases__, opts, _base_alias}, :{}]}, _, [multi_alias | _]}]} =
-           ast,
+         {:alias, _, [{{_, _, [{alias, opts, _base_alias}, :{}]}, _, [multi_alias | _]}]} = ast,
          issues,
          issue_meta
-       ) do
+       )
+       when alias in [:__aliases__, :__MODULE__] do
     {:__aliases__, _, module} = multi_alias
     module = Enum.join(module, ".")
 
