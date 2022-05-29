@@ -30,8 +30,8 @@ defmodule Credo.Check.Readability.LargeNumbers do
   @doc false
   # TODO: consider for experimental check front-loader (tokens)
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
     min_number = Params.get(params, :only_greater_than, __MODULE__)
+    issue_meta = IssueMeta.for(source_file, Keyword.merge(params, only_greater_than: min_number))
 
     allowed_trailing_digits =
       case Params.get(params, :trailing_digits, __MODULE__) do
@@ -198,9 +198,13 @@ defmodule Credo.Check.Readability.LargeNumbers do
   end
 
   defp issue_for(issue_meta, line_no, column, trigger, expected) do
+    params = IssueMeta.params(issue_meta)
+    only_greater_than = Params.get(params, :only_greater_than, __MODULE__)
+
     format_issue(
       issue_meta,
-      message: "Large numbers should be written with underscores: #{Enum.join(expected, " or ")}",
+      message:
+        "Numbers larger than #{only_greater_than} should be written with underscores: #{Enum.join(expected, " or ")}",
       line_no: line_no,
       column: column,
       trigger: trigger
