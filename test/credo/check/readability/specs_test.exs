@@ -19,7 +19,7 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
-  test "it should NOT report functions with specs containing a `with` clause" do
+  test "it should NOT report functions with specs containing a `when` clause" do
     """
     defmodule CredoTypespecTest do
       @spec foo(a, a) :: a when a: integer
