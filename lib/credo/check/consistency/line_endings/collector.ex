@@ -6,6 +6,8 @@ defmodule Credo.Check.Consistency.LineEndings.Collector do
   def collect_matches(source_file, _params) do
     source_file
     |> SourceFile.lines()
+    # remove the last line since it behaves differently on windows and linux
+    # and apparently does not help determining line endings (see #965)
     |> List.delete_at(-1)
     |> Enum.reduce(%{}, fn line, stats ->
       Map.update(stats, line_ending(line), 1, &(&1 + 1))
