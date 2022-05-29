@@ -6,6 +6,7 @@ defmodule Credo.Check.Consistency.LineEndings.Collector do
   def collect_matches(source_file, _params) do
     source_file
     |> SourceFile.lines()
+    |> List.delete_at(-1)
     |> Enum.reduce(%{}, fn line, stats ->
       Map.update(stats, line_ending(line), 1, &(&1 + 1))
     end)
