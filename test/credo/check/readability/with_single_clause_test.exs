@@ -49,6 +49,21 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
     |> refute_issues()
   end
 
+  test "it should NOT report when using unquote_splicing" do
+    """
+    quote do
+      with unquote_splicing(cases) do
+        {:ok, unquote(ret)}
+      else
+        _ -> :error
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
