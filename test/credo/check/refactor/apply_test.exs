@@ -55,7 +55,7 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
-  test "it should NOT report violation for apply/3 when args returnded by a function" do
+  test "it should NOT report violation for apply/3 when args returned by a function" do
     """
     defmodule Test do
       def some_function(module, fun, args) do
