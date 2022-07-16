@@ -1,8 +1,16 @@
 # Changelog
 
+## 1.6.5
+
+- Include the 'only_greater_than' value in the `Credo.Check.Readability.LargeNumbers` message
+- Ignore Phoenix.LiveView modules by default
+- Fix for false positive in `Credo.Check.Refactor.Apply`
+- Fix for false positive in `Credo.Check.Refactor.NegatedIsNil`
+- Fix for false positive in `Credo.Check.Readability.WithSingleClause`
+
 ## 1.6.4
 
-- Fix for false positive in `MaxLineLength`
+- Fix for false positive in `Credo.Check.Readability.MaxLineLength`
 - Fix a bug in `Credo.Check.Refactor.PipeChainStart`
 - Fix error message in `gen.check` command
 
