@@ -1,6 +1,8 @@
 defmodule Credo.Code.ScopeTest do
   use Credo.Test.Case
 
+  doctest Credo.Code.Scope
+
   alias Credo.Code.Scope
 
   test "it should report the correct scope" do
@@ -180,6 +182,7 @@ defmodule Credo.Code.ScopeTest do
   test "it should report the correct mod_name" do
     assert "Credo.Sample" == Scope.mod_name("Credo.Sample.foobar")
     assert "Credo.Sample" == Scope.mod_name("Credo.Sample")
+    assert "Credo.Code" == Scope.mod_name("Credo.Code.__after_compile__")
   end
 
   test "it should give a list of scope names" do

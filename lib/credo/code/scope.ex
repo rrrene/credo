@@ -22,7 +22,7 @@ defmodule Credo.Code.Scope do
     names = String.split(scope_name, ".")
     base_name = List.last(names)
 
-    if String.match?(base_name, ~r/^[a-z]/) do
+    if String.match?(base_name, ~r/^[_a-z]/) do
       names
       |> Enum.slice(0..(length(names) - 2))
       |> Enum.join(".")
