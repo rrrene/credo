@@ -16,11 +16,76 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation for apply/2 when args returnded by a function" do
+    """
+    defmodule Test do
+      def some_function(fun, args) do
+        apply(fun, Enum.reverse(args))
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation for apply/2 when prepend args" do
+    """
+    defmodule Test do
+      def some_function(fun, args) do
+        apply(fun, [:foo | args])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report violation for apply/3" do
     """
     defmodule Test do
       def some_function(module, fun, args) do
         apply(module, fun, args)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation for apply/3 when args returned by a function" do
+    """
+    defmodule Test do
+      def some_function(module, fun, args) do
+        apply(module, fun, Enum.reverse(args))
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation for apply/3 when prepend args" do
+    """
+    defmodule Test do
+      def some_function(module, fun, args) do
+        apply(fun, [:foo | args])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation for apply/3 when called with __MODULE__" do
+    """
+    defmodule Test do
+      def some_function do
+        apply(__MODULE__, :foo, [])
       end
     end
     """

@@ -35,6 +35,8 @@ defmodule Credo.Check.Refactor.Apply do
     end
   end
 
+  defp issue({:apply, _meta, [{:__MODULE__, _, _}, _fun, _args]}, _issue_meta), do: nil
+
   defp issue({:apply, meta, [fun, args]}, issue_meta) do
     do_issue(:apply2, fun, args, meta, issue_meta)
   end
@@ -44,6 +46,8 @@ defmodule Credo.Check.Refactor.Apply do
   end
 
   defp issue(_ast, _issue_meta), do: nil
+
+  defp do_issue(_apply, _fun, [{:|, _, _}], _meta, _issue_meta), do: nil
 
   defp do_issue(:apply2, {name, _meta, nil}, args, meta, issue_meta)
        when is_atom(name) and is_list(args) do
