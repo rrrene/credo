@@ -157,6 +157,8 @@ defmodule Credo.Code do
     Credo.Code.prewalk(parent, &find_child(&1, &2, child), false)
   end
 
+  defp find_child({parent, _meta, child}, _acc, child), do: {parent, true}
+
   defp find_child(parent, acc, child), do: {parent, acc || parent == child}
 
   @doc """

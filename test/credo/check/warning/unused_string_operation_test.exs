@@ -32,6 +32,26 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> refute_issues()
   end
 
+  test "it should NOT report when module is a variable" do
+    """
+    defmodule Foo do
+      def foo(module, value) do
+        module.fun(String.to_integer(value))
+        :ok
+      end
+    end
+
+    defmodule Bar do
+      def fun(arg) do
+        IO.inspect(arg)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation when end of pipe AND return value" do
     """
     defmodule CredoSampleModule do

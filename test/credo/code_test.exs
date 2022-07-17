@@ -63,6 +63,17 @@ defmodule Credo.CodeTest do
     assert Credo.Code.contains_child?(parent, child)
   end
 
+  test "it should return true /2" do
+    parent =
+      {{:., [line: 3, column: 22],
+        [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
+       [{:value, [line: 3, column: 34], nil}]}
+
+    child = [{:value, [line: 3, column: 34], nil}]
+
+    assert Credo.Code.contains_child?(parent, child)
+  end
+
   test "it should return the function name" do
     ast =
       """
