@@ -55,7 +55,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
     message = """
     Exception modules should be named consistently.
     It seems your strategy is to prefix them with `#{expected}`,
-    but `#{trigger}` does not follow that convention."
+    but `#{trigger}` does not follow that convention.
     """
 
     to_one_line(message)
