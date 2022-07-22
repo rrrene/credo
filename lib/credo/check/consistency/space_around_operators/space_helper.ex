@@ -31,6 +31,11 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper do
   def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:int, _, _}), do: true
   def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:float, _, _}), do: true
   def usually_no_space_after?({:"(", _}, {:dual_op, _, :-}, {:flt, _, _}), do: true
+  def usually_no_space_after?({:"{", _}, {:dual_op, _, :-}, {:identifier, _, _}), do: true
+  def usually_no_space_after?({:"{", _}, {:dual_op, _, :-}, {:number, _, _}), do: true
+  def usually_no_space_after?({:"{", _}, {:dual_op, _, :-}, {:int, _, _}), do: true
+  def usually_no_space_after?({:"{", _}, {:dual_op, _, :-}, {:float, _, _}), do: true
+  def usually_no_space_after?({:"{", _}, {:dual_op, _, :-}, {:flt, _, _}), do: true
   def usually_no_space_after?({:",", _}, {:dual_op, _, :-}, {:identifier, _, _}), do: true
   def usually_no_space_after?({:",", _}, {:dual_op, _, :-}, {:number, _, _}), do: true
   def usually_no_space_after?({:",", _}, {:dual_op, _, :-}, {:int, _, _}), do: true

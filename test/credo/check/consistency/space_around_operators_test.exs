@@ -208,12 +208,29 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   assert MyModule.fun !=  -24
   ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
   """
-
   @with_spaces7 """
   defmodule AlwaysNoSpacesInBinaryTypespecTest do
     @callback foo() :: <<_::_*8>>
 
     def foo, do: 1 + 1
+  end
+  """
+  @with_spaces8 """
+  defmodule AlwaysNoSpacesInBinaryTypespecTest do
+
+    def seed_collection(entity, collection, opts) when is_map(collection) do
+      collection = Enum.map(collection, fn {_key, entity} -> entity end)
+      seed_collection(entity, collection, opts)
+    end
+
+    def foo do
+      %{
+        geom12: %Geo.Point{coordinates: {-74.30323, 47.619055}},
+        geom13: %Geo.Point{coordinates: {-74.30323, 47.619055}},
+        geom14: %Geo.Point{coordinates: {-74.30323, 47.619055}},
+        geom15: %Geo.Point{coordinates: {-74.30323, 47.619055}},
+      }
+    end
   end
   """
 
@@ -244,6 +261,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   test "it should not report issues when used with sigil" do
     [
       @without_spaces3
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should not report issues when operators are negative float values" do
+    [
+      @with_spaces8
     ]
     |> to_source_files()
     |> run_check(@described_check)
