@@ -238,15 +238,35 @@ defmodule Credo.Check.Readability.AliasOrder do
   end
 
   defp do_autocorrect({:__block__ = op, meta, [{:alias, _, _} | _] = aliases}) do
-    mapper = fn {:alias, _, [{:__aliases__, _, _} = node]} -> compare_name(node) end
-
     modified =
-      Enum.sort_by(aliases, mapper, fn left, right ->
-        Enum.sort([left, right]) == [left, right]
-      end)
+      aliases
+      |> Macro.prewalk(&remove_line_numbers/1)
+      |> Enum.map(&sort_multi_aliases/1)
+      |> sort_aliases()
 
-    {op, meta, modified}
+    {op, Keyword.delete(meta, :line), modified}
   end
 
   defp do_autocorrect(ast), do: ast
+
+  defp sort_multi_aliases({op, meta, [{op2, meta2, [{_, _, _} | _] = aliases}]}) do
+    {op, meta, [{op2, meta2, sort_aliases(aliases)}]}
+  end
+
+  defp sort_multi_aliases(node), do: node
+
+  defp sort_aliases(aliases) do
+    Enum.sort_by(aliases, &name_for_sorting/1, fn left, right ->
+      Enum.sort([left, right]) == [left, right]
+    end)
+  end
+
+  defp remove_line_numbers({op, meta, args}) when is_list(meta),
+    do: {op, Keyword.delete(meta, :line), args}
+
+  defp remove_line_numbers(ast), do: ast
+
+  defp name_for_sorting({_, _, [{_, _, node}, [as: _]]}), do: compare_name(node)
+  defp name_for_sorting({_, _, [{_, _, _} = node]}), do: compare_name(node)
+  defp name_for_sorting({_, _, [node]}), do: compare_name(node)
 end

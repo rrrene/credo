@@ -1,5 +1,5 @@
 defmodule Credo.CLI.Task.RunAutocorrectTest do
-  use ExUnit.Case, async: true
+  use Credo.Test.Case
 
   alias Credo.CLI.Task.RunAutocorrect
 
@@ -32,7 +32,7 @@ defmodule Credo.CLI.Task.RunAutocorrectTest do
         %Credo.Issue{filename: "b", check: CheckThree}
       ]
 
-      exec = %Credo.Execution{autocorrect: true}
+      exec = %Credo.Execution{autocorrect: true} |> Credo.Execution.ExecutionIssues.start_server()
       read_fun = fn _ -> "start" end
       write_fun = fn file_path, contents -> send(self(), {:write, file_path, contents}) end
       RunAutocorrect.call(exec, [issues: issues], read_fun, write_fun)

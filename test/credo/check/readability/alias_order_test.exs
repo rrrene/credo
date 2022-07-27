@@ -251,9 +251,42 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
 
     test "works with multi-aliases" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Sorter, Command}
+        alias Credo.CLI.Filename
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Command, Sorter}
+        alias Credo.CLI.Filename
+      end
+      """
+
+      assert @described_check.autocorrect(starting) == expected
     end
 
     test "works with as: option" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias App.Module2
+        alias App.Module1, as: Module3
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias App.Module1, as: Module3
+        alias App.Module2
+      end
+      """
+
+      assert @described_check.autocorrect(starting) == expected
+    end
+
+    test "works with multiple blocks of aliases including multi-aliases" do
     end
   end
 end
