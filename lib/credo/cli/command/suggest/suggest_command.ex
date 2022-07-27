@@ -41,6 +41,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       print_before_analysis: [__MODULE__.PrintBeforeInfo],
       run_analysis: [Task.RunChecks],
       filter_issues: [Task.SetRelevantIssues],
+      run_autocorrect: [Task.RunAutocorrect],
       print_after_analysis: [__MODULE__.PrintResultsAndSummary]
     )
   end
