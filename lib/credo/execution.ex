@@ -29,7 +29,7 @@ defmodule Credo.Execution do
             plugins: [],
             parse_timeout: 5000,
             strict: false,
-            autocorrect: false,
+            autocorrect: true,
 
             # options, set by the command line
             format: nil,
