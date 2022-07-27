@@ -287,6 +287,30 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     end
 
     test "works with multiple blocks of aliases including multi-aliases" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Filename
+        alias Credo.CLI.{Sorter, Command}
+
+        alias App.Module2
+        alias App.Module1
+      end
+      """
+
+      # NOTE: For some reason I couldn't get the formatter to keep the newline between these
+      # groups. I'm likely missing some of the metadata that influences how the formatter is told
+      # to keep user-inserted newlines, but I'll need to dig deeper into the formatter to make
+      # that stuff work. For now, this has almost all the behavior that we want!
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Command, Sorter}
+        alias Credo.CLI.Filename
+        alias App.Module1
+        alias App.Module2
+      end
+      """
+
+      assert @described_check.autocorrect(starting) == expected
     end
   end
 end

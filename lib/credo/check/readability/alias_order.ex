@@ -240,14 +240,43 @@ defmodule Credo.Check.Readability.AliasOrder do
   defp do_autocorrect({:__block__ = op, meta, [{:alias, _, _} | _] = aliases}) do
     modified =
       aliases
-      |> Macro.prewalk(&remove_line_numbers/1)
-      |> Enum.map(&sort_multi_aliases/1)
-      |> sort_aliases()
+      |> group_aliases()
+      |> Enum.map(fn {line, group} ->
+        group
+        |> Macro.prewalk(&remove_line_numbers/1)
+        |> Enum.map(&sort_multi_aliases/1)
+        |> sort_aliases()
+        |> put_line_number(line)
+      end)
+      |> List.flatten()
 
     {op, Keyword.delete(meta, :line), modified}
   end
 
   defp do_autocorrect(ast), do: ast
+
+  defp put_line_number([{op, meta, args} | tail], line) do
+    modified = {op, Keyword.put(meta, :line, line), args}
+    [modified | tail]
+  end
+
+  defp group_aliases(aliases) do
+    chunk_fun = fn
+      {_, meta, _} = node, {_, []} ->
+        {:cont, {meta[:line], [node]}}
+
+      {_, meta, _} = node, {line, [{_, meta2, _} | _] = chunk} ->
+        if meta[:line] - 1 > meta2[:line] do
+          {:cont, {line, chunk}, {meta[:line], [node]}}
+        else
+          {:cont, {line, [node | chunk]}}
+        end
+    end
+
+    after_fun = fn acc -> {:cont, acc, []} end
+
+    Enum.chunk_while(aliases, {nil, []}, chunk_fun, after_fun)
+  end
 
   defp sort_multi_aliases({op, meta, [{op2, meta2, [{_, _, _} | _] = aliases}]}) do
     {op, meta, [{op2, meta2, sort_aliases(aliases)}]}
