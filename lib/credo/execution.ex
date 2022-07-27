@@ -495,6 +495,14 @@ defmodule Credo.Execution do
   end
 
   @doc """
+  This removes an issue for the given `exec` struct if the issue has been automatically resolved
+  before the run has completed.
+  """
+  def remove_issue(exec, issue) do
+    ExecutionIssues.remove_issue(exec, issue)
+  end
+
+  @doc """
   Sets the issues for the given `exec` struct, overwriting any existing issues.
   """
   def put_issues(exec, issues) do
