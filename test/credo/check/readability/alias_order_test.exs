@@ -228,4 +228,32 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       assert issue.trigger == "Sorter"
     end)
   end
+
+  describe "autocorrect/1" do
+    test "puts all the aliases in the right order" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Sorter
+        alias Credo.CLI.Command
+        alias Credo.CLI.Filename
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Command
+        alias Credo.CLI.Filename
+        alias Credo.CLI.Sorter
+      end
+      """
+
+      assert @described_check.autocorrect(starting) == expected
+    end
+
+    test "works with multi-aliases" do
+    end
+
+    test "works with as: option" do
+    end
+  end
 end
