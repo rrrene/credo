@@ -247,7 +247,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       end
       """
 
-      assert @described_check.autocorrect(starting) == expected
+      assert @described_check.autocorrect(starting, nil) == expected
     end
 
     test "works with multi-aliases" do
@@ -265,7 +265,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       end
       """
 
-      assert @described_check.autocorrect(starting) == expected
+      assert @described_check.autocorrect(starting, nil) == expected
     end
 
     test "works with as: option" do
@@ -283,7 +283,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       end
       """
 
-      assert @described_check.autocorrect(starting) == expected
+      assert @described_check.autocorrect(starting, nil) == expected
     end
 
     test "works with multiple blocks of aliases including multi-aliases" do
@@ -310,7 +310,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       end
       """
 
-      assert @described_check.autocorrect(starting) == expected
+      assert @described_check.autocorrect(starting, nil) == expected
     end
   end
 end

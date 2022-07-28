@@ -224,7 +224,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     )
   end
 
-  def autocorrect(file) do
+  def autocorrect(file, _issue) do
     {:ok, quoted} = :"Elixir.Code".string_to_quoted(file)
 
     modified =

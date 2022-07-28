@@ -40,7 +40,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
     )
   end
 
-  def autocorrect(file) do
+  def autocorrect(file, _issue) do
     "#{file}\n"
   end
 end

@@ -28,7 +28,7 @@ defmodule Credo.CLI.Task.RunAutocorrect do
   end
 
   defp run_autocorrect(issue, file, exec) do
-    case issue.check.autocorrect(file) do
+    case issue.check.autocorrect(file, issue) do
       ^file ->
         file
 
