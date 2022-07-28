@@ -720,4 +720,55 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
       assert "String.to_float" == issue.trigger
     end)
   end
+
+  describe "autocorrect/2" do
+    test "removes the unused String function" do
+      starting = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          x = parameter1 + parameter2
+
+          String.split(parameter1)
+
+          parameter1
+        end
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          x = parameter1 + parameter2
+          parameter1
+        end
+      end
+      """
+
+      assert @described_check.autocorrect(starting, nil) == expected
+    end
+
+    test "it should report a violation when end of pipe" do
+      starting = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          parameter1 + parameter2
+          |> String.split(parameter1)
+
+          parameter1
+        end
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          parameter1 + parameter2
+          parameter1
+        end
+      end
+      """
+
+      assert @described_check.autocorrect(starting, nil) == expected
+    end
+  end
 end
