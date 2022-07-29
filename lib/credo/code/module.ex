@@ -4,7 +4,6 @@ defmodule Credo.Code.Module do
   functions or module attributes.
   """
 
-  alias Credo.Code
   alias Credo.Code.Block
   alias Credo.Code.Name
 
@@ -76,7 +75,7 @@ defmodule Credo.Code.Module do
 
   @doc "Reads an attribute from a module's `ast`"
   def attribute(ast, attr_name) do
-    case Code.postwalk(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
+    case Credo.Code.postwalk(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
       {:ok, value} ->
         value
 
@@ -104,14 +103,14 @@ defmodule Credo.Code.Module do
 
   def def_count({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&collect_defs/2)
+    |> Credo.Code.postwalk(&collect_defs/2)
     |> Enum.count()
   end
 
   def defs(nil), do: []
 
   def defs({:defmodule, _, _arguments} = ast) do
-    Code.postwalk(ast, &collect_defs/2)
+    Credo.Code.postwalk(ast, &collect_defs/2)
   end
 
   @doc "Returns the arity of the given function definition `ast`"
@@ -168,7 +167,7 @@ defmodule Credo.Code.Module do
 
   def def_names({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&collect_defs/2)
+    |> Credo.Code.postwalk(&collect_defs/2)
     |> Enum.map(&def_name/1)
     |> Enum.uniq()
   end
@@ -178,7 +177,7 @@ defmodule Credo.Code.Module do
 
   def def_names_with_op({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&collect_defs/2)
+    |> Credo.Code.postwalk(&collect_defs/2)
     |> Enum.map(&def_name_with_op/1)
     |> Enum.uniq()
   end
@@ -188,7 +187,7 @@ defmodule Credo.Code.Module do
 
   def def_names_with_op({:defmodule, _, _arguments} = ast, arity) do
     ast
-    |> Code.postwalk(&collect_defs/2)
+    |> Credo.Code.postwalk(&collect_defs/2)
     |> Enum.map(&def_name_with_op(&1, arity))
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
@@ -213,7 +212,7 @@ defmodule Credo.Code.Module do
   @doc "Returns the list of modules used in a given module source code."
   def modules({:defmodule, _, _arguments} = ast) do
     ast
-    |> Code.postwalk(&find_dependent_modules/2)
+    |> Credo.Code.postwalk(&find_dependent_modules/2)
     |> Enum.uniq()
   end
 
