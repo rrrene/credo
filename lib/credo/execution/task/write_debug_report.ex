@@ -6,8 +6,8 @@ defmodule Credo.Execution.Task.WriteDebugReport do
 
   use Credo.Execution.Task
 
-  alias Credo.Execution.ExecutionTiming
   alias Credo.CLI.Output.UI
+  alias Credo.Execution.ExecutionTiming
 
   def call(%Credo.Execution{debug: true} = exec, _opts) do
     Logger.flush()

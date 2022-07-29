@@ -3,19 +3,17 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.Collector do
 
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Code
-
   def collect_matches(source_file, _params) do
     position_recorder = &record_position/4
 
-    Code.prewalk(source_file, &traverse(position_recorder, &1, &2), %{})
+    Credo.Code.prewalk(source_file, &traverse(position_recorder, &1, &2), %{})
   end
 
   def find_locations_not_matching(expected, source_file) do
     location_recorder = &record_not_matching(expected, &1, &2, &3, &4)
 
     source_file
-    |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Credo.Code.prewalk(&traverse(location_recorder, &1, &2), [])
     |> Enum.reverse()
   end
 

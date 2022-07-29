@@ -68,7 +68,6 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
       ignore: []
     ]
 
-  alias Credo.Code
   alias Credo.CLI.Output.UI
 
   @doc false
@@ -77,7 +76,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
     params = normalize_params(params)
 
     source_file
-    |> Code.ast()
+    |> Credo.Code.ast()
     |> Credo.Code.Module.analyze()
     |> all_errors(params, IssueMeta.for(source_file, params))
     |> Enum.sort_by(&{&1.line_no, &1.column})

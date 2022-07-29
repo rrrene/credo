@@ -1,6 +1,6 @@
 defmodule Credo.Check.Readability.StringSigils do
-  alias Credo.SourceFile
   alias Credo.Code.Heredocs
+  alias Credo.SourceFile
 
   use Credo.Check,
     base_priority: :low,

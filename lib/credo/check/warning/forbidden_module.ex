@@ -20,11 +20,10 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       ]
     ]
 
-  alias Credo.Code
   alias Credo.Code.Name
 
   @impl Credo.Check
-  def run(source_file = %SourceFile{}, params) do
+  def run(%SourceFile{} = source_file, params) do
     modules = Params.get(params, :modules, __MODULE__)
 
     modules =
@@ -34,10 +33,13 @@ defmodule Credo.Check.Warning.ForbiddenModule do
         Enum.map(modules, fn key -> {Name.full(key), nil} end)
       end
 
-    Code.prewalk(source_file, &traverse(&1, &2, modules, IssueMeta.for(source_file, params)))
+    Credo.Code.prewalk(
+      source_file,
+      &traverse(&1, &2, modules, IssueMeta.for(source_file, params))
+    )
   end
 
-  defp traverse(ast = {:__aliases__, meta, modules}, issues, forbidden_modules, issue_meta) do
+  defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
     issues = put_issue_if_forbidden(issues, issue_meta, meta[:line], module, forbidden_modules)
@@ -46,7 +48,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   end
 
   defp traverse(
-         ast = {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]},
+         {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]} = ast,
          issues,
          forbidden_modules,
          issue_meta

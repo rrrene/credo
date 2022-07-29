@@ -40,8 +40,6 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
       """
     ]
 
-  alias Credo.Code
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
@@ -51,7 +49,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   end
 
   defp errors(source_file) do
-    {_ast, errors} = Macro.prewalk(Code.ast(source_file), MapSet.new(), &traverse/2)
+    {_ast, errors} = Macro.prewalk(Credo.Code.ast(source_file), MapSet.new(), &traverse/2)
     Enum.sort_by(errors, &{&1.line, &1.column})
   end
 

@@ -288,7 +288,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  if(Version.match?(System.version(), ">= 1.12.0-rc")) do
+  if Version.match?(System.version(), ">= 1.12.0-rc") do
     # Elixir >= 1.12.0
     #
     test "it should not report issues if spaces are used everywhere /2" do

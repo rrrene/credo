@@ -12,11 +12,11 @@ defmodule Credo.Application do
   ]
 
   if Version.match?(System.version(), ">= 1.10.0-rc") do
-    def children() do
+    def children do
       Enum.map(@worker_modules, &{&1, []})
     end
   else
-    def children() do
+    def children do
       import Supervisor.Spec, warn: false
       Enum.map(@worker_modules, &worker(&1, []))
     end

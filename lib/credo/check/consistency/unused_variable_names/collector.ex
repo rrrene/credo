@@ -3,19 +3,17 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
 
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Code
-
   def collect_matches(source_file, _params) do
     unused_variable_recorder = &record_unused_variable/2
 
-    Code.prewalk(source_file, &traverse(unused_variable_recorder, &1, &2), %{})
+    Credo.Code.prewalk(source_file, &traverse(unused_variable_recorder, &1, &2), %{})
   end
 
   def find_locations_not_matching(expected, source_file) do
     location_recorder = &record_not_matching(expected, &1, &2)
 
     source_file
-    |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Credo.Code.prewalk(&traverse(location_recorder, &1, &2), [])
     |> Enum.reverse()
   end
 

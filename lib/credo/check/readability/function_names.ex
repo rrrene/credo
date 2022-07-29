@@ -47,7 +47,7 @@ defmodule Credo.Check.Readability.FunctionNames do
     |> issues_list()
   end
 
-  defp empty_issues(), do: %{}
+  defp empty_issues, do: %{}
 
   defp add_issue(issues, name, arity, issue), do: Map.put_new(issues, {name, arity}, issue)
 

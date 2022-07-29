@@ -42,14 +42,12 @@ defmodule Credo.BuildInfo do
   end
 
   defp in_git_work_tree? do
-    try do
-      {_, exit_status} =
-        System.cmd("git", ["rev-parse", "--is-inside-work-tree"], stderr_to_stdout: true)
+    {_, exit_status} =
+      System.cmd("git", ["rev-parse", "--is-inside-work-tree"], stderr_to_stdout: true)
 
-      exit_status == 0
-    rescue
-      _ -> false
-    end
+    exit_status == 0
+  rescue
+    _ -> false
   end
 
   defp git_branch do

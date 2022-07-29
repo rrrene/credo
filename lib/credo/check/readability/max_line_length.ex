@@ -28,8 +28,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ]
 
   alias Credo.Code.Heredocs
-  alias Credo.Code.Strings
   alias Credo.Code.Sigils
+  alias Credo.Code.Strings
 
   @def_ops [:def, :defp, :defmacro]
   @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/

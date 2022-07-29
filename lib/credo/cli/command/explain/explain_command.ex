@@ -6,10 +6,10 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
     cli_switches: Credo.CLI.Command.Suggest.SuggestCommand.cli_switches()
 
   alias Credo.Check
-  alias Credo.Execution
   alias Credo.CLI.Command.Explain.ExplainOutput, as: Output
   alias Credo.CLI.Filename
   alias Credo.CLI.Task
+  alias Credo.Execution
   alias Credo.Issue
   alias Credo.SourceFile
 

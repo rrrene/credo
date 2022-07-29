@@ -36,8 +36,6 @@ defmodule Credo.Check.Refactor.WithClauses do
       """
     ]
 
-  alias Credo.Code
-
   @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`"
   @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`"
 
@@ -45,7 +43,7 @@ defmodule Credo.Check.Refactor.WithClauses do
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   # TODO: consider for experimental check front-loader (ast)

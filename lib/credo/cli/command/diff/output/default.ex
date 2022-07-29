@@ -447,7 +447,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     end
   end
 
-  defp diff_marker() do
+  defp diff_marker do
     [:faint, "  ", :reset, ""]
   end
 

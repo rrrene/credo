@@ -3,20 +3,18 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
 
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Code
-
   @directives [:alias, :import, :require, :use]
 
   def collect_matches(source_file, _params) do
     source_file
-    |> Code.prewalk(&traverse/2, [])
+    |> Credo.Code.prewalk(&traverse/2, [])
     |> group_usages
     |> count_occurrences
   end
 
   def find_locations_not_matching(expected, source_file) do
     source_file
-    |> Code.prewalk(&traverse/2, [])
+    |> Credo.Code.prewalk(&traverse/2, [])
     |> group_usages
     |> drop_locations(expected)
   end

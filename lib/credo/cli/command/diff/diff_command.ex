@@ -6,11 +6,11 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   alias Credo.CLI.Task
   alias Credo.Execution
 
+  alias Credo.CLI.Command.Diff.Task.FilterIssues
+  alias Credo.CLI.Command.Diff.Task.FilterIssuesForExitStatus
   alias Credo.CLI.Command.Diff.Task.GetGitDiff
   alias Credo.CLI.Command.Diff.Task.PrintBeforeInfo
-  alias Credo.CLI.Command.Diff.Task.FilterIssues
   alias Credo.CLI.Command.Diff.Task.PrintResultsAndSummary
-  alias Credo.CLI.Command.Diff.Task.FilterIssuesForExitStatus
 
   use Credo.CLI.Command,
     short_description: "Suggest code objects to look at next (based on git-diff)",
@@ -127,7 +127,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     end
   end
 
-  defp git_present?() do
+  defp git_present? do
     case System.cmd("git", ["--help"], stderr_to_stdout: true) do
       {_output, 0} -> true
       {_output, _} -> false

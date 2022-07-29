@@ -3,8 +3,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Code
-
   import Credo.Check.Consistency.SpaceAroundOperators.SpaceHelper,
     only: [
       operator?: 1,
@@ -16,13 +14,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.Collector do
 
   def collect_matches(source_file, _params) do
     source_file
-    |> Code.to_tokens()
+    |> Credo.Code.to_tokens()
     |> traverse_tokens(&record_spaces(&1, &2, &3, &4), %{})
   end
 
   def find_locations_not_matching(expected, source_file) do
     source_file
-    |> Code.to_tokens()
+    |> Credo.Code.to_tokens()
     |> traverse_tokens(&record_not_matching(expected, &1, &2, &3, &4), [])
     |> Enum.reverse()
   end

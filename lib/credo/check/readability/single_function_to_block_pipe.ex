@@ -28,12 +28,10 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
       """
     ]
 
-  alias Credo.Code
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
   end
 
   defp traverse(ast, {false, issues}, _issue_meta) do

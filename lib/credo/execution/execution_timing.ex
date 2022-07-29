@@ -29,7 +29,7 @@ defmodule Credo.Execution.ExecutionTiming do
   @doc """
   Returns the current timestamp in the same format (microseconds) as the returned starting times of `run/1`.
   """
-  def now(), do: :os.system_time(:microsecond)
+  def now, do: :os.system_time(:microsecond)
 
   @doc """
   Runs the given `fun` and returns a tuple of `{started_at, duration, result}`.

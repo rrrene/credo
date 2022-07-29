@@ -132,9 +132,9 @@ defmodule Credo.Test.Case do
     end
   end
 
+  alias Credo.Test.Assertions
   alias Credo.Test.CheckRunner
   alias Credo.Test.SourceFiles
-  alias Credo.Test.Assertions
 
   @doc """
   Refutes the presence of any issues.

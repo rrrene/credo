@@ -41,7 +41,6 @@ defmodule Credo.Check.Readability.AliasOrder do
       """
     ]
 
-  alias Credo.Code
   alias Credo.Code.Name
 
   @doc false
@@ -49,7 +48,7 @@ defmodule Credo.Check.Readability.AliasOrder do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   defp traverse({:defmodule, _, _} = ast, issues, issue_meta) do
@@ -126,17 +125,21 @@ defmodule Credo.Check.Readability.AliasOrder do
     sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
 
     if downcased_mod_list != sorted_downcased_mod_list do
-      trigger =
-        downcased_mod_list
-        |> Enum.with_index()
-        |> Enum.find_value(fn {downcased_mod_entry, index} ->
-          if downcased_mod_entry != Enum.at(sorted_downcased_mod_list, index) do
-            Enum.at(mod_list, index)
-          end
-        end)
-
-      issue_opts(line_no, [base, trigger], trigger)
+      issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list)
     end
+  end
+
+  defp issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list) do
+    trigger =
+      downcased_mod_list
+      |> Enum.with_index()
+      |> Enum.find_value(fn {downcased_mod_entry, index} ->
+        if downcased_mod_entry != Enum.at(sorted_downcased_mod_list, index) do
+          Enum.at(mod_list, index)
+        end
+      end)
+
+    issue_opts(line_no, [base, trigger], trigger)
   end
 
   defp issue_opts(line_no, module, trigger) do
@@ -149,7 +152,7 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp extract_alias_groups({:defmodule, _, _} = ast) do
     ast
-    |> Code.postwalk(&find_alias_groups/2)
+    |> Credo.Code.postwalk(&find_alias_groups/2)
     |> Enum.reverse()
     |> Enum.reduce([[]], fn definition, acc ->
       case definition do

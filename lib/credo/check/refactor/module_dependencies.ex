@@ -24,8 +24,8 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       ]
     ]
 
-  alias Credo.Code.Name
   alias Credo.Code.Module
+  alias Credo.Code.Name
 
   @doc false
   @impl true

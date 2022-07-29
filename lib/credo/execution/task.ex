@@ -63,8 +63,8 @@ defmodule Credo.Execution.Task do
 
       import Credo.Execution
 
-      alias Credo.Execution
       alias Credo.CLI.Output.UI
+      alias Credo.Execution
 
       @impl true
       def call(%Execution{halted: false} = exec) do

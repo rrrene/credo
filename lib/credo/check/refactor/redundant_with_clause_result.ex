@@ -24,7 +24,6 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
       """
     ]
 
-  alias Credo.Code
   alias Credo.Code.Block
 
   require Logger
@@ -36,7 +35,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   defp traverse({:with, meta, clauses_and_body} = ast, issues, issue_meta) do
@@ -83,7 +82,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   defp redundant?({:<-, _meta, [body, _expr]}, body), do: true
 
   defp redundant?({:<-, _meta, [match, _expr]}, body) do
-    Code.remove_metadata(match) == Code.remove_metadata(body)
+    Credo.Code.remove_metadata(match) == Credo.Code.remove_metadata(body)
   end
 
   defp redundant?(_last_clause, _body), do: false

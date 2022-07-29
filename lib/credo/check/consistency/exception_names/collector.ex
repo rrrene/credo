@@ -3,21 +3,20 @@ defmodule Credo.Check.Consistency.ExceptionNames.Collector do
 
   use Credo.Check.Consistency.Collector
 
-  alias Credo.Code
   alias Credo.Code.Module
   alias Credo.Code.Name
 
   def collect_matches(source_file, _params) do
     exception_recorder = &record_exception/2
 
-    Code.prewalk(source_file, &traverse(exception_recorder, &1, &2), %{})
+    Credo.Code.prewalk(source_file, &traverse(exception_recorder, &1, &2), %{})
   end
 
   def find_locations_not_matching(expected, source_file) do
     location_recorder = &record_not_matching(expected, &1, &2)
 
     source_file
-    |> Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Credo.Code.prewalk(&traverse(location_recorder, &1, &2), [])
     |> Enum.reverse()
   end
 

@@ -3,8 +3,8 @@ defmodule Credo.Execution.Task.ConvertCLIOptionsToConfig do
 
   use Credo.Execution.Task
 
-  alias Credo.ConfigBuilder
   alias Credo.CLI.Output.UI
+  alias Credo.ConfigBuilder
 
   @exit_status Credo.CLI.ExitStatus.config_parser_error()
 
