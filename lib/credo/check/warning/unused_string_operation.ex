@@ -46,7 +46,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
     )
   end
 
-  def autocorrect(file, _issue) do
+  def autofix(file, _issue) do
     {_, quoted} = Credo.Code.ast(file)
     source_file = SourceFile.parse(file, "nofile")
 
@@ -60,7 +60,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
 
     modified =
       quoted
-      |> Macro.prewalk(&do_autocorrect(&1, unused_calls))
+      |> Macro.prewalk(&do_autofix(&1, unused_calls))
       |> Macro.to_string()
       |> :"Elixir.Code".format_string!()
       |> to_string()
@@ -68,7 +68,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
     "#{modified}\n"
   end
 
-  defp do_autocorrect({:__block__, meta, [{:|>, _pipe_meta, pipe_args} | tail] = args}, unused_calls) do
+  defp do_autofix({:__block__, meta, [{:|>, _pipe_meta, pipe_args} | tail] = args}, unused_calls) do
     args =
       if List.last(pipe_args) in unused_calls do
         [hd(pipe_args) | tail]
@@ -79,13 +79,13 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
     {:__block__, meta, args}
   end
 
-  defp do_autocorrect({:__block__, meta, args}, unused_calls) do
+  defp do_autofix({:__block__, meta, args}, unused_calls) do
     {:__block__, meta, Enum.reject(args, & &1 in unused_calls)}
   end
 
-  defp do_autocorrect({:do, node}, unused_calls) do
-    {:do, do_autocorrect(node, unused_calls)}
+  defp do_autofix({:do, node}, unused_calls) do
+    {:do, do_autofix(node, unused_calls)}
   end
 
-  defp do_autocorrect(ast, _), do: ast
+  defp do_autofix(ast, _), do: ast
 end

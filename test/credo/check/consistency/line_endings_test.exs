@@ -56,14 +56,14 @@ defmodule Credo.Check.Readability.LineEndingsTest do
     |> assert_issue
   end
 
-  describe "autocorrect/1" do
+  describe "autofix/1" do
     test "switches unix to windows line endings" do
       starting = "defmodule Credo.Sample do\n@test_attribute :foo\nend\n"
       expected = "defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend\r\n"
 
       issue = %Credo.Issue{message: "File is using unix line endings while most of the files use windows line endings."}
 
-      assert @described_check.autocorrect(starting, issue) == expected
+      assert @described_check.autofix(starting, issue) == expected
     end
 
     test "switches windows to unix line endings" do
@@ -77,7 +77,7 @@ defmodule Credo.Check.Readability.LineEndingsTest do
 
       issue = %Credo.Issue{message: "File is using windows line endings while most of the files use unix line endings."}
 
-      assert @described_check.autocorrect(starting, issue) == expected
+      assert @described_check.autofix(starting, issue) == expected
     end
   end
 end

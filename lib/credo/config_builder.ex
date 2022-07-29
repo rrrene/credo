@@ -81,7 +81,7 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_ignore(switches)
     |> add_switch_mute_exit_status(switches)
     |> add_switch_only(switches)
-    |> add_switch_autocorrect(switches)
+    |> add_switch_autofix(switches)
     |> add_switch_read_from_stdin(switches)
     |> add_switch_strict(switches)
     |> add_switch_min_priority(switches)
@@ -263,13 +263,13 @@ defmodule Credo.ConfigBuilder do
 
   defp add_switch_only(exec, _), do: exec
 
-  # add_switch_autocorrect
+  # add_switch_autofix
 
-  defp add_switch_autocorrect(exec, %{autocorrect: true}) do
-    %Execution{exec | autocorrect: true}
+  defp add_switch_autofix(exec, %{autofix: true}) do
+    %Execution{exec | autofix: true}
   end
 
-  defp add_switch_autocorrect(exec, _), do: exec
+  defp add_switch_autofix(exec, _), do: exec
 
   # add_switch_ignore
 

@@ -721,7 +721,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     end)
   end
 
-  describe "autocorrect/2" do
+  describe "autofix/2" do
     test "removes the unused String function" do
       starting = """
       defmodule CredoSampleModule do
@@ -744,7 +744,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
       end
       """
 
-      assert @described_check.autocorrect(starting, nil) == expected
+      assert @described_check.autofix(starting, nil) == expected
     end
 
     test "it should report a violation when end of pipe" do
@@ -768,7 +768,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
       end
       """
 
-      assert @described_check.autocorrect(starting, nil) == expected
+      assert @described_check.autofix(starting, nil) == expected
     end
   end
 end

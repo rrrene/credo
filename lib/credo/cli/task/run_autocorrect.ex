@@ -1,10 +1,10 @@
-defmodule Credo.CLI.Task.RunAutocorrect do
+defmodule Credo.CLI.Task.RunAutofix do
   @moduledoc false
 
   use Credo.Execution.Task
 
   def call(exec, opts, read_fun \\ &File.read!/1, write_fun \\ &File.write!/2) do
-    if exec.autocorrect do
+    if exec.autofix do
       issues = Keyword.get_lazy(opts, :issues, fn -> Execution.get_issues(exec) end)
 
       issues
@@ -12,7 +12,7 @@ defmodule Credo.CLI.Task.RunAutocorrect do
       |> Enum.each(fn {file_path, issues} ->
         file = read_fun.(file_path)
 
-        corrected = Enum.reduce(issues, file, &run_autocorrect(&1, &2, exec))
+        corrected = Enum.reduce(issues, file, &run_autofix(&1, &2, exec))
 
         write_fun.(file_path, corrected)
       end)
@@ -27,8 +27,8 @@ defmodule Credo.CLI.Task.RunAutocorrect do
     end)
   end
 
-  defp run_autocorrect(issue, file, exec) do
-    case issue.check.autocorrect(file, issue) do
+  defp run_autofix(issue, file, exec) do
+    case issue.check.autofix(file, issue) do
       ^file ->
         file
 

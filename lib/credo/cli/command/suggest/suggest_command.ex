@@ -30,7 +30,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.boolean("read_from_stdin"),
       Switch.boolean("strict"),
       Switch.boolean("verbose"),
-      Switch.boolean("autocorrect"),
+      Switch.boolean("autofix"),
       Switch.boolean("watch")
     ]
 
@@ -42,7 +42,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       print_before_analysis: [__MODULE__.PrintBeforeInfo],
       run_analysis: [Task.RunChecks],
       filter_issues: [Task.SetRelevantIssues],
-      run_autocorrect: [Task.RunAutocorrect],
+      run_autofix: [Task.RunAutofix],
       print_after_analysis: [__MODULE__.PrintResultsAndSummary]
     )
   end

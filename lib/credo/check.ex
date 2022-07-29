@@ -154,7 +154,7 @@ defmodule Credo.Check do
               Credo.Issue.t()
 
   @doc false
-  @callback autocorrect(source_file :: String.t(), issue :: Issue.t()) :: String.t()
+  @callback autofix(source_file :: String.t(), issue :: Issue.t()) :: String.t()
 
   @base_category_exit_status_map %{
     consistency: 1,
@@ -400,7 +400,7 @@ defmodule Credo.Check do
 
       @doc false
       @impl true
-      def autocorrect(source_file, _issue) do
+      def autofix(source_file, _issue) do
         source_file
       end
 
