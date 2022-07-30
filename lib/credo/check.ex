@@ -153,6 +153,9 @@ defmodule Credo.Check do
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
 
+  @doc false
+  @callback autofix(source_file :: String.t(), issue :: Issue.t()) :: String.t()
+
   @base_category_exit_status_map %{
     consistency: 1,
     design: 2,
@@ -393,6 +396,12 @@ defmodule Credo.Check do
 
       def run(%SourceFile{} = source_file, params) do
         throw("Implement me")
+      end
+
+      @doc false
+      @impl true
+      def autofix(source_file, _issue) do
+        source_file
       end
 
       defoverridable Credo.Check

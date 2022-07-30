@@ -228,4 +228,89 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       assert issue.trigger == "Sorter"
     end)
   end
+
+  describe "autofix/1" do
+    test "puts all the aliases in the right order" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Sorter
+        alias Credo.CLI.Command
+        alias Credo.CLI.Filename
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Command
+        alias Credo.CLI.Filename
+        alias Credo.CLI.Sorter
+      end
+      """
+
+      assert @described_check.autofix(starting, nil) == expected
+    end
+
+    test "works with multi-aliases" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Sorter, Command}
+        alias Credo.CLI.Filename
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Command, Sorter}
+        alias Credo.CLI.Filename
+      end
+      """
+
+      assert @described_check.autofix(starting, nil) == expected
+    end
+
+    test "works with as: option" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias App.Module2
+        alias App.Module1, as: Module3
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        alias App.Module1, as: Module3
+        alias App.Module2
+      end
+      """
+
+      assert @described_check.autofix(starting, nil) == expected
+    end
+
+    test "works with multiple blocks of aliases including multi-aliases" do
+      starting = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.Filename
+        alias Credo.CLI.{Sorter, Command}
+
+        alias App.Module2
+        alias App.Module1
+      end
+      """
+
+      # NOTE: For some reason I couldn't get the formatter to keep the newline between these
+      # groups. I'm likely missing some of the metadata that influences how the formatter is told
+      # to keep user-inserted newlines, but I'll need to dig deeper into the formatter to make
+      # that stuff work. For now, this has almost all the behavior that we want!
+      expected = """
+      defmodule CredoSampleModule do
+        alias Credo.CLI.{Command, Sorter}
+        alias Credo.CLI.Filename
+        alias App.Module1
+        alias App.Module2
+      end
+      """
+
+      assert @described_check.autofix(starting, nil) == expected
+    end
+  end
 end

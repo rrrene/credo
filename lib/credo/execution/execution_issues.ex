@@ -46,6 +46,10 @@ defmodule Credo.Execution.ExecutionIssues do
     GenServer.call(pid, :to_map)
   end
 
+  def remove_issue(%Execution{issues_pid: pid}, issue) do
+    GenServer.call(pid, {:remove_issue, issue})
+  end
+
   # callbacks
 
   def init(_) do
@@ -72,5 +76,13 @@ defmodule Credo.Execution.ExecutionIssues do
 
   def handle_call(:to_map, _from, current_state) do
     {:reply, current_state, current_state}
+  end
+
+  def handle_call({:remove_issue, issue}, _from, current_state) do
+    existing_issues = List.wrap(current_state[issue.filename])
+    new_issue_list = List.delete(existing_issues, issue)
+    new_current_state = Map.put(current_state, issue.filename, new_issue_list)
+
+    {:reply, new_current_state, new_current_state}
   end
 end

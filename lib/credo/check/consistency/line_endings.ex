@@ -44,4 +44,15 @@ defmodule Credo.Check.Consistency.LineEndings do
   defp message_for(:windows = _expected) do
     "File is using unix line endings while most of the files use windows line endings."
   end
+
+  def autofix(file, issue) do
+    if issue.message == message_for(:windows) do
+      do_autofix(file, :unix_to_windows)
+    else
+      do_autofix(file, :windows_to_unix)
+    end
+  end
+
+  defp do_autofix(file, :windows_to_unix), do: String.replace(file, "\r\n", "\n")
+  defp do_autofix(file, :unix_to_windows), do: String.replace(file, "\n", "\r\n")
 end

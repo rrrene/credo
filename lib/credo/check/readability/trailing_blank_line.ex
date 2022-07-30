@@ -39,4 +39,8 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
       line_no: line_no
     )
   end
+
+  def autofix(file, _issue) do
+    "#{file}\n"
+  end
 end

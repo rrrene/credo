@@ -71,4 +71,23 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
       line_no: line_no
     )
   end
+
+  def autofix(file, _issue) do
+    {:ok, quoted} = :"Elixir.Code".string_to_quoted(file)
+
+    modified =
+      quoted
+      |> Macro.prewalk(&do_autofix/1)
+      |> Macro.to_string()
+      |> :"Elixir.Code".format_string!()
+      |> to_string()
+
+    "#{modified}\n"
+  end
+
+  defp do_autofix({:unless, meta, [clause, [do: falsy, else: truthy]]}) do
+    {:if, meta, [clause, [do: truthy, else: falsy]]}
+  end
+
+  defp do_autofix(ast), do: ast
 end

@@ -28,6 +28,7 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
       """
     ]
 
+  alias Credo.Check.Warning.UnusedFunctionReturnHelper
   alias Credo.Check.Warning.UnusedOperation
 
   @checked_module :String
@@ -44,4 +45,47 @@ defmodule Credo.Check.Warning.UnusedStringOperation do
       &format_issue/2
     )
   end
+
+  def autofix(file, _issue) do
+    {_, quoted} = Credo.Code.ast(file)
+    source_file = SourceFile.parse(file, "nofile")
+
+    unused_calls =
+      UnusedFunctionReturnHelper.find_unused_calls(
+        source_file,
+        [],
+        [@checked_module],
+        @funs_with_return_value
+      )
+
+    modified =
+      quoted
+      |> Macro.prewalk(&do_autofix(&1, unused_calls))
+      |> Macro.to_string()
+      |> :"Elixir.Code".format_string!()
+      |> to_string()
+
+    "#{modified}\n"
+  end
+
+  defp do_autofix({:__block__, meta, [{:|>, _pipe_meta, pipe_args} | tail] = args}, unused_calls) do
+    args =
+      if List.last(pipe_args) in unused_calls do
+        [hd(pipe_args) | tail]
+      else
+        args
+      end
+
+    {:__block__, meta, args}
+  end
+
+  defp do_autofix({:__block__, meta, args}, unused_calls) do
+    {:__block__, meta, Enum.reject(args, & &1 in unused_calls)}
+  end
+
+  defp do_autofix({:do, node}, unused_calls) do
+    {:do, do_autofix(node, unused_calls)}
+  end
+
+  defp do_autofix(ast, _), do: ast
 end

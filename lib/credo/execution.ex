@@ -29,6 +29,7 @@ defmodule Credo.Execution do
             plugins: [],
             parse_timeout: 5000,
             strict: false,
+            autofix: false,
 
             # options, set by the command line
             format: nil,
@@ -519,6 +520,14 @@ defmodule Credo.Execution do
     exec
     |> ExecutionIssues.to_map()
     |> Map.get(filename, [])
+  end
+
+  @doc """
+  This removes an issue for the given `exec` struct if the issue has been automatically resolved
+  before the run has completed.
+  """
+  def remove_issue(exec, issue) do
+    ExecutionIssues.remove_issue(exec, issue)
   end
 
   @doc """

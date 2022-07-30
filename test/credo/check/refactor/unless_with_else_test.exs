@@ -47,4 +47,38 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  describe "autofix/2" do
+    test "changes the unless with else to an if clause" do
+      starting = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          unless allowed? do
+            unless other_condition? do
+              something
+            end
+          else
+            something_else
+          end
+        end
+      end
+      """
+
+      expected = """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          if allowed? do
+            something_else
+          else
+            unless other_condition? do
+              something
+            end
+          end
+        end
+      end
+      """
+
+      assert @described_check.autofix(starting, nil) == expected
+    end
+  end
 end
