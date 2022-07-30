@@ -93,4 +93,13 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report slightly unexpected code" do
+    """
+    defmodule Person, do: def greet(), do: :howdy
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end

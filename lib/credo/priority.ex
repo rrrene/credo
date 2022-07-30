@@ -78,7 +78,7 @@ defmodule Credo.Priority do
           |> Enum.slice(0..(length(names) - 2))
           |> Enum.join(".")
 
-        mod_prio = lookup[mod_name]
+        mod_prio = lookup[mod_name] || 0
 
         {scope_name, prio + mod_prio}
       else
