@@ -422,7 +422,16 @@ defmodule Credo.Execution do
       Credo.Execution.get_assign(exec, "foo", 42)
       # => 42
   """
-  def get_assign(exec, name, default \\ nil) do
+  def get_assign(exec, name_or_list, default \\ nil)
+
+  def get_assign(exec, path, default) when is_list(path) do
+    case get_in(exec.assigns, path) do
+      nil -> default
+      value -> value
+    end
+  end
+
+  def get_assign(exec, name, default) do
     Map.get(exec.assigns, name, default)
   end
 
@@ -432,8 +441,27 @@ defmodule Credo.Execution do
       Credo.Execution.put_assign(exec, "foo", 42)
       # => %Credo.Execution{...}
   """
+  def put_assign(exec, name_or_list, value)
+
+  def put_assign(exec, path, value) when is_list(path) do
+    %__MODULE__{exec | assigns: do_put_nested_assign(exec.assigns, path, value)}
+  end
+
   def put_assign(exec, name, value) do
     %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
+  end
+
+  defp do_put_nested_assign(map, [last_key], value) do
+    Map.put(map, last_key, value)
+  end
+
+  defp do_put_nested_assign(map, [next_key | rest], value) do
+    new_map =
+      map
+      |> Map.get(next_key, %{})
+      |> do_put_nested_assign(rest, value)
+
+    Map.put(map, next_key, new_map)
   end
 
   # Config Files

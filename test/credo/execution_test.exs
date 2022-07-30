@@ -3,6 +3,43 @@ defmodule Credo.ExecutionTest do
 
   alias Credo.Execution
 
+  test "it should work for put_assign & get_assign" do
+    exec = Execution.put_assign(%Execution{}, "foo", "bar")
+
+    assert Execution.get_assign(exec, "foo") == "bar"
+  end
+
+  test "it should work for put_assign_in /1" do
+    exec =
+      Execution.put_assign(
+        %Execution{},
+        ["credo.magic_funs", :foo],
+        "bar"
+      )
+
+    assert Execution.get_assign(exec, "credo.magic_funs") == %{foo: "bar"}
+
+    assert Execution.get_assign(exec, ["credo.magic_funs", :none_existing], :baz) == :baz
+  end
+
+  test "it should work for put_assign_in and get_assign /2" do
+    exec =
+      Execution.put_assign(
+        %Execution{},
+        ["credo.magic_funs", Credo.Check.Readability.ModuleDoc, "foo"],
+        "bar"
+      )
+
+    assert Execution.get_assign(exec, "credo.magic_funs") ==
+             %{Credo.Check.Readability.ModuleDoc => %{"foo" => "bar"}}
+
+    assert Execution.get_assign(exec, [
+             "credo.magic_funs",
+             Credo.Check.Readability.ModuleDoc,
+             "foo"
+           ]) == "bar"
+  end
+
   test "it should work for append_task/4" do
     exec = %Execution{
       pipeline_map: %{
