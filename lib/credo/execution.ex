@@ -513,6 +513,13 @@ defmodule Credo.Execution do
   end
 
   @doc """
+  Returns all issues grouped by filename for the given `exec` struct.
+  """
+  def get_issues_grouped_by_filename(exec) do
+    ExecutionIssues.to_map(exec)
+  end
+
+  @doc """
   Returns all issues for the given `exec` struct that relate to the given `filename`.
   """
   def get_issues(exec, filename) do
