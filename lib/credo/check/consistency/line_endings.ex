@@ -31,17 +31,24 @@ defmodule Credo.Check.Consistency.LineEndings do
   defp issues_for(expected, source_file, params) do
     first_line_with_issue = @collector.first_line_with_issue(expected, source_file)
 
+    message =
+      case expected do
+        :unix ->
+          "File is using windows line endings while most of the files use unix line endings."
+
+        :windows ->
+          "File is using unix line endings while most of the files use windows line endings."
+      end
+
+    trigger =
+      case expected do
+        :unix -> "\r\n"
+        :windows -> "\n"
+      end
+
     source_file
     |> IssueMeta.for(params)
-    |> format_issue(message: message_for(expected), line_no: first_line_with_issue)
+    |> format_issue(message: message, line_no: first_line_with_issue, trigger: trigger)
     |> List.wrap()
-  end
-
-  defp message_for(:unix = _expected) do
-    "File is using windows line endings while most of the files use unix line endings."
-  end
-
-  defp message_for(:windows = _expected) do
-    "File is using unix line endings while most of the files use windows line endings."
   end
 end
