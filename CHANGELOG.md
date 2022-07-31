@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.6
+
+- Fix error when analysing single-line modules
+- Fix false positive for `Credo.Check.Readability.SpaceAroundOperators`
+- Fix false positive for `Credo.Check.Warning.UnusedStringOperation`
+- Fix bug in `Credo.Code.Scope.mod_name/1`
+
 ## 1.6.5
 
 - Include the 'only_greater_than' value in the `Credo.Check.Readability.LargeNumbers` message
