@@ -5,7 +5,8 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
     default: Credo.CLI.Command.Suggest.Output.Default,
     flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
     oneline: Credo.CLI.Command.Suggest.Output.Oneline,
-    json: Credo.CLI.Command.Suggest.Output.Json
+    json: Credo.CLI.Command.Suggest.Output.Json,
+    github: Credo.CLI.Command.Suggest.Output.Github
 
   alias Credo.CLI.Output.UI
 

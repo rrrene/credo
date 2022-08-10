@@ -5,7 +5,8 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
     default: Credo.CLI.Command.Diff.Output.Default,
     flycheck: Credo.CLI.Command.Diff.Output.FlyCheck,
     oneline: Credo.CLI.Command.Diff.Output.Oneline,
-    json: Credo.CLI.Command.Diff.Output.Json
+    json: Credo.CLI.Command.Diff.Output.Json,
+    github: Credo.CLI.Command.Diff.Output.Github
 
   alias Credo.CLI.Output.UI
 

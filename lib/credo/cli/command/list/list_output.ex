@@ -5,7 +5,8 @@ defmodule Credo.CLI.Command.List.ListOutput do
     default: Credo.CLI.Command.List.Output.Default,
     flycheck: Credo.CLI.Command.List.Output.FlyCheck,
     oneline: Credo.CLI.Command.List.Output.Oneline,
-    json: Credo.CLI.Command.List.Output.Json
+    json: Credo.CLI.Command.List.Output.Json,
+    github: Credo.CLI.Command.List.Output.Github
 
   alias Credo.CLI.Output.UI
 
