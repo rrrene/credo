@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   use Credo.Check,
     param_defaults: [
       ignore_names: [
-        ~r/(\.\w+Controller|\.Endpoint|\.\w+Live|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
+        ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/
       ]
     ],
     explanations: [
