@@ -64,6 +64,14 @@ defmodule Credo.CLI.Output.FormatDelegator do
 
       unquote(format_mods)
 
+      defp format_mod(%Execution{format: nil} = exec) do
+        if System.get_env("GITHUB_ACTION") do
+          format_mod(%{exec | format: "github"})
+        else
+          format_mod(%{exec | format: "default"})
+        end
+      end
+
       unquote(default_format_mod)
     end
   end
