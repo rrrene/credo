@@ -2,7 +2,8 @@ defmodule Credo.Execution.Task.AssignExitStatusForIssues do
   @moduledoc false
 
   use Credo.Execution.Task
-  use Bitwise
+
+  import Bitwise
 
   def call(exec, _opts) do
     exit_status =
