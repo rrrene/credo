@@ -13,31 +13,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: [20.3, 21.3, 22.3, 23.3, 24.0]
-        elixir: [1.8.2, 1.9.4, 1.10.4, 1.11.4, 1.12.2, 1.13.4]
+        otp: [21.3, 22.3, 23.3, 24.0]
+        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4, 1.14.0-rc.1]
         exclude:
           - otp: 24.0
-            elixir: 1.8.2
-          - otp: 24.0
-            elixir: 1.9.4
-          - otp: 24.0
             elixir: 1.10.4
-          - otp: 23.3
-            elixir: 1.8.2
-          - otp: 23.3
-            elixir: 1.9.4
           - otp: 21.3
             elixir: 1.12.2
           - otp: 21.3
             elixir: 1.13.4
-          - otp: 20.3
-            elixir: 1.10.4
-          - otp: 20.3
-            elixir: 1.11.4
-          - otp: 20.3
-            elixir: 1.12.2
-          - otp: 20.3
-            elixir: 1.13.4
+          - otp: 21.3
+            elixir: 1.14.0-rc.1
         repo_url: ["https://github.com/elixir-lang/elixir.git"]
         repo_branch: ["v1.13", "main"]
     steps:
