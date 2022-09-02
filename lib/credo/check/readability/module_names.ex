@@ -25,8 +25,7 @@ defmodule Credo.Check.Readability.ModuleNames do
       it easier to follow.
       """,
       params: [
-        ignore:
-          "List of ignored name segment patterns e.g. `[~r/Sample_Module/, \"Sample_Module\"]`"
+        ignore: "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
       ]
     ]
 
@@ -63,17 +62,11 @@ defmodule Credo.Check.Readability.ModuleNames do
   end
 
   defp issues_for_name(name, meta, issues, issue_meta, ignored_patterns) do
-    segments =
+    module_name =
       name
       |> to_string
-      |> String.split(".")
 
-    all_correct? =
-      Enum.all?(segments, fn segment ->
-         Name.pascal_case?(segment) or ignored_segment?(ignored_patterns, segment) 
-      end)
-
-    if all_correct? do
+    if Name.pascal_case?(module_name) or ignored_module?(ignored_patterns, module_name) do
       issues
     else
       [issue_for(issue_meta, meta[:line], name) | issues]
@@ -89,15 +82,14 @@ defmodule Credo.Check.Readability.ModuleNames do
     )
   end
 
-  defp ignored_segment?([], _segment), do: false
+  defp ignored_module?([], _module_name), do: false
 
-  defp ignored_segment?(ignored_patterns, segment) do
+  defp ignored_module?(ignored_patterns, module_name) do
     Enum.any?(ignored_patterns, fn
       %Regex{} = pattern ->
-        String.match?(segment, pattern)
-
-      module_name ->
-        String.equivalent?(segment, to_string(module_name))
+        String.match?(module_name, pattern)
+      name ->
+        module_name == name
     end)
   end
 end
