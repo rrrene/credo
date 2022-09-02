@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.7
+
+- Improve compatibility with Elixir 1.14 (based on v1.14.0-rc.1)
+
 ## 1.6.6
 
 - Fix error when analysing single-line modules
