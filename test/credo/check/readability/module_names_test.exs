@@ -42,43 +42,43 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on allowed segment name" do
+  test "it should not raise on ignored segment name" do
+    """
+    defmodule Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: ["Sample_Module"])
+    |> refute_issues()
+  end
+
+  test "it should not raise on ignored segment pattern" do
     """
     defmodule Credo.Sample_Module do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, allow: ["Sample_Module"])
+    |> run_check(@described_check, ignore: [~r/Sample_Module/])
     |> refute_issues()
   end
 
-  test "it should not raise on allowed segment pattern" do
-    """
-    defmodule Credo.Sample_Module do
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check, allow: [~r/Sample_Module/])
-    |> refute_issues()
-  end
-
-  test "it should not raise on allowed segment when multiple are present" do
+  test "it should not raise on ignored segment when multiple are present" do
     """
     defmodule Credo.Another_Module.SampleModule do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, allow: [~r/Another_Module/])
+    |> run_check(@described_check, ignore: [~r/Another_Module/])
     |> refute_issues()
   end
 
-  test "it should not raise on multiple allowed segments" do
+  test "it should not raise on multiple ignored segments" do
     """
     defmodule Credo.Another_Module.Sample_Module do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, allow: ["Another_Module", "Sample_Module"])
+    |> run_check(@described_check, ignore: ["Another_Module", "Sample_Module"])
     |> refute_issues()
   end
 
@@ -112,7 +112,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, allow: [~r/Another_Module/])
+    |> run_check(@described_check, ignore: [~r/Another_Module/])
     |> assert_issue()
   end
 end
