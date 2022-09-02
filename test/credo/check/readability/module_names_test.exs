@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
 
   test "it should not raise on ignored pattern" do
     """
-    defmodule Credo.Sample_Module do
+    defmodule Sample_Module do
     end
     """
     |> to_source_file
