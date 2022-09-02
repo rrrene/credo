@@ -70,7 +70,7 @@ defmodule Credo.Check.Readability.ModuleNames do
 
     all_correct? =
       Enum.all?(segments, fn segment ->
-         allowed_segment?(allowed_patterns, segment) or Name.pascal_case?(segment)
+         Name.pascal_case?(segment) or allowed_segment?(allowed_patterns, segment) 
       end)
 
     if all_correct? do
