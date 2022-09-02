@@ -42,6 +42,46 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
+  test "it should not raise on allowed segment name" do
+    """
+    defmodule Credo.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow: ["Sample_Module"])
+    |> refute_issues()
+  end
+
+  test "it should not raise on allowed segment pattern" do
+    """
+    defmodule Credo.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow: [~r/Sample_Module/])
+    |> refute_issues()
+  end
+
+  test "it should not raise on allowed segment when multiple are present" do
+    """
+    defmodule Credo.Another_Module.SampleModule do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow: [~r/Another_Module/])
+    |> refute_issues()
+  end
+
+  test "it should not raise on multiple allowed segments" do
+    """
+    defmodule Credo.Another_Module.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow: ["Another_Module", "Sample_Module"])
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -53,6 +93,26 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation for invalid segment" do
+    """
+    defmodule Credo.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with multiple segments when one is invalid" do
+    """
+    defmodule Credo.Another_Module.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow: [~r/Another_Module/])
     |> assert_issue()
   end
 end
