@@ -13,7 +13,7 @@ This enables shell based pipeline workflows (e.g. on CI systems) which test Cred
 The exit status of each check is used to construct a bit map of the types of issues which were encountered by or-ing them together to produce the final result:
 
 ```elixir
-use Bitwise
+import Bitwise
 
 issues
 |> Enum.map(&(&1.exit_status))
