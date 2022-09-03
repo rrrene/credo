@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         otp: [21.3, 22.3, 23.3, 24.2]
-        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4]
+        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4, 1.14.0]
         exclude:
           - otp: 24.0
             elixir: 1.10.4
@@ -25,7 +25,7 @@ jobs:
           - otp: 21.3
             elixir: 1.13.4
           - otp: 21.3
-            elixir: 1.14.0-rc.1
+            elixir: 1.14.0
     steps:
       - uses: actions/checkout@v2.3.1
         with:
