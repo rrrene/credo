@@ -24,6 +24,8 @@ jobs:
             elixir: 1.13.4
           - otp: 21.3
             elixir: 1.14.0
+          - otp: 22.3
+            elixir: 1.14.0
         repo_url: ["https://github.com/elixir-lang/elixir.git"]
         repo_branch: ["v1.13", "main"]
     steps:

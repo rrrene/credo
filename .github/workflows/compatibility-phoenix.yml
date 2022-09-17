@@ -54,6 +54,8 @@ jobs:
             elixir: 1.13.4
           - otp: 21.3
             elixir: 1.14.0
+          - otp: 22.3
+            elixir: 1.14.0
     steps:
       - uses: actions/checkout@v2.3.1
       - uses: erlef/setup-beam@v1
