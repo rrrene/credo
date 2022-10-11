@@ -1,6 +1,9 @@
 defmodule Credo.Check.Readability.AliasOrder do
   use Credo.Check,
     base_priority: :low,
+    param_defaults: [
+      sort_method: :alpha
+    ],
     explanations: [
       check: """
       Alphabetically ordered lists are more easily scannable by the read.
@@ -38,7 +41,16 @@ defmodule Credo.Check.Readability.AliasOrder do
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
-      """
+      """,
+      params: [
+        sort_method: """
+        The ordering method to use.
+
+        Options
+        - `:aplha` - Alphabetical case-insensitive sorting.
+        - `:ascii` - Case-sensitive sorting where capitals are ordered earier than their lower case equivilants.
+        """
+      ]
     ]
 
   alias Credo.Code.Name
@@ -46,26 +58,27 @@ defmodule Credo.Check.Readability.AliasOrder do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
+    sort_method = Params.get(params, :sort_method, __MODULE__)
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, sort_method))
   end
 
-  defp traverse({:defmodule, _, _} = ast, issues, issue_meta) do
+  defp traverse({:defmodule, _, _} = ast, issues, issue_meta, sort_method) do
     new_issues =
       ast
       |> extract_alias_groups()
-      |> Enum.reduce([], &traverse_groups(&1, &2, issue_meta))
+      |> Enum.reduce([], &traverse_groups(&1, &2, issue_meta, sort_method))
 
     {ast, issues ++ new_issues}
   end
 
-  defp traverse(ast, issues, _), do: {ast, issues}
+  defp traverse(ast, issues, _, _), do: {ast, issues}
 
-  defp traverse_groups(group, acc, issue_meta) do
+  defp traverse_groups(group, acc, issue_meta, sort_method) do
     group
     |> Enum.chunk_every(2, 1)
-    |> Enum.reduce_while(nil, &process_group/2)
+    |> Enum.reduce_while(nil, fn chunk, _ -> process_group(sort_method, chunk) end)
     |> case do
       nil ->
         acc
@@ -75,7 +88,10 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group([{line_no, mod_list_second, a}, {_line_no, _mod_list_second, b}], _)
+  defp process_group(:alpha, [
+         {line_no, mod_list_second, a},
+         {_line_no, _mod_list_second, b}
+       ])
        when a > b do
     module =
       case mod_list_second do
@@ -88,7 +104,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     {:halt, issue_opts}
   end
 
-  defp process_group([{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}], _) do
+  defp process_group(_sort_method, [{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}]) do
     issue_opts =
       cond do
         issue = inner_group_order_issue(line_no1, mod_list_first) ->
@@ -108,7 +124,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group([{line_no1, mod_list_first, _}], _) do
+  defp process_group(_sort_method, [{line_no1, mod_list_first, _}]) do
     if issue_opts = inner_group_order_issue(line_no1, mod_list_first) do
       {:halt, issue_opts}
     else

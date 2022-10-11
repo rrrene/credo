@@ -118,6 +118,18 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
+  test "it should work with case-sensitive sorting" do
+    """
+    defmodule Test do
+      alias MyApp.AlphaBravoCharlie
+      alias MyApp.AlphaBravoalpha
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -227,5 +239,17 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "Sorter"
     end)
+  end
+
+  test "it should repot violation with case-sensitive sorting" do
+    """
+    defmodule Test do
+      alias MyApp.AlphaBravoalpha
+      alias MyApp.AlphaBravoCharlie
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
+    |> refute_issues()
   end
 end
