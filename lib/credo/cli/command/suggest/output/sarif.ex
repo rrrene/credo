@@ -9,6 +9,6 @@ defmodule Credo.CLI.Command.Suggest.Output.Sarif do
   def print_after_info(_source_files, exec, _time_load, _time_run) do
     exec
     |> Execution.get_issues()
-    |> SARIF.print_issues()
+    |> SARIF.print_issues(exec)
   end
 end
