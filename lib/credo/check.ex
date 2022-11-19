@@ -149,6 +149,11 @@ defmodule Credo.Check do
   """
   @callback tags() :: list(atom)
 
+  @doc """
+  Returns the docs URL for the check.
+  """
+  @callback docs_uri() :: binary()
+
   @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
@@ -174,6 +179,7 @@ defmodule Credo.Check do
   @valid_use_opts [
     :base_priority,
     :category,
+    :docs_uri,
     :elixir_version,
     :exit_status,
     :explanations,
@@ -287,6 +293,23 @@ defmodule Credo.Check do
         end
       end
 
+    docs_uri =
+      if opts[:docs_uri] do
+        quote do
+          @impl true
+          def docs_uri do
+            unquote(opts[:docs_uri])
+          end
+        end
+      else
+        quote do
+          @impl true
+          def docs_uri do
+            "https://hexdocs.pm/credo/#{Credo.Code.Name.full(__MODULE__)}.html"
+          end
+        end
+      end
+
     quote do
       @moduledoc unquote(moduledoc(opts))
       @behaviour Credo.Check
@@ -314,6 +337,7 @@ defmodule Credo.Check do
       unquote(def_param_defaults)
       unquote(def_explanations)
       unquote(def_tags)
+      unquote(docs_uri)
 
       @impl true
       def format_issue(issue_meta, issue_options) do

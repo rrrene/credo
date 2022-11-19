@@ -31,4 +31,19 @@ defmodule Credo.CheckTest do
     assert time_in_microseconds < 1_000_000
     assert {:def, "AliasTest.test"} == result
   end
+
+  defmodule DocsUriTestCheck do
+    use Credo.Check, docs_uri: "https://example.org"
+
+    def run(%SourceFile{} = _source_file, _params \\ []) do
+      []
+    end
+  end
+
+  test "it should generate a docs_uri" do
+    assert DocsUriTestCheck.docs_uri() == "https://example.org"
+
+    assert Credo.Check.Readability.ModuleDoc.docs_uri() ==
+             "https://hexdocs.pm/credo/Credo.Check.Readability.ModuleDoc.html"
+  end
 end
