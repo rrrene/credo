@@ -71,7 +71,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
             issue.category
           ]
         },
-        "helpUri" => "https://hexdocs.pm/credo/#{Credo.Code.Name.full(issue.check)}.html"
+        "helpUri" => issue.check.docs_uri()
       },
       %{
         "ruleId" => Credo.Code.Name.full(issue.check),
