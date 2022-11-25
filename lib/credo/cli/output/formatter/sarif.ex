@@ -71,7 +71,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
             issue.category
           ]
         },
-        "helpUri" => "#{issue.check.docs_uri()}"
+        "helpUri" => issue.check.docs_uri()
       },
       %{
         "ruleId" => Credo.Code.Name.full(issue.check),
