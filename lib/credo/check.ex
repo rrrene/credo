@@ -152,7 +152,7 @@ defmodule Credo.Check do
   @doc """
   Returns the docs URL for the check.
   """
-  @callback docs_uri() :: Keyword.t()
+  @callback docs_uri() :: binary()
 
   @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
