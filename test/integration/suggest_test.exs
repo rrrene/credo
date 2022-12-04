@@ -138,7 +138,7 @@ defmodule Credo.SuggestTest do
     assert first_result["ruleId"] == "Credo.Check.Design.TagFIXME"
 
     second_result = Enum.at(results, 1)
-    assert second_result["level"] == "warning"
+    assert second_result["level"] == nil
     assert second_result["rank"] == 14
     assert second_result["ruleId"] == "Credo.Check.Design.TagTODO"
   end

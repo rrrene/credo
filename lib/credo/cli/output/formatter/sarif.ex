@@ -54,7 +54,9 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
 
   defp priority_to_sarif_rank(_), do: 0
 
-  defp issue_to_sarif(%Issue{} = issue) do
+  defp issue_to_sarif(%Issue{} = issue, exec) do
+    sarif_level = priority_to_sarif_level(issue.priority)
+
     column_end =
       if issue.column && issue.trigger do
         issue.column + String.length(to_string(issue.trigger))
@@ -64,7 +66,8 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
       %{
         "id" => Credo.Code.Name.full(issue.check),
         "fullDescription" => %{
-          "text" => issue.check.explanation
+          "text" => issue.check.explanation |> String.replace("`", "\""),
+          "markdown" => issue.check.explanation
         },
         "properties" => %{
           "tags" => [
@@ -75,16 +78,17 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
       },
       %{
         "ruleId" => Credo.Code.Name.full(issue.check),
-        "level" => priority_to_sarif_level(issue.priority),
+        "level" => sarif_level,
         "rank" => priority_to_sarif_rank(issue.priority),
         "message" => %{
-          "text" => issue.message
+          "text" => issue.message |> String.replace("`", "\""),
+          "markdown" => issue.message
         },
         "locations" => [
           %{
             "physicalLocation" => %{
               "artifactLocation" => %{
-                "uri" => to_string(issue.filename),
+                "uri" => to_string(Path.relative_to(issue.filename, exec.cli_options.path)),
                 "uriBaseId" => "ROOTPATH"
               },
               "region" => %{
@@ -106,7 +110,9 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
       }
     }
 
-    remove_nil_endcolumn(rule_and_issue, !column_end)
+    rule_and_issue
+    |> remove_nil_endcolumn(!column_end)
+    |> remove_warning_level(sarif_level == :warning)
   end
 
   defp remove_nil_endcolumn(sarif, false), do: sarif
@@ -116,6 +122,16 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
 
     {atom1,
      pop_in(atom2, ["locations", Access.at(0), "physicalLocation", "region", "endColumn"])
+     |> elem(1)}
+  end
+
+  defp remove_warning_level(sarif, false), do: sarif
+
+  defp remove_warning_level(sarif, true) do
+    {atom1, atom2} = sarif
+
+    {atom1,
+     pop_in(atom2, ["level"])
      |> elem(1)}
   end
 
@@ -134,7 +150,11 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
   end
 
   def print_issues(issues, exec) do
-    issue_list = Enum.map(issues, &issue_to_sarif/1)
+    issue_list =
+      Enum.map(issues, fn issue ->
+        issue_to_sarif(issue, exec)
+      end)
+
     {final_rules, final_results} = sum_rules_and_results(issue_list, [], [])
 
     sarif = %{
