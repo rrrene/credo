@@ -175,7 +175,8 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
             "ROOTPATH" => %{
               "uri" => "file:///"
             }
-          }
+          },
+          "columnKind" => "utf16CodeUnits"
         }
       ]
     }
