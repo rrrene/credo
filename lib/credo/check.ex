@@ -154,6 +154,11 @@ defmodule Credo.Check do
   """
   @callback docs_uri() :: binary()
 
+  @doc """
+  Returns an ID that can be used to identify the check.
+  """
+  @callback id() :: binary()
+
   @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
@@ -183,6 +188,7 @@ defmodule Credo.Check do
     :elixir_version,
     :exit_status,
     :explanations,
+    :id,
     :param_defaults,
     :run_on_all,
     :tags
@@ -310,6 +316,23 @@ defmodule Credo.Check do
         end
       end
 
+    id =
+      if opts[:id] do
+        quote do
+          @impl true
+          def id do
+            unquote(opts[:id])
+          end
+        end
+      else
+        quote do
+          @impl true
+          def id do
+            Credo.Code.Name.full(__MODULE__)
+          end
+        end
+      end
+
     quote do
       @moduledoc unquote(moduledoc(opts))
       @behaviour Credo.Check
@@ -338,6 +361,7 @@ defmodule Credo.Check do
       unquote(def_explanations)
       unquote(def_tags)
       unquote(docs_uri)
+      unquote(id)
 
       @impl true
       def format_issue(issue_meta, issue_options) do
