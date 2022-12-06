@@ -33,24 +33,23 @@ defmodule Credo.CheckTest do
   end
 
   defmodule DocsUriTestCheck do
-    use Credo.Check, docs_uri: "https://example.org", id: "MY_ID"
+    use Credo.Check, docs_uri: "https://example.org"
 
     def run(%SourceFile{} = _source_file, _params \\ []) do
       []
     end
   end
 
-  test "it should generate a docs_uri" do
+  test "it should use/generate a docs_uri" do
     assert DocsUriTestCheck.docs_uri() == "https://example.org"
 
     assert Credo.Check.Readability.ModuleDoc.docs_uri() ==
              "https://hexdocs.pm/credo/Credo.Check.Readability.ModuleDoc.html"
   end
 
-  test "it should generate a id" do
-    assert DocsUriTestCheck.id() == "MY_ID"
+  test "it should use/generate an id" do
+    assert DocsUriTestCheck.id() == "Credo.CheckTest.DocsUriTestCheck"
 
-    assert Credo.Check.Readability.ModuleDoc.id() ==
-             "Credo.Check.Readability.ModuleDoc"
+    assert Credo.Check.Readability.ModuleDoc.id() == "EX3009"
   end
 end
