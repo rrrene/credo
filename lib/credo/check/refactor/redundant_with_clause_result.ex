@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   use Credo.Check,
+    id: "EX4024",
     base_priority: :high,
     explanations: [
       check: ~S"""

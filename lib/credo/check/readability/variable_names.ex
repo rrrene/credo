@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.VariableNames do
   use Credo.Check,
+    id: "EX3031",
     base_priority: :high,
     explanations: [
       check: """

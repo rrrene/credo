@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.LeakyEnvironment do
   use Credo.Check,
+    id: "EX5008",
     base_priority: :high,
     tags: [:controversial],
     category: :warning,

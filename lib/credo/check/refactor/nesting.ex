@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.Nesting do
   use Credo.Check,
+    id: "EX4021",
     param_defaults: [max_nesting: 2],
     explanations: [
       check: """

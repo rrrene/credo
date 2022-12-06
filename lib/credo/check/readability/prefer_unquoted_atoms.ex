@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   use Credo.Check,
+    id: "EX3018",
     run_on_all: true,
     base_priority: :high,
     elixir_version: "< 1.7.0-dev",

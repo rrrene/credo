@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.PreferImplicitTry do
   use Credo.Check,
+    id: "EX3017",
     base_priority: :low,
     explanations: [
       check: """

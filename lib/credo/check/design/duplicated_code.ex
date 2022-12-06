@@ -1,5 +1,6 @@
 defmodule Credo.Check.Design.DuplicatedCode do
   use Credo.Check,
+    id: "EX2002",
     run_on_all: true,
     base_priority: :higher,
     tags: [:controversial],

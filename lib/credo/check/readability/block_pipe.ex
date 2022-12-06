@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.BlockPipe do
   use Credo.Check,
+    id: "EX3003",
     tags: [:controversial],
     param_defaults: [
       exclude: []

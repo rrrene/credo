@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
   use Credo.Check,
+    id: "EX3015",
     base_priority: :low,
     explanations: [
       check: """

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedTupleOperation do
   use Credo.Check,
+    id: "EX5024",
     base_priority: :high,
     explanations: [
       check: """

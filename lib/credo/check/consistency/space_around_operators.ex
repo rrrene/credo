@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.SpaceAroundOperators do
   use Credo.Check,
+    id: "EX1005",
     run_on_all: true,
     base_priority: :high,
     tags: [:formatter],

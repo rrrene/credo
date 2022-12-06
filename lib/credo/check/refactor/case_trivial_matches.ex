@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.CaseTrivialMatches do
   use Credo.Check,
+    id: "EX4004",
     explanations: [
       check: """
       PLEASE NOTE: This check is deprecated as it might do more harm than good.

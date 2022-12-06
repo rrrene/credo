@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.CondStatements do
   use Credo.Check,
+    id: "EX4005",
     explanations: [
       check: """
       Each cond statement should have 3 or more statements including the

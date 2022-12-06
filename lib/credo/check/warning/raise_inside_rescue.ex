@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.RaiseInsideRescue do
   use Credo.Check,
+    id: "EX5013",
     explanations: [
       check: """
       Using `Kernel.raise` inside of a `rescue` block creates a new stacktrace.

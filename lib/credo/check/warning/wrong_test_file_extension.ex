@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.WrongTestFileExtension do
   use Credo.Check,
+    id: "EX5025",
     base_priority: :high,
     param_defaults: [included: ["test/**/*_test.ex"]],
     explanations: [

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.ExceptionNames do
   use Credo.Check,
+    id: "EX1001",
     run_on_all: true,
     base_priority: :high,
     explanations: [

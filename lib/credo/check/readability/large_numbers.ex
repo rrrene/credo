@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.LargeNumbers do
   use Credo.Check,
+    id: "EX3006",
     base_priority: :high,
     tags: [:formatter],
     param_defaults: [

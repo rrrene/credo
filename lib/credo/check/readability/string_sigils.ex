@@ -3,6 +3,7 @@ defmodule Credo.Check.Readability.StringSigils do
   alias Credo.SourceFile
 
   use Credo.Check,
+    id: "EX3027",
     base_priority: :low,
     param_defaults: [
       maximum_allowed_quotes: 3

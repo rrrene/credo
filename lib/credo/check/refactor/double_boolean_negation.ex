@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.DoubleBooleanNegation do
   use Credo.Check,
+    id: "EX4007",
     base_priority: :low,
     tags: [:controversial],
     explanations: [

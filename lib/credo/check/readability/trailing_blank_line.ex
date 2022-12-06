@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.TrailingBlankLine do
   use Credo.Check,
+    id: "EX3028",
     base_priority: :low,
     tags: [:formatter],
     explanations: [

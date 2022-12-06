@@ -1,5 +1,6 @@
 defmodule Credo.Check.Design.TagTODO do
   use Credo.Check,
+    id: "EX2005",
     param_defaults: [include_doc: true],
     explanations: [
       check: """

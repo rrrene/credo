@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.AppendSingleItem do
   use Credo.Check,
+    id: "EX4002",
     base_priority: :low,
     tags: [:controversial],
     explanations: [

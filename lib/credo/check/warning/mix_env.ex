@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.MixEnv do
   use Credo.Check,
+    id: "EX5010",
     base_priority: :high,
     param_defaults: [excluded_paths: []],
     explanations: [

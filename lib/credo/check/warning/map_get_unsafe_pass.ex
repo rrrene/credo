@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.MapGetUnsafePass do
   use Credo.Check,
+    id: "EX5009",
     base_priority: :normal,
     tags: [:controversial],
     explanations: [

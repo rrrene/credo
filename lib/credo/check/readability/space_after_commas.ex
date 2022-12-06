@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.SpaceAfterCommas do
   use Credo.Check,
+    id: "EX3024",
     tags: [:formatter],
     explanations: [
       check: """

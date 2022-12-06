@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.Semicolons do
   use Credo.Check,
+    id: "EX3020",
     base_priority: :high,
     tags: [:formatter],
     explanations: [

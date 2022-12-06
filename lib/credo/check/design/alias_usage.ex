@@ -1,5 +1,6 @@
 defmodule Credo.Check.Design.AliasUsage do
   use Credo.Check,
+    id: "EX2001",
     base_priority: :normal,
     param_defaults: [
       excluded_namespaces: ~w[File IO Inspect Kernel Macro Supervisor Task Version],

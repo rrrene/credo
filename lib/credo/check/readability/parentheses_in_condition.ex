@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.ParenthesesInCondition do
   use Credo.Check,
+    id: "EX3013",
     base_priority: :high,
     tags: [:formatter],
     explanations: [

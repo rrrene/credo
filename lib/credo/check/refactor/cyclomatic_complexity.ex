@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.CyclomaticComplexity do
   use Credo.Check,
+    id: "EX4006",
     param_defaults: [max_complexity: 9],
     explanations: [
       check: """

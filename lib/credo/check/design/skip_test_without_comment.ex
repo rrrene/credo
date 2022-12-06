@@ -1,5 +1,6 @@
 defmodule Credo.Check.Design.SkipTestWithoutComment do
   use Credo.Check,
+    id: "EX2003",
     base_priority: :normal,
     explanations: [
       check: """

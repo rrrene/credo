@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
   use Credo.Check,
+    id: "EX1003",
     run_on_all: true,
     base_priority: :high,
     tags: [:controversial],

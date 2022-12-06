@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.MaxLineLength do
   use Credo.Check,
+    id: "EX3007",
     base_priority: :low,
     tags: [:formatter],
     param_defaults: [

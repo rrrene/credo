@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedKeywordOperation do
   use Credo.Check,
+    id: "EX5019",
     base_priority: :high,
     explanations: [
       check: """

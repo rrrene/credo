@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.StrictModuleLayout do
   use Credo.Check,
+    id: "EX3026",
     base_priority: :low,
     tags: [:controversial],
     explanations: [

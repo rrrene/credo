@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.LineEndings do
   use Credo.Check,
+    id: "EX1002",
     run_on_all: true,
     base_priority: :high,
     tags: [:formatter],

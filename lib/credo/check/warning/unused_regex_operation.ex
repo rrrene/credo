@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedRegexOperation do
   use Credo.Check,
+    id: "EX5022",
     base_priority: :high,
     explanations: [
       check: """

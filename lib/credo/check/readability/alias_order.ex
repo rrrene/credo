@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.AliasOrder do
   use Credo.Check,
+    id: "EX3002",
     base_priority: :low,
     explanations: [
       check: """

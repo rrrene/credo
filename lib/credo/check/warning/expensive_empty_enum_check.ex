@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   use Credo.Check,
+    id: "EX5003",
     base_priority: :high,
     explanations: [
       # TODO: improve checkdoc

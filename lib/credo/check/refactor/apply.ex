@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.Apply do
   use Credo.Check,
+    id: "EX4003",
     base_priority: :low,
     explanations: [
       check: """

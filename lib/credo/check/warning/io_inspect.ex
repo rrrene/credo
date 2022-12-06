@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.IoInspect do
   use Credo.Check,
+    id: "EX5006",
     base_priority: :high,
     explanations: [
       check: """
@@ -22,10 +23,10 @@ defmodule Credo.Check.Warning.IoInspect do
   end
 
   defp traverse(
-        {{:., _, [{:__aliases__, _, [:Elixir, :IO]}, :inspect]}, meta, _arguments} = ast,
-        issues,
-        issue_meta
-      ) do
+         {{:., _, [{:__aliases__, _, [:"Elixir", :IO]}, :inspect]}, meta, _arguments} = ast,
+         issues,
+         issue_meta
+       ) do
     {ast, issues_for_call(meta, issues, issue_meta)}
   end
 

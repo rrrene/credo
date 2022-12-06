@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.UnlessWithElse do
   use Credo.Check,
+    id: "EX4027",
     base_priority: :high,
     explanations: [
       check: """

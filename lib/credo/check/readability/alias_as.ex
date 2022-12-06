@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.AliasAs do
   use Credo.Check,
+    id: "EX3001",
     base_priority: :low,
     tags: [:experimental],
     explanations: [

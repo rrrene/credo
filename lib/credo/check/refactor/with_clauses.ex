@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.WithClauses do
   use Credo.Check,
+    id: "EX4029",
     base_priority: :high,
     explanations: [
       check: ~S"""

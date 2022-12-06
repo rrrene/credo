@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.PipeChainStart do
   use Credo.Check,
+    id: "EX4023",
     tags: [:controversial],
     param_defaults: [
       excluded_argument_types: [],
@@ -42,9 +43,9 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     :<~,
     :~>,
     :<~>,
-    :<|>,
-    :^^^,
-    :~~~,
+    :"<|>",
+    :"^^^",
+    :"~~~",
     :"..//"
   ]
 

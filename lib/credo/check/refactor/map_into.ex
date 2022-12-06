@@ -1,6 +1,7 @@
 defmodule Credo.Check.Refactor.MapInto do
   # only available in Elixir < 1.8 since performance improvements have since made this check obsolete
   use Credo.Check,
+    id: "EX4013",
     base_priority: :high,
     elixir_version: "< 1.8.0",
     explanations: [
