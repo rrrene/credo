@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     name: "[${{matrix.otp}}/${{matrix.elixir}}] CI Tests on Credo [OTP/Elixir]"
     strategy:
       fail-fast: false
