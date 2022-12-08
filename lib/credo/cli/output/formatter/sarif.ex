@@ -64,7 +64,8 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
 
     rule_and_issue = {
       %{
-        "id" => Credo.Code.Name.full(issue.check),
+        "id" => issue.check.id,
+        "name" => Credo.Code.Name.full(issue.check),
         "fullDescription" => %{
           "text" => issue.check.explanation |> String.replace("`", "'"),
           "markdown" => issue.check.explanation
@@ -77,7 +78,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
         "helpUri" => issue.check.docs_uri
       },
       %{
-        "ruleId" => Credo.Code.Name.full(issue.check),
+        "ruleId" => issue.check.id,
         "level" => sarif_level,
         "rank" => priority_to_sarif_rank(issue.priority),
         "message" => %{
@@ -113,6 +114,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
     rule_and_issue
     |> remove_nil_endcolumn(!column_end)
     |> remove_warning_level(sarif_level == :warning)
+    |> remove_redundant_name(issue.check.id == Credo.Code.Name.full(issue.check))
   end
 
   defp remove_nil_endcolumn(sarif, false), do: sarif
@@ -130,9 +132,15 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
   defp remove_warning_level(sarif, true) do
     {atom1, atom2} = sarif
 
-    {atom1,
-     pop_in(atom2, ["level"])
-     |> elem(1)}
+    {atom1, pop_in(atom2, ["level"]) |> elem(1)}
+  end
+
+  defp remove_redundant_name(sarif, false), do: sarif
+
+  defp remove_redundant_name(sarif, true) do
+    {atom1, atom2} = sarif
+
+    {pop_in(atom1, ["name"]) |> elem(1), atom2}
   end
 
   def sum_rules_and_results([head | tail], rules, results) do

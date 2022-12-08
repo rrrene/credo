@@ -124,7 +124,8 @@ defmodule Credo.SuggestTest do
     rules = get_in(sarif_map, ["runs", Access.at(0), "tool", "driver", "rules"])
     results = get_in(sarif_map, ["runs", Access.at(0), "results"])
 
-    assert List.first(rules)["id"] == "Credo.Check.Design.TagFIXME"
+    assert List.first(rules)["id"] == "EX2004"
+    assert List.first(rules)["name"] == "Credo.Check.Design.TagFIXME"
 
     assert List.first(rules)["helpUri"] ==
              "https://hexdocs.pm/credo/Credo.Check.Design.TagFIXME.html"
@@ -135,12 +136,12 @@ defmodule Credo.SuggestTest do
     first_result = List.first(results)
     assert first_result["level"] == "error"
     assert first_result["rank"] == 23
-    assert first_result["ruleId"] == "Credo.Check.Design.TagFIXME"
+    assert first_result["ruleId"] == "EX2004"
 
     second_result = Enum.at(results, 1)
     assert second_result["level"] == nil
     assert second_result["rank"] == 14
-    assert second_result["ruleId"] == "Credo.Check.Design.TagTODO"
+    assert second_result["ruleId"] == "EX2005"
   end
 
   test "it should report issues using suggest command on Credo itself with integration config file" do
