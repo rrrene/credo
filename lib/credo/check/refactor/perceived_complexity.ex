@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.PerceivedComplexity do
   use Credo.Check,
+    id: "EX4022",
     param_defaults: [max_complexity: 9],
     explanations: [
       check: """

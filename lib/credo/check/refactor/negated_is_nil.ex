@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.NegatedIsNil do
   use Credo.Check,
+    id: "EX4020",
     base_priority: :low,
     tags: [:controversial],
     explanations: [
@@ -63,9 +64,9 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
     {ast, [issue | issues]}
   end
 
-  defp traverse({:when, meta, [fun, {_ , _, [first_op | second_op]}]} = ast, issues, issue_meta) do
-        {_, first_op_issues} = traverse({:when, meta, [fun, first_op]}, issues, issue_meta)
-        {_, second_op_issues} = traverse({:when, meta, [fun, second_op]}, issues, issue_meta)
+  defp traverse({:when, meta, [fun, {_, _, [first_op | second_op]}]} = ast, issues, issue_meta) do
+    {_, first_op_issues} = traverse({:when, meta, [fun, first_op]}, issues, issue_meta)
+    {_, second_op_issues} = traverse({:when, meta, [fun, second_op]}, issues, issue_meta)
 
     {ast, first_op_issues ++ second_op_issues ++ issues}
   end

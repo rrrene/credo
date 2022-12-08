@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.MultiAlias do
   use Credo.Check,
+    id: "EX3011",
     base_priority: :low,
     tags: [:controversial],
     explanations: [

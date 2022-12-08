@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.ParameterPatternMatching do
   use Credo.Check,
+    id: "EX1004",
     run_on_all: true,
     base_priority: :high,
     param_defaults: [

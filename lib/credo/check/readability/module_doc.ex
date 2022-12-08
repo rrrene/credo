@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.ModuleDoc do
   use Credo.Check,
+    id: "EX3009",
     param_defaults: [
       ignore_names: [
         ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View)$/

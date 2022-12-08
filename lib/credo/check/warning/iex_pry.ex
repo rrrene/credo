@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.IExPry do
   use Credo.Check,
+    id: "EX5005",
     base_priority: :high,
     explanations: [
       check: """

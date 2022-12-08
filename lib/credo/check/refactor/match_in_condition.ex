@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.MatchInCondition do
   use Credo.Check,
+    id: "EX4016",
     param_defaults: [
       allow_tagged_tuples: false
     ],

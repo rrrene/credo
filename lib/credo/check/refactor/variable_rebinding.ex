@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.VariableRebinding do
   use Credo.Check,
+    id: "EX4028",
     tags: [:controversial],
     param_defaults: [allow_bang: false],
     explanations: [

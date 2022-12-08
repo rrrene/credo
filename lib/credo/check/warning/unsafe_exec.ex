@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnsafeExec do
   use Credo.Check,
+    id: "EX5015",
     base_priority: :high,
     category: :warning,
     explanations: [

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   use Credo.Check,
+    id: "EX3032",
     category: :warning,
     base_priority: :low,
     explanations: [

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.RedundantBlankLines do
   use Credo.Check,
+    id: "EX3019",
     base_priority: :low,
     tags: [:formatter],
     param_defaults: [max_blank_lines: 1],

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.SeparateAliasRequire do
   use Credo.Check,
+    id: "EX3021",
     base_priority: :low,
     explanations: [
       check: """

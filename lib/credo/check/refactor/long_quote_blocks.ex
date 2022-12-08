@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.LongQuoteBlocks do
   use Credo.Check,
+    id: "EX4012",
     base_priority: :high,
     param_defaults: [max_line_count: 150, ignore_comments: false],
     explanations: [

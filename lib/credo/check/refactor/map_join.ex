@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.MapJoin do
   use Credo.Check,
+    id: "EX4014",
     base_priority: :high,
     explanations: [
       check: """
@@ -16,7 +17,7 @@ defmodule Credo.Check.Refactor.MapJoin do
           Enum.map_join(["a", "b", "c"], ", ", &String.upcase/1)
 
       The reason for this is performance, because the two separate calls
-      to `Enum.map/2` and `Enum.join/2` require two iterations whereas 
+      to `Enum.map/2` and `Enum.join/2` require two iterations whereas
       `Enum.map_join/3` performs the same work in one pass.
       """
     ]

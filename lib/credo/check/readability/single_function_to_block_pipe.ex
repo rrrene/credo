@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
   use Credo.Check,
+    id: "EX3022",
     tags: [:controversial],
     explanations: [
       check: """

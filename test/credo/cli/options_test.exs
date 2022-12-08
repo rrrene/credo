@@ -149,6 +149,22 @@ defmodule Credo.CLI.OptionsTest do
     assert expand_path("") == options.path
   end
 
+  test "path: it should work w/ multiple files" do
+    args = String.split("foo.ex foo/bar.ex foo/baz.ex")
+    options = parse(args)
+    assert is_nil(options.command)
+    assert expand_path("") == options.path
+    assert ~w"foo.ex foo/bar.ex foo/baz.ex" != options.switches.files_included
+  end
+
+  test "path: it should work w/ double-dash and multiple files" do
+    args = String.split("--strict --version -- foo.ex foo/bar.ex foo/baz.ex")
+    options = parse(args)
+    assert is_nil(options.command)
+    assert expand_path("") == options.path
+    assert ~w"foo.ex foo/bar.ex foo/baz.ex" != options.switches.files_included
+  end
+
   test "path: it should work w/ glob" do
     args = String.split("src/**/*.ex --strict --version")
     options = parse(args)

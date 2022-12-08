@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
   use Credo.Check,
+    id: "EX5001",
     base_priority: :high,
     tags: [:controversial],
     category: :warning,

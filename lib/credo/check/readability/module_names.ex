@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.ModuleNames do
   use Credo.Check,
+    id: "EX3010",
     base_priority: :high,
     explanations: [
       check: """

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.WithSingleClause do
   use Credo.Check,
+    id: "EX3033",
     explanations: [
       check: ~S"""
       `with` statements are useful when you need to chain a sequence

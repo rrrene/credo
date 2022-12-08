@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.OperationOnSameValues do
   use Credo.Check,
+    id: "EX5011",
     base_priority: :high,
     explanations: [
       check: """

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.FilterReject do
   use Credo.Check,
+    id: "EX4009",
     tags: [:controversial],
     explanations: [
       check: """

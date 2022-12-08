@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.NestedFunctionCalls do
   use Credo.Check,
+    id: "EX3012",
     tags: [:controversial],
     param_defaults: [min_pipeline_length: 2],
     explanations: [

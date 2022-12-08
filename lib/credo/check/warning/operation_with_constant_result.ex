@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.OperationWithConstantResult do
   use Credo.Check,
+    id: "EX5012",
     base_priority: :high,
     explanations: [
       check: """

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnsafeToAtom do
   use Credo.Check,
+    id: "EX5016",
     base_priority: :high,
     category: :warning,
     tags: [:controversial],

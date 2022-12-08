@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.PredicateFunctionNames do
   use Credo.Check,
+    id: "EX3016",
     base_priority: :high,
     explanations: [
       check: """

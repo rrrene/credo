@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.UnnecessaryAliasExpansion do
   use Credo.Check,
+    id: "EX3030",
     base_priority: :low,
     explanations: [
       check: """

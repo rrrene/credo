@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.RejectReject do
   use Credo.Check,
+    id: "EX4026",
     explanations: [
       check: """
       One `Enum.reject/2` is more efficient than `Enum.reject/2 |> Enum.reject/2`.

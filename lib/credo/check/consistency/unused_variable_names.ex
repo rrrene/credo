@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.UnusedVariableNames do
   use Credo.Check,
+    id: "EX1008",
     run_on_all: true,
     base_priority: :high,
     param_defaults: [

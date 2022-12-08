@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedEnumOperation do
   use Credo.Check,
+    id: "EX5017",
     base_priority: :high,
     explanations: [
       check: """

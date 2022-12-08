@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   use Credo.Check,
+    id: "EX4019",
     base_priority: :high,
     explanations: [
       check: """

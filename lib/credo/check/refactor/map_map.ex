@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.MapMap do
   use Credo.Check,
+    id: "EX4015",
     explanations: [
       check: """
       One `Enum.map/2` is more efficient than `Enum.map/2 |> Enum.map/2`.

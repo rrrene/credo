@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedListOperation do
   use Credo.Check,
+    id: "EX5020",
     base_priority: :high,
     explanations: [
       check: """

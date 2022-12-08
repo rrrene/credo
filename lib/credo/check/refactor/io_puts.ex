@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.IoPuts do
   use Credo.Check,
+    id: "EX4011",
     tags: [:controversial],
     explanations: [
       check: """

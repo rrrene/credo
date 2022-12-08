@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
   use Credo.Check,
+    id: "EX3014",
     base_priority: :low,
     param_defaults: [parens: false],
     explanations: [

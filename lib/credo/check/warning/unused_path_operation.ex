@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedPathOperation do
   use Credo.Check,
+    id: "EX5021",
     base_priority: :high,
     explanations: [
       check: """

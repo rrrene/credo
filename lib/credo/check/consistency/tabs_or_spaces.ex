@@ -1,5 +1,6 @@
 defmodule Credo.Check.Consistency.TabsOrSpaces do
   use Credo.Check,
+    id: "EX1007",
     run_on_all: true,
     base_priority: :high,
     tags: [:formatter],

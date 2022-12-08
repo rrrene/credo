@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.SpecWithStruct do
   use Credo.Check,
+    id: "EX5014",
     base_priority: :normal,
     category: :warning,
     explanations: [

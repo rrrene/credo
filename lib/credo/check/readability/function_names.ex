@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.FunctionNames do
   use Credo.Check,
+    id: "EX3004",
     base_priority: :high,
     param_defaults: [
       allow_acronyms: false

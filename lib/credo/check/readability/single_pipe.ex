@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.SinglePipe do
   use Credo.Check,
+    id: "EX3023",
     base_priority: :high,
     tags: [:controversial],
     param_defaults: [allow_0_arity_functions: false],

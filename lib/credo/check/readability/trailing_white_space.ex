@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.TrailingWhiteSpace do
   use Credo.Check,
+    id: "EX3029",
     base_priority: :low,
     tags: [:formatter],
     param_defaults: [

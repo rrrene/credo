@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.Specs do
   use Credo.Check,
+    id: "EX3025",
     tags: [:controversial],
     param_defaults: [
       include_defp: false

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.FunctionArity do
   use Credo.Check,
+    id: "EX4010",
     param_defaults: [max_arity: 8, ignore_defp: false],
     explanations: [
       check: """

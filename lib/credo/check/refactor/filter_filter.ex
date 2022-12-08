@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.FilterFilter do
   use Credo.Check,
+    id: "EX4008",
     explanations: [
       check: """
       One `Enum.filter/2` is more efficient than `Enum.filter/2 |> Enum.filter/2`.

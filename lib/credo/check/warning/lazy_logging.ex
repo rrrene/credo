@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.LazyLogging do
   use Credo.Check,
+    id: "EX5007",
     base_priority: :high,
     elixir_version: "< 1.7.0",
     param_defaults: [

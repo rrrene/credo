@@ -1,5 +1,6 @@
 defmodule Credo.Check.Design.TagFIXME do
   use Credo.Check,
+    id: "EX2004",
     base_priority: :high,
     param_defaults: [include_doc: true],
     explanations: [

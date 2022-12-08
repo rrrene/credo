@@ -1,5 +1,6 @@
 defmodule Credo.Check.Refactor.ABCSize do
   use Credo.Check,
+    id: "EX4001",
     tags: [:controversial],
     param_defaults: [
       max_size: 30,

@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.UnusedFileOperation do
   use Credo.Check,
+    id: "EX5018",
     base_priority: :high,
     explanations: [
       check: """
