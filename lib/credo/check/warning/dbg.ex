@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.Dbg do
   use Credo.Check,
+    id: "EX5026",
     base_priority: :high,
     elixir_version: ">= 1.14.0-dev",
     explanations: [
