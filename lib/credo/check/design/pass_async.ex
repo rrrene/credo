@@ -70,9 +70,17 @@ defmodule Credo.Check.Design.PassAsync do
   end
 
   defp to_code(ast) do
-    ast
-    |> Code.quoted_to_algebra()
-    |> Inspect.Algebra.format(:infinity)
-    |> IO.iodata_to_binary()
+    if has_quoted_to_algebra?() do
+      ast
+      |> Code.quoted_to_algebra()
+      |> Inspect.Algebra.format(:infinity)
+      |> IO.iodata_to_binary()
+    else
+      ast
+    end
+  end
+
+  defp has_quoted_to_algebra? do
+    function_exported?(Code, :quoted_to_algebra, 1)
   end
 end

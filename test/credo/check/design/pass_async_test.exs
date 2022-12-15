@@ -48,8 +48,10 @@ defmodule Credo.Check.Design.PassAsyncTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 2
-        assert issue.column == 3
-        assert issue.trigger == "use #{@case_name}, bite_strength: :xtreme"
+        if has_quoted_to_algebra?() do
+          assert issue.column == 3
+          assert issue.trigger == "use #{@case_name}, bite_strength: :xtreme"
+        end
       end)
     end
 
@@ -64,9 +66,15 @@ defmodule Credo.Check.Design.PassAsyncTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 3
-        assert issue.column == 3
-        assert issue.trigger == "use #{@case_name}"
+        if has_quoted_to_algebra?() do
+          assert issue.column == 3
+          assert issue.trigger == "use #{@case_name}"
+        end
       end)
     end
+  end
+
+  def has_quoted_to_algebra? do
+    function_exported?(Code, :quoted_to_algebra, 1)
   end
 end
