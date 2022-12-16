@@ -94,7 +94,22 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> refute_issues()
   end
 
-  test "it should NOT two nested functions calls when the inner function call takes no arguments" do
+  test "it should NOT report nested function calls when the outer function is already in a pipeline" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        [1,2,3,4]
+        |> Test.test()
+        |> Enum.map(SomeMod.some_fun(argument))
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
+  test "it should NOT report two nested functions calls when the inner function call takes no arguments" do
     """
     defmodule CredoSampleModule do
       def some_code do
@@ -157,5 +172,22 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> to_source_file()
     |> run_check(NestedFunctionCalls, min_pipeline_length: 3)
     |> refute_issues()
+  end
+
+  test "it should report nested function calls inside a pipeline when the inner function calls could be a pipeline of their own" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        [1,2,3,4]
+        |> Test.test()
+        |> Enum.map(fn(item) ->
+          SomeMod.some_fun(another_fun(item))
+        end)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls)
+    |> assert_issue()
   end
 end
