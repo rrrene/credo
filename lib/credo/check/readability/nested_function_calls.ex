@@ -33,6 +33,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
       ]
     ]
 
+  alias Credo.Check.PipeHelpers
   alias Credo.Code.Name
 
   @doc false
@@ -42,54 +43,53 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
 
     min_pipeline_length = Params.get(params, :min_pipeline_length, __MODULE__)
 
-    {_continue, issues} =
+    {_min_pipeline_length, issues} =
       Credo.Code.prewalk(
         source_file,
-        &traverse(&1, &2, issue_meta, min_pipeline_length),
-        {true, []}
+        &traverse(&1, &2, issue_meta),
+        {min_pipeline_length, []}
       )
 
     issues
   end
 
-  # A call with no arguments
-  defp traverse({{:., _loc, _call}, _meta, []} = ast, {_, issues}, _, min_pipeline_length) do
-    {ast, {min_pipeline_length, issues}}
+  # A call in a pipeline
+  defp traverse({:|>, _meta, [pipe_input, {{:., _meta2, _fun}, _meta3, args}]}, accumulator, _issue_meta) do
+    {[pipe_input, args], accumulator}
   end
 
-  # A call with arguments
+  # A fully qualified call with no arguments
+  defp traverse({{:., _meta, _call}, _meta2, []} = ast, accumulator, _issue_meta) do
+    {ast, accumulator}
+  end
+
+  # Any call
   defp traverse(
-         {{:., _loc, call}, meta, args} = ast,
-         {_, issues},
-         issue_meta,
-         min_pipeline_length
+         {{_name, _loc, call}, meta, args} = ast,
+         {min_pipeline_length, issues} = acc,
+         issue_meta
        ) do
     if valid_chain_start?(ast) do
-      {ast, {min_pipeline_length, issues}}
+      {ast, acc}
     else
       case length_as_pipeline(args) + 1 do
         potential_pipeline_length when potential_pipeline_length >= min_pipeline_length ->
-          {ast,
-           {min_pipeline_length, issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]}}
+          new_issues = issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]
+          {ast, {min_pipeline_length, new_issues}}
 
         _ ->
-          {ast, {min_pipeline_length, issues}}
+          {nil, acc}
       end
     end
   end
 
-  # Another expression
-  defp traverse(ast, {_, issues}, _issue_meta, min_pipeline_length) do
+  # Another expression, we must no longer be in a pipeline
+  defp traverse(ast, {min_pipeline_length, issues}, _issue_meta) do
     {ast, {min_pipeline_length, issues}}
   end
 
-  # Call with no arguments
-  defp length_as_pipeline([{{:., _loc, _call}, _meta, []} | _]) do
-    0
-  end
-
   # Call with function call for first argument
-  defp length_as_pipeline([{{:., _loc, _call}, _meta, args} = call_ast | _]) do
+  defp length_as_pipeline([{_name, _meta, args} = call_ast | _]) do
     if valid_chain_start?(call_ast) do
       0
     else
@@ -111,15 +111,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
     )
   end
 
-  # Taken from the Credo.Check.Refactor.PipeChainStart module, with modifications
-  # map[:access]
-  defp valid_chain_start?({{:., _, [Access, :get]}, _, _}), do: true
-
-  # Module.function_call()
-  defp valid_chain_start?({{:., _, _}, _, []}), do: true
-
-  # Kernel.to_string is invoked for string interpolation e.g. "string #{variable}"
-  defp valid_chain_start?({{:., _, [Kernel, :to_string]}, _, _}), do: true
-
-  defp valid_chain_start?(_), do: false
+  defp valid_chain_start?(ast) do
+    PipeHelpers.valid_chain_start?(ast, [], [])
+  end
 end
