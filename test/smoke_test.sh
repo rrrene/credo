@@ -10,6 +10,7 @@ mix credo --mute-exit-status
 mix credo --strict --mute-exit-status
 mix credo --strict --enable-disabled-checks . --mute-exit-status
 mix credo --debug --mute-exit-status
+mix credo --strict --format=sarif
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
 mix credo diff HEAD^ --mute-exit-status
@@ -27,7 +28,7 @@ mix credo explain Credo.Check.Refactor.Nesting --mute-exit-status --format=json
 mix credo.gen.check $GENEREATE_CREDO_CHECK
 rm $GENEREATE_CREDO_CHECK
 
-mix credo.gen.config
+mix credo.gen.config || true
 
 mix credo categories
 mix credo categories --format=json
