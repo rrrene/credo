@@ -124,24 +124,24 @@ defmodule Credo.SuggestTest do
     rules = get_in(sarif_map, ["runs", Access.at(0), "tool", "driver", "rules"])
     results = get_in(sarif_map, ["runs", Access.at(0), "results"])
 
-    assert List.first(rules)["id"] == "EX2004"
-    assert List.first(rules)["name"] == "Credo.Check.Design.TagFIXME"
+    assert List.first(rules)["id"] == "EX3009"
+    assert List.first(rules)["name"] == "Credo.Check.Readability.ModuleDoc"
 
     assert List.first(rules)["helpUri"] ==
-             "https://hexdocs.pm/credo/Credo.Check.Design.TagFIXME.html"
+             "https://hexdocs.pm/credo/Credo.Check.Readability.ModuleDoc.html"
 
     assert length(rules) == 3
     assert length(results) == 5
 
     first_result = List.first(results)
-    assert first_result["level"] == "error"
-    assert first_result["rank"] == 23
-    assert first_result["ruleId"] == "EX2004"
+    assert first_result["level"] == nil
+    assert first_result["rank"] == 13
+    assert first_result["ruleId"] == "EX3009"
 
-    second_result = Enum.at(results, 1)
-    assert second_result["level"] == nil
-    assert second_result["rank"] == 14
-    assert second_result["ruleId"] == "EX2005"
+    last_result = Enum.at(results, 4)
+    assert last_result["level"] == "error"
+    assert last_result["rank"] == 23
+    assert last_result["ruleId"] == "EX2004"
   end
 
   test "it should report issues using suggest command on Credo itself with integration config file" do

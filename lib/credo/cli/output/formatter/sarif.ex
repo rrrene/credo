@@ -3,28 +3,95 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
 
   alias Credo.Issue
 
+  # we use this key and Jason's key ordering to ensure that the "version"
+  # is right below the "schema" key in the JSON output
+  @version_placeholder_json_key "$schema__this_key_goes_to_line2__version"
+
+  def print_issues(issues, exec) do
+    issue_list =
+      Enum.map(issues, fn issue ->
+        issue_to_sarif(issue, exec)
+      end)
+
+    {final_rules, final_results} = sum_rules_and_results(issue_list, [], [])
+
+    %{
+      "$schema" => "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+      @version_placeholder_json_key => "2.1.0",
+      "runs" => [
+        %{
+          "tool" => %{
+            "driver" => %{
+              "name" => "Credo",
+              "informationUri" => "http://credo-ci.org/",
+              "version" => "#{Credo.version()}",
+              "rules" => final_rules
+            }
+          },
+          "results" => final_results,
+          "originalUriBaseIds" => %{
+            "ROOTPATH" => %{
+              "uri" => to_file_uri(exec.cli_options.path)
+            }
+          },
+          "columnKind" => "utf16CodeUnits"
+        }
+      ]
+    }
+    |> print_map()
+  end
+
+  def print_map(map) do
+    map
+    |> prepare_for_json()
+    |> Jason.encode!(pretty: true)
+    |> move_version_to_top()
+    |> IO.puts()
+  end
+
+  defp prepare_for_json(term)
+       when is_atom(term) or is_number(term) or is_binary(term) do
+    term
+  end
+
+  defp prepare_for_json(term) when is_list(term), do: Enum.map(term, &prepare_for_json/1)
+
+  defp prepare_for_json(%Regex{} = regex), do: inspect(regex)
+
+  defp prepare_for_json(%{} = term) do
+    Enum.into(term, %{}, fn {key, value} ->
+      {prepare_key_for_json(key), prepare_for_json(value)}
+    end)
+  end
+
+  defp prepare_for_json(term) when is_tuple(term) do
+    term
+    |> Tuple.to_list()
+    |> prepare_for_json()
+  end
+
+  defp prepare_for_json(term) do
+    inspect(term)
+  end
+
+  defp prepare_key_for_json(key) when is_atom(key) or is_binary(key) or is_number(key) do
+    key
+  end
+
+  defp prepare_key_for_json(key) do
+    inspect(key)
+  end
+
+  defp move_version_to_top(sarif) do
+    String.replace(sarif, ~s("#{@version_placeholder_json_key}": "), ~s("version": "))
+  end
+
   defp to_file_uri(path) do
     "file:///" <>
       (path
        |> String.replace("\\", "/")
        |> String.replace_leading("/", "")
        |> String.replace_trailing("/", "")) <> "/"
-  end
-
-  defp move_version_to_top(sarif) do
-    lines = String.split(sarif, ~r{(\r\n|\r|\n)})
-    version_line = Enum.at(lines, -2) <> ","
-    line_number = length(lines) - 2
-    line_before_version_line = String.trim_trailing(Enum.at(lines, -3), ",")
-
-    lines
-    |> List.delete_at(-2)
-    |> List.insert_at(2, version_line)
-    |> Enum.with_index()
-    |> Enum.map_join("\n", fn
-      {_, ^line_number} -> line_before_version_line
-      {value, _} -> value
-    end)
   end
 
   defp priority_to_sarif_level(priority) when is_number(priority) do
@@ -143,7 +210,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
     {pop_in(atom1, ["name"]) |> elem(1), atom2}
   end
 
-  def sum_rules_and_results([head | tail], rules, results) do
+  defp sum_rules_and_results([head | tail], rules, results) do
     {current_rule, current_result} = head
     existing_rule = Enum.find_index(rules, fn x -> x["id"] == current_rule["id"] end)
 
@@ -153,90 +220,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
     end
   end
 
-  def sum_rules_and_results([], rules, results) do
+  defp sum_rules_and_results([], rules, results) do
     {rules, results}
-  end
-
-  def print_issues(issues, exec) do
-    issue_list =
-      Enum.map(issues, fn issue ->
-        issue_to_sarif(issue, exec)
-      end)
-
-    {final_rules, final_results} = sum_rules_and_results(issue_list, [], [])
-
-    sarif = %{
-      "$schema" => "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
-      "version" => "2.1.0",
-      "runs" => [
-        %{
-          "tool" => %{
-            "driver" => %{
-              "name" => "Credo",
-              "informationUri" => "http://credo-ci.org/",
-              "version" => "#{Credo.version()}",
-              "rules" => []
-            }
-          },
-          "results" => [],
-          "originalUriBaseIds" => %{
-            "ROOTPATH" => %{
-              "uri" => "file:///"
-            }
-          },
-          "columnKind" => "utf16CodeUnits"
-        }
-      ]
-    }
-
-    sarif
-    |> put_in(["runs", Access.at(0), "tool", "driver", "rules"], final_rules)
-    |> put_in(["runs", Access.at(0), "results"], final_results)
-    |> put_in(
-      ["runs", Access.at(0), "originalUriBaseIds", "ROOTPATH", "uri"],
-      to_file_uri(exec.cli_options.path)
-    )
-    |> print_map()
-  end
-
-  def print_map(map) do
-    map
-    |> prepare_for_json()
-    |> Jason.encode!(pretty: true)
-    |> move_version_to_top()
-    |> IO.puts()
-  end
-
-  defp prepare_for_json(term)
-       when is_atom(term) or is_number(term) or is_binary(term) do
-    term
-  end
-
-  defp prepare_for_json(term) when is_list(term), do: Enum.map(term, &prepare_for_json/1)
-
-  defp prepare_for_json(%Regex{} = regex), do: inspect(regex)
-
-  defp prepare_for_json(%{} = term) do
-    Enum.into(term, %{}, fn {key, value} ->
-      {prepare_key_for_json(key), prepare_for_json(value)}
-    end)
-  end
-
-  defp prepare_for_json(term) when is_tuple(term) do
-    term
-    |> Tuple.to_list()
-    |> prepare_for_json()
-  end
-
-  defp prepare_for_json(term) do
-    inspect(term)
-  end
-
-  defp prepare_key_for_json(key) when is_atom(key) or is_binary(key) or is_number(key) do
-    key
-  end
-
-  defp prepare_key_for_json(key) do
-    inspect(key)
   end
 end

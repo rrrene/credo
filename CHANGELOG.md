@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0
+
+- Add SARIF support
+- Add `id/0` to checks
+- Ensure stable ordering of analysis results
+
 ## 1.6.7
 
 - Improve compatibility with Elixir 1.14 (based on v1.14.0-rc.1)
