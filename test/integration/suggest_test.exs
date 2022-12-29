@@ -119,15 +119,20 @@ defmodule Credo.SuggestTest do
     sarif_map = Jason.decode!(sarif)
 
     assert sarif_map["version"] == "2.1.0"
-    assert List.first(sarif_map["runs"])["tool"]["driver"]["name"] == "Credo"
 
-    rules = get_in(sarif_map, ["runs", Access.at(0), "tool", "driver", "rules"])
-    results = get_in(sarif_map, ["runs", Access.at(0), "results"])
+    first_run = List.first(sarif_map["runs"])
 
-    assert List.first(rules)["id"] == "EX3009"
-    assert List.first(rules)["name"] == "Credo.Check.Readability.ModuleDoc"
+    assert first_run["tool"]["driver"]["name"] == "Credo"
 
-    assert List.first(rules)["helpUri"] ==
+    rules = first_run["tool"]["driver"]["rules"]
+    results = first_run["results"]
+
+    first_rule = List.first(rules)
+
+    assert first_rule["id"] == "EX3009"
+    assert first_rule["name"] == "Credo.Check.Readability.ModuleDoc"
+
+    assert first_rule["helpUri"] ==
              "https://hexdocs.pm/credo/Credo.Check.Readability.ModuleDoc.html"
 
     assert length(rules) == 3
