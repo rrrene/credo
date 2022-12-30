@@ -30,11 +30,35 @@ defmodule Credo.Check.Refactor.Apply do
   end
 
   defp traverse(ast, issues, issue_meta) do
+    if match?({:|>, _, _}, ast) do
+      IO.inspect(ast, label: :ast)
+    end
+
+    if match?({:apply, _, _}, ast) do
+      IO.inspect(ast, label: :apply)
+    end
+
     case issue(ast, issue_meta) do
-      nil -> {ast, issues}
-      issue -> {ast, [issue | issues]}
+      :stop ->
+        {[], issues}
+
+      nil ->
+        {ast, issues}
+
+      issue ->
+        {ast, [issue | issues]}
     end
   end
+
+  defp issue(
+         {:|>, meta,
+          [
+            {_, _, _} = arg0,
+            {:apply, _, apply_args}
+          ]},
+         issue_meta
+       ),
+       do: issue({:apply, meta, [arg0 | apply_args]}, issue_meta) || :stop
 
   defp issue({:apply, _meta, [{:__MODULE__, _, _}, _fun, _args]}, _issue_meta), do: nil
 

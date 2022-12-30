@@ -107,6 +107,46 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation for piped apply/3 when fun is a var" do
+    """
+    defmodule Test do
+      def some_function(module, fun, arg1, arg2) do
+        module
+        |> apply(fun1, [arg1, arg2])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should report violation for apply/2 in a pipe" do
+    """
+    defmodule Test do
+      def some_function(fun, arg1, arg2) do
+        fun2 |> apply([arg1, arg2])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation for apply/3 in a pipe" do
+    """
+    defmodule Test do
+      def some_function(module, arg1, arg2) do
+        module |> apply(:fun_name3, [arg1, arg2])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should NOT report violation for apply/3 when fun is a function" do
     ~S"""
     defmodule Test do
