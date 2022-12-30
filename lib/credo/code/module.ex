@@ -378,6 +378,11 @@ defmodule Credo.Code.Module do
        when clause in ~w/use import alias require defstruct/a and is_list(args),
        do: add_module_element(state, clause, meta)
 
+  defp analyze(state, {clause, meta, [{:when, _, [fun | _rest]}, body]})
+       when clause in ~w/def defmacro defguard defp defmacrop defguardp/a do
+    analyze(state, {clause, meta, [fun, body]})
+  end
+
   defp analyze(state, {clause, meta, definition})
        when clause in ~w/def defmacro defguard defp defmacrop defguardp/a do
     fun_name = fun_name(definition)

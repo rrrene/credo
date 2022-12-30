@@ -526,12 +526,19 @@ defmodule Credo.Code.ModuleTest do
 
              defp d(1), do: true
              defp d(2), do: false
+
+             @impl true
+             def e(x) when is_binary(x), do: true
+             def e(nil), do: false
+             def e(x) when is_integer(x) and x > 10, do: true
+             def e(1), do: true
              """) == [
                {Test,
                 public_fun: [line: 2, column: 3],
                 callback_fun: [line: 6, column: 3],
                 private_fun: [line: 10, column: 3],
-                private_fun: [line: 13, column: 3]}
+                private_fun: [line: 13, column: 3],
+                callback_fun: [line: 17, column: 3]}
              ]
     end
 
