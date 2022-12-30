@@ -10,7 +10,7 @@ mix credo --mute-exit-status
 mix credo --strict --mute-exit-status
 mix credo --strict --enable-disabled-checks . --mute-exit-status
 mix credo --debug --mute-exit-status
-mix credo --strict --format=sarif
+mix credo --strict --format=sarif --mute-exit-status
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
 mix credo diff HEAD^ --mute-exit-status
