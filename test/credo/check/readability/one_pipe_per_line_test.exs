@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.PipePerLineTest do
+defmodule Credo.Check.Readability.OnePipePerLineTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Readability.PipePerLine
+  @described_check Credo.Check.Readability.OnePipePerLine
 
   test "it should NOT report the expected code" do
     """
