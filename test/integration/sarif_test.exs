@@ -46,8 +46,8 @@ defmodule Credo.SarifTest do
     assert first_rule["helpUri"] ==
              "https://hexdocs.pm/credo/Credo.Check.Design.TagFIXME.html"
 
-    assert length(rules) == 5
-    assert length(results) == 7
+    assert length(rules) == 4
+    assert length(results) == 6
 
     first_result = List.first(results)
     assert first_result["level"] == "error"
