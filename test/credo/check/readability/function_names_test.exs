@@ -85,6 +85,14 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     def left ++ right do
       # ++ code
     end
+
+    def left +++ right do
+      # ++ code
+    end
+
+    def left --- right do
+      # ++ code
+    end
     """
     |> to_source_file
     |> run_check(@described_check)
