@@ -13,7 +13,27 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
         issue_to_sarif(issue, exec)
       end)
 
-    {final_rules, final_results} = sum_rules_and_results(issue_list, [], [])
+    {_, final_results} = sum_rules_and_results(issue_list, [], [])
+
+    final_rules =
+      issues
+      |> Enum.uniq_by(& &1.check.id)
+      |> Enum.map(fn issue ->
+        %{
+          "id" => issue.check.id,
+          "name" => Credo.Code.Name.full(issue.check),
+          "fullDescription" => %{
+            "text" => issue.check.explanation |> String.replace("`", "'"),
+            "markdown" => issue.check.explanation
+          },
+          "properties" => %{
+            "tags" => [
+              issue.category
+            ]
+          },
+          "helpUri" => issue.check.docs_uri
+        }
+      end)
 
     %{
       "$schema" => "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
@@ -161,7 +181,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
               },
               "region" => %{
                 "startLine" => issue.line_no,
-                "startColumn" => if(issue.column, do: issue.column, else: 1),
+                "startColumn" => issue.column || 1,
                 "endColumn" => column_end,
                 "snippet" => %{
                   "text" => issue.trigger
