@@ -2,9 +2,82 @@
 
 ## 1.7.0
 
-- Add SARIF support
-- Add `id/0` to checks
-- Ensure stable ordering of analysis results
+- `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
+- `Credo.Check.Readability.FunctionNames` now ignores custom operators
+- `Credo.Check.Readability.ModuleNames` now supports an `:ignore` parameter
+- Fixed a false positive in `Credo.Check.Refactor.Apply` in pipes
+
+### Add SARIF support
+
+Credo 1.7 provides a formatter that will output data in [SARIF](http://sarifweb.azurewebsites.net) format, allowing [direct GitHub support](https://help.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/uploading-a-sarif-file-to-github) via the `Security` tab.
+
+You can now use `mix credo --format=sarif` to output results in SARIF format.
+
+### Add IDs to checks
+
+This was requested for SARIF support and has been added to provide a unique identifier for checks that is more technical than the check name.
+
+Check authors can add IDs to their custom checks by using the `:id` option:
+
+    defmodule MyCheck do
+      use Credo.Check,
+        id: "EX5042",
+        category: :warning,
+        # ...
+    end
+
+Credo's naming scheme for these IDs is simple:
+
+```
+EX5042
+^^
+```
+
+`EX` stands for Elixir.
+
+```
+EX5042
+  ^
+```
+
+The first digit represents the category.
+
+```
+EX5042
+   ^
+```
+
+The second digit is always `0` for Credo's standard checks (see below).
+
+```
+EX5042
+    ^^
+```
+
+The last two digits are the incremental number of the check.
+
+This means that you can extend Credo with
+
+* up to 99 categories,
+* up to 999 checks per category or
+* use the second digit for something completely different
+
+all while adhering to Credo's own scheme (and of course, you can simply invent a completely different naming scheme for your checks).
+
+### Ensure stable ordering of analysis results
+
+Continuing our quest to remove ambiguity and reduce undocumented behaviour, Credo now orders its results by default.
+
+Credo's results always had one caveat: Their order was determined by the runtime behaviour of the checks and workers running the checks (it was up to the output mechanism to provide its own stable order).
+
+Now, results are always sorted by check ID, filename and line number.
+
+### New checks
+
+- `Credo.Check.Readability.OneArityFunctionInPipe`
+- `Credo.Check.Readability.OnePipePerLine`
+- `Credo.Check.Refactor.FilterCount`
+- `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig`
 
 ## 1.6.7
 
