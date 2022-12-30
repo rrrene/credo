@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.PipePerLine do
   use Credo.Check,
+    id: "EX3035",
     category: :readability,
     explanations: [
       check: """
