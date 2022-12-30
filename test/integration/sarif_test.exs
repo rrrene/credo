@@ -40,21 +40,21 @@ defmodule Credo.SarifTest do
 
     first_rule = List.first(rules)
 
-    assert first_rule["id"] == "EX3009"
-    assert first_rule["name"] == "Credo.Check.Readability.ModuleDoc"
+    assert first_rule["id"] == "EX2004"
+    assert first_rule["name"] == "Credo.Check.Design.TagFIXME"
 
     assert first_rule["helpUri"] ==
-             "https://hexdocs.pm/credo/Credo.Check.Readability.ModuleDoc.html"
+             "https://hexdocs.pm/credo/Credo.Check.Design.TagFIXME.html"
 
-    assert length(rules) == 3
-    assert length(results) == 5
+    assert length(rules) == 5
+    assert length(results) == 7
 
     first_result = List.first(results)
-    assert first_result["level"] == nil
-    assert first_result["rank"] == 13
-    assert first_result["ruleId"] == "EX3009"
+    assert first_result["level"] == "error"
+    assert first_result["rank"] == 24
+    assert first_result["ruleId"] == "EX4030"
 
-    last_result = Enum.at(results, 4)
+    last_result = Enum.at(results, Enum.count(results) - 1)
     assert last_result["level"] == "error"
     assert last_result["rank"] == 23
     assert last_result["ruleId"] == "EX2004"
