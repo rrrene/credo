@@ -64,11 +64,14 @@ defmodule Credo.Check.Readability.ModuleNames do
   end
 
   defp issues_for_name(name, meta, issues, issue_meta, ignored_patterns) do
-    module_name =
-      name
-      |> to_string
+    module_name = Name.full(name)
 
-    if Name.pascal_case?(module_name) or ignored_module?(ignored_patterns, module_name) do
+    pascal_case? =
+      module_name
+      |> String.split(".")
+      |> Enum.all?(&Name.pascal_case?/1)
+
+    if pascal_case? or ignored_module?(ignored_patterns, module_name) do
       issues
     else
       [issue_for(issue_meta, meta[:line], name) | issues]

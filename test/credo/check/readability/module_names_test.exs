@@ -11,6 +11,9 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     """
     defmodule CredoSampleModule do
     end
+
+    defmodule Credo.AnotherModule.SampleModule do
+    end
     """
     |> to_source_file
     |> run_check(@described_check)
