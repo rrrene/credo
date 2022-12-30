@@ -3,6 +3,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   Check to avoid ignoring Logger metadata in your logger config
   """
   use Credo.Check,
+    id: "EX5027",
     base_priority: :high,
     category: :warning,
     param_defaults: [
