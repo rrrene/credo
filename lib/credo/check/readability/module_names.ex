@@ -26,7 +26,8 @@ defmodule Credo.Check.Readability.ModuleNames do
       it easier to follow.
       """,
       params: [
-        ignore: "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
+        ignore:
+          "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
       ]
     ]
 
@@ -89,6 +90,10 @@ defmodule Credo.Check.Readability.ModuleNames do
     Enum.any?(ignored_patterns, fn
       %Regex{} = pattern ->
         String.match?(module_name, pattern)
+
+      name when is_atom(name) ->
+        module_name == Credo.Code.Name.full(name)
+
       name ->
         module_name == name
     end)

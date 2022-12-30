@@ -82,13 +82,23 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on long segmented module" do
+  test "it should not raise on multiple ignored segment patterns for binary" do
     """
     defmodule Credo.Another_Module.Sample_Module do
     end
     """
     |> to_source_file
     |> run_check(@described_check, ignore: ["Credo.Another_Module.Sample_Module"])
+    |> refute_issues()
+  end
+
+  test "it should not raise on multiple ignored segment patterns for atom" do
+    """
+    defmodule Credo.Another_Module.Sample_Module do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: [Credo.Another_Module.Sample_Module])
     |> refute_issues()
   end
 
