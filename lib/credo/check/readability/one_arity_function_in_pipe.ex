@@ -1,5 +1,6 @@
 defmodule Credo.Check.Readability.OneArityFunctionInPipe do
   use Credo.Check,
+    id: "EX3034",
     base_priority: :low,
     explanations: [
       check: """
