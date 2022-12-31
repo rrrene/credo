@@ -77,6 +77,7 @@ Now, results are always sorted by check ID, filename and line number.
 - `Credo.Check.Readability.OneArityFunctionInPipe`
 - `Credo.Check.Readability.OnePipePerLine`
 - `Credo.Check.Refactor.FilterCount`
+- `Credo.Check.Refactor.PassAsyncInTestCases`
 - `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig`
 
 ## 1.6.7
