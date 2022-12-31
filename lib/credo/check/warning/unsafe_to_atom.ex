@@ -48,6 +48,20 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     {nil, issues}
   end
 
+  defp traverse(
+         {:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast,
+         issues,
+         issue_meta
+       ) do
+    case get_forbidden_pipe(call, args) do
+      {bad, suggestion} ->
+        {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
+
+      nil ->
+        {ast, issues}
+    end
+  end
+
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       {bad, suggestion} ->
@@ -98,6 +112,30 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   end
 
   defp get_forbidden_call(_, _) do
+    nil
+  end
+
+  defp get_forbidden_pipe([:erlang, :list_to_atom], []) do
+    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([:erlang, :binary_to_atom], [_]) do
+    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:String]}, :to_atom], []) do
+    {"String.to_atom/1", "String.to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:List]}, :to_atom], []) do
+    {"List.to_atom/1", "List.to_existing_atom/1"}
+  end
+
+  defp get_forbidden_pipe([{:__aliases__, _, [:Module]}, :concat], []) do
+    {"Module.concat/1", "Module.safe_concat/1"}
+  end
+
+  defp get_forbidden_pipe(_, _) do
     nil
   end
 
