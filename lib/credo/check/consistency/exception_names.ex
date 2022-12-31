@@ -37,7 +37,7 @@ defmodule Credo.Check.Consistency.ExceptionNames do
   @doc false
   @impl true
   def run_on_all_source_files(exec, source_files, params) do
-    @collector.find_and_append_issues(source_files, exec, params, &issues_for/3)
+    @collector.find_and_append_issues(source_files, exec, params, &issues_for/3, true)
   end
 
   defp issues_for(expected, source_file, params) do

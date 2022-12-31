@@ -75,7 +75,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     |> refute_issues()
   end
 
-  test "it should report a violation for different naming schemes" do
+  test "it should NOT report a violation for different naming schemes for 1:1 situations" do
     [
       """
       defmodule Credo.Sample do
@@ -92,10 +92,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "UndefinedResponse" == issue.trigger
-      assert 1 == issue.line_no
-    end)
+    |> refute_issues()
   end
 
   test "it should report a violation for different naming schemes (suffixes)" do

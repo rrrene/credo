@@ -121,12 +121,24 @@ defmodule Credo.Check.Consistency.Collector do
               [SourceFile.t()],
               Execution.t(),
               Keyword.t(),
-              Collector.issue_formatter()
+              Collector.issue_formatter(),
+              boolean()
             ) :: atom
-      def find_and_append_issues(source_files, exec, params, issue_formatter)
+      def find_and_append_issues(
+            source_files,
+            exec,
+            params,
+            issue_formatter,
+            supress_issues_for_single_match? \\ false
+          )
           when is_list(source_files) and is_function(issue_formatter) do
         source_files
-        |> Collector.find_issues(__MODULE__, params, issue_formatter)
+        |> Collector.find_issues(
+          __MODULE__,
+          params,
+          issue_formatter,
+          supress_issues_for_single_match?
+        )
         |> Enum.each(&Collector.append_issue_via_issue_service(&1, exec))
 
         :ok
@@ -134,7 +146,13 @@ defmodule Credo.Check.Consistency.Collector do
     end
   end
 
-  def find_issues(source_files, collector, params, issue_formatter) do
+  def find_issues(
+        source_files,
+        collector,
+        params,
+        issue_formatter,
+        supress_issues_for_single_match?
+      ) do
     frequencies_per_source_file =
       source_files
       |> Enum.map(&Task.async(fn -> {&1, collector.collect_matches(&1, params)} end))
@@ -144,15 +162,7 @@ defmodule Credo.Check.Consistency.Collector do
 
     if map_size(frequencies) > 0 do
       most_frequent_match =
-        case params[:force] do
-          nil ->
-            {most_frequent_match, _frequency} = Enum.max_by(frequencies, &elem(&1, 1))
-
-            most_frequent_match
-
-          value ->
-            value
-        end
+        most_frequent_match(frequencies, supress_issues_for_single_match?, params[:force])
 
       result =
         frequencies_per_source_file
@@ -166,8 +176,27 @@ defmodule Credo.Check.Consistency.Collector do
     end
   end
 
+  defp most_frequent_match(frequencies, supress_issues_for_single_match?, nil) do
+    {value, frequency_of_match} = Enum.max_by(frequencies, &elem(&1, 1))
+    single_match? = frequency_of_match == 1
+
+    if single_match? && supress_issues_for_single_match? do
+      :__only_single_match__
+    else
+      value
+    end
+  end
+
+  defp most_frequent_match(_frequencies, _supress_issues_for_single_match, forced_value) do
+    forced_value
+  end
+
   def append_issue_via_issue_service(%Issue{} = issue, exec) do
     ExecutionIssues.append(exec, issue)
+  end
+
+  defp source_files_with_issues(_frequencies_per_file, :__only_single_match__) do
+    []
   end
 
   defp source_files_with_issues(frequencies_per_file, most_frequent_match) do
