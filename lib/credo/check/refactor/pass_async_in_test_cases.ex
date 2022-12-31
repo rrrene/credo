@@ -41,7 +41,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     module_name = module_name_from(module_namespace)
 
     if String.ends_with?(module_name, "Case") do
-      {ast, issues ++ [issue_for(ast, meta[:line], issue_meta)]}
+      {ast, issues ++ [issue_for(module_name, meta[:line], issue_meta)]}
     else
       {ast, issues}
     end
@@ -52,11 +52,11 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     {ast, issues}
   end
 
-  defp issue_for(ast, line_no, issue_meta) do
+  defp issue_for(module_name, line_no, issue_meta) do
     format_issue(
       issue_meta,
       message: "Pass an `:async` boolean option to `use` a test case module",
-      trigger: to_code(ast),
+      trigger: module_name,
       line_no: line_no
     )
   end
@@ -65,20 +65,5 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     module_namespace
     |> List.last()
     |> to_string()
-  end
-
-  defp to_code(ast) do
-    if has_quoted_to_algebra?() do
-      ast
-      |> Code.quoted_to_algebra()
-      |> Inspect.Algebra.format(:infinity)
-      |> IO.iodata_to_binary()
-    else
-      ast
-    end
-  end
-
-  defp has_quoted_to_algebra? do
-    function_exported?(Code, :quoted_to_algebra, 1)
   end
 end
