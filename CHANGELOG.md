@@ -1,11 +1,12 @@
 # Changelog
 
-## 1.7.0
+## 1.7.0-rc.1
 
 - `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
 - `Credo.Check.Readability.FunctionNames` now ignores custom operators
+- `Credo.Check.Refactor.Apply` now works in pipes
+- `Credo.Check.Consistency.ExceptionNames` does no longer yield an issue if there is only one match
 - `Credo.Check.Readability.ModuleNames` now supports an `:ignore` parameter
-- Fixed a false positive in `Credo.Check.Refactor.Apply` in pipes
 
 ### Add SARIF support
 
