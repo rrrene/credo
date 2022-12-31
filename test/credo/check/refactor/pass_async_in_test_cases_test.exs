@@ -1,6 +1,7 @@
-defmodule Credo.Check.Design.PassAsyncTest do
+defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
   use Credo.Test.Case, async: true
-  @described_check Credo.Check.Design.PassAsync
+
+  @described_check Credo.Check.Refactor.PassAsyncInTestCases
 
   test "it ignores `use` statements for modules not ending in 'Case'" do
     """
@@ -48,6 +49,7 @@ defmodule Credo.Check.Design.PassAsyncTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 2
+
         if has_quoted_to_algebra?() do
           assert issue.column == 3
           assert issue.trigger == "use #{@case_name}, bite_strength: :xtreme"
@@ -66,6 +68,7 @@ defmodule Credo.Check.Design.PassAsyncTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 3
+
         if has_quoted_to_algebra?() do
           assert issue.column == 3
           assert issue.trigger == "use #{@case_name}"

@@ -1,12 +1,10 @@
-defmodule Credo.Check.Design.PassAsync do
-  @moduledoc """
-  Check that we pass an `async` option when we `use` test case modules.
-  """
-
+defmodule Credo.Check.Refactor.PassAsyncInTestCases do
   use Credo.Check,
+    id: "EX4031",
     base_priority: :normal,
-    category: :consistency,
-    param_defaults: [],
+    param_defaults: [
+      files: %{included: ["**/*_test.exs"]}
+    ],
     explanations: [
       check: """
       Test modules marked `async: true` are run concurrently, speeding up the
