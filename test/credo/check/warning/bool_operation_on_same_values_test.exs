@@ -25,6 +25,22 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report redefining operators" do
+    """
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      import Kernel, except: [&&: 2]
+
+      def x && x, do: true
+      def _ && _, do: false
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
