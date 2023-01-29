@@ -99,6 +99,20 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code (for && operator) /2" do
+    """
+    defmodule X do
+      import Kernel, except: [&&: 2]
+
+      def x && x, do: true
+      def _ && _, do: false
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation when acronyms are allowed" do
     """
     def clean_HTTP_url(0), do: :ok
