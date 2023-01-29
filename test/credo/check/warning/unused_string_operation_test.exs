@@ -32,6 +32,34 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation when inside of function argument" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        CredoSampleModule.runner().do_some_function(parameter |> String.upcase())
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when inside of function argument /2" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter) do
+        do_some_function(parameter |> String.upcase())
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report when module is a variable" do
     """
     defmodule Foo do

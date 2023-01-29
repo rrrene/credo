@@ -158,7 +158,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          candidate
        )
        when is_list(arguments) do
-    # IO.inspect(ast, label: ":__block__ (#{Macro.to_string(candidate)} #{acc})")
+    # IO.inspect(ast, label: ":__block__ /1 (#{Macro.to_string(candidate)} #{acc})")
 
     last_call = List.last(arguments)
 
@@ -174,7 +174,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          :not_verified = acc,
          candidate
        ) do
-    # IO.inspect(ast, label: ":__block__ (#{Macro.to_string(candidate)} #{acc})")
+    # IO.inspect(ast, label: ":__block__ /2 (#{Macro.to_string(candidate)} #{acc})")
 
     last_call = List.last(arguments)
 
@@ -278,6 +278,14 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     end
   end
 
+  {:., [line: 3, column: 31],
+   [
+     {{:., [line: 3, column: 22],
+       [{:__aliases__, [line: 3, column: 5], [:CredoSampleModule]}, :runner]},
+      [line: 3, column: 23], []},
+     :do_some_function
+   ]}
+
   # module.my_fun()
   defp verify_candidate(
          {{:., _, [{module_variable, _, nil}, fun_name]}, _, arguments} = ast,
@@ -286,6 +294,26 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        )
        when is_atom(fun_name) and is_atom(module_variable) and is_list(arguments) do
     # IO.inspect(ast, label: "Mod.fun() /4 (#{Macro.to_string(candidate)} #{acc})")
+
+    if Credo.Code.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
+  # get_module().my_fun()
+  defp verify_candidate(
+         {{:., _,
+           [
+             {{:., _, [{:__aliases__, _, [_ | _]}, _]}, _, []},
+             fun_name
+           ]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_list(arguments) do
+    # IO.inspect(ast, label: "Mod.fun() /5 (#{Macro.to_string(candidate)} #{acc})")
 
     if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
