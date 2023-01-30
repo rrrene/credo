@@ -101,6 +101,24 @@ defmodule Credo.Check.Readability.FunctionNames do
       {ast, issues}
     end
 
+    # ignore non-special-form (overridable) operators
+    defp traverse(
+           {unquote(op), _meta,
+            [
+              {:when, _,
+               [
+                 {operator, _, _} | _
+               ]}
+              | _
+            ]} = ast,
+           issues,
+           _issue_meta,
+           _allow_acronyms?
+         )
+         when operator in @all_nonspecial_operators do
+      {ast, issues}
+    end
+
     defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta, allow_acronyms?) do
       {ast, issues_for_definition(arguments, issues, issue_meta, allow_acronyms?)}
     end

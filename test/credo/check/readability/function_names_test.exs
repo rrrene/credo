@@ -104,8 +104,7 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     defmodule X do
       import Kernel, except: [&&: 2]
 
-      def x && x, do: true
-      def _ && _, do: false
+      def d && d when is_ternary(d), do: d
     end
     """
     |> to_source_file
