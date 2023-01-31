@@ -41,6 +41,23 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report redefining operators with guards" do
+    """
+    defmodule CredoSampleModule do
+      @moduledoc false
+
+      import Kernel, except: [&&: 2]
+
+      defguard is_ternary(x) when x in ~w[yes no maybe]a
+
+      def d && d when is_ternary(d), do: d
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

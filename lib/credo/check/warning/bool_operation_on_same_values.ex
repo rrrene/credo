@@ -66,6 +66,20 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
          ) do
       {ast, acc ++ [unquote(op)]}
     end
+
+    defp traverse_for_operator_redef(
+           {:def, _,
+            [
+              {:when, _,
+               [
+                 {unquote(op), _, _} | _
+               ]}
+              | _
+            ]} = ast,
+           acc
+         ) do
+      {ast, acc ++ [unquote(op)]}
+    end
   end
 
   defp traverse_for_operator_redef(ast, acc) do
