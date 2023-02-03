@@ -12,8 +12,9 @@ defmodule Credo.Check.Design.AliasUsage do
                           Process Protocol Range Record Regex Registry Set
                           Stream String StringIO Supervisor System Task Time
                           Tuple URI Version],
-      if_nested_deeper_than: 0,
       if_called_more_often_than: 0,
+      if_nested_deeper_than: 0,
+      if_referenced: false,
       only: nil
     ],
     explanations: [
@@ -52,6 +53,8 @@ defmodule Credo.Check.Design.AliasUsage do
         if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
         if_called_more_often_than:
           "Only raise an issue if a module is called more often than this.",
+        if_referenced:
+          "Raise an issue if a module is referenced by name, e.g. as an argument in a function call.",
         only: """
         Regex or a list of regexes that specifies which modules to include for this check.
 
@@ -79,9 +82,11 @@ defmodule Credo.Check.Design.AliasUsage do
 
     only = Params.get(params, :only, __MODULE__)
 
+    if_referenced? = Params.get(params, :if_referenced, __MODULE__)
+
     source_file
     |> Credo.Code.prewalk(
-      &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only)
+      &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only, if_referenced?)
     )
     |> filter_issues_if_called_more_often_than(if_called_more_often_than)
     |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
@@ -93,7 +98,8 @@ defmodule Credo.Check.Design.AliasUsage do
          issue_meta,
          excluded_namespaces,
          excluded_lastnames,
-         only
+         only,
+         if_referenced?
        ) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
@@ -109,7 +115,8 @@ defmodule Credo.Check.Design.AliasUsage do
           excluded_lastnames,
           only,
           aliases,
-          mod_deps
+          mod_deps,
+          if_referenced?
         )
       )
 
@@ -122,13 +129,14 @@ defmodule Credo.Check.Design.AliasUsage do
          _source_file,
          _excluded_namespaces,
          _excluded_lastnames,
-         _only
+         _only,
+         _if_referenced?
        ) do
     {ast, issues}
   end
 
   # Ignore module attributes
-  defp find_issues({:@, _, _}, issues, _, _, _, _, _, _) do
+  defp find_issues({:@, _, _}, issues, _, _, _, _, _, _, _) do
     {nil, issues}
   end
 
@@ -136,6 +144,7 @@ defmodule Credo.Check.Design.AliasUsage do
   defp find_issues(
          {:., _, [{:__aliases__, _, _}, :{}]} = ast,
          issues,
+         _,
          _,
          _,
          _,
@@ -155,6 +164,7 @@ defmodule Credo.Check.Design.AliasUsage do
          _,
          _,
          _,
+         _,
          _
        )
        when is_list(mod_list) do
@@ -169,21 +179,22 @@ defmodule Credo.Check.Design.AliasUsage do
          excluded_lastnames,
          only,
          aliases,
-         mod_deps
+         mod_deps,
+         _if_referenced?
        )
        when is_list(mod_list) and is_atom(fun_atom) do
-    {ast,
-     maybe_add_issue(
-       mod_list,
-       meta,
-       issues,
-       issue_meta,
-       excluded_namespaces,
-       excluded_lastnames,
-       only,
-       aliases,
-       mod_deps
-     )}
+    do_find_issues(
+      ast,
+      mod_list,
+      meta,
+      issues,
+      issue_meta,
+      excluded_namespaces,
+      excluded_lastnames,
+      only,
+      aliases,
+      mod_deps
+    )
   end
 
   defp find_issues(
@@ -194,28 +205,30 @@ defmodule Credo.Check.Design.AliasUsage do
          excluded_lastnames,
          only,
          aliases,
-         mod_deps
+         mod_deps,
+         true
        )
        when is_list(mod_list) and is_atom(fun_atom) and fun_atom not in @keywords do
-    {ast,
-     maybe_add_issue(
-       mod_list,
-       meta,
-       issues,
-       issue_meta,
-       excluded_namespaces,
-       excluded_lastnames,
-       only,
-       aliases,
-       mod_deps
-     )}
+    do_find_issues(
+      ast,
+      mod_list,
+      meta,
+      issues,
+      issue_meta,
+      excluded_namespaces,
+      excluded_lastnames,
+      only,
+      aliases,
+      mod_deps
+    )
   end
 
-  defp find_issues(ast, issues, _, _, _, _, _, _) do
+  defp find_issues(ast, issues, _, _, _, _, _, _, _) do
     {ast, issues}
   end
 
-  defp maybe_add_issue(
+  defp do_find_issues(
+         ast,
          mod_list,
          meta,
          issues,
@@ -228,31 +241,31 @@ defmodule Credo.Check.Design.AliasUsage do
        ) do
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
-        issues
+        {ast, issues}
 
       Enum.any?(mod_list, &unquote?/1) ->
-        issues
+        {ast, issues}
 
       excluded_lastname_or_namespace?(
         mod_list,
         excluded_namespaces,
         excluded_lastnames
       ) ->
-        issues
+        {ast, issues}
 
       excluded_with_only?(mod_list, only) ->
-        issues
+        {ast, issues}
 
       conflicting_with_aliases?(mod_list, aliases) ->
-        issues
+        {ast, issues}
 
       conflicting_with_other_modules?(mod_list, mod_deps) ->
-        issues
+        {ast, issues}
 
       true ->
         trigger = Credo.Code.Name.full(mod_list)
 
-        issues ++ [issue_for(issue_meta, meta[:line], trigger)]
+        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
     end
   end
 
