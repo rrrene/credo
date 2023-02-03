@@ -124,6 +124,7 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
   test "it should NOT report a violation when acronyms are allowed /2" do
     """
     def clean_HTTP2_url(0), do: :ok
+    def can_HTTP2_url?(0), do: false
     """
     |> to_source_file
     |> run_check(@described_check, allow_acronyms: true)

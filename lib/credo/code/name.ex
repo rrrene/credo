@@ -117,7 +117,7 @@ defmodule Credo.Code.Name do
     name
     |> String.split("_")
     |> Enum.all?(fn part ->
-      String.match?(part, ~r/^([[:lower:][:digit:]]+|[[:upper:][:digit:]]+)$/u)
+      String.match?(part, ~r/^([[:lower:][:digit:]]+|[[:upper:][:digit:]]+)[\?!]?$/u)
     end)
   end
 

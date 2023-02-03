@@ -126,7 +126,12 @@ defmodule Credo.Code.NameTest do
     assert "snake_case_23" |> Name.snake_case?()
     assert "latency_μs" |> Name.snake_case?()
     assert "rené_föhring" |> Name.snake_case?()
+    assert "is_true?" |> Name.snake_case?()
     refute "SnakeCase_mixed" |> Name.snake_case?()
+
+    assert "is_JA" |> Name.snake_case?(true)
+    assert "can_HTTP2_url?" |> Name.snake_case?(true)
+    refute "is_JaA?" |> Name.snake_case?(true)
   end
 
   #
