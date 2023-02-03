@@ -21,6 +21,8 @@ defmodule Credo.Check.Warning.UnusedPathOperationTest do
       def no_error(:one) do
         call(Path.join("~", "foo"))
 
+        function_with_side_effects!(Path.join(...))
+
         "something"
       end
 
