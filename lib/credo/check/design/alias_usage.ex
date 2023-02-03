@@ -62,6 +62,8 @@ defmodule Credo.Check.Design.AliasUsage do
 
   alias Credo.Code.Name
 
+  @keywords [:alias]
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -170,38 +172,88 @@ defmodule Credo.Check.Design.AliasUsage do
          mod_deps
        )
        when is_list(mod_list) and is_atom(fun_atom) do
+    {ast,
+     maybe_add_issue(
+       mod_list,
+       meta,
+       issues,
+       issue_meta,
+       excluded_namespaces,
+       excluded_lastnames,
+       only,
+       aliases,
+       mod_deps
+     )}
+  end
+
+  defp find_issues(
+         {fun_atom, _, [{:__aliases__, meta, mod_list}]} = ast,
+         issues,
+         issue_meta,
+         excluded_namespaces,
+         excluded_lastnames,
+         only,
+         aliases,
+         mod_deps
+       )
+       when is_list(mod_list) and is_atom(fun_atom) and fun_atom not in @keywords do
+    {ast,
+     maybe_add_issue(
+       mod_list,
+       meta,
+       issues,
+       issue_meta,
+       excluded_namespaces,
+       excluded_lastnames,
+       only,
+       aliases,
+       mod_deps
+     )}
+  end
+
+  defp find_issues(ast, issues, _, _, _, _, _, _) do
+    {ast, issues}
+  end
+
+  defp maybe_add_issue(
+         mod_list,
+         meta,
+         issues,
+         issue_meta,
+         excluded_namespaces,
+         excluded_lastnames,
+         only,
+         aliases,
+         mod_deps
+       ) do
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
-        {ast, issues}
+        issues
 
       Enum.any?(mod_list, &unquote?/1) ->
-        {ast, issues}
+        issues
 
       excluded_lastname_or_namespace?(
         mod_list,
         excluded_namespaces,
         excluded_lastnames
       ) ->
-        {ast, issues}
+        issues
 
       excluded_with_only?(mod_list, only) ->
-        {ast, issues}
+        issues
 
       conflicting_with_aliases?(mod_list, aliases) ->
-        {ast, issues}
+        issues
 
       conflicting_with_other_modules?(mod_list, mod_deps) ->
-        {ast, issues}
+        issues
 
       true ->
         trigger = Credo.Code.Name.full(mod_list)
 
-        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
+        issues ++ [issue_for(issue_meta, meta[:line], trigger)]
     end
-  end
-
-  defp find_issues(ast, issues, _, _, _, _, _, _) do
-    {ast, issues}
   end
 
   defp unquote?({:unquote, _, arguments}) when is_list(arguments), do: true
