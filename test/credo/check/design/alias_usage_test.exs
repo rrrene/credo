@@ -194,6 +194,23 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues()
   end
 
+  test "it should work when module passed as argument" do
+    """
+    defmodule Test do
+      def fun1 do
+        fun2(Credo.Foo.Bar)
+      end
+
+      def fun2(mod) do
+        mod.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -275,6 +292,23 @@ defmodule Credo.Check.Design.AliasUsageTest do
     """
     |> to_source_file
     |> run_check(@described_check, only: [~r/^Credo.+$/])
+    |> assert_issue()
+  end
+
+  test "reports violation when module passed as argument" do
+    """
+    defmodule Test do
+      def fun1 do
+        fun2(Credo.Foo.Bar)
+      end
+
+      def fun2(mod) do
+        mod.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, if_referenced: true)
     |> assert_issue()
   end
 
