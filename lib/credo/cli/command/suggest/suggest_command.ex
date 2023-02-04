@@ -9,6 +9,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
   use Credo.CLI.Command,
     short_description: "Suggest code objects to look at next (default)",
+    treat_unknown_args_as_files: true,
     cli_switches: [
       Switch.boolean("all_priorities", alias: :A),
       Switch.boolean("all", alias: :a),

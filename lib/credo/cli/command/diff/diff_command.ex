@@ -14,6 +14,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
 
   use Credo.CLI.Command,
     short_description: "Suggest code objects to look at next (based on git-diff)",
+    treat_unknown_args_as_files: true,
     cli_switches:
       Credo.CLI.Command.Suggest.SuggestCommand.cli_switches() ++
         [

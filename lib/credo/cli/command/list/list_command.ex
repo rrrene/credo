@@ -3,6 +3,7 @@ defmodule Credo.CLI.Command.List.ListCommand do
 
   use Credo.CLI.Command,
     short_description: "List all issues grouped by files",
+    treat_unknown_args_as_files: true,
     cli_switches: Credo.CLI.Command.Suggest.SuggestCommand.cli_switches()
 
   alias Credo.CLI.Command.List.ListOutput

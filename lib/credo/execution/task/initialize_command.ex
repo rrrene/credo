@@ -7,15 +7,6 @@ defmodule Credo.Execution.Task.InitializeCommand do
     command_name = Execution.get_command_name(exec)
     command_mod = Execution.get_command(exec, command_name)
 
-    init_command(exec, command_mod)
-  end
-
-  defp init_command(exec, command_mod) do
-    # exec =
-    #   exec
-    #   |> command_mod.init()
-    #   |> Execution.ensure_execution_struct("#{command_mod}.init/1")
-
     exec =
       command_mod
       |> cli_options_switches()

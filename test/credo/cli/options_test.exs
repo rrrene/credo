@@ -47,9 +47,20 @@ defmodule Credo.CLI.OptionsTest do
     Path.join(Path.expand(fixture_path(@fixture_name)), name)
   end
 
-  defp parse(args) do
+  defp parse(args, treat_unknown_args_as_files? \\ false) do
     dir = fixture_path(@fixture_name)
-    Options.parse(true, args, dir, @command_names, nil, [], @switches, @aliases)
+
+    Options.parse(
+      true,
+      args,
+      dir,
+      @command_names,
+      nil,
+      [],
+      @switches,
+      @aliases,
+      treat_unknown_args_as_files?
+    )
   end
 
   defp switches(args), do: parse(args).switches
@@ -159,10 +170,10 @@ defmodule Credo.CLI.OptionsTest do
 
   test "path: it should work w/ double-dash and multiple files" do
     args = String.split("--strict --version -- foo.ex foo/bar.ex foo/baz.ex")
-    options = parse(args)
+    options = parse(args, true)
     assert is_nil(options.command)
     assert expand_path("") == options.path
-    assert ~w"foo.ex foo/bar.ex foo/baz.ex" != options.switches.files_included
+    assert 3 == length(options.switches[:files_included])
   end
 
   test "path: it should work w/ glob" do

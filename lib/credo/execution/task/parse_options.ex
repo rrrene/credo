@@ -25,6 +25,16 @@ defmodule Credo.Execution.Task.ParseOptions do
         exec.cli_aliases
       end
 
+    treat_unknown_args_as_files? =
+      if exec.cli_options && exec.cli_options.command do
+        command_name = Execution.get_command_name(exec)
+        command_mod = Execution.get_command(exec, command_name)
+
+        command_mod.treat_unknown_args_as_files?
+      else
+        false
+      end
+
     cli_options =
       Options.parse(
         use_strict_parser?,
@@ -34,7 +44,8 @@ defmodule Credo.Execution.Task.ParseOptions do
         given_command_name,
         [UI.edge()],
         exec.cli_switches,
-        cli_aliases
+        cli_aliases,
+        treat_unknown_args_as_files?
       )
 
     %Execution{exec | cli_options: cli_options}

@@ -65,6 +65,7 @@ defmodule Credo.CLI.Command do
 
   @valid_use_opts [
     :short_description,
+    :treat_unknown_args_as_files,
     :cli_switches
   ]
 
@@ -96,11 +97,20 @@ defmodule Credo.CLI.Command do
         end
       end
 
+    def_treat_unknown_args_as_files =
+      quote do
+        @impl true
+        def treat_unknown_args_as_files? do
+          !!unquote(opts[:treat_unknown_args_as_files])
+        end
+      end
+
     quote do
       @before_compile Credo.CLI.Command
       @behaviour Credo.CLI.Command
 
       unquote(def_short_description)
+      unquote(def_treat_unknown_args_as_files)
       unquote(def_cli_switches)
 
       @deprecated "Use Credo.Execution.Task.run/2 instead"
@@ -154,6 +164,8 @@ defmodule Credo.CLI.Command do
 
   @doc "Returns a short, one-line description of what the command does"
   @callback short_description() :: String.t()
+
+  @callback treat_unknown_args_as_files?() :: boolean()
 
   @callback cli_switches() :: [Map.t()]
 end

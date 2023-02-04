@@ -40,6 +40,18 @@ defmodule Credo.CLI.Options do
   Returns a `Options` struct for the given parameters.
   """
   def parse(
+        use_strict_parser?,
+        argv,
+        current_dir,
+        command_names,
+        given_command_name,
+        ignored_args,
+        switches_definition,
+        aliases,
+        treat_unknown_args_as_files? \\ false
+      )
+
+  def parse(
         true = _use_strict_parser?,
         argv,
         current_dir,
@@ -47,7 +59,8 @@ defmodule Credo.CLI.Options do
         given_command_name,
         ignored_args,
         switches_definition,
-        aliases
+        aliases,
+        treat_unknown_args_as_files?
       ) do
     argv
     |> OptionParser.parse(strict: switches_definition, aliases: aliases)
@@ -56,7 +69,8 @@ defmodule Credo.CLI.Options do
       command_names,
       given_command_name,
       ignored_args,
-      switches_definition
+      switches_definition,
+      treat_unknown_args_as_files?
     )
   end
 
@@ -68,7 +82,8 @@ defmodule Credo.CLI.Options do
         given_command_name,
         ignored_args,
         switches_definition,
-        aliases
+        aliases,
+        treat_unknown_args_as_files?
       ) do
     argv
     |> OptionParser.parse(switches: switches_definition, aliases: aliases)
@@ -77,7 +92,8 @@ defmodule Credo.CLI.Options do
       command_names,
       given_command_name,
       ignored_args,
-      []
+      [],
+      treat_unknown_args_as_files?
     )
   end
 
@@ -87,7 +103,8 @@ defmodule Credo.CLI.Options do
          command_names,
          given_command_name,
          ignored_args,
-         switches_definition
+         switches_definition,
+         treat_unknown_args_as_files?
        ) do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
 
@@ -117,15 +134,36 @@ defmodule Credo.CLI.Options do
 
     {path, switches} =
       if File.dir?(path) do
+        switches =
+          if treat_unknown_args_as_files? do
+            Map.put(switches, :files_included, unknown_args)
+          else
+            switches
+          end
+
         {path, switches}
       else
-        {current_dir, Map.put(switches, :files_included, [path])}
+        files_included =
+          if treat_unknown_args_as_files? do
+            [path] ++ unknown_args
+          else
+            [path]
+          end
+
+        {current_dir, Map.put(switches, :files_included, files_included)}
+      end
+
+    args =
+      if treat_unknown_args_as_files? do
+        []
+      else
+        unknown_args
       end
 
     %__MODULE__{
       command: command || given_command_name,
       path: path,
-      args: unknown_args,
+      args: args,
       switches: switches,
       unknown_switches: unknown_switches_keywords ++ extra_unknown_switches
     }

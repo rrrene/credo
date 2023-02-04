@@ -322,7 +322,11 @@ defmodule Credo.Execution do
   """
   def get_command(exec, name) do
     Map.get(exec.commands, name) ||
-      raise ~s'Command not found: "#{inspect(name)}"\n\nRegistered commands: #{inspect(exec.commands, pretty: true)}'
+      raise """
+      Command not found: "#{inspect(name)}"
+
+      Registered commands: #{inspect(exec.commands, pretty: true)}
+      """
   end
 
   @doc false
