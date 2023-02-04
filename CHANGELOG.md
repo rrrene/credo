@@ -1,12 +1,14 @@
 # Changelog
 
-## 1.7.0-rc.1
+## 1.7.0-rc.2
 
 - `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
 - `Credo.Check.Readability.FunctionNames` now ignores custom operators
 - `Credo.Check.Refactor.Apply` now works in pipes
 - `Credo.Check.Consistency.ExceptionNames` does no longer yield an issue if there is only one match
 - `Credo.Check.Readability.ModuleNames` now supports an `:ignore` parameter
+- `Credo.Check.Design.AliasUsage` now supports an `:if_referenced` parameter
+- `Credo.Check.Readability.FunctionNames` now works for acronyms in predicate functions
 
 ### Add SARIF support
 
@@ -64,6 +66,20 @@ This means that you can extend Credo with
 * use the second digit for something completely different
 
 all while adhering to Credo's own scheme (and of course, you can simply invent a completely different naming scheme for your checks).
+
+### Allow passing of multiple files to Mix task
+
+It is now possible to pass a list of files to `mix credo`.
+
+```
+mix credo lib/foo.ex lib/foo/bar.ex lib/foo/baz.ex
+```
+
+This means that you can now use the output of commands to determine which files to analyse, e.g.:
+
+```
+mix credo $(git diff --name-only)
+```
 
 ### Ensure stable ordering of analysis results
 
