@@ -87,7 +87,7 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 2" do
+  test "it should report a violation /2" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -108,7 +108,7 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 3" do
+  test "it should report a violation /3" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -127,7 +127,7 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 4" do
+  test "it should report a violation /4" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -140,6 +140,29 @@ defmodule Credo.Check.Refactor.NestingTest do
             acc ++ [item]
           end)
         end)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /5" do
+    """
+    defmodule CredoSampleModule do
+      defp foo() do
+        if true do
+          if true do
+            if true do
+              if true do
+                "nested"
+              end
+            end
+          end
+        else
+          "flat"
+        end
       end
     end
     """
