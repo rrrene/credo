@@ -53,6 +53,10 @@ defmodule Credo.Code.Block do
     {:ok, block}
   end
 
+  def do_block_for(do: do_block, else: _else_block) do
+    {:ok, do_block}
+  end
+
   def do_block_for(arguments) when is_list(arguments) do
     Enum.find_value(arguments, &find_keyword(&1, :do))
   end
@@ -249,7 +253,9 @@ defmodule Credo.Code.Block do
     end
   end
 
-  defp find_keyword(_, _), do: nil
+  defp find_keyword(_, _) do
+    nil
+  end
 
   @doc """
   Returns the children of the `do` block of the given AST node.
