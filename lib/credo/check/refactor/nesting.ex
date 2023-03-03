@@ -86,9 +86,12 @@ defmodule Credo.Check.Refactor.Nesting do
   defp find_depth(arguments, nest_list, line_no, trigger)
        when is_list(arguments) do
     arguments
-    |> Credo.Code.Block.do_block_for!()
-    |> List.wrap()
-    |> Enum.map(&find_depth(&1, nest_list, line_no, trigger))
+    |> Credo.Code.Block.all_blocks_for!()
+    |> Enum.flat_map(fn block ->
+      block
+      |> List.wrap()
+      |> Enum.map(&find_depth(&1, nest_list, line_no, trigger))
+    end)
     |> Enum.sort()
     |> List.last()
   end

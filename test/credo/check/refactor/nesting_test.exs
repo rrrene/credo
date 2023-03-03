@@ -170,4 +170,27 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report a violation /6" do
+    """
+    defmodule CredoSampleModule do
+      defp foo() do
+        if true do
+          "flat"
+        else
+          if true do
+            if true do
+              if true do
+                "nested"
+              end
+            end
+          end
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
