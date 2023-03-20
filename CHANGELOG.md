@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.0-rc.2
+## 1.7.0
 
 - `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
 - `Credo.Check.Readability.FunctionNames` now ignores custom operators
@@ -9,6 +9,7 @@
 - `Credo.Check.Readability.ModuleNames` now supports an `:ignore` parameter
 - `Credo.Check.Design.AliasUsage` now supports an `:if_referenced` parameter
 - `Credo.Check.Readability.FunctionNames` now works for acronyms in predicate functions
+- `Credo.Check.Readability.NestedFunctionCalls` now works for calls already in a pipeline and local function calls
 
 ### Add SARIF support
 
