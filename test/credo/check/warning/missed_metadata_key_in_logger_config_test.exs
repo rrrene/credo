@@ -134,4 +134,21 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  for fun <- @logger_functions do
+    test "it should NOT report Logger.#{fun}/2 is used and `all` metadata is allowed" do
+      """
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          Logger.#{unquote(fun)}(fn ->
+            "A warning message: #{inspect(1)}"
+          end, account_id: 1)
+        end
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, metadata_keys: :all)
+      |> refute_issues()
+    end
+  end
 end

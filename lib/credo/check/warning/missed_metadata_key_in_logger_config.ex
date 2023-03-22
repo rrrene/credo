@@ -121,6 +121,10 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     nil
   end
 
+  defp issue_for_call(_logger_metadata, _meta, _issue_meta, :all) do
+    nil
+  end
+
   defp issue_for_call(logger_metadata, meta, issue_meta, metadata_keys) do
     if Keyword.keyword?(logger_metadata) do
       case Keyword.drop(logger_metadata, metadata_keys) do
