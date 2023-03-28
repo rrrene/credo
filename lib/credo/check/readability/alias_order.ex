@@ -4,7 +4,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     base_priority: :low,
     explanations: [
       check: """
-      Alphabetically ordered lists are more easily scannable by the read.
+      Alphabetically ordered lists are more easily scannable by the reader.
 
           # preferred
 
