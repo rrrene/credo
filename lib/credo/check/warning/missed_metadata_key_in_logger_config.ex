@@ -43,11 +43,25 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-    state = {false, []}
 
-    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+    case ignore_check?(issue_meta) do
+      true ->
+        []
 
-    issues
+      false ->
+        state = {false, []}
+
+        {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+
+        issues
+    end
+  end
+
+  # if logger metadata: :all is set, then ignore this check
+  defp ignore_check?(issue_meta) do
+    issue_meta_params = IssueMeta.params(issue_meta)
+    metadata_keys = find_metadata_keys(issue_meta_params)
+    metadata_keys == :all
   end
 
   defp traverse(
