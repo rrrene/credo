@@ -44,16 +44,14 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    case ignore_check?(issue_meta) do
-      true ->
-        []
+    if ignore_check?(issue_meta) do
+      []
+    else
+      state = {false, []}
 
-      false ->
-        state = {false, []}
+      {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
 
-        {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
-
-        issues
+      issues
     end
   end
 
