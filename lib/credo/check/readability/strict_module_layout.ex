@@ -64,7 +64,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
         """,
         ignore_module_attributes: """
         List of atoms identifying the module attributes which are not checked, and may
-        therefor appear anywhere in the module. Useful for custom DSLs that use attributes
+        therefore appear anywhere in the module. Useful for custom DSLs that use attributes
         before function heads.
 
         For example, if you provide `~w/trace/a`, all `@trace` attributes will be ignored.
