@@ -326,7 +326,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
         |> to_source_file
         |> run_check(@described_check,
           order: ~w(import module_attribute)a,
-          ignore_module_attributes: ~w/@trace/a
+          ignore_module_attributes: ~w/trace/a
         )
         |> assert_issue
 
