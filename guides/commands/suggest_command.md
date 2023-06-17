@@ -181,7 +181,7 @@ Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore)
 
 ### `--min-priority`
 
-Minimum priority to show issues (high,medium,normal,low,lower or number)
+Minimum priority to show issues (higher,high,normal,low,ignore or number)
 
 ```bash
 $ mix credo --min-priority high
