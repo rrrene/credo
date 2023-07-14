@@ -42,12 +42,17 @@ defmodule Credo.Check.Runner do
     files_excluded = Params.files_excluded(params, check)
 
     found_relevant_files =
-      if files_included == [] and files_excluded == [] do
-        []
-      else
-        exec
-        |> Execution.working_dir()
-        |> Credo.Sources.find_in_dir(files_included, files_excluded)
+      cond do
+        files_included == [] and files_excluded == [] ->
+          []
+
+        exec.read_from_stdin ->
+          []
+
+        true ->
+          exec
+          |> Execution.working_dir()
+          |> Credo.Sources.find_in_dir(files_included, files_excluded)
       end
 
     source_files =
