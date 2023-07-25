@@ -19,7 +19,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
       In your app's logger configuration, you would need to include the `:error_code` key:
 
           config :logger, :console,
-            format: "[$level] $message $metadata\n",
+            format: "[$level] $message $metadata\\n",
             metadata: [:error_code, :file]
 
       That way your logs might then receive lines like this:
