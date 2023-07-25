@@ -12,6 +12,7 @@ defmodule Credo.Priority do
   @def_ops [:def, :defp, :defmacro]
   @many_functions_count 5
 
+  @priority_names ~w[higher high normal low ignore]
   @priority_names_map %{
     "ignore" => -100,
     "low" => -10,
@@ -29,12 +30,16 @@ defmodule Credo.Priority do
     case Integer.parse(string) do
       :error -> string |> String.to_atom() |> to_integer()
       {value, ""} -> value
-      {_value, _rest} -> raise "Got an invalid priority: #{inspect(string)}"
+      {_value, _rest} -> raise error_message_for_invalid_priority(string)
     end
   end
 
   def to_integer(key) when is_atom(key) do
-    @priority_names_map[to_string(key)] || raise "Got an invalid priority: #{inspect(key)}"
+    @priority_names_map[to_string(key)] || raise error_message_for_invalid_priority(key)
+  end
+
+  defp error_message_for_invalid_priority(key) do
+    "Got an invalid priority: #{inspect(key)}  (valid are numbers or #{Enum.join(@priority_names, "/")})"
   end
 
   def to_atom(priority)
