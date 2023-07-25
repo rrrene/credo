@@ -47,7 +47,7 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
             --from-git-merge-base     Diff from where the current HEAD branched off from the given merge base
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
-            --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+            --min-priority            Minimum priority to show issues (higher,high,normal,low,ignore or number)
             --mute-exit-status        Exit with status zero even if there are issues
             --only                    Alias for --checks
             --since                   Diff from the given point in time (using Git)
