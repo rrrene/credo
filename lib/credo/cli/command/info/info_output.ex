@@ -43,7 +43,7 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
             --format                  Display the list in a specific format (json,flycheck,oneline)
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
-            --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+            --min-priority            Minimum priority to show issues (higher,high,normal,low,ignore or number)
             --only                    Alias for --checks
             --verbose                 Display more information (e.g. checked files)
 
