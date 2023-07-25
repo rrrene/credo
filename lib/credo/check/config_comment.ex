@@ -121,14 +121,12 @@ defmodule Credo.Check.ConfigComment do
   end
 
   defp check_tuple_ignores_issue?(check_or_regex, issue) do
-    case check_or_regex do
-      %Regex{} ->
-        issue.check
-        |> to_string
-        |> String.match?(check_or_regex)
-
-      _ ->
-        issue.check == check_or_regex
+    if match?(%Regex{}, check_or_regex) do
+      issue.check
+      |> to_string
+      |> String.match?(check_or_regex)
+    else
+      issue.check == check_or_regex
     end
   end
 
