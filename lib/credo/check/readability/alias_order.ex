@@ -47,8 +47,8 @@ defmodule Credo.Check.Readability.AliasOrder do
         The ordering method to use.
 
         Options
-        - `:aplha` - Alphabetical case-insensitive sorting.
-        - `:ascii` - Case-sensitive sorting where capitals are ordered earier than their lower case equivilants.
+        - `:alpha` - Alphabetical case-insensitive sorting.
+        - `:ascii` - Case-sensitive sorting where upper case characters are ordered before their lower case equivalent. (Does not support alias groups)
         """
       ]
     ]
@@ -102,6 +102,14 @@ defmodule Credo.Check.Readability.AliasOrder do
     issue_opts = issue_opts(line_no, module, module)
 
     {:halt, issue_opts}
+  end
+
+  defp process_group(:ascii, [
+         {line_no, {a, []}, _},
+         {_line_no, {b, []}, _}
+       ])
+       when a > b do
+    {:halt, issue_opts(line_no, a, a)}
   end
 
   defp process_group(_sort_method, [{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}]) do
