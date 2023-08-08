@@ -112,13 +112,13 @@ defmodule Credo.Check.Readability.AliasOrder do
     {:halt, issue_opts(line_no, a, a)}
   end
 
-  defp process_group(_sort_method, [{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}]) do
+  defp process_group(sort_method, [{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}]) do
     issue_opts =
       cond do
-        issue = inner_group_order_issue(line_no1, mod_list_first) ->
+        issue = inner_group_order_issue(sort_method, line_no1, mod_list_first) ->
           issue
 
-        issue = inner_group_order_issue(line_no2, mod_list_second) ->
+        issue = inner_group_order_issue(sort_method, line_no2, mod_list_second) ->
           issue
 
         true ->
@@ -132,8 +132,8 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp process_group(_sort_method, [{line_no1, mod_list_first, _}]) do
-    if issue_opts = inner_group_order_issue(line_no1, mod_list_first) do
+  defp process_group(sort_method, [{line_no1, mod_list_first, _}]) do
+    if issue_opts = inner_group_order_issue(sort_method, line_no1, mod_list_first) do
       {:halt, issue_opts}
     else
       {:cont, nil}
@@ -142,9 +142,9 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp process_group(_, _), do: {:cont, nil}
 
-  defp inner_group_order_issue(_line_no, {_base, []}), do: nil
+  defp inner_group_order_issue(_sort_method, _line_no, {_base, []}), do: nil
 
-  defp inner_group_order_issue(line_no, {base, mod_list}) do
+  defp inner_group_order_issue(:alpha = _sort_method, line_no, {base, mod_list}) do
     downcased_mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
     sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
 
@@ -153,9 +153,17 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list) do
+  defp inner_group_order_issue(:ascii = _sort_method, line_no, {base, mod_list}) do
+    sorted_mod_list = Enum.sort(mod_list)
+
+    if mod_list != sorted_mod_list do
+      issue_opts(line_no, base, mod_list, mod_list, sorted_mod_list)
+    end
+  end
+
+  defp issue_opts(line_no, base, mod_list, trigger_source_mod_list, sorted_downcased_mod_list) do
     trigger =
-      downcased_mod_list
+      trigger_source_mod_list
       |> Enum.with_index()
       |> Enum.find_value(fn {downcased_mod_entry, index} ->
         if downcased_mod_entry != Enum.at(sorted_downcased_mod_list, index) do
