@@ -48,7 +48,7 @@ defmodule Credo.Check.Readability.AliasOrder do
 
         Options
         - `:alpha` - Alphabetical case-insensitive sorting.
-        - `:ascii` - Case-sensitive sorting where upper case characters are ordered before their lower case equivalent. (Does not support alias groups)
+        - `:ascii` - Case-sensitive sorting where upper case characters are ordered before their lower case equivalent.
         """
       ]
     ]
