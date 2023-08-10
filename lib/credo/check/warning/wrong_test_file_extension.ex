@@ -2,42 +2,58 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
   use Credo.Check,
     id: "EX5025",
     base_priority: :high,
-    param_defaults: [included: ["test/**/*_test.ex"]],
+    param_defaults: [excluded_paths: ["test/support", "test/test_helper.exs"]],
     explanations: [
       check: """
-      Invoking mix test from the command line will run the tests in each file
-      matching the pattern `*_test.exs` found in the test directory of your project.
+      This check ensures that all test files end in `_test.exs`.
 
-      (from the `ex_unit` docs)
+      ### Background
 
-      This check ensures that test files are not ending with `.ex` (which would cause them to be skipped).
-      """
+      Running `mix test` will only execute the test files that match the pattern `*_test.exs` found
+      in the in the `test` directory of your project.
+      """,
+      params: [
+        excluded_paths: "List of paths or regex to exclude from this check"
+      ]
     ]
-
-  @test_files_with_ex_ending_regex ~r/test\/.*\/.*_test.ex$/
 
   alias Credo.SourceFile
 
   @doc false
-  def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
+  @impl true
+  def run(source_file, params \\ [])
 
-    if matches?(filename, @test_files_with_ex_ending_regex) do
-      issue_meta
-      |> issue_for()
-      |> List.wrap()
+  def run(%SourceFile{filename: "test/" <> _ = filename} = source_file, params) do
+    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
+
+    if not ignore_path?(filename, excluded_paths) and
+         (wrong_file_extension?(filename) or
+            missing_test_suffix?(filename)) do
+      issue =
+        source_file
+        |> IssueMeta.for(params)
+        |> format_issue(message: "Test files should end with `_test.exs`")
+
+      [issue]
     else
       []
     end
   end
 
-  defp issue_for(issue_meta) do
-    format_issue(
-      issue_meta,
-      message: "Test files should end with .exs"
-    )
+  def run(%SourceFile{}, _params), do: []
+
+  defp wrong_file_extension?(filename) do
+    filename |> Path.basename() |> String.ends_with?("_test.ex")
   end
 
-  defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
-  defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
+  defp missing_test_suffix?(filename) do
+    not (filename |> Path.basename(".exs") |> String.ends_with?("_test"))
+  end
+
+  defp ignore_path?(filename, excluded_paths) do
+    Enum.any?(excluded_paths, &matches?(filename, &1))
+  end
+
+  defp matches?(filename, %Regex{} = regex), do: Regex.match?(regex, filename)
+  defp matches?(filename, path) when is_binary(path), do: String.starts_with?(filename, path)
 end
