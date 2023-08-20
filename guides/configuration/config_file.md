@@ -30,10 +30,12 @@ Credo's config is a plain `.exs` file, no magic here. It contains a map with a s
       strict: false,
       parse_timeout: 5000,
       color: true,
-      checks: [
-        {Credo.Check.Design.AliasUsage, priority: :low},
-        # ... other checks omitted for readability ...
-      ]
+      checks: %{
+        enabled: [
+          {Credo.Check.Design.AliasUsage, priority: :low},
+          # ... other checks omitted for readability ...
+        ]
+      }
     }
   ]
 }
@@ -95,6 +97,119 @@ mix credo --config-name spring-cleaning
 to run the custom configuration we added.
 
 
+### `:checks`
+
+Configures check modules that Credo should load at start up.
+
+Read more about [check configuration](./check_params.md) and [adding custom checks](../custom_checks/adding_checks.md).
+
+#### `:enabled`
+
+Enables *only* the given checks. This is an easy way to pin a project's checks.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: %{
+        enabled: [
+          # this means that `TabsOrSpaces` will not run
+          {Credo.Check.Consistency.TabsOrSpaces, []},
+        ]
+      }
+      # files etc.
+    }
+  ]
+}
+```
+
+#### `:disabled`
+
+Disables the given checks. This is an easy way to use the default checks, but explicitly disable some you don't need or want.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: %{
+        disabled: [
+          # this means that `TabsOrSpaces` will not run
+          {Credo.Check.Consistency.TabsOrSpaces, []},
+        ]
+      }
+      # files etc.
+    }
+  ]
+}
+```
+
+This has the added benefit that, when re-enabled via [`--enable-disabled-checks`](suggest_command.html#enable-disabled-checks), check are enabled with their [customized params](./check_params.md).
+
+
+#### `:extra`
+
+Configures the given checks with the given parameters.
+
+[Credo configs are transitive](config_file.html#transitive-configuration-files) in nature, so this can be useful in a situation where you want to pin checks for an umbrella, but want to overwrite individual checks in a child app.
+
+
+```elixir
+# my_umbrella/.credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: %{
+        enabled: [
+          {Credo.Check.Readability.LargeNumbers, []}
+        ]
+      }
+    }
+  ]
+}
+
+# my_umbrella/apps/my_app2/.credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: %{
+        extra: [
+          # this means that the checks config from the parent applies,
+          # only `LargeNumbers` being configured differently for this project
+          {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
+        ]
+      }
+    }
+  ]
+}
+```
+
+
+### `:color`
+
+Set to `false` to disable colored output (*defaults to `true`*).
+
+This is equivalent to using the `--no-color` CLI switch.
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      color: false,
+      # files, checks etc.
+    }
+  ]
+}
+```
+
+
 ### `:files`
 
 ```elixir
@@ -117,6 +232,24 @@ The `:files` map can have two fields:
 
 - `:included` contains a list of files, directories and globs (as in `"**/*_test.exs"`)
 - `:excluded` contains a list of files, directories, globs (as in `"**/*_test.exs"`) and regular expressions (as in `~r"/_build/"`)
+
+
+### `:parse_timeout`
+
+Configures a timeout for parsing source files in milliseconds (*defaults to 5000 milliseconds*).
+
+```elixir
+# .credo.exs
+%{
+  configs: [
+    %{
+      name: "default",
+      parse_timeout: 60_000,
+      # files, checks etc.
+    }
+  ]
+}
+```
 
 
 ### `:plugins`
@@ -190,9 +323,15 @@ This is equivalent to using the `--strict` CLI switch.
 ```
 
 
-### `:parse_timeout`
+## Using a custom configuration
 
-Configures a timeout for parsing source files in milliseconds (*defaults to 5000 milliseconds*).
+You can tell Credo to use a custom config key instead of `default`:
+
+```bash
+mix credo --config-name <CONFIG_NAME>
+```
+
+For example, given the following config file:
 
 ```elixir
 # .credo.exs
@@ -200,55 +339,22 @@ Configures a timeout for parsing source files in milliseconds (*defaults to 5000
   configs: [
     %{
       name: "default",
-      parse_timeout: 60_000,
       # files, checks etc.
-    }
-  ]
-}
-```
-
-
-### `:color`
-
-Set to `false` to disable colored output (*defaults to `true`*).
-
-This is equivalent to using the `--no-color` CLI switch.
-
-```elixir
-# .credo.exs
-%{
-  configs: [
+    },
     %{
-      name: "default",
-      color: false,
+      name: "picky",
+      strict: true,
       # files, checks etc.
-    }
+    },
   ]
 }
 ```
 
+You can run the `picky` config with this command:
 
-### `:checks`
-
-Configures check modules that Credo should load at start up (*defaults to `[]`*).
-
-```elixir
-# .credo.exs
-%{
-  configs: [
-    %{
-      name: "default",
-      checks: [
-        {Credo.Check.Consistency.TabsOrSpaces, false},
-        {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2},
-      ],
-      # files etc.
-    }
-  ]
-}
+```bash
+mix credo --config-name picky
 ```
-
-Read more about [check configuration](./check_params.md) and [adding custom checks](../custom_checks/adding_checks.md).
 
 
 ## Using a specific configuration file
@@ -259,8 +365,11 @@ You can tell Credo to use a specific config file anywhere in the file system:
 mix credo --config-file <PATH_TO_CONFIG_FILE>
 ```
 
-Please note that when specifying a config file this way, only that config files contents are loaded.
-The "Transitive configuration files" mechanism described in the next section does not apply in this case.
+> #### Note {: .warning}
+>
+> Specifying a config file this way, only that config file's contents are loaded.
+> The "Transitive configuration files" mechanism described in the next section does not apply in this case.
+
 
 ## Transitive configuration files
 
