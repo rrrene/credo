@@ -115,7 +115,7 @@ Enables *only* the given checks. This is an easy way to pin a project's checks.
       name: "default",
       checks: %{
         enabled: [
-          # this means that `TabsOrSpaces` will not run
+          # this means that only `TabsOrSpaces` will run
           {Credo.Check.Consistency.TabsOrSpaces, []},
         ]
       }
