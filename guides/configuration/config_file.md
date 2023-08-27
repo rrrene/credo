@@ -152,9 +152,28 @@ This has the added benefit that, when re-enabled via [`--enable-disabled-checks`
 
 #### `:extra`
 
-Configures the given checks with the given parameters.
+Enables and configures the given checks with the given parameters.
 
-[Credo configs are transitive](config_file.html#transitive-configuration-files) in nature, so this can be useful in a situation where you want to pin checks for an umbrella, but want to overwrite individual checks in a child app.
+This can be used in a [Credo Plugin](../plugins/creating_plugins.md) to [add a check to the current Credo config](Credo.Plugin.html#register_default_config/2) ([configs are transitive](config_file.html#transitive-configuration-files)) without interfering with what other configs are doing.
+
+```elixir
+# a manually registered Config in a Credo Plugin (see links above)
+%{
+  configs: [
+    %{
+      name: "default",
+      checks: %{
+        extra: [
+          {MyCredoPlugin.Check.BetterTabsOrSpaces, []},
+        ]
+      }
+      # files etc.
+    }
+  ]
+}
+```
+
+This can also be useful in a situation where you want to enable checks for an umbrella, but want to overwrite individual checks in a child app.
 
 
 ```elixir
