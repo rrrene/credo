@@ -8,6 +8,7 @@ defmodule Credo.Application do
     Credo.Service.SourceFileAST,
     Credo.Service.SourceFileLines,
     Credo.Service.SourceFileScopes,
+    Credo.Service.SourceFileScopePriorities,
     Credo.Service.SourceFileSource
   ]
 
