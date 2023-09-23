@@ -44,7 +44,7 @@ defmodule Credo.Check.Readability.DuplicatedAliases do
       issue_meta,
       message:
         "Duplicated alias: #{format_alias(trigger)}, already defined in line #{existing_alias_line_no}",
-      trigger: "#{format_alias(trigger)}",
+      trigger: format_alias(trigger),
       line_no: line_no
     )
   end
