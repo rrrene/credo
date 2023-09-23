@@ -1,5 +1,18 @@
 defmodule Credo.Check.Readability.DuplicatedAliases do
-  use Credo.Check
+  use Credo.Check,
+    base_priority: :low,
+    category: :readability,
+    explanations: [
+      check: """
+      Sometimes during code reviews in large projects with modules that use many
+      aliases, there can be issues when solving conflicts and some duplicated
+      may end up not being noticed by reviewers and get merged into the main
+      branch.
+
+      These duplicated alias can accumulate over many different files over time
+      and make the aliases section of a file larger and more confusing.
+      """
+    ]
 
   alias Credo.SourceFile
 
