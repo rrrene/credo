@@ -95,6 +95,7 @@
           ## Readability Checks
           #
           {Credo.Check.Readability.AliasOrder, []},
+          {Credo.Check.Readability.DuplicatedAliases, []},
           {Credo.Check.Readability.FunctionNames, []},
           {Credo.Check.Readability.LargeNumbers, []},
           {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 120]},
