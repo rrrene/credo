@@ -49,4 +49,32 @@ defmodule Credo.Check.Readability.DuplicatedAliasesTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "should NOT raise an issue for single line alias + duplicated multi-alias" do
+    file = """
+    defmodule M1 do
+      alias IO.ANSI
+      alias {IO.ANSI, URI}
+    end
+    """
+
+    file
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "should NOT raise an issue for duplicated alias between multi-aliases" do
+    file = """
+    defmodule M1 do
+      alias {IO.ANSI, URI}
+      alias {File, IO.ANSI}
+    end
+    """
+
+    file
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
