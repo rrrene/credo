@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1
+
+- Fix compatibility & compiler warnings with Elixir 1.15
+- Improve docs
+- `Credo.Check.Readability.Specs` works for parensless definitions
+
 ## 1.7.0
 
 - `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
