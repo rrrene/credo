@@ -17,26 +17,26 @@ $ mix credo suggest --checks-without-tag formatter --checks-without-tag controve
 
 ## Command Line Switches
 
-| Name, shorthand                                                                                    | Description                                                             |
-|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [`--all`](#all), [`-a`](#all)                                                                      | Show all issues for each category                                       |
-| [`--all-priorities`](#all-priorities-aliased-as-strict), [`-A`](#all-priorities-aliased-as-strict) | Show all issues including low priority ones                             |
-| [`--checks`](#checks-aliased-as-only)                                                              | Only include checks that match the given comma-seperated patterns       |
-| [`--checks-with-tag`](#checks-with-tag)                                                            | Only include checks that match the given tag                            |
-| [`--checks-without-tag`](#checks-without-tag)                                                      | Ignore checks that match the given tag                                  |
-| [`--config-file`](#config-file)                                                                    | Use the given config file as Credo's config                             |
-| [`--config-name`](#config-name)                                                                    | Use the given config instead of "default"                               |
-| [`--enable-disabled-checks`](#enable-disabled-checks)                                              | Re-enable disabled checks that match the given comma-seperated patterns |
-| [`--files-included`](#files-included)                                                              | Only include these files                                                |
-| [`--files-excluded`](#files-excluded)                                                              | Exclude these files                                                     |
-| [`--format`](#format)                                                                              | Display the list in a specific format (json, flycheck, or oneline)      |
-| [`--ignore-checks`](#ignore-checks-aliased-as-ignore)                                              | Ignore checks that match the given comma-seperated patterns             |
-| [`--ignore`](#ignore)                                                                              | Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore)         |
-| [`--min-priority`](#min-priority)                                                                  | Minimum priority to show issues                                         |
-| [`--mute-exit-status`](#mute-exit-status)                                                          | Exit with status zero even if there are issues                          |
-| [`--only`](#only)                                                                                  | Alias for [`--checks`](#checks-aliased-as-only)                         |
-| [`--strict`](#strict)                                                                              | Alias for [`--all-priorities`](#all-priorities-aliased-as-strict)       |
-| [`--verbose`](#verbose)                                                                            | Additionally print the check and the source code that raised the issue  |
+| Name, shorthand                                                                                    | Description                                                              |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [`--all`](#all), [`-a`](#all)                                                                      | Show all issues for each category                                        |
+| [`--all-priorities`](#all-priorities-aliased-as-strict), [`-A`](#all-priorities-aliased-as-strict) | Show all issues including low priority ones                              |
+| [`--checks`](#checks-aliased-as-only)                                                              | Only include checks that match the given comma-seperated patterns        |
+| [`--checks-with-tag`](#checks-with-tag)                                                            | Only include checks that match the given tag                             |
+| [`--checks-without-tag`](#checks-without-tag)                                                      | Ignore checks that match the given tag                                   |
+| [`--config-file`](#config-file)                                                                    | Use the given config file as Credo's config                              |
+| [`--config-name`](#config-name)                                                                    | Use the given config instead of "default"                                |
+| [`--enable-disabled-checks`](#enable-disabled-checks)                                              | Re-enable disabled checks that match the given comma-seperated patterns  |
+| [`--files-included`](#files-included)                                                              | Only include these files                                                 |
+| [`--files-excluded`](#files-excluded)                                                              | Exclude these files                                                      |
+| [`--format`](#format)                                                                              | Display the list in a specific format (json, flycheck, sarif or oneline) |
+| [`--ignore-checks`](#ignore-checks-aliased-as-ignore)                                              | Ignore checks that match the given comma-seperated patterns              |
+| [`--ignore`](#ignore)                                                                              | Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore)          |
+| [`--min-priority`](#min-priority)                                                                  | Minimum priority to show issues                                          |
+| [`--mute-exit-status`](#mute-exit-status)                                                          | Exit with status zero even if there are issues                           |
+| [`--only`](#only)                                                                                  | Alias for [`--checks`](#checks-aliased-as-only)                          |
+| [`--strict`](#strict)                                                                              | Alias for [`--all-priorities`](#all-priorities-aliased-as-strict)        |
+| [`--verbose`](#verbose)                                                                            | Additionally print the check and the source code that raised the issue   |
 
 ## Descriptions
 
@@ -151,7 +151,7 @@ $ mix credo --files-excluded "./test/**/*.exs"
 
 ### `--format`
 
-Display the list in a specific format (json, flycheck, or oneline)
+Display the list in a specific format (json, flycheck, sarif or oneline)
 
 ```bash
 $ mix credo --format json

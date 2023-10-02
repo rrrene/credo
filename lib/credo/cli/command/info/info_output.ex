@@ -40,7 +40,7 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
             --enable-disabled-checks  Re-enable disabled checks that match the given strings
             --files-included          Only include these files (accepts globs, can be used multiple times)
             --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-            --format                  Display the list in a specific format (json,flycheck,oneline)
+            --format                  Display the list in a specific format (json,flycheck,sarif,oneline)
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
             --min-priority            Minimum priority to show issues (higher,high,normal,low,ignore or number)
