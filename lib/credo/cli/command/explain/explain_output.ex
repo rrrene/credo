@@ -31,7 +31,7 @@ defmodule Credo.CLI.Command.Explain.ExplainOutput do
       """
 
       Explain options:
-            --format            Display the list in a specific format (json,flycheck,oneline)
+            --format            Display the list in a specific format (json,flycheck,sarif,oneline)
 
       General options:
             --[no-]color        Toggle colored output
