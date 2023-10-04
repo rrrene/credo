@@ -19,9 +19,14 @@ defmodule Credo.Check.Runner do
       |> warn_about_ineffective_patterns(exec)
       |> fix_deprecated_notation_for_checks_without_params()
 
-    Credo.Check.Worker.run(check_tuples, exec.max_concurrent_check_runs, fn check_tuple ->
-      run_check(exec, check_tuple)
-    end)
+    check_tuples
+    |> Task.async_stream(
+      fn check_tuple ->
+        run_check(exec, check_tuple)
+      end,
+      timeout: :infinity
+    )
+    |> Stream.run()
 
     :ok
   end

@@ -392,8 +392,11 @@ defmodule Credo.Check do
 
       defp do_run_on_all_source_files(exec, source_files, params) do
         source_files
-        |> Enum.map(&Task.async(fn -> run_on_source_file(exec, &1, params) end))
-        |> Enum.each(&Task.await(&1, :infinity))
+        |> Task.async_stream(fn source -> run_on_source_file(exec, source, params) end,
+          max_concurrency: exec.max_concurrent_check_runs,
+          timeout: :infinity
+        )
+        |> Stream.run()
 
         :ok
       end
