@@ -104,7 +104,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   defp run_credo_on_dir(exec, dirname, previous_git_ref, given_ref) do
     {previous_argv, _last_arg} =
       exec.argv
-      |> Enum.slice(1..-1)
+      |> Enum.slice(1..-1//1)
       |> Enum.reduce({[], nil}, fn
         _, {argv, "--working-dir"} -> {Enum.slice(argv, 1..-2), nil}
         _, {argv, "--from-git-merge-base"} -> {Enum.slice(argv, 1..-2), nil}

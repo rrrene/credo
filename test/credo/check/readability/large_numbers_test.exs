@@ -136,7 +136,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
 
   test "check old false positive is fixed /3" do
     """
-    check all integer <- integer(-10_000..-1) do
+    check all integer <- integer(-10_000..-1//1) do
       assert is_integer(integer)
     end
     """
