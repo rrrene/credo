@@ -90,11 +90,11 @@ jobs:
              repo: https://github.com/nerves-project/nerves.git
 
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: 25.3
-          elixir-version: 1.15.6
+          otp-version: 26.1
+          elixir-version: 1.15.7
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile
