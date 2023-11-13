@@ -58,7 +58,7 @@ defmodule Credo.Code.InterpolationHelper do
     line = String.to_charlist(line)
     part1 = Enum.slice(line, 0, col_start - 1)
     part2 = String.to_charlist(String.duplicate(char, length))
-    part3 = Enum.slice(line, (col_end - 1)..-1)
+    part3 = Credo.Backports.Enum.slice(line, (col_end - 1)..-1)
     List.to_string(part1 ++ part2 ++ part3)
   end
 
