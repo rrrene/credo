@@ -144,7 +144,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   defp number_in_range?(line, column) do
     line
-    |> String.slice(column..-1)
+    |> Credo.Backports.String.slice(column..-1)
     |> String.match?(~r/^\d+\.\./)
   end
 
@@ -171,13 +171,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     # -1 because we need to subtract the operator
     binary_pattern_end_after? =
       line
-      |> String.slice(column..-1)
+      |> Credo.Backports.String.slice(column..-1)
       |> String.match?(~r/\>\>/)
 
     # -1 because we need to subtract the operator
     typed_after? =
       line
-      |> String.slice(column..-1)
+      |> Credo.Backports.String.slice(column..-1)
       |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/)
 
     # -2 because we need to subtract the operator
