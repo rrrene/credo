@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.2
+
+- Fix compatibility & compiler warnings with Elixir 1.16
+
 ## 1.7.1
 
 - Fix compatibility & compiler warnings with Elixir 1.15
