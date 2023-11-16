@@ -13,24 +13,24 @@ jobs:
       fail-fast: false
       matrix:
         otp: [23.3, 24.2, 25.3]
-        elixir: [1.11.4, 1.12.2, 1.13.4, 1.14.5, 1.15.6]
+        elixir: [1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7]
         exclude:
           - elixir: 1.11.4
             otp: 25.3
-          - elixir: 1.12.2
+          - elixir: 1.12.3
             otp: 25.3
           - elixir: 1.14.5
             otp: 25.3
-          - elixir: 1.15.6
-            otp: 26.0
-          - elixir: 1.15.6
+          - elixir: 1.15.7
+            otp: 26.1
+          - elixir: 1.15.7
             otp: 23.3
-          - elixir: 1.15.6
+          - elixir: 1.15.7
             otp: 24.2
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
@@ -48,12 +48,12 @@ jobs:
     strategy:
       matrix:
         otp: [21.3, 22.3, 23.3, 24.2]
-        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4, 1.14.0]
+        elixir: [1.10.4, 1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7]
         exclude:
           - otp: 24.2
             elixir: 1.10.4
           - otp: 21.3
-            elixir: 1.12.2
+            elixir: 1.12.3
           - otp: 21.3
             elixir: 1.13.4
           - otp: 21.3
@@ -61,7 +61,7 @@ jobs:
           - otp: 22.3
             elixir: 1.14.0
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
