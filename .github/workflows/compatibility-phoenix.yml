@@ -22,11 +22,12 @@ jobs:
           - elixir: 1.14.5
             otp: 25.3
           - elixir: 1.15.7
-            otp: 26.1
-          - elixir: 1.15.7
             otp: 23.3
           - elixir: 1.15.7
             otp: 24.2
+        include:
+          - elixir: 1.15.7
+            otp: 26.1
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
     steps:
