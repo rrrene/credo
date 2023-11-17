@@ -124,4 +124,18 @@ defmodule Credo.Check.Warning.MixEnvTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report violations from variables named like def operations" do
+    """
+    defmodule CredoSampleModule do
+      def some_function do
+        def = Mix.env()
+        defp = &Mix.env/0
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues()
+  end
 end

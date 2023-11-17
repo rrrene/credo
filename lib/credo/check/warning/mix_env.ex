@@ -53,7 +53,7 @@ defmodule Credo.Check.Warning.MixEnv do
 
   for op <- @def_ops do
     # catch variables named e.g. `defp`
-    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do
+    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta) do
       {ast, issues}
     end
 
