@@ -31,6 +31,8 @@ jobs:
         include:
           - elixir: 1.15.7
             otp: 26.1
+          - elixir: 1.16.0-rc.0
+            otp: 26.1
     steps:
       - uses: actions/checkout@v4
         with:
