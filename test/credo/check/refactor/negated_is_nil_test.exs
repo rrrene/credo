@@ -108,4 +108,32 @@ defmodule Credo.Check.Refactor.NegatedIsNilTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  test "it should report only one violation in a module with multiple functions when only one is problematic" do
+    """
+    defmodule CredoSampleModule do
+      def hello(a) when not is_nil(a), do: a
+      def foo1(x) when is_integer(x), do: x
+      def foo2(x) when is_integer(x), do: x
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report two violations in a module with multiple functions when two are problematic" do
+    """
+    defmodule CredoSampleModule do
+      def hello(a) when not is_nil(a), do: a
+      def foo1(x) when is_integer(x), do: x
+      def foo2(x) when is_integer(x), do: x
+      def hello2(a) when not is_nil(a), do: a
+      def foo3(x) when is_integer(x), do: x
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+  end
 end
