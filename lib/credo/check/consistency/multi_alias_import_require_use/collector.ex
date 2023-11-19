@@ -7,20 +7,34 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
 
   def collect_matches(source_file, _params) do
     source_file
-    |> Credo.Code.prewalk(&traverse/2, [])
-    |> group_usages
-    |> count_occurrences
+    |> Credo.Code.prewalk(&traverse/2, {%{}, nil})
+    |> elem(0)
+    |> Enum.map(fn {_mod_name, aliases} ->
+      aliases
+      |> group_usages
+      |> count_occurrences
+    end)
+    |> merge_module_stats()
   end
 
   def find_locations_not_matching(expected, source_file) do
     source_file
-    |> Credo.Code.prewalk(&traverse/2, [])
-    |> group_usages
-    |> drop_locations(expected)
+    |> Credo.Code.prewalk(&traverse/2, {%{}, nil})
+    |> elem(0)
+    |> Enum.map(fn {_mod_name, aliases} ->
+      aliases
+      |> group_usages
+      |> drop_locations(expected)
+    end)
+    |> List.flatten()
   end
 
-  defp traverse({directive, meta, arguments} = ast, acc)
-       when directive in @directives do
+  defp traverse({:defmodule, _, [{:__aliases__, _, mod_name} | _]} = ast, {acc, _}) do
+    {ast, {Map.put(acc, mod_name, []), mod_name}}
+  end
+
+  defp traverse({directive, meta, arguments} = ast, {acc, current_module})
+       when directive in @directives and not is_nil(current_module) do
     aliases =
       case arguments do
         [{:__aliases__, _, nested_modules}] when length(nested_modules) > 1 ->
@@ -35,9 +49,12 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
       end
 
     if aliases do
-      {ast, [{directive, aliases, meta[:line]} | acc]}
+      updated_acc = Map.update(acc, current_module, [], fn entries ->
+        [{directive, aliases, meta[:line]} | entries]
+      end)
+      {ast, {updated_acc, current_module}}
     else
-      {ast, acc}
+      {ast, {acc, current_module}}
     end
   end
 
@@ -93,5 +110,13 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
       end)
 
     {:lists.reverse(acc1), :lists.reverse(acc2)}
+  end
+
+  defp merge_module_stats(stats_list) do
+    Enum.reduce(stats_list, %{}, fn stats, acc ->
+      Enum.reduce(stats, acc, fn {key, val}, acc ->
+        Map.update(acc, key, val, &(&1 + val))
+      end)
+    end)
   end
 end
