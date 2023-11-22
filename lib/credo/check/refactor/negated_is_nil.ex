@@ -68,7 +68,7 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
     {_, first_op_issues} = traverse({:when, meta, [fun, first_op]}, [], issue_meta)
     {_, second_op_issues} = traverse({:when, meta, [fun, second_op]}, [], issue_meta)
 
-    {ast, first_op_issues ++ second_op_issues ++ issues}
+    {ast, (first_op_issues ++ (second_op_issues -- issues))}
   end
 
   defp traverse(ast, issues, _), do: {ast, issues}

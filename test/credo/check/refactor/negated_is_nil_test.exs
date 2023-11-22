@@ -57,6 +57,37 @@ defmodule Credo.Check.Refactor.NegatedIsNilTest do
     |> assert_issue()
   end
 
+  test "it should report multiple violations with guards - `when not is_nil and guard not is nil`" do
+    """
+    defmodule CredoSampleModule do
+      defguard my_guard(value) when not is_nil(value)
+
+      def some_function(parameter1, parameter2, parameter3) when not is_nil(parameter1) and my_guard(parameter2) and my_guard(parameter3) do
+        something
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
+      assert Enum.count(issues) == 2
+    end)
+  end
+
+  test "it should report one violation - `when not is_nil and not is nil`" do
+    # This is due to the way the check works, and is probably fine since it will fail if the first one is removed
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2, parameter3) when not is_nil(parameter2) and not is_nil(parameter3) and is_nil(parameter3) do
+        something
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation - `when not is_nil is part of a multi clause guard`" do
     """
     defmodule CredoSampleModule do
