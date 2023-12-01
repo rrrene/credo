@@ -41,6 +41,68 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
     end
   end
 
+  describe "Version-specific" do
+    for fun <- @logger_functions do
+      if Version.match?(System.version(), "~> 1.15") do
+        test "it should report a violation when Logger.#{fun}/2 is used with metadata not present in default_formatter but present in console in ~> 1.15 Elixir" do
+          """
+          defmodule CredoSampleModule do
+            def some_function(parameter1, parameter2) do
+              var_1 = "Hello world"
+              Logger.#{unquote(fun)}("The module: #\{var1\}", key_old: "value")
+            end
+          end
+          """
+          |> to_source_file
+          |> run_check(@described_check)
+          |> assert_issue()
+        end
+
+        test "it should NOT report a violation when Logger.#{fun}/2 is used with metadata present in default_formatter in ~> 1.15 Elixir" do
+          """
+          defmodule CredoSampleModule do
+            def some_function(parameter1, parameter2) do
+              var_1 = "Hello world"
+              Logger.#{unquote(fun)}("The module: #\{var1\}", key_new: "value")
+            end
+          end
+          """
+          |> to_source_file
+          |> run_check(@described_check)
+          |> refute_issues()
+        end
+      else
+        test "it should NOT report a violation when Logger.#{fun}/2 is used with metadata not present in default_formatter but present in console in <= 1.15 Elixir" do
+          """
+          defmodule CredoSampleModule do
+            def some_function(parameter1, parameter2) do
+              var_1 = "Hello world"
+              Logger.#{unquote(fun)}("The module: #\{var1\}", key_old: "value")
+            end
+          end
+          """
+          |> to_source_file
+          |> run_check(@described_check)
+          |> refute_issues()
+        end
+
+        test "it should report a violation when Logger.#{fun}/2 is used with metadata present in default_formatter in <= 1.15 Elixir" do
+          """
+          defmodule CredoSampleModule do
+            def some_function(parameter1, parameter2) do
+              var_1 = "Hello world"
+              Logger.#{unquote(fun)}("The module: #\{var1\}", key_new: "value")
+            end
+          end
+          """
+          |> to_source_file
+          |> run_check(@described_check)
+          |> assert_issue()
+        end
+      end
+    end
+  end
+
   for fun <- @logger_functions do
     test "it should report a violation when Logger.#{fun}/2 is used with disallowed metadata" do
       """
