@@ -155,12 +155,20 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   end
 
   defp find_metadata_keys(params) do
-    metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
+    with [] <- Params.get(params, :metadata_keys, __MODULE__) do
+      find_metadata_from_config()
+    end
+  end
 
-    if metadata_keys == [] do
-      :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
+  defp find_metadata_from_config do
+    with true <- Version.match?(System.version(), "~> 1.15"),
+         {:ok, options} <- Application.fetch_env(:logger, :default_formatter) do
+      Keyword.get(options, :metadata, [])
     else
-      metadata_keys
+      _ ->
+        :logger
+        |> Application.get_env(:console, [])
+        |> Keyword.get(:metadata, [])
     end
   end
 end
