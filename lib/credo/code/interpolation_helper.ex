@@ -271,6 +271,6 @@ defmodule Credo.Code.InterpolationHelper do
     # col-1 to account for col being 1-based
     start = max(col_end - 1, 0)
 
-    String.slice(line, start..-1)
+    Credo.Backports.String.slice(line, start..-1)
   end
 end

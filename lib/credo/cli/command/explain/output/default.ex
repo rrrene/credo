@@ -269,7 +269,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
     |> String.trim()
     |> String.split("\n")
     |> Enum.flat_map(&format_explanation(&1, outer_color))
-    |> Enum.slice(0..-2)
+    |> Credo.Backports.Enum.slice(0..-2)
     |> UI.puts()
 
     UI.puts_edge([outer_color, :faint])

@@ -106,11 +106,11 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
       exec.argv
       |> Credo.Backports.Enum.slice(1..-1)
       |> Enum.reduce({[], nil}, fn
-        _, {argv, "--working-dir"} -> {Enum.slice(argv, 1..-2), nil}
-        _, {argv, "--from-git-merge-base"} -> {Enum.slice(argv, 1..-2), nil}
-        _, {argv, "--from-git-ref"} -> {Enum.slice(argv, 1..-2), nil}
-        _, {argv, "--from-dir"} -> {Enum.slice(argv, 1..-2), nil}
-        _, {argv, "--since"} -> {Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--working-dir"} -> {Credo.Backports.Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--from-git-merge-base"} -> {Credo.Backports.Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--from-git-ref"} -> {Credo.Backports.Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--from-dir"} -> {Credo.Backports.Enum.slice(argv, 1..-2), nil}
+        _, {argv, "--since"} -> {Credo.Backports.Enum.slice(argv, 1..-2), nil}
         "--show-fixed", {argv, _last_arg} -> {argv, nil}
         "--show-kept", {argv, _last_arg} -> {argv, nil}
         ^previous_git_ref, {argv, _last_arg} -> {argv, nil}
