@@ -171,6 +171,7 @@ defmodule Credo.Check do
     warning: 16
   }
 
+  alias Credo.Service.SourceFileScopePriorities
   alias Credo.Check
   alias Credo.Check.Params
   alias Credo.Code.Scope
@@ -759,7 +760,18 @@ defmodule Credo.Check do
   end
 
   defp priority_for(source_file, scope) do
-    scope_prio_map = Priority.scope_priorities(source_file)
+    # Caching scope priorities, because these have to be computed only once per file. This
+    # significantly speeds up the execution time when a large number of issues are generated.
+    scope_prio_map =
+      case SourceFileScopePriorities.get(source_file) do
+        {:ok, value} ->
+          value
+
+        :notfound ->
+          result = Priority.scope_priorities(source_file)
+          SourceFileScopePriorities.put(source_file, result)
+          result
+      end
 
     scope_prio_map[scope] || 0
   end
