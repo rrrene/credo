@@ -42,12 +42,14 @@ defmodule Credo.Execution do
             enable_disabled_checks: nil,
             ignore_checks_tags: [],
             ignore_checks: nil,
-            max_concurrent_check_runs: nil,
             min_priority: 0,
             mute_exit_status: false,
             only_checks_tags: [],
             only_checks: nil,
             read_from_stdin: false,
+
+            # This is no longer used, but we keep it so existing plugins that use it don't break
+            max_concurrent_check_runs: nil,
 
             # state, which is accessed and changed over the course of Credo's execution
             pipeline_map: %{},
