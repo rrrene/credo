@@ -25,7 +25,7 @@
   <p>
     Analysis in
     <code>
-      <%= File.cwd! %>
+      <%= File.cwd!() %>
     </code> took
     <strong><%= @time_total %> ms</strong> (<%= @time_load %> ms to load, <%= @time_run %> ms running checks)
   </p>

@@ -96,7 +96,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
 
   test "it should report slightly unexpected code" do
     """
-    defmodule Person, do: def greet(), do: :howdy
+    defmodule Person, do: def(greet(), do: :howdy)
     """
     |> to_source_file
     |> run_check(@described_check)
