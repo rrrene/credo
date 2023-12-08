@@ -190,4 +190,28 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> run_check(NestedFunctionCalls)
     |> assert_issue()
   end
+
+  test "it should NOT report any issues when Kernel.to_string() is called inside a string interpolation" do
+    ~S"""
+    defmodule FeatureFlag.Adapters.Test do
+      def get(flag, context, fallback) do
+        args = {flag, context, fallback}
+        case :ets.lookup(@table, flag) do
+          [] ->
+            raise "No stubs found for #{inspect(args)}"
+
+          stubs ->
+            attempt_stubs(args, Enum.reverse(stubs))
+        end
+      end
+
+      defp attempt_stubs(args, []) do
+        raise "No stub found for args: #{inspect(args)}"
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
 end
