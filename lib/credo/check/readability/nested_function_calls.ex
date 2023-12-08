@@ -252,6 +252,13 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
         ),
         do: true
 
+    # Kernel.to_string() in a string interpolation
+    def cannot_be_in_pipeline?(
+          {{:., _, [Kernel, :to_string]}, meta, _} = _ast,
+          _excluded_functions,
+          _excluded_argument_types
+        ), do: meta[:from_interpolation]
+
     # Elixir <= 1.8.0
     # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
     # we want to consider these charlists a valid pipe chain start
