@@ -59,8 +59,13 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   # A fully qualified call with no arguments
-  defp traverse({{:., _meta, _call}, _meta2, []} = ast, accumulator, _issue) do
-    {ast, accumulator}
+  defp traverse({{:., _meta, _call}, _meta2, []} = ast, acc, _issue) do
+    {ast, acc}
+  end
+
+  # We don't look into interpolations in strings/binaries
+  defp traverse({:<<>>, _meta, _args}, acc, _issue) do
+    {nil, acc}
   end
 
   # Any call
@@ -251,13 +256,6 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
           _excluded_argument_types
         ),
         do: true
-
-    # Kernel.to_string() in a string interpolation
-    def cannot_be_in_pipeline?(
-          {{:., _, [Kernel, :to_string]}, meta, _} = ast,
-          _excluded_functions,
-          _excluded_argument_types
-        ), do: meta[:from_interpolation]
 
     # Elixir <= 1.8.0
     # '__#{val}__' are compiled to String.to_charlist("__#{val}__")
