@@ -61,6 +61,14 @@ defmodule Credo.Check.Warning.Dbg do
     {ast, issues_for_call(meta, issues, issue_meta)}
   end
 
+  defp traverse(
+         {:|>, _, [_, {:dbg, meta, nil}]} = ast,
+         issues,
+         issue_meta
+       ) do
+    {ast, issues_for_call(meta, issues, issue_meta)}
+  end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end

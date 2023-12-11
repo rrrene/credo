@@ -181,4 +181,18 @@ defmodule Credo.Check.Warning.DbgTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "it should report a violation /10" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def headers_to_strings(headers) do
+        :x |> dbg
+        Enum.map(headers, fn {key, value} -> "#{key}: #{value}" end)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
