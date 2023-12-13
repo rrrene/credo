@@ -18,7 +18,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
       In your app's logger configuration, you would need to include the `:error_code` key:
 
-          config :logger, :console,
+          config :logger, :default_formatter,
             format: "[$level] $message $metadata\\n",
             metadata: [:error_code, :file]
 
@@ -31,8 +31,8 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
         metadata_keys: """
         Do not raise an issue for these Logger metadata keys.
 
-        By default, we assume the metadata keys listed under your `console`
-        backend.
+        By default, we read the metadata keys configured as the current environment's
+        `:default_formatter` (or `:console` for older versions of Elixir).
         """
       ]
     ]
@@ -42,24 +42,22 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   @doc false
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ignore_check? = find_metadata_keys(params) == :all
 
-    if ignore_check?(issue_meta) do
+    if ignore_check? do
       []
     else
-      state = {false, []}
-
-      {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
-
-      issues
+      do_run(source_file, params)
     end
   end
 
-  # if logger metadata: :all is set, then ignore this check
-  defp ignore_check?(issue_meta) do
-    issue_meta_params = IssueMeta.params(issue_meta)
-    metadata_keys = find_metadata_keys(issue_meta_params)
-    metadata_keys == :all
+  defp do_run(source_file, params) do
+    issue_meta = IssueMeta.for(source_file, params)
+    state = {false, []}
+
+    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+
+    issues
   end
 
   defp traverse(
@@ -149,7 +147,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp logger_import?(_), do: false
 
   defp issue_for(issue_meta, line_no, missed_keys) do
-    message = "Logger metadata key #{Enum.join(missed_keys, ", ")} will be ignored in production"
+    message = "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config"
 
     format_issue(issue_meta, message: message, line_no: line_no)
   end
@@ -158,9 +156,23 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
 
     if metadata_keys == [] do
-      :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
+      find_metadata_keys_in_logger_config() || []
     else
       metadata_keys
     end
+  end
+
+  if Version.match?(System.version(), ">= 1.15.0-rc") do
+    defp find_metadata_keys_in_logger_config(),
+      do: find_metadata_keys_in_logger_config(:default_formatter)
+  else
+    defp find_metadata_keys_in_logger_config(),
+      do: find_metadata_keys_in_logger_config(:console)
+  end
+
+  defp find_metadata_keys_in_logger_config(key) do
+    :logger
+    |> Application.get_env(key, [])
+    |> Keyword.get(:metadata)
   end
 end
