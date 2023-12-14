@@ -53,11 +53,13 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
 
   defp traverse({:when, meta, [_, {negation, _, [{:is_nil, _, _}]}]} = ast, issues, issue_meta)
        when negation in [:!, :not] do
+    trigger = to_string(negation)
+
     issue =
       format_issue(
         issue_meta,
         message: "Negated is_nil in guard clause found",
-        trigger: "when !/not is_nil",
+        trigger: trigger,
         line_no: meta[:line]
       )
 

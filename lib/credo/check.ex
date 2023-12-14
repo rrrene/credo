@@ -634,7 +634,7 @@ defmodule Credo.Check do
   options to `format_issue/2`:
 
   - `:priority`     Sets the issue's priority.
-  - `:trigger`      Sets the issue's trigger.
+  - `:trigger`      Sets the issue's trigger, i.e. the text causing the issue (see `Credo.Check.Warning.IoInspect`).
   - `:line_no`      Sets the issue's line number. Tries to find `column` if `:trigger` is supplied.
   - `:column`       Sets the issue's column.
   - `:exit_status`  Sets the issue's exit_status.
