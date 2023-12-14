@@ -7,7 +7,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
   # cases NOT raising issues
   #
 
-  test "does not trigger when using Enum.count/2" do
+  test "it should NOT report when using Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -20,7 +20,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> refute_issues()
   end
 
-  test "does not trigger when piping list into Enum.filter/2 and piping result of that into Enum.count/2" do
+  test "it should NOT report when piping list into Enum.filter/2 and piping result of that into Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -35,7 +35,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> refute_issues()
   end
 
-  test "does not trigger when filter-count pipeline is part of a larger pipeline using Enum.count/2" do
+  test "it should NOT report when part of a larger pipeline using Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -52,7 +52,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> refute_issues()
   end
 
-  test "does not trigger when piping list into Enum.filter/2 and passing result as parameter to Enum.count/2" do
+  test "it should NOT report when piping list into Enum.filter/2 and passing result as parameter to Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -65,7 +65,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> refute_issues()
   end
 
-  test "does not trigger when applying Enum.filter/2 to two arguments and passing result to Enum.count/2" do
+  test "it should NOT report when applying Enum.filter/2 to two arguments and passing result to Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
@@ -78,7 +78,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> refute_issues()
   end
 
-  test "does not trigger when applying Enum.filter/2 to two arguments and piping into Enum.count/2" do
+  test "it should NOT report when applying Enum.filter/2 to two arguments and piping into Enum.count/2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -96,7 +96,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
   # cases raising issues
   #
 
-  test "triggers when piping list into Enum.filter/2 and piping result of that into Enum.count/1" do
+  test "it should report a violation when piping list into Enum.filter/2 and piping result of that into Enum.count/1" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -111,7 +111,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> assert_issue()
   end
 
-  test "triggers when filter-count pipeline is part of a larger pipeline" do
+  test "it should report a violation when filter-count pipeline is part of a larger pipeline" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -128,7 +128,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> assert_issue()
   end
 
-  test "triggers when piping list into Enum.filter/2 and passing result as parameter to Enum.count/1" do
+  test "it should report a violation when piping list into Enum.filter/2 and passing result as parameter to Enum.count/1" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -141,7 +141,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> assert_issue()
   end
 
-  test "triggers when applying Enum.filter/2 to two arguments and passing result to Enum.count/1" do
+  test "it should report a violation when applying Enum.filter/2 to two arguments and passing result to Enum.count/1" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
@@ -154,7 +154,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     |> assert_issue()
   end
 
-  test "triggers when applying Enum.filter/2 to two arguments and piping into Enum.count/1" do
+  test "it should report a violation when applying Enum.filter/2 to two arguments and piping into Enum.count/1" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
