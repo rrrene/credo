@@ -41,7 +41,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -57,7 +57,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -76,7 +76,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -95,7 +95,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -112,7 +112,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -128,7 +128,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -147,7 +147,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -166,7 +166,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "utc_now_truncate")
+    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -174,12 +174,12 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
     {ast, issues}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no, module) do
     format_issue(
       issue_meta,
       message:
-        "Pass time unit to `{Naive}DateTime.utc_now` instead of composing with `{Naive}DateTime.truncate/2`.",
-      trigger: trigger,
+        "Pass time unit to `#{module}.utc_now` instead of composing with `#{module}.truncate/2`.",
+      trigger: "#{module}.truncate/2",
       line_no: line_no
     )
   end
