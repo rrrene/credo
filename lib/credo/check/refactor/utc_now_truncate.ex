@@ -4,7 +4,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
     base_priority: :high,
     explanations: [
       check: """
-      Pass time unit to `{Naive}DateTime.utc_now` instead of composing with `{Naive}DateTime.truncate/2`.
+      `DateTime.utc_now/1` is more efficient than `DateTime.utc_now/0 |> DateTime.truncate/1`.
 
       This should be refactored:
 
