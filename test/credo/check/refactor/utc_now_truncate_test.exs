@@ -3,7 +3,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
 
   @described_check Credo.Check.Refactor.UtcNowTruncate
 
-  test "triggers when applying DateTime.truncate/2 to DateTime.utc_now/0" do
+  test "should report a violation when applying DateTime.truncate/2 to DateTime.utc_now/0" do
     """
     defmodule M do
       def f do
@@ -16,7 +16,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when applying DateTime.truncate/2 to DateTime.utc_now/1" do
+  test "should report a violation when applying DateTime.truncate/2 to DateTime.utc_now/1" do
     """
     defmodule M do
       def f do
@@ -29,7 +29,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when applying DateTime.truncate/2 to DateTime.utc_now/2" do
+  test "should report a violation when applying DateTime.truncate/2 to DateTime.utc_now/2" do
     """
     defmodule M do
       def f do
@@ -42,7 +42,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of DateTime.utc_now/0 into DateTime.truncate/2" do
+  test "should report a violation when piping result of DateTime.utc_now/0 into DateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -55,7 +55,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of DateTime.utc_now/1 into DateTime.truncate/2" do
+  test "should report a violation when piping result of DateTime.utc_now/1 into DateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -68,7 +68,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of DateTime.utc_now/2 into DateTime.truncate/2" do
+  test "should report a violation when piping result of DateTime.utc_now/2 into DateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -81,7 +81,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to DateTime.utc_now/1 and applying DateTime.truncate/2 to that" do
+  test "should report a violation when piping argument to DateTime.utc_now/1 and applying DateTime.truncate/2 to that" do
     """
     defmodule M do
       def f do
@@ -94,7 +94,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to DateTime.utc_now/2 and applying DateTime.truncate/2 to that" do
+  test "should report a violation when piping argument to DateTime.utc_now/2 and applying DateTime.truncate/2 to that" do
     """
     defmodule M do
       def f do
@@ -107,7 +107,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to DateTime.utc_now/1 and piping result to DateTime.truncate/2" do
+  test "should report a violation when piping argument to DateTime.utc_now/1 and piping result to DateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -120,7 +120,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to DateTime.utc_now/2 and piping result to DateTime.truncate/2" do
+  test "should report a violation when piping argument to DateTime.utc_now/2 and piping result to DateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -133,7 +133,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/0" do
+  test "should report a violation when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/0" do
     """
     defmodule M do
       def f do
@@ -146,7 +146,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/1" do
+  test "should report a violation when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/1" do
     """
     defmodule M do
       def f do
@@ -159,7 +159,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/2" do
+  test "should report a violation when applying NaiveDateTime.truncate/2 to NaiveDateTime.utc_now/2" do
     """
     defmodule M do
       def f do
@@ -172,7 +172,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of NaiveDateTime.utc_now/0 into NaiveDateTime.truncate/2" do
+  test "should report a violation when piping result of NaiveDateTime.utc_now/0 into NaiveDateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -185,7 +185,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of NaiveDateTime.utc_now/1 into NaiveDateTime.truncate/2" do
+  test "should report a violation when piping result of NaiveDateTime.utc_now/1 into NaiveDateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -198,7 +198,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping result of NaiveDateTime.utc_now/2 into NaiveDateTime.truncate/2" do
+  test "should report a violation when piping result of NaiveDateTime.utc_now/2 into NaiveDateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -211,7 +211,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to NaiveDateTime.utc_now/1 and applying NaiveDateTime.truncate/2 to that" do
+  test "should report a violation when piping argument to NaiveDateTime.utc_now/1 and applying NaiveDateTime.truncate/2 to that" do
     """
     defmodule M do
       def f do
@@ -224,7 +224,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to NaiveDateTime.utc_now/2 and applying NaiveDateTime.truncate/2 to that" do
+  test "should report a violation when piping argument to NaiveDateTime.utc_now/2 and applying NaiveDateTime.truncate/2 to that" do
     """
     defmodule M do
       def f do
@@ -237,7 +237,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to NaiveDateTime.utc_now/1 and piping result to NaiveDateTime.truncate/2" do
+  test "should report a violation when piping argument to NaiveDateTime.utc_now/1 and piping result to NaiveDateTime.truncate/2" do
     """
     defmodule M do
       def f do
@@ -250,7 +250,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> assert_issue()
   end
 
-  test "triggers when piping argument to NaiveDateTime.utc_now/2 and piping result to NaiveDateTime.truncate/2" do
+  test "should report a violation when piping argument to NaiveDateTime.utc_now/2 and piping result to NaiveDateTime.truncate/2" do
     """
     defmodule M do
       def f do
