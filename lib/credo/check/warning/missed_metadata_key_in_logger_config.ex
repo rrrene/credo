@@ -38,6 +38,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     ]
 
   @logger_functions ~w(alert critical debug emergency error info notice warn warning metadata log)a
+  @native_logger_metadata_keys [:ansi_color]
 
   @doc false
   @impl Credo.Check
@@ -53,9 +54,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
   defp do_run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+    metadata_keys = find_metadata_keys(params) ++ @native_logger_metadata_keys
+
     state = {false, []}
 
-    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, metadata_keys), state)
 
     issues
   end
@@ -63,10 +66,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
          state,
-         issue_meta
+         issue_meta,
+         metadata_keys
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -74,10 +78,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {fun_name, meta, arguments} = ast,
          {true, _issues} = state,
-         issue_meta
+         issue_meta,
+         metadata_keys
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -85,7 +90,8 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {:import, _meta, arguments} = ast,
          {_module_contains_import?, issues} = state,
-         _issue_meta
+         _issue_meta,
+         _metadata_keys
        ) do
     if logger_import?(arguments) do
       {ast, {true, issues}}
@@ -94,7 +100,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     end
   end
 
-  defp traverse(ast, state, _issue_meta) do
+  defp traverse(ast, state, _issue_meta, _metadata_keys) do
     {ast, state}
   end
 
@@ -102,13 +108,6 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
   defp add_issue_to_state({module_contains_import?, issues}, issue) do
     {module_contains_import?, [issue | issues]}
-  end
-
-  defp find_issue(fun_name, arguments, meta, issue_meta) do
-    params = IssueMeta.params(issue_meta)
-    metadata_keys = find_metadata_keys(params)
-
-    issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
   end
 
   defp issue_for_call(:metadata, [logger_metadata], meta, issue_meta, metadata_keys) do

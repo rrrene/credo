@@ -149,4 +149,17 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  test "it should NOT report when Logger.log/2 is used with natively supported metadata" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        Logger.debug("test", ansi_color: :yellow)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
