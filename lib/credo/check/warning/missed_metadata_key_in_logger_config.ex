@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     ],
     explanations: [
       check: """
-      Ensures custom metadata keys are included in logger config
+      Ensures custom metadata keys are included in logger config.
 
       Note that all metadata is optional and may not always be available.
 
@@ -25,6 +25,9 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
       That way your logs might then receive lines like this:
 
           [error] We have a problem error_code=pc_load_letter file=lib/app.ex
+
+      If you want to allow any metadata to be printed, you can use `:all` in the logger's
+      metadata config.
       """,
       params: [
         ignore_logger_functions: "Do not raise an issue for these Logger functions.",
@@ -33,6 +36,17 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
         By default, we read the metadata keys configured as the current environment's
         `:default_formatter` (or `:console` for older versions of Elixir).
+
+        You can use this parameter to dynamically load the environment/backend you care about,
+        via `.credo.exs` (e.g. reading the `:file_log` config from `config/prod.exs`):
+
+            {Credo.Check.Warning.MissedMetadataKeyInLoggerConfig,
+              [
+                metadata_keys:
+                  "config/prod.exs"
+                  |> Config.Reader.read!()
+                  |> get_in([:logger, :file_log, :metadata])
+              ]}
         """
       ]
     ]
