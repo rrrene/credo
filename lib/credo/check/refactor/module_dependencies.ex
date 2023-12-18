@@ -35,7 +35,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
 
     max_deps = Params.get(params, :max_deps, __MODULE__)
     dependency_namespaces = Params.get(params, :dependency_namespaces, __MODULE__)
-    excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)
+    excluded_namespaces = params |> Params.get(:excluded_namespaces, __MODULE__) |> Enum.map(&to_string/1)
     excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
 
     case ignore_path?(source_file.filename, excluded_paths) do
