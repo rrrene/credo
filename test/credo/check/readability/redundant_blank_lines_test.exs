@@ -15,6 +15,13 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
       end
 
       def b do
+        foo = "
+        a
+
+
+        b
+        "
+
         2
       end
     end
