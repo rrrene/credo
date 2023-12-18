@@ -124,6 +124,7 @@ defmodule Credo.Mixfile do
         ".credo.exs",
         ".template.check.ex",
         ".template.debug.html",
+        "CHANGELOG.md",
         "lib",
         "LICENSE",
         "mix.exs",
