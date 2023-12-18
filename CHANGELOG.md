@@ -3,6 +3,14 @@
 ## 1.7.2
 
 - Fix compatibility & compiler warnings with Elixir 1.16
+- Fix a bottleneck in multicore performance
+- Cache scope priorities
+- `CHANGELOG.md` is now included in the package
+- `Credo.Check.Refactor.NegatedIsNil` no longer leaks memory
+- `Credo.Check.Readability.NestedFunctionCalls` no longer warns on function calls in interpolated strings
+- `Credo.Check.Refactor.ModuleDependencies` now takes modules for `:excluded_namespaces` parameter
+- `Credo.Check.Warning.Dbg` now warns when part of a pipeline and called without parens
+- `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig` received various fixes and improvements
 
 ## 1.7.1
 
