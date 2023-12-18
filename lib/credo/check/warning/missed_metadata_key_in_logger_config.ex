@@ -38,7 +38,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     ]
 
   @logger_functions ~w(alert critical debug emergency error info notice warn warning metadata log)a
-  @native_logger_metadata_keys [:ansi_color]
+  @native_logger_metadata_keys [:ansi_color, :report_cb]
 
   @doc false
   @impl Credo.Check
