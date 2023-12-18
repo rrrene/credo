@@ -35,6 +35,11 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
     {nil, issues}
   end
 
+  # skip specs
+  defp traverse({:@, _, [{:spec, _, _}]}, issues, _) do
+    {nil, issues}
+  end
+
   for {op, constant_result, operand} <- @ops_and_constant_results do
     defp traverse(
            {unquote(op), meta, [_lhs, unquote(operand)]} = ast,

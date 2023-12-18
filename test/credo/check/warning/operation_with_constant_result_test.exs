@@ -23,6 +23,23 @@ defmodule Credo.Check.Warning.OperationWithConstantResultTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code with specs" do
+    """
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      @spec some() :: <<_::1, _::_*1>>
+      def some(), do: <<1::1>>
+
+      @spec other() :: <<_::_*1>>
+      def other(), do: <<>>
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
