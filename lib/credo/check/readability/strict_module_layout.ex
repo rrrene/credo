@@ -135,16 +135,13 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
           end)
           |> Stream.reject(fn {part, meta} ->
             cond do
-              # Ignore all regular parts from the `ignore` list.
               part in ignored_parts ->
                 true
 
-              # Ignore module attributes if the attribute name is in the `ignore_module_attributes` list.
               part == :module_attribute and
                   Keyword.get(meta, :attribute, nil) in ignore_module_attributes ->
                 true
 
-              # Everything else is checked.
               true ->
                 false
             end
