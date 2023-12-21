@@ -12,6 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        repo_url: ["https://github.com/phoenixframework/phoenix.git"]
+        repo_branch: ["v1.6", "main"]
         otp: [23.3, 24.3, 25.3]
         elixir: [1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7]
         exclude:
@@ -30,8 +32,6 @@ jobs:
             otp: 26.1
           - elixir: 1.16.0-rc.1
             otp: 26.1
-        repo_url: ["https://github.com/phoenixframework/phoenix.git"]
-        repo_branch: ["v1.6", "main"]
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
