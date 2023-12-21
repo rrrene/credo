@@ -151,12 +151,11 @@ defmodule Credo.Mixfile do
       {:file_system, "~> 0.2 or ~> 1.0"},
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},
+
       # nimble_parsec >= 1.4 requires Elixir 1.12
       # we want to keep Elixir 1.11 compatibility for one more release
       {:nimble_parsec, "~> 1.3.0", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.10", only: :test},
-      {:inch_ex, "~> 2.0", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
     ]
   end
 
