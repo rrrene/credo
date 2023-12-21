@@ -189,6 +189,60 @@ defmodule Credo.Code.StringsTest do
     assert expected == source |> Strings.replace_with_spaces(".")
   end
 
+  test "it should NOT report expected code with multiline strings" do
+    input = ~S"""
+    foo = "
+    a
+
+
+    b
+    "
+    """
+    expected = ~S"""
+    foo = "
+    .
+    .
+    .
+    .
+    "
+    """
+
+    assert expected == Strings.replace_with_spaces(
+      input,
+      ".",
+      ".",
+      "nofilename",
+      "."
+    )
+  end
+
+  test "it should NOT report expected code with multiline string sigils" do
+    input = ~S"""
+    foo = ~s"
+    a
+
+
+    b
+    "
+    """
+    expected = ~S"""
+    foo = ~s"
+    .
+    .
+    .
+    .
+    "
+    """
+
+    assert expected == Strings.replace_with_spaces(
+      input,
+      ".",
+      ".",
+      "nofilename",
+      "."
+    )
+  end
+
   test "it should NOT report expected code 2" do
     input = ~S"""
     escape_charlist('"\\' ++ r)
