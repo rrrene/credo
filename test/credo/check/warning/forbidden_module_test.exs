@@ -73,7 +73,9 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2])
+    |> run_check(@described_check,
+      modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]
+    )
     |> assert_issues()
   end
 
@@ -124,7 +126,9 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     end
     """
     |> to_source_file
-    |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2])
+    |> run_check(@described_check,
+      modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]
+    )
     |> assert_issues()
   end
 end

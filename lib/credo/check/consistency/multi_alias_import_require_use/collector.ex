@@ -49,9 +49,11 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
       end
 
     if aliases do
-      updated_acc = Map.update(acc, current_module, [], fn entries ->
-        [{directive, aliases, meta[:line]} | entries]
-      end)
+      updated_acc =
+        Map.update(acc, current_module, [], fn entries ->
+          [{directive, aliases, meta[:line]} | entries]
+        end)
+
       {ast, {updated_acc, current_module}}
     else
       {ast, {acc, current_module}}

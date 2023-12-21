@@ -198,6 +198,7 @@ defmodule Credo.Code.StringsTest do
     b
     "
     """
+
     expected = ~S"""
     foo = "
     .
@@ -207,13 +208,14 @@ defmodule Credo.Code.StringsTest do
     "
     """
 
-    assert expected == Strings.replace_with_spaces(
-      input,
-      ".",
-      ".",
-      "nofilename",
-      "."
-    )
+    assert expected ==
+             Strings.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
   end
 
   test "it should NOT report expected code with multiline string sigils" do
@@ -225,6 +227,7 @@ defmodule Credo.Code.StringsTest do
     b
     "
     """
+
     expected = ~S"""
     foo = ~s"
     .
@@ -234,13 +237,14 @@ defmodule Credo.Code.StringsTest do
     "
     """
 
-    assert expected == Strings.replace_with_spaces(
-      input,
-      ".",
-      ".",
-      "nofilename",
-      "."
-    )
+    assert expected ==
+             Strings.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
   end
 
   test "it should NOT report expected code 2" do

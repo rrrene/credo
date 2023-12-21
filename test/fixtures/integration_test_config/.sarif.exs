@@ -18,13 +18,13 @@
             files: %{included: "**/*.ex", excluded: "**/*_redux.ex"}
           },
           {Credo.Check.Readability.TrailingWhiteSpace,
-            [
-              category: :warning,
-              exit_status: 23,
-              files: %{excluded: "**/*.ex"},
-              priority: :high,
-              tags: [:__initial__, :my_tag]
-            ]}
+           [
+             category: :warning,
+             exit_status: 23,
+             files: %{excluded: "**/*.ex"},
+             priority: :high,
+             tags: [:__initial__, :my_tag]
+           ]}
         ]
       }
     }

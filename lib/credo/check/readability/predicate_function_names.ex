@@ -81,7 +81,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
       {name, meta, nil} ->
         issues_for_name(op, name, meta, issues, issue_meta)
 
-      {name, meta, [_|_]} ->
+      {name, meta, [_ | _]} ->
         issues_for_name(op, name, meta, issues, issue_meta)
 
       _ ->

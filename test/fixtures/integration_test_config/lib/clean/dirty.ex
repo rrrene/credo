@@ -158,22 +158,22 @@ defmodule Xgit.Lib.Config do
     do: raise(ConfigInvalidError, "config value contains byte 0x00")
 
   defp escape_charlist(reversed_result, [?\n | remainder], needs_quote?),
-    do: escape_charlist('n\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"n\\" ++ reversed_result, remainder, needs_quote?)
 
   defp escape_charlist(reversed_result, [?\t | remainder], needs_quote?),
-    do: escape_charlist('t\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"t\\" ++ reversed_result, remainder, needs_quote?)
 
   # Doesn't match `git config foo.bar $'x\by'`, which doesn't escape the
   # \x08, but since both escaped and unescaped forms are readable, we'll
   # prefer internal consistency here.
   defp escape_charlist(reversed_result, [?\b | remainder], needs_quote?),
-    do: escape_charlist('b\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"b\\" ++ reversed_result, remainder, needs_quote?)
 
   defp escape_charlist(reversed_result, [?\\ | remainder], needs_quote?),
-    do: escape_charlist('\\\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"\\\\" ++ reversed_result, remainder, needs_quote?)
 
   defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
-    do: escape_charlist('"\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"\"\\" ++ reversed_result, remainder, needs_quote?)
 
   defp escape_charlist(reversed_result, [c | remainder], _needs_quote?)
        when c == ?# or c == ?;,

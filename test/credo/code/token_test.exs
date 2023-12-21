@@ -32,9 +32,9 @@ defmodule Credo.Code.TokenTest do
       tokens = Credo.Code.to_tokens(source)
 
       expected = [
-        {:int, {1, 1, 134}, '134'},
+        {:int, {1, 1, 134}, ~c"134"},
         {:dual_op, {1, 5, nil}, :+},
-        {:int, {1, 7, 145}, '145'}
+        {:int, {1, 7, 145}, ~c"145"}
       ]
 
       assert expected == tokens
@@ -52,12 +52,12 @@ defmodule Credo.Code.TokenTest do
       expected =
         if Version.match?(System.version(), ">= 1.14.0-dev") do
           [
-            {:identifier, {1, 1, 'a'}, :a},
+            {:identifier, {1, 1, ~c"a"}, :a},
             {:match_op, {1, 3, nil}, :=},
             {:bin_string, {1, 5, nil},
              [
                "MyModule.SubModule.",
-               {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, 'name'}, :name}]}
+               {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, ~c"name"}, :name}]}
              ]}
           ]
         else
@@ -87,12 +87,12 @@ defmodule Credo.Code.TokenTest do
       expected =
         if Version.match?(System.version(), ">= 1.14.0-dev") do
           [
-            {:identifier, {1, 1, 'a'}, :a},
+            {:identifier, {1, 1, ~c"a"}, :a},
             {:match_op, {1, 3, nil}, :=},
             {:list_string, {1, 5, nil},
              [
                "MyModule.SubModule.",
-               {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, 'name'}, :name}]}
+               {{1, 25, nil}, {1, 31, nil}, [{:identifier, {1, 27, ~c"name"}, :name}]}
              ]}
           ]
         else
@@ -122,26 +122,26 @@ defmodule Credo.Code.TokenTest do
       expected =
         if Version.match?(System.version(), ">= 1.14.0-dev") do
           [
-            {:identifier, {1, 1, 'a'}, :a},
+            {:identifier, {1, 1, ~c"a"}, :a},
             {:match_op, {1, 3, nil}, :=},
             {:bin_string, {1, 5, nil},
              [
                "MyModule.",
                {{1, 15, nil}, {1, 40, nil},
                 [
-                  {:paren_identifier, {1, 17, 'fun'}, :fun},
+                  {:paren_identifier, {1, 17, ~c"fun"}, :fun},
                   {:"(", {1, 20, nil}},
-                  {:alias, {1, 21, 'Module'}, :Module},
+                  {:alias, {1, 21, ~c"Module"}, :Module},
                   {:., {1, 27, nil}},
-                  {:paren_identifier, {1, 28, 'value'}, :value},
+                  {:paren_identifier, {1, 28, ~c"value"}, :value},
                   {:"(", {1, 33, nil}},
                   {:")", {1, 34, nil}},
                   {:dual_op, {1, 36, nil}, :+},
-                  {:int, {1, 38, 1}, '1'},
+                  {:int, {1, 38, 1}, ~c"1"},
                   {:")", {1, 39, nil}}
                 ]},
                ".SubModule.",
-               {{1, 52, nil}, {1, 58, nil}, [{:identifier, {1, 54, 'name'}, :name}]}
+               {{1, 52, nil}, {1, 58, nil}, [{:identifier, {1, 54, ~c"name"}, :name}]}
              ]}
           ]
         else
@@ -161,7 +161,7 @@ defmodule Credo.Code.TokenTest do
                   {:"(", {1, 33, nil}},
                   {:")", {1, 34, nil}},
                   {:dual_op, {1, 36, nil}, :+},
-                  {:int, {1, 38, 1}, '1'},
+                  {:int, {1, 38, 1}, ~c"1"},
                   {:")", {1, 39, nil}}
                 ]},
                ".SubModule.",
@@ -205,7 +205,7 @@ defmodule Credo.Code.TokenTest do
               {:"(", {3, 28, nil}},
               {:")", {3, 29, nil}},
               {:dual_op, {3, 31, nil}, :+},
-              {:int, {3, 33, 1}, '1'},
+              {:int, {3, 33, 1}, ~c"1"},
               {:")", {3, 34, nil}}
             ]},
            ".SubModule.",
@@ -243,7 +243,7 @@ defmodule Credo.Code.TokenTest do
             @kw_identifier_token,
             {:bin_string, {1, 28, nil},
              [
-               {{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, 'filename'}, :filename}]},
+               {{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, ~c"filename"}, :filename}]},
                " world"
              ]},
             {:"}", {1, 47, nil}}
@@ -275,10 +275,10 @@ defmodule Credo.Code.TokenTest do
           [
             {:%{}, {1, 1, nil}},
             {:"{", {1, 2, nil}},
-            {:kw_identifier, {1, 3, 'some_atom_with_quotes'}, :some_atom_with_quotes},
+            {:kw_identifier, {1, 3, ~c"some_atom_with_quotes"}, :some_atom_with_quotes},
             {:bin_string, {1, 26, nil},
              [
-               {{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, 'filename'}, :filename}]},
+               {{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, ~c"filename"}, :filename}]},
                " world"
              ]},
             {:"}", {1, 45, nil}}

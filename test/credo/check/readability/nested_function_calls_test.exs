@@ -20,7 +20,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     defmodule CredoSampleModule do
       def some_code do
-        "Take 10 #{Enum.take([1,2,2,3,3], 10)}"
+        "Take 10 #{Enum.take([1, 2, 2, 3, 3], 10)}"
       end
     end
     """
@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     defmodule CredoSampleModule do
       def some_code do
-        'Take 10 #{Enum.take([1,2,2,3,3], 10)}'
+        'Take 10 #{Enum.take([1, 2, 2, 3, 3], 10)}'
       end
     end
     """

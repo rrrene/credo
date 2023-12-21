@@ -1,6 +1,6 @@
 defmodule X do
   defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
-    do: escape_charlist('"\\' ++ reversed_result, remainder, needs_quote?)
+    do: escape_charlist(~c"\"\\" ++ reversed_result, remainder, needs_quote?)
 
   @doc ~S"""
   Escape a subsection name before saving.

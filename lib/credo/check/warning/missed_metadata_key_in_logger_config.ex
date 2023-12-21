@@ -72,7 +72,8 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
     state = {false, []}
 
-    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, metadata_keys), state)
+    {_, issues} =
+      Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, metadata_keys), state)
 
     issues
   end

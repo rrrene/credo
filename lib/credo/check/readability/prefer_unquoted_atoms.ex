@@ -84,7 +84,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   end
 
   defp safe_atom_name(token) when is_binary(token) do
-    ':#{token}'
+    ~c":#{token}"
     |> :elixir_tokenizer.tokenize(1, [])
     |> safe_atom_name(token)
   end
