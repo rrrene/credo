@@ -89,6 +89,10 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     end
   end
 
+  defp issues_for_name(_op, {:unquote, _, [_|_]} = _name, _meta, issues, _issue_meta) do
+    issues
+  end
+
   defp issues_for_name(_op, name, meta, issues, issue_meta) do
     name = to_string(name)
 
