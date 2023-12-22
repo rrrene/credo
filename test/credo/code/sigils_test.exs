@@ -360,4 +360,62 @@ defmodule Credo.Code.SigilsTest do
     assert result == expected
     assert match?({:ok, _}, Code.string_to_quoted(result))
   end
+
+  test "it should NOT report expected code with multiline strings" do
+    input = ~S"""
+    foo = ~x'
+    a
+
+
+    b
+    '
+    """
+
+    expected = ~S"""
+    foo = ~x'
+    .
+    .
+    .
+    .
+    '
+    """
+
+    assert expected ==
+            Sigils.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
+  end
+
+  test "it should NOT report expected code with multiline string sigils" do
+    input = ~S"""
+    foo = ~H"
+    a
+
+
+    b
+    "
+    """
+
+    expected = ~S"""
+    foo = ~H"
+    .
+    .
+    .
+    .
+    "
+    """
+
+    assert expected ==
+            Sigils.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
+  end
 end
