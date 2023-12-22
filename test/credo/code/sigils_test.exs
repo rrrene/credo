@@ -381,7 +381,7 @@ defmodule Credo.Code.SigilsTest do
     """
 
     assert expected ==
-            Sigils.replace_with_spaces(
+             Sigils.replace_with_spaces(
                input,
                ".",
                ".",
@@ -410,7 +410,7 @@ defmodule Credo.Code.SigilsTest do
     """
 
     assert expected ==
-            Sigils.replace_with_spaces(
+             Sigils.replace_with_spaces(
                input,
                ".",
                ".",

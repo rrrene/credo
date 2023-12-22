@@ -429,7 +429,9 @@ defmodule Credo.Code.ModuleTest do
     end
 
     test "recognizes module attribute" do
-      assert analyze(~s/@mod_attr 1/) == [{Test, [module_attribute: [attribute: :mod_attr, line: 2, column: 3]]}]
+      assert analyze(~s/@mod_attr 1/) == [
+               {Test, [module_attribute: [attribute: :mod_attr, line: 2, column: 3]]}
+             ]
     end
 
     test "recognizes struct definition" do

@@ -141,7 +141,7 @@ defmodule Credo.Code.CharlistsTest do
     """
 
     assert expected ==
-            Charlists.replace_with_spaces(
+             Charlists.replace_with_spaces(
                input,
                ".",
                ".",
@@ -170,7 +170,7 @@ defmodule Credo.Code.CharlistsTest do
     """
 
     assert expected ==
-            Charlists.replace_with_spaces(
+             Charlists.replace_with_spaces(
                input,
                ".",
                ".",
