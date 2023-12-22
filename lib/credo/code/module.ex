@@ -371,6 +371,9 @@ defmodule Credo.Code.Module do
        typedoc dialyzer external_resource file on_definition on_load vsn spec/a,
        do: state
 
+  defp analyze(state, {:@, meta, [{name, _, _}]}),
+    do: add_module_element(state, :module_attribute, Keyword.put(meta, :attribute, name))
+
   defp analyze(state, {:@, meta, _}),
     do: add_module_element(state, :module_attribute, meta)
 
@@ -444,7 +447,7 @@ defmodule Credo.Code.Module do
   end
 
   defp add_module_element(state, element, meta) do
-    location = Keyword.take(meta, ~w/line column/a)
-    update_in(state.current_module.parts, &[{element, location} | &1])
+    meta = Keyword.take(meta, ~w/attribute line column/a)
+    update_in(state.current_module.parts, &[{element, meta} | &1])
   end
 end

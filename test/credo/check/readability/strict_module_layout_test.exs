@@ -277,4 +277,60 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       assert issue.message == "alias must appear before require"
     end
   end
+
+  describe "ignored module attributes" do
+    test "ignores custom module attributes" do
+      """
+      defmodule Test do
+        use Baz
+
+        import Bar
+
+        @trace trace_fun()
+        def test_fun() do
+          nil
+        end
+
+        @trace trace_fun()
+        def test() do
+          nil
+        end
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check,
+        order: ~w(use import module_attribute)a,
+        ignore_module_attributes: ~w/trace/a
+      )
+      |> refute_issues
+    end
+
+    test "only ignores set module attributes" do
+      [issue] =
+        """
+        defmodule Test do
+          import Bar
+
+          @trace trace_fun()
+          def test_fun() do
+            nil
+          end
+
+          @bad_attribute
+          @trace trace_fun()
+          def test() do
+            nil
+          end
+        end
+        """
+        |> to_source_file
+        |> run_check(@described_check,
+          order: ~w(import module_attribute)a,
+          ignore_module_attributes: ~w/trace/a
+        )
+        |> assert_issue
+
+      assert issue.message == "module attribute must appear before public function"
+    end
+  end
 end
