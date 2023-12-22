@@ -13,9 +13,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: [23.3, 24.3, 25.3]
-        elixir: [1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7]
+        repo_url: ["https://github.com/elixir-lang/elixir.git"]
+        repo_branch: ["v1.13", "main"]
+        otp: [23.3, 24.3, 25.3, 26.1]
+        elixir: [1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7, 1.16.0-rc.1]
         exclude:
+          - elixir: 1.11.4
+            otp: 26.1
+          - elixir: 1.12.3
+            otp: 26.1
+          - elixir: 1.13.4
+            otp: 26.1
+          - elixir: 1.14.5
+            otp: 26.1
           - elixir: 1.11.4
             otp: 25.3
           - elixir: 1.12.3
@@ -26,13 +36,10 @@ jobs:
             otp: 23.3
           - elixir: 1.15.7
             otp: 24.3
-        include:
-          - elixir: 1.15.7
-            otp: 26.1
           - elixir: 1.16.0-rc.1
-            otp: 26.1
-        repo_url: ["https://github.com/elixir-lang/elixir.git"]
-        repo_branch: ["v1.13", "main"]
+            otp: 23.3
+          - elixir: 1.16.0-rc.1
+            otp: 24.3
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1

@@ -53,7 +53,7 @@ jobs:
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
 
   test_on_new_project:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
