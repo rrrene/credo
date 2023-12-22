@@ -18,7 +18,7 @@ PROJECT_DIRNAME=tmp/$PROJECT_NAME
 
 # setup
 
-yes | mix archive.install hex phx_new 1.4.11
+yes | mix archive.install hex phx_new
 
 cd $PROJECT_ROOT
 
