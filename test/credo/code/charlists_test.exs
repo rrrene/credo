@@ -120,4 +120,62 @@ defmodule Credo.Code.CharlistsTest do
 
     assert result == result2, "Charlists.replace_with_spaces/2 should be idempotent"
   end
+
+  test "it should NOT report expected code with multiline strings" do
+    input = ~S"""
+    foo = '
+    a
+
+
+    b
+    '
+    """
+
+    expected = ~S"""
+    foo = '
+    .
+    .
+    .
+    .
+    '
+    """
+
+    assert expected ==
+            Charlists.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
+  end
+
+  test "it should NOT report expected code with multiline string sigils" do
+    input = ~S"""
+    foo = ~c"
+    a
+
+
+    b
+    "
+    """
+
+    expected = ~S"""
+    foo = ~c"
+    .
+    .
+    .
+    .
+    "
+    """
+
+    assert expected ==
+            Charlists.replace_with_spaces(
+               input,
+               ".",
+               ".",
+               "nofilename",
+               "."
+             )
+  end
 end
