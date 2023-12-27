@@ -132,7 +132,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          when is_list(arguments) do
       # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
 
-      head_expression = Credo.Backports.Enum.slice(arguments, 0..-2)
+      head_expression = Credo.Backports.Enum.slice(arguments, 0..-2//1)
 
       if Credo.Code.contains_child?(head_expression, candidate) do
         {nil, :VERIFIED}

@@ -237,7 +237,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
     ending_of_number =
       ~r/^([0-9_\.]+)/
-      |> Regex.run(Credo.Backports.String.slice(line, (column1 + 1)..-1))
+      |> Regex.run(Credo.Backports.String.slice(line, (column1 + 1)..-1//1))
       |> List.wrap()
       |> List.last()
       |> to_string()

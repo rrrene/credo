@@ -90,7 +90,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     name_size = text |> to_string |> String.length()
     skip = (SourceFile.column(source_file, line_no, text) || -1) + name_size - 1
 
-    Credo.Backports.String.slice(line, skip..-1)
+    Credo.Backports.String.slice(line, skip..-1//1)
   end
 
   defp issue_for(issue_meta, line_no, kind) do
