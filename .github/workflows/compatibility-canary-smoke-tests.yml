@@ -93,8 +93,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: 26.1
-          elixir-version: 1.15.7
+          otp-version: 26.2
+          elixir-version: 1.16.0
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile
