@@ -49,10 +49,10 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
   # DateTime.utc_now(_) |> DateTime.truncate(_)
   # DateTime.utc_now(_, _) |> DateTime.truncate(_)
   defp traverse(
-         {:|>, meta,
+         {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
-            {{:., _, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
+            {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
           ]} = ast,
          issues,
          issue_meta
@@ -83,14 +83,14 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
   # _ |> DateTime.utc_now() |> DateTime.truncate(_)
   # _ |> DateTime.utc_now(_) |> DateTime.truncate(_)
   defp traverse(
-         {:|>, meta,
+         {:|>, _,
           [
             {:|>, _,
              [
                _,
                {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _}
              ]},
-            {{:., _, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
+            {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
           ]} = ast,
          issues,
          issue_meta
@@ -120,10 +120,10 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
   # NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
   # NaiveDateTime.utc_now(_, _) |> NaiveDateTime.truncate(_)
   defp traverse(
-         {:|>, meta,
+         {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
-            {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
+            {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
           ]} = ast,
          issues,
          issue_meta
@@ -154,14 +154,14 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
   # _ |> NaiveDateTime.utc_now() |> NaiveDateTime.truncate(_)
   # _ |> NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
   defp traverse(
-         {:|>, meta,
+         {:|>, _,
           [
             {:|>, _,
              [
                _,
                {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _}
              ]},
-            {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
+            {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
           ]} = ast,
          issues,
          issue_meta
