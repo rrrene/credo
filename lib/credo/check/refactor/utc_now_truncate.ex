@@ -179,7 +179,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
       issue_meta,
       message:
         "Pass time unit to `#{module}.utc_now` instead of composing with `#{module}.truncate/2`.",
-      trigger: "#{module}.truncate/2",
+      trigger: "#{module}.truncate",
       line_no: line_no
     )
   end

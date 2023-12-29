@@ -262,4 +262,30 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     |> run_check(@described_check)
     |> assert_issue()
   end
+
+  test "should report a violaton with a correct trigger value for DateTime.truncate/2" do
+    """
+    defmodule M do
+      def f do
+        DateTime.truncate(DateTime.utc_now(), :second)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue -> assert issue.trigger == "DateTime.truncate" end)
+  end
+
+  test "should report a violaton with a correct trigger value for NaiveDateTime.truncate/2" do
+    """
+    defmodule M do
+      def f do
+        NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue -> assert issue.trigger == "NaiveDateTime.truncate" end)
+  end
 end
