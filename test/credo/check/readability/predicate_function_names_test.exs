@@ -31,6 +31,16 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation with defmacro" do
+    """
+    defmacro is_user(cookie) do
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation with quote" do
     ~S'''
     defmodule ElixirScript.FFI do

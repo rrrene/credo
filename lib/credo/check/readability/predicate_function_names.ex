@@ -93,7 +93,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     issues
   end
 
-  defp issues_for_name(_op, name, meta, issues, issue_meta) do
+  defp issues_for_name(op, name, meta, issues, issue_meta) do
     name = to_string(name)
 
     cond do
@@ -103,7 +103,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
           | issues
         ]
 
-      String.starts_with?(name, "is_") ->
+      String.starts_with?(name, "is_") && op != :defmacro ->
         [issue_for(issue_meta, meta[:line], name, :only_predicate) | issues]
 
       true ->
