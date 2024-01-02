@@ -41,7 +41,6 @@ defmodule Credo.Check.Refactor.Nesting do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_nesting))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp traverse(
            {unquote(op) = op, meta, arguments} = ast,

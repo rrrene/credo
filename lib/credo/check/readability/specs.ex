@@ -79,7 +79,6 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {keyword, meta, [{:when, _, def_ast} | _]},
          issues,

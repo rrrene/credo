@@ -29,7 +29,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
     ]
 
   @doc false
-  # TODO: consider for experimental check front-loader (tokens)
   def run(%SourceFile{} = source_file, params) do
     min_number = Params.get(params, :only_greater_than, __MODULE__)
     issue_meta = IssueMeta.for(source_file, Keyword.merge(params, only_greater_than: min_number))

@@ -32,7 +32,6 @@ defmodule Credo.Check.Refactor.FunctionArity do
     )
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp traverse(
            {unquote(op) = op, meta, arguments} = ast,

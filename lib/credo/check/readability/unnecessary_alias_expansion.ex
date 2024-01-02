@@ -30,7 +30,6 @@ defmodule Credo.Check.Readability.UnnecessaryAliasExpansion do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {:alias, _, [{{:., _, [_, :{}]}, _, [{:__aliases__, opts, [child]}]}]} = ast,
          issues,

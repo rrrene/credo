@@ -99,7 +99,6 @@ defmodule Credo.Check.Readability.MaxLineLength do
     end)
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp find_definitions({unquote(op), meta, arguments} = ast, definitions)
          when is_list(arguments) do
@@ -111,7 +110,6 @@ defmodule Credo.Check.Readability.MaxLineLength do
     {ast, definitions}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
     {ast, [meta[:line] | specs]}
   end

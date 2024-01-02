@@ -55,8 +55,6 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     {ast, issues}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
-  # NOTE: see above how we want to exclude certain front-loads
   for op <- @def_ops do
     defp traverse(
            {unquote(op), meta, arguments} = ast,

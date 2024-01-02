@@ -40,7 +40,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, parens?))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     # catch variables named e.g. `defp`
     defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do

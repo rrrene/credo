@@ -64,7 +64,6 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     )
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse(
          {:|>, _, [{:|>, _, _} | _]} = ast,
          issues,

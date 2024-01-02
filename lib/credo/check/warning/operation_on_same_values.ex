@@ -43,7 +43,6 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     # exclude def arguments for operators
     defp traverse(
