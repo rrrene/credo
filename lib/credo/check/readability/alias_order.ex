@@ -145,15 +145,6 @@ defmodule Credo.Check.Readability.AliasOrder do
 
   defp inner_group_order_issue(_sort_method, _line_no, {_base, []}), do: nil
 
-  defp inner_group_order_issue(:alpha = _sort_method, line_no, {base, mod_list}) do
-    downcased_mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
-    sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
-
-    if downcased_mod_list != sorted_downcased_mod_list do
-      issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list)
-    end
-  end
-
   defp inner_group_order_issue(:ascii = _sort_method, line_no, {base, mod_list}) do
     sorted_mod_list = Enum.sort(mod_list)
 
@@ -162,12 +153,21 @@ defmodule Credo.Check.Readability.AliasOrder do
     end
   end
 
-  defp issue_opts(line_no, base, mod_list, trigger_source_mod_list, sorted_downcased_mod_list) do
+  defp inner_group_order_issue(_sort_method, line_no, {base, mod_list}) do
+    downcased_mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
+    sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
+
+    if downcased_mod_list != sorted_downcased_mod_list do
+      issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list)
+    end
+  end
+
+  defp issue_opts(line_no, base, mod_list, comparison_mod_list, sorted_comparison_mod_list) do
     trigger =
-      trigger_source_mod_list
+      comparison_mod_list
       |> Enum.with_index()
-      |> Enum.find_value(fn {downcased_mod_entry, index} ->
-        if downcased_mod_entry != Enum.at(sorted_downcased_mod_list, index) do
+      |> Enum.find_value(fn {comparison_mod_entry, index} ->
+        if comparison_mod_entry != Enum.at(sorted_comparison_mod_list, index) do
           Enum.at(mod_list, index)
         end
       end)
