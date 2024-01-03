@@ -38,7 +38,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     aliases =
       case arguments do
         [{:__aliases__, _, nested_modules}] when length(nested_modules) > 1 ->
-          base_name = Credo.Backports.Enum.slice(nested_modules, 0..-2)
+          base_name = Credo.Backports.Enum.slice(nested_modules, 0..-2//-1)
           {:single, base_name}
 
         [{{:., _, [{:__aliases__, _, _namespaces}, :{}]}, _, _nested_aliases}] ->

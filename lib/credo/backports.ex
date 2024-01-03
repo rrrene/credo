@@ -1,7 +1,7 @@
 defmodule Credo.Backports do
   defmodule Enum do
     if Version.match?(System.version(), ">= 1.12.0-rc") do
-      def slice(a, x..y) do
+      def slice(a, x..y//_) do
         Elixir.Enum.slice(a, x..y//1)
       end
     end
@@ -13,7 +13,7 @@ defmodule Credo.Backports do
 
   defmodule String do
     if Version.match?(System.version(), ">= 1.12.0-rc") do
-      def slice(a, x..y) do
+      def slice(a, x..y//_) do
         Elixir.String.slice(a, x..y//1)
       end
     end
