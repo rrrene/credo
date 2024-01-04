@@ -24,8 +24,7 @@ defmodule Credo.CLI.Output.FirstRunHint do
 
     readability_issue_count =
       issues
-      |> Enum.filter(&(&1.category == :readability))
-      |> Enum.count()
+      |> Enum.count(&(&1.category == :readability))
 
     relative_issue_count_per_category = div(issue_count, @category_count)
 

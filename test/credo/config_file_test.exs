@@ -457,8 +457,7 @@ defmodule Credo.ConfigFileTest do
 
     config_subdir_count =
       dirs
-      |> Enum.filter(&String.ends_with?(&1, "config"))
-      |> Enum.count()
+      |> Enum.count(&String.ends_with?(&1, "config"))
 
     assert config_subdir_count > 1
   end
