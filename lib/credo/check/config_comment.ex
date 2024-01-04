@@ -135,7 +135,7 @@ defmodule Credo.Check.ConfigComment do
   defp value_for(param_string) do
     if regex_value?(param_string) do
       param_string
-      |> Credo.Backports.String.slice(1..-2//-1)
+      |> Credo.Backports.String.slice(Range.new(1, -2, -1))
       |> Regex.compile!("i")
     else
       String.to_atom("Elixir.#{param_string}")

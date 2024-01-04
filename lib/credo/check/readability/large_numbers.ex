@@ -181,7 +181,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       Enum.map(allowed_trailing_digits, fn trailing_digits ->
         if String.length(string) > trailing_digits do
           base =
-            Credo.Backports.String.slice(string, 0..(-1 * trailing_digits - 1))
+            Credo.Backports.String.slice(string, Range.new(0, -1 * trailing_digits - 1, -1))
             |> String.reverse()
             |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
             |> String.reverse()
