@@ -194,8 +194,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         typed_after?,
         typed_before?
       ]
-      |> Enum.filter(& &1)
-      |> Enum.count()
+      |> Enum.count(& &1)
 
     heuristics_met_count >= 2
   end
