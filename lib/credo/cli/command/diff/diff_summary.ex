@@ -133,8 +133,7 @@ defmodule Credo.CLI.Command.Diff.DiffSummary do
 
   defp category_count(issues, category) do
     issues
-    |> Enum.filter(&(&1.category == category))
-    |> Enum.count()
+    |> Enum.count(&(&1.category == category))
   end
 
   defp summary_parts_new(_source_files, issues) do

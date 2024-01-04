@@ -120,8 +120,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp category_count(issues, category) do
     issues
-    |> Enum.filter(&(&1.category == category))
-    |> Enum.count()
+    |> Enum.count(&(&1.category == category))
   end
 
   defp summary_parts(source_files, issues) do
