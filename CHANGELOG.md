@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.3
+
+- `Credo.Check.Readability.AliasOrder` now supports a `:sort_method` parameter
+- `Credo.Check.Readability.PredicateFunctionNames` received fixes
+- `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig` received fixes
+
 ## 1.7.2
 
 - Fix compatibility & compiler warnings with Elixir 1.16
