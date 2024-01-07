@@ -52,7 +52,15 @@ defmodule Credo.Check.Runner do
           []
 
         exec.read_from_stdin ->
-          []
+          # TODO: I am unhappy with how convoluted this gets
+          #       but it is necessary to avoid hitting the filesystem when reading from STDIN
+          [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
+
+          if filename in files_excluded do
+            :skip_run
+          else
+            []
+          end
 
         true ->
           exec
@@ -78,6 +86,10 @@ defmodule Credo.Check.Runner do
           []
         end
     end
+  end
+
+  defp filter_source_files(_source_files, :skip_run) do
+    []
   end
 
   defp filter_source_files(source_files, []) do
