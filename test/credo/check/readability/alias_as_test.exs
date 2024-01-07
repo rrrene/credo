@@ -48,6 +48,39 @@ defmodule Credo.Check.Readability.AliasAsTest do
     assert issue3.trigger == "App.Module4"
   end
 
+  test "it should ignore violations for ignored modules" do
+    """
+    defmodule Test do
+      alias App.Module1, as: M1
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: [App.Module1])
+    |> refute_issues()
+  end
+
+  test "it should ignore violations for __MODULE__ when :__MODULE__ is in ignore list" do
+    """
+    defmodule Test do
+      alias __MODULE__, as: Foo
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: [:__MODULE__])
+    |> refute_issues()
+  end
+
+  test "it should ignore violations for __MODULE__ when the module is in ignore list" do
+    """
+    defmodule Test do
+      alias __MODULE__, as: Foo
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore: [Test])
+    |> refute_issues()
+  end
+
   test "it should not raise on alias __MODULE__, as: Foo" do
     _ =
       """
