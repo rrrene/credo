@@ -195,12 +195,10 @@ defmodule Credo.Check do
     :tags
   ]
 
-  @__default_checks__ do
-    {config, _binding} = Code.eval_file(".credo.exs")
-    %{:name => "default", :checks => %{:enabled => check_tuples}} = List.first(config[:configs])
+  {config, _binding} = Code.eval_file(".credo.exs")
+  %{:name => "default", :checks => %{:enabled => check_tuples}} = List.first(config[:configs])
 
-    Enum.map(check_tuples, fn {check, _params} -> check end)
-  end
+  @__default_checks__ Enum.map(check_tuples, fn {check, _params} -> check end)
 
   @doc false
   defmacro __using__(opts) do
