@@ -99,7 +99,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
   # cases NOT raising issues
   #
 
-  test "it should report the correct result " do
+  test "it should NOT report the correct result " do
     [
       @without_spaces
     ]
@@ -108,7 +108,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     |> refute_issues()
   end
 
-  test "it should report the correct result 1" do
+  test "it should NOT report the correct result 1" do
     [
       @with_spaces,
       @with_spaces2

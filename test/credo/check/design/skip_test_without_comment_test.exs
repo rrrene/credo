@@ -3,6 +3,10 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
 
   @described_check Credo.Check.Design.SkipTestWithoutComment
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report when comment precedes the tag" do
     """
     defmodule CredoSampleModuleTest do
@@ -26,6 +30,10 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   @tag :skip
   test "it should report a violation" do

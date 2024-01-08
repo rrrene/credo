@@ -3,7 +3,11 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
 
   alias Credo.Check.Readability.NestedFunctionCalls
 
-  test "it should NOT code with no nested function calls" do
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should NOT report code with no nested function calls" do
     """
     defmodule CredoSampleModule do
       def some_code do
@@ -122,6 +126,34 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> refute_issues()
   end
 
+  test "it should NOT report any issues when Kernel.to_string() is called inside a string interpolation" do
+    ~S"""
+    defmodule FeatureFlag.Adapters.Test do
+      def get(flag, context, fallback) do
+        args = {flag, context, fallback}
+        case :ets.lookup(@table, flag) do
+          [] ->
+            raise "No stubs found for #{inspect(args)}"
+
+          stubs ->
+            attempt_stubs(args, Enum.reverse(stubs))
+        end
+      end
+
+      defp attempt_stubs(args, []) do
+        raise "No stub found for args: #{inspect(args)}"
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(NestedFunctionCalls)
+    |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
+
   test "it should report two nested functions calls when the inner call receives some arguments" do
     """
     defmodule CredoSampleModule do
@@ -189,29 +221,5 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> to_source_file()
     |> run_check(NestedFunctionCalls)
     |> assert_issue()
-  end
-
-  test "it should NOT report any issues when Kernel.to_string() is called inside a string interpolation" do
-    ~S"""
-    defmodule FeatureFlag.Adapters.Test do
-      def get(flag, context, fallback) do
-        args = {flag, context, fallback}
-        case :ets.lookup(@table, flag) do
-          [] ->
-            raise "No stubs found for #{inspect(args)}"
-
-          stubs ->
-            attempt_stubs(args, Enum.reverse(stubs))
-        end
-      end
-
-      defp attempt_stubs(args, []) do
-        raise "No stub found for args: #{inspect(args)}"
-      end
-    end
-    """
-    |> to_source_file()
-    |> run_check(NestedFunctionCalls)
-    |> refute_issues()
   end
 end

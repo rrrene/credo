@@ -17,6 +17,71 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
   end
   """
 
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should NOT report an issue if t() is used in a spec" do
+    [
+      """
+      defmodule CorrectUsage do
+        @spec f(MyApp.MyStruct.t()) :: any
+        def f(_) do
+          "yay"
+        end
+
+        @spec g(any, AStruct.t()) :: MyApp.MyStruct.t()
+        def g(_, _) do
+          "yay"
+        end
+      end
+      """,
+      @my_struct_module,
+      @a_struct_module
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report an issue for functions, macros, or variables named spec" do
+    [
+      """
+      defmodule IgnoredFunction do
+        def spec(%AStruct{}) do
+          "okay"
+        end
+
+        def spec(arg) when arg == %AStruct{} do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule IgnoredMacro do
+        defmacro spec(arg) do
+          arg
+        end
+      end
+      """,
+      """
+      defmodule IgnoredVariable do
+        def spec(id) do
+          spec = %AStruct{id: id}
+        end
+      end
+      """,
+      @a_struct_module
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
+
   test "it should report an issue if a struct is used as a parameter in a spec" do
     [
       """
@@ -145,62 +210,5 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     |> to_source_files()
     |> run_check(@described_check)
     |> assert_issues()
-  end
-
-  test "it should NOT report an issue if t() is used in a spec" do
-    [
-      """
-      defmodule CorrectUsage do
-        @spec f(MyApp.MyStruct.t()) :: any
-        def f(_) do
-          "yay"
-        end
-
-        @spec g(any, AStruct.t()) :: MyApp.MyStruct.t()
-        def g(_, _) do
-          "yay"
-        end
-      end
-      """,
-      @my_struct_module,
-      @a_struct_module
-    ]
-    |> to_source_files()
-    |> run_check(@described_check)
-    |> refute_issues()
-  end
-
-  test "it should NOT report an issue for functions, macros, or variables named spec" do
-    [
-      """
-      defmodule IgnoredFunction do
-        def spec(%AStruct{}) do
-          "okay"
-        end
-
-        def spec(arg) when arg == %AStruct{} do
-          arg
-        end
-      end
-      """,
-      """
-      defmodule IgnoredMacro do
-        defmacro spec(arg) do
-          arg
-        end
-      end
-      """,
-      """
-      defmodule IgnoredVariable do
-        def spec(id) do
-          spec = %AStruct{id: id}
-        end
-      end
-      """,
-      @a_struct_module
-    ]
-    |> to_source_files()
-    |> run_check(@described_check)
-    |> refute_issues()
   end
 end

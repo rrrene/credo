@@ -37,7 +37,7 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     |> refute_issues()
   end
 
-  test "rebinding opt-in bang sigils is allowed" do
+  test "it should NOT report rebinding opt-in bang sigils" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -143,7 +143,7 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     |> assert_issue()
   end
 
-  test "rebinding bang sigils is forbidden without the :allow_bang option" do
+  test "it should report rebinding bang sigils is forbidden without the :allow_bang option" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do

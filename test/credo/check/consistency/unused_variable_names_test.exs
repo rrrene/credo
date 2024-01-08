@@ -3,6 +3,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   @described_check Credo.Check.Consistency.UnusedVariableNames
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report correct behaviour" do
     [
       """
@@ -91,6 +95,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation for different naming schemes (expects anonymous)" do
     [

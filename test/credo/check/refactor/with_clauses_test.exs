@@ -23,7 +23,9 @@ defmodule Credo.Check.Refactor.WithClausesTest do
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
+  end
 
+  test "it should NOT report expected code /2" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
@@ -38,7 +40,7 @@ defmodule Credo.Check.Refactor.WithClausesTest do
     |> refute_issues()
   end
 
-  test "it shouldn't check calls to functions called \"with\"" do
+  test "it should NOT report calls to functions called \"with\"" do
     """
     def some_function(parameter1, parameter2) do
       with(parameter1, parameter2)

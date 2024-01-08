@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> refute_issues()
   end
 
-  test "it should not report exception modules" do
+  test "it should NOT report exception modules" do
     """
     defmodule CredoSampleModule do
       defexception message: "Bad luck"

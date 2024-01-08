@@ -71,7 +71,5 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
       |> run_check(@described_check)
       |> assert_issues()
     end
-
-    #
   end
 end

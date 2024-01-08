@@ -171,7 +171,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> refute_issues
   end
 
-  test "should not report infix operators" do
+  test "should NOT report infix operators" do
     """
     (1 + 2) |> IO.puts
     (1 * 2) |> IO.puts

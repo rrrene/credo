@@ -38,7 +38,7 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
     |> refute_issues()
   end
 
-  test "it shouldn't check calls to functions called \"with\"" do
+  test "it should NOT report calls to functions called \"with\"" do
     """
     def some_function(parameter1, parameter2) do
       with(parameter1, parameter2)

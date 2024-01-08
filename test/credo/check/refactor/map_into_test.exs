@@ -45,7 +45,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 2" do
+  test "it should report a violation /2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 3" do
+  test "it should report a violation /3" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -74,7 +74,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 4" do
+  test "it should report a violation /4" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -90,7 +90,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 5" do
+  test "it should report a violation /5" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -104,7 +104,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 6" do
+  test "it should report a violation /6" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do

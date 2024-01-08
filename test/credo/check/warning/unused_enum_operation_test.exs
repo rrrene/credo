@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
 
   @described_check Credo.Check.Warning.UnusedEnumOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
@@ -614,7 +618,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   end
 
   #
-  #
+  # cases raising issues
   #
 
   test "it should report a violation when NOT the last statement in rescue block" do

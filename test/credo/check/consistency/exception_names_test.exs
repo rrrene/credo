@@ -3,6 +3,10 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   @described_check Credo.Check.Consistency.ExceptionNames
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report modules without defexception" do
     [
       """
@@ -94,6 +98,10 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation for different naming schemes (suffixes)" do
     [

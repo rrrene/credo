@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
 
   @described_check Credo.Check.Readability.SeparateAliasRequire
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report violation on consecutive aliases" do
     """
     defmodule Test do
@@ -145,6 +149,23 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation on separate single-line multi-aliases" do
+    """
+    defmodule Test do
+      alias App.{Module1, Module2}
+
+      alias App.Module2
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
+
   test "it should report violation on separate multi-line multi-aliases" do
     """
     defmodule Test do
@@ -163,18 +184,5 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
-  end
-
-  test "it should NOT report violation on separate single-line multi-aliases" do
-    """
-    defmodule Test do
-      alias App.{Module1, Module2}
-
-      alias App.Module2
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> refute_issues()
   end
 end

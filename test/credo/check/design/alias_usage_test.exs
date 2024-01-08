@@ -183,7 +183,7 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues()
   end
 
-  test "it should work with __MODULE__" do
+  test "it should NOT report with __MODULE__" do
     """
     defmodule Test do
       alias __MODULE__.SubModule
@@ -194,7 +194,7 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues()
   end
 
-  test "it should work when module passed as argument" do
+  test "it should NOT report when module passed as argument" do
     """
     defmodule Test do
       def fun1 do

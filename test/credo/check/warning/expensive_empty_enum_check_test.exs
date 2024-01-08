@@ -3,7 +3,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
 
   @described_check Credo.Check.Warning.ExpensiveEmptyEnumCheck
 
-  test "it should not report when when using length with non zero" do
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should NOT report when when using length with non zero" do
     """
     defmodule CredoSampleModule do
       def some_function(some_list) do
@@ -20,7 +24,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> refute_issues()
   end
 
-  test "it should not report when when using length with non zero backwards" do
+  test "it should NOT report when when using length with non zero backwards" do
     """
     defmodule CredoSampleModule do
       def some_function(some_list) do
@@ -37,7 +41,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> refute_issues()
   end
 
-  test "it should not report when checking if Enum.count is non 0" do
+  test "it should NOT report when checking if Enum.count is non 0" do
     """
     defmodule CredoSampleModule do
       def some_function(enum) do
@@ -54,7 +58,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> refute_issues()
   end
 
-  test "it should non report when checking if Enum.count is non 0 backwards" do
+  test "it should NOT report when checking if Enum.count is non 0 backwards" do
     """
     defmodule CredoSampleModule do
       def some_function(enum) do
@@ -70,6 +74,46 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  test "it should NOT report when checking if a variable called length is 0" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        length = 0
+        if length == 0 do
+          "is 0"
+        else
+          "something else"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report when checking if a variable called length is 0 backwards" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(enum) do
+        length = 0
+        if 0 == length do
+          "is 0"
+        else
+          "something else"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report when checking if length is 0" do
     """
@@ -188,41 +232,5 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
-  end
-
-  test "it should not report when checking if a variable called length is 0" do
-    """
-    defmodule CredoSampleModule do
-      def some_function(enum) do
-        length = 0
-        if length == 0 do
-          "is 0"
-        else
-          "something else"
-        end
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> refute_issues()
-  end
-
-  test "it should not report when checking if a variable called length is 0 backwards" do
-    """
-    defmodule CredoSampleModule do
-      def some_function(enum) do
-        length = 0
-        if 0 == length do
-          "is 0"
-        else
-          "something else"
-        end
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> refute_issues()
   end
 end

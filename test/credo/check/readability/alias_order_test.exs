@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with __MODULE__" do
+  test "it should NOT report with __MODULE__" do
     """
     defmodule Test do
       alias __MODULE__.SubModule
@@ -77,7 +77,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with multi-alias" do
+  test "it should NOT report with multi-alias" do
     """
     defmodule Test do
       alias Detroit.Learnables.Learnable
@@ -92,7 +92,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with an intersecting `require`" do
+  test "it should NOT report with an intersecting `require`" do
     """
     defmodule Test do
       alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
@@ -106,7 +106,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with multi alias syntax" do
+  test "it should NOT report with multi alias syntax" do
     """
     defmodule Test do
       alias MyApp.Accounts.{Organization, User, UserOrganization}
@@ -118,7 +118,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with case-sensitive sorting" do
+  test "it should NOT report with case-sensitive sorting" do
     """
     defmodule Test do
       alias MyApp.AlphaBravoCharlie
@@ -130,7 +130,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with case-sensitive alias grouping" do
+  test "it should NOT report with case-sensitive alias grouping" do
     """
     defmodule Test do
       alias MyApp.{AlphaBravoCharlie, AlphaBravoalpha}

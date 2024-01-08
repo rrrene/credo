@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
 
   @described_check Credo.Check.Readability.OnePipePerLine
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report the expected code" do
     """
     defmodule CredoSampleModule do
@@ -20,7 +24,11 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     |> refute_issues()
   end
 
-  test "reports a violation that includes rejected module attrs" do
+  #
+  # cases raising issues
+  #
+
+  test "it should report a violation that includes rejected module attrs" do
     """
     defmodule CredoSampleModule do
       use ExUnit.Case
@@ -35,7 +43,7 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     |> assert_issue()
   end
 
-  test "reports multiple violations when having multiples pipes" do
+  test "it should report multiple violations when having multiples pipes" do
     """
     defmodule CredoSampleModule do
       use ExUnit.Case

@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
 
   @described_check Credo.Check.Warning.UnusedListOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
@@ -389,8 +393,9 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     |> refute_issues()
   end
 
-  ##############################################################################
-  ##############################################################################
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
     """

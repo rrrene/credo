@@ -57,11 +57,11 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
   end
 
   #
-  # cases NOT raising issues
+  # cases raising issues
   #
 
   @tag :to_be_implemented
-  test "it should NOT report for forced, valid props" do
+  test "it should report for forced, valid props" do
     [
       @with_spaces,
       @with_spaces2

@@ -258,7 +258,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   # cases NOT raising issues
   #
 
-  test "it should not report issues when used with sigil" do
+  test "it should NOT report issues when used with sigil" do
     [
       @without_spaces3
     ]
@@ -267,7 +267,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues when operators are negative float values" do
+  test "it should NOT report issues when operators are negative float values" do
     [
       @with_spaces8
     ]
@@ -276,7 +276,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are used everywhere" do
+  test "it should NOT report issues if spaces are used everywhere" do
     [
       @with_spaces,
       @with_spaces2,
@@ -291,7 +291,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   if Version.match?(System.version(), ">= 1.12.0-rc") do
     # Elixir >= 1.12.0
     #
-    test "it should not report issues if spaces are used everywhere /2" do
+    test "it should NOT report issues if spaces are used everywhere /2" do
       [
         @with_spaces,
         @with_spaces2,
@@ -315,7 +315,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
 
-  test "it should not report issues if spaces are used everywhere in a single file" do
+  test "it should NOT report issues if spaces are used everywhere in a single file" do
     [
       @with_spaces5
     ]
@@ -324,7 +324,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are used everywhere in two files" do
+  test "it should NOT report issues if spaces are used everywhere in two files" do
     [
       @with_spaces5,
       @with_spaces6
@@ -334,7 +334,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are omitted everywhere" do
+  test "it should NOT report issues if spaces are omitted everywhere" do
     [
       @without_spaces,
       @without_spaces2

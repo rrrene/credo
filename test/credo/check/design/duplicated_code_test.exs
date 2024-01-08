@@ -5,6 +5,55 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   alias Credo.Check.Design.DuplicatedCode
 
+  #
+  # cases NOT raising issues
+  #
+
+  test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
+    s1 = """
+    defmodule M1 do
+      test "something is duplicated" do
+        if p1 == p2 do
+          p1
+        else
+          p2 + p1
+          if p1 == p2 do
+            p1
+          else
+            p2 + p1
+          end
+        end
+      end
+    end
+    """
+
+    s2 = """
+    defmodule M2 do
+      test "something is duplicated" do
+        if p1 == p2 do
+          p1
+        else
+          p2 + p1
+          if p1 == p2 do
+            p1
+          else
+            p2 + p1
+          end
+        end
+      end
+    end
+    """
+
+    [s1, s2]
+    |> to_source_files
+    |> run_check(@described_check, excluded_macros: [:test])
+    |> refute_issues
+  end
+
+  #
+  # cases raising issues
+  #
+
   test "should raise an issue for duplicated code" do
     s1 = """
     defmodule M1 do
@@ -107,47 +156,6 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
     |> to_source_files
     |> run_check(@described_check, mass_threshold: 16)
     |> assert_issues()
-  end
-
-  test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
-    s1 = """
-    defmodule M1 do
-      test "something is duplicated" do
-        if p1 == p2 do
-          p1
-        else
-          p2 + p1
-          if p1 == p2 do
-            p1
-          else
-            p2 + p1
-          end
-        end
-      end
-    end
-    """
-
-    s2 = """
-    defmodule M2 do
-      test "something is duplicated" do
-        if p1 == p2 do
-          p1
-        else
-          p2 + p1
-          if p1 == p2 do
-            p1
-          else
-            p2 + p1
-          end
-        end
-      end
-    end
-    """
-
-    [s1, s2]
-    |> to_source_files
-    |> run_check(@described_check, excluded_macros: [:test])
-    |> refute_issues
   end
 
   # unit tests for different aspects

@@ -3,36 +3,9 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
 
   @described_check Credo.Check.Readability.OneArityFunctionInPipe
 
-  test "it should report a violation for missing parentheses" do
-    """
-    defmodule Test do
-      def some_function(arg) do
-        arg
-        |> foo()
-        |> bar
-        |> baz()
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue()
-  end
-
-  test "it should report violations for missing parentheses" do
-    """
-    defmodule Test do
-      def some_function(arg) do
-        arg
-        |> foo
-        |> bar
-      end
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issues()
-  end
+  #
+  # cases NOT raising issues
+  #
 
   test "it should NOT report violation for a valid pipe" do
     """
@@ -70,5 +43,40 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
+
+  test "it should report a violation for missing parentheses" do
+    """
+    defmodule Test do
+      def some_function(arg) do
+        arg
+        |> foo()
+        |> bar
+        |> baz()
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report violations for missing parentheses" do
+    """
+    defmodule Test do
+      def some_function(arg) do
+        arg
+        |> foo
+        |> bar
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues()
   end
 end

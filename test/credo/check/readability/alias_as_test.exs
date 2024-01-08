@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.AliasAsTest do
 
   @described_check Credo.Check.Readability.AliasAs
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report violation" do
     """
     defmodule Test do
@@ -15,18 +19,21 @@ defmodule Credo.Check.Readability.AliasAsTest do
     |> refute_issues()
   end
 
-  test "it should report a violation" do
-    [issue] =
-      """
-      defmodule Test do
-        alias App.Module1, as: M1
-      end
-      """
-      |> to_source_file
-      |> run_check(@described_check)
-      |> assert_issue()
+  #
+  # cases raising issues
+  #
 
-    assert issue.trigger == "App.Module1"
+  test "it should report a violation" do
+    """
+    defmodule Test do
+      alias App.Module1, as: M1
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "App.Module1"
+    end)
   end
 
   test "it should report multiple violations" do
@@ -48,15 +55,14 @@ defmodule Credo.Check.Readability.AliasAsTest do
     assert issue3.trigger == "App.Module4"
   end
 
-  test "it should not raise on alias __MODULE__, as: Foo" do
-    _ =
-      """
-      defmodule Test do
-        alias __MODULE__, as: Foo
-      end
-      """
-      |> to_source_file
-      |> run_check(@described_check)
-      |> assert_issue()
+  test "it should report on alias __MODULE__, as: Foo" do
+    """
+    defmodule Test do
+      alias __MODULE__, as: Foo
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
 
   @described_check Credo.Check.Warning.UnusedKeywordOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
@@ -355,6 +359,10 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation when buried in :if, :when and :fn" do
     """

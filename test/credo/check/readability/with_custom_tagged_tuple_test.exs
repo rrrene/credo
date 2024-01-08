@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
 
   @described_check Credo.Check.Readability.WithCustomTaggedTuple
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report violation" do
     """
     defmodule Test do
@@ -17,6 +21,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
     """

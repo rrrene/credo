@@ -31,14 +31,14 @@ defmodule Credo.Check.Readability.LineEndingsTest do
   # cases NOT raising issues
   #
 
-  test "it should not report expected code for linux" do
+  test "it should NOT report expected code for linux" do
     [@unix_line_endings, @unix_line_endings2]
     |> to_source_files
     |> run_check(@described_check)
     |> refute_issues
   end
 
-  test "it should not report expected code for windows" do
+  test "it should NOT report expected code for windows" do
     [@windows_line_endings |> String.trim()]
     |> to_source_files
     |> run_check(@described_check)
