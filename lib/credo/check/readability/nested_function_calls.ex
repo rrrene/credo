@@ -121,12 +121,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   defmodule PipeHelper do
-    @moduledoc """
-    This module exists to contain logic for the cannot_be_in_pipline?/3 helper
-    function. This function was originally copied from the
-    Credo.Check.Refactor.PipeChainStart module's valid_chain_start?/3 function.
-    Both functions are identical.
-    """
+    @moduledoc false
 
     @elixir_custom_operators [
       :<-,
