@@ -163,7 +163,7 @@
         ],
         disabled: [
           #
-          # Checks scheduled for next check update (opt-in for now, just replace `false` with `[]`)
+          # Checks scheduled for next check update (opt-in for now)
 
           #
           # Controversial and experimental checks (opt-in, just move the check to `:enabled`
