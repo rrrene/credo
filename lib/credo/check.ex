@@ -195,6 +195,12 @@ defmodule Credo.Check do
     :tags
   ]
 
+  @__default_checks__ Code.eval_file(".credo.exs")
+                      |> then(fn {config, _binding} -> config[:configs] end)
+                      |> List.first()
+                      |> then(fn %{:name => "default"} = config -> config[:checks][:enabled] end)
+                      |> Enum.map(fn {check, _params} -> check end)
+
   @doc false
   defmacro __using__(opts) do
     Enum.each(opts, fn
@@ -334,8 +340,10 @@ defmodule Credo.Check do
         end
       end
 
+    module_doc = moduledoc(opts, __CALLER__.module)
+
     quote do
-      @moduledoc unquote(moduledoc(opts))
+      @moduledoc unquote(module_doc)
       @behaviour Credo.Check
       @before_compile Credo.Check
 
@@ -499,12 +507,14 @@ defmodule Credo.Check do
     end
   end
 
-  defp moduledoc(opts) do
+  defp moduledoc(opts, module) do
     explanations = opts[:explanations]
 
     base_priority = opts_to_string(opts[:base_priority]) || 0
 
-    # category = opts_to_string(opts[:category]) || to_string(__MODULE__)
+    default_check? = module in @__default_checks__
+
+    tags = opts[:tags] || []
 
     elixir_version_hint =
       if opts[:elixir_version] do
@@ -513,6 +523,42 @@ defmodule Credo.Check do
         "requires Elixir `#{elixir_version}`"
       else
         "works with any version of Elixir"
+      end
+
+    default_check_hint =
+      if default_check? do
+        """
+        > #### This check is enabled by default. {: .tip}
+        >
+        > [Learn how to disable it](config_file.html#checks) via `.credo.exs`.
+        """
+      else
+        """
+        > #### This check is disabled by default. {: .neutral}
+        >
+        > [Learn how to enable it](config_file.html#checks) via `.credo.exs`.
+        """
+      end
+
+    # TODO: list all tags
+    tag_hint =
+      if :formatter in tags do
+        """
+        > #### This check is tagged `:formatter` {: .info}
+        >
+        > This means you can disable this check when also using Elixir's formatter.
+        """
+      else
+        if :controversial in tags do
+          """
+          > #### This check is tagged `:controversial` {: .warning}
+          >
+          > This means that this check is more opinionated than others and not for everyone's taste.
+          """
+        else
+          """
+          """
+        end
       end
 
     check_doc = opts_to_string(explanations[:check])
@@ -553,6 +599,12 @@ defmodule Credo.Check do
       end
 
     """
+    ## Basics
+
+    #{String.trim(default_check_hint)}
+
+    #{String.trim(tag_hint)}
+
     This check has a base priority of `#{base_priority}` and #{elixir_version_hint}.
 
     ## Explanation
