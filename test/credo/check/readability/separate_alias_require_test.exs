@@ -183,6 +183,9 @@ defmodule Credo.Check.Readability.SeparateAliasImportRequireUseTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 11
+      assert issue.trigger == "alias"
+    end)
   end
 end

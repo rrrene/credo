@@ -51,6 +51,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
 
   defp errors(source_file) do
     {_ast, errors} = Macro.prewalk(Credo.Code.ast(source_file), MapSet.new(), &traverse/2)
+
     Enum.sort_by(errors, &{&1.line, &1.column})
   end
 
@@ -76,7 +77,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
       issue_meta,
       message: "Invalid usage of placeholder `#{inspect(error.placeholder)}` in with",
       line_no: error.line,
-      column: error.column
+      trigger: inspect(error.placeholder)
     )
   end
 end

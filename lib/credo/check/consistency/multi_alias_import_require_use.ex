@@ -38,7 +38,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse do
     issue_locations = @collector.find_locations_not_matching(expected, source_file)
 
     Enum.map(issue_locations, fn line_no ->
-      format_issue(issue_meta, message: message_for(expected), line_no: line_no)
+      format_issue(issue_meta, message: message_for(expected), line_no: line_no, trigger: "")
     end)
   end
 

@@ -110,6 +110,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
+      assert issue.line_no == 2
       assert issue.message == "the last clause in `with` is redundant"
     end)
   end
@@ -125,7 +126,9 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
+      assert issue.line_no == 2
       assert issue.message == "the `with` statement is redundant"
+      assert issue.trigger == "with"
     end)
   end
 end

@@ -30,7 +30,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     module_name = module_name_from(module_namespace)
 
     if String.ends_with?(module_name, "Case") and !Keyword.has_key?(options, :async) do
-      {ast, issues ++ [issue_for(ast, meta[:line], issue_meta)]}
+      {ast, issues ++ [issue_for(module_name, meta[:line], issue_meta)]}
     else
       {ast, issues}
     end

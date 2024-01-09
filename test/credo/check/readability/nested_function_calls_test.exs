@@ -1,7 +1,7 @@
 defmodule Credo.Check.Readability.NestedFunctionCallsTest do
   use Credo.Test.Case
 
-  alias Credo.Check.Readability.NestedFunctionCalls
+  @described_check Credo.Check.Readability.NestedFunctionCalls
 
   #
   # cases NOT raising issues
@@ -16,7 +16,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -29,7 +29,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -55,7 +55,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -68,7 +68,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -81,7 +81,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -94,7 +94,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -109,7 +109,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -122,7 +122,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -146,7 +146,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -163,7 +163,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -176,7 +176,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> assert_issues()
   end
 
@@ -189,7 +189,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls, min_pipeline_length: 1)
+    |> run_check(@described_check, min_pipeline_length: 1)
     |> assert_issue()
   end
 
@@ -202,7 +202,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls, min_pipeline_length: 3)
+    |> run_check(@described_check, min_pipeline_length: 3)
     |> refute_issues()
   end
 
@@ -219,7 +219,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 end

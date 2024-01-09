@@ -76,8 +76,12 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
     {ast, issues}
   end
 
-  defp issue_for(issue_meta, line_no, type) do
-    format_issue(issue_meta, message: message(type), line_no: line_no)
+  defp issue_for(issue_meta, line_no, macro_name) do
+    format_issue(issue_meta,
+      message: message(macro_name),
+      line_no: line_no,
+      trigger: to_string(macro_name)
+    )
   end
 
   def message(:alias), do: "aliases should be consecutive within a file"

@@ -70,10 +70,14 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   defp issue_for({clauses, body}, meta, issue_meta) do
     case {redundant?(List.last(clauses), body), length(clauses)} do
       {true, 1} ->
-        format_issue(issue_meta, message: @redundant_with, line_no: meta[:line])
+        format_issue(issue_meta, message: @redundant_with, line_no: meta[:line], trigger: "with")
 
       {true, _length} ->
-        format_issue(issue_meta, message: @redundant_clause, line_no: meta[:line])
+        format_issue(issue_meta,
+          message: @redundant_clause,
+          line_no: meta[:line],
+          trigger: "with"
+        )
 
       _else ->
         nil

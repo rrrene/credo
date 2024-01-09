@@ -73,10 +73,10 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
     cond do
       parens? and not enforce_parens? ->
-        issues ++ [issue_for(issue_meta, line_no, :present)]
+        issues ++ [issue_for(issue_meta, name, line_no, :present)]
 
       not parens? and enforce_parens? ->
-        issues ++ [issue_for(issue_meta, line_no, :missing)]
+        issues ++ [issue_for(issue_meta, name, line_no, :missing)]
 
       true ->
         issues
@@ -92,7 +92,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     Credo.Backports.String.slice(line, skip..-1)
   end
 
-  defp issue_for(issue_meta, line_no, kind) do
+  defp issue_for(issue_meta, name, line_no, kind) do
     message =
       case kind do
         :present ->
@@ -102,6 +102,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
           "Use parentheses () when defining a function which has no arguments."
       end
 
-    format_issue(issue_meta, message: message, line_no: line_no)
+    format_issue(issue_meta, message: message, line_no: line_no, trigger: to_string(name))
   end
 end

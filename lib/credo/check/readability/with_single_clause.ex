@@ -90,7 +90,8 @@ defmodule Credo.Check.Readability.WithSingleClause do
           format_issue(issue_meta,
             message:
               "`with` contains only one <- clause and an `else` branch, consider using `case` instead",
-            line_no: line
+            line_no: line,
+            trigger: "with"
           )
         ]
 

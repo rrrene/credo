@@ -135,6 +135,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "debug"
+    end)
   end
 end

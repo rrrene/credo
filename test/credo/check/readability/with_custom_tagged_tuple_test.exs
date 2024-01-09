@@ -43,10 +43,13 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
-      issue_messages = Enum.map(issues, & &1.message)
+      [issue1, issue2] = issues
 
-      assert Enum.member?(issue_messages, "Invalid usage of placeholder `:resource` in with")
-      assert Enum.member?(issue_messages, "Invalid usage of placeholder `:authz` in with")
+      assert issue1.message == "Invalid usage of placeholder `:resource` in with"
+      assert issue1.trigger == ":resource"
+
+      assert issue2.message == "Invalid usage of placeholder `:authz` in with"
+      assert issue2.trigger == ":authz"
     end)
   end
 end

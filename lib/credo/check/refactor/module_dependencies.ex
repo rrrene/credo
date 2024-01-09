@@ -86,7 +86,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       else
         module_dependencies = get_dependencies(ast, dependency_namespaces)
 
-        issues_for_module(module_dependencies, max, issue_meta, meta)
+        issues_for_module(module_dependencies, max, issue_meta, meta, module_name)
       end
 
     {ast, issues ++ new_issues}
@@ -105,19 +105,19 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     |> filter_namespaces(dependency_namespaces)
   end
 
-  defp issues_for_module(deps, max_deps, issue_meta, meta) when length(deps) > max_deps do
+  defp issues_for_module(deps, max_deps, issue_meta, meta, module_name)
+       when length(deps) > max_deps do
     [
       format_issue(
         issue_meta,
         message: "Module has too many dependencies: #{length(deps)} (max is #{max_deps})",
-        trigger: deps,
-        line_no: meta[:line],
-        column_no: meta[:column]
+        trigger: module_name,
+        line_no: meta[:line]
       )
     ]
   end
 
-  defp issues_for_module(_, _, _, _), do: []
+  defp issues_for_module(_, _, _, _, _), do: []
 
   # Resolve dependencies to full module names
   defp with_fullnames(dependencies, aliases) do

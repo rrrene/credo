@@ -83,12 +83,24 @@ defmodule Credo.Check.Refactor.WithClauses do
   end
 
   defp issue_if_not_starting_with_pattern_clause(_clauses, line, issue_meta) do
-    [format_issue(issue_meta, message: @message_first_clause_not_pattern, line_no: line)]
+    [
+      format_issue(issue_meta,
+        message: @message_first_clause_not_pattern,
+        line_no: line,
+        trigger: "with"
+      )
+    ]
   end
 
   defp issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta) do
     if length(clauses) > 1 and not match?({:<-, _, _}, Enum.at(clauses, -1)) do
-      [format_issue(issue_meta, message: @message_last_clause_not_pattern, line_no: line)]
+      [
+        format_issue(issue_meta,
+          message: @message_last_clause_not_pattern,
+          line_no: line,
+          trigger: "with"
+        )
+      ]
     else
       []
     end
