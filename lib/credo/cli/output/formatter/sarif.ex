@@ -184,7 +184,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
                 "startColumn" => issue.column || 1,
                 "endColumn" => column_end,
                 "snippet" => %{
-                  "text" => issue.trigger
+                  "text" => to_trigger(issue.trigger)
                 }
               }
             },
@@ -203,6 +203,9 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
     |> remove_warning_level(sarif_level == :warning)
     |> remove_redundant_name(issue.check.id == Credo.Code.Name.full(issue.check))
   end
+
+  defp to_trigger({:__no_trigger__}), do: ""
+  defp to_trigger(trigger), do: to_string(trigger)
 
   defp remove_nil_endcolumn(sarif, false), do: sarif
 
