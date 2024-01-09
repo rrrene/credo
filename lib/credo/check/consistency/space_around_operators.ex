@@ -206,26 +206,24 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         |> Credo.Code.TokenAstCorrelation.find_tokens_in_ast(ast)
         |> List.wrap()
         |> List.first()
-        |> is_parameter_in_function_call()
+        |> parameter_in_function_call?()
 
       _ ->
         false
     end
   end
 
-  defp is_parameter_in_function_call({atom, _, arguments})
+  defp parameter_in_function_call?({atom, _, arguments})
        when is_atom(atom) and is_list(arguments) do
     true
   end
 
-  defp is_parameter_in_function_call(
-         {{:., _, [{:__aliases__, _, _mods}, fun_name]}, _, arguments}
-       )
+  defp parameter_in_function_call?({{:., _, [{:__aliases__, _, _mods}, fun_name]}, _, arguments})
        when is_atom(fun_name) and is_list(arguments) do
     true
   end
 
-  defp is_parameter_in_function_call(_) do
+  defp parameter_in_function_call?(_) do
     false
   end
 

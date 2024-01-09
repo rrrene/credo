@@ -74,7 +74,7 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
          _
        )
        when if_or_unless in [:if, :unless] do
-    if Enum.any?(collect_paren_children(t), &is_do/1) do
+    if Enum.any?(collect_paren_children(t), &do?/1) do
       false
     else
       token
@@ -155,8 +155,8 @@ defmodule Credo.Check.Readability.ParenthesesInCondition do
 
   defp check_for_closing_paren(_, _, _, _), do: false
 
-  defp is_do({_, _, :do}), do: true
-  defp is_do(_), do: false
+  defp do?({_, _, :do}), do: true
+  defp do?(_), do: false
 
   defp collect_paren_children(x) do
     {_, children} = Enum.reduce(x, {0, []}, &collect_paren_child/2)
