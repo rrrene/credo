@@ -172,8 +172,33 @@ defmodule Credo.Test.Case do
       |> to_source_file()
       |> run_check(MyProject.MyCheck, foo_parameter: "bar")
   """
-  def run_check(source_file, check, params \\ []) do
-    CheckRunner.run_check(source_file, check, params)
+  def run_check(source_files, check, params \\ []) do
+    issues = CheckRunner.run_check(source_files, check, params)
+
+    warn_on_malformed_issues(source_files, issues)
+
+    issues
+  end
+
+  defp warn_on_malformed_issues(_source_files, issues) do
+    Enum.each(issues, fn issue ->
+      case issue.trigger do
+        {:__no_trigger__} ->
+          :ok
+
+        trigger when is_nil(trigger) ->
+          IO.warn(":trigger is nil")
+
+        trigger when is_binary(trigger) ->
+          :ok
+
+        trigger when is_atom(trigger) ->
+          :ok
+
+        trigger ->
+          IO.warn(":trigger is not a binary: #{inspect(trigger, pretty: true)}")
+      end
+    end)
   end
 
   #
