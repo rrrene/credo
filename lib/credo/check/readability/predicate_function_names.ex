@@ -8,36 +8,36 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
       * For functions, they should end in a question mark.
 
-          # preferred
+            # preferred
 
-          defp user?(cookie) do
-          end
+            defp user?(cookie) do
+            end
 
-          defp has_attachment?(mail) do
-          end
+            defp has_attachment?(mail) do
+            end
 
-          # NOT preferred
+            # NOT preferred
 
-          defp is_user?(cookie) do
-          end
+            defp is_user?(cookie) do
+            end
 
-          defp is_user(cookie) do
-          end
+            defp is_user(cookie) do
+            end
 
       * For guard-safe macros they should have the prefix `is_` and not end in a question mark.
 
-          # preferred
+            # preferred
 
-          defmacro is_user(cookie) do
-          end
+            defmacro is_user(cookie) do
+            end
 
-          # NOT preferred
+            # NOT preferred
 
-          defmacro is_user?(cookie) do
-          end
+            defmacro is_user?(cookie) do
+            end
 
-          defmacro user?(cookie) do
-          end
+            defmacro user?(cookie) do
+            end
 
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
