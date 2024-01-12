@@ -1,4 +1,4 @@
-name: "OS Smoke Tests"
+name: "Compatibility: Windows"
 on:
   push:
     branches:
@@ -10,12 +10,10 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    name: "[${{matrix.os}}] testing latest Credo [OS]"
+    runs-on: windows-2022
+    name: "Compatibility: Windows"
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-20.04, windows-2022] # macos-12 (erlef/setup-beam does not work with macOS)
     steps:
       - uses: actions/checkout@v4
         with:
