@@ -48,18 +48,19 @@ defmodule Credo.Check.Readability.AliasAs do
   defp add_issue(issues, issue), do: [issue | issues]
 
   defp issue({:alias, _, [{:__MODULE__, _, nil}, [as: {_, meta, _}]]}, issue_meta),
-    do: issue_for(issue_meta, meta[:line], inspect(:__MODULE__))
+    do: issue_for(issue_meta, meta[:line])
 
-  defp issue({:alias, _, [{_, _, original}, [as: {_, meta, _}]]}, issue_meta),
-    do: issue_for(issue_meta, meta[:line], inspect(Module.concat(original)))
+  defp issue({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, issue_meta) do
+    issue_for(issue_meta, meta[:line])
+  end
 
   defp issue(_ast, _issue_meta), do: nil
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
       message: "Avoid using the :as option with alias.",
-      trigger: trigger,
+      trigger: "as:",
       line_no: line_no
     )
   end

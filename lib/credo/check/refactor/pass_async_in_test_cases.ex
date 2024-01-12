@@ -26,7 +26,11 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
   end
 
   # `use` with options
-  defp traverse({:use, _, [{_, meta, module_namespace}, options]} = ast, issues, issue_meta) do
+  defp traverse(
+         {:use, _, [{_, meta, module_namespace}, [_ | _] = options]} = ast,
+         issues,
+         issue_meta
+       ) do
     module_name = module_name_from(module_namespace)
 
     if String.ends_with?(module_name, "Case") and !Keyword.has_key?(options, :async) do

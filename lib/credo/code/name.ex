@@ -75,6 +75,11 @@ defmodule Credo.Code.Name do
     full([full(mod_list), name])
   end
 
+  def full({{:., _, [{struct_name, _, nil}, field_name]}, _, []})
+      when is_atom(struct_name) and is_atom(field_name) do
+    full([struct_name, field_name])
+  end
+
   def full({:@, _, [{name, _, nil}]}) when is_atom(name) do
     "@#{name}"
   end

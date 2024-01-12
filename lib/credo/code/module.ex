@@ -306,9 +306,7 @@ defmodule Credo.Code.Module do
     module_parts(state)
   end
 
-  defp traverse_file({:defmodule, meta, args}, state) do
-    [first_arg, [do: module_ast]] = args
-
+  defp traverse_file({:defmodule, meta, [first_arg, [do: module_ast]]}, state) do
     state = start_module(state, meta)
     {_ast, state} = Macro.prewalk(module_ast, state, &traverse_module/2)
 
