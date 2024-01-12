@@ -165,13 +165,10 @@ defmodule Credo.CLI.Output.Summary do
     Credo.Code.prewalk(source_file, &scope_count_traverse/2, 0)
   end
 
-  defp scope_count([]), do: 0
-
   defp scope_count(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&Task.async(fn -> scope_count(&1) end))
-    |> Enum.map(&Task.await/1)
-    |> Enum.reduce(&(&1 + &2))
+    |> Task.async_stream(&scope_count/1)
+    |> Enum.reduce(0, fn {:ok, n}, sum -> n + sum end)
   end
 
   @def_ops [:defmodule, :def, :defp, :defmacro]

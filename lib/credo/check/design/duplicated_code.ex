@@ -54,18 +54,11 @@ defmodule Credo.Check.Design.DuplicatedCode do
   defp append_issues_via_issue_service(found_hashes, source_files, nodes_threshold, params, exec)
        when is_map(found_hashes) do
     found_hashes
-    |> Enum.map(
-      &Task.async(fn ->
-        do_append_issues_via_issue_service(
-          &1,
-          source_files,
-          nodes_threshold,
-          params,
-          exec
-        )
-      end)
+    |> Task.async_stream(
+      &do_append_issues_via_issue_service(&1, source_files, nodes_threshold, params, exec),
+      timeout: :infinity
     )
-    |> Enum.map(&Task.await(&1, :infinity))
+    |> Enum.map(fn {:ok, result} -> result end)
   end
 
   defp do_append_issues_via_issue_service(
@@ -97,8 +90,8 @@ defmodule Credo.Check.Design.DuplicatedCode do
     chunked_nodes =
       source_files
       |> Enum.chunk_every(30)
-      |> Enum.map(&Task.async(fn -> calculate_hashes_for_chunk(&1, mass_threshold) end))
-      |> Enum.map(&Task.await(&1, :infinity))
+      |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold), timeout: :infinity)
+      |> Enum.map(fn {:ok, hashes} -> hashes end)
 
     nodes =
       Enum.reduce(chunked_nodes, %{}, fn current_hashes, existing_hashes ->
