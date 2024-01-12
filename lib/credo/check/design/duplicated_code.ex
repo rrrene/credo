@@ -91,7 +91,10 @@ defmodule Credo.Check.Design.DuplicatedCode do
     nodes =
       source_files
       |> Enum.chunk_every(30)
-      |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold), timeout: :infinity, ordered: false)
+      |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold),
+        timeout: :infinity,
+        ordered: false
+      )
       |> Enum.reduce(%{}, fn {:ok, current_hashes}, existing_hashes ->
         Map.merge(existing_hashes, current_hashes, fn _hash, node_items1, node_items2 ->
           node_items1 ++ node_items2
