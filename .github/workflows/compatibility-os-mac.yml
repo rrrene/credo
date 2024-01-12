@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: "Compatibility: macOS"
+    name: "Compile & Run"
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@master
@@ -20,12 +20,12 @@ jobs:
         run: |
           brew update
           brew install elixir
-          
+
       - run: mix deps.get
       - run: mix deps.compile
       - run: |
           mix compile --force --warnings-as-errors
-          
+
       - run: |
           mix credo --mute-exit-status
 

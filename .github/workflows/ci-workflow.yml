@@ -11,7 +11,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
-    name: "[${{matrix.otp}}/${{matrix.elixir}}] CI Tests on Credo [OTP/Elixir]"
+    name: "Elixir ${{matrix.elixir}} OTP ${{matrix.otp}}"
     strategy:
       fail-fast: false
       matrix:

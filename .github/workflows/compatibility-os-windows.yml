@@ -10,8 +10,8 @@ on:
 
 jobs:
   test:
+    name: "Compile & Run"
     runs-on: windows-2022
-    name: "Compatibility: Windows"
     strategy:
       fail-fast: false
     steps:

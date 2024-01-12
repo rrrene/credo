@@ -8,7 +8,7 @@ on:
 jobs:
   test_on_new_project:
     runs-on: ubuntu-20.04
-    name: "[${{matrix.project.name}}]"
+    name: "Elixir ${{matrix.elixir}} OTP ${{matrix.otp}} - Credo running on ${{matrix.project.name}}"
     strategy:
       fail-fast: false
       matrix:

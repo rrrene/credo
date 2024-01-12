@@ -8,7 +8,7 @@ on:
 jobs:
   test_on_source:
     runs-on: ubuntu-20.04
-    name: "[${{matrix.otp}}/${{matrix.elixir}}] Phoenix ${{matrix.repo_branch}} source code analysed by Credo [OTP/Elixir]"
+    name: "Elixir ${{matrix.elixir}} OTP ${{matrix.otp}} - Credo running on Phoenix ${{matrix.repo_branch}}"
     strategy:
       fail-fast: false
       matrix:
