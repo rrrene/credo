@@ -1,0 +1,71 @@
+name: "OS: macOS"
+
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Install commands
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Install awscli and awsebcli
+        run: |
+          brew update
+          brew install elixir
+          
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: |
+          mix compile --force --warnings-as-errors
+          
+      - run: |
+          mix credo --mute-exit-status
+
+          mix credo --strict --mute-exit-status
+          mix credo --strict --enable-disabled-checks . --mute-exit-status
+          mix credo --debug --mute-exit-status
+          mix credo --strict --format=sarif --mute-exit-status
+          mix credo list --mute-exit-status
+          mix credo suggest --mute-exit-status
+          mix credo diff HEAD^ --mute-exit-status
+          mix credo diff v1.4.0 --mute-exit-status
+
+      - run: |
+          # explain issues
+          mix credo test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status
+          mix credo explain test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status
+          mix credo test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status --format=json
+          mix credo explain test/fixtures/example_code/clean_redux.ex:1:11 --mute-exit-status --format=json
+
+      - run: |
+          # explain check
+          mix credo explain Credo.Check.Refactor.Nesting --mute-exit-status
+          mix credo explain Credo.Check.Refactor.Nesting --mute-exit-status --format=json
+
+      - run: |
+          mix credo categories
+          mix credo categories --format=json
+
+      - run: |
+          mix credo info
+          mix credo info --verbose
+          mix credo info --format=json
+          mix credo info --verbose --format=json
+
+      - run: |
+          mix credo version
+          mix credo help
+
+          mix credo -v
+          mix credo -h
+
+          echo ""
+          echo "Smoke test successful."
