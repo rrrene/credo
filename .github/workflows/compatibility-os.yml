@@ -1,0 +1,31 @@
+name: "CI Tests"
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    name: "[${{matrix.os}}] testing latest Credo [OS]"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-12, windows-2022]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 26.2
+          elixir-version: 1.16.0
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile --warnings-as-errors
+      - run: mix test
+      - run: mix credo --mute-exit-status
