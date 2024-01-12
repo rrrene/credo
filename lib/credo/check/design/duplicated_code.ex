@@ -88,14 +88,11 @@ defmodule Credo.Check.Design.DuplicatedCode do
   end
 
   defp duplicate_nodes(source_files, mass_threshold) do
-    chunked_nodes =
+    nodes =
       source_files
       |> Enum.chunk_every(30)
       |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold), timeout: :infinity, ordered: false)
-      |> Enum.map(fn {:ok, hashes} -> hashes end)
-
-    nodes =
-      Enum.reduce(chunked_nodes, %{}, fn current_hashes, existing_hashes ->
+      |> Enum.reduce(%{}, fn {:ok, current_hashes}, existing_hashes ->
         Map.merge(existing_hashes, current_hashes, fn _hash, node_items1, node_items2 ->
           node_items1 ++ node_items2
         end)
@@ -197,10 +194,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     else
       hash = ast |> Credo.Code.remove_metadata() |> to_hash
       node_item = %{node: ast, filename: filename, mass: nil}
-      node_items = Map.get(existing_hashes, hash, [])
-
-      updated_hashes = Map.put(existing_hashes, hash, node_items ++ [node_item])
-
+      updated_hashes = Map.update(existing_hashes, hash, [node_item], &[node_item | &1])
       {ast, updated_hashes}
     end
   end
