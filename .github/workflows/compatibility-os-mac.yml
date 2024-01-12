@@ -1,4 +1,4 @@
-name: "OS: macOS"
+name: "Compatibility: macOS"
 
 on:
   push:
@@ -11,12 +11,12 @@ on:
 
 jobs:
   test:
-    name: Install commands
+    name: "Compatibility: macOS"
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@master
 
-      - name: Install awscli and awsebcli
+      - name: Install Elixir
         run: |
           brew update
           brew install elixir
