@@ -167,7 +167,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp scope_count(source_files) when is_list(source_files) do
     source_files
-    |> Task.async_stream(&scope_count/1)
+    |> Task.async_stream(&scope_count/1, ordered: false)
     |> Enum.reduce(0, fn {:ok, n}, sum -> n + sum end)
   end
 

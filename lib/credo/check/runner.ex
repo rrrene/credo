@@ -20,12 +20,7 @@ defmodule Credo.Check.Runner do
       |> fix_deprecated_notation_for_checks_without_params()
 
     check_tuples
-    |> Task.async_stream(
-      fn check_tuple ->
-        run_check(exec, check_tuple)
-      end,
-      timeout: :infinity
-    )
+    |> Task.async_stream(&run_check(exec, &1), timeout: :infinity, ordered: false)
     |> Stream.run()
 
     :ok

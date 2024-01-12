@@ -56,9 +56,10 @@ defmodule Credo.Check.Design.DuplicatedCode do
     found_hashes
     |> Task.async_stream(
       &do_append_issues_via_issue_service(&1, source_files, nodes_threshold, params, exec),
-      timeout: :infinity
+      timeout: :infinity,
+      ordered: false
     )
-    |> Enum.map(fn {:ok, result} -> result end)
+    |> Stream.run()
   end
 
   defp do_append_issues_via_issue_service(
@@ -90,7 +91,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
     chunked_nodes =
       source_files
       |> Enum.chunk_every(30)
-      |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold), timeout: :infinity)
+      |> Task.async_stream(&calculate_hashes_for_chunk(&1, mass_threshold), timeout: :infinity, ordered: false)
       |> Enum.map(fn {:ok, hashes} -> hashes end)
 
     nodes =
