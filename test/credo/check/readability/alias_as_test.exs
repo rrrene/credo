@@ -32,7 +32,7 @@ defmodule Credo.Check.Readability.AliasAsTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.trigger == "App.Module1"
+      assert issue.trigger == "as:"
     end)
   end
 
@@ -50,9 +50,9 @@ defmodule Credo.Check.Readability.AliasAsTest do
       |> run_check(@described_check)
       |> assert_issues()
 
-    assert issue1.trigger == "App.Module1"
-    assert issue2.trigger == "App.Module3"
-    assert issue3.trigger == "App.Module4"
+    assert issue1.trigger == "as:"
+    assert issue2.trigger == "as:"
+    assert issue3.trigger == "as:"
   end
 
   test "it should report on alias __MODULE__, as: Foo" do
