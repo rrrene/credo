@@ -1,4 +1,4 @@
-name: "Reproducing Test-Case Detector (experimental)"
+name: "Housekeeping: Reproducing Test-Case Detector (experimental)"
 
 on:
   pull_request:
