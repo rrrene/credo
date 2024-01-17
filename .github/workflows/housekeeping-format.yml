@@ -1,4 +1,4 @@
-name: "Housekeeping"
+name: "Housekeeping: Formatter"
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
 jobs:
   test:
     name: "mix format"
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
         with:
