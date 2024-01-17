@@ -402,7 +402,8 @@ defmodule Credo.Check do
         source_files
         |> Task.async_stream(fn source -> run_on_source_file(exec, source, params) end,
           max_concurrency: exec.max_concurrent_check_runs,
-          timeout: :infinity
+          timeout: :infinity,
+          ordered: false
         )
         |> Stream.run()
 

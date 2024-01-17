@@ -170,24 +170,12 @@ defmodule Credo.Sources do
   end
 
   defp read_files(filenames, parse_timeout) do
-    tasks = Enum.map(filenames, &Task.async(fn -> to_source_file(&1) end))
-
-    task_dictionary =
-      tasks
-      |> Enum.zip(filenames)
-      |> Enum.into(%{})
-
-    tasks_with_results = Task.yield_many(tasks, parse_timeout)
-
-    results =
-      Enum.map(tasks_with_results, fn {task, res} ->
-        # Shutdown the tasks that did not reply nor exit
-        {task, res || Task.shutdown(task, :brutal_kill)}
-      end)
-
-    Enum.map(results, fn
-      {_task, {:ok, value}} -> value
-      {task, nil} -> SourceFile.timed_out(task_dictionary[task])
+    filenames
+    |> Task.async_stream(&to_source_file/1, timeout: parse_timeout, on_timeout: :kill_task)
+    |> Stream.zip(filenames)
+    |> Enum.map(fn
+      {{:exit, :timeout}, filename} -> SourceFile.timed_out(filename)
+      {{:ok, value}, _} -> value
     end)
   end
 
