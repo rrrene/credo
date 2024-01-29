@@ -24,25 +24,20 @@ defmodule Credo.Check.Readability.ImplTrue do
       """
     ]
 
-  alias Credo.Code.Heredocs
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    source_file
-    |> Heredocs.replace_with_spaces()
-    |> String.split("\n")
-    |> Enum.with_index(1)
-    |> Enum.reduce([], &check_line(&1, &2, issue_meta))
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp check_line({line, line_number}, issues, issue_meta) do
-    case String.trim(line) do
-      "@impl true" -> [issue_for(issue_meta, line_number) | issues]
-      _ -> issues
-    end
+  defp traverse({:@, meta, [{:impl, _, [true]}]}, issues, issue_meta) do
+    {nil, issues ++ [issue_for(issue_meta, meta[:line])]}
+  end
+
+  defp traverse(ast, issues, _issue_meta) do
+    {ast, issues}
   end
 
   defp issue_for(issue_meta, line_no) do
