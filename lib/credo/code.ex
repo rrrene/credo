@@ -16,6 +16,8 @@ defmodule Credo.Code do
 
   alias Credo.SourceFile
 
+  @elixir_version System.version()
+
   defmodule ParserError do
     @moduledoc """
     This is an internal `Issue` raised by Credo when it finds itself unable to
@@ -74,9 +76,15 @@ defmodule Credo.Code do
 
   @doc false
   def ast(source, filename \\ "nofilename") when is_binary(source) do
-    case Code.string_to_quoted(source, line: 1, columns: true, file: filename) do
-      {:ok, value} ->
-        {:ok, value}
+    case Code.string_to_quoted_with_comments(source,
+           line: 1,
+           columns: true,
+           file: filename,
+           token_metadata: true,
+           emit_warnings: false
+         ) do
+      {:ok, ast, comments} ->
+        {:ok, {{:elixir, @elixir_version}, {ast, comments}}}
 
       {:error, error} ->
         {:error, [issue_for(error, filename)]}

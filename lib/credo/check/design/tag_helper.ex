@@ -22,18 +22,15 @@ defmodule Credo.Check.Design.TagHelper do
 
   defp tags_from_comments(source_file, tag_name) do
     regex = Regex.compile!("(\\A|[^\\?])#\\s*#{tag_name}:?\\s*.+", "i")
-    source = SourceFile.source(source_file)
+    comments = SourceFile.comments(source_file)
 
-    if source =~ regex do
-      source
-      |> Credo.Code.clean_charlists_strings_and_sigils()
-      |> String.split("\n")
-      |> Enum.with_index()
-      |> Enum.map(&find_tag_in_line(&1, regex))
-      |> Enum.filter(&tags?/1)
-    else
-      []
-    end
+    comments
+    |> Enum.filter(fn %{text: text} ->
+      String.match?(text, regex)
+    end)
+    |> Enum.map(fn %{line: line_no, text: text} ->
+      {line_no, text}
+    end)
   end
 
   defp traverse({:@, _, [{name, meta, [string]} | _]} = ast, memo, regex)
@@ -50,17 +47,4 @@ defmodule Credo.Check.Design.TagHelper do
   defp traverse(ast, memo, _regex) do
     {ast, memo}
   end
-
-  defp find_tag_in_line({line, index}, regex) do
-    tag_list =
-      regex
-      |> Regex.run(line)
-      |> List.wrap()
-      |> Enum.map(&String.trim/1)
-
-    {index + 1, line, List.first(tag_list)}
-  end
-
-  defp tags?({_line_no, _line, nil}), do: false
-  defp tags?({_line_no, _line, _tag}), do: true
 end

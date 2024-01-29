@@ -39,7 +39,7 @@ defmodule Credo.Check.Design.TagTODO do
     |> Enum.map(&issue_for(issue_meta, &1))
   end
 
-  defp issue_for(issue_meta, {line_no, _line, trigger}) do
+  defp issue_for(issue_meta, {line_no, trigger}) do
     format_issue(
       issue_meta,
       message: "Found a #{@tag_name} tag in a comment: #{trigger}",
