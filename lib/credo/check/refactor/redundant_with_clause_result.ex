@@ -29,8 +29,8 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
 
   require Logger
 
-  @redundant_with "the `with` statement is redundant"
-  @redundant_clause "the last clause in `with` is redundant"
+  @redundant_with "`with` statement is redundant"
+  @redundant_clause "Last clause in `with` is redundant"
 
   @doc false
   @impl true
