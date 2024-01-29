@@ -38,7 +38,7 @@ defmodule Credo.Check.Design.TagHelper do
     if string =~ regex do
       trimmed = String.trim_trailing(string)
 
-      {nil, memo ++ [{meta[:line], trimmed, trimmed}]}
+      {nil, memo ++ [{meta[:line], trimmed}]}
     else
       {ast, memo}
     end

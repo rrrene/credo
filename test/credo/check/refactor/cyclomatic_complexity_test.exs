@@ -156,7 +156,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
   #
 
   def complexity(source) do
-    {:ok, ast} = Credo.Code.ast(source)
+    {:ok, {{:elixir, _}, {ast, _comments}}} = Credo.Code.ast(source)
     @described_check.complexity_for(ast)
   end
 

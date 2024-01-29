@@ -207,7 +207,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   #
 
   def abc_size(source, excluded_functions \\ []) do
-    {:ok, ast} = Credo.Code.ast(source)
+    {:ok, {{:elixir, _}, {ast, _comments}}} = Credo.Code.ast(source)
 
     @described_check.abc_size_for(ast, excluded_functions)
   end
