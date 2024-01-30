@@ -2,6 +2,9 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   use Credo.Check,
     id: "EX2003",
     base_priority: :normal,
+    param_defaults: [
+      files: %{included: ["test/**/*_test.exs"]}
+    ],
     explanations: [
       check: """
       Skipped tests should have a comment documenting why the test is skipped.
@@ -24,8 +27,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
       While the pure existence of a comment does not change anything per se, a thoughtful
       comment can improve the odds for future iteration on the issue.
       """
-    ],
-    param_defaults: [included: ["test/**/*_test.exs"]]
+    ]
 
   @tag_skip_regex ~r/^\s*\@tag :skip\s*$/
   @comment_regex ~r/^\s*\#.*$/
