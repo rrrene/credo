@@ -1,0 +1,14 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/elixir-asdf:2": {}
+  },
+  "customizations": {
+		"vscode": {
+			"settings": {},
+			"extensions": [
+        "jakebecker.elixir-ls"
+      ]
+		}
+  }
+}
