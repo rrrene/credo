@@ -3,7 +3,7 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
     id: "EX5025",
     base_priority: :high,
     param_defaults: [
-      files: %{included: ["test/**/*_test.exs"]}
+      files: %{included: ["test/**/*_test.ex"]}
     ],
     explanations: [
       check: """
@@ -12,7 +12,7 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
 
       (from the `ex_unit` docs)
 
-      This check ensures that test files are not ending with `.ex` (which would cause them to be skipped).
+      This check ensures that test files are not ending with `_test.ex` (which would cause them to be skipped).
       """
     ]
 

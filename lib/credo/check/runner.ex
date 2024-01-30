@@ -61,6 +61,10 @@ defmodule Credo.Check.Runner do
           exec
           |> Execution.working_dir()
           |> Credo.Sources.find_in_dir(files_included, files_excluded)
+          |> case do
+            [] -> :skip_run
+            files -> files
+          end
       end
 
     source_files =
