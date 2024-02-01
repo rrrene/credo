@@ -6,13 +6,13 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
       check: """
       Module attribute names are always written in snake_case in Elixir.
 
-      # snake_case
+          # snake_case
 
-      @inbox_name "incoming"
+          @inbox_name "incoming"
 
-      # not snake_case
+          # not snake_case
 
-      @inboxName "incoming"
+          @inboxName "incoming"
 
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making

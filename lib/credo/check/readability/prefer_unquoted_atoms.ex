@@ -36,7 +36,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
       atom key, this can lead to subtle bugs which are hard to discover.
 
       Like all `Readability` issues, this one is not a technical concern.
-      The code will behave identical in both ways.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 

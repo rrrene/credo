@@ -13,6 +13,10 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
       See also: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206
 
       Most text editors ensure this "final newline" automatically.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 
