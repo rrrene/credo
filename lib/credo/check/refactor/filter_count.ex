@@ -35,14 +35,14 @@ defmodule Credo.Check.Refactor.FilterCount do
             {:|>, _,
              [
                _,
-               {{:., meta, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
+               {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
              ]},
-            {{:., _, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
+            {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
           ]} = ast,
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "filter_count")
+    new_issue = issue_for(issue_meta, meta[:line], "count")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -54,20 +54,20 @@ defmodule Credo.Check.Refactor.FilterCount do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "filter_count")
+    new_issue = issue_for(issue_meta, meta[:line], "count")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
   defp traverse(
          {:|>, _,
           [
-            {{:., meta, [{:__aliases__, _, [:Enum]}, :filter]}, _, _},
-            {{:., _, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
+            {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _},
+            {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
           ]} = ast,
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "filter_count")
+    new_issue = issue_for(issue_meta, meta[:line], "count")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -79,7 +79,7 @@ defmodule Credo.Check.Refactor.FilterCount do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "filter_count")
+    new_issue = issue_for(issue_meta, meta[:line], "count")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
