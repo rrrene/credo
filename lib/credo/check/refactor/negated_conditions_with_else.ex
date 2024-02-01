@@ -49,8 +49,10 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
 
   defp traverse({:if, meta, arguments} = ast, issues, issue_meta) do
-    if negated_condition?(arguments) && Credo.Code.Block.else_block?(ast) do
-      new_issue = issue_for(issue_meta, meta[:line], "!")
+    negator = negated_condition(arguments)
+
+    if negator && Credo.Code.Block.else_block?(ast) do
+      new_issue = issue_for(issue_meta, meta[:line], negator)
 
       {ast, issues ++ [new_issue]}
     else
@@ -62,26 +64,20 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
     {ast, issues}
   end
 
-  defp negated_condition?(arguments) when is_list(arguments) do
-    arguments |> List.first() |> negated_condition?()
-  end
+  defp negated_condition({:!, _, _}), do: "!"
 
-  defp negated_condition?({:!, _meta, _arguments}) do
-    true
-  end
-
-  defp negated_condition?({:not, _meta, _arguments}) do
-    true
-  end
+  defp negated_condition({:not, _, _}), do: "not"
 
   # parentheses around the condition wrap it in a __block__
-  defp negated_condition?({:__block__, _meta, arguments}) do
-    negated_condition?(arguments)
+  defp negated_condition({:__block__, _, arguments}) do
+    negated_condition(arguments)
   end
 
-  defp negated_condition?(_) do
-    false
+  defp negated_condition(arguments) when is_list(arguments) do
+    arguments |> List.first() |> negated_condition()
   end
+
+  defp negated_condition(_), do: nil
 
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
