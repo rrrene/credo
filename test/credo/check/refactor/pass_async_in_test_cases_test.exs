@@ -61,6 +61,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 2
+        assert issue.trigger == "use"
       end)
     end
 
@@ -75,6 +76,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 3
+        assert issue.trigger == "use"
       end)
     end
   end

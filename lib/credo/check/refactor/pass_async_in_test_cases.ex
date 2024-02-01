@@ -27,47 +27,40 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
 
   # `use` with options
   defp traverse(
-         {:use, _, [{_, meta, module_namespace}, [_ | _] = options]} = ast,
+         {:use, meta, [{_, _meta, module_namespace}, [_ | _] = options]} = ast,
          issues,
          issue_meta
        ) do
-    module_name = module_name_from(module_namespace)
+    module_name = Credo.Code.Name.last(module_namespace)
 
     if String.ends_with?(module_name, "Case") and !Keyword.has_key?(options, :async) do
-      {ast, issues ++ [issue_for(module_name, meta[:line], issue_meta)]}
+      {ast, issues ++ [issue_for(meta[:line], issue_meta)]}
     else
       {ast, issues}
     end
   end
 
   # `use` without options
-  defp traverse({:use, _, [{_, meta, module_namespace}]} = ast, issues, issue_meta) do
-    module_name = module_name_from(module_namespace)
+  defp traverse({:use, meta, [{_op, _meta, module_namespace}]} = ast, issues, issue_meta) do
+    module_name = Credo.Code.Name.last(module_namespace)
 
     if String.ends_with?(module_name, "Case") do
-      {ast, issues ++ [issue_for(module_name, meta[:line], issue_meta)]}
+      {ast, issues ++ [issue_for(meta[:line], issue_meta)]}
     else
       {ast, issues}
     end
   end
 
-  # Ignore all other AST nodes
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issue_for(module_name, line_no, issue_meta) do
+  defp issue_for(line_no, issue_meta) do
     format_issue(
       issue_meta,
       message: "Pass an `:async` boolean option to `use` a test case module",
-      trigger: module_name,
+      trigger: "use",
       line_no: line_no
     )
-  end
-
-  defp module_name_from(module_namespace) do
-    module_namespace
-    |> List.last()
-    |> to_string()
   end
 end
