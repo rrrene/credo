@@ -36,8 +36,8 @@ defmodule Credo.Check.Warning.UnsafeExec do
 
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
-      {bad, suggestion} ->
-        {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
+      {bad, suggestion, trigger} ->
+        {ast, [issue_for(bad, suggestion, trigger, meta[:line], issue_meta) | issues]}
 
       nil ->
         {ast, issues}
@@ -49,28 +49,27 @@ defmodule Credo.Check.Warning.UnsafeExec do
   end
 
   defp get_forbidden_call([:os, :cmd], [_]) do
-    {":os.cmd/1", "System.cmd/2,3"}
+    {":os.cmd/1", "System.cmd/2,3", "System.cmd"}
   end
 
   defp get_forbidden_call([:os, :cmd], [_, _]) do
-    {":os.cmd/2", "System.cmd/2,3"}
+    {":os.cmd/2", "System.cmd/2,3", "System.cmd"}
   end
 
   defp get_forbidden_call([:erlang, :open_port], [{:spawn, _}, _]) do
-    {":erlang.open_port/2 with `:spawn`", ":erlang.open_port/2 with `:spawn_executable`"}
+    {":erlang.open_port/2 with `:spawn`", ":erlang.open_port/2 with `:spawn_executable`",
+     ":erlang.open_port"}
   end
 
   defp get_forbidden_call(_, _) do
     nil
   end
 
-  defp issues_for_call(call, suggestion, meta, issue_meta, issues) do
-    options = [
+  defp issue_for(call, suggestion, trigger, line_no, issue_meta) do
+    format_issue(issue_meta,
       message: "Prefer #{suggestion} over #{call} to prevent command injection",
-      trigger: call,
-      line_no: meta[:line]
-    ]
-
-    [format_issue(issue_meta, options) | issues]
+      trigger: trigger,
+      line_no: line_no
+    )
   end
 end

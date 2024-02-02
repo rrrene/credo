@@ -36,18 +36,19 @@ defmodule Credo.Check.Design.TagHelper do
     end
   end
 
-  defp traverse({:@, _, [{name, meta, [string]} | _]} = ast, issues, regex)
+  defp traverse({:@, _, [{name, meta, [string]} | _]} = ast, memo, regex)
        when name in @doc_attribute_names and is_binary(string) do
     if string =~ regex do
       trimmed = String.trim_trailing(string)
-      {nil, issues ++ [{meta[:line], trimmed, trimmed}]}
+
+      {nil, memo ++ [{meta[:line], trimmed, trimmed}]}
     else
-      {ast, issues}
+      {ast, memo}
     end
   end
 
-  defp traverse(ast, issues, _regex) do
-    {ast, issues}
+  defp traverse(ast, memo, _regex) do
+    {ast, memo}
   end
 
   defp find_tag_in_line({line, index}, regex) do

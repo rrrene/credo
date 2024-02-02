@@ -117,4 +117,39 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
       assert 8 == issue.line_no
     end)
   end
+
+  test "it should report multiple violations" do
+    """
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def catcher do
+        try do
+          raise "oops"
+        rescue
+          e ->
+            if is_nil(e) do
+              Logger.warn("Something bad happened") && raise e
+            else
+              raise e
+            end
+        end
+      end
+
+      def catcher do
+        raise "oops"
+      rescue
+        e ->
+          if is_nil(e) do
+            Logger.warn("Something bad happened") && raise e
+          else
+            raise e
+          end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(fn issues -> assert Enum.count(issues) == 4 end)
+  end
 end

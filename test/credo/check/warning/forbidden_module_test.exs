@@ -106,15 +106,16 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   test "it should display a custom message" do
     """
     defmodule CredoSampleModule do
-      def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
+      def some_function, do:
+        CredoSampleModule.ForbiddenModule.another_function()
     end
     """
     |> to_source_file
     |> run_check(@described_check, modules: [{CredoSampleModule.ForbiddenModule, "my message"}])
     |> assert_issue(fn issue ->
-      expected_message = "my message"
-
-      assert issue.message == expected_message
+      assert issue.line_no == 3
+      assert issue.trigger == "CredoSampleModule.ForbiddenModule"
+      assert issue.message == "my message"
     end)
   end
 

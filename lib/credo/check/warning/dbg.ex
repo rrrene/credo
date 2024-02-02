@@ -12,8 +12,6 @@ defmodule Credo.Check.Warning.Dbg do
       """
     ]
 
-  @call_string "dbg"
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -22,11 +20,19 @@ defmodule Credo.Check.Warning.Dbg do
   end
 
   defp traverse(
+         {:@, _, [{:dbg, _, _}]},
+         issues,
+         _issue_meta
+       ) do
+    {nil, issues}
+  end
+
+  defp traverse(
          {:dbg, meta, []} = ast,
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(
@@ -34,7 +40,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(
@@ -42,7 +48,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(
@@ -50,7 +56,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(
@@ -58,7 +64,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(
@@ -66,22 +72,18 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line], @call_string) | issues]
-  end
-
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
       message: "There should be no calls to dbg.",
-      trigger: trigger,
+      trigger: "dbg",
       line_no: line_no
     )
   end

@@ -10,7 +10,10 @@ defmodule Credo.Check.Warning.DbgTest do
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
+      @dbg "this should be found"
+
       def some_function(parameter1, parameter2) do
+        dbg = "variables should also not be a problem"
         parameter1 + parameter2
       end
     end
@@ -193,6 +196,9 @@ defmodule Credo.Check.Warning.DbgTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "dbg"
+    end)
   end
 end
