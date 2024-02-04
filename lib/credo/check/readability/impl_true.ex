@@ -47,7 +47,7 @@ defmodule Credo.Check.Readability.ImplTrue do
     format_issue(
       issue_meta,
       message: "@impl true should be @impl MyBehaviour",
-      trigger: "@impl true",
+      trigger: "@impl",
       line_no: line_no
     )
   end

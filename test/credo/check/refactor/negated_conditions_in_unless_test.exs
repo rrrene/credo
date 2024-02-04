@@ -57,7 +57,10 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "!"
+    end)
   end
 
   test "it should report a violation with not" do
@@ -72,6 +75,9 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "not"
+    end)
   end
 end

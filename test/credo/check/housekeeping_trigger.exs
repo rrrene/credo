@@ -8,7 +8,10 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
       |> Path.wildcard()
       |> Enum.reject(&String.match?(&1, ~r/(collector|helper)/))
       |> Enum.reject(
-        &String.match?(&1, ~r/(wrong_test_file|unreachable_code|regex_multiple_spaces)/)
+        &String.match?(
+          &1,
+          ~r/(wrong_test_file|unreachable_code|regex_multiple_spaces|regex_empty_character_classes|module_size|case_trivial_matches)/
+        )
       )
       |> Enum.map(&{&1, File.read!(&1)})
       |> Enum.flat_map(fn {filename, source} ->

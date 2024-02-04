@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.TrailingBlankLine do
       issue_meta,
       message: "There should be a final \\n at the end of each file.",
       line_no: line_no,
-      trigger: {:__no_trigger__}
+      trigger: Issue.no_trigger()
     )
   end
 end

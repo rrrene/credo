@@ -23,4 +23,9 @@ defmodule Credo.Issue do
             # optional: the name of the module, macro or
             #  function where the issue was found
             scope: nil
+
+  @doc """
+  A value that be assigned to `:trigger` if there is no actual trigger.
+  """
+  def no_trigger, do: {:__no_trigger__}
 end

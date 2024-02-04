@@ -27,8 +27,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
-      assert "!!" == trigger
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "!!"
     end)
   end
 
@@ -38,8 +38,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
-      assert "!!" == trigger
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "!!"
     end)
   end
 
@@ -58,8 +58,8 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn %Credo.Issue{trigger: trigger} ->
-      assert "not not" == trigger
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "not not"
     end)
   end
 end

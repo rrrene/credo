@@ -104,6 +104,9 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
     """
     |> to_source_file
     |> run_check(@described_check, max_line_count: 7)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "quote"
+    end)
   end
 end

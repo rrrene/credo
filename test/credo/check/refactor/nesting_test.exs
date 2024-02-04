@@ -124,7 +124,10 @@ defmodule Credo.Check.Refactor.NestingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 7
+      assert issue.trigger == "if"
+    end)
   end
 
   test "it should report a violation /4" do
@@ -168,7 +171,9 @@ defmodule Credo.Check.Refactor.NestingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "if"
+    end)
   end
 
   test "it should report a violation /6" do
@@ -191,6 +196,8 @@ defmodule Credo.Check.Refactor.NestingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "if"
+    end)
   end
 end

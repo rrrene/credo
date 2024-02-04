@@ -713,11 +713,13 @@ defmodule Credo.Check do
     line_no = opts[:line_no]
     column = opts[:column]
     severity = opts[:severity] || Severity.default_value()
+    trigger = opts[:trigger]
 
     trigger =
-      case opts[:trigger] do
-        {:__no_trigger__} -> {:__no_trigger__}
-        trigger -> to_string(trigger)
+      if trigger == Issue.no_trigger() do
+        trigger
+      else
+        to_string(trigger)
       end
 
     %Issue{

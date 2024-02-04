@@ -241,7 +241,9 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "otherParam"
+    end)
   end
 
   test "it should report a violation /17" do
@@ -257,7 +259,10 @@ defmodule Credo.Check.Readability.VariableNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 5
+      assert issue.trigger == "someValue"
+    end)
   end
 
   test "it should report multiple violations" do

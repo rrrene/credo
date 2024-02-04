@@ -84,7 +84,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     if valid_chain_start?(lhs, excluded_functions, excluded_argument_types) do
       {ast, issues}
     else
-      {ast, issues ++ [issue_for(issue_meta, meta[:line], "TODO")]}
+      {ast, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
     end
   end
 

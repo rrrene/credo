@@ -113,6 +113,18 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
+  test "it should NOT report functions with `@impl true`" do
+    """
+    defmodule CredoTypespecTest do
+      @impl true
+      def foo(a), do: a
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -179,18 +191,8 @@ defmodule Credo.Check.Readability.SpecsTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
-  end
-
-  test "it should NOT report functions with `@impl true`" do
-    """
-    defmodule CredoTypespecTest do
-      @impl true
-      def foo(a), do: a
-    end
-    """
-    |> to_source_file()
-    |> run_check(@described_check)
-    |> refute_issues()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "foo"
+    end)
   end
 end

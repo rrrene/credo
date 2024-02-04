@@ -181,9 +181,11 @@ defmodule Credo.Test.Case do
   end
 
   defp warn_on_malformed_issues(_source_files, issues) do
+    no_trigger = Credo.Issue.no_trigger()
+
     Enum.each(issues, fn issue ->
       case issue.trigger do
-        {:__no_trigger__} ->
+        ^no_trigger ->
           :ok
 
         trigger when is_nil(trigger) ->

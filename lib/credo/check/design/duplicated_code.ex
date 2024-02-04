@@ -248,7 +248,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
           issue_meta,
           message: "Duplicate code found in #{filenames} (mass: #{node_mass}).",
           line_no: line_no,
-          trigger: {:__no_trigger__},
+          trigger: Issue.no_trigger(),
           severity: Severity.compute(1 + Enum.count(other_nodes), 1)
         )
       end
