@@ -169,7 +169,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
       issue_meta,
       message:
         "Function is too complex (cyclomatic complexity is #{actual_value}, max is #{max_value}).",
-      trigger: to_string(trigger),
+      trigger: trigger,
       line_no: line_no,
       severity: Severity.compute(actual_value, max_value)
     )

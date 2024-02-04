@@ -114,7 +114,7 @@ defmodule Credo.Check.Warning.LazyLogging do
       issue_meta,
       message: "Prefer lazy Logger calls.",
       line_no: line_no,
-      trigger: to_string(trigger)
+      trigger: trigger
     )
   end
 end

@@ -68,42 +68,43 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
          {{:., _, [{:__aliases__, _, [:Application]}, :fetch_env]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.fetch_env/2"}
+    {ast, {"Application.fetch_env/2", "Application.fetch_env"}}
   end
 
   defp get_forbidden_call(
          {{:., _, [{:__aliases__, _, [:Application]}, :fetch_env!]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.fetch_env!/2"}
+    {ast, {"Application.fetch_env!/2", "Application.fetch_env"}}
   end
 
   defp get_forbidden_call(
          {{:., _, [{:__aliases__, _, [:Application]}, :get_all_env]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.get_all_env/1"}
+    {ast, {"Application.get_all_env/1", "Application.get_all_env"}}
   end
 
   defp get_forbidden_call(
          {{:., _, [{:__aliases__, _, [:Application]}, :get_env]}, _meta, args} = ast,
          _acc
        ) do
-    {ast, "Application.get_env/#{length(args)}"}
+    {ast, {"Application.get_env/#{length(args)}", "Application.get_env"}}
   end
 
   defp get_forbidden_call(ast, acc) do
     {ast, acc}
   end
 
-  defp issues_for_call(attribute, call, meta, issue_meta, issues) do
-    options = [
-      message:
-        "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
-      trigger: call,
-      line_no: meta[:line]
+  defp issues_for_call(attribute, {call, trigger}, meta, issue_meta, issues) do
+    [
+      format_issue(issue_meta,
+        message:
+          "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
+        trigger: trigger,
+        line_no: meta[:line]
+      )
+      | issues
     ]
-
-    [format_issue(issue_meta, options) | issues]
   end
 end

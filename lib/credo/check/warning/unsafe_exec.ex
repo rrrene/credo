@@ -49,11 +49,11 @@ defmodule Credo.Check.Warning.UnsafeExec do
   end
 
   defp get_forbidden_call([:os, :cmd], [_]) do
-    {":os.cmd/1", "System.cmd/2,3", "System.cmd"}
+    {":os.cmd/1", "System.cmd/2,3", ":os.cmd"}
   end
 
   defp get_forbidden_call([:os, :cmd], [_, _]) do
-    {":os.cmd/2", "System.cmd/2,3", "System.cmd"}
+    {":os.cmd/2", "System.cmd/2,3", ":os.cmd"}
   end
 
   defp get_forbidden_call([:erlang, :open_port], [{:spawn, _}, _]) do

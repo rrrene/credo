@@ -29,8 +29,21 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
   # cases raising issues
   #
 
+  test "it should report a violation" do
+    """
+    defmodule CredoSampleModule do
+      @config_1 Application.fetch_env(:my_app, :key)
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Application.fetch_env"
+    end)
+  end
+
   test "it should report a violation when bad calls are made" do
-    errors =
+    issues =
       """
       defmodule CredoSampleModule do
         @config_1 Application.fetch_env(:my_app, :key)
@@ -51,39 +64,44 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
       |> to_source_file
       |> run_check(@described_check)
 
-    assert_errors = [
+    assert_issues = [
       {
         "Module attribute @config_1 makes use of unsafe Application configuration call Application.fetch_env/2",
-        2
+        2,
+        "Application.fetch_env"
       },
       {
         "Module attribute @config_3 makes use of unsafe Application configuration call Application.fetch_env!/2",
-        4
+        4,
+        "Application.fetch_env"
       },
       {
         "Module attribute @config_5 makes use of unsafe Application configuration call Application.get_all_env/1",
-        6
+        6,
+        "Application.get_all_env"
       },
       {
         "Module attribute @config_7 makes use of unsafe Application configuration call Application.get_env/2",
-        8
+        8,
+        "Application.get_env"
       },
       {
         "Module attribute @config_9 makes use of unsafe Application configuration call Application.get_env/3",
-        10
+        10,
+        "Application.get_env"
       }
     ]
 
-    assert length(errors) == 5
+    assert length(issues) == 5
 
-    Enum.each(assert_errors, fn {error_message, line_number} ->
-      assert error_exists?(errors, error_message, line_number)
+    Enum.each(assert_issues, fn {error_message, line_no, trigger} ->
+      assert error_exists?(issues, error_message, line_no, trigger)
     end)
   end
 
-  defp error_exists?(errors, error_message, line_number) do
+  defp error_exists?(errors, error_message, line_no, trigger) do
     Enum.any?(errors, fn
-      %Credo.Issue{message: ^error_message, line_no: ^line_number} -> true
+      %Credo.Issue{message: ^error_message, line_no: ^line_no, trigger: ^trigger} -> true
       _ -> false
     end)
   end

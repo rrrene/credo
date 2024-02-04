@@ -114,6 +114,9 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 7
+      assert issue.trigger == "Map.get"
+    end)
   end
 end

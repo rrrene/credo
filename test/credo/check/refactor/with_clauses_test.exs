@@ -80,6 +80,9 @@ defmodule Credo.Check.Refactor.WithClausesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 2
+      assert issue.trigger == "with"
+    end)
   end
 end

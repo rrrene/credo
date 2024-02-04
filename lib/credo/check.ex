@@ -711,9 +711,14 @@ defmodule Credo.Check do
     exit_status = Check.to_exit_status(exit_status_or_category)
 
     line_no = opts[:line_no]
-    trigger = opts[:trigger]
     column = opts[:column]
     severity = opts[:severity] || Severity.default_value()
+
+    trigger =
+      case opts[:trigger] do
+        {:__no_trigger__} -> {:__no_trigger__}
+        trigger -> to_string(trigger)
+      end
 
     %Issue{
       priority: priority,

@@ -54,8 +54,8 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
          issue_meta
        ) do
     case get_forbidden_pipe(call, args) do
-      {bad, suggestion} ->
-        {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
+      {bad, suggestion, trigger} ->
+        {ast, issues_for_call(bad, suggestion, trigger, meta, issue_meta, issues)}
 
       nil ->
         {ast, issues}
@@ -64,8 +64,8 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
 
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
-      {bad, suggestion} ->
-        {ast, issues_for_call(bad, suggestion, meta, issue_meta, issues)}
+      {bad, suggestion, trigger} ->
+        {ast, issues_for_call(bad, suggestion, trigger, meta, issue_meta, issues)}
 
       nil ->
         {ast, issues}
@@ -77,27 +77,27 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   end
 
   defp get_forbidden_call([:erlang, :list_to_atom], [_]) do
-    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
+    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1", ":erlang.list_to_atom"}
   end
 
   defp get_forbidden_call([:erlang, :binary_to_atom], [_, _]) do
-    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
+    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2", ":erlang.binary_to_atom"}
   end
 
   defp get_forbidden_call([{:__aliases__, _, [:String]}, :to_atom], [_]) do
-    {"String.to_atom/1", "String.to_existing_atom/1"}
+    {"String.to_atom/1", "String.to_existing_atom/1", "String.to_atom"}
   end
 
   defp get_forbidden_call([{:__aliases__, _, [:List]}, :to_atom], [_]) do
-    {"List.to_atom/1", "List.to_existing_atom/1"}
+    {"List.to_atom/1", "List.to_existing_atom/1", "List.to_atom"}
   end
 
   defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_]) do
-    {"Module.concat/1", "Module.safe_concat/1"}
+    {"Module.concat/1", "Module.safe_concat/1", "Module.concat"}
   end
 
   defp get_forbidden_call([{:__aliases__, _, [:Module]}, :concat], [_, _]) do
-    {"Module.concat/2", "Module.safe_concat/2"}
+    {"Module.concat/2", "Module.safe_concat/2", "Module.concat"}
   end
 
   defp get_forbidden_call([{:__aliases__, _, [:Jason]}, decode], args)
@@ -105,7 +105,8 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     args
     |> Enum.any?(fn arg -> Keyword.keyword?(arg) and Keyword.get(arg, :keys) == :atoms end)
     |> if do
-      {"Jason.#{decode}(..., keys: :atoms)", "Jason.#{decode}(..., keys: :atoms!)"}
+      {"Jason.#{decode}(..., keys: :atoms)", "Jason.#{decode}(..., keys: :atoms!)",
+       "Jason.#{decode}"}
     else
       nil
     end
@@ -116,36 +117,37 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   end
 
   defp get_forbidden_pipe([:erlang, :list_to_atom], []) do
-    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1"}
+    {":erlang.list_to_atom/1", ":erlang.list_to_existing_atom/1", ":erlang.list_to_atom"}
   end
 
   defp get_forbidden_pipe([:erlang, :binary_to_atom], [_]) do
-    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2"}
+    {":erlang.binary_to_atom/2", ":erlang.binary_to_existing_atom/2", ":erlang.binary_to_atom"}
   end
 
   defp get_forbidden_pipe([{:__aliases__, _, [:String]}, :to_atom], []) do
-    {"String.to_atom/1", "String.to_existing_atom/1"}
+    {"String.to_atom/1", "String.to_existing_atom/1", "String.to_atom"}
   end
 
   defp get_forbidden_pipe([{:__aliases__, _, [:List]}, :to_atom], []) do
-    {"List.to_atom/1", "List.to_existing_atom/1"}
+    {"List.to_atom/1", "List.to_existing_atom/1", "List.to_atom"}
   end
 
   defp get_forbidden_pipe([{:__aliases__, _, [:Module]}, :concat], []) do
-    {"Module.concat/1", "Module.safe_concat/1"}
+    {"Module.concat/1", "Module.safe_concat/1", "Module.concat"}
   end
 
   defp get_forbidden_pipe(_, _) do
     nil
   end
 
-  defp issues_for_call(call, suggestion, meta, issue_meta, issues) do
-    options = [
-      message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime",
-      trigger: call,
-      line_no: meta[:line]
+  defp issues_for_call(call, suggestion, trigger, meta, issue_meta, issues) do
+    [
+      format_issue(issue_meta,
+        message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime",
+        trigger: trigger,
+        line_no: meta[:line]
+      )
+      | issues
     ]
-
-    [format_issue(issue_meta, options) | issues]
   end
 end

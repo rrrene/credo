@@ -37,7 +37,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipe do
       meta,
       message: "One arity functions should have parentheses in pipes",
       line_no: line,
-      trigger: to_string(name)
+      trigger: name
     )
   end
 end

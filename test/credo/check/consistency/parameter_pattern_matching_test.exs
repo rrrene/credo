@@ -120,11 +120,11 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
       assert Enum.any?(issues, fn issue ->
-               issue.trigger == :foo_left && issue.line_no == 5
+               issue.trigger == "foo_left" && issue.line_no == 5
              end)
 
       assert Enum.any?(issues, fn issue ->
-               issue.trigger == :foo_left && issue.line_no == 8
+               issue.trigger == "foo_left" && issue.line_no == 8
              end)
 
       assert 2 == Enum.count(issues)

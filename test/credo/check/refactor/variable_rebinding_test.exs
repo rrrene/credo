@@ -154,6 +154,9 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 4
+      assert issue.trigger == "a!"
+    end)
   end
 end

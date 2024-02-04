@@ -80,7 +80,7 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
     format_issue(issue_meta,
       message: message(macro_name),
       line_no: line_no,
-      trigger: to_string(macro_name)
+      trigger: macro_name
     )
   end
 

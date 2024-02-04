@@ -102,6 +102,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
           "Use parentheses () when defining a function which has no arguments."
       end
 
-    format_issue(issue_meta, message: message, line_no: line_no, trigger: to_string(name))
+    format_issue(issue_meta, message: message, line_no: line_no, trigger: name)
   end
 end

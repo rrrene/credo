@@ -79,7 +79,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
       issue_meta,
       message: "Avoid single pipes to a block",
       line_no: line_no,
-      trigger: to_string(marker)
+      trigger: marker
     )
   end
 end

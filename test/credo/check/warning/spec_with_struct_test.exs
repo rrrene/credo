@@ -98,6 +98,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert %{line_no: 2, message: "Struct %MyApp.MyStruct{} found in @spec"} = issue
+      assert issue.trigger == "%MyApp.MyStruct{"
     end)
   end
 
@@ -115,7 +116,10 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 2
+      assert issue.trigger == "%AStruct{"
+    end)
   end
 
   test "it should report an issue if a struct is part of a union in a spec" do

@@ -7,6 +7,9 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
       Path.join(__DIR__, "*/**/*_test.exs")
       |> Path.wildcard()
       |> Enum.reject(&String.match?(&1, ~r/(collector|helper)/))
+      |> Enum.reject(
+        &String.match?(&1, ~r/(wrong_test_file|unreachable_code|regex_multiple_spaces)/)
+      )
       |> Enum.map(&{&1, File.read!(&1)})
       |> Enum.flat_map(fn {filename, source} ->
         ast = Code.string_to_quoted!(source)
@@ -40,7 +43,7 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
 
         if acc == [] do
           [
-            "- #{Credo.Code.Module.name(ast) |> String.replace(~r/Test$/, "")}"
+            "- #{Path.relative_to_cwd(filename)}:1"
           ]
         else
           []

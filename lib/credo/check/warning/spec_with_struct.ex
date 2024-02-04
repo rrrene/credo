@@ -39,7 +39,7 @@ defmodule Credo.Check.Warning.SpecWithStruct do
           Enum.reduce(structs, issues, fn curr, acc ->
             options = [
               message: "Struct %#{curr}{} found in @spec",
-              trigger: "%#{curr}{}",
+              trigger: "%#{curr}{",
               line_no: meta[:line]
             ]
 

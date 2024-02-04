@@ -40,21 +40,21 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
                             }
   @length_pattern quote do: {:length, _, [_]}
   @comparisons [
-    {@enum_count_pattern, 0},
-    {0, @enum_count_pattern},
-    {@length_pattern, 0},
-    {0, @length_pattern}
+    {@enum_count_pattern, 0, "Enum.count"},
+    {0, @enum_count_pattern, "Enum.count"},
+    {@length_pattern, 0, "length"},
+    {0, @length_pattern, "length"}
   ]
   @operators [:==, :===]
 
-  for {lhs, rhs} <- @comparisons,
+  for {lhs, rhs, trigger} <- @comparisons,
       operator <- @operators do
     defp traverse(
            {unquote(operator), meta, [unquote(lhs), unquote(rhs)]} = ast,
            issues,
            issue_meta
          ) do
-      {ast, issues_for_call(meta, issues, issue_meta, ast)}
+      {ast, issues_for_call(meta, unquote(trigger), issues, issue_meta, ast)}
     end
   end
 
@@ -62,8 +62,8 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {ast, issues}
   end
 
-  defp issues_for_call(meta, issues, issue_meta, ast) do
-    [issue_for(issue_meta, meta[:line], Macro.to_string(ast), suggest(ast)) | issues]
+  defp issues_for_call(meta, trigger, issues, issue_meta, ast) do
+    [issue_for(issue_meta, meta[:line], trigger, suggest(ast)) | issues]
   end
 
   defp suggest({_op, _, [0, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
