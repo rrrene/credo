@@ -18,7 +18,6 @@ defmodule Credo.Check.Warning.MixEnv do
 
   alias Credo.SourceFile
 
-  @call_string "Mix.env"
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
@@ -79,14 +78,14 @@ defmodule Credo.Check.Warning.MixEnv do
   end
 
   defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line], @call_string) | issues]
+    [issue_for(issue_meta, meta[:line]) | issues]
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
       message: "There should be no calls to Mix.env in application code.",
-      trigger: trigger,
+      trigger: "Mix.env",
       line_no: line_no
     )
   end

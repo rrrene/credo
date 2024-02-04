@@ -3,20 +3,20 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
 
   @described_check Credo.Check.Consistency.MultiAliasImportRequireUse
 
-  @single """
+  @single ~S"""
   defmodule Credo.Sample2 do
     alias Foo.Bar
     alias Foo.Quux
     require Foo.Bar
   end
   """
-  @single2 """
+  @single2 ~S"""
   defmodule Credo.Sample2 do
     import Assertions
     import MyApp.Factory
   end
   """
-  @multi """
+  @multi ~S"""
   defmodule Credo.Sample3 do
     alias Foo.{Bar, Quux}
     alias Bar.{Baz, Bang}
@@ -24,7 +24,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
     require Foo.Quux
   end
   """
-  @multi_module_same_file """
+  @multi_module_same_file ~S"""
   defmodule CredoMultiAliasExample.SetMultiAliasToSingles do
     @moduledoc "This modules does many aliases to set the consistency to multi-alias"
 

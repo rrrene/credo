@@ -136,18 +136,19 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
   test "it should report a violation on def rather than when" do
     """
     defmodule CredoTest do
-    defp foobar(v) when is_atom(v) do
-      if first_condition do
-        if second_condition && third_condition, do: call_something
-        if fourth_condition || fifth_condition, do: call_something_else
+      defp foobar(v) when is_atom(v) do
+        if first_condition do
+          if second_condition && third_condition, do: call_something
+          if fourth_condition || fifth_condition, do: call_something_else
+        end
       end
-    end
     end
     """
     |> to_source_file
     |> run_check(@described_check, max_complexity: 4)
-    |> assert_issue()
-    |> assert_trigger(:foobar)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "foobar"
+    end)
   end
 
   #

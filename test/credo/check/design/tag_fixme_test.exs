@@ -54,7 +54,10 @@ defmodule Credo.Check.Design.TagFIXMETest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger =~ "# fixme"
+    end)
   end
 
   test "it should report a couple of issues" do

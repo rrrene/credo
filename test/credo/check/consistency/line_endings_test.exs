@@ -1,9 +1,9 @@
-defmodule Credo.Check.Readability.LineEndingsTest do
+defmodule Credo.Check.Consistency.LineEndingsTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.LineEndings
 
-  @unix_line_endings """
+  @unix_line_endings ~S"""
   defmodule Credo.Sample do
     defmodule InlineModule do
       def foobar do
@@ -12,7 +12,7 @@ defmodule Credo.Check.Readability.LineEndingsTest do
     end
   end
   """
-  @unix_line_endings2 """
+  @unix_line_endings2 ~S"""
   defmodule OtherModule do
     defmacro foo do
       {:ok} = File.read
@@ -23,7 +23,7 @@ defmodule Credo.Check.Readability.LineEndingsTest do
     end
   end
   """
-  @windows_line_endings """
+  @windows_line_endings ~s"""
   defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend
   """
 

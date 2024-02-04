@@ -11,7 +11,7 @@ check_version =
     end
   end)
 
-exclude = Keyword.merge([to_be_implemented: true], check_version)
+exclude = Keyword.merge([to_be_implemented: true, housekeeping: true], check_version)
 
 ExUnit.configure(exclude: exclude)
 

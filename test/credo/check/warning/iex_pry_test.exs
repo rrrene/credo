@@ -35,6 +35,9 @@ defmodule Credo.Check.Warning.IExPryTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 4
+      assert issue.trigger == "IEx.pry"
+    end)
   end
 end
