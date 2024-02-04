@@ -44,7 +44,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
       issue_meta,
       message: "There should be no more than #{max_blank_lines} consecutive blank lines.",
       line_no: line,
-      trigger: ""
+      trigger: Issue.no_trigger()
     )
   end
 

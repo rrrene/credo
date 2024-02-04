@@ -53,6 +53,8 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
     [@unix_line_endings, @windows_line_endings]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "\r\n"
+    end)
   end
 end

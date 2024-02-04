@@ -1,4 +1,4 @@
-defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
+defmodule Credo.Check.HousekeepingTriggerTest do
   use Credo.Test.Case
 
   @tag housekeeping: :trigger
@@ -10,14 +10,14 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
       |> Enum.reject(
         &String.match?(
           &1,
-          ~r/(wrong_test_file|unreachable_code|regex_multiple_spaces|regex_empty_character_classes|module_size|case_trivial_matches)/
+          ~r/(wrong_test_file|unreachable_code|regex_multiple_spaces|regex_empty_character_classes|module_size|case_trivial_matches|perceived_complexity|duplicated_code)/
         )
       )
       |> Enum.map(&{&1, File.read!(&1)})
       |> Enum.flat_map(fn {filename, source} ->
         ast = Code.string_to_quoted!(source)
 
-        {ast, acc} =
+        {_ast, acc} =
           Macro.prewalk(ast, [], fn
             {:test, _, [_ | _] = args}, acc ->
               Macro.prewalk(args, acc, fn

@@ -88,7 +88,9 @@ end"
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == Credo.Issue.no_trigger()
+    end)
   end
 
   test "it should report based on  max_blank_lines param" do

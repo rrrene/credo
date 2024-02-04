@@ -105,6 +105,9 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
     [@single, @multi_module_same_file]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      # TODO: we need a real trigger for this
+      assert issue.trigger == ""
+    end)
   end
 end

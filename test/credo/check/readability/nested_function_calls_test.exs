@@ -220,6 +220,8 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "SomeMod.some_fun"
+    end)
   end
 end

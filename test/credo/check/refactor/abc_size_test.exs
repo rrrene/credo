@@ -157,7 +157,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     """
     defmodule CredoEctoQueryModule do
 
-      def fun() do
+      def foobar() do
         Favorite
         |> where(user_id: ^user.id)
         |> join(:left, [f], t in Template, f.entity_id == t.id and f.entity_type == "template")
@@ -172,7 +172,9 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     """
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "foobar"
+    end)
   end
 
   #

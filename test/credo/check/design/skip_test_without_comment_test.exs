@@ -35,7 +35,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
   # cases raising issues
   #
 
-  @tag :skip
+  # @tag :skip
   test "it should report a violation" do
     """
     defmodule CredoSampleModuleTest do
@@ -49,6 +49,8 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     """
     |> to_source_file("foo_test.exs")
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "@tag :skip"
+    end)
   end
 end

@@ -309,7 +309,9 @@ defmodule Credo.Check.Design.AliasUsageTest do
     """
     |> to_source_file
     |> run_check(@described_check, if_referenced: true)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Credo.Foo.Bar"
+    end)
   end
 
   #
@@ -394,6 +396,8 @@ defmodule Credo.Check.Design.AliasUsageTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Exzmq.Socket"
+    end)
   end
 end

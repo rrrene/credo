@@ -79,7 +79,11 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issues()
+    |> assert_issues(fn issues ->
+      assert Enum.any?(issues, fn issue ->
+               issue.trigger == "\t"
+             end)
+    end)
   end
 
   @tag :to_be_implemented
@@ -90,6 +94,10 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
     ]
     |> to_source_files
     |> run_check(@described_check, force: :tabs)
-    |> assert_issues()
+    |> assert_issues(fn issues ->
+      assert Enum.any?(issues, fn issue ->
+               issue.trigger == " "
+             end)
+    end)
   end
 end

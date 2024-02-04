@@ -386,7 +386,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "+"
+    end)
   end
 
   test "it should report the correct result /6" do

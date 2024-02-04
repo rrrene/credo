@@ -83,7 +83,9 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "case"
+    end)
   end
 
   test "it should report violation for single pipes to case with function" do

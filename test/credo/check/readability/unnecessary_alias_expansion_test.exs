@@ -84,6 +84,8 @@ defmodule Credo.Check.Readability.UnnecessaryAliasExpansionTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Module3"
+    end)
   end
 end

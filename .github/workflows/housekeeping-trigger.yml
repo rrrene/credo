@@ -1,0 +1,24 @@
+name: "Housekeeping: Trigger"
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: "mix test ..."
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 26.2
+          elixir-version: 1.16.0
+      - run: mix deps.get
+      - run: mix test test/credo/check/housekeeping_trigger.exs

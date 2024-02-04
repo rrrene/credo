@@ -35,7 +35,7 @@ defmodule Credo.Check.Refactor.MapJoin do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_join")
+    new_issue = issue_for(issue_meta, meta[:line], "Enum.join")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -48,7 +48,7 @@ defmodule Credo.Check.Refactor.MapJoin do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_join")
+    new_issue = issue_for(issue_meta, meta[:line], "|>")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -61,7 +61,7 @@ defmodule Credo.Check.Refactor.MapJoin do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_join")
+    new_issue = issue_for(issue_meta, meta[:line], "|>")
     {ast, issues ++ List.wrap(new_issue)}
   end
 
@@ -78,7 +78,7 @@ defmodule Credo.Check.Refactor.MapJoin do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_join")
+    new_issue = issue_for(issue_meta, meta[:line], "|>")
     {ast, issues ++ List.wrap(new_issue)}
   end
 

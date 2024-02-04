@@ -41,21 +41,21 @@ defmodule Credo.Check.Refactor.MapInto do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_into")
+    new_issue = issue_for(issue_meta, meta[:line], "Enum.into")
 
     {ast, issues ++ List.wrap(new_issue)}
   end
 
   defp traverse(
-         {:|>, meta,
+         {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
-            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, _}
+            {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, _}
           ]} = ast,
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_into")
+    new_issue = issue_for(issue_meta, meta[:line], "Enum.into")
 
     {ast, issues ++ List.wrap(new_issue)}
   end
@@ -69,7 +69,7 @@ defmodule Credo.Check.Refactor.MapInto do
          issues,
          issue_meta
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "map_into")
+    new_issue = issue_for(issue_meta, meta[:line], "|>")
 
     {ast, issues ++ List.wrap(new_issue)}
   end
@@ -88,7 +88,7 @@ defmodule Credo.Check.Refactor.MapInto do
          issue_meta
        )
        when length(into_args) == 1 do
-    new_issue = issue_for(issue_meta, meta[:line], "map_into")
+    new_issue = issue_for(issue_meta, meta[:line], "|>")
 
     {ast, issues ++ List.wrap(new_issue)}
   end

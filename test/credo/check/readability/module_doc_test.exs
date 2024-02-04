@@ -78,7 +78,9 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "CredoSampleModule"
+    end)
   end
 
   test "it should report empty multi line strings" do
@@ -91,7 +93,9 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "CredoSampleModule"
+    end)
   end
 
   test "it should report slightly unexpected code" do
@@ -100,6 +104,8 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Person"
+    end)
   end
 end
