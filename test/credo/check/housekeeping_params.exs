@@ -1,11 +1,16 @@
 defmodule Ast do
   defmacro collect(ast, pattern1, blocks \\ []) do
-    dbg(pattern1)
     do_block1 = blocks[:do]
+
+    {pattern1, guards} =
+      case pattern1 do
+        {:when, _, [pattern1, guards]} -> {pattern1, guards}
+        _ -> {pattern1, true}
+      end
 
     quote do
       Macro.prewalk(unquote(ast), [], fn
-        m_i_ast = unquote(pattern1), m_i_acc ->
+        m_i_ast = unquote(pattern1), m_i_acc when unquote(guards) ->
           m_i_result = unquote(do_block1)
 
           {m_i_ast, List.wrap(m_i_result) ++ m_i_acc}
@@ -53,19 +58,17 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
 
             Enum.uniq(Keyword.keys(defaults) ++ Keyword.keys(explanations))
           end
-          |> dbg
 
         test_ast = Code.string_to_quoted!(test_source)
 
-        all_param_names =
-          collect test_ast, {:test, _, args} do
+        tested_params =
+          collect test_ast, {:test, _, args} when is_list(args) do
             collect args, {:run_check, _, [_check, params]} do
               Keyword.keys(params)
             end
           end
-          |> dbg
 
-        untested_params = all_param_names -- acc
+        untested_params = all_param_names -- tested_params
 
         if check_source != "" && untested_params != [] do
           "- #{Credo.Code.Module.name(check_ast)} - untested params: #{inspect(untested_params)}"
