@@ -108,4 +108,16 @@ defmodule Credo.Check.Readability.ModuleDocTest do
       assert issue.trigger == "Person"
     end)
   end
+
+  test "it should report controller submodules when the :ignore_names param says so" do
+    """
+    defmodule MyApp.SomePhoenixController do
+      defmodule SubModule do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
+    |> assert_issues()
+  end
 end

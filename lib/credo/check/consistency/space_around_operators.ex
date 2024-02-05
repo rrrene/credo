@@ -29,11 +29,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 
-  # TODO: add *ignored* operators, so you can add "|" and still write
-  #       [head|tail] while enforcing 2 + 3 / 1 ...
-  # FIXME: this seems to be already implemented, but there don't seem to be
-  # any related test cases around.
-
   @doc false
   @impl true
   def run_on_all_source_files(exec, source_files, params) do

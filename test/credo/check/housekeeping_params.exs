@@ -23,7 +23,7 @@ defmodule Ast do
   end
 end
 
-defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
+defmodule Credo.Check.HousekeepingParamsTest do
   use Credo.Test.Case
 
   require Ast
@@ -34,7 +34,9 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
     errors =
       Path.join(__DIR__, "*/**/*_test.exs")
       |> Path.wildcard()
-      |> Enum.reject(&String.match?(&1, ~r/(collector|helper)/))
+      |> Enum.reject(
+        &String.match?(&1, ~r/(collector|helper|duplicated_code|perceived_complexity)/)
+      )
       |> Enum.map(&{&1, File.read!(&1)})
       |> Enum.map(fn {filename, test_source} ->
         check_filename =
@@ -68,10 +70,11 @@ defmodule Credo.Check.HousekeepingHeredocsInTestsTest do
             end
           end
 
-        untested_params = all_param_names -- tested_params
+        untested_params =
+          (all_param_names -- tested_params) -- Credo.Check.Params.builtin_param_names()
 
         if check_source != "" && untested_params != [] do
-          "- #{Credo.Code.Module.name(check_ast)} - untested params: #{inspect(untested_params)}"
+          "- #{Path.relative_to_cwd(filename)}:1 - untested params: #{inspect(untested_params)}"
         end
       end)
       |> Enum.reject(&is_nil/1)

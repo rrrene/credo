@@ -166,4 +166,19 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
 
     assert 3 == Enum.count(issues)
   end
+
+  test "it should report issues when variable declarations are inconsistent throughout sourcefiles (forcing left side)" do
+    issues =
+      [
+        @var_right_map,
+        @var_right_struct,
+        @var_right_list,
+        @var_left_map
+      ]
+      |> to_source_files
+      |> run_check(@described_check, force: :before)
+      |> assert_issues()
+
+    assert 3 == Enum.count(issues)
+  end
 end

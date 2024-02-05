@@ -220,4 +220,44 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
       assert 3 == issue.line_no
     end)
   end
+
+  test "it should report a violation for naming schemes other than the forced one" do
+    [
+      """
+      defmodule Credo.SampleOne do
+        defmodule Foo do
+          def bar(name, _) when is_binary(name) do
+            case name do
+              "foo" <> _name -> "FOO"
+              "bar" <> _name -> "BAR"
+              _name -> "DEFAULT"
+            end
+          end
+        end
+      end
+      """,
+      """
+      defmodule Credo.SampleTwo do
+        defmodule Foo do
+          def bar(list) do
+            Enum.map(list, fn _item -> 1 end)
+          end
+        end
+      end
+      """
+    ]
+    |> to_source_files
+    |> run_check(@described_check, force: :anonymous)
+    |> assert_issues(fn issues ->
+      assert Enum.count(issues) == 4
+
+      assert Enum.any?(issues, fn issue ->
+               issue.trigger == "_name"
+             end)
+
+      assert Enum.any?(issues, fn issue ->
+               issue.trigger == "_item"
+             end)
+    end)
+  end
 end

@@ -183,6 +183,32 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation when module is included in only parameter but is also in excluded_lastnames" do
+    """
+    defmodule Test do
+      def just_an_example do
+        Credo.Foo.Bar.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, only: ~r/^Credo.+$/, excluded_lastnames: ["Bar"])
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation when module is covered in excluded_lastnames" do
+    """
+    defmodule Test do
+      def just_an_example do
+        Credo.Foo.Bar.call
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_lastnames: ["Bar"])
+    |> refute_issues()
+  end
+
   test "it should NOT report with __MODULE__" do
     """
     defmodule Test do

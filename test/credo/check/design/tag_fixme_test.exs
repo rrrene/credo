@@ -61,12 +61,12 @@ defmodule Credo.Check.Design.TagFIXMETest do
   end
 
   test "it should report a couple of issues" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case # FIXME: this is the first
-      @moduledoc \"\"\"
+      @moduledoc """
         this is an example # FIXME: and this is no actual comment
-      \"\"\"
+      """
 
       def some_fun do # FIXME this is the second
         x = ~s{also: # FIXME: no comment here}
@@ -76,11 +76,35 @@ defmodule Credo.Check.Design.TagFIXMETest do
         "also: # FIXME: no comment here as well"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
+      assert Enum.count(issues) == 3
+    end)
+  end
+
+  test "it should report a couple of issues when including docstrings" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case # FIXME: this is the first
+
+      @doc """
+      FIXME: and this is no actual comment
+      """
+      def some_fun do # FIXME this is the second
+        x = ~s{also: # FIXME: no comment here}
+        assert 2 == x
+        ?" # FIXME: this is the third
+
+        "also: # FIXME: no comment here as well"
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, include_doc: true)
+    |> assert_issues(fn issues ->
+      assert Enum.count(issues) == 4
     end)
   end
 end

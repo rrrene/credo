@@ -436,4 +436,29 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  test "it should allow no spaces if specified in :ignore" do
+    source_files =
+      [
+        ~S"""
+        defmodule TestTest do
+          def test(a, b, c) do
+            a = fn b, c -> b+c end
+
+            a.(-30, 10)
+            a.(-3.0, 1.0)
+          end
+        end
+        """
+      ]
+      |> to_source_files()
+
+    source_files
+    |> run_check(@described_check)
+    |> assert_issue()
+
+    source_files
+    |> run_check(@described_check, ignore: [:+])
+    |> refute_issues()
+  end
 end

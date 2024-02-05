@@ -177,6 +177,31 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     end)
   end
 
+  test "it should NOT report count ecto functions when ecto functions are excluded via :excluded_functions" do
+    """
+    defmodule CredoEctoQueryModule do
+
+      def foobar() do
+        Favorite
+        |> where(user_id: ^user.id)
+        |> join(:left, [f], t in Template, f.entity_id == t.id and f.entity_type == "template")
+        |> join(:left, [f, t], d in Document, f.entity_id == d.id and f.entity_type == "document")
+        |> join(:left, [f, t, d], dt in Template, dt.id == d.template_id)
+        |> join(:left, [f, t, d, dt], c in Category, c.id == t.category_id or c.id == dt.category_id)
+        |> select([f, t, d, dt, c], c)
+        |> distinct(true)
+        |> Repo.all()
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check,
+      max_size: 3,
+      excluded_functions: ["where", "from", "select", "join"]
+    )
+    |> refute_issues()
+  end
+
   #
   # ABC size unit tests
   #

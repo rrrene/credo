@@ -63,6 +63,29 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> refute_issues()
   end
 
+  test "it should NOT report when :max_nesting is used properly" do
+    """
+    defmodule CredoSampleModule do
+      defp foo() do
+        if true do
+          "flat"
+        else
+          if true do
+            if true do
+              if true do
+                "nested"
+              end
+            end
+          end
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, max_nesting: 4)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
