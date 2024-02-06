@@ -31,7 +31,7 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report a violation on non-umbrella test path" do
+  test "it should NOT report a violation when using param :excluded_paths" do
     """
     defmodule CredoSampleModule do
       def some_function() do
@@ -52,7 +52,7 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     end
     """
     |> to_source_file("test/foo/my_test.exs")
-    |> run_check(@described_check)
+    |> run_check(@described_check, excluded_paths: [~r"test/foo"])
     |> refute_issues()
   end
 
@@ -78,6 +78,81 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     """
     |> to_source_file("apps/foo/test/foo/my_test.exs")
     |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when using param :max_deps" do
+    """
+    defmodule CredoSampleModule do
+      def some_function() do
+        [
+          DateTime,
+          Kernel,
+          GenServer,
+          GenEvent,
+          File,
+          Time,
+          IO,
+          Logger,
+          URI,
+          Path,
+          String
+        ]
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, max_deps: 20)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when using param :excluded_namespaces" do
+    """
+    defmodule CredoSample.Excluded.Module do
+      def some_function() do
+        [
+          Foo.Bar.DateTime,
+          Foo.Bar.Kernel,
+          Foo.Bar.GenServer,
+          Foo.Bar.GenEvent,
+          Foo.Bar.File,
+          Foo.Bar.Time,
+          Foo.Bar.IO,
+          Foo.Bar.Logger,
+          URI,
+          Path,
+          String
+        ]
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, excluded_namespaces: ["CredoSample.Excluded"])
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when using param :dependency_namespaces" do
+    """
+    defmodule CredoSample.Excluded.Module do
+      def some_function() do
+        [
+          Foo.Bar.DateTime,
+          Foo.Bar.Kernel,
+          Foo.Bar.GenServer,
+          Foo.Bar.GenEvent,
+          Foo.Bar.File,
+          Foo.Bar.Time,
+          Foo.Bar.IO,
+          Foo.Bar.Logger,
+          URI,
+          Path,
+          String
+        ]
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, dependency_namespaces: ["Foo.Bar"])
     |> refute_issues()
   end
 
