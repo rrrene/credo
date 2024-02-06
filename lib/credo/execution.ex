@@ -769,9 +769,7 @@ defmodule Credo.Execution do
 
   @doc false
   defp put_builtin_command(exec, name, command_mod) do
-    exec
-    |> command_mod.init()
-    |> put_command(Credo, name, command_mod)
+    put_command(exec, Credo, name, command_mod)
   end
 
   @doc ~S"""
