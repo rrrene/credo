@@ -30,7 +30,6 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
       metadata config.
       """,
       params: [
-        ignore_logger_functions: "Do not raise an issue for these Logger functions.",
         metadata_keys: """
         Do not raise an issue for these Logger metadata keys.
 
@@ -160,12 +159,6 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]), do: true
   defp logger_import?(_), do: false
 
-  defp issue_for(issue_meta, line_no, [trigger | _] = missed_keys) do
-    message = "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config"
-
-    format_issue(issue_meta, message: message, line_no: line_no, trigger: trigger)
-  end
-
   defp find_metadata_keys(params) do
     metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
 
@@ -181,5 +174,13 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     :logger
     |> Application.get_env(key, [])
     |> Keyword.get(:metadata)
+  end
+
+  defp issue_for(issue_meta, line_no, [trigger | _] = missed_keys) do
+    format_issue(issue_meta,
+      message: "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config",
+      line_no: line_no,
+      trigger: trigger
+    )
   end
 end
