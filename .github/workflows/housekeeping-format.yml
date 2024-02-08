@@ -19,7 +19,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 26.2
-          elixir-version: 1.16.0
+          elixir-version: 1.16.1
       - run: mix deps.get
       - run: mix compile
       - run: ./test/check_formatted.sh
