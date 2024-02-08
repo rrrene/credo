@@ -134,7 +134,6 @@
           {Credo.Check.Refactor.RedundantWithClauseResult, []},
           {Credo.Check.Refactor.RejectReject, []},
           {Credo.Check.Refactor.UnlessWithElse, []},
-          {Credo.Check.Refactor.UtcNowTruncate, []},
           {Credo.Check.Refactor.WithClauses, []},
 
           #
@@ -165,6 +164,7 @@
         disabled: [
           #
           # Checks scheduled for next check update (opt-in for now)
+          {Credo.Check.Refactor.UtcNowTruncate, []},
 
           #
           # Controversial and experimental checks (opt-in, just move the check to `:enabled`
