@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.4
+
+- Add new check `Credo.Check.Refactor.UtcNowTruncate` as opt-in check (this is scheduled to become a standard check in v1.8)
+- Add lots of improvements around `:trigger` in `Credo.Issue`
+- Add new output format `short`
+- Improve docs for several checks
+- Fix another, smaller bottleneck in multicore performance
+- Fix `--read-from-stdin` not respecting `:files` param
+- Fix SARIF output format for non-string triggers
+- Fix initializing builtin commands twice
+- Fix `diff` command not recognizing a git ref as first argument
+
 ## 1.7.3
 
 - `Credo.Check.Readability.AliasOrder` now supports a `:sort_method` parameter
