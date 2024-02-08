@@ -9,8 +9,23 @@ on:
       - master
 
 jobs:
+  format:
+    name: "used mix format"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 26.2
+          elixir-version: 1.16.1
+      - run: mix deps.get
+      - run: mix compile
+      - run: ./test/check_formatted.sh
+
   trigger:
-    name: "trigger"
+    name: "tested for trigger"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -22,8 +37,9 @@ jobs:
           elixir-version: 1.16.1
       - run: mix deps.get
       - run: mix test test/credo/check/housekeeping_trigger.exs
+
   params:
-    name: "params"
+    name: "tested all params"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
