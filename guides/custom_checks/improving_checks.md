@@ -1,3 +1,6 @@
+# Improving Custom Checks
+
+```elixir
 defmodule Credo.Check.Readability.DuplicatedAliases do
   use Credo.Check,
     base_priority: :low,
@@ -25,15 +28,16 @@ defmodule Credo.Check.Readability.DuplicatedAliases do
   end
 
   defp traverse(
-         {:alias, _, [{:__aliases__, meta, alias_} | _]} = ast,
+         {:alias, _, [{:__aliases__, meta, aliased_module} | _]} = ast,
          {cache, issue_meta, issues}
        ) do
-    if Map.has_key?(cache, alias_) do
-      existing_alias_meta = Map.fetch!(cache, alias_)
-      issue = build_issue(alias_, meta[:line], existing_alias_meta[:line], issue_meta)
+    if Map.has_key?(cache, aliased_module) do
+      existing_alias_meta = Map.fetch!(cache, aliased_module)
+      issue = build_issue(Credo.Code.Name.full(aliased_module), meta[:line], existing_alias_meta[:line], issue_meta)
+
       {ast, {cache, issue_meta, [issue | issues]}}
     else
-      {ast, {Map.put(cache, alias_, meta), issue_meta, issues}}
+      {ast, {Map.put(cache, aliased_module, meta), issue_meta, issues}}
     end
   end
 
@@ -43,15 +47,10 @@ defmodule Credo.Check.Readability.DuplicatedAliases do
     format_issue(
       issue_meta,
       message:
-        "Duplicated alias: #{format_alias(trigger)}, already defined in line #{existing_alias_line_no}",
-      trigger: format_alias(trigger),
+        "Duplicated alias: #{trigger}, already defined in line #{existing_alias_line_no}",
+      trigger: trigger,
       line_no: line_no
     )
   end
-
-  defp format_alias(a) do
-    a
-    |> List.wrap()
-    |> Enum.join(".")
-  end
 end
+```
