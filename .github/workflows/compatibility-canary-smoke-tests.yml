@@ -54,7 +54,7 @@ jobs:
              repo: https://github.com/elixir-tools/gen_lsp.git
 
           -  name: req
-             repo: https://github.com/wojtekmac/req.git
+             repo: https://github.com/wojtekmach/req.git
 
           -  name: bandit
              repo: https://github.com/mtrudel/bandit.git
@@ -80,6 +80,9 @@ jobs:
 
           -  name: ecto
              repo: https://github.com/elixir-ecto/ecto.git
+
+          -  name: ecto_sql
+             repo: https://github.com/elixir-ecto/ecto_sql.git
 
           -  name: plug
              repo: https://github.com/elixir-plug/plug.git
