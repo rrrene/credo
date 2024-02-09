@@ -125,6 +125,7 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
+
   #
   # cases raising issues
   #
@@ -193,6 +194,23 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "foo"
+    end)
+  end
+
+  test "it should report/not crash for unquote/1 calls in the function name" do
+    ~S"""
+    defmodule SpecIssue do
+      function_name = :do_something
+
+      def unquote(function_name)() do
+        :ok
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "unquote(function_name)"
     end)
   end
 end

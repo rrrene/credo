@@ -110,6 +110,12 @@ defmodule Credo.Check.Readability.Specs do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
+    trigger = if is_tuple(trigger) do
+      Macro.to_string(trigger)
+    else
+      trigger
+    end
+
     format_issue(
       issue_meta,
       message: "Functions should have a @spec type specification.",
