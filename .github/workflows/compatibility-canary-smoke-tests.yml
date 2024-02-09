@@ -47,6 +47,21 @@ jobs:
           -  name: benchee
              repo: https://github.com/PragTob/benchee.git
 
+          -  name: next-ls
+             repo: https://github.com/elixir-tools/next-ls.git
+
+          -  name: gen_lsp
+             repo: https://github.com/elixir-tools/gen_lsp.git
+
+          -  name: req
+             repo: https://github.com/wojtekmac/req.git
+
+          -  name: bandit
+             repo: https://github.com/mtrudel/bandit.git
+
+          -  name: decimal
+             repo: https://github.com/ericmj/decimal.git
+
           # Elixir
           -  name: elixir
              repo: https://github.com/elixir-lang/elixir.git
@@ -88,6 +103,10 @@ jobs:
           # Nerves
           -  name: nerves
              repo: https://github.com/nerves-project/nerves.git
+
+          # Nx
+          -  name: nx
+             repo: https://github.com/elixir-nx/nx.git
 
     steps:
       - uses: actions/checkout@v4
