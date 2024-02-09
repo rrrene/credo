@@ -125,7 +125,6 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
-
   #
   # cases raising issues
   #
