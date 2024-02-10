@@ -5,7 +5,7 @@
 set -e
 
 DIRNAME=$( cd "$( dirname "$0" )" && pwd )
-PROJECT_ROOT=$( cd "$DIRNAME/.." && pwd )
+CREDO_ROOT=$( cd "$DIRNAME/.." && pwd )
 
 # script specific sources, variables and function definitions
 
@@ -19,7 +19,7 @@ CREDO_ARG5=$7
 
 # setup
 
-cd $PROJECT_ROOT
+cd $CREDO_ROOT
 
 mkdir -p tmp
 
