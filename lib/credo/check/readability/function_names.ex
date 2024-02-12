@@ -127,17 +127,22 @@ defmodule Credo.Check.Readability.FunctionNames do
     {ast, issues}
   end
 
-  defp issues_for_definition(body, issues, issue_meta, allow_acronyms?) do
-    case Enum.at(body, 0) do
-      {:when, _when_meta, [{name, meta, args} | _guard]} ->
-        issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
+  defp issues_for_definition(
+         [{:when, _when_meta, [{name, meta, args} | _guard]} | _],
+         issues,
+         issue_meta,
+         allow_acronyms?
+       ) do
+    issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
+  end
 
-      {name, meta, args} when is_atom(name) ->
-        issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
+  defp issues_for_definition([{name, meta, args} | _], issues, issue_meta, allow_acronyms?)
+       when is_atom(name) do
+    issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
+  end
 
-      _ ->
-        issues
-    end
+  defp issues_for_definition(_body, issues, _issue_meta, _allow_acronyms?) do
+    issues
   end
 
   defp issues_for_name({:unquote, _, _}, _args, _meta, issues, _issue_meta, _allow_acronyms?) do
