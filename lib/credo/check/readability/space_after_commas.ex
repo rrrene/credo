@@ -58,7 +58,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   defp issue_for(issue_meta, trigger, line_no, column) do
     format_issue(
       issue_meta,
-      message: "Space missing after comma",
+      message: "Space missing after comma.",
       trigger: trigger,
       line_no: line_no,
       column: column

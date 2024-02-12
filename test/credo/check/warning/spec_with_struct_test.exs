@@ -97,7 +97,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     |> to_source_files()
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert %{line_no: 2, message: "Struct %MyApp.MyStruct{} found in @spec"} = issue
+      assert %{line_no: 2, message: "Struct %MyApp.MyStruct{} found in `@spec`."} = issue
       assert issue.trigger == "%MyApp.MyStruct{"
     end)
   end

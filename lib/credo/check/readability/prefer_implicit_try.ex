@@ -25,6 +25,10 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
             _ -> :rescued
           end
 
+      This emphazises that you really want to try/rescue anything the function does,
+      which might be important for other contributors so they can reason about adding
+      code to the function.
+
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.

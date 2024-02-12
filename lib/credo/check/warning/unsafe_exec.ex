@@ -67,7 +67,7 @@ defmodule Credo.Check.Warning.UnsafeExec do
 
   defp issue_for(call, suggestion, trigger, line_no, issue_meta) do
     format_issue(issue_meta,
-      message: "Prefer #{suggestion} over #{call} to prevent command injection",
+      message: "Prefer #{suggestion} over #{call} to prevent command injection.",
       trigger: trigger,
       line_no: line_no
     )

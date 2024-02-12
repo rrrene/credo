@@ -84,7 +84,7 @@ defmodule Credo.Check.Readability.BlockPipe do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Use a variable or create a new function instead of piping to a block",
+      message: "Use a variable or create a new function instead of piping to a block.",
       trigger: trigger,
       line_no: line_no
     )

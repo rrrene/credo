@@ -134,7 +134,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   defp issue_for(op, line_no, issue_meta) do
     format_issue(
       issue_meta,
-      message: "There should be no matches in `#{op}` conditions.",
+      message: "Avoid matches in `#{op}` conditions.",
       trigger: @trigger,
       line_no: line_no
     )

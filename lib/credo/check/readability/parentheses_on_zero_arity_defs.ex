@@ -73,10 +73,10 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
     cond do
       parens? and not enforce_parens? ->
-        issues ++ [issue_for(issue_meta, name, line_no, :present)]
+        [issue_for(issue_meta, name, line_no, :present) | issues]
 
       not parens? and enforce_parens? ->
-        issues ++ [issue_for(issue_meta, name, line_no, :missing)]
+        [issue_for(issue_meta, name, line_no, :missing) | issues]
 
       true ->
         issues
@@ -99,7 +99,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
           "Do not use parentheses when defining a function which has no arguments."
 
         :missing ->
-          "Use parentheses () when defining a function which has no arguments."
+          "Use parentheses when defining a function which has no arguments."
       end
 
     format_issue(issue_meta, message: message, line_no: line_no, trigger: name)

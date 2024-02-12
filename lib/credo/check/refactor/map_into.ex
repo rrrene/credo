@@ -100,7 +100,7 @@ defmodule Credo.Check.Refactor.MapInto do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "`Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`",
+      message: "`Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`.",
       trigger: trigger,
       line_no: line_no
     )

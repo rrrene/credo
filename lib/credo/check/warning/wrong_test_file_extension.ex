@@ -29,7 +29,7 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
   defp issue_for(issue_meta) do
     format_issue(
       issue_meta,
-      message: "Test files should end with .exs",
+      message: "Test files should end with `_test.exs`.",
       line_no: 1,
       trigger: Issue.no_trigger()
     )

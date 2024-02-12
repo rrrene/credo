@@ -45,7 +45,7 @@ defmodule Credo.Check.Readability.Semicolons do
   defp issue_for(issue_meta, line_no, column) do
     format_issue(
       issue_meta,
-      message: "Don't use ; to separate statements and expressions",
+      message: "Don't use `;` to separate statements and expressions.",
       line_no: line_no,
       column: column,
       trigger: ";"

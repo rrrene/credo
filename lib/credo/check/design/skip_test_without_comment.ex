@@ -67,7 +67,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`",
+      message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`.",
       trigger: "@tag :skip",
       line_no: line_no
     )

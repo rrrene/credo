@@ -90,7 +90,7 @@ defmodule Credo.Check.Refactor.FilterCount do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "`Enum.count/2` is more efficient than `Enum.filter/2 |> Enum.count/1`",
+      message: "`Enum.count/2` is more efficient than `Enum.filter/2 |> Enum.count/1`.",
       trigger: trigger,
       line_no: line_no
     )

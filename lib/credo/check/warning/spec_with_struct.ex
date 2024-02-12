@@ -37,13 +37,7 @@ defmodule Credo.Check.Warning.SpecWithStruct do
       {ast, structs} ->
         issues =
           Enum.reduce(structs, issues, fn curr, acc ->
-            options = [
-              message: "Struct %#{curr}{} found in @spec",
-              trigger: "%#{curr}{",
-              line_no: meta[:line]
-            ]
-
-            [format_issue(issue_meta, options) | acc]
+            [issue_for(issue_meta, meta[:line], curr) | acc]
           end)
 
         {ast, issues}
@@ -60,5 +54,13 @@ defmodule Credo.Check.Warning.SpecWithStruct do
 
   defp find_structs(ast, acc) do
     {ast, acc}
+  end
+
+  defp issue_for(issue_meta, line_no, struct) do
+    format_issue(issue_meta,
+      message: "Struct %#{struct}{} found in `@spec`.",
+      trigger: "%#{struct}{",
+      line_no: line_no
+    )
   end
 end

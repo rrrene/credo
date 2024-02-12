@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
     issue =
       format_issue(
         issue_meta,
-        message: "Negated is_nil in guard clause found",
+        message: "Avoid negated `is_nil/1` in guard clauses.",
         trigger: trigger,
         line_no: meta[:line]
       )

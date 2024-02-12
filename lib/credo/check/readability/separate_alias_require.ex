@@ -84,6 +84,6 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
     )
   end
 
-  def message(:alias), do: "aliases should be consecutive within a file"
-  def message(:require), do: "requires should be consecutive within a file"
+  def message(:alias), do: "`alias` calls should be consecutive within a module."
+  def message(:require), do: "`require` calls should be consecutive within a module."
 end

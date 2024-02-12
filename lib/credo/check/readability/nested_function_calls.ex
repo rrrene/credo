@@ -110,7 +110,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Use a pipeline when there are nested function calls",
+      message: "Use a pipeline instead of nested function calls.",
       trigger: trigger,
       line_no: line_no
     )

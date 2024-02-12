@@ -178,7 +178,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
   defp issue_for(issue_meta, line_no, [trigger | _] = missed_keys) do
     format_issue(issue_meta,
-      message: "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config",
+      message: "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config.",
       line_no: line_no,
       trigger: trigger
     )

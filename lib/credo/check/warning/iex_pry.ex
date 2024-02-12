@@ -42,7 +42,7 @@ defmodule Credo.Check.Warning.IExPry do
     new_issue =
       format_issue(
         issue_meta,
-        message: "There should be no calls to IEx.pry/0.",
+        message: "There should be no calls to `IEx.pry/0`.",
         trigger: @call_string,
         line_no: meta[:line]
       )

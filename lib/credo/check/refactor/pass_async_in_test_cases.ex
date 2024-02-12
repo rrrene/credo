@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
   defp issue_for(line_no, issue_meta) do
     format_issue(
       issue_meta,
-      message: "Pass an `:async` boolean option to `use` a test case module",
+      message: "Pass an `:async` boolean option to `use` a test case module.",
       trigger: "use",
       line_no: line_no
     )

@@ -66,7 +66,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "When using #{trigger}, clear or overwrite sensitive environment variables",
+      message: "When using #{trigger}, clear or overwrite sensitive environment variables.",
       trigger: trigger,
       line_no: line_no
     )

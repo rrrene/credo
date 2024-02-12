@@ -81,7 +81,7 @@ defmodule Credo.Check.Refactor.Apply do
   defp issue_for(meta, issue_meta) do
     format_issue(
       issue_meta,
-      message: "Avoid `apply/2` and `apply/3` when the number of arguments is known",
+      message: "Avoid `apply/2` and `apply/3` when the number of arguments is known.",
       line_no: meta[:line],
       trigger: "apply"
     )

@@ -143,7 +143,7 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   defp issues_for_call(call, suggestion, trigger, meta, issue_meta, issues) do
     [
       format_issue(issue_meta,
-        message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime",
+        message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime.",
         trigger: trigger,
         line_no: meta[:line]
       )

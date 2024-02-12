@@ -42,7 +42,7 @@ defmodule Credo.Check.Refactor.IoPuts do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "There should be no calls to IO.puts/1.",
+      message: "There should be no calls to `IO.puts/1`.",
       trigger: trigger,
       line_no: line_no
     )

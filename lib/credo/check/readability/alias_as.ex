@@ -5,7 +5,8 @@ defmodule Credo.Check.Readability.AliasAs do
     tags: [:experimental],
     explanations: [
       check: """
-      Aliases which are not completely renamed using the `:as` option are easier to follow.
+      Aliases can be "renamed" using the `:as` option, but that sometimes
+      makes the code more difficult to read.
 
           # preferred
 
@@ -27,6 +28,12 @@ defmodule Credo.Check.Readability.AliasAs do
               M1.run(foo)
             end
           end
+
+      Please note that you might want to deactivate this check for cases in which you have an alias that
+      is used tons throughout your codebase.
+
+      If, for example, you are using a third-party module named `FlupsyTopsyDataRetentionServiceServer`
+      in half your modules, it is of course reasonable to alias it to `Server`.
 
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
@@ -59,7 +66,7 @@ defmodule Credo.Check.Readability.AliasAs do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Avoid using the :as option with alias.",
+      message: "Avoid using the `:as` option with `alias`.",
       trigger: "as:",
       line_no: line_no
     )

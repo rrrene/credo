@@ -45,10 +45,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
     |> assert_issues(fn issues ->
       [issue1, issue2] = issues
 
-      assert issue1.message == "Invalid usage of placeholder `:resource` in with"
+      assert issue1.message == "Avoid using tagged tuples as placeholders in `with` (found: `:resource`)."
       assert issue1.trigger == ":resource"
 
-      assert issue2.message == "Invalid usage of placeholder `:authz` in with"
+      assert issue2.message == "Avoid using tagged tuples as placeholders in `with` (found: `:authz`)."
       assert issue2.trigger == ":authz"
     end)
   end

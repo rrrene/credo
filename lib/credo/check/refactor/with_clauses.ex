@@ -37,8 +37,8 @@ defmodule Credo.Check.Refactor.WithClauses do
       """
     ]
 
-  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`"
-  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`"
+  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`."
+  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`."
 
   @doc false
   @impl true

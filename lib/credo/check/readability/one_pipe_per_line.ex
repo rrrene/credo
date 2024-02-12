@@ -33,7 +33,8 @@ defmodule Credo.Check.Readability.OnePipePerLine do
       """
     ]
 
-  @impl Credo.Check
+  @doc false
+  @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
@@ -41,14 +42,8 @@ defmodule Credo.Check.Readability.OnePipePerLine do
     |> Enum.filter(&filter_pipes/1)
     |> Enum.group_by(fn {_, {line, _, _}, :|>} -> line end)
     |> Enum.filter(&filter_tokens/1)
-    |> Enum.map(fn {_, [{_, {line_no, column_no, _}, _} | _]} ->
-      format_issue(
-        issue_meta,
-        message: "Don't use multiple |> in the same line",
-        line_no: line_no,
-        column: column_no,
-        trigger: "|>"
-      )
+    |> Enum.map(fn {_, [{_, {line_no, column, _}, _} | _]} ->
+      issue_for(issue_meta, line_no, column)
     end)
   end
 
@@ -58,4 +53,14 @@ defmodule Credo.Check.Readability.OnePipePerLine do
   defp filter_tokens({_, [_]}), do: false
   defp filter_tokens({_, [_ | _]}), do: true
   defp filter_tokens(_), do: false
+
+  defp issue_for(issue_meta, line_no, column) do
+    format_issue(
+      issue_meta,
+      message: "Avoid using multiple pipes (`|>`) on the same line.",
+      line_no: line_no,
+      column: column,
+      trigger: "|>"
+    )
+  end
 end
