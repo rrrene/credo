@@ -4,12 +4,14 @@
     "ghcr.io/devcontainers-contrib/features/elixir-asdf:2": {}
   },
   "customizations": {
-		"vscode": {
-			"settings": {},
-			"extensions": [
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true
+      },
+      "extensions": [
         "jakebecker.elixir-ls",
         "samuel-pordeus.elixir-test"
       ]
-		}
+    }
   }
 }
