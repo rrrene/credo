@@ -75,7 +75,8 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   defp issue_for(error, issue_meta) do
     format_issue(
       issue_meta,
-      message: "Avoid using tagged tuples as placeholders in `with` (found: `#{inspect(error.tuple_tag)}`).",
+      message:
+        "Avoid using tagged tuples as placeholders in `with` (found: `#{inspect(error.tuple_tag)}`).",
       line_no: error.line,
       trigger: inspect(error.tuple_tag)
     )
