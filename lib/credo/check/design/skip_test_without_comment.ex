@@ -29,40 +29,28 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
       """
     ]
 
-  @tag_skip_regex ~r/^\s*\@tag :skip\s*$/
-  @comment_regex ~r/^\s*\#.*$/
-
   @doc false
   @impl true
   def run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+    comments = SourceFile.comments(source_file)
 
-    source_file
-    |> Credo.Code.clean_charlists_strings_and_sigils()
-    |> String.split("\n")
-    |> Enum.with_index(1)
-    |> Enum.map(&transform_line/1)
-    |> check_lines([], issue_meta)
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, comments, issue_meta))
   end
 
-  defp transform_line({line, line_number}) do
-    cond do
-      line =~ @tag_skip_regex -> {:tag_skip, line_number}
-      line =~ @comment_regex -> {:comment, line_number}
-      true -> {line, line_number}
+  defp traverse({:@, meta, [{:tag, _, [:skip]}]} = ast, issues, comments, issue_meta) do
+    with line_no <- meta[:line] - 1,
+         Enum.find(comments, fn
+           %{line: ^line_no} -> true
+           _ -> false
+         end) do
+      {ast, [issue_for(issue_meta, meta[:line])] ++ issues}
+    else
+      _ -> {ast, issues}
     end
   end
 
-  defp check_lines([{:tag_skip, line_number} | rest], issues, issue_meta) do
-    check_lines(rest, [issue_for(issue_meta, line_number) | issues], issue_meta)
-  end
-
-  defp check_lines([{:comment, _}, {:tag_skip, _} | rest], issues, issue_meta) do
-    check_lines(rest, issues, issue_meta)
-  end
-
-  defp check_lines([_hd | tl], issues, issue_meta), do: check_lines(tl, issues, issue_meta)
-  defp check_lines([], issues, _issue_meta), do: issues
+  defp traverse(ast, issues, _comments, _issue_meta), do: {ast, issues}
 
   defp issue_for(issue_meta, line_no) do
     format_issue(
