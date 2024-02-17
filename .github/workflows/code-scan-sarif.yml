@@ -14,7 +14,7 @@
 # 2. Follow the annotated workflow below and make any necessary modifications then save the workflow to your repository
 #    and review the "Security" tab once the action has run.
 
-name: Credo
+name: Code Scanning w/ SARIF output
 
 on:
   push:
@@ -22,8 +22,6 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "master" ]
-  schedule:
-    - cron: '33 2 * * 5'
 
 permissions:
   contents: read
@@ -41,16 +39,12 @@ jobs:
         with:
           otp-version: 26.2
           elixir-version: 1.16.1
-      - name: get dependencies
-        run: mix deps.get
-      - name: compile dependencies
-        run: mix deps.compile
-      - name: compile
-        run: mix compile
-      - name: credo-scan
-        run: mix credo --format=sarif --mute-exit-status > credo_output.sarif
-      - name: upload sarif
-        uses: github/codeql-action/upload-sarif@v2
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile
+      - run: mix credo --format=sarif --mute-exit-status > credo_output.sarif
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: credo_output.sarif
