@@ -31,6 +31,7 @@ defmodule Credo do
     |> WriteDebugReport.call([])
   end
 
+  @doc false
   def run(argv_or_exec, files_that_changed) do
     argv_or_exec
     |> Execution.build(files_that_changed)
@@ -38,5 +39,6 @@ defmodule Credo do
     |> WriteDebugReport.call([])
   end
 
+  @doc false
   def version, do: @version
 end

@@ -51,7 +51,21 @@ defmodule Credo.Check.Runner do
           #       but it is necessary to avoid hitting the filesystem when reading from STDIN
           [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
 
-          if filename in files_excluded do
+          file_included? =
+            if files_included != [] do
+              Credo.Sources.filename_matches?(filename, files_included)
+            else
+              true
+            end
+
+          file_excluded? =
+            if files_excluded != [] do
+              Credo.Sources.filename_matches?(filename, files_excluded)
+            else
+              false
+            end
+
+          if !file_included? || file_excluded? do
             :skip_run
           else
             []

@@ -9,6 +9,41 @@ defmodule Credo.Sources do
   @default_sources_glob ~w(** *.{ex,exs})
   @stdin_filename "stdin"
 
+  @doc false
+  def filename_matches?(filename, patterns) do
+    patterns
+    |> List.wrap()
+    |> Enum.any?(&match_filename_pattern(filename, &1))
+  end
+
+  defp match_filename_pattern(filename, pattern) when is_binary(pattern) do
+    if String.contains?(pattern, "*") do
+      matches_glob_naively?(filename, pattern)
+    else
+      String.starts_with?(filename, pattern)
+    end
+  end
+
+  defp match_filename_pattern(filename, %Regex{} = pattern), do: String.match?(filename, pattern)
+
+  defp match_filename_pattern(_, pattern),
+    do: raise("Expected String or Regex, got: #{inspect(pattern)}")
+
+  # naively converts glob pattern to regex
+  # does not account for brace or tilde expansion or command substitution
+  # or anything other than * and **
+  defp matches_glob_naively?(filename, pattern) do
+    pattern
+    |> String.replace("/", "\\/")
+    |> String.replace("**", ".+")
+    |> String.replace("*", "[^\/]+")
+    |> Regex.compile()
+    |> case do
+      {:ok, regex} -> String.match?(filename, regex)
+      _ -> raise "Compiling glob pattern to regex failed: #{inspect(pattern)}"
+    end
+  end
+
   @doc """
   Finds sources for a given `Credo.Execution`.
 
