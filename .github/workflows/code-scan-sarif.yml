@@ -35,17 +35,12 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        otp: [version]
-        elixir: [version]
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
+          otp-version: 26.2
+          elixir-version: 1.16.1
       - name: get dependencies
         run: mix deps.get
       - name: compile dependencies
