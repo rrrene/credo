@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.5
+
+- Fix `--read-from-stdin` not respecting `:files`/`:included` param
+- `Credo.Check.Readability.NestedFunctionCalls` no longer crashes for functions with an unquoted name
+
 ## 1.7.4
 
 - Add new check `Credo.Check.Refactor.UtcNowTruncate` as opt-in check (this is scheduled to become a standard check in v1.8)
