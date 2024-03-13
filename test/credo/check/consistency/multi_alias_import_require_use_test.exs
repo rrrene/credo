@@ -110,4 +110,35 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUseTest do
       assert issue.trigger == ""
     end)
   end
+
+  test "it should not report errors when #1117" do
+    [
+      ~S'''
+      defmodule A.B.Foo do
+        alias A.{B, C}
+      end
+      ''',
+      ~S'''
+      defmodule SomeModule do
+        @moduledoc false
+
+        alias A.B.Foo
+
+        case Application.compile_env(:app, SomeModule)[:use_bar] do
+          "true" ->
+            defp a do
+              alias A.B.Bar
+              Bar.f()
+            end
+
+          _ ->
+            defp a, do: nil
+        end
+      end
+      '''
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end

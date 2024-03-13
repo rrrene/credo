@@ -33,6 +33,10 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.Collector do
     {ast, {Map.put(acc, mod_name, []), mod_name}}
   end
 
+  defp traverse({op, _, _}, acc) when op in [:def, :defp] do
+    {nil, acc}
+  end
+
   defp traverse({directive, meta, arguments} = ast, {acc, current_module})
        when directive in @directives and not is_nil(current_module) do
     aliases =
