@@ -107,7 +107,7 @@ end
 
 ## `credo:disable-for-lines:<count>`
 
-This config comment can be used to disable Credo for the preceding line of source code:
+This config comment can be used to disable Credo for the following `<count>` lines of source code:
 
 ```elixir
 # credo:disable-for-lines:3
