@@ -83,7 +83,7 @@ defmodule Credo.PriorityTest do
     assert expected == Priority.scope_priorities(source_file)
   end
 
-  test "it should not crash if @def_ops attributes provided and and should return correct scope_priorities" do
+  test "it should not crash if @def_ops attributes provided and should return correct scope_priorities" do
     source_file =
       """
       defmodule Credo.Sample.Module do
