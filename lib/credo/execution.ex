@@ -119,7 +119,7 @@ defmodule Credo.Execution do
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
-  @doc "Builds an Execution struct for the the given `argv`."
+  @doc "Builds an Execution struct for the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
 
