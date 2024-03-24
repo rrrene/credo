@@ -81,6 +81,34 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation with callback" do
+    """
+    defmodule Foo do
+      @callback is_bar
+      @callback is_bar(a)
+    end
+
+    defmodule FooImpl do
+      @behaviour Foo
+
+      @impl Foo
+      def is_bar do
+      end
+
+      @impl Foo
+      def is_bar(a) when is_binary(a) do
+      end
+
+      @impl Foo
+      def is_bar(a) do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
