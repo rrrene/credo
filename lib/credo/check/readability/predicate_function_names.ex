@@ -108,10 +108,10 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   end
 
   defp issues_for_definition(op, [{name, meta, args} | _], issues, issue_meta, impl_list) do
-    if {name, length(args)} not in impl_list do
-      issues_for_name(op, name, meta, issues, issue_meta)
-    else
+    if {name, length(args)} in impl_list do
       issues
+    else
+      issues_for_name(op, name, meta, issues, issue_meta)
     end
   end
 
