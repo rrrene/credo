@@ -52,39 +52,85 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    impl_list = Credo.Code.prewalk(source_file, &find_impls(&1, &2))
+
+    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, impl_list))
+  end
+
+  defp find_impls({:__block__, _meta, args} = ast, impls) do
+    block_impls = find_impls_in_block(args)
+    {ast, block_impls ++ impls}
+  end
+
+  defp find_impls(ast, impls) do
+    {ast, impls}
+  end
+
+  defp find_impls_in_block(block_args) when is_list(block_args) do
+    block_args
+    |> Enum.reduce([], &do_find_impls_in_block/2)
+  end
+
+  defp do_find_impls_in_block({:@, _, [{:impl, _, [impl]}]}, acc) when impl != false do
+    [:impl | acc]
+  end
+
+  # def when
+  defp do_find_impls_in_block({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    do_find_impls_in_block({keyword, meta, def_ast}, [:impl | impls])
+  end
+
+  # def 0 arity
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, nil} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    [{name, 0} | impls]
+  end
+
+  # def n arity
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, args} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    [{name, length(args)} | impls]
+  end
+
+  defp do_find_impls_in_block(_, acc) do
+    acc
   end
 
   for op <- @def_ops do
     # catch variables named e.g. `defp`
-    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
+    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta, _impl_list) do
       {ast, issues}
     end
 
     defp traverse(
            {unquote(op) = op, _meta, arguments} = ast,
            issues,
-           issue_meta
+           issue_meta,
+           impl_list
          ) do
-      {ast, issues_for_definition(op, arguments, issues, issue_meta)}
+      {ast, issues_for_definition(op, arguments, issues, issue_meta, impl_list)}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
+  defp traverse(ast, issues, _issue_meta, _impl_list) do
     {ast, issues}
   end
 
-  defp issues_for_definition(op, body, issues, issue_meta) do
-    case Enum.at(body, 0) do
-      {name, meta, nil} ->
-        issues_for_name(op, name, meta, issues, issue_meta)
+  defp issues_for_definition(op, [{name, meta, nil} | _], issues, issue_meta, impl_list) do
+    issues_for_definition(op, [{name, meta, []}], issues, issue_meta, impl_list)
+  end
 
-      {name, meta, [_ | _]} ->
-        issues_for_name(op, name, meta, issues, issue_meta)
-
-      _ ->
-        issues
+  defp issues_for_definition(op, [{name, meta, args} | _], issues, issue_meta, impl_list) do
+    if {name, length(args)} in impl_list do
+      issues
+    else
+      issues_for_name(op, name, meta, issues, issue_meta)
     end
+  end
+
+  defp issues_for_definition(_op, _, issues, _issue_meta, _impl_list) do
+    issues
   end
 
   defp issues_for_name(_op, {:unquote, _, [_ | _]} = _name, _meta, issues, _issue_meta) do
