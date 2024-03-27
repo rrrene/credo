@@ -109,6 +109,63 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should report a violation with false negatives" do
+    """
+    defmodule FooImpl do
+      def impl(false), do: false
+      def impl(true), do: true
+      def is_bar do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with false negatives /2" do
+    """
+    defmodule FooImpl do
+      impl(true)
+      def is_bar do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with false negatives /3" do
+    """
+    defmodule Foo do
+      @impl is_bar(a)
+    end
+    defmodule FooImpl do
+      def is_bar do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation with false negatives /4" do
+    """
+    defmodule Foo do
+      @impl true
+    end
+    defmodule FooImpl do
+      def is_bar do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   #
   # cases raising issues
   #
