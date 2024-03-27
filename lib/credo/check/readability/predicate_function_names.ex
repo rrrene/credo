@@ -57,30 +57,44 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, impl_list))
   end
 
-  defp find_impls({:impl, _, [impl]} = ast, impls) when impl != false do
-    {ast, [:impl | impls]}
-  end
-
-  # def when
-  defp find_impls({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | impls])
-       when keyword in @def_ops do
-    find_impls({keyword, meta, def_ast}, [:impl | impls])
-  end
-
-  # def 0 arity
-  defp find_impls({keyword, _meta, [{name, _, nil} | _]} = ast, [:impl | impls])
-       when keyword in @def_ops do
-    {ast, [{name, 0} | impls]}
-  end
-
-  # def n arity
-  defp find_impls({keyword, _meta, [{name, _, args} | _]} = ast, [:impl | impls])
-       when keyword in @def_ops do
-    {ast, [{name, length(args)} | impls]}
+  defp find_impls({:__block__, _meta, args} = ast, impls) do
+    block_impls = find_impls_in_block(args)
+    {ast, block_impls ++ impls}
   end
 
   defp find_impls(ast, impls) do
     {ast, impls}
+  end
+
+  defp find_impls_in_block(block_args) when is_list(block_args) do
+    block_args
+    |> Enum.reduce([], &do_find_impls_in_block/2)
+  end
+
+  defp do_find_impls_in_block({:@, _, [{:impl, _, [impl]}]}, acc) when impl != false do
+    [:impl | acc]
+  end
+
+  # def when
+  defp do_find_impls_in_block({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    do_find_impls_in_block({keyword, meta, def_ast}, [:impl | impls])
+  end
+
+  # def 0 arity
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, nil} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    [{name, 0} | impls]
+  end
+
+  # def n arity
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, args} | _]}, [:impl | impls])
+       when keyword in @def_ops do
+    [{name, length(args)} | impls]
+  end
+
+  defp do_find_impls_in_block(_, acc) do
+    acc
   end
 
   for op <- @def_ops do
