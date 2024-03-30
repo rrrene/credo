@@ -52,9 +52,17 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    impl_list = Credo.Code.prewalk(source_file, &find_impls(&1, &2))
+    issue_candidates = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, impl_list))
+    if issue_candidates == [] do
+      []
+    else
+      impl_list = Credo.Code.prewalk(source_file, &find_impls(&1, &2))
+
+      issue_candidates
+      |> Enum.reject(fn {_, signature} -> signature in impl_list end)
+      |> Enum.map(fn {issue, _} -> issue end)
+    end
   end
 
   defp find_impls({:__block__, _meta, args} = ast, impls) do
@@ -80,7 +88,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
          :record_next_definition | impls
        ])
        when keyword in @def_ops do
-    do_find_impls_in_block({keyword, meta, def_ast}, [:impl | impls])
+    do_find_impls_in_block({keyword, meta, def_ast}, [:record_next_definition | impls])
   end
 
   # def 0 arity
@@ -88,7 +96,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
          :record_next_definition | impls
        ])
        when keyword in @def_ops do
-    [{name, 0} | impls]
+    [{to_string(name), 0} | impls]
   end
 
   # def n arity
@@ -96,7 +104,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
          :record_next_definition | impls
        ])
        when keyword in @def_ops do
-    [{name, length(args)} | impls]
+    [{to_string(name), length(args)} | impls]
   end
 
   defp do_find_impls_in_block(_, acc) do
@@ -105,69 +113,71 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
   for op <- @def_ops do
     # catch variables named e.g. `defp`
-    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta, _impl_list) do
+    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta) do
       {ast, issues}
     end
 
     defp traverse(
            {unquote(op) = op, _meta, arguments} = ast,
            issues,
-           issue_meta,
-           impl_list
+           issue_meta
          ) do
-      {ast, issues_for_definition(op, arguments, issues, issue_meta, impl_list)}
+      {ast, issues_candidate_for_definition(op, arguments, issues, issue_meta)}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _impl_list) do
+  defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issues_for_definition(op, [{name, meta, nil} | _], issues, issue_meta, impl_list) do
-    issues_for_definition(op, [{name, meta, []}], issues, issue_meta, impl_list)
+  defp issues_candidate_for_definition(op, [{name, meta, nil} | _], issues, issue_meta) do
+    issues_candidate_for_definition(op, [{name, meta, []}], issues, issue_meta)
   end
 
-  defp issues_for_definition(op, [{name, meta, args} | _], issues, issue_meta, impl_list) do
-    if {name, length(args)} in impl_list do
-      issues
-    else
-      issues_for_name(op, name, meta, issues, issue_meta)
-    end
+  defp issues_candidate_for_definition(op, [{name, meta, args} | _], issues, issue_meta) do
+    issues_candidate_for_name(op, name, meta, issues, issue_meta, args)
   end
 
-  defp issues_for_definition(_op, _, issues, _issue_meta, _impl_list) do
+  defp issues_candidate_for_definition(_op, _, issues, _issue_meta) do
     issues
   end
 
-  defp issues_for_name(_op, {:unquote, _, [_ | _]} = _name, _meta, issues, _issue_meta) do
+  defp issues_candidate_for_name(
+         _op,
+         {:unquote, _, [_ | _]} = _name,
+         _meta,
+         issues,
+         _issue_meta,
+         _args
+       ) do
     issues
   end
 
-  defp issues_for_name(op, name, meta, issues, issue_meta) do
+  defp issues_candidate_for_name(op, name, meta, issues, issue_meta, args) do
     name = to_string(name)
 
     cond do
       String.starts_with?(name, "is_") && String.ends_with?(name, "?") ->
         [
-          issue_for(issue_meta, meta[:line], name, :predicate_and_question_mark)
+          issue_candidate_for(issue_meta, meta[:line], name, args, :predicate_and_question_mark)
           | issues
         ]
 
       String.starts_with?(name, "is_") && op != :defmacro ->
-        [issue_for(issue_meta, meta[:line], name, :only_predicate) | issues]
+        [issue_candidate_for(issue_meta, meta[:line], name, args, :only_predicate) | issues]
 
       true ->
         issues
     end
   end
 
-  defp issue_for(issue_meta, line_no, trigger, _) do
-    format_issue(
-      issue_meta,
-      message:
-        "Predicate function names should not start with 'is', and should end in a question mark.",
-      trigger: trigger,
-      line_no: line_no
-    )
+  defp issue_candidate_for(issue_meta, line_no, trigger, args, _) do
+    {format_issue(
+       issue_meta,
+       message:
+         "Predicate function names should not start with 'is', and should end in a question mark.",
+       trigger: trigger,
+       line_no: line_no
+     ), {trigger, length(args)}}
   end
 end
