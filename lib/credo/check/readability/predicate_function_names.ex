@@ -72,23 +72,29 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
   end
 
   defp do_find_impls_in_block({:@, _, [{:impl, _, [impl]}]}, acc) when impl != false do
-    [:impl | acc]
+    [:record_next_definition | acc]
   end
 
   # def when
-  defp do_find_impls_in_block({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | impls])
+  defp do_find_impls_in_block({keyword, meta, [{:when, _, def_ast} | _]}, [
+         :record_next_definition | impls
+       ])
        when keyword in @def_ops do
     do_find_impls_in_block({keyword, meta, def_ast}, [:impl | impls])
   end
 
   # def 0 arity
-  defp do_find_impls_in_block({keyword, _meta, [{name, _, nil} | _]}, [:impl | impls])
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, nil} | _]}, [
+         :record_next_definition | impls
+       ])
        when keyword in @def_ops do
     [{name, 0} | impls]
   end
 
   # def n arity
-  defp do_find_impls_in_block({keyword, _meta, [{name, _, args} | _]}, [:impl | impls])
+  defp do_find_impls_in_block({keyword, _meta, [{name, _, args} | _]}, [
+         :record_next_definition | impls
+       ])
        when keyword in @def_ops do
     [{name, length(args)} | impls]
   end
