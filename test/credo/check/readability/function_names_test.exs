@@ -75,6 +75,23 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code for multi letter sigils /5" do
+    """
+    def sigil_ZZO(input, args) do
+      # ...
+    end
+    defmacro sigil_ZZU({:<<>>, _, [string]}, []) do
+      # ...
+    end
+    defmacro sigil_ZZU({:<<>>, _, [string]}, []) when is_binary(string) do
+      # ...
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report expected code (for operators) /6" do
     """
     defmacro @expr2

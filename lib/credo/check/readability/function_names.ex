@@ -149,8 +149,10 @@ defmodule Credo.Check.Readability.FunctionNames do
     issues
   end
 
-  defp issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?) do
-    if name |> to_string |> Name.snake_case?(allow_acronyms?) do
+  defp issues_for_name("sigil_" <> sigil_letters = name, args, meta, issues, issue_meta, _allow_acronyms?) do
+    multi_letter_sigil? = String.match?(sigil_letters, ~r/^[A-Z]+$/)
+
+    if multi_letter_sigil? do
       issues
     else
       issue = issue_for(issue_meta, meta[:line], name)
@@ -158,6 +160,21 @@ defmodule Credo.Check.Readability.FunctionNames do
 
       add_issue(issues, name, arity, issue)
     end
+  end
+
+  defp issues_for_name("" <> name, args, meta, issues, issue_meta, allow_acronyms?) do
+    if Name.snake_case?(name, allow_acronyms?) do
+      issues
+    else
+      issue = issue_for(issue_meta, meta[:line], name)
+      arity = length(args || [])
+
+      add_issue(issues, name, arity, issue)
+    end
+  end
+
+  defp issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?) do
+    name |> to_string |> issues_for_name(args, meta, issues, issue_meta, allow_acronyms?)
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
