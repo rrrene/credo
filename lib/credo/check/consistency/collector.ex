@@ -183,7 +183,7 @@ defmodule Credo.Check.Consistency.Collector do
   end
 
   defp most_frequent_match(frequencies, supress_issues_for_single_match?, nil) do
-    {value, frequency_of_match} = Enum.max_by(frequencies, &elem(&1, 1))
+    {value, frequency_of_match} = frequencies |> Enum.sort() |> Enum.max_by(&elem(&1, 1))
     single_match? = frequency_of_match == 1
 
     if single_match? && supress_issues_for_single_match? do
