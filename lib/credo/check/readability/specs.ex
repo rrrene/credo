@@ -79,6 +79,10 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
+  defp traverse({:quote, _, _}, issues, _specs, _issue_meta) do
+    {nil, issues}
+  end
+
   defp traverse(
          {keyword, meta, [{:when, _, def_ast} | _]},
          issues,

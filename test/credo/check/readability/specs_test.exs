@@ -125,6 +125,22 @@ defmodule Credo.Check.Readability.SpecsTest do
     |> refute_issues()
   end
 
+  test "it should NOT report functions inside `quote`" do
+    """
+    @spec to_def(t(), atom()) :: Macro.t()
+    def to_def(%__MODULE__{vars: vars, code: code}, name) do
+      quote generated: true do
+        def unquote(name)(unquote_splicing(vars)) do
+          unquote(code)
+        end
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
