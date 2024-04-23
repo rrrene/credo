@@ -83,7 +83,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp matches_requirement?({check}, elixir_version) do
-    Version.match?(elixir_version, check.elixir_version)
+    Version.match?(elixir_version, check.elixir_version())
   end
 
   defp to_match_regexes(nil), do: []
