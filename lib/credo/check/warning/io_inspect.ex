@@ -23,7 +23,7 @@ defmodule Credo.Check.Warning.IoInspect do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:"Elixir", :IO]}, :inspect]}, meta, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:"Elixir", :IO]}, :inspect]}, _, _arguments} = ast,
          issues,
          issue_meta
        ) do
@@ -31,7 +31,7 @@ defmodule Credo.Check.Warning.IoInspect do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:IO]}, :inspect]}, meta, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:IO]}, :inspect]}, _meta, _arguments} = ast,
          issues,
          issue_meta
        ) do
@@ -43,15 +43,16 @@ defmodule Credo.Check.Warning.IoInspect do
   end
 
   defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line], @call_string) | issues]
+    [issue_for(issue_meta, meta, @call_string) | issues]
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message: "There should be no calls to `IO.inspect/1`.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end
