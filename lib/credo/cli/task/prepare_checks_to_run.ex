@@ -49,7 +49,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
       Enum.reject(exec.checks.enabled, fn
         # deprecated
         {check} ->
-          Credo.Priority.to_integer(check.base_priority) < below_priority
+          Credo.Priority.to_integer(check.base_priority()) < below_priority
 
         {_check, false} ->
           true

@@ -87,7 +87,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
         category: check.category(),
         check: check,
         explanation_for_issue: check.explanation,
-        priority: check.base_priority
+        priority: check.base_priority()
       }
     end
   end
