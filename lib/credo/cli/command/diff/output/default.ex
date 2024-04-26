@@ -316,7 +316,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       UI.edge(outer_color),
       outer_color,
       tag_style,
-      Output.check_tag(check.category),
+      Output.check_tag(check.category()),
       " ",
       priority |> Output.priority_arrow(),
       :normal,

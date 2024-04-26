@@ -84,7 +84,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
 
     defp cast_to_explanation(check) do
       %{
-        category: check.category,
+        category: check.category(),
         check: check,
         explanation_for_issue: check.explanation,
         priority: check.base_priority

@@ -33,7 +33,7 @@ defmodule Credo.CLI.Output do
   end
 
   def check_tag(check_mod, in_parens) do
-    check_mod.category
+    check_mod.category()
     |> to_string
     |> check_tag(in_parens)
   end
@@ -55,8 +55,8 @@ defmodule Credo.CLI.Output do
     |> check_color
   end
 
-  def check_color(check_mod) do
-    check_mod.category
+  def check_color(%{} = issue_or_map) do
+    issue_or_map.category
     |> to_string
     |> check_color
   end

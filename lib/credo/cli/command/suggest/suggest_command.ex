@@ -115,7 +115,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
     def modify_config_to_only_include_needed_checks(%Credo.Execution{} = exec, files_that_changed) do
       checks =
         Enum.map(exec.checks, fn {check, params} ->
-          if check.category == :consistency do
+          if check.category() == :consistency do
             {check, params}
           else
             {check, Params.put_rerun_files_that_changed(params, files_that_changed)}
