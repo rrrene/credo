@@ -100,6 +100,6 @@ defmodule Credo.Check.Params do
 
   @doc false
   def tags(params, check_mod) do
-    params[:__tags__] || params[:tags] || check_mod.tags
+    params[:__tags__] || params[:tags] || check_mod.tags()
   end
 end
