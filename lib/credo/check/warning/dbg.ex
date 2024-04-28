@@ -32,7 +32,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(
@@ -40,7 +40,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(
@@ -48,7 +48,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(
@@ -56,7 +56,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(
@@ -64,7 +64,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(
@@ -72,19 +72,20 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta) | issues]}
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
       message: "There should be no calls to `dbg/1`.",
       trigger: "dbg",
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

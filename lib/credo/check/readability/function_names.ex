@@ -149,7 +149,14 @@ defmodule Credo.Check.Readability.FunctionNames do
     issues
   end
 
-  defp issues_for_name("sigil_" <> sigil_letters = name, args, meta, issues, issue_meta, _allow_acronyms?) do
+  defp issues_for_name(
+         "sigil_" <> sigil_letters = name,
+         args,
+         meta,
+         issues,
+         issue_meta,
+         _allow_acronyms?
+       ) do
     multi_letter_sigil? = String.match?(sigil_letters, ~r/^[A-Z]+$/)
 
     if multi_letter_sigil? do
