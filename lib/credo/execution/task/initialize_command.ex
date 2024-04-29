@@ -22,7 +22,7 @@ defmodule Credo.Execution.Task.InitializeCommand do
   end
 
   defp cli_options_switches(command_mod) do
-    command_mod.cli_switches
+    command_mod.cli_switches()
     |> List.wrap()
     |> Enum.map(fn
       %{name: name, type: type} when is_binary(name) -> {String.to_atom(name), type}
@@ -31,7 +31,7 @@ defmodule Credo.Execution.Task.InitializeCommand do
   end
 
   defp cli_options_aliases(command_mod) do
-    command_mod.cli_switches
+    command_mod.cli_switches()
     |> List.wrap()
     |> Enum.map(fn
       %{name: name, alias: alias} when is_binary(name) -> {alias, String.to_atom(name)}

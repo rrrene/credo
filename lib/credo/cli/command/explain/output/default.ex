@@ -52,7 +52,7 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
          term_width
        ) do
     check_name = check |> to_string |> String.replace(~r/^Elixir\./, "")
-    color = Output.check_color(check.category)
+    color = Output.check_color(check.category())
 
     UI.puts()
 
@@ -84,9 +84,9 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
       inner_color,
       tag_style,
       "  ",
-      Output.check_tag(check.category),
+      Output.check_tag(check.category()),
       :reset,
-      " Category: #{check.category} "
+      " Category: #{check.category()} "
     ]
     |> UI.puts()
 
@@ -189,9 +189,9 @@ defmodule Credo.CLI.Command.Explain.Output.Default do
       inner_color,
       tag_style,
       "  ",
-      Output.check_tag(check.category),
+      Output.check_tag(check.category()),
       :reset,
-      " Category: #{check.category} "
+      " Category: #{check.category()} "
     ]
     |> UI.puts()
 

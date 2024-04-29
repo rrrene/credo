@@ -255,14 +255,14 @@ defmodule Credo.Execution do
   """
   def tags_for_check(check, params)
 
-  def tags_for_check(check, nil), do: check.tags
-  def tags_for_check(check, []), do: check.tags
+  def tags_for_check(check, nil), do: check.tags()
+  def tags_for_check(check, []), do: check.tags()
 
   def tags_for_check(check, params) when is_list(params) do
     params
     |> Credo.Check.Params.tags(check)
     |> Enum.flat_map(fn
-      :__initial__ -> check.tags
+      :__initial__ -> check.tags()
       tag -> [tag]
     end)
   end

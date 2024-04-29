@@ -12,7 +12,7 @@ defmodule Credo.CLI.Task.SetRelevantIssues do
       |> Filter.important(exec)
       |> Filter.valid_issues(exec)
       |> Enum.sort_by(fn issue ->
-        {issue.check.id, issue.filename, issue.line_no}
+        {issue.check.id(), issue.filename, issue.line_no}
       end)
 
     put_issues(exec, issues)

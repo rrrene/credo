@@ -28,7 +28,7 @@ defmodule Credo.CLI.Output.Formatter.Oneline do
 
     [
       inner_color,
-      Output.check_tag(check.category),
+      Output.check_tag(check.category()),
       " ",
       priority |> Output.priority_arrow(),
       " ",

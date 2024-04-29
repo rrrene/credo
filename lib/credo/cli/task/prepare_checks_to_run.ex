@@ -49,7 +49,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
       Enum.reject(exec.checks.enabled, fn
         # deprecated
         {check} ->
-          Credo.Priority.to_integer(check.base_priority) < below_priority
+          Credo.Priority.to_integer(check.base_priority()) < below_priority
 
         {_check, false} ->
           true
@@ -83,7 +83,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
   end
 
   defp matches_requirement?({check}, elixir_version) do
-    Version.match?(elixir_version, check.elixir_version)
+    Version.match?(elixir_version, check.elixir_version())
   end
 
   defp to_match_regexes(nil), do: []
