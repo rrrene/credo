@@ -50,7 +50,10 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     """
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 2
+      assert issue.column == 26
+    end)
   end
 
   test "it should report on aliases" do
@@ -62,7 +65,10 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     """
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 2
+      assert issue.column == 9
+    end)
   end
 
   test "it should report on grouped aliases" do
@@ -76,7 +82,14 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> run_check(@described_check,
       modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]
     )
-    |> assert_issues()
+    |> assert_issues(fn [one, two] ->
+      assert one.trigger == "CredoSampleModule.ForbiddenModule2"
+      assert one.line_no == 2
+      assert one.column == 60
+      assert two.trigger == "CredoSampleModule.ForbiddenModule"
+      assert two.line_no == 2
+      assert two.column == 43
+    end)
   end
 
   test "it should report on import" do

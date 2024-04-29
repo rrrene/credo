@@ -71,6 +71,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 10 == issue.line_no
+      assert 9 == issue.column
     end)
   end
 
@@ -93,6 +94,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 9 == issue.line_no
+      assert 7 == issue.column
     end)
   end
 
@@ -115,6 +117,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     |> assert_issue(fn issue ->
       assert "raise" == issue.trigger
       assert 8 == issue.line_no
+      assert 53 == issue.column
     end)
   end
 

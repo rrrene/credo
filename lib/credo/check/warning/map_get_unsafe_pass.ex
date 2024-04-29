@@ -57,9 +57,9 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
       {next_expr, _} = Enum.at(pipe, idx + 1, {nil, nil})
 
       case {expr, nil_safe?(next_expr)} do
-        {{{{:., meta, [{_, _, [:Map]}, :get]}, _, args}, _}, false}
+        {{{{:., _, [{_, meta, [:Map]}, :get]}, _, args}, _}, false}
         when length(args) != required_length ->
-          acc ++ [issue_for(issue_meta, meta[:line], @call_string)]
+          [issue_for(issue_meta, meta, @call_string) | acc]
 
         _ ->
           acc
@@ -80,13 +80,14 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
     end
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message:
         "`Map.get` with no default return value is potentially unsafe in pipes, use `Map.get/3` instead.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

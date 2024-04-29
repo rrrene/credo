@@ -42,7 +42,10 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.column == 9
+    end)
   end
 
   test "it should report a violation /2" do
@@ -73,6 +76,7 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.line_no == 3
+      assert issue.column == 13
       assert issue.trigger == ":erlang.open_port"
     end)
   end

@@ -885,7 +885,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert "Enum.map" == issue.trigger
+      assert issue.trigger == "Enum.map"
+      assert issue.line_no == 5
+      assert issue.column == 7
     end)
   end
 end

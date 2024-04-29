@@ -131,6 +131,8 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "length"
+      assert issue.line_no == 3
+      assert issue.column == 26
     end)
   end
 
@@ -148,7 +150,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "length"
+      assert issue.line_no == 3
+      assert issue.column == 10
+    end)
   end
 
   test "it should report when checking if Enum.count/1 is 0" do
@@ -168,6 +174,8 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "Enum.count"
       assert issue.message =~ "Enum.empty"
+      assert issue.line_no == 3
+      assert issue.column == 30
     end)
   end
 
@@ -185,7 +193,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.message =~ "Enum.empty" end)
+    |> assert_issue(fn issue ->
+      assert issue.message =~ "Enum.empty"
+      assert issue.line_no == 3
+      assert issue.column == 10
+    end)
   end
 
   test "it should report when checking if Enum.count/2 is 0" do

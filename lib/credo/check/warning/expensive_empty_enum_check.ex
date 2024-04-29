@@ -63,7 +63,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   end
 
   defp issues_for_call(meta, trigger, issues, issue_meta, ast) do
-    [issue_for(issue_meta, meta[:line], trigger, suggest(ast)) | issues]
+    [issue_for(issue_meta, meta, trigger, suggest(ast)) | issues]
   end
 
   defp suggest({_op, _, [0, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
@@ -72,12 +72,13 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
   defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"
 
-  defp issue_for(issue_meta, line_no, trigger, suggestion) do
+  defp issue_for(issue_meta, meta, trigger, suggestion) do
     format_issue(
       issue_meta,
       message: "#{trigger} is expensive, prefer #{suggestion}.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

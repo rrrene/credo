@@ -37,6 +37,24 @@ defmodule Credo.Check.Refactor.IoPutsTest do
     |> assert_issue()
   end
 
+  test "it should report a violation with two on the same line" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        IO.puts(parameter1); IO.puts(parameter2)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(fn [one, two] ->
+      assert one.line_no == 3
+      assert one.column == 26
+      assert two.line_no == 3
+      assert two.column == 5
+    end)
+  end
+
   test "it should report a violation /2" do
     """
     defmodule CredoSampleModule do

@@ -120,7 +120,16 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues()
+    |> assert_issues(fn [three, two, one] ->
+      assert one.line_no == 5
+      assert one.column == 5
+
+      assert two.line_no == 6
+      assert two.column == 5
+
+      assert three.line_no == 7
+      assert three.column == 5
+    end)
   end
 
   test "it should report a violation with imported :debug from Logger" do
@@ -137,6 +146,8 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "debug"
+      assert issue.line_no == 5
+      assert issue.column == 5
     end)
   end
 end

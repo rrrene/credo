@@ -43,7 +43,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
-    issues = put_issue_if_forbidden(issues, issue_meta, meta[:line], module, forbidden_modules)
+    issues = put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules)
 
     {ast, issues}
   end
@@ -56,12 +56,12 @@ defmodule Credo.Check.Warning.ForbiddenModule do
        ) do
     modules =
       Enum.map(aliases, fn {:__aliases__, meta, module} ->
-        {Name.full([base_alias, module]), meta[:line]}
+        {Name.full([base_alias, module]), meta}
       end)
 
     issues =
-      Enum.reduce(modules, issues, fn {module, line}, issues ->
-        put_issue_if_forbidden(issues, issue_meta, line, module, forbidden_modules)
+      Enum.reduce(modules, issues, fn {module, meta}, issues ->
+        put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules)
       end)
 
     {ast, issues}
@@ -83,7 +83,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     Enum.member?(forbidden_module_names, module)
   end
 
-  defp issue_for(issue_meta, line_no, module, forbidden_modules) do
+  defp issue_for(issue_meta, meta, module, forbidden_modules) do
     trigger = Name.full(module)
     message = message(forbidden_modules, module) || "The `#{trigger}` module is not allowed."
 
@@ -91,7 +91,8 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       issue_meta,
       message: message,
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 

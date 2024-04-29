@@ -37,7 +37,7 @@ defmodule Credo.Check.Warning.UnsafeExec do
   defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       {bad, suggestion, trigger} ->
-        {ast, [issue_for(bad, suggestion, trigger, meta[:line], issue_meta) | issues]}
+        {ast, [issue_for(bad, suggestion, trigger, meta, issue_meta) | issues]}
 
       nil ->
         {ast, issues}
@@ -65,11 +65,12 @@ defmodule Credo.Check.Warning.UnsafeExec do
     nil
   end
 
-  defp issue_for(call, suggestion, trigger, line_no, issue_meta) do
+  defp issue_for(call, suggestion, trigger, meta, issue_meta) do
     format_issue(issue_meta,
       message: "Prefer #{suggestion} over #{call} to prevent command injection.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

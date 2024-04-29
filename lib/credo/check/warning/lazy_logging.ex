@@ -46,7 +46,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:Logger]}, fun_name]}, _, arguments} = ast,
          state,
          issue_meta
        )
@@ -99,7 +99,7 @@ defmodule Credo.Check.Warning.LazyLogging do
   end
 
   defp issue_for_call([{:<<>>, _, [_ | _]} | _] = _args, meta, fun_name, issue_meta) do
-    issue_for(issue_meta, meta[:line], fun_name)
+    issue_for(issue_meta, meta, fun_name)
   end
 
   defp issue_for_call(_args, _meta, _trigger, _issue_meta) do
@@ -109,11 +109,12 @@ defmodule Credo.Check.Warning.LazyLogging do
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]), do: true
   defp logger_import?(_), do: false
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message: "Prefer lazy Logger calls.",
-      line_no: line_no,
+      line_no: meta[:line],
+      column: meta[:column],
       trigger: trigger
     )
   end

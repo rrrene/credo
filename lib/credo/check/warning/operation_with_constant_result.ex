@@ -49,12 +49,12 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
       new_issue =
         issue_for(
           issue_meta,
-          meta[:line],
+          meta,
           unquote(op),
           unquote(constant_result)
         )
 
-      {ast, issues ++ [new_issue]}
+      {ast, [new_issue | issues]}
     end
   end
 
@@ -62,12 +62,13 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
     {ast, issues}
   end
 
-  defp issue_for(issue_meta, line_no, trigger, constant_result) do
+  defp issue_for(issue_meta, meta, trigger, constant_result) do
     format_issue(
       issue_meta,
       message: "Operation will always return #{constant_result}.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end
