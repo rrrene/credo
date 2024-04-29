@@ -36,13 +36,13 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:@, meta, [attribute_definition]} = ast, issues, issue_meta) do
+  defp traverse({:@, _meta, [attribute_definition]} = ast, issues, issue_meta) do
     case traverse_attribute(attribute_definition) do
       nil ->
         {ast, issues}
 
       {attribute, call} ->
-        {ast, issues_for_call(attribute, call, meta, issue_meta, issues)}
+        {ast, issues_for_call(attribute, call, issue_meta, issues)}
     end
   end
 
@@ -96,14 +96,14 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
     {ast, acc}
   end
 
-  defp issues_for_call(attribute, {call_meta, call, trigger}, _meta, issue_meta, issues) do
+  defp issues_for_call(attribute, {meta, call, trigger}, issue_meta, issues) do
     [
       format_issue(issue_meta,
         message:
           "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
         trigger: trigger,
-        line_no: call_meta[:line],
-        column: call_meta[:column]
+        line_no: meta[:line],
+        column: meta[:column]
       )
       | issues
     ]
