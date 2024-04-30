@@ -101,8 +101,11 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
 
   defp error_exists?(errors, error_message, {line_no, column}, trigger) do
     Enum.any?(errors, fn
-      %Credo.Issue{message: ^error_message, line_no: ^line_no, column: ^column, trigger: ^trigger} -> true
-      _ -> false
+      %Credo.Issue{message: ^error_message, line_no: ^line_no, column: ^column, trigger: ^trigger} ->
+        true
+
+      _ ->
+        false
     end)
   end
 end
