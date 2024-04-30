@@ -194,8 +194,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
       issue_meta,
       message: "#{part_to_string(part)} must appear before #{part_to_string(current_part)}",
       trigger: inspect(module),
-      line_no: Keyword.get(file_pos, :line),
-      column: Keyword.get(file_pos, :column)
+      line_no: Keyword.get(file_pos, :line)
     )
   end
 

@@ -32,7 +32,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
   end
 
   defp traverse(
@@ -40,7 +40,7 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
   end
 
   defp traverse(
@@ -48,23 +48,23 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:"Elixir", :Kernel]}, :dbg]}, meta, _args} = ast,
+         {{:., _, [{:__aliases__, meta, [:"Elixir", :Kernel]}, :dbg]}, _, _args} = ast,
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "Elixir.Kernel.dbg") | issues]}
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:Kernel]}, :dbg]}, meta, _args} = ast,
+         {{:., _, [{:__aliases__, meta, [:Kernel]}, :dbg]}, _, _args} = ast,
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "Kernel.dbg") | issues]}
   end
 
   defp traverse(
@@ -72,18 +72,18 @@ defmodule Credo.Check.Warning.Dbg do
          issues,
          issue_meta
        ) do
-    {ast, [issue_for(issue_meta, meta) | issues]}
+    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issue_for(issue_meta, meta) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message: "There should be no calls to `dbg/1`.",
-      trigger: "dbg",
+      trigger: trigger,
       line_no: meta[:line],
       column: meta[:column]
     )

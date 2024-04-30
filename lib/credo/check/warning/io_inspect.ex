@@ -12,8 +12,6 @@ defmodule Credo.Check.Warning.IoInspect do
       """
     ]
 
-  @call_string "IO.inspect"
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -27,7 +25,7 @@ defmodule Credo.Check.Warning.IoInspect do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, issues_for_call(meta, "Elixir.IO.inspect", issues, issue_meta)}
   end
 
   defp traverse(
@@ -35,15 +33,15 @@ defmodule Credo.Check.Warning.IoInspect do
          issues,
          issue_meta
        ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+    {ast, issues_for_call(meta, "IO.inspect", issues, issue_meta)}
   end
 
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
 
-  defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta, @call_string) | issues]
+  defp issues_for_call(meta, trigger, issues, issue_meta) do
+    [issue_for(issue_meta, meta, trigger) | issues]
   end
 
   defp issue_for(issue_meta, meta, trigger) do
