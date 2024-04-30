@@ -175,12 +175,13 @@ defmodule Credo.Test.Case do
   def run_check(source_files, check, params \\ []) do
     issues = CheckRunner.run_check(source_files, check, params)
 
-    warn_on_malformed_issues(source_files, issues)
+    check_on_malformed_issues(source_files, issues)
 
     issues
   end
 
-  defp warn_on_malformed_issues(_source_files, issues) do
+  defp check_on_malformed_issues(source_files, issues) do
+    source_files = List.wrap(source_files)
     no_trigger = Credo.Issue.no_trigger()
 
     Enum.each(issues, fn issue ->
@@ -189,18 +190,53 @@ defmodule Credo.Test.Case do
           :ok
 
         trigger when is_nil(trigger) ->
-          IO.warn(":trigger is nil")
+          warn_or_flunk(":trigger is nil")
 
         trigger when is_binary(trigger) ->
-          :ok
+          warn_on_missing_trigger(source_files, issue)
 
         trigger when is_atom(trigger) ->
-          :ok
+          warn_on_missing_trigger(source_files, issue)
 
         trigger ->
-          IO.warn(":trigger is not a binary: #{inspect(trigger, pretty: true)}")
+          warn_or_flunk(":trigger is not a binary: #{inspect(trigger, pretty: true)}")
       end
     end)
+  end
+
+  defp warn_on_missing_trigger(source_files, issue) do
+    trigger = to_string(issue.trigger)
+    line = get_source_line(source_files, issue)
+
+    if issue.column do
+      actual_trigger = String.slice(line, issue.column - 1, String.length(trigger))
+
+      if actual_trigger != trigger do
+        warn_or_flunk("""
+        found trigger is not the given trigger:
+          actual:   #{inspect(actual_trigger, pretty: true)}
+          expected: #{inspect(trigger, pretty: true)}
+        """)
+      end
+    end
+  end
+
+  defp get_source_line(source_files, %Credo.Issue{} = issue) do
+    source_files
+    |> find_source_file(issue)
+    |> Credo.SourceFile.line_at(issue.line_no)
+  end
+
+  defp find_source_file(source_files, %Credo.Issue{filename: filename}) do
+    Enum.find(source_files, &(&1.filename == filename)) || raise "Could not find source file"
+  end
+
+  defp warn_or_flunk(message) do
+    if System.get_env("ASSERT_TRIGGERS") do
+      ExUnit.Assertions.flunk(message)
+    else
+      IO.warn(message)
+    end
   end
 
   #
