@@ -27,6 +27,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  @offset 2
   defp traverse({{:., _, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       nil ->
@@ -36,6 +37,11 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
         {ast, [issue_for(issue_meta, meta, trigger) | issues]}
 
       trigger ->
+        [module, _function] = call
+        len = module |> Atom.to_string() |> String.length()
+        column = meta[:column] - len - @offset
+        meta = Keyword.put(meta, :column, column)
+
         {ast, [issue_for(issue_meta, meta, trigger) | issues]}
     end
   end

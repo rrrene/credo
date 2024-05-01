@@ -121,12 +121,15 @@ defmodule Credo.Check.Warning.LazyLoggingTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn [three, two, one] ->
+      assert one.trigger == "Logger.debug"
       assert one.line_no == 5
       assert one.column == 5
 
+      assert two.trigger == "Logger.debug"
       assert two.line_no == 6
       assert two.column == 5
 
+      assert three.trigger == "Logger.debug"
       assert three.line_no == 7
       assert three.column == 5
     end)

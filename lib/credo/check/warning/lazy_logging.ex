@@ -51,7 +51,8 @@ defmodule Credo.Check.Warning.LazyLogging do
          issue_meta
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    trigger = "Logger.#{fun_name}"
+    issue = find_issue(fun_name, arguments, meta, issue_meta, trigger)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -62,7 +63,7 @@ defmodule Credo.Check.Warning.LazyLogging do
          issue_meta
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = find_issue(fun_name, arguments, meta, issue_meta, fun_name)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -89,12 +90,12 @@ defmodule Credo.Check.Warning.LazyLogging do
     {module_contains_import?, [issue | issues]}
   end
 
-  defp find_issue(fun_name, arguments, meta, issue_meta) do
+  defp find_issue(fun_name, arguments, meta, issue_meta, trigger) do
     params = IssueMeta.params(issue_meta)
     ignored_functions = Params.get(params, :ignore, __MODULE__)
 
     unless Enum.member?(ignored_functions, fun_name) do
-      issue_for_call(arguments, meta, fun_name, issue_meta)
+      issue_for_call(arguments, meta, trigger, issue_meta)
     end
   end
 

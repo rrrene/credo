@@ -74,7 +74,7 @@ defmodule Credo.Check.Warning.LeakyEnvironmentTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.line_no == 3
-      assert issue.column == 13
+      assert issue.column == 5
       assert issue.trigger == ":erlang.open_port"
     end)
   end
