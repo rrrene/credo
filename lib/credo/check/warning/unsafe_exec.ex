@@ -66,11 +66,10 @@ defmodule Credo.Check.Warning.UnsafeExec do
     nil
   end
 
-  # offset 2 characters for the dot call and the atom syntax
-  @offset 2
+  @colon_and_dot_length 2
   defp issue_for(call, suggestion, trigger, meta, module, issue_meta) do
     len = module |> Atom.to_string() |> String.length()
-    column = meta[:column] - len - @offset
+    column = meta[:column] - len - @colon_and_dot_length
 
     format_issue(issue_meta,
       message: "Prefer #{suggestion} over #{call} to prevent command injection.",
