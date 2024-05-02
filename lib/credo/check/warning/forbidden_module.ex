@@ -46,7 +46,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
-    if found_module?(module, forbidden_modules) do
+    if forbidden_modules[module] do
       {ast, [issue_for(issue_meta, meta, module, forbidden_modules[module]) | issues]}
     else
       {ast, issues}
@@ -63,7 +63,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       Enum.reduce(aliases, issues, fn {:__aliases__, meta, module}, issues ->
         full_name = Name.full([base_alias, module])
 
-        if found_module?(full_name, forbidden_modules) do
+        if forbidden_modules[full_name] do
           message = forbidden_modules[full_name]
           trigger = Name.full(module)
           [issue_for(issue_meta, meta, trigger, message) | issues]
@@ -76,11 +76,6 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   end
 
   defp traverse(ast, issues, _, _), do: {ast, issues}
-
-  defp found_module?(module, forbidden_modules) when is_map_key(forbidden_modules, module),
-    do: true
-
-  defp found_module?(_, _), do: false
 
   defp issue_for(issue_meta, meta, trigger, message) do
     format_issue(
