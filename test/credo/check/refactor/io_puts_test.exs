@@ -47,11 +47,11 @@ defmodule Credo.Check.Refactor.IoPutsTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [one, two] ->
+    |> assert_issues(fn [two, one] ->
       assert one.line_no == 3
-      assert one.column == 26
+      assert one.column == 5
       assert two.line_no == 3
-      assert two.column == 5
+      assert two.column == 26
     end)
   end
 
