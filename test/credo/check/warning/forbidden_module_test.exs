@@ -82,13 +82,13 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> run_check(@described_check,
       modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]
     )
-    |> assert_issues(fn [one, two] ->
-      assert one.trigger == "CredoSampleModule.ForbiddenModule2"
+    |> assert_issues(fn [two, one] ->
+      assert one.trigger == "ForbiddenModule"
       assert one.line_no == 2
-      assert one.column == 60
-      assert two.trigger == "CredoSampleModule.ForbiddenModule"
+      assert one.column == 43
+      assert two.trigger == "ForbiddenModule2"
       assert two.line_no == 2
-      assert two.column == 43
+      assert two.column == 60
     end)
   end
 
@@ -127,6 +127,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     |> run_check(@described_check, modules: [{CredoSampleModule.ForbiddenModule, "my message"}])
     |> assert_issue(fn issue ->
       assert issue.line_no == 3
+      assert issue.column == 5
       assert issue.trigger == "CredoSampleModule.ForbiddenModule"
       assert issue.message == "my message"
     end)

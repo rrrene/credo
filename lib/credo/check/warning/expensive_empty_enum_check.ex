@@ -50,11 +50,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   for {lhs, rhs, trigger} <- @comparisons,
       operator <- @operators do
     defp traverse(
-           {unquote(operator), meta, [unquote(lhs), unquote(rhs)]} = ast,
+           {unquote(operator), _meta, [unquote(lhs), unquote(rhs)]} = ast,
            issues,
            issue_meta
          ) do
-      {ast, issues_for_call(meta, unquote(trigger), issues, issue_meta, ast)}
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
     end
   end
 
@@ -62,12 +62,18 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {ast, issues}
   end
 
-  defp issues_for_call(meta, trigger, issues, issue_meta, ast) do
+  defp issues_for_call(trigger, issues, issue_meta, ast) do
+    meta = get_meta(ast)
     [issue_for(issue_meta, meta, trigger, suggest(ast)) | issues]
   end
 
   defp suggest({_op, _, [0, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
   defp suggest({_op, _, [{_pattern, _, args}, 0]}), do: suggest_for_arity(Enum.count(args))
+
+  defp get_meta({_op, _, [0, {{:., _, [{:__aliases__, meta, _}, _]}, _, _}]}), do: meta
+  defp get_meta({_op, _, [0, {_, meta, _}]}), do: meta
+  defp get_meta({_op, _, [{{:., _, [{:__aliases__, meta, _}, _]}, _, _}, 0]}), do: meta
+  defp get_meta({_op, _, [{_, meta, _}, 0]}), do: meta
 
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
   defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"

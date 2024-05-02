@@ -132,7 +132,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "length"
       assert issue.line_no == 3
-      assert issue.column == 26
+      assert issue.column == 8
     end)
   end
 
@@ -153,7 +153,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "length"
       assert issue.line_no == 3
-      assert issue.column == 10
+      assert issue.column == 13
     end)
   end
 
@@ -175,7 +175,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
       assert issue.trigger == "Enum.count"
       assert issue.message =~ "Enum.empty"
       assert issue.line_no == 3
-      assert issue.column == 30
+      assert issue.column == 8
     end)
   end
 
@@ -196,7 +196,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue(fn issue ->
       assert issue.message =~ "Enum.empty"
       assert issue.line_no == 3
-      assert issue.column == 10
+      assert issue.column == 13
     end)
   end
 
