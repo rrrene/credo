@@ -29,12 +29,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
     modules =
       if Keyword.keyword?(modules) do
-        Map.new(modules, fn {key, value} -> {Name.full(key), value} end)
+        Enum.map(modules, fn {key, value} -> {Name.full(key), value} end)
       else
-        Map.new(modules, fn module ->
-          full = Name.full(module)
-          {full, "The `#{Name.full(module)}` module is not allowed."}
-        end)
+        Enum.map(modules, fn key -> {Name.full(key), nil} end)
       end
 
     Credo.Code.prewalk(
@@ -46,11 +43,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
-    if forbidden_modules[module] do
-      {ast, [issue_for(issue_meta, meta, module, forbidden_modules[module]) | issues]}
-    else
-      {ast, issues}
-    end
+    issues = put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, module)
+
+    {ast, issues}
   end
 
   defp traverse(
@@ -61,15 +56,9 @@ defmodule Credo.Check.Warning.ForbiddenModule do
        ) do
     issues =
       Enum.reduce(aliases, issues, fn {:__aliases__, meta, module}, issues ->
-        full_name = Name.full([base_alias, module])
-
-        if forbidden_modules[full_name] do
-          message = forbidden_modules[full_name]
-          trigger = Name.full(module)
-          [issue_for(issue_meta, meta, trigger, message) | issues]
-        else
-          issues
-        end
+        full_module = Name.full([base_alias, module])
+        module = Name.full(module)
+        put_issue_if_forbidden(issues, issue_meta, meta, full_module, forbidden_modules, module)
       end)
 
     {ast, issues}
@@ -77,7 +66,23 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   defp traverse(ast, issues, _, _), do: {ast, issues}
 
-  defp issue_for(issue_meta, meta, trigger, message) do
+  defp put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, trigger) do
+    forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
+
+    if found_module?(forbidden_module_names, module) do
+      [issue_for(issue_meta, meta, module, forbidden_modules, trigger) | issues]
+    else
+      issues
+    end
+  end
+
+  defp found_module?(forbidden_module_names, module) do
+    Enum.member?(forbidden_module_names, module)
+  end
+
+  defp issue_for(issue_meta, meta, module, forbidden_modules, trigger) do
+    message = message(forbidden_modules, module) || "The `#{trigger}` module is not allowed."
+
     format_issue(
       issue_meta,
       message: message,
@@ -85,5 +90,12 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       line_no: meta[:line],
       column: meta[:column]
     )
+  end
+
+  defp message(forbidden_modules, module) do
+    Enum.find_value(forbidden_modules, fn
+      {^module, message} -> message
+      _ -> nil
+    end)
   end
 end
