@@ -78,7 +78,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, meta, [:Logger]}, fun_name]}, _, arguments} = ast,
+         {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
          state,
          issue_meta,
          metadata_keys
@@ -151,7 +151,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
           nil
 
         missed ->
-          issue_for(issue_meta, meta, Keyword.keys(missed))
+          issue_for(issue_meta, meta[:line], Keyword.keys(missed))
       end
     end
   end
@@ -176,11 +176,10 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     |> Keyword.get(:metadata)
   end
 
-  defp issue_for(issue_meta, meta, [trigger | _] = missed_keys) do
+  defp issue_for(issue_meta, line_no, [trigger | _] = missed_keys) do
     format_issue(issue_meta,
       message: "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config.",
-      line_no: meta[:line],
-      column: meta[:column],
+      line_no: line_no,
       trigger: trigger
     )
   end
