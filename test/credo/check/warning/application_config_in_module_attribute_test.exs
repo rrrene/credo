@@ -67,42 +67,45 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
     assert_issues = [
       {
         "Module attribute @config_1 makes use of unsafe Application configuration call Application.fetch_env/2",
-        2,
+        {2, 13},
         "Application.fetch_env"
       },
       {
         "Module attribute @config_3 makes use of unsafe Application configuration call Application.fetch_env!/2",
-        4,
+        {4, 13},
         "Application.fetch_env"
       },
       {
         "Module attribute @config_5 makes use of unsafe Application configuration call Application.get_all_env/1",
-        6,
+        {6, 13},
         "Application.get_all_env"
       },
       {
         "Module attribute @config_7 makes use of unsafe Application configuration call Application.get_env/2",
-        8,
+        {8, 13},
         "Application.get_env"
       },
       {
         "Module attribute @config_9 makes use of unsafe Application configuration call Application.get_env/3",
-        10,
+        {10, 13},
         "Application.get_env"
       }
     ]
 
     assert length(issues) == 5
 
-    Enum.each(assert_issues, fn {error_message, line_no, trigger} ->
-      assert error_exists?(issues, error_message, line_no, trigger)
+    Enum.each(assert_issues, fn {error_message, pos, trigger} ->
+      assert error_exists?(issues, error_message, pos, trigger)
     end)
   end
 
-  defp error_exists?(errors, error_message, line_no, trigger) do
+  defp error_exists?(errors, error_message, {line_no, column}, trigger) do
     Enum.any?(errors, fn
-      %Credo.Issue{message: ^error_message, line_no: ^line_no, trigger: ^trigger} -> true
-      _ -> false
+      %Credo.Issue{message: ^error_message, line_no: ^line_no, column: ^column, trigger: ^trigger} ->
+        true
+
+      _ ->
+        false
     end)
   end
 end

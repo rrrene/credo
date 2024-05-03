@@ -66,7 +66,7 @@ defmodule Credo.Check.Warning.MixEnv do
   end
 
   defp traverse_defs(
-         {{:., _, [{:__aliases__, _, [:Mix]}, :env]}, meta, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:Mix]}, :env]}, _, _arguments} = ast,
          issues,
          issue_meta
        ) do
@@ -78,15 +78,16 @@ defmodule Credo.Check.Warning.MixEnv do
   end
 
   defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line]) | issues]
+    [issue_for(issue_meta, meta) | issues]
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
       message: "There should be no calls to Mix.env in application code.",
       trigger: "Mix.env",
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

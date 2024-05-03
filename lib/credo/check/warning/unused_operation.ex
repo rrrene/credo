@@ -26,7 +26,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
       )
 
     Enum.reduce(all_unused_calls, [], fn invalid_call, issues ->
-      {_, meta, _} = invalid_call
+      {{:., _, [{:__aliases__, meta, _}, _fun_name]}, _, _} = invalid_call
 
       trigger =
         invalid_call
@@ -34,16 +34,17 @@ defmodule Credo.Check.Warning.UnusedOperation do
         |> String.split("(")
         |> List.first()
 
-      issues ++ [issue_for(format_issue_fun, issue_meta, meta[:line], trigger, checked_module)]
+      [issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) | issues]
     end)
   end
 
-  defp issue_for(format_issue_fun, issue_meta, line_no, trigger, checked_module) do
+  defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) do
     format_issue_fun.(
       issue_meta,
       message: "There should be no unused return values for #{checked_module} functions.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

@@ -74,8 +74,14 @@ defmodule Credo.Check.Warning.OperationWithConstantResultTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 2 == Enum.count(issues)
+    |> assert_issues(fn [two, one] ->
+      assert one.trigger == "*"
+      assert one.line_no == 5
+      assert one.column == 7
+
+      assert two.trigger == "*"
+      assert two.line_no == 6
+      assert two.column == 7
     end)
   end
 end

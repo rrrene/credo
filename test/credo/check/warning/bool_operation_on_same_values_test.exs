@@ -98,6 +98,8 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "and"
+      assert issue.line_no == 5
+      assert issue.column == 7
     end)
   end
 end

@@ -43,7 +43,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
     module = Name.full(modules)
 
-    issues = put_issue_if_forbidden(issues, issue_meta, meta[:line], module, forbidden_modules)
+    issues = put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, module)
 
     {ast, issues}
   end
@@ -54,14 +54,11 @@ defmodule Credo.Check.Warning.ForbiddenModule do
          forbidden_modules,
          issue_meta
        ) do
-    modules =
-      Enum.map(aliases, fn {:__aliases__, meta, module} ->
-        {Name.full([base_alias, module]), meta[:line]}
-      end)
-
     issues =
-      Enum.reduce(modules, issues, fn {module, line}, issues ->
-        put_issue_if_forbidden(issues, issue_meta, line, module, forbidden_modules)
+      Enum.reduce(aliases, issues, fn {:__aliases__, meta, module}, issues ->
+        full_module = Name.full([base_alias, module])
+        module = Name.full(module)
+        put_issue_if_forbidden(issues, issue_meta, meta, full_module, forbidden_modules, module)
       end)
 
     {ast, issues}
@@ -69,11 +66,11 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   defp traverse(ast, issues, _, _), do: {ast, issues}
 
-  defp put_issue_if_forbidden(issues, issue_meta, line_no, module, forbidden_modules) do
+  defp put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, trigger) do
     forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
 
     if found_module?(forbidden_module_names, module) do
-      [issue_for(issue_meta, line_no, module, forbidden_modules) | issues]
+      [issue_for(issue_meta, meta, module, forbidden_modules, trigger) | issues]
     else
       issues
     end
@@ -83,15 +80,15 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     Enum.member?(forbidden_module_names, module)
   end
 
-  defp issue_for(issue_meta, line_no, module, forbidden_modules) do
-    trigger = Name.full(module)
+  defp issue_for(issue_meta, meta, module, forbidden_modules, trigger) do
     message = message(forbidden_modules, module) || "The `#{trigger}` module is not allowed."
 
     format_issue(
       issue_meta,
       message: message,
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 

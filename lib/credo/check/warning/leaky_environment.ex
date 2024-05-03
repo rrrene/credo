@@ -27,13 +27,22 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
+  @colon_and_dot_length 2
   defp traverse({{:., _, call}, meta, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       nil ->
         {ast, issues}
 
+      {trigger, meta} ->
+        {ast, [issue_for(issue_meta, meta, trigger) | issues]}
+
       trigger ->
-        {ast, [issue_for(issue_meta, meta[:line], trigger) | issues]}
+        [module, _function] = call
+        len = module |> Atom.to_string() |> String.length()
+        column = meta[:column] - len - @colon_and_dot_length
+        meta = Keyword.put(meta, :column, column)
+
+        {ast, [issue_for(issue_meta, meta, trigger) | issues]}
     end
   end
 
@@ -41,14 +50,14 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     {ast, issues}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:System]}, :cmd], [_, _]) do
-    "System.cmd"
+  defp get_forbidden_call([{:__aliases__, meta, [:System]}, :cmd], [_, _]) do
+    {"System.cmd", meta}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:System]}, :cmd], [_, _, opts])
+  defp get_forbidden_call([{:__aliases__, meta, [:System]}, :cmd], [_, _, opts])
        when is_list(opts) do
     if not Keyword.has_key?(opts, :env) do
-      "System.cmd"
+      {"System.cmd", meta}
     end
   end
 
@@ -63,12 +72,13 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     nil
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message: "When using #{trigger}, clear or overwrite sensitive environment variables.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end
