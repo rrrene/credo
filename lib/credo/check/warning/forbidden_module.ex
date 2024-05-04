@@ -25,18 +25,18 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
-    modules = Params.get(params, :modules, __MODULE__)
-
-    modules =
-      if Keyword.keyword?(modules) do
-        Enum.map(modules, fn {key, value} -> {Name.full(key), value} end)
-      else
-        Enum.map(modules, fn key -> {Name.full(key), nil} end)
-      end
+    forbidden_modules =
+      params
+      |> Params.get(:modules, __MODULE__)
+      |> Enum.map(fn
+        {key, value} -> {Name.full(key), value}
+        key -> {Name.full(key), nil}
+      end)
+      |> Map.new()
 
     Credo.Code.prewalk(
       source_file,
-      &traverse(&1, &2, modules, IssueMeta.for(source_file, params))
+      &traverse(&1, &2, forbidden_modules, IssueMeta.for(source_file, params))
     )
   end
 
@@ -58,6 +58,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       Enum.reduce(aliases, issues, fn {:__aliases__, meta, module}, issues ->
         full_module = Name.full([base_alias, module])
         module = Name.full(module)
+
         put_issue_if_forbidden(issues, issue_meta, meta, full_module, forbidden_modules, module)
       end)
 
@@ -67,21 +68,15 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   defp traverse(ast, issues, _, _), do: {ast, issues}
 
   defp put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, trigger) do
-    forbidden_module_names = Enum.map(forbidden_modules, &elem(&1, 0))
-
-    if found_module?(forbidden_module_names, module) do
+    if Map.has_key?(forbidden_modules, module) do
       [issue_for(issue_meta, meta, module, forbidden_modules, trigger) | issues]
     else
       issues
     end
   end
 
-  defp found_module?(forbidden_module_names, module) do
-    Enum.member?(forbidden_module_names, module)
-  end
-
   defp issue_for(issue_meta, meta, module, forbidden_modules, trigger) do
-    message = message(forbidden_modules, module) || "The `#{trigger}` module is not allowed."
+    message = forbidden_modules[module] || "The `#{trigger}` module is not allowed."
 
     format_issue(
       issue_meta,
@@ -90,12 +85,5 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       line_no: meta[:line],
       column: meta[:column]
     )
-  end
-
-  defp message(forbidden_modules, module) do
-    Enum.find_value(forbidden_modules, fn
-      {^module, message} -> message
-      _ -> nil
-    end)
   end
 end

@@ -34,10 +34,11 @@ defmodule Credo.Check.Warning.UnsafeExec do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
+  defp traverse({{:., meta, call}, _, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       {bad, suggestion, trigger} ->
         [module, _function] = call
+
         {ast, [issue_for(bad, suggestion, trigger, meta, module, issue_meta) | issues]}
 
       nil ->
@@ -66,10 +67,8 @@ defmodule Credo.Check.Warning.UnsafeExec do
     nil
   end
 
-  @colon_and_dot_length 2
-  defp issue_for(call, suggestion, trigger, meta, module, issue_meta) do
-    len = module |> Atom.to_string() |> String.length()
-    column = meta[:column] - len - @colon_and_dot_length
+  defp issue_for(call, suggestion, trigger, meta, erlang_module, issue_meta) do
+    column = meta[:column] - String.length(":#{erlang_module}")
 
     format_issue(issue_meta,
       message: "Prefer #{suggestion} over #{call} to prevent command injection.",

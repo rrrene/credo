@@ -27,8 +27,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  @colon_and_dot_length 2
-  defp traverse({{:., _, call}, meta, args} = ast, issues, issue_meta) do
+  defp traverse({{:., meta, call}, _, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       nil ->
         {ast, issues}
@@ -36,13 +35,10 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
       {trigger, meta} ->
         {ast, [issue_for(issue_meta, meta, trigger) | issues]}
 
-      trigger ->
+      "" <> trigger ->
         [module, _function] = call
-        len = module |> Atom.to_string() |> String.length()
-        column = meta[:column] - len - @colon_and_dot_length
-        meta = Keyword.put(meta, :column, column)
 
-        {ast, [issue_for(issue_meta, meta, trigger) | issues]}
+        {ast, [issue_for(issue_meta, meta, trigger, module) | issues]}
     end
   end
 
@@ -61,8 +57,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     end
   end
 
-  defp get_forbidden_call([:erlang, :open_port], [_, opts])
-       when is_list(opts) do
+  defp get_forbidden_call([:erlang, :open_port], [_, opts]) when is_list(opts) do
     if not Keyword.has_key?(opts, :env) do
       ":erlang.open_port"
     end
@@ -72,13 +67,20 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     nil
   end
 
-  defp issue_for(issue_meta, meta, trigger) do
+  defp issue_for(issue_meta, meta, trigger, erlang_module \\ nil) do
+    column =
+      if erlang_module do
+        meta[:column] - String.length(":#{erlang_module}")
+      else
+        meta[:column]
+      end
+
     format_issue(
       issue_meta,
       message: "When using #{trigger}, clear or overwrite sensitive environment variables.",
       trigger: trigger,
       line_no: meta[:line],
-      column: meta[:column]
+      column: column
     )
   end
 end
