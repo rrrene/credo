@@ -34,7 +34,49 @@ defmodule Credo.Check.Warning.UnusedKeywordOperation do
   alias Credo.Check.Warning.UnusedOperation
 
   @checked_module :Keyword
-  @funs_with_return_value nil
+  @funs_with_return_value [
+    :delete,
+    :delete_first,
+    :drop,
+    :equal?,
+    :fetch,
+    :fetch!,
+    :filter,
+    :from_keys,
+    :get,
+    :get_and_update,
+    :get_and_update!,
+    :get_lazy,
+    :get_values,
+    :has_key?,
+    :keys,
+    :keyword?,
+    :merge,
+    :merge,
+    :new,
+    :new,
+    :new,
+    :pop,
+    :pop!,
+    :pop_first,
+    :pop_lazy,
+    :pop_values,
+    :put,
+    :put_new,
+    :put_new_lazy,
+    :reject,
+    :replace,
+    :replace!,
+    :replace_lazy,
+    :split,
+    :split_with,
+    :take,
+    :to_list,
+    :update,
+    :update!,
+    :validate,
+    :values
+  ]
 
   @doc false
   @impl true

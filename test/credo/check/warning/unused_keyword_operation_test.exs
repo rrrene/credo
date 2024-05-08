@@ -11,6 +11,8 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
+        Keyword.validate!(opts, [:base_url, :meta, :receive_timeout])
+
         Keyword.values(parameter1) + parameter2
       end
 
