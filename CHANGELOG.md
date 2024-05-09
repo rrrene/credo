@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.6
+
+- `Credo.Check.Consistency.MultiAliasImportRequireUse` fixed false positive
+- `Credo.Check.Readability.PredicateFunctionNames` now ignores functions that implement a behaviour
+- `Credo.Check.Readability.FunctionName` now supports multi-letter sigils
+- `Credo.Check.Readability.Specs` fixed false positive
+- `Credo.Check.Warning.UnusedKeywordOperation` fixed false positive
+- Fix `column` information on several checks in case there are two offending calls on the same line
+- Fix some deprecation warnings for upcoming Elixir 1.17
+
 ## 1.7.5
 
 - Fix `--read-from-stdin` not respecting `:files`/`:included` param
