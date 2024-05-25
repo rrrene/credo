@@ -150,7 +150,7 @@ defmodule Credo.Code do
 
       # Elixir >= 1.17
       {:ok, _, _, _, tokens, _} ->
-        tokens
+        Enum.reverse(tokens)
 
       {:error, _, _, _, tokens} ->
         tokens
