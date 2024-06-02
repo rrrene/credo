@@ -14,17 +14,13 @@ jobs:
       matrix:
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
-        otp: [23.3, 24.3, 25.3, 26.1]
-        elixir: [1.11.4, 1.12.3, 1.13.4, 1.14.5, 1.15.7, 1.16.2]
+        otp: [24.3, 25.3, 26.2]
+        elixir: [1.13.4, 1.14.5, 1.15.7, 1.16.2, 1.17.0-rc.0]
         exclude:
-          - elixir: 1.11.4
-            otp: 26.1
-          - elixir: 1.12.3
-            otp: 26.1
           - elixir: 1.13.4
-            otp: 26.1
+            otp: 26.2
           - elixir: 1.14.5
-            otp: 26.1
+            otp: 26.2
           - elixir: 1.11.4
             otp: 25.3
           - elixir: 1.12.3
@@ -36,8 +32,8 @@ jobs:
           - elixir: 1.15.7
             otp: 24.3
           - elixir: 1.16.2
-            otp: 23.3
-          - elixir: 1.16.2
+            otp: 24.3
+          - elixir: 1.17.0-rc.0
             otp: 24.3
     steps:
       - uses: actions/checkout@v4
