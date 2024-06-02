@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.7-rc.0
+
+- Fix compatibility & compiler warnings with Elixir 1.17
+- `Credo.Check.Design.SkipTestWithoutComment`, `Credo.Check.Refactor.PassAsyncInTestCases` and `Credo.Check.Warning.WrongTestFileExtension` now work for umrella apps
+
 ## 1.7.6
 
 - `Credo.Check.Consistency.MultiAliasImportRequireUse` fixed false positive
