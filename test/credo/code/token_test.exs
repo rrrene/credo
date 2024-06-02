@@ -236,27 +236,42 @@ defmodule Credo.Code.TokenTest do
       tokens = Credo.Code.to_tokens(source)
 
       expected =
-        if Version.match?(System.version(), ">= 1.14.0-dev") do
-          [
-            {:%{}, {1, 1, nil}},
-            {:"{", {1, 2, nil}},
-            @kw_identifier_token,
-            {:bin_string, {1, 28, nil},
-             [
-               {{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, ~c"filename"}, :filename}]},
-               " world"
-             ]},
-            {:"}", {1, 47, nil}}
-          ]
-        else
-          [
-            {:%{}, {1, 1, nil}},
-            {:"{", {1, 2, nil}},
-            @kw_identifier_token,
-            {:bin_string, {1, 28, nil},
-             [{{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, nil}, :filename}]}, " world"]},
-            {:"}", {1, 47, nil}}
-          ]
+        cond do
+          Version.match?(System.version(), ">= 1.17.0-rc.0") ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 1, nil}},
+              @kw_identifier_token,
+              {:bin_string, {1, 28, nil},
+               [
+                 {{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, ~c"filename"}, :filename}]},
+                 " world"
+               ]},
+              {:"}", {1, 47, nil}}
+            ]
+
+          Version.match?(System.version(), ">= 1.14.0-dev") ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 2, nil}},
+              @kw_identifier_token,
+              {:bin_string, {1, 28, nil},
+               [
+                 {{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, ~c"filename"}, :filename}]},
+                 " world"
+               ]},
+              {:"}", {1, 47, nil}}
+            ]
+
+          true ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 2, nil}},
+              @kw_identifier_token,
+              {:bin_string, {1, 28, nil},
+               [{{1, 29, nil}, {1, 39, nil}, [{:identifier, {1, 31, nil}, :filename}]}, " world"]},
+              {:"}", {1, 47, nil}}
+            ]
         end
 
       assert expected == tokens
@@ -271,27 +286,42 @@ defmodule Credo.Code.TokenTest do
       tokens = Credo.Code.to_tokens(source)
 
       expected =
-        if Version.match?(System.version(), ">= 1.14.0-dev") do
-          [
-            {:%{}, {1, 1, nil}},
-            {:"{", {1, 2, nil}},
-            {:kw_identifier, {1, 3, ~c"some_atom_with_quotes"}, :some_atom_with_quotes},
-            {:bin_string, {1, 26, nil},
-             [
-               {{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, ~c"filename"}, :filename}]},
-               " world"
-             ]},
-            {:"}", {1, 45, nil}}
-          ]
-        else
-          [
-            {:%{}, {1, 1, nil}},
-            {:"{", {1, 2, nil}},
-            {:kw_identifier, {1, 3, nil}, :some_atom_with_quotes},
-            {:bin_string, {1, 26, nil},
-             [{{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, nil}, :filename}]}, " world"]},
-            {:"}", {1, 45, nil}}
-          ]
+        cond do
+          Version.match?(System.version(), ">= 1.17.0-rc.0") ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 1, nil}},
+              {:kw_identifier, {1, 3, ~c"some_atom_with_quotes"}, :some_atom_with_quotes},
+              {:bin_string, {1, 26, nil},
+               [
+                 {{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, ~c"filename"}, :filename}]},
+                 " world"
+               ]},
+              {:"}", {1, 45, nil}}
+            ]
+
+          Version.match?(System.version(), ">= 1.14.0-dev") ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 2, nil}},
+              {:kw_identifier, {1, 3, ~c"some_atom_with_quotes"}, :some_atom_with_quotes},
+              {:bin_string, {1, 26, nil},
+               [
+                 {{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, ~c"filename"}, :filename}]},
+                 " world"
+               ]},
+              {:"}", {1, 45, nil}}
+            ]
+
+          true ->
+            [
+              {:%{}, {1, 1, nil}},
+              {:"{", {1, 2, nil}},
+              {:kw_identifier, {1, 3, nil}, :some_atom_with_quotes},
+              {:bin_string, {1, 26, nil},
+               [{{1, 27, nil}, {1, 37, nil}, [{:identifier, {1, 29, nil}, :filename}]}, " world"]},
+              {:"}", {1, 45, nil}}
+            ]
         end
 
       assert expected == tokens
