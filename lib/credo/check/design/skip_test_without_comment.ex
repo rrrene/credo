@@ -3,7 +3,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
     id: "EX2003",
     base_priority: :normal,
     param_defaults: [
-      files: %{included: ["test/**/*_test.exs"]}
+      files: %{included: ["**/*_test.exs"]}
     ],
     explanations: [
       check: """

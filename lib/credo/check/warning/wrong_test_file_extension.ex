@@ -3,7 +3,7 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
     id: "EX5025",
     base_priority: :high,
     param_defaults: [
-      files: %{included: ["test/**/*_test.ex"]}
+      files: %{included: ["**/*_test.ex"]}
     ],
     explanations: [
       check: """

@@ -3,7 +3,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     id: "EX4031",
     base_priority: :normal,
     param_defaults: [
-      files: %{included: ["test/**/*_test.exs"]}
+      files: %{included: ["**/*_test.exs"]}
     ],
     explanations: [
       check: """
