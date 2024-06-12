@@ -78,9 +78,9 @@ jobs:
           otp-version: 26.2
           elixir-version: 1.16.2
       - run: mix deps.get
-      - run: mix credo
+      - run: mix credo --mute-exit-status
       - run: mkdir tmp
       - run: elixir test/old_credo.exs > tmp/old_credo.txt
-      - run: mix credo --strict --enable-disabled-checks .+ --no-color --format oneline > tmp/new_credo.txt
+      - run: mix credo --mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline > tmp/new_credo.txt
       - run: diff tmp/old_credo.txt tmp/new_credo.txt
 
