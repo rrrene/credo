@@ -80,6 +80,7 @@ jobs:
       - run: mix deps.get
       - run: mix credo --mute-exit-status
       - run: mkdir tmp
+      - run: elixir test/old_credo.exs
       - run: elixir test/old_credo.exs > tmp/old_credo.txt
       - run: mix credo --mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline > tmp/new_credo.txt
       - run: diff tmp/old_credo.txt tmp/new_credo.txt
