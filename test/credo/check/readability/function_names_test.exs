@@ -115,7 +115,7 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report expected code for private multi letter sigils /2" do
+  test "it should NOT report expected code for private multi letter sigils" do
     """
     defp sigil_ZZO(input, args) do
       # ...
