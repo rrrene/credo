@@ -84,7 +84,7 @@ defmodule Credo.Check.Warning.MixEnv do
   defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
-      message: "There should be no calls to Mix.env in application code.",
+      message: "There should be no calls to `Mix.env` in application code.",
       trigger: "Mix.env",
       line_no: meta[:line],
       column: meta[:column]
