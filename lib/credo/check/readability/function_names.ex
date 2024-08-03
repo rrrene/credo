@@ -66,7 +66,7 @@ defmodule Credo.Check.Readability.FunctionNames do
            _issue_meta,
            _allow_acronyms?
          )
-         when op in [:def, :defmacro] do
+         when op in [:def, :defmacro, :defmacrop] do
       {ast, issues}
     end
 
@@ -77,7 +77,7 @@ defmodule Credo.Check.Readability.FunctionNames do
            _issue_meta,
            _allow_acronyms?
          )
-         when op in [:def, :defmacro] do
+         when op in [:def, :defmacro, :defmacrop] do
       {ast, issues}
     end
   end
