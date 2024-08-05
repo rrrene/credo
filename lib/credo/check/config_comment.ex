@@ -1,6 +1,6 @@
 defmodule Credo.Check.ConfigComment do
   @moduledoc """
-  `ConfigComment` structs represent comments which follow control Credo's behaviour.
+  `ConfigComment` structs represent comments which control Credo's behaviour.
 
   The following comments are supported:
 
