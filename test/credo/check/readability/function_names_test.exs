@@ -63,6 +63,9 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     def sigil_O(input, args) do
       # ...
     end
+    def sigil_o(input, args) do
+      # ...
+    end
     defmacro sigil_U({:<<>>, _, [string]}, []) do
       # ...
     end
@@ -77,7 +80,27 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report expected code for multi letter sigils /5" do
+  test "it should NOT report expected code /6" do
+    """
+    defp sigil_O(input, args) do
+      # ...
+    end
+    defp sigil_p(input, args) do
+      # ...
+    end
+    defmacrop sigil_U({:<<>>, _, [string]}, []) do
+      # ...
+    end
+    defmacrop sigil_U({:<<>>, _, [string]}, []) when is_binary(string) do
+      # ...
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report expected code for multi letter sigils" do
     """
     def sigil_ZZO(input, args) do
       # ...
@@ -86,6 +109,23 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
       # ...
     end
     defmacro sigil_ZZU({:<<>>, _, [string]}, []) when is_binary(string) do
+      # ...
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report expected code for private multi letter sigils" do
+    """
+    defp sigil_ZZO(input, args) do
+      # ...
+    end
+    defmacrop sigil_ZZU({:<<>>, _, [string]}, []) do
+      # ...
+    end
+    defmacrop sigil_ZZU({:<<>>, _, [string]}, []) when is_binary(string) do
       # ...
     end
     """
