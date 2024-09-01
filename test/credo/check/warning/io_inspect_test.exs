@@ -20,6 +20,19 @@ defmodule Credo.Check.Warning.IoInspectTest do
     |> refute_issues()
   end
 
+  test "it should NOT report Inspect/3" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1) do
+        IO.inspect(:stderr, parameter1, [])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
