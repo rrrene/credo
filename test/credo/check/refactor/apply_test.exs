@@ -44,6 +44,17 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
+
+    """
+    defmodule Test do
+      def some_function(fun, args) do
+        apply(fun, [:foo, :bar | args])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
   end
 
   test "it should NOT report violation for apply/3" do
@@ -76,7 +87,18 @@ defmodule Credo.Check.Refactor.ApplyTest do
     """
     defmodule Test do
       def some_function(module, fun, args) do
-        apply(fun, [:foo | args])
+        apply(module, fun, [:foo | args])
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+
+    """
+    defmodule Test do
+      def some_function(module, fun, args) do
+        apply(module, fun, [:foo, :bar | args])
       end
     end
     """

@@ -55,16 +55,21 @@ defmodule Credo.Check.Refactor.Apply do
   defp issue({:apply, _meta, [{:__MODULE__, _, _}, _fun, _args]}, _issue_meta), do: nil
 
   defp issue({:apply, meta, [fun, args]}, issue_meta) do
-    do_issue(:apply2, fun, args, meta, issue_meta)
+    issue(:apply2, fun, args, meta, issue_meta)
   end
 
   defp issue({:apply, meta, [_module, fun, args]}, issue_meta) do
-    do_issue(:apply3, fun, args, meta, issue_meta)
+    issue(:apply3, fun, args, meta, issue_meta)
   end
 
   defp issue(_ast, _issue_meta), do: nil
 
-  defp do_issue(_apply, _fun, [{:|, _, _}], _meta, _issue_meta), do: nil
+  defp issue(tag, fun, args, meta, issue_meta) do
+    args = if(is_list(args), do: Enum.reverse(args), else: args)
+    do_issue(tag, fun, args, meta, issue_meta)
+  end
+
+  defp do_issue(_apply, _fun, [{:|, _, _} | _], _meta, _issue_meta), do: nil
 
   defp do_issue(:apply2, {name, _meta, nil}, args, meta, issue_meta)
        when is_atom(name) and is_list(args) do
