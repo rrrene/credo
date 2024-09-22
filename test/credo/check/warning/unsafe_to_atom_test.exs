@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S"""
     defmodule CredoSampleModule do
       @test_module_attribute String.to_atom("foo")
       @test_module_attribute2 Jason.decode("", keys: :atoms)
@@ -35,6 +35,10 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
 
       def convert_erlang_binary(parameter) do
         :erlang.binary_to_existing_atom(parameter, :utf8)
+      end
+
+      for n <- 1..4 do
+        def unquote(:"fun_#{n}")(), do: unquote(n)
       end
     end
     """
