@@ -16,23 +16,24 @@ defmodule Credo.Check.Warning.IoInspect do
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
-
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, meta, [:"Elixir", :IO]}, :inspect]}, _, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:"Elixir", :IO]}, :inspect]}, _, args} = ast,
          issues,
          issue_meta
-       ) do
+       )
+       when length(args) < 3 do
     {ast, issues_for_call(meta, "Elixir.IO.inspect", issues, issue_meta)}
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, meta, [:IO]}, :inspect]}, _meta, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:IO]}, :inspect]}, _, args} = ast,
          issues,
          issue_meta
-       ) do
+       )
+       when length(args) < 3 do
     {ast, issues_for_call(meta, "IO.inspect", issues, issue_meta)}
   end
 
