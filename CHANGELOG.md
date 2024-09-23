@@ -3,7 +3,7 @@
 ## 1.7.7
 
 - Fix compatibility & compiler warnings with Elixir 1.17
-- `Credo.Check.Design.SkipTestWithoutComment`, `Credo.Check.Refactor.PassAsyncInTestCases` and `Credo.Check.Warning.WrongTestFileExtension` now work for umrella apps
+- `Credo.Check.Design.SkipTestWithoutComment`, `Credo.Check.Refactor.PassAsyncInTestCases` and `Credo.Check.Warning.WrongTestFileExtension` now work for umbrella apps
 
 ## 1.7.6
 
