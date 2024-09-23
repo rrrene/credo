@@ -52,6 +52,11 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     {nil, issues}
   end
 
+  # module.unquote(:"some_atom")
+  defp traverse({{:., _, [_, :unquote]}, _, [_ | _] = _args}, issues, _) do
+    {nil, issues}
+  end
+
   defp traverse(
          {:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast,
          issues,

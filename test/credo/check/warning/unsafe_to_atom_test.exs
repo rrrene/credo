@@ -35,6 +35,8 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
 
       def convert_erlang_binary(parameter) do
         :erlang.binary_to_existing_atom(parameter, :utf8)
+
+        unquote(context).unquote(:"get_#{type}_by")(id: id)
       end
 
       for n <- 1..4 do
