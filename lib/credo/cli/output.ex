@@ -33,7 +33,7 @@ defmodule Credo.CLI.Output do
   end
 
   def check_tag(check_mod, in_parens) do
-    check_mod.category()
+    check_mod.category
     |> to_string
     |> check_tag(in_parens)
   end
