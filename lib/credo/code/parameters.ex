@@ -15,6 +15,9 @@ defmodule Credo.Code.Parameters do
         {_atom, _meta, nil} ->
           0
 
+        {:when, _when_meta, [{_fun, _meta, args} | _guards]} ->
+          length(args || [])
+
         {_atom, _meta, list} ->
           Enum.count(list)
 

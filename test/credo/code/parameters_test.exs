@@ -146,6 +146,32 @@ defmodule Credo.Code.ParametersTest do
     assert 2 == Parameters.count(ast)
   end
 
+  test "returns the correct paramter counts for a function with a guard condition" do
+    {:ok, ast} =
+      """
+      def foobar(a, b, c, d) when is_integer(a), do: :ok
+      """
+      |> Code.string_to_quoted()
+
+    assert 4 == Parameters.count(ast)
+
+    {:ok, ast} =
+      """
+      def foobar(a, b, c, d, e) when is_integer(a) and is_map(b), do: :ok
+      """
+      |> Code.string_to_quoted()
+
+    assert 5 == Parameters.count(ast)
+
+    {:ok, ast} =
+      """
+      def foobar when is_integer(@a), do: :ok
+      """
+      |> Code.string_to_quoted()
+
+    assert 0 == Parameters.count(ast)
+  end
+
   test "returns the correct parameter counts for ASTs" do
     ast =
       {:def, [line: 2],
