@@ -336,6 +336,20 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     assert rounded_abc_size(source) == 3
   end
 
+  test "it should NOT count pin operators (^) for abc size" do
+    source = """
+      def test(param, foo) do
+        case param do
+          ^foo -> foo.bar
+          "bar" -> bar.baz
+          "baz" -> bux.bus
+        end
+      end
+    """
+
+    assert rounded_abc_size(source) == 6
+  end
+
   test "it should NOT count functions given to ignore for abc size" do
     source = """
     def fun() do

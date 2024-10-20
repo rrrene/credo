@@ -27,7 +27,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
-  @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}]
+  @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}, :^]
 
   @doc false
   @impl true
