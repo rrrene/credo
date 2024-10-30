@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         otp: [24.3, 25.3, 26.2]
-        elixir: [1.13.4, 1.14.5, 1.15.7, 1.16.2, 1.17.0-rc.0]
+        elixir: [1.13.4, 1.14.5, 1.15.7, 1.16.2, 1.17.3]
         exclude:
           - elixir: 1.13.4
             otp: 26.2
@@ -34,7 +34,7 @@ jobs:
             otp: 24.3
           - elixir: 1.16.2
             otp: 24.3
-          - elixir: 1.17.0-rc.0
+          - elixir: 1.17.3
             otp: 24.3
 
     steps:
