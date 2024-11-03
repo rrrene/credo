@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.9
+
+- `Credo.Check.Refactor.ABCSize` fixed false positive for pin operator (`^`)
+- `Credo.Check.Readability.FunctionNames` fixed false positive for pow operator (`**`)
+- Fixed a bug in `Credo.Code.Parameters` when couting parameters for functions with guards
+
 ## 1.7.8
 
 - `Credo.Check.Refactor.Apply` fixed false positive
