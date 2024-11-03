@@ -219,4 +219,21 @@ defmodule Credo.Check.Warning.DbgTest do
       assert issue.trigger == "dbg"
     end)
   end
+
+  test "it should report a violation /11" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        params
+        |> tap(&dbg/1)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 4
+      assert issue.trigger == "dbg/1"
+    end)
+  end
 end
