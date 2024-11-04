@@ -71,7 +71,7 @@ defmodule Credo.Check.Params do
 
   @doc false
   def category(params, check_mod) do
-    params[:__category__] || params[:category] || check_mod.category
+    params[:__category__] || params[:category] || check_mod.category()
   end
 
   @doc false
