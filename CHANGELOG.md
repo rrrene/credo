@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.10
+
+- Maintenance release
+
 ## 1.7.9
 
 - `Credo.Check.Refactor.ABCSize` fixed false positive for pin operator (`^`)
