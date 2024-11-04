@@ -50,7 +50,7 @@ defmodule Credo.CLI.Command.Help do
         |> to_string
         |> String.pad_trailing(@ljust)
 
-      case module.short_description do
+      case module.short_description() do
         nil ->
           UI.puts("  #{padded_name}")
 
