@@ -49,4 +49,5 @@ jobs:
       - run: mix deps.compile
       - run: mix compile --warnings-as-errors
       - run: mix test
+      - run: ./test/runtime_warnings.sh
       - run: ./test/smoke_test.sh
