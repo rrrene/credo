@@ -66,6 +66,20 @@ jobs:
       - run: mix deps.get
       - run: ASSERT_TRIGGERS=1 mix test
 
+  no_deps_compiler_warnings:
+    name: "compiling deps shows no compiler warnings (optional)"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 26.2
+          elixir-version: 1.17.3
+      - run: mix deps.get
+      - run: mix deps.compile 2>&1 | ./test/error_if_warnings.sh
+
   compare_to_latest_credo:
     name: "resulting issues are still the same (optional)"
     runs-on: ubuntu-20.04
