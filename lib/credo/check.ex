@@ -707,7 +707,7 @@ defmodule Credo.Check do
 
     priority = Priority.to_integer(issue_priority)
 
-    exit_status_or_category = Params.exit_status(params, check) || issue_category
+    exit_status_or_category = opts[:exit_status] || Params.exit_status(params, check) || issue_category
     exit_status = Check.to_exit_status(exit_status_or_category)
 
     line_no = opts[:line_no]
