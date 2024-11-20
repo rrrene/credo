@@ -52,4 +52,43 @@ defmodule Credo.CheckTest do
 
     assert Credo.Check.Readability.ModuleDoc.id() == "EX3009"
   end
+
+  defmodule MyCustomCheck1 do
+    use Credo.Check, category: :example, base_priority: :high
+
+    def run(%SourceFile{} = source_file, params \\ []) do
+      issue_meta = IssueMeta.for(source_file, params)
+
+      [
+        format_issue(issue_meta,
+          priority: 113,
+          trigger: :foobar,
+          line_no: 3,
+          column: 15,
+          exit_status: 23,
+          severity: 11
+        )
+      ]
+    end
+  end
+
+  test "it should use format_issue/2" do
+    """
+    defmodule AliasTest do
+      def test do
+        Any.Thing.foobar()
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(MyCustomCheck1)
+    |> assert_issue(fn issue ->
+      assert issue.priority == 113
+      assert issue.trigger == "foobar"
+      assert issue.line_no == 3
+      assert issue.column == 15
+      assert issue.exit_status == 23
+      assert issue.severity == 11
+    end)
+  end
 end

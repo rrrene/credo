@@ -707,7 +707,9 @@ defmodule Credo.Check do
 
     priority = Priority.to_integer(issue_priority)
 
-    exit_status_or_category = opts[:exit_status] || Params.exit_status(params, check) || issue_category
+    exit_status_or_category =
+      opts[:exit_status] || Params.exit_status(params, check) || issue_category
+
     exit_status = Check.to_exit_status(exit_status_or_category)
 
     line_no = opts[:line_no]
@@ -723,6 +725,8 @@ defmodule Credo.Check do
       end
 
     %Issue{
+      check: check,
+      category: issue_category,
       priority: priority,
       filename: source_file.filename,
       message: opts[:message],
@@ -734,14 +738,15 @@ defmodule Credo.Check do
     }
     |> add_line_no_options(line_no, source_file)
     |> add_column_if_missing(trigger, line_no, column, source_file)
-    |> add_check_and_category(check, issue_category)
+    |> force_priority_if_given(opts[:priority])
   end
 
-  defp add_check_and_category(issue, check, issue_category) do
+  defp force_priority_if_given(issue, nil), do: issue
+
+  defp force_priority_if_given(issue, priority) do
     %Issue{
       issue
-      | check: check,
-        category: issue_category
+      | priority: priority
     }
   end
 
