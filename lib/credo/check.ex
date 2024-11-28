@@ -693,19 +693,12 @@ defmodule Credo.Check do
   - `:severity`     Sets the issue's severity.
   """
   def format_issue(issue_meta, opts, check) do
+    source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
     issue_category = Params.category(params, check)
     issue_base_priority = Params.priority(params, check)
 
-    format_issue(issue_meta, opts, issue_category, issue_base_priority, check)
-  end
-
-  @doc false
-  def format_issue(issue_meta, opts, issue_category, issue_priority, check) do
-    source_file = IssueMeta.source_file(issue_meta)
-    params = IssueMeta.params(issue_meta)
-
-    priority = Priority.to_integer(issue_priority)
+    priority = Priority.to_integer(issue_base_priority)
 
     exit_status_or_category =
       opts[:exit_status] || Params.exit_status(params, check) || issue_category
