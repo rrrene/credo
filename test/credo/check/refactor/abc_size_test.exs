@@ -367,4 +367,24 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
 
     assert rounded_abc_size(source, ["where", "join", "select", "distinct"]) == 1
   end
+
+  test "it should return the same ABC size for equivalently complex code" do
+    source1 = """
+    def call(ast) do
+      if match?({:fn, _meta, _args}, ast) do
+        # ...
+      end
+    end
+    """
+
+    source2 = """
+    def call(ast) do
+      if {:fn, _meta, _args} = ast do
+        # ...
+      end
+    end
+    """
+
+    assert rounded_abc_size(source1) == rounded_abc_size(source2)
+  end
 end

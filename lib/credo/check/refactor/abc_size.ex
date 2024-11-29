@@ -27,7 +27,7 @@ defmodule Credo.Check.Refactor.ABCSize do
   @def_ops [:def, :defp, :defmacro]
   @branch_ops [:.]
   @condition_ops [:if, :unless, :for, :try, :case, :cond, :and, :or, :&&, :||]
-  @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}, :^]
+  @non_calls [:==, :fn, :__aliases__, :__block__, :if, :or, :|>, :%{}, :{}, :^]
 
   @doc false
   @impl true
@@ -223,7 +223,9 @@ defmodule Credo.Check.Refactor.ABCSize do
          [a: a, b: b, c: c, var_names: var_names],
          _excluded_functions
        ) do
-    is_variable = Enum.member?(var_names, fun_or_var_name)
+    is_variable =
+      Enum.member?(var_names, fun_or_var_name) ||
+        String.starts_with?(to_string(fun_or_var_name), "_")
 
     if is_variable do
       {ast, [a: a, b: b, c: c, var_names: var_names]}
