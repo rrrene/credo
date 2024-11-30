@@ -691,14 +691,13 @@ defmodule Credo.Check do
   - `:column`       Sets the issue's column.
   - `:exit_status`  Sets the issue's exit_status.
   - `:severity`     Sets the issue's severity.
+  - `:category`     Sets the issue's category.
   """
   def format_issue(issue_meta, opts, check) do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
-    issue_category = Params.category(params, check)
-    issue_base_priority = Params.priority(params, check)
-
-    priority = Priority.to_integer(issue_base_priority)
+    issue_category = opts[:category] || Params.category(params, check)
+    priority = params |> Params.priority(check) |> Priority.to_integer()
 
     exit_status_or_category =
       opts[:exit_status] || Params.exit_status(params, check) || issue_category
