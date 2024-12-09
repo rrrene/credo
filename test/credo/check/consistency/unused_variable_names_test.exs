@@ -286,6 +286,36 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     end)
   end
 
+  test "it should report a violation for different naming schemes with a macro (expects meaningful)" do
+    [
+      """
+      defmodule Credo.SampleOne do
+        defmodule Foo do
+          defmacro __using__(_) do
+          end
+        end
+
+        def bar(_opts) do
+        end
+      end
+      """,
+      """
+      defmodule Credo.SampleTwo do
+        defmodule Foo do
+          defmacrop bar(_opts) do
+          end
+        end
+      end
+      """
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert "_" == issue.trigger
+      assert 3 == issue.line_no
+    end)
+  end
+
   test "it should report a violation for naming schemes other than the forced one" do
     [
       """

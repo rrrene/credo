@@ -22,7 +22,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
   end
 
   defp traverse(callback, {def, _, [{_, _, params} | _]} = ast, acc)
-       when def in [:def, :defp] do
+       when def in [:def, :defp, :defmacro, :defmacrop] do
     {ast, reduce_unused_variables(params, callback, acc)}
   end
 
