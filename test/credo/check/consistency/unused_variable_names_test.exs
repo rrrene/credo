@@ -254,7 +254,41 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     end)
   end
 
-  test "it should report a violation for different naming schemes with a list (expects meaningful)" do
+  test "it should report a violation for different naming schemes with a map match (expects meaningful)" do
+    [
+      """
+      defmodule Credo.SampleOne do
+        defmodule Foo do
+          def bar(%{a: _a, b: _b, c: _}) do
+            :ok
+          end
+        end
+      end
+      """,
+      """
+      defmodule Credo.SampleTwo do
+        defmodule Foo do
+          def bar(map) do
+            case map do
+              %{a: _} -> :ok
+              _map -> :error
+            end
+          end
+        end
+      end
+      """
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
+      assert length(issues) == 2
+
+      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 3}, &1))
+      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 5}, &1))
+    end)
+  end
+
+  test "it should report a violation for different naming schemes with a list match (expects meaningful)" do
     [
       """
       defmodule Credo.SampleOne do

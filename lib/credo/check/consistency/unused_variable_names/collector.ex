@@ -39,16 +39,14 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
       {_, _, params}, param_acc when is_list(params) ->
         reduce_unused_variables(params, callback, param_acc)
 
-      # two elements tuple
-      {left, right}, param_acc ->
-        reduce_unused_variables([left, right], callback, param_acc)
+      tuple_ast, param_acc when tuple_size(tuple_ast) == 2 ->
+        reduce_unused_variables(Tuple.to_list(tuple_ast), callback, param_acc)
 
       list_ast, param_acc when is_list(list_ast) ->
         reduce_unused_variables(list_ast, callback, param_acc)
 
       param_ast, param_acc ->
         if unused_variable_ast?(param_ast) do
-          IO.inspect(param_ast, label: :param_ast)
           callback.(param_ast, param_acc)
         else
           param_acc
