@@ -221,7 +221,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     end)
   end
 
-  test "it should report a violation for different naming schemes with two elem tuple match (expects meaningful)" do
+  test "it should report a violation for different naming schemes in a two elem tuple match (expects meaningful)" do
     [
       """
       defmodule Credo.SampleOne do
@@ -251,6 +251,38 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
       assert Enum.find(issues, &match?(%{trigger: "_", line_no: 5}, &1))
       assert Enum.find(issues, &match?(%{trigger: "_", line_no: 4}, &1))
+    end)
+  end
+
+  test "it should report a violation for different naming schemes with a list (expects meaningful)" do
+    [
+      """
+      defmodule Credo.SampleOne do
+        defmodule Foo do
+          def bar(list) do
+            case list do
+              [] -> :empty
+              [head | _] -> head
+            end
+          end
+        end
+      end
+      """,
+      """
+      defmodule Credo.SampleTwo do
+        defmodule Foo do
+          def bar([_a, _b | rest]) do
+            rest
+          end
+        end
+      end
+      """
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert "_" == issue.trigger
+      assert 6 == issue.line_no
     end)
   end
 
