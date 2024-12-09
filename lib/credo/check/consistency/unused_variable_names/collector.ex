@@ -17,7 +17,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
     |> Enum.reverse()
   end
 
-  defp traverse(callback, {:=, _, params} = ast, acc) do
+  defp traverse(callback, {match, _, params} = ast, acc) when match in ~w[= <-]a do
     {ast, reduce_unused_variables(params, callback, acc)}
   end
 
@@ -38,6 +38,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
     Enum.reduce(ast, acc, fn
       {_, _, params}, param_acc when is_list(params) ->
         reduce_unused_variables(params, callback, param_acc)
+
+      # two elements tuple
+      {left, right}, param_acc ->
+        reduce_unused_variables([left, right], callback, param_acc)
 
       param_ast, param_acc ->
         if unused_variable_ast?(param_ast) do
