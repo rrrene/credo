@@ -224,10 +224,10 @@ defmodule Credo.Code.TokenTest do
       assert @heredoc_interpolations_position == position
     end
 
-    if Version.match?(System.version(), ">= 1.13.0") do
-      @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}
+    if Version.match?(System.version(), ">= 1.18.0-rc.0") do
+      @kw_identifier_token {:kw_identifier, {1, 3, 34}, :"some-atom-with-quotes"}
     else
-      @kw_identifier_token {:kw_identifier_unsafe, {1, 3, nil}, ["some-atom-with-quotes"]}
+      @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}
     end
 
     @tag needs_elixir: "1.7.0"
