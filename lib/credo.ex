@@ -11,7 +11,7 @@ defmodule Credo do
   alias Credo.Execution
   alias Credo.Execution.Task.WriteDebugReport
 
-  @version Mix.Project.config()[:version] |> Credo.BuildInfo.version()
+  @version Mix.Project.config()[:version]
 
   @doc """
   Runs Credo with the given `argv` and returns its final `Credo.Execution` struct.
