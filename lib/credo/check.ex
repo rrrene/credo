@@ -457,11 +457,7 @@ defmodule Credo.Check do
 
       defoverridable Credo.Check
 
-      defp append_issues_and_timings([] = _issues, exec) do
-        exec
-      end
-
-      defp append_issues_and_timings([_ | _] = issues, exec) do
+      defp append_issues_and_timings(issues, exec) do
         Credo.Execution.ExecutionIssues.append(exec, issues)
       end
     end
