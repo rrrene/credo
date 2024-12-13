@@ -53,6 +53,21 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> refute_issues()
   end
 
+  test "it should NOT report modules or submodules when @moduledoc is present" do
+    """
+    defmodule Foo do
+      @moduledoc false
+
+      defmodule Bar do
+        @moduledoc false
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -67,6 +82,20 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report modules when @moduledoc is present in submodules only" do
+    """
+    defmodule Foo do
+      # distinctly no moduledoc here
+      defmodule Bar do
+        @moduledoc false
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
     |> assert_issue()
   end
 
