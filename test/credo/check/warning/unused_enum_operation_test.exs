@@ -145,6 +145,21 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation when inside an anon function call" do
+    """
+    defmodule CredoSampleModule do
+      def fun(anon_func) do
+        anon_func.(Enum.random(1..10))
+
+        :ok
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation when inside of assignment" do
     """
     defmodule CredoSampleModule do
