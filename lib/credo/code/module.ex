@@ -74,6 +74,25 @@ defmodule Credo.Code.Module do
   end
 
   @doc "Reads an attribute from a module's `ast`"
+  def attribute({:defmodule, _, _arguments} = ast, attr_name) do
+    arguments =
+      case Credo.Code.Block.do_block_for!(ast) do
+        {:__block__, [], arguments} -> arguments
+        value -> List.wrap(value)
+      end
+
+    attr_value =
+      Enum.find_value(arguments, fn
+        {:@, _meta, [{^attr_name, _, [value]} | _tail]} -> {:ok, value}
+        _ -> nil
+      end)
+
+    case attr_value do
+      {:ok, value} -> value
+      error -> {:error, error}
+    end
+  end
+
   def attribute(ast, attr_name) do
     case Credo.Code.postwalk(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
       {:ok, value} ->
