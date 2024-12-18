@@ -145,6 +145,22 @@ defmodule Credo.Test.Case do
 
   @doc """
   Asserts the presence of a single issue.
+
+  This is useful for saying "in this snippet, there is exactly one issue":
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue()
+
+  If `callback` is given, calls it with the found issue:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue(fn issue ->
+        assert issue.line_no == 3
+        assert issue.trigger == "foo"
+      end)
+
   """
   def assert_issue(issues, callback \\ nil) do
     Assertions.assert_issue(issues, callback)
@@ -152,6 +168,21 @@ defmodule Credo.Test.Case do
 
   @doc """
   Asserts the presence of more than one issue.
+
+  This is useful for saying "in this snippet, there is more than one issue":
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues()
+
+  If `callback` is given, calls it with the found issues:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues(fn issues ->
+        assert Enum.count(issues) == 3
+      end)
+
   """
   def assert_issues(issues, callback \\ nil) do
     Assertions.assert_issues(issues, callback)
