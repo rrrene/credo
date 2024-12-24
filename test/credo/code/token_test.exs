@@ -224,7 +224,7 @@ defmodule Credo.Code.TokenTest do
       assert @heredoc_interpolations_position == position
     end
 
-    if Version.match?(System.version(), ">= 1.18.0-rc.0") do
+    if Version.match?(System.version(), ">= 1.18.0-dev") do
       @kw_identifier_token {:kw_identifier, {1, 3, 34}, :"some-atom-with-quotes"}
     else
       @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}

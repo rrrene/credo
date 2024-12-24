@@ -27,349 +27,174 @@ defmodule Credo.Code.TokenAstCorrelationTest do
   end
   """
 
-  if Version.match?(System.version(), ">= 1.13.0") do
-    test "should give correct ast for source_example1" do
-      source = @source_example1
-      {:ok, ast} = Credo.Code.ast(source)
+  test "should give correct ast for source_example1" do
+    source = @source_example1
+    {:ok, ast} = Credo.Code.ast(source)
 
-      expected = {
-        :defmodule,
-        [line: 1, column: 1],
+    expected = {
+      :defmodule,
+      [line: 1, column: 1],
+      [
+        {
+          :__aliases__,
+          [line: 1, column: 11],
+          [:Credo, :Sample]
+        },
         [
-          {
-            :__aliases__,
-            [line: 1, column: 11],
-            [:Credo, :Sample]
-          },
-          [
-            do: {
-              :__block__,
-              ~c"",
-              [
-                {
-                  :@,
-                  [line: 2, column: 3],
-                  [
-                    {
-                      :test_attribute,
-                      [line: 2, column: 4],
-                      [:foo]
-                    }
-                  ]
-                },
-                {
-                  :def,
-                  [line: 4, column: 3],
-                  [
-                    {
-                      :foobar,
-                      [line: 4, column: 7],
-                      [
-                        {
-                          :parameter,
-                          [line: 4, column: 14],
-                          nil
-                        }
-                      ]
-                    },
+          do: {
+            :__block__,
+            ~c"",
+            [
+              {
+                :@,
+                [line: 2, column: 3],
+                [
+                  {
+                    :test_attribute,
+                    [line: 2, column: 4],
+                    [:foo]
+                  }
+                ]
+              },
+              {
+                :def,
+                [line: 4, column: 3],
+                [
+                  {
+                    :foobar,
+                    [line: 4, column: 7],
                     [
-                      do: {
-                        :+,
-                        [line: 5, column: 29],
-                        [
-                          {
-                            {
-                              :.,
-                              [line: 5, column: 11],
-                              [
-                                {
-                                  :__aliases__,
-                                  [line: 5, column: 5],
-                                  [:String]
-                                },
-                                :split
-                              ]
-                            },
-                            [line: 5, column: 12],
-                            [
-                              {
-                                :parameter,
-                                [line: 5, column: 18],
-                                nil
-                              }
-                            ]
-                          },
-                          {
-                            :parameter,
-                            [line: 5, column: 31],
-                            nil
-                          }
-                        ]
+                      {
+                        :parameter,
+                        [line: 4, column: 14],
+                        nil
                       }
                     ]
-                  ]
-                },
-                {
-                  :defmodule,
-                  [line: 8, column: 3],
+                  },
                   [
-                    {
-                      :__aliases__,
-                      [line: 8, column: 13],
-                      [:InlineModule]
-                    },
-                    [
-                      do: {
-                        :def,
-                        [line: 9, column: 5],
-                        [
-                          {
-                            :when,
-                            [line: 9, column: 19],
-                            [
-                              {
-                                :foobar,
-                                [line: 9, column: 9],
-                                [
-                                  {
-                                    :v,
-                                    [line: 9, column: 16],
-                                    nil
-                                  }
-                                ]
-                              },
-                              {
-                                :is_atom,
-                                [line: 9, column: 24],
-                                [
-                                  {
-                                    :v,
-                                    [line: 9, column: 32],
-                                    nil
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          [
-                            do: {
-                              :=,
-                              [line: 10, column: 13],
-                              [
-                                {
-                                  :{},
-                                  [line: 10, column: 7],
-                                  [:ok]
-                                },
-                                {
-                                  {
-                                    :.,
-                                    [line: 10, column: 19],
-                                    [
-                                      {
-                                        :__aliases__,
-                                        [line: 10, column: 15],
-                                        [:File]
-                                      },
-                                      :read
-                                    ]
-                                  },
-                                  [
-                                    {:no_parens, true},
-                                    {:line, 10},
-                                    {:column, 20}
-                                  ],
-                                  ~c""
-                                }
-                              ]
-                            }
-                          ]
-                        ]
-                      }
-                    ]
-                  ]
-                }
-              ]
-            }
-          ]
-        ]
-      }
-
-      assert expected == ast
-    end
-  end
-
-  # Elixir >= 1.10.0 and < 1.13.0
-  if Version.match?(System.version(), ">= 1.10.0 and < 1.13.0") do
-    test "should give correct ast for source_example1" do
-      source = @source_example1
-      {:ok, ast} = Credo.Code.ast(source)
-
-      expected = {
-        :defmodule,
-        [line: 1, column: 1],
-        [
-          {
-            :__aliases__,
-            [line: 1, column: 11],
-            [:Credo, :Sample]
-          },
-          [
-            do: {
-              :__block__,
-              ~c"",
-              [
-                {
-                  :@,
-                  [line: 2, column: 3],
-                  [
-                    {
-                      :test_attribute,
-                      [line: 2, column: 4],
-                      [:foo]
-                    }
-                  ]
-                },
-                {
-                  :def,
-                  [line: 4, column: 3],
-                  [
-                    {
-                      :foobar,
-                      [line: 4, column: 7],
+                    do: {
+                      :+,
+                      [line: 5, column: 29],
                       [
                         {
-                          :parameter,
-                          [line: 4, column: 14],
-                          nil
-                        }
-                      ]
-                    },
-                    [
-                      do: {
-                        :+,
-                        [line: 5, column: 29],
-                        [
                           {
-                            {
-                              :.,
-                              [line: 5, column: 11],
-                              [
-                                {
-                                  :__aliases__,
-                                  [line: 5, column: 5],
-                                  [:String]
-                                },
-                                :split
-                              ]
-                            },
+                            :.,
                             [line: 5, column: 11],
                             [
                               {
-                                :parameter,
-                                [line: 5, column: 18],
-                                nil
-                              }
-                            ]
-                          },
-                          {
-                            :parameter,
-                            [line: 5, column: 31],
-                            nil
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                },
-                {
-                  :defmodule,
-                  [line: 8, column: 3],
-                  [
-                    {
-                      :__aliases__,
-                      [line: 8, column: 13],
-                      [:InlineModule]
-                    },
-                    [
-                      do: {
-                        :def,
-                        [line: 9, column: 5],
-                        [
-                          {
-                            :when,
-                            [line: 9, column: 19],
-                            [
-                              {
-                                :foobar,
-                                [line: 9, column: 9],
-                                [
-                                  {
-                                    :v,
-                                    [line: 9, column: 16],
-                                    nil
-                                  }
-                                ]
+                                :__aliases__,
+                                [line: 5, column: 5],
+                                [:String]
                               },
-                              {
-                                :is_atom,
-                                [line: 9, column: 24],
-                                [
-                                  {
-                                    :v,
-                                    [line: 9, column: 32],
-                                    nil
-                                  }
-                                ]
-                              }
+                              :split
                             ]
                           },
+                          [line: 5, column: 12],
                           [
-                            do: {
-                              :=,
-                              [line: 10, column: 13],
+                            {
+                              :parameter,
+                              [line: 5, column: 18],
+                              nil
+                            }
+                          ]
+                        },
+                        {
+                          :parameter,
+                          [line: 5, column: 31],
+                          nil
+                        }
+                      ]
+                    }
+                  ]
+                ]
+              },
+              {
+                :defmodule,
+                [line: 8, column: 3],
+                [
+                  {
+                    :__aliases__,
+                    [line: 8, column: 13],
+                    [:InlineModule]
+                  },
+                  [
+                    do: {
+                      :def,
+                      [line: 9, column: 5],
+                      [
+                        {
+                          :when,
+                          [line: 9, column: 19],
+                          [
+                            {
+                              :foobar,
+                              [line: 9, column: 9],
                               [
                                 {
-                                  :{},
-                                  [line: 10, column: 7],
-                                  [:ok]
-                                },
+                                  :v,
+                                  [line: 9, column: 16],
+                                  nil
+                                }
+                              ]
+                            },
+                            {
+                              :is_atom,
+                              [line: 9, column: 24],
+                              [
                                 {
-                                  {
-                                    :.,
-                                    [line: 10, column: 19],
-                                    [
-                                      {
-                                        :__aliases__,
-                                        [line: 10, column: 15],
-                                        [:File]
-                                      },
-                                      :read
-                                    ]
-                                  },
-                                  [
-                                    {:no_parens, true},
-                                    {:line, 10},
-                                    {:column, 19}
-                                  ],
-                                  ~c""
+                                  :v,
+                                  [line: 9, column: 32],
+                                  nil
                                 }
                               ]
                             }
                           ]
+                        },
+                        [
+                          do: {
+                            :=,
+                            [line: 10, column: 13],
+                            [
+                              {
+                                :{},
+                                [line: 10, column: 7],
+                                [:ok]
+                              },
+                              {
+                                {
+                                  :.,
+                                  [line: 10, column: 19],
+                                  [
+                                    {
+                                      :__aliases__,
+                                      [line: 10, column: 15],
+                                      [:File]
+                                    },
+                                    :read
+                                  ]
+                                },
+                                [
+                                  {:no_parens, true},
+                                  {:line, 10},
+                                  {:column, 20}
+                                ],
+                                ~c""
+                              }
+                            ]
+                          }
                         ]
-                      }
-                    ]
+                      ]
+                    }
                   ]
-                }
-              ]
-            }
-          ]
+                ]
+              }
+            ]
+          }
         ]
-      }
+      ]
+    }
 
-      assert expected == ast
-    end
+    assert expected == ast
   end
 
   test "should give correct result for source_example1" do
