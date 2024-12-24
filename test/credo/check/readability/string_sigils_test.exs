@@ -170,7 +170,7 @@ defmodule Credo.Check.Readability.StringSigilsTest do
   end
 
   test "doesn't crash on #729" do
-    log =
+    stderr_output =
       capture_io(:stderr, fn ->
         ~S"""
         defmodule CredoInterpolationError do
@@ -187,6 +187,6 @@ defmodule Credo.Check.Readability.StringSigilsTest do
         |> refute_issues()
       end)
 
-    assert log == ""
+    assert stderr_output == ""
   end
 end

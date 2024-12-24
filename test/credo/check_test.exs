@@ -1,6 +1,8 @@
 defmodule Credo.CheckTest do
   use Credo.Test.Case
 
+  import ExUnit.CaptureIO
+
   alias Credo.Check
 
   @generated_lines 1000
@@ -90,5 +92,28 @@ defmodule Credo.CheckTest do
       assert issue.exit_status == 23
       assert issue.severity == 11
     end)
+  end
+
+  defmodule IssueInvalidMessageTestCheck do
+    use Credo.Check
+
+    @message <<70, 111, 117, 110, 100, 32, 109, 105, 115, 115, 112, 101, 108, 108, 101, 100, 32,
+               119, 111, 114, 100, 32, 96, 103, 97, 114, 114, 121, 226, 96, 46>>
+
+    def run(%SourceFile{} = source_file, params \\ []) do
+      IssueMeta.for(source_file, params) |> format_issue(message: @message) |> List.wrap()
+    end
+  end
+
+  test "it should handle an invalid message" do
+    stderr_output =
+      capture_io(:stderr, fn ->
+        "# we do not need code, as the check is creating an issue in any case"
+        |> to_source_file
+        |> run_check(IssueInvalidMessageTestCheck)
+      end)
+
+    assert stderr_output != ""
+    assert stderr_output =~ "containing invalid bytes"
   end
 end

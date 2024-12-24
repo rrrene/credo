@@ -705,6 +705,7 @@ defmodule Credo.Check do
     column = opts[:column]
     severity = opts[:severity] || Severity.default_value()
     trigger = opts[:trigger]
+    message = to_string(opts[:message])
 
     trigger =
       if trigger == Issue.no_trigger() do
@@ -713,12 +714,23 @@ defmodule Credo.Check do
         to_string(trigger)
       end
 
+    message =
+      if String.valid?(message) do
+        message
+      else
+        IO.warn(
+          "#{check_name(check)} creates an Issue with a `:message` containing invalid bytes: #{inspect(message)}"
+        )
+
+        "(see warning) #{inspect(message)}"
+      end
+
     %Issue{
       check: check,
       category: issue_category,
       priority: priority,
       filename: source_file.filename,
-      message: opts[:message],
+      message: message,
       trigger: trigger,
       line_no: line_no,
       column: column,
@@ -763,6 +775,8 @@ defmodule Credo.Check do
       issue
     end
   end
+
+  defp check_name(module), do: Credo.Code.Name.full(module)
 
   # Returns the scope for the given line as a tuple consisting of the call to
   # define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the

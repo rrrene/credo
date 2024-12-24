@@ -344,7 +344,9 @@ defmodule Credo.Plugin do
         import Credo.Plugin
 
         def init(exec) do
-          register_cli_switch(exec, :kastle, :string, :X, fn(switch_value) ->
+          exec
+          |> register_command("demo", CredoDemoPlugin.DemoCommand)
+          |> register_cli_switch(:kastle, :string, :X, fn(switch_value) ->
             {:castle, String.upcase(switch_value)}
           end)
         end
