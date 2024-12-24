@@ -49,7 +49,7 @@ jobs:
     name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
-        otp: [23.3, 24.3, 25.3, 26.1]
+        otp: [24.3, 25.3, 26.2]
         # phx_new depends on newer versions of Elixir than Credo
         elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.0]
         exclude:
