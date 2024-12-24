@@ -68,7 +68,8 @@ defmodule Credo.CheckTest do
           line_no: 3,
           column: 15,
           exit_status: 23,
-          severity: 11
+          severity: 11,
+          category: :custom_category
         )
       ]
     end
@@ -91,6 +92,7 @@ defmodule Credo.CheckTest do
       assert issue.column == 15
       assert issue.exit_status == 23
       assert issue.severity == 11
+      assert issue.category == :custom_category
     end)
   end
 
