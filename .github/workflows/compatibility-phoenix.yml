@@ -15,7 +15,7 @@ jobs:
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
         otp: [24.3, 25.3, 26.2]
-        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.0]
+        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.1]
         exclude:
           - elixir: 1.14.5
             otp: 26.2
@@ -29,7 +29,7 @@ jobs:
             otp: 24.3
           - elixir: 1.17.3
             otp: 24.3
-          - elixir: 1.18.0
+          - elixir: 1.18.1
             otp: 24.3
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
       matrix:
         otp: [24.3, 25.3, 26.2]
         # phx_new depends on newer versions of Elixir than Credo
-        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.0]
+        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.1]
         exclude:
           - elixir: 1.14.5
             otp: 26.2
@@ -65,7 +65,7 @@ jobs:
             otp: 24.3
           - elixir: 1.17.3
             otp: 24.3
-          - elixir: 1.18.0
+          - elixir: 1.18.1
             otp: 24.3
     steps:
       - uses: actions/checkout@v4
