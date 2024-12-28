@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.11
+
+- Fix compatibility & compiler warnings with Elixir 1.18
+- Fix crashing for invalid strings in issue messages
+- Show required Elixir version for skipped checks
+- Add options `:exit_status` and `:category` to `format_issue/2` when using `Credo.Check`
+- `Credo.Check.Readability.ModuleDoc` fixed false positive
+- `Credo.Check.Warning.UnusedEnumOperation` fixed false positive
+- `Credo.Check.Refactor.ABCSize` fixed false positive for tuples and underscored matches (`_foo`)
+
 ## 1.7.10
 
 - Maintenance release
