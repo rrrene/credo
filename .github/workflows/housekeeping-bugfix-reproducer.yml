@@ -7,19 +7,15 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     name: "Test for lib/ changes"
-    strategy:
-      matrix:
-        otp: [26.2]
-        elixir: [1.16.2]
     steps:
       - uses: actions/checkout@v4
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
+          otp-version: 26.2
+          elixir-version: 1.18.1
 
       - run: git fetch origin master:master
 
