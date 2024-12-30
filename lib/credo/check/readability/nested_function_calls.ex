@@ -68,6 +68,11 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
     {nil, acc}
   end
 
+  # We don't look into @type attributes
+  defp traverse({:@, _, [{:type, _, _args}]}, acc, _issue) do
+    {nil, acc}
+  end
+
   # Any call
   defp traverse(
          {{_name, _loc, call}, meta, args} = ast,
@@ -137,7 +142,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
       :"<|>",
       :"^^^",
       :"~~~",
-      :"..//"
+      :..//
     ]
 
     def cannot_be_in_pipeline?(
