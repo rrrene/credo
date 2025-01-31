@@ -389,4 +389,18 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
              end)
     end)
   end
+
+  test "it should report a violation once" do
+    [
+      """
+      defmodule Foo do
+        def bar(["a" <> _a] = assigns), do: :ok
+        def baz(["a" <> _] = assigns), do: :ok
+      end
+      """
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
 end
