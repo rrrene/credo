@@ -62,4 +62,26 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegationTest do
       assert issue.trigger == "not not"
     end)
   end
+
+  test "it should report mixed violation '! not'" do
+    """
+    ! not true
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "! not"
+    end)
+  end
+
+  test "it should report mixed violation 'not !'" do
+    """
+    not ! true
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "not !"
+    end)
+  end
 end

@@ -45,26 +45,16 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # Checking for `!!`
-  defp traverse({:!, meta, [{:!, _, ast}]}, issues, issue_meta) do
+  @negation_operators [:!, :not]
+  defguard both_negations(a, b) when a in @negation_operators and b in @negation_operators
+
+  defp traverse({operator_a, meta, [{operator_b, _, ast}]}, issues, issue_meta)
+       when both_negations(operator_a, operator_b) do
     issue =
       format_issue(
         issue_meta,
         message: "Double boolean negation found.",
-        trigger: "!!",
-        line_no: meta[:line]
-      )
-
-    {ast, [issue | issues]}
-  end
-
-  # Checking for `not not`
-  defp traverse({:not, meta, [{:not, _, ast}]}, issues, issue_meta) do
-    issue =
-      format_issue(
-        issue_meta,
-        message: "Double boolean negation found.",
-        trigger: "not not",
+        trigger: format_trigger(operator_a, operator_b),
         line_no: meta[:line]
       )
 
@@ -74,4 +64,7 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
+
+  defp format_trigger(:!, :!), do: "!!"
+  defp format_trigger(a, b), do: Enum.join([a, b], " ")
 end
