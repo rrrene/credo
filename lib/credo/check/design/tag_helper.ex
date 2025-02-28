@@ -29,8 +29,7 @@ defmodule Credo.Check.Design.TagHelper do
       |> Credo.Code.clean_charlists_strings_and_sigils()
       |> String.split("\n")
       |> Enum.with_index()
-      |> Enum.map(&find_tag_in_line(&1, regex))
-      |> Enum.filter(&tags?/1)
+      |> Enum.flat_map(&find_tag_in_line(&1, regex))
     else
       []
     end
@@ -41,7 +40,7 @@ defmodule Credo.Check.Design.TagHelper do
     if string =~ regex do
       trimmed = String.trim_trailing(string)
 
-      {nil, memo ++ [{meta[:line], trimmed, trimmed}]}
+      {nil, memo ++ [{meta[:line], meta[:column], trimmed, trimmed}]}
     else
       {ast, memo}
     end
@@ -58,9 +57,13 @@ defmodule Credo.Check.Design.TagHelper do
       |> List.wrap()
       |> Enum.map(&String.trim/1)
 
-    {index + 1, line, List.first(tag_list)}
-  end
+    if tag = List.first(tag_list) do
+      col =
+        Regex.run(~r"(.*)#"U, line) |> List.first("") |> String.length()
 
-  defp tags?({_line_no, _line, nil}), do: false
-  defp tags?({_line_no, _line, _tag}), do: true
+      [{index + 1, col, line, tag}]
+    else
+      []
+    end
+  end
 end
