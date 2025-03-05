@@ -384,16 +384,19 @@ defmodule Credo.Check do
       @impl true
       def run_on_all_source_files(exec, source_files, params \\ [])
 
-      @impl true
-      def run_on_all_source_files(exec, source_files, params) do
-        if function_exported?(__MODULE__, :run, 3) do
+      if function_exported?(__MODULE__, :run, 3) do
+        @impl true
+        def run_on_all_source_files(exec, source_files, params) do
           IO.warn(
             "Defining `run(source_files, exec, params)` for checks that run on all source files is deprecated. " <>
               "Define `run_on_all_source_files(exec, source_files, params)` instead."
           )
 
           apply(__MODULE__, :run, [source_files, exec, params])
-        else
+        end
+      else
+        @impl true
+        def run_on_all_source_files(exec, source_files, params) do
           do_run_on_all_source_files(exec, source_files, params)
         end
       end
