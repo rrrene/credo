@@ -38,6 +38,9 @@ defmodule Credo.Execution.Task.ValidateOptions do
   defp print_switch(exec, {name, _value}), do: print_switch(exec, name)
 
   defp print_switch(exec, name) do
-    UI.warn([:red, "** (credo) Unknown switch for `#{exec.cli_options.command}` command: #{name}"])
+    UI.warn([
+      :red,
+      "** (credo) Unknown switch for `#{exec.cli_options.command}` command: #{name}"
+    ])
   end
 end

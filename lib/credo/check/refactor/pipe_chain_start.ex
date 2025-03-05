@@ -46,7 +46,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     :"<|>",
     :"^^^",
     :"~~~",
-    :"..//"
+    :..//
   ]
 
   @doc false
