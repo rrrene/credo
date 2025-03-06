@@ -14,6 +14,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
 
     source_file
     |> Credo.Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Enum.uniq()
     |> Enum.reverse()
   end
 
