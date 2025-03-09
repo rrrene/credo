@@ -77,10 +77,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
   defp record_not_matching(expected, {name, meta, _}, acc) do
     case {expected, Atom.to_string(name)} do
       {:anonymous, "_" <> rest = trigger} when rest != "" ->
-        [[line_no: meta[:line], trigger: trigger] | acc]
+        [[line_no: meta[:line], column: meta[:column], trigger: trigger] | acc]
 
       {:meaningful, "_" = trigger} ->
-        [[line_no: meta[:line], trigger: trigger] | acc]
+        [[line_no: meta[:line], column: meta[:column], trigger: trigger] | acc]
 
       _ ->
         acc
