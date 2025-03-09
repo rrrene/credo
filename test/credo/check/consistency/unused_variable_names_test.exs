@@ -401,6 +401,31 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
+  end
+
+  test "it should report only a single violation for naming schemes other than the forced one" do
+    [
+      ~S'''
+      defmodule FooWeb.CoreComponents do
+        @moduledoc false
+
+        def icon(%{name: "hero-" <> _} = assigns) do
+          ~H"""
+          <span class={[@name, @class]} />
+          """
+        end
+      end
+      ''',
+      ~S'''
+      defmodule Foo do
+        @moduledoc """
+        Documentation for `Foo`.
+        """
+      end
+      '''
+    ]
+    |> to_source_files
+    |> run_check(@described_check, force: :meaningful)
     |> assert_issue()
   end
 end
