@@ -68,8 +68,9 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
     {nil, acc}
   end
 
-  # We don't look into @type attributes
-  defp traverse({:@, _, [{:type, _, _args}]}, acc, _issue) do
+  # We don't look into typespec attributes
+  defp traverse({:@, _, [{attr_name, _, _args}]}, acc, _issue)
+    when attr_name in ~w[callback macrocallback opaque spec type typep]a do
     {nil, acc}
   end
 
