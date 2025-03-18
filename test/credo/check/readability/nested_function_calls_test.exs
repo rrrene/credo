@@ -10,10 +10,12 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
   test "it should NOT report code with no nested function calls" do
     """
     defmodule CredoSampleModule do
+      @callback callback_name :: Keyword.t(Some.remote(some_arg))
+      @macrocallback macrocallback_name :: Keyword.t(Some.remote(some_arg))
+      @spec spec_name :: Keyword.t(Some.remote(some_arg))
+      @opaque opaque_name :: Keyword.t(Some.remote(some_arg))
       @type type_name :: Keyword.t(Some.remote(some_arg))
-      def some_code(_foo) do
-        Enum.shuffle([1,2,3])
-      end
+      @typep typep_name :: Keyword.t(Some.remote(some_arg))
     end
     """
     |> to_source_file()
