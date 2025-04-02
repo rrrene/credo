@@ -48,6 +48,6 @@ defmodule Credo.Execution.Task.ParseOptions do
         treat_unknown_args_as_files?
       )
 
-    %Execution{exec | cli_options: cli_options}
+    %{exec | cli_options: cli_options}
   end
 end

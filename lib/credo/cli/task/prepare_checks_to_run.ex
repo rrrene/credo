@@ -19,7 +19,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
       |> Credo.Check.ConfigCommentFinder.run()
       |> Enum.into(%{})
 
-    %Execution{exec | config_comment_map: config_comment_map}
+    %{exec | config_comment_map: config_comment_map}
   end
 
   defp enable_disabled_checks_if_applicable(%Execution{enable_disabled_checks: nil} = exec) do
@@ -41,7 +41,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
 
     checks = Keyword.merge(exec.checks.enabled, enable_disabled_checks)
 
-    %Execution{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
+    %{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
   end
 
   defp exclude_low_priority_checks(exec, below_priority) do
@@ -63,7 +63,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
           priority < below_priority
       end)
 
-    %Execution{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
+    %{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
   end
 
   defp exclude_checks_based_on_elixir_version(exec) do
@@ -71,7 +71,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
     skipped_checks = Enum.reject(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
     checks = Enum.filter(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
 
-    %Execution{
+    %{
       exec
       | checks: %{enabled: checks, disabled: exec.checks.disabled},
         skipped_checks: skipped_checks

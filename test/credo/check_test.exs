@@ -118,4 +118,25 @@ defmodule Credo.CheckTest do
     assert stderr_output != ""
     assert stderr_output =~ "containing invalid bytes"
   end
+
+  defmodule CheckNotImplementingRun3 do
+    use Credo.Check
+
+    def run_on_all_source_files(_exec, _source_files, _params) do
+      # do stuff without implementing `run/3`
+      :ok
+    end
+  end
+
+  test "it should not warn on check impl" do
+    stderr_output =
+      capture_io(:stderr, fn ->
+        "# we do not need code, as the check is creating an issue in any case"
+        |> to_source_file
+        |> run_check(CheckNotImplementingRun3)
+      end)
+
+    assert stderr_output != ""
+    assert stderr_output =~ "xxx"
+  end
 end

@@ -10,7 +10,7 @@ defmodule Credo.Execution.ExecutionIssues do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %Execution{exec | issues_pid: pid}
+    %{exec | issues_pid: pid}
   end
 
   @doc "Appends an `issue` for the specified `filename`."

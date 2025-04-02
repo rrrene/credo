@@ -8,7 +8,7 @@ defmodule Credo.Execution.ExecutionConfigFiles do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %Execution{exec | config_files_pid: pid}
+    %{exec | config_files_pid: pid}
   end
 
   def put(%Execution{config_files_pid: pid}, list) do

@@ -744,7 +744,7 @@ defmodule Credo.Check do
   defp force_priority_if_given(issue, nil), do: issue
 
   defp force_priority_if_given(issue, priority) do
-    %Issue{
+    %{
       issue
       | priority: priority
     }
@@ -752,7 +752,7 @@ defmodule Credo.Check do
 
   defp add_column_if_missing(issue, trigger, line_no, column, source_file) do
     if trigger && line_no && !column do
-      %Issue{
+      %{
         issue
         | column: SourceFile.column(source_file, line_no, trigger)
       }
@@ -765,7 +765,7 @@ defmodule Credo.Check do
     if line_no do
       {_def, scope} = scope_for(source_file, line: line_no)
 
-      %Issue{
+      %{
         issue
         | priority: issue.priority + priority_for(source_file, scope),
           scope: scope

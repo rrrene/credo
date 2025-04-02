@@ -46,9 +46,9 @@ defmodule Credo.Execution.Task.DetermineCommand do
   defp set_command_and_path(exec, _options, nil, _path), do: exec
 
   defp set_command_and_path(exec, options, command, path) do
-    %Execution{
+    %{
       exec
-      | cli_options: %Options{
+      | cli_options: %{
           options
           | command: command,
             path: path

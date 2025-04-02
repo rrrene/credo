@@ -20,8 +20,6 @@ defmodule Credo.ConfigBuilder do
     end
   end
 
-  defp pattern_split_regex(), do: ~r/,\s*/
-
   defp get_config_file(exec, %Options{} = options) do
     config_name = options.switches[:config_name]
     config_filename = options.switches[:config_file]
@@ -37,7 +35,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_config_file_to_exec(exec, %ConfigFile{} = config_file) do
-    %Execution{
+    %{
       exec
       | files: config_file.files,
         color: config_file.color,
@@ -49,7 +47,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_strict_to_exec(exec, %ConfigFile{} = config_file, options) do
-    %Execution{
+    %{
       exec
       | strict: strict_via_args_or_config_file?(options.args, config_file)
     }
@@ -91,7 +89,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_all
 
   defp add_switch_all(exec, %{all: true}) do
-    %Execution{exec | all: true}
+    %{exec | all: true}
   end
 
   defp add_switch_all(exec, _), do: exec
@@ -99,7 +97,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_files_included
 
   defp add_switch_files_included(exec, %{files_included: [_head | _tail] = files_included}) do
-    %Execution{exec | files: %{exec.files | included: files_included}}
+    %{exec | files: %{exec.files | included: files_included}}
   end
 
   defp add_switch_files_included(exec, _), do: exec
@@ -107,7 +105,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_files_excluded
 
   defp add_switch_files_excluded(exec, %{files_excluded: [_head | _tail] = files_excluded}) do
-    %Execution{exec | files: %{exec.files | excluded: files_excluded}}
+    %{exec | files: %{exec.files | excluded: files_excluded}}
   end
 
   defp add_switch_files_excluded(exec, _), do: exec
@@ -117,7 +115,7 @@ defmodule Credo.ConfigBuilder do
   defp add_switch_checks_with_tag(exec, %{
          checks_with_tag: [_head | _tail] = checks_with_tag
        }) do
-    %Execution{exec | only_checks_tags: checks_with_tag}
+    %{exec | only_checks_tags: checks_with_tag}
   end
 
   defp add_switch_checks_with_tag(exec, _), do: exec
@@ -127,7 +125,7 @@ defmodule Credo.ConfigBuilder do
   defp add_switch_checks_without_tag(exec, %{
          checks_without_tag: [_head | _tail] = checks_without_tag
        }) do
-    %Execution{exec | ignore_checks_tags: checks_without_tag}
+    %{exec | ignore_checks_tags: checks_without_tag}
   end
 
   defp add_switch_checks_without_tag(exec, _), do: exec
@@ -135,7 +133,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_color
 
   defp add_switch_color(exec, %{color: color}) do
-    %Execution{exec | color: color}
+    %{exec | color: color}
   end
 
   defp add_switch_color(exec, _), do: exec
@@ -143,7 +141,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_debug
 
   defp add_switch_debug(exec, %{debug: debug}) do
-    %Execution{exec | debug: debug}
+    %{exec | debug: debug}
   end
 
   defp add_switch_debug(exec, _), do: exec
@@ -155,13 +153,13 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_strict(exec, %{strict: true}) do
-    new_config = %Execution{exec | strict: true}
+    new_config = %{exec | strict: true}
 
     Execution.set_strict(new_config)
   end
 
   defp add_switch_strict(exec, %{strict: false}) do
-    new_config = %Execution{exec | strict: false}
+    new_config = %{exec | strict: false}
 
     Execution.set_strict(new_config)
   end
@@ -169,7 +167,7 @@ defmodule Credo.ConfigBuilder do
   defp add_switch_strict(exec, _), do: Execution.set_strict(exec)
 
   defp add_switch_help(exec, %{help: true}) do
-    %Execution{exec | help: true}
+    %{exec | help: true}
   end
 
   defp add_switch_help(exec, _), do: exec
@@ -177,7 +175,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_verbose
 
   defp add_switch_verbose(exec, %{verbose: true}) do
-    %Execution{exec | verbose: true}
+    %{exec | verbose: true}
   end
 
   defp add_switch_verbose(exec, _), do: exec
@@ -185,7 +183,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_crash_on_error
 
   defp add_switch_crash_on_error(exec, %{crash_on_error: true}) do
-    %Execution{exec | crash_on_error: true}
+    %{exec | crash_on_error: true}
   end
 
   defp add_switch_crash_on_error(exec, _), do: exec
@@ -193,7 +191,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_mute_exit_status
 
   defp add_switch_mute_exit_status(exec, %{mute_exit_status: true}) do
-    %Execution{exec | mute_exit_status: true}
+    %{exec | mute_exit_status: true}
   end
 
   defp add_switch_mute_exit_status(exec, _), do: exec
@@ -201,7 +199,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_read_from_stdin
 
   defp add_switch_read_from_stdin(exec, %{read_from_stdin: true}) do
-    %Execution{exec | read_from_stdin: true}
+    %{exec | read_from_stdin: true}
   end
 
   defp add_switch_read_from_stdin(exec, _), do: exec
@@ -209,7 +207,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_version
 
   defp add_switch_version(exec, %{version: true}) do
-    %Execution{exec | version: true}
+    %{exec | version: true}
   end
 
   defp add_switch_version(exec, _), do: exec
@@ -217,7 +215,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_format
 
   defp add_switch_format(exec, %{format: format}) do
-    %Execution{exec | format: format}
+    %{exec | format: format}
   end
 
   defp add_switch_format(exec, _), do: exec
@@ -225,7 +223,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_min_priority
 
   defp add_switch_min_priority(exec, %{min_priority: min_priority}) do
-    %Execution{exec | min_priority: min_priority}
+    %{exec | min_priority: min_priority}
   end
 
   defp add_switch_min_priority(exec, _), do: exec
@@ -233,7 +231,7 @@ defmodule Credo.ConfigBuilder do
   # add_switch_enable_disabled_checks
 
   defp add_switch_enable_disabled_checks(exec, %{enable_disabled_checks: check_pattern}) do
-    %Execution{exec | enable_disabled_checks: String.split(check_pattern, pattern_split_regex())}
+    %{exec | enable_disabled_checks: String.split(check_pattern, pattern_split_regex())}
   end
 
   defp add_switch_enable_disabled_checks(exec, _), do: exec
@@ -251,7 +249,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_only(exec, %{checks: check_pattern}) do
-    new_config = %Execution{
+    new_config = %{
       exec
       | strict: true,
         only_checks: String.split(check_pattern, pattern_split_regex())
@@ -275,7 +273,7 @@ defmodule Credo.ConfigBuilder do
   end
 
   defp add_switch_ignore(exec, %{ignore_checks: ignore_pattern}) do
-    %Execution{exec | ignore_checks: String.split(ignore_pattern, pattern_split_regex())}
+    %{exec | ignore_checks: String.split(ignore_pattern, pattern_split_regex())}
   end
 
   defp add_switch_ignore(exec, _), do: exec
@@ -320,4 +318,8 @@ defmodule Credo.ConfigBuilder do
   defp validate_converter_fun_result(_exec, plugin_mod, switch_name, value) do
     raise "Expected CLI switch to plugin param converter function to return a two-element tuple of {param_name, param_value}, got #{inspect(value)} (plugin: #{inspect(plugin_mod)}, switch: #{inspect(switch_name)})"
   end
+
+  # moved to private function due to deprecation of regexes
+  # in module attributes in Elixir 1.19
+  defp pattern_split_regex(), do: ~r/,\s*/
 end
