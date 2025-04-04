@@ -37,7 +37,6 @@ defmodule Credo.Check.Readability.MaxLineLength do
   alias Credo.Code.Strings
 
   @def_ops [:def, :defp, :defmacro]
-  @url_regex ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
 
   @doc false
   @impl true
@@ -81,9 +80,11 @@ defmodule Credo.Check.Readability.MaxLineLength do
         lines
       end
 
+    url_regex = ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
+
     lines_for_comparison =
       if ignore_urls do
-        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ @url_regex end)
+        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ url_regex end)
       else
         lines_for_comparison
       end

@@ -6,8 +6,6 @@ defmodule Credo.Check.ConfigCommentFinder do
   # It traverses the given codebase to find `Credo.Check.ConfigComment`
   # compatible comments, which control Credo's behaviour.
 
-  @config_comment_format ~r/#\s*credo\:([\w-\:]+)\s*(.*)/im
-
   alias Credo.Check.ConfigComment
   alias Credo.SourceFile
 
@@ -28,10 +26,12 @@ defmodule Credo.Check.ConfigCommentFinder do
     end
   end
 
+  defp config_comment_format(), do: ~r/#\s*credo\:([\w\-\:]+)\s*(.*)/im
+
   defp find_config_comments(source_file) do
     source = SourceFile.source(source_file)
 
-    if source =~ @config_comment_format do
+    if source =~ config_comment_format() do
       source
       |> Credo.Code.clean_charlists_strings_and_sigils()
       |> Credo.Code.to_lines()
@@ -42,7 +42,7 @@ defmodule Credo.Check.ConfigCommentFinder do
   end
 
   defp find_config_comment({line_no, string}, memo) do
-    case Regex.run(@config_comment_format, string) do
+    case Regex.run(config_comment_format(), string) do
       nil ->
         memo
 
