@@ -13,19 +13,36 @@ defmodule Credo.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.html": :test,
-        "test.fast": :test,
-        "test.slow": :test
-      ],
       name: "Credo",
       description: "A static code analysis tool with a focus on code consistency and teaching.",
       package: package(),
       source_url: "https://github.com/rrrene/credo",
       docs: docs(),
       aliases: aliases()
+    ] ++ project_cli_entry()
+  end
+
+  defp preferred_cli_env do
+    [
+      coveralls: :test,
+      "coveralls.html": :test,
+      "test.fast": :test,
+      "test.slow": :test
     ]
+  end
+
+  if Version.match?(System.version(), ">= 1.19.0-dev") do
+    defp project_cli_entry do
+      []
+    end
+
+    def cli do
+      [preferred_cli_env: preferred_cli_env()]
+    end
+  else
+    defp project_cli_entry do
+      [preferred_cli_env: preferred_cli_env()]
+    end
   end
 
   defp docs do
