@@ -29,19 +29,12 @@ defmodule Credo.Check.ConfigCommentFinder do
   end
 
   defp find_config_comments(source_file) do
-    source = SourceFile.source(source_file)
+    {_ast, comments} = SourceFile.ast_with_comments(source_file)
 
-    if source =~ @config_comment_format do
-      source
-      |> Credo.Code.clean_charlists_strings_and_sigils()
-      |> Credo.Code.to_lines()
-      |> Enum.reduce([], &find_config_comment/2)
-    else
-      []
-    end
+    Enum.reduce(comments, [], &find_config_comment/2)
   end
 
-  defp find_config_comment({line_no, string}, memo) do
+  defp find_config_comment(%{line: line_no, text: string}, memo) do
     case Regex.run(@config_comment_format, string) do
       nil ->
         memo
