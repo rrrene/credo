@@ -26,8 +26,6 @@ defmodule Credo.Check.ConfigCommentFinder do
     end
   end
 
-  defp config_comment_format(), do: ~r/#\s*credo\:([\w\-\:]+)\s*(.*)/im
-
   defp find_config_comments(source_file) do
     source = SourceFile.source(source_file)
 
@@ -50,4 +48,8 @@ defmodule Credo.Check.ConfigCommentFinder do
         memo ++ [ConfigComment.new(instruction, param_string, line_no)]
     end
   end
+
+  # moved to private function due to deprecation of regexes
+  # in module attributes in Elixir 1.19
+  defp config_comment_format, do: ~r/#\s*credo\:([\w\-\:]+)\s*(.*)/im
 end

@@ -321,5 +321,5 @@ defmodule Credo.ConfigBuilder do
 
   # moved to private function due to deprecation of regexes
   # in module attributes in Elixir 1.19
-  defp pattern_split_regex(), do: ~r/,\s*/
+  defp pattern_split_regex, do: ~r/,\s*/
 end

@@ -50,7 +50,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
 
   # moved to private function due to deprecation of regexes
   # in module attributes in Elixir 1.19
-  defp all_regexes() do
+  defp all_regexes do
     [
       with_space: ~r/[^\?]([\{\[\(]\s+\S|\S\s+[\)\]\}]])/,
       without_space: ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/,
