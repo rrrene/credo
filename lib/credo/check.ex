@@ -339,7 +339,7 @@ defmodule Credo.Check do
         end
       end
 
-    module_doc = moduledoc(opts, __CALLER__.module)
+    module_doc = moduledoc(opts, __CALLER__.module, Mix.Project.config()[:app])
 
     quote do
       @moduledoc unquote(module_doc)
@@ -503,7 +503,7 @@ defmodule Credo.Check do
     end
   end
 
-  defp moduledoc(opts, module) do
+  defp moduledoc(opts, module, app) do
     explanations = opts[:explanations]
 
     base_priority = opts_to_string(opts[:base_priority]) || 0
@@ -526,13 +526,13 @@ defmodule Credo.Check do
         """
         > #### This check is enabled by default. {: .tip}
         >
-        > [Learn how to disable it](config_file.html#checks) via `.credo.exs`.
+        > [Learn how to disable it](#{credo_docs_uri(app, "config_file.html#checks")}) via `.credo.exs`.
         """
       else
         """
         > #### This check is disabled by default. {: .neutral}
         >
-        > [Learn how to enable it](config_file.html#checks) via `.credo.exs`.
+        > [Learn how to enable it](#{credo_docs_uri(app, "config_file.html#checks")}) via `.credo.exs`.
         """
       end
 
@@ -613,11 +613,14 @@ defmodule Credo.Check do
 
     ## General Parameters
 
-    Like with all checks, [general params](check_params.html) can be applied.
+    Like with all checks, [general params](#{credo_docs_uri(app, "check_params.html")}) can be applied.
 
-    Parameters can be configured via the [`.credo.exs` config file](config_file.html).
+    Parameters can be configured via the [`.credo.exs` config file](#{credo_docs_uri(app, "config_file.html")}).
     """
   end
+
+  defp credo_docs_uri(:credo, path), do: path
+  defp credo_docs_uri(_other_app, path), do: "`e:credo:#{path}`"
 
   defp opts_to_string(value) do
     {result, _} =
