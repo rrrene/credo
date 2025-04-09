@@ -37,6 +37,7 @@ defmodule Credo.Check.Design.TagHelperTest do
     expected = [
       {
         4,
+        19,
         "  def some_fun do # TODO: find a better name for this",
         "# TODO: find a better name for this"
       }
@@ -62,6 +63,7 @@ defmodule Credo.Check.Design.TagHelperTest do
     expected = [
       {
         4,
+        19,
         "  def some_fun do # TODO find a better name for this",
         "# TODO find a better name for this"
       }
@@ -88,6 +90,7 @@ defmodule Credo.Check.Design.TagHelperTest do
     expected = [
       {
         4,
+        3,
         "  # todo find a better name for this",
         "# todo find a better name for this"
       }

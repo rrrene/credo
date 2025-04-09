@@ -40,7 +40,10 @@ defmodule Credo.Check.Design.TagFIXMETest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 4
+      assert issue.column == 3
+    end)
   end
 
   test "it should report an issue when lower case" do
