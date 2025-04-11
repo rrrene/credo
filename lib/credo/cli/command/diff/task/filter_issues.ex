@@ -28,12 +28,12 @@ defmodule Credo.CLI.Command.Diff.Task.FilterIssues do
     # not in previous_issues, in current_issues
     new_issues = Enum.filter(current_issues, &new_issue?(&1, previous_issues, previous_dirname))
 
-    old_issues = Enum.map(old_issues, fn issue -> %Issue{issue | diff_marker: :old} end)
+    old_issues = Enum.map(old_issues, fn issue -> %{issue | diff_marker: :old} end)
 
     # TODO: we have to rewrite the filename to make it look like the file is in the current dir
     #       instead of the generated tmp dir
-    fixed_issues = Enum.map(fixed_issues, fn issue -> %Issue{issue | diff_marker: :fixed} end)
-    new_issues = Enum.map(new_issues, fn issue -> %Issue{issue | diff_marker: :new} end)
+    fixed_issues = Enum.map(fixed_issues, fn issue -> %{issue | diff_marker: :fixed} end)
+    new_issues = Enum.map(new_issues, fn issue -> %{issue | diff_marker: :new} end)
 
     List.flatten([new_issues, fixed_issues, old_issues])
   end

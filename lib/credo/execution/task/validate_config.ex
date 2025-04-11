@@ -139,6 +139,6 @@ defmodule Credo.Execution.Task.ValidateConfig do
     enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
     disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
-    %Execution{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
+    %{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
   end
 end

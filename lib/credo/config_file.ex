@@ -461,6 +461,6 @@ defmodule Credo.ConfigFile do
         |> Enum.uniq()
     }
 
-    {:ok, %__MODULE__{config | files: files}}
+    {:ok, %{config | files: files}}
   end
 end

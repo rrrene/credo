@@ -6,8 +6,6 @@ defmodule Credo.Check.ConfigCommentFinder do
   # It traverses the given codebase to find `Credo.Check.ConfigComment`
   # compatible comments, which control Credo's behaviour.
 
-  @config_comment_format ~r/#\s*credo\:([\w-\:]+)\s*(.*)/im
-
   alias Credo.Check.ConfigComment
   alias Credo.SourceFile
 
@@ -35,7 +33,9 @@ defmodule Credo.Check.ConfigCommentFinder do
   end
 
   defp find_config_comment(%{line: line_no, text: string}, memo) do
-    case Regex.run(@config_comment_format, string) do
+    config_comment_format = ~r/#\s*credo\:([\w\-\:]+)\s*(.*)/im
+
+    case Regex.run(config_comment_format, string) do
       nil ->
         memo
 

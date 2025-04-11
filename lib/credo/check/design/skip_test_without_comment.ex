@@ -29,9 +29,6 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
       """
     ]
 
-  @tag_skip_regex ~r/^\s*\@tag :skip\s*$/
-  @comment_regex ~r/^\s*\#.*$/
-
   @doc false
   @impl true
   def run(source_file, params) do
@@ -46,9 +43,12 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   end
 
   defp transform_line({line, line_number}) do
+    tag_skip_regex = ~r/^\s*\@tag :skip\s*$/
+    comment_regex = ~r/^\s*\#.*$/
+
     cond do
-      line =~ @tag_skip_regex -> {:tag_skip, line_number}
-      line =~ @comment_regex -> {:comment, line_number}
+      line =~ tag_skip_regex -> {:tag_skip, line_number}
+      line =~ comment_regex -> {:comment, line_number}
       true -> {line, line_number}
     end
   end

@@ -122,7 +122,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
           end
         end)
 
-      %Execution{exec | checks: checks}
+      %{exec | checks: checks}
     end
   end
 end
