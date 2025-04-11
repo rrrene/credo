@@ -125,15 +125,15 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   test "it should report when there are many commas not followed by spaces" do
     """
     defmodule CredoSampleModule do
-      @attribute [1,2,"three",4,5]
+      @attribute [1,2,"three",'4',5]
     end
     """
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
       assert 4 == Enum.count(issues)
-      assert [16, 18, 26, 28] == Enum.map(issues, & &1.column)
-      assert [",2", ",\"", ",4", ",5"] == Enum.map(issues, & &1.trigger)
+      assert [16, 18, 26, 30] == Enum.map(issues, & &1.column)
+      assert [",2", ",\"", ",'", ",5"] == Enum.map(issues, & &1.trigger)
     end)
   end
 

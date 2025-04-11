@@ -266,4 +266,23 @@ defmodule Credo.Code.Token do
   def to_col_end(col_start, value, add \\ 0) do
     col_start + String.length(to_string(value)) + add
   end
+
+  @doc false
+  def reduce(string_or_source_file, callback, acc \\ [])
+
+  def reduce(string_or_source_file, callback, acc) do
+    string_or_source_file
+    |> Credo.Code.to_tokens()
+    |> do_reduce(callback, acc)
+  end
+
+  defp do_reduce([], _callback, acc), do: acc
+
+  defp do_reduce([prev | [current | [next | rest]]], callback, acc) do
+    acc = callback.(prev, current, next, acc)
+
+    do_reduce([current | [next | rest]], callback, acc)
+  end
+
+  defp do_reduce(_tokens, _callback, acc), do: acc
 end

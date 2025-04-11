@@ -31,27 +31,47 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       """
     ]
 
-  alias Credo.Code.Charlists
-  alias Credo.Code.Heredocs
-  alias Credo.Code.Sigils
-  alias Credo.Code.Strings
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
     source_file
-    |> Sigils.replace_with_spaces(" ", " ", source_file.filename)
-    |> Strings.replace_with_spaces(" ", " ", source_file.filename)
-    |> Heredocs.replace_with_spaces(" ", " ", "", source_file.filename)
-    |> Charlists.replace_with_spaces(" ", " ", source_file.filename)
-    |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
-    |> Credo.Code.to_lines()
-    |> Enum.flat_map(&find_issues(issue_meta, &1))
+    |> Credo.Code.Token.reduce(&collect(&1, &2, &3, &4))
+    |> Enum.map(&issue_for(issue_meta, &1))
   end
 
-  defp issue_for(issue_meta, trigger, line_no, column) do
+  defp collect(_prev, {:",", {line, col, _}}, {:atom, {_line, col2, _}, _value}, acc) do
+    do_collect(line, col, col2, ":", acc)
+  end
+
+  defp collect(_prev, {:",", {line, col, _}}, {:bin_string, {_line, col2, _}, _value}, acc) do
+    do_collect(line, col, col2, "\"", acc)
+  end
+
+  defp collect(_prev, {:",", {line, col, _}}, {:list_string, {_line, col2, _}, _value}, acc) do
+    do_collect(line, col, col2, "'", acc)
+  end
+
+  defp collect(_prev, {:",", {line, col, _}}, {_, {_line, col2, value}, _}, acc) do
+    do_collect(line, col, col2, value, acc)
+  end
+
+  defp collect(_prev, {:",", {line, col, _}}, {value, {_line, col2, _}}, acc) do
+    do_collect(line, col, col2, value, acc)
+  end
+
+  defp collect(_prev, _current, _next, acc), do: acc
+
+  defp do_collect(line, col, col2, value, acc) do
+    if col2 == col + 1 do
+      acc ++ [{line, col, ",#{value}"}]
+    else
+      acc
+    end
+  end
+
+  defp issue_for(issue_meta, {line_no, column, trigger}) do
     format_issue(
       issue_meta,
       message: "Space missing after comma.",
@@ -59,19 +79,5 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       line_no: line_no,
       column: column
     )
-  end
-
-  defp find_issues(issue_meta, {line_no, line}) do
-    # Matches commas followed by non-whitespace unless preceded by
-    # a question mark that is not part of a variable or function name
-    unspaced_commas = ~r/(?<!\W\?)(\,\S)/
-
-    unspaced_commas
-    |> Regex.scan(line, capture: :all_but_first, return: :index)
-    |> List.flatten()
-    |> Enum.map(fn {idx, len} ->
-      trigger = String.slice(line, idx, len)
-      issue_for(issue_meta, trigger, line_no, idx + 1)
-    end)
   end
 end
