@@ -62,13 +62,37 @@ defmodule Credo.Code.Token do
     position_tuple_for_heredoc(atom_or_charlist, line_no, col_start)
   end
 
+  def position({:atom, {line_no, col_start, atom_or_charlist}, _atom}) do
+    # +1 for the `:` of the atom
+    col_end = col_start + String.length(to_string(atom_or_charlist)) + 1
+
+    {line_no, col_start, line_no, col_end}
+  end
+
   def position({:atom_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
+  def position({:atom_quoted, {line_no, col_start, _}, atom_or_charlist}) do
+    # +1 for the `:` of the atom and 2 for the quotes
+    col_end = col_start + String.length(to_string(atom_or_charlist)) + 1 + 2
+
+    {line_no, col_start, line_no, col_end}
+  end
+
   # Elixir >= 1.10.0 tuple syntax
-  def position({:sigil, {line_no, col_start, nil}, _, atom_or_charlist, _list, _number, _binary}) do
-    position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+  def position({:sigil, {line_no, col_start, nil}, sigil_name, charlist, _list, _number, _binary})
+      when is_list(charlist) do
+    case position_tuple_for_quoted_string(charlist, line_no, col_start) do
+      {line_no, col_start, line_no, col_end} ->
+        sigil_tag = String.replace("~#{sigil_name}", ~r/sigil_/, "")
+
+        # col_end + 1 for opening delimiter
+        {line_no, col_start, line_no, col_end + String.length(sigil_tag) + 1}
+
+      value ->
+        value
+    end
   end
 
   # Elixir >= 1.9.0 tuple syntax
@@ -76,7 +100,8 @@ defmodule Credo.Code.Token do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
-  def position({:kw_identifier_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
+  def position({:kw_identifier_unsafe, {line_no, col_start, _}, atom_or_charlist})
+      when is_atom(atom_or_charlist) or is_list(atom_or_charlist) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
@@ -133,10 +158,10 @@ defmodule Credo.Code.Token do
   end
 
   @doc false
-  def position_tuple_for_quoted_string(list, line_no, col_start)
-      when is_list(list) do
+  def position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+      when is_list(atom_or_charlist) or is_atom(atom_or_charlist) do
     # add 1 for " (closing double quote)
-    {line_no_end, col_end, terminator} = convert_to_col_end(line_no, col_start, list)
+    {line_no_end, col_end, terminator} = convert_to_col_end(line_no, col_start, atom_or_charlist)
 
     {line_no_end, col_end} =
       case terminator do

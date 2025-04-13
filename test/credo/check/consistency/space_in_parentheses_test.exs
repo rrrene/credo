@@ -139,9 +139,8 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 7 == issue.line_no
-      assert "{:" == issue.trigger
+    |> assert_issues(fn issues ->
+      assert Enum.any?(issues, &(7 == &1.line_no && &1.trigger == "{"))
     end)
   end
 
@@ -153,7 +152,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert 4 == issue.line_no
-      assert "{}" == issue.trigger
+      assert "%{}" == issue.trigger
     end)
   end
 
@@ -165,7 +164,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert 4 == issue.line_no
-      assert "[]" == issue.trigger
+      assert "[" == issue.trigger
     end)
   end
 

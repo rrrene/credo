@@ -4,17 +4,15 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
   use Credo.Check.Consistency.Collector
 
   def collect_matches(source_file, _params) do
-    regexes = all_regexes()
+    # dbg(Credo.Code.to_tokens(source_file), limit: :infinity)
 
-    source_file
-    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
-    |> Credo.Code.to_lines()
-    |> Enum.reduce(%{}, &spaces(&1, &2, regexes))
+    Credo.Code.Token.reduce(source_file, &spaces(&1, &2, &3, &4), %{})
+    |> Map.new(fn {key, value} ->
+      {key, Enum.count(value)}
+    end)
   end
 
   def find_locations_not_matching(expected, source_file, allow_empty_enums) do
-    regexes = all_regexes()
-
     actual =
       case expected do
         :with_space when allow_empty_enums == true -> :without_space_allow_empty_enums
@@ -22,39 +20,83 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
         :without_space -> :with_space
       end
 
-    source_file
-    |> Credo.Code.clean_charlists_strings_sigils_and_comments("")
-    |> Credo.Code.to_lines()
-    |> List.foldr([], &locate(actual, &1, &2, regexes))
+    Credo.Code.Token.reduce(source_file, &spaces(&1, &2, &3, &4), %{})
+    |> Map.get(actual)
+    |> List.wrap()
   end
 
-  defp spaces({_line_no, line}, acc, regexes) do
-    Enum.reduce(regexes, acc, fn {kind_of_space, regex}, space_map ->
-      if Regex.match?(regex, line) do
-        Map.update(space_map, kind_of_space, 1, &(&1 + 1))
-      else
-        space_map
+  defp spaces({:%{}, {_, col0, _}}, {:"{", {line, col, _}} = t1, {:"}", {line, col2, _}} = _next, acc) do
+    {line_no, col_start, _line_no_end, _col_end} = Credo.Code.Token.position(t1)
+
+    empty_enum? = true
+
+    no_space_between? = col0 == col && col + 2 == col2
+
+    location = [trigger: "%{}", line_no: line_no, column: col_start]
+
+    do_spaces(no_space_between?, empty_enum?, location, acc)
+  end
+
+  # ignores `, ]` at the end of a list
+  defp spaces({:",", {line, _col, _}}, {:"]", {line, _col2, _}}, _next, acc), do: acc
+
+  defp spaces({:"[", {line, _col, _}}, {:"]", {line, _col2, _}}, _next, acc), do: acc
+  defp spaces({:"(", {line, _col, _}}, {:")", {line, _col2, _}}, _next, acc), do: acc
+  defp spaces({:"{", {line, _col, _}}, {:"}", {line, _col2, _}}, _next, acc), do: acc
+
+  defp spaces(_prev, {paren, {_line, _col, _}} = t1, next, acc) when paren in [:"(", :"[", :"{"] do
+    # dbg(:opening)
+    {line_no, col_start, _line_no_end, col_end} = Credo.Code.Token.position(t1)
+    # dbg(next)
+    {line_no2, col_start2, _line_no_end, _col_end} = Credo.Code.Token.position(next)
+
+    empty_enum? =
+      case next do
+        {:")", _} -> true
+        {:"}", _} -> true
+        {:"]", _} -> true
+        _ -> false
       end
-    end)
+
+    no_space_between? = line_no == line_no2 && col_end == col_start2
+    location = [trigger: "#{paren}", line_no: line_no, column: col_start]
+
+    do_spaces(no_space_between?, empty_enum?, location, acc)
   end
 
-  defp locate(kind_of_space, {line_no, line}, locations, regexes) do
-    case Regex.run(regexes[kind_of_space], line) do
-      nil ->
-        locations
+  defp spaces(prev, {paren, {_, _, _}} = t1, _next, acc) when paren in [:"}", :"]", :")"] do
+    # dbg(:closing)
 
-      match ->
-        [[trigger: Enum.at(match, 1), line_no: line_no] | locations]
+    {line_no, _col_start, _line_no_end, col_end} = Credo.Code.Token.position(prev)
+    {line_no2, col_start2, _line_no_end, _col_end} = Credo.Code.Token.position(t1)
+
+    empty_enum? =
+      case prev do
+        {:"(", _} -> true
+        {:"{", _} -> true
+        {:"[", _} -> true
+        _ -> false
+      end
+
+    no_space_between? = line_no == line_no2 && col_end == col_start2
+    location = [trigger: "#{paren}", line_no: line_no, column: col_start2]
+
+    do_spaces(no_space_between?, empty_enum?, location, acc)
+  end
+
+  defp spaces(_prev, _current, _next, acc), do: acc
+
+  defp do_spaces(no_space_between?, empty_enum?, location, acc) do
+    if no_space_between? do
+      if empty_enum? do
+        Map.update(acc, :without_space, [location], &[location | &1])
+      else
+        acc
+        |> Map.update(:without_space, [location], &[location | &1])
+        |> Map.update(:without_space_allow_empty_enums, [location], &[location | &1])
+      end
+    else
+      Map.update(acc, :with_space, [location], &[location | &1])
     end
-  end
-
-  # moved to private function due to deprecation of regexes
-  # in module attributes in Elixir 1.19
-  defp all_regexes do
-    [
-      with_space: ~r/[^\?]([\{\[\(]\s+\S|\S\s+[\)\]\}]])/,
-      without_space: ~r/[^\?]([\{\[\(]\S|\S[\)\]\}])/,
-      without_space_allow_empty_enums: ~r/[^\?](?!\{\}|\[\])([\{\[\(]\S|\S[\)\]\}])/
-    ]
   end
 end

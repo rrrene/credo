@@ -331,4 +331,71 @@ defmodule Credo.Code.TokenTest do
       assert {1, 26, 1, 45} == position
     end
   end
+
+  test "should give correct token position for identifiers" do
+    source =
+      ~S"""
+      defmodule InlineModule do
+        def foobar do
+          {:ok} = File.read(filename)
+        end
+      end
+      """
+
+    tokens = Credo.Code.to_tokens(source)
+
+    expected = [
+      {:identifier, {1, 1, ~c"defmodule"}, :defmodule},
+      {:alias, {1, 11, ~c"InlineModule"}, :InlineModule},
+      {:do, {1, 24, nil}},
+      {:eol, {1, 26, 1}},
+      {:identifier, {2, 3, ~c"def"}, :def},
+      {:do_identifier, {2, 7, ~c"foobar"}, :foobar},
+      {:do, {2, 14, nil}},
+      {:eol, {2, 16, 1}},
+      {:"{", {3, 5, nil}},
+      {:atom, {3, 6, ~c"ok"}, :ok},
+      {:"}", {3, 9, nil}},
+      {:match_op, {3, 11, nil}, :=},
+      {:alias, {3, 13, ~c"File"}, :File},
+      {:., {3, 17, nil}},
+      {:paren_identifier, {3, 18, ~c"read"}, :read},
+      {:"(", {3, 22, nil}},
+      {:identifier, {3, 23, ~c"filename"}, :filename},
+      {:")", {3, 31, nil}},
+      {:eol, {3, 32, 1}},
+      {:end, {4, 3, nil}},
+      {:eol, {4, 6, 1}},
+      {:end, {5, 1, nil}},
+      {:eol, {5, 4, 1}}
+    ]
+
+    assert tokens == expected
+
+    assert {2, 7, 2, 14} == Token.position({:do_identifier, {2, 7, ~c"filenam"}, :filenam})
+    assert {3, 6, 3, 9} == Token.position({:atom, {3, 6, ~c"ok"}, :ok})
+    assert {3, 23, 3, 31} == Token.position({:identifier, {3, 23, ~c"filename"}, :filename})
+    assert {3, 18, 3, 22} == Token.position({:paren_identifier, {3, 18, ~c"read"}, :read})
+  end
+
+  test "should give correct token position for sigils" do
+    tokens = Credo.Code.to_tokens("      parse_code(:\"okay\", acc <> ~s(\"\"\"))")
+
+    expected = [
+      {:paren_identifier, {1, 7, ~c"parse_code"}, :parse_code},
+      {:"(", {1, 17, nil}},
+      {:atom_quoted, {1, 18, 34}, :okay},
+      {:",", {1, 25, 0}},
+      {:identifier, {1, 27, ~c"acc"}, :acc},
+      {:concat_op, {1, 31, nil}, :<>},
+      {:sigil, {1, 34, nil}, :sigil_s, ["\"\"\""], [], nil, "("},
+      {:")", {1, 41, nil}}
+    ]
+
+    assert tokens == expected
+
+    assert {1, 18, 1, 25} == Token.position({:atom_quoted, {1, 18, 34}, :okay})
+    assert {11, 28, 11, 38} == Token.position({:sigil, {11, 28, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("})
+    assert {11, 28, 11, 39} == Token.position({:sigil, {11, 28, nil}, :sigil_XX, ["\\\"\\\"\\\""], [], nil, "("})
+  end
 end
