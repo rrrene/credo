@@ -256,8 +256,18 @@ defmodule Credo.Test.Case do
   end
 
   @doc false
+  def test_source_files? do
+    test_source_files() != []
+  end
+
+  @doc false
+  def test_source_files do
+    Process.get(:credo_test_source_files, [])
+  end
+
+  @doc false
   def get_issue_inline(issue) do
-    source_files = Process.get(:credo_test_source_files) || raise "No source files found"
+    source_files = test_source_files()
     source_line = get_source_line(source_files, issue)
 
     marker =

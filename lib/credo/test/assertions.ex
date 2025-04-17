@@ -55,10 +55,14 @@ defmodule Credo.Test.Assertions do
       |> Inspect.Algebra.format(50)
       |> Enum.join("")
 
-    """
-    #{inspected}
+    if Credo.Test.Case.test_source_files?() do
+      """
+      #{inspected}
 
-    #{Credo.Test.Case.get_issue_inline(issue)}
-    """
+      #{Credo.Test.Case.get_issue_inline(issue)}
+      """
+    else
+      inspected
+    end
   end
 end

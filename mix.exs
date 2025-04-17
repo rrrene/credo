@@ -1,7 +1,7 @@
 defmodule Credo.Mixfile do
   use Mix.Project
 
-  @version "1.7.11"
+  @version "1.7.12"
 
   def project do
     [
@@ -18,7 +18,13 @@ defmodule Credo.Mixfile do
       package: package(),
       source_url: "https://github.com/rrrene/credo",
       docs: docs(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_ignore_filters: [
+        "test/old_credo.exs",
+        "test/regression/run_older_credo_version.exs",
+        ~r[test/credo/check/housekeeping_.+.exs],
+        ~r[/fixtures/]
+      ]
     ] ++ project_cli_entry()
   end
 

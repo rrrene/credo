@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.12
+
+- Fix compatibility & compiler warnings with Elixir 1.19 (dev)
+- Provide `:column` on all checks
+- Fix check docs in other project's documentation
+- `Credo.Check.Refactor.DoubleBooleanNegation` fixed false positive
+- `Credo.Check.Readability.NestedFunctionCalls` fixed false positive
+- `Credo.Check.Consistency.UnusedVariableNames` fixed duplicate issues
+
 ## 1.7.11
 
 - Fix compatibility & compiler warnings with Elixir 1.18
