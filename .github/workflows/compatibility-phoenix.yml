@@ -7,7 +7,7 @@ on:
 
 jobs:
   test_on_source:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: "Elixir ${{matrix.elixir}} OTP ${{matrix.otp}} - ${{matrix.repo_branch}}"
     strategy:
       fail-fast: false
@@ -45,7 +45,7 @@ jobs:
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
 
   test_on_new_project:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
