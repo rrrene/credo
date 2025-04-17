@@ -204,6 +204,7 @@ defmodule Credo.Test.Case do
       |> run_check(MyProject.MyCheck, foo_parameter: "bar")
   """
   def run_check(source_files, check, params \\ []) do
+    Process.put(:credo_test_source_files, source_files)
     issues = CheckRunner.run_check(source_files, check, params)
 
     check_on_malformed_issues(source_files, issues)
@@ -247,18 +248,54 @@ defmodule Credo.Test.Case do
         found trigger is not the given trigger:
           actual:   #{inspect(actual_trigger, pretty: true)}
           expected: #{inspect(trigger, pretty: true)}
+
+        #{get_issue_inline(issue)}
         """)
       end
     end
   end
 
-  defp get_source_line(source_files, %Credo.Issue{} = issue) do
+  @doc false
+  def test_source_files? do
+    test_source_files() != []
+  end
+
+  @doc false
+  def test_source_files do
+    Process.get(:credo_test_source_files, [])
+  end
+
+  @doc false
+  def get_issue_inline(issue) do
+    source_files = test_source_files()
+    source_line = get_source_line(source_files, issue)
+
+    marker =
+      if issue.column && issue.trigger != Credo.Issue.no_trigger() do
+        String.duplicate(" ", issue.column - 1) <>
+          String.duplicate("^", String.length(to_string(issue.trigger)))
+      else
+        ""
+      end
+
+    """
+    #{source_line}
+    #{marker}
+    """
+  end
+
+  defp get_source_line(source_files, %Credo.Issue{} = issue) when is_list(source_files) do
     source_files
     |> find_source_file(issue)
     |> Credo.SourceFile.line_at(issue.line_no)
   end
 
-  defp find_source_file(source_files, %Credo.Issue{filename: filename}) do
+  defp get_source_line(%Credo.SourceFile{} = source_file, %Credo.Issue{} = issue) do
+    Credo.SourceFile.line_at(source_file, issue.line_no)
+  end
+
+  defp find_source_file(source_files, %Credo.Issue{filename: filename})
+       when is_list(source_files) do
     Enum.find(source_files, &(&1.filename == filename)) || raise "Could not find source file"
   end
 
