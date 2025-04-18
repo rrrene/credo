@@ -9,6 +9,11 @@ defmodule Credo.Check.Design.TagHelper do
 
   @deprecated "Use find_tags/3 instead"
   def tags(source_file, tag_name, include_doc?) do
+    do_tags(source_file, tag_name, include_doc?)
+  end
+
+  @doc false
+  def do_tags(source_file, tag_name, include_doc?) do
     TagHelperDeprecated.tags(source_file, tag_name, include_doc?)
   end
 

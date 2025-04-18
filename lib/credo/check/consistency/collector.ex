@@ -139,7 +139,7 @@ defmodule Credo.Check.Consistency.Collector do
           issue_formatter,
           supress_issues_for_single_match?
         )
-        |> Enum.each(&Collector.append_issue_via_issue_service(&1, exec))
+        |> Collector.append_issue_via_issue_service(exec)
 
         :ok
       end
@@ -197,8 +197,8 @@ defmodule Credo.Check.Consistency.Collector do
     forced_value
   end
 
-  def append_issue_via_issue_service(%Issue{} = issue, exec) do
-    ExecutionIssues.append(exec, issue)
+  def append_issue_via_issue_service(issues, exec) do
+    ExecutionIssues.append(exec, issues)
   end
 
   defp source_files_with_issues(_frequencies_per_file, :__only_single_match__) do
