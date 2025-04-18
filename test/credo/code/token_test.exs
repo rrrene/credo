@@ -384,19 +384,20 @@ defmodule Credo.Code.TokenTest do
         parse_code(:"okay", acc <> ~s(\"\"\"))
       ''')
 
-    expected = [
-      {:paren_identifier, {1, 3, ~c"parse_code"}, :parse_code},
-      {:"(", {1, 13, nil}},
-      {:atom_quoted, {1, 14, 34}, :okay},
-      {:",", {1, 21, 0}},
-      {:identifier, {1, 23, ~c"acc"}, :acc},
-      {:concat_op, {1, 27, nil}, :<>},
-      {:sigil, {1, 30, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("},
-      {:")", {1, 40, nil}},
-      {:eol, {1, 41, 1}}
-    ]
-
-    assert tokens == expected
+    assert match?(
+             [
+               {:paren_identifier, {1, 3, ~c"parse_code"}, :parse_code},
+               {:"(", {1, 13, nil}},
+               {:atom_quoted, {1, 14, _nil_or_34}, :okay},
+               {:",", {1, 21, 0}},
+               {:identifier, {1, 23, ~c"acc"}, :acc},
+               {:concat_op, {1, 27, nil}, :<>},
+               {:sigil, {1, 30, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("},
+               {:")", {1, 40, nil}},
+               {:eol, {1, 41, 1}}
+             ],
+             tokens
+           )
 
     assert {1, 18, 1, 25} == Token.position({:atom_quoted, {1, 18, 34}, :okay})
     assert {1, 30, 1, 40} == Token.position({:sigil, {1, 30, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("})
