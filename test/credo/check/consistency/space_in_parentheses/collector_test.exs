@@ -26,19 +26,19 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
   end
   """
   @with_spaces_empty_enum """
-    defmodule Credo.Sample2 do
-      defmodule InlineModule do
-        def foobar do
-          exists = File.exists?(filename)
-          { result, %{} } = File.read( filename )
-        end
+  defmodule Credo.Sample2 do
+    defmodule InlineModule do
+      def foobar do
+        exists = File.exists?(filename)
+        { result, %{} } = File.read( filename )
+      end
 
-        def barfoo do
-          exists = File.exists?(filename)
-          { result, [] } = File.read( filename )
-        end
+      def barfoo do
+        exists = File.exists?(filename)
+        { result, [] } = File.read( filename )
       end
     end
+  end
   """
 
   @heredoc_example """
@@ -51,27 +51,31 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
   \"\"\"
   """
 
-  test "it should report correct frequencies" do
+  test "it should report correct frequencies for without_spaces" do
     without_spaces =
       @without_spaces
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{without_space: 2, without_space_allow_empty_enums: 2} == without_spaces
+    assert %{without_space: 6, without_space_allow_empty_enums: 6} == without_spaces
+  end
 
+  test "it should report correct frequencies for with_spaces" do
     with_spaces =
       @with_spaces
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{with_space: 1} == with_spaces
+    assert %{with_space: 4} == with_spaces
+  end
 
+  test "it should report correct frequencies for empty enums" do
     empty_enum =
       @with_spaces_empty_enum
       |> to_source_file()
       |> Collector.collect_matches([])
 
-    assert %{with_space: 2, without_space: 4, without_space_allow_empty_enums: 2} == empty_enum
+    assert %{with_space: 8, without_space: 6, without_space_allow_empty_enums: 4} == empty_enum
   end
 
   test "it should NOT report heredocs containing sigil chars" do

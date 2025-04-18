@@ -118,6 +118,34 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report with config on empty params" do
+    [
+      @with_spaces_empty_params1,
+      @with_spaces_empty_params2
+    ]
+    |> to_source_files()
+    |> run_check(@described_check, allow_empty_enums: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report with without_spaces" do
+    [
+      ~S'''
+      defmodule Credo.Test.IntegrationTest do
+        def run(argv) do
+          if System.get_env("DEBUG") do
+            {suffix, remainder} = Enum.split_while(remainder, &(&1 != ?\n))
+          end
+        end
+      end
+
+      '''
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -144,7 +172,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     end)
   end
 
-  test "it should trigger error with no config on empty map" do
+  test "it should report with no config on empty map" do
     [
       @with_spaces_empty_params1
     ]
@@ -156,7 +184,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     end)
   end
 
-  test "it should trigger error with no config on empty array" do
+  test "it should report with no config on empty array" do
     [
       @with_spaces_empty_params2
     ]
@@ -164,17 +192,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert 4 == issue.line_no
-      assert "[" == issue.trigger
+      assert "[]" == issue.trigger
     end)
-  end
-
-  test "it should not trigger error with config on empty params" do
-    [
-      @with_spaces_empty_params1,
-      @with_spaces_empty_params2
-    ]
-    |> to_source_files()
-    |> run_check(@described_check, allow_empty_enums: true)
-    |> refute_issues()
   end
 end
