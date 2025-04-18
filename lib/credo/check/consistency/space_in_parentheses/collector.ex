@@ -30,16 +30,15 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     |> List.wrap()
   end
 
-  defp spaces({:%{}, {_, col0, _}}, {:"{", {line, col, _}} = t1, {:"}", {line, col2, _}} = _next, acc) do
-    {line_no, col_start, _line_no_end, _col_end} = Credo.Code.Token.position(t1)
+  defp spaces({:%{}, {line_no, col0, _}}, {:"{", {line, col, _}}, {:"}", {line, col2, _}} = _next, acc) do
+    # elixir <= 1.16 || elixir > 1.16
+    no_space_between? =
+      (col0 + 1 == col && col + 1 == col2) ||
+        (col0 == col && col + 2 == col2)
 
-    empty_enum? = true
+    location = [trigger: "%{}", line_no: line_no, column: col0]
 
-    no_space_between? = col0 == col && col + 2 == col2
-
-    location = [trigger: "%{}", line_no: line_no, column: col_start]
-
-    do_spaces(no_space_between?, empty_enum?, location, acc)
+    do_spaces(no_space_between?, true, location, acc)
   end
 
   defp spaces(_prev, {:"[", {line, col, _}}, {:"]", {line, col2, _}} = _next, acc) when col2 - col == 1 do
