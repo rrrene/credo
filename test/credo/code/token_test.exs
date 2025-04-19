@@ -603,4 +603,44 @@ defmodule Credo.Code.TokenTest do
 
     assert {1, 59, 1, 62} == Token.position({:char, {1, 59, ~c"?\\n"}, 10})
   end
+
+  test "should give correct token position for nils" do
+    tokens =
+      Credo.Code.to_tokens(~S'''
+      defp prefix_str_for_body(nil), do: "\t"
+      ''')
+
+    expected = [
+      {:identifier, {1, 1, ~c"defp"}, :defp},
+      {:paren_identifier, {1, 6, ~c"prefix_str_for_body"}, :prefix_str_for_body},
+      {:"(", {1, 25, nil}},
+      {nil, {1, 26, nil}},
+      {:")", {1, 29, nil}},
+      {:",", {1, 30, 0}},
+      {:kw_identifier, {1, 32, ~c"do"}, :do},
+      {:bin_string, {1, 36, nil}, ["\t"]},
+      {:eol, {1, 40, 1}}
+    ]
+
+    assert tokens == expected
+
+    assert {1, 26, 1, 29} == Token.position({nil, {1, 26, nil}})
+  end
+
+  test "should give correct token position for op atoms" do
+    tokens = Credo.Code.to_tokens(~S'[ :&, nil, ]')
+
+    expected = [
+      {:"[", {1, 1, nil}},
+      {:atom, {1, 3, nil}, :&},
+      {:",", {1, 5, 0}},
+      {nil, {1, 7, nil}},
+      {:",", {1, 10, 0}},
+      {:"]", {1, 12, nil}}
+    ]
+
+    assert tokens == expected
+
+    assert {1, 3, 1, 5} == Token.position({:atom, {1, 3, nil}, :&})
+  end
 end

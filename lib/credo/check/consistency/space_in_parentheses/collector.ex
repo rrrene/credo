@@ -4,6 +4,9 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
   use Credo.Check.Consistency.Collector
 
   def collect_from_source_file(source_file) do
+    # Credo.Code.to_tokens(source_file) |> dbg(limit: :infinity)
+
+    # |> dbg
     Credo.Code.Token.reduce(source_file, &spaces(&1, &2, &3, &4), %{})
   end
 
@@ -30,7 +33,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     |> List.wrap()
   end
 
-  defp spaces({:%{}, {line_no, col0, _}}, {:"{", {line, col, _}}, {:"}", {line, col2, _}} = _next, acc) do
+  defp spaces({:%{}, {line_no, col0, _}}, {:"{", {line_no, col, _}}, {:"}", {line_no, col2, _}} = _next, acc) do
     # elixir <= 1.16 || elixir > 1.16
     no_space_between? =
       (col0 + 1 == col && col + 1 == col2) ||
@@ -39,6 +42,27 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     location = [trigger: "%{}", line_no: line_no, column: col0]
 
     do_spaces(no_space_between?, true, location, acc)
+  end
+
+  defp spaces({:%{}, {line_no, col0, _}}, {:"{", {line_no, col, _}}, next, acc) do
+    {line_no2, col2, _line_no_end, _col_end} = Credo.Code.Token.position(next)
+
+    no_space_between? =
+      if line_no != line_no2 do
+        false
+      else
+        if col0 == col do
+          # elixir > 1.16
+          col + 1 == col2 - 1
+        else
+          # elixir <= 1.16
+          col == col2 - 1
+        end
+      end
+
+    location = [trigger: "%{", line_no: line_no, column: col0]
+
+    do_spaces(no_space_between?, false, location, acc)
   end
 
   defp spaces(_prev, {:"[", {line, col, _}}, {:"]", {line, col2, _}} = _next, acc) when col2 - col == 1 do

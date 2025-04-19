@@ -68,6 +68,13 @@ defmodule Credo.Code.Token do
     {line_no, col_start, line_no, col_end}
   end
 
+  def position({:atom, {line_no, col_start, nil}, atom}) do
+    # +1 for the `:` of the atom
+    col_end = col_start + String.length(to_string(atom)) + 1
+
+    {line_no, col_start, line_no, col_end}
+  end
+
   def position({:atom, {line_no, col_start, atom_or_charlist}, _atom}) do
     # +1 for the `:` of the atom
     col_end = col_start + String.length(to_string(atom_or_charlist)) + 1
@@ -113,6 +120,10 @@ defmodule Credo.Code.Token do
   # Elixir < 1.9.0 tuple syntax
   def position({_, {line_no, col_start, _}, atom_or_charlist}) do
     position_tuple(atom_or_charlist, line_no, col_start)
+  end
+
+  def position({nil, {line_no, col_start, nil}}) do
+    {line_no, col_start, line_no, col_start + 3}
   end
 
   def position({atom_or_charlist, {line_no, col_start, _}}) do

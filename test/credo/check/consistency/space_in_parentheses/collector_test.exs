@@ -93,6 +93,30 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
     assert %{with_space: 2, without_space: 4, without_space_allow_empty_enums: 2} == empty_enum
   end
 
+  test "it should report correct frequencies for empty enums /3" do
+    empty_enum =
+      ~S'''
+      %{s | config_lines: []}
+      '''
+      |> to_source_file()
+      |> Collector.collect_matches([])
+
+    assert %{without_space: 3, without_space_allow_empty_enums: 2} == empty_enum
+  end
+
+  test "it should report correct frequencies for " do
+    empty_enum =
+      ~S'''
+      defp prefix_str_for_body(nil), do: "\t"
+      defp prefix_str_for_body(""), do: "\t"
+      defp prefix_str_for_body(_), do: ""
+      '''
+      |> to_source_file()
+      |> Collector.collect_matches([])
+
+    assert %{without_space: 6, without_space_allow_empty_enums: 6} == empty_enum
+  end
+
   test "it should NOT report heredocs containing sigil chars" do
     values =
       @heredoc_example
