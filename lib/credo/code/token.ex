@@ -62,13 +62,49 @@ defmodule Credo.Code.Token do
     position_tuple_for_heredoc(atom_or_charlist, line_no, col_start)
   end
 
+  def position({:char, {line_no, col_start, charlist}, _number}) when is_list(charlist) do
+    col_end = col_start + String.length(to_string(charlist))
+
+    {line_no, col_start, line_no, col_end}
+  end
+
+  def position({:atom, {line_no, col_start, nil}, atom}) do
+    # +1 for the `:` of the atom
+    col_end = col_start + String.length(to_string(atom)) + 1
+
+    {line_no, col_start, line_no, col_end}
+  end
+
+  def position({:atom, {line_no, col_start, atom_or_charlist}, _atom}) do
+    # +1 for the `:` of the atom
+    col_end = col_start + String.length(to_string(atom_or_charlist)) + 1
+
+    {line_no, col_start, line_no, col_end}
+  end
+
   def position({:atom_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
+  def position({:atom_quoted, {line_no, col_start, _}, atom_or_charlist}) do
+    # +1 for the `:` of the atom and 2 for the quotes
+    col_end = col_start + String.length(to_string(atom_or_charlist)) + 1 + 2
+
+    {line_no, col_start, line_no, col_end}
+  end
+
   # Elixir >= 1.10.0 tuple syntax
-  def position({:sigil, {line_no, col_start, nil}, _, atom_or_charlist, _list, _number, _binary}) do
-    position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+  def position({:sigil, {line_no, col_start, nil}, sigil_name, charlist, _list, _number, _binary})
+      when is_list(charlist) do
+    case position_tuple_for_quoted_string(charlist, line_no, col_start) do
+      {line1, col_start, line1, col_end} ->
+        sigil_tag = String.replace("~#{sigil_name}", ~r/sigil_/, "")
+
+        {line1, col_start, line1, col_end + String.length(sigil_tag)}
+
+      value ->
+        value
+    end
   end
 
   # Elixir >= 1.9.0 tuple syntax
@@ -76,13 +112,18 @@ defmodule Credo.Code.Token do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
-  def position({:kw_identifier_unsafe, {line_no, col_start, _}, atom_or_charlist}) do
+  def position({:kw_identifier_unsafe, {line_no, col_start, _}, atom_or_charlist})
+      when is_atom(atom_or_charlist) or is_list(atom_or_charlist) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
   # Elixir < 1.9.0 tuple syntax
   def position({_, {line_no, col_start, _}, atom_or_charlist}) do
     position_tuple(atom_or_charlist, line_no, col_start)
+  end
+
+  def position({nil, {line_no, col_start, nil}}) do
+    {line_no, col_start, line_no, col_start + 3}
   end
 
   def position({atom_or_charlist, {line_no, col_start, _}}) do
@@ -133,10 +174,41 @@ defmodule Credo.Code.Token do
   end
 
   @doc false
-  def position_tuple_for_quoted_string(list, line_no, col_start)
-      when is_list(list) do
-    # add 1 for " (closing double quote)
-    {line_no_end, col_end, terminator} = convert_to_col_end(line_no, col_start, list)
+  def position_tuple_for_quoted_string([string], line_no, col_start)
+      when is_binary(string) do
+    # a simple string with double quotes (note the brackets in the fun head match)
+    case String.split(string, "\n") do
+      [string] ->
+        # no line break
+        col_end = col_start + String.length(string) + 2
+
+        {line_no, col_start, line_no, col_end}
+
+      [_ | _] = list ->
+        # line breaks
+        newlines = Enum.count(list) - 1
+        last_line = List.last(list)
+
+        {line_no_end, col_end, terminator} = convert_to_col_end(line_no + newlines, 1, last_line)
+
+        {line_no_end, col_end} =
+          case terminator do
+            :eol ->
+              # move to next line
+              {line_no_end + 1, 1}
+
+            _ ->
+              # add 1 for " (closing double quote)
+              {line_no_end, col_end + 1}
+          end
+
+        {line_no, col_start, line_no_end, col_end}
+    end
+  end
+
+  def position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+      when is_list(atom_or_charlist) or is_atom(atom_or_charlist) do
+    {line_no_end, col_end, terminator} = convert_to_col_end(line_no, col_start, atom_or_charlist)
 
     {line_no_end, col_end} =
       case terminator do
@@ -266,4 +338,23 @@ defmodule Credo.Code.Token do
   def to_col_end(col_start, value, add \\ 0) do
     col_start + String.length(to_string(value)) + add
   end
+
+  @doc false
+  def reduce(string_or_source_file, callback, acc \\ [])
+
+  def reduce(string_or_source_file, callback, acc) do
+    string_or_source_file
+    |> Credo.Code.to_tokens()
+    |> do_reduce(callback, acc)
+  end
+
+  defp do_reduce([], _callback, acc), do: acc
+
+  defp do_reduce([prev | [current | [next | rest]]], callback, acc) do
+    acc = callback.(prev, current, next, acc)
+
+    do_reduce([current | [next | rest]], callback, acc)
+  end
+
+  defp do_reduce(_tokens, _callback, acc), do: acc
 end
