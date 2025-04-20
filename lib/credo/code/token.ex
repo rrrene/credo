@@ -94,13 +94,13 @@ defmodule Credo.Code.Token do
   end
 
   # Elixir >= 1.10.0 tuple syntax
-  def position({:sigil, {line_no, col_start, nil}, sigil_name, charlist, _list, _number, _binary})
+  def position({:sigil, {line_no, col_start, nil}, sigil_name, charlist, modifiers, _number, _binary})
       when is_list(charlist) do
     case position_tuple_for_quoted_string(charlist, line_no, col_start) do
       {line1, col_start, line1, col_end} ->
         sigil_tag = String.replace("~#{sigil_name}", ~r/sigil_/, "")
 
-        {line1, col_start, line1, col_end + String.length(sigil_tag)}
+        {line1, col_start, line1, col_end + String.length(sigil_tag) + String.length(to_string(modifiers))}
 
       value ->
         value
@@ -313,7 +313,7 @@ defmodule Credo.Code.Token do
   defp convert_to_col_end(
          _,
          _,
-         {:sigil, {line_no, col_start, nil}, _, list, _list, _number, _binary}
+         {:sigil, {line_no, col_start, nil}, _, list, _modifiers, _number, _binary}
        )
        when is_list(list) do
     Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)

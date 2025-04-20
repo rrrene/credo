@@ -437,6 +437,27 @@ defmodule Credo.Code.TokenTest do
     assert {2, 5, 3, 5} == Token.position({:bin_string, {2, 5, nil}, ["a\n  b"]})
   end
 
+  # test "should give correct token position for strings /2" do
+  #   tokens =
+  #     Credo.Code.to_tokens(~S'''
+  #     IO.puts("\nFailed to make a screenshot")
+  #     ''')
+
+  #   expected = [
+  #     {:alias, {1, 1, ~c"IO"}, :IO},
+  #     {:., {1, 3, nil}},
+  #     {:paren_identifier, {1, 4, ~c"puts"}, :puts},
+  #     {:"(", {1, 8, nil}},
+  #     {:bin_string, {1, 9, nil}, ["\\nFailed to make a screenshot"]},
+  #     {:")", {1, 40, nil}},
+  #     {:eol, {1, 41, 1}}
+  #   ]
+
+  #   assert tokens == expected
+
+  #   assert {1, 12, 1, 18} == Token.position({:bin_string, {1, 12, nil}, ["okay"]})
+  # end
+
   test "should give correct token position for strings with interpolations" do
     tokens =
       Credo.Code.to_tokens(~S'''
@@ -642,5 +663,28 @@ defmodule Credo.Code.TokenTest do
     assert tokens == expected
 
     assert {1, 3, 1, 5} == Token.position({:atom, {1, 3, nil}, :&})
+  end
+
+  test "should give correct token position for regexes" do
+    tokens =
+      Credo.Code.to_tokens(~S'''
+      run_check(@described_check, ignore: ~w/use import/a)
+      ''')
+
+    expected = [
+      {:paren_identifier, {1, 1, ~c"run_check"}, :run_check},
+      {:"(", {1, 10, nil}},
+      {:at_op, {1, 11, nil}, :@},
+      {:identifier, {1, 12, ~c"described_check"}, :described_check},
+      {:",", {1, 27, 0}},
+      {:kw_identifier, {1, 29, ~c"ignore"}, :ignore},
+      {:sigil, {1, 37, nil}, :sigil_w, ["use import"], ~c"a", nil, "/"},
+      {:")", {1, 52, nil}},
+      {:eol, {1, 53, 1}}
+    ]
+
+    assert tokens == expected
+
+    assert {1, 37, 1, 52} == Token.position({:sigil, {1, 37, nil}, :sigil_w, ["use import"], ~c"a", nil, "/"})
   end
 end

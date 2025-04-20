@@ -102,6 +102,26 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.Collector do
     end
   end
 
+  # there is a "problem" with the tokenizer where control characters are not escaped
+  # in the tokenizer; this is a quick and dirty fix to handle that
+  defp spaces({:bin_string, {line, col0, nil}, [string]}, {paren, {line, col1, _}}, _next, acc)
+       when is_binary(string) and paren in [:"}", :"]", :")"] do
+    norm_string =
+      string
+      |> String.replace("\\", "\\\\", global: true)
+      |> String.replace(~r/\n/, "\\n", global: true)
+      |> String.replace(~r/\r/, "\\r", global: true)
+      |> String.replace(~r/\t/, "\\t", global: true)
+      |> String.replace(~r/\"/, "\\\"", global: true)
+
+    col0_end = col0 + String.length(norm_string) + 1
+
+    no_space_between? = col0_end == col1 - 1
+    location = [trigger: "#{paren}", line_no: line, column: col1]
+
+    do_spaces(no_space_between?, false, location, acc)
+  end
+
   defp spaces(prev, {paren, {_, _, _}} = t1, _next, acc) when paren in [:"}", :"]", :")"] do
     {line_no, _col_start, _line_no_end, col_end} = prev |> Credo.Code.Token.position()
     {line_no2, col_start2, _line_no_end, _col_end} = t1 |> Credo.Code.Token.position()
