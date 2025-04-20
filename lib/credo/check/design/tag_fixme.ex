@@ -36,15 +36,16 @@ defmodule Credo.Check.Design.TagFIXME do
     include_doc? = Params.get(params, :include_doc, __MODULE__)
 
     source_file
-    |> TagHelper.tags(@tag_name, include_doc?)
+    |> TagHelper.find_tags(@tag_name, include_doc?)
     |> Enum.map(&issue_for(issue_meta, &1))
   end
 
-  defp issue_for(issue_meta, {line_no, _line, trigger}) do
+  defp issue_for(issue_meta, {{line_no, column}, _line, trigger}) do
     format_issue(
       issue_meta,
       message: "Found a #{@tag_name} tag in a comment: #{trigger}",
       line_no: line_no,
+      column: column,
       trigger: trigger
     )
   end
