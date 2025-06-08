@@ -28,6 +28,14 @@ And run:
 
     $ mix credo
 
+### Install via `brew`
+
+If you are a [Homebrew](https://brew.sh/) user, you can install [credo](https://formulae.brew.sh/formula/credo) via:
+
+```bash
+$ brew install credo
+```
+
 ## Documentation
 
 Documentation is [available on Hexdocs](https://hexdocs.pm/credo/)
