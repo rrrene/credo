@@ -210,7 +210,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
       ast
       |> Inspect.Algebra.to_doc(%Inspect.Opts{})
       |> Inspect.Algebra.format(80)
-      |> Enum.join("")
+      |> IO.iodata_to_binary()
 
     :sha256
     |> :crypto.hash(string)
