@@ -14,14 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         repo_url: ["https://github.com/elixir-lang/elixir.git"]
-        repo_branch: ["v1.13", "main"]
+        repo_branch: ["v1.18", "main"]
         otp: [24.3, 25.3, 26.2]
-        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.1]
+        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.1, 1.19.0-rc.0]
         exclude:
-          - elixir: 1.14.5
-            otp: 26.2
-          - elixir: 1.14.5
-            otp: 25.3
           - elixir: 1.15.7
             otp: 23.3
           - elixir: 1.15.7
@@ -31,6 +27,8 @@ jobs:
           - elixir: 1.17.3
             otp: 24.3
           - elixir: 1.18.1
+            otp: 24.3
+          - elixir: 1.19.0-rc.0
             otp: 24.3
     steps:
       - uses: actions/checkout@v4
