@@ -53,7 +53,7 @@ defmodule Credo.Test.Assertions do
       issue
       |> Inspect.Algebra.to_doc(%Inspect.Opts{})
       |> Inspect.Algebra.format(50)
-      |> Enum.join("")
+      |> IO.iodata_to_binary()
 
     if Credo.Test.Case.test_source_files?() do
       """
