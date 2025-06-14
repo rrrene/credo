@@ -14,21 +14,9 @@ jobs:
       matrix:
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
-        otp: [24.3, 25.3, 26.2]
+        otp: [25.3, 26.2, 27.3]
         elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.1, 1.19.0-rc.0]
         exclude:
-          - elixir: 1.15.7
-            otp: 23.3
-          - elixir: 1.15.7
-            otp: 24.3
-          - elixir: 1.16.2
-            otp: 24.3
-          - elixir: 1.17.3
-            otp: 24.3
-          - elixir: 1.18.1
-            otp: 24.3
-          - elixir: 1.19.0-rc.0
-            otp: 24.3
           - elixir: 1.19.0-rc.0
             otp: 25.3
     steps:
@@ -49,24 +37,11 @@ jobs:
     name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
-        otp: [24.3, 25.3, 26.2]
-        # phx_new depends on newer versions of Elixir than Credo
-        elixir: [1.14.5, 1.15.7, 1.16.2, 1.17.3, 1.18.1]
+        otp: [25.3, 26.2, 27.3]
+        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.1, 1.19.0-rc.0]
         exclude:
-          - elixir: 1.14.5
-            otp: 26.2
-          - elixir: 1.14.5
+          - elixir: 1.19.0-rc.0
             otp: 25.3
-          - elixir: 1.15.7
-            otp: 23.3
-          - elixir: 1.15.7
-            otp: 24.3
-          - elixir: 1.16.2
-            otp: 24.3
-          - elixir: 1.17.3
-            otp: 24.3
-          - elixir: 1.18.1
-            otp: 24.3
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
