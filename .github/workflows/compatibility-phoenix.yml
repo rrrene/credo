@@ -29,6 +29,8 @@ jobs:
             otp: 24.3
           - elixir: 1.19.0-rc.0
             otp: 24.3
+          - elixir: 1.19.0-rc.0
+            otp: 25.3
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
