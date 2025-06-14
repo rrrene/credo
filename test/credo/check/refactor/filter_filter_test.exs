@@ -115,4 +115,55 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
       assert issue.trigger == "|>"
     end)
   end
+
+  test "reports chains of Map.filter" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        %{"a" => 1, "b" => 2, "c" => 3}
+        |> Map.filter(fn {key, value} -> key == "a" end)
+        |> Map.filter(fn {key, value} -> value == 1 end)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.message =~ "`Map.filter/2`"
+      refute issue.message =~ "`Enum.filter/2`"
+    end)
+  end
+
+  test "reports chains of Keyword.filter" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        [a: 1, b: 2, c: 3]
+        |> Keyword.filter(fn {key, value} -> key == :a end)
+        |> Keyword.filter(fn {key, value} -> value == 1 end)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.message =~ "`Keyword.filter/2`"
+      refute issue.message =~ "`Enum.filter/2`"
+    end)
+  end
+
+  test "does not report on mix-and-match modules" do
+    """
+    defmodule Credo.Sample.Module do
+      def some_function(p1, p2, p3, p4, p5) do
+        ["a", "b", "c"]
+        |> Map.filter(&String.contains?(&1, "x"))
+        |> Enum.filter(fn {key, value} -> value == 1 end)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
