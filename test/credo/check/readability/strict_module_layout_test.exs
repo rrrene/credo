@@ -305,6 +305,18 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       |> refute_issues
     end
 
+    test "ignores enforce_keys module attribute" do
+      """
+      defmodule Test do
+        @enforce_keys [:bar]
+        defstruct bar: nil
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, order: [:defstruct, :module_attribute])
+      |> refute_issues
+    end
+
     test "only ignores set module attributes" do
       """
       defmodule Test do

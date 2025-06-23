@@ -385,7 +385,7 @@ defmodule Credo.Code.Module do
 
   defp analyze(state, {:@, _meta, [{ignore_attribute, _, _}]})
        when ignore_attribute in ~w/after_compile before_compile compile impl deprecated doc
-       typedoc dialyzer external_resource file on_definition on_load vsn spec/a,
+       typedoc dialyzer external_resource file on_definition on_load vsn spec enforce_keys/a,
        do: state
 
   defp analyze(state, {:@, meta, [{name, _, _}]}),
