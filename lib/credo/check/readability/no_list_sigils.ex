@@ -1,27 +1,27 @@
 defmodule Credo.Check.Readability.NoListSigils do
-  @moduledoc """
-  A check to suggest explicit lists over the ~w and ~W sigls.
-  """
   use Credo.Check,
     param_defaults: [],
     explanations: [
       check: ~S"""
-      Although the ~w and ~W sigils allow for brevity when writing code, code is
-      read many more times than it is written. List definitions are both relatively
-      brief and completely unambiguous; consider defining lists explicitly rather than
-      via the sigil.
+      Code is read more times than it is written and although the ~w and ~W sigils 
+      allow for brevity in code, explicit list definitions have the benefit that they are 
+      both relatively brief and completely unambiguous.
 
-      Instead of
+      # preferred
+
+          ["foo", "bar", "baz"]
+          [:"例（括弧）+追加", :別言葉]
+          [~S({"key":"value"}), ~S({"key2":"value2"})]
+
+      # NOT preferred
 
           ~w'foo bar baz'
           ~w/例（括弧）+追加 別言葉/a
           ~W({"key":"value"} {"key2":"value2"})
 
-      Prefer:
-
-          ["foo", "bar", "baz"]
-          [:"例（括弧）+追加", :別言葉]
-          [~S({"key":"value"}), ~S({"key2":"value2"})]
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """,
       params: []
     ]
