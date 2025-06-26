@@ -37,7 +37,7 @@ defmodule Credo.Check.Readability.ListSigils do
       format_issue(
         issue_meta,
         message: ~S{Avoid ~w sigil: ~w(foo bar), prefer explicit lists: ["foo", "bar"]},
-        trigger: :sigil_w,
+        trigger: "~w",
         line_no: context[:line]
       )
 
@@ -50,7 +50,7 @@ defmodule Credo.Check.Readability.ListSigils do
         issue_meta,
         message:
           ~S<Avoid ~W sigil: ~W({"key":"value"}), prefer explicit lists: [~S({"key":"value"})]>,
-        trigger: :sigil_W,
+        trigger: "~W",
         line_no: context[:line]
       )
 
