@@ -1,7 +1,7 @@
-defmodule Credo.Check.Readability.NoListSigilsTest do
+defmodule Credo.Check.Readability.ListSigilsTest do
   use Credo.Test.Case, async: true
 
-  @described_check Credo.Check.Readability.NoListSigils
+  @described_check Credo.Check.Readability.ListSigils
 
   #
   # cases NOT raising issues

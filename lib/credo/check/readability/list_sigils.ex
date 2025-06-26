@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.NoListSigils do
+defmodule Credo.Check.Readability.ListSigils do
   use Credo.Check,
     param_defaults: [],
     explanations: [
