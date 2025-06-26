@@ -2,6 +2,9 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   use Credo.Check,
     id: "EX2003",
     base_priority: :normal,
+    param_defaults: [
+      files: %{included: ["test/**/*_test.exs", "apps/**/test/**/*_test.exs"]}
+    ],
     explanations: [
       check: """
       Skipped tests should have a comment documenting why the test is skipped.
@@ -24,11 +27,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
       While the pure existence of a comment does not change anything per se, a thoughtful
       comment can improve the odds for future iteration on the issue.
       """
-    ],
-    param_defaults: [included: ["test/**/*_test.exs"]]
-
-  @tag_skip_regex ~r/^\s*\@tag :skip\s*$/
-  @comment_regex ~r/^\s*\#.*$/
+    ]
 
   @doc false
   @impl true
@@ -44,9 +43,12 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   end
 
   defp transform_line({line, line_number}) do
+    tag_skip_regex = ~r/^\s*\@tag :skip\s*$/
+    comment_regex = ~r/^\s*\#.*$/
+
     cond do
-      line =~ @tag_skip_regex -> {:tag_skip, line_number}
-      line =~ @comment_regex -> {:comment, line_number}
+      line =~ tag_skip_regex -> {:tag_skip, line_number}
+      line =~ comment_regex -> {:comment, line_number}
       true -> {line, line_number}
     end
   end
@@ -65,7 +67,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`",
+      message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`.",
       trigger: "@tag :skip",
       line_no: line_no
     )

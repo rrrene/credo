@@ -29,11 +29,6 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   @collector Credo.Check.Consistency.SpaceAroundOperators.Collector
 
-  # TODO: add *ignored* operators, so you can add "|" and still write
-  #       [head|tail] while enforcing 2 + 3 / 1 ...
-  # FIXME: this seems to be already implemented, but there don't seem to be
-  # any related test cases around.
-
   @doc false
   @impl true
   def run_on_all_source_files(exec, source_files, params) do
@@ -144,7 +139,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
 
   defp number_in_range?(line, column) do
     line
-    |> String.slice(column..-1)
+    |> String.slice(column..-1//1)
     |> String.match?(~r/^\d+\.\./)
   end
 
@@ -171,13 +166,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
     # -1 because we need to subtract the operator
     binary_pattern_end_after? =
       line
-      |> String.slice(column..-1)
+      |> String.slice(column..-1//1)
       |> String.match?(~r/\>\>/)
 
     # -1 because we need to subtract the operator
     typed_after? =
       line
-      |> String.slice(column..-1)
+      |> String.slice(column..-1//1)
       |> String.match?(~r/^\s*(integer|native|signed|unsigned|binary|size|little|float)/)
 
     # -2 because we need to subtract the operator
@@ -194,8 +189,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         typed_after?,
         typed_before?
       ]
-      |> Enum.filter(& &1)
-      |> Enum.count()
+      |> Enum.count(& &1)
 
     heuristics_met_count >= 2
   end
@@ -207,26 +201,24 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators do
         |> Credo.Code.TokenAstCorrelation.find_tokens_in_ast(ast)
         |> List.wrap()
         |> List.first()
-        |> is_parameter_in_function_call()
+        |> parameter_in_function_call?()
 
       _ ->
         false
     end
   end
 
-  defp is_parameter_in_function_call({atom, _, arguments})
+  defp parameter_in_function_call?({atom, _, arguments})
        when is_atom(atom) and is_list(arguments) do
     true
   end
 
-  defp is_parameter_in_function_call(
-         {{:., _, [{:__aliases__, _, _mods}, fun_name]}, _, arguments}
-       )
+  defp parameter_in_function_call?({{:., _, [{:__aliases__, _, _mods}, fun_name]}, _, arguments})
        when is_atom(fun_name) and is_list(arguments) do
     true
   end
 
-  defp is_parameter_in_function_call(_) do
+  defp parameter_in_function_call?(_) do
     false
   end
 

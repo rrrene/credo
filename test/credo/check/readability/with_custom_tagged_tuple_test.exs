@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
 
   @described_check Credo.Check.Readability.WithCustomTaggedTuple
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report violation" do
     """
     defmodule Test do
@@ -17,6 +21,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
     """
@@ -35,10 +43,17 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
-      issue_messages = Enum.map(issues, & &1.message)
+      [issue1, issue2] = issues
 
-      assert Enum.member?(issue_messages, "Invalid usage of placeholder `:resource` in with")
-      assert Enum.member?(issue_messages, "Invalid usage of placeholder `:authz` in with")
+      assert issue1.message ==
+               "Avoid using tagged tuples as placeholders in `with` (found: `:resource`)."
+
+      assert issue1.trigger == ":resource"
+
+      assert issue2.message ==
+               "Avoid using tagged tuples as placeholders in `with` (found: `:authz`)."
+
+      assert issue2.trigger == ":authz"
     end)
   end
 end

@@ -39,9 +39,16 @@ defmodule Credo.Check.Consistency.TabsOrSpaces do
     lines_with_issues = @collector.find_locations_not_matching(expected, source_file)
 
     Enum.map(lines_with_issues, fn line_no ->
-      format_issue(issue_meta, message: message_for(expected), line_no: line_no)
+      format_issue(issue_meta,
+        message: message_for(expected),
+        line_no: line_no,
+        trigger: trigger_for(expected)
+      )
     end)
   end
+
+  defp trigger_for(:spaces = _expected), do: "\t"
+  defp trigger_for(:tabs = _expected), do: " "
 
   defp message_for(:spaces = _expected) do
     "File is using tabs while most of the files use spaces for indentation."

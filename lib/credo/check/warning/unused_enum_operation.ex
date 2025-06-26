@@ -10,9 +10,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
       While this is correct ...
 
           def prepend_my_username(my_username, usernames) do
-            valid_usernames = Enum.reject(usernames, &is_nil/1)
+            usernames = Enum.reject(usernames, &is_nil/1)
 
-            [my_username] ++ valid_usernames
+            [my_username] ++ usernames
           end
 
       ... we forgot to save the downcased username in this example:
@@ -22,7 +22,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperation do
           def prepend_my_username(my_username, usernames) do
             Enum.reject(usernames, &is_nil/1)
 
-            [my_username] ++ valid_usernames
+            [my_username] ++ usernames
           end
 
       Since Elixir variables are immutable, Enum operations never work on the

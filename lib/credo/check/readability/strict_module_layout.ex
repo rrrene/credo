@@ -61,12 +61,20 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
         List of atoms identifying the module parts which are not checked, and may
         therefore appear anywhere in the module. Supported values are the same as
         in the `:order` param.
+        """,
+        ignore_module_attributes: """
+        List of atoms identifying the module attributes which are not checked, and may
+        therefore appear anywhere in the module. Useful for custom DSLs that use attributes
+        before function heads.
+
+        For example, if you provide `~w/trace/a`, all `@trace` attributes will be ignored.
         """
       ]
     ],
     param_defaults: [
       order: ~w/shortdoc moduledoc behaviour use import alias require/a,
-      ignore: []
+      ignore: [],
+      ignore_module_attributes: []
     ]
 
   alias Credo.CLI.Output.UI
@@ -106,6 +114,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   defp all_errors(modules_and_parts, params, issue_meta) do
     expected_order = expected_order(params)
     ignored_parts = Keyword.get(params, :ignore, [])
+    ignore_module_attributes = Keyword.get(params, :ignore_module_attributes, [])
 
     Enum.reduce(
       modules_and_parts,
@@ -118,13 +127,25 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
             # because enforcing an internal order between these two kinds is counterproductive if
             # a module implements multiple behaviours. In such cases, we typically want to group
             # callbacks by the implementation, not by the kind (fun vs macro).
-            {callback_impl, location} when callback_impl in ~w/callback_macro callback_fun/a ->
-              {:callback_impl, location}
+            {callback_impl, meta} when callback_impl in ~w/callback_macro callback_fun/a ->
+              {:callback_impl, meta}
 
             other ->
               other
           end)
-          |> Stream.reject(fn {part, _location} -> part in ignored_parts end)
+          |> Stream.reject(fn {part, meta} ->
+            cond do
+              part in ignored_parts ->
+                true
+
+              part == :module_attribute and
+                  Keyword.get(meta, :attribute, nil) in ignore_module_attributes ->
+                true
+
+              true ->
+                false
+            end
+          end)
 
         module_errors(module, parts, expected_order, issue_meta) ++ errors
       end
@@ -173,8 +194,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
       issue_meta,
       message: "#{part_to_string(part)} must appear before #{part_to_string(current_part)}",
       trigger: inspect(module),
-      line_no: Keyword.get(file_pos, :line),
-      column: Keyword.get(file_pos, :column)
+      line_no: Keyword.get(file_pos, :line)
     )
   end
 

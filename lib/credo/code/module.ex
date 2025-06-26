@@ -74,6 +74,25 @@ defmodule Credo.Code.Module do
   end
 
   @doc "Reads an attribute from a module's `ast`"
+  def attribute({:defmodule, _, _arguments} = ast, attr_name) do
+    arguments =
+      case Credo.Code.Block.do_block_for!(ast) do
+        {:__block__, [], arguments} -> arguments
+        value -> List.wrap(value)
+      end
+
+    attr_value =
+      Enum.find_value(arguments, fn
+        {:@, _meta, [{^attr_name, _, [value]} | _tail]} -> {:ok, value}
+        _ -> nil
+      end)
+
+    case attr_value do
+      {:ok, value} -> value
+      error -> {:error, error}
+    end
+  end
+
   def attribute(ast, attr_name) do
     case Credo.Code.postwalk(ast, &find_attribute(&1, &2, attr_name), {:error, nil}) do
       {:ok, value} ->
@@ -306,9 +325,7 @@ defmodule Credo.Code.Module do
     module_parts(state)
   end
 
-  defp traverse_file({:defmodule, meta, args}, state) do
-    [first_arg, [do: module_ast]] = args
-
+  defp traverse_file({:defmodule, meta, [first_arg, [do: module_ast]]}, state) do
     state = start_module(state, meta)
     {_ast, state} = Macro.prewalk(module_ast, state, &traverse_module/2)
 
@@ -368,8 +385,11 @@ defmodule Credo.Code.Module do
 
   defp analyze(state, {:@, _meta, [{ignore_attribute, _, _}]})
        when ignore_attribute in ~w/after_compile before_compile compile impl deprecated doc
-       typedoc dialyzer external_resource file on_definition on_load vsn spec/a,
+       typedoc dialyzer external_resource file on_definition on_load vsn spec enforce_keys/a,
        do: state
+
+  defp analyze(state, {:@, meta, [{name, _, _}]}),
+    do: add_module_element(state, :module_attribute, Keyword.put(meta, :attribute, name))
 
   defp analyze(state, {:@, meta, _}),
     do: add_module_element(state, :module_attribute, meta)
@@ -444,7 +464,7 @@ defmodule Credo.Code.Module do
   end
 
   defp add_module_element(state, element, meta) do
-    location = Keyword.take(meta, ~w/line column/a)
-    update_in(state.current_module.parts, &[{element, location} | &1])
+    meta = Keyword.take(meta, ~w/attribute line column/a)
+    update_in(state.current_module.parts, &[{element, meta} | &1])
   end
 end

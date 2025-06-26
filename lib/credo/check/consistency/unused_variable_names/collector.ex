@@ -14,15 +14,16 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
 
     source_file
     |> Credo.Code.prewalk(&traverse(location_recorder, &1, &2), [])
+    |> Enum.uniq()
     |> Enum.reverse()
   end
 
-  defp traverse(callback, {:=, _, params} = ast, acc) do
+  defp traverse(callback, {match, _, params} = ast, acc) when match in ~w[= <-]a do
     {ast, reduce_unused_variables(params, callback, acc)}
   end
 
   defp traverse(callback, {def, _, [{_, _, params} | _]} = ast, acc)
-       when def in [:def, :defp] do
+       when def in [:def, :defp, :defmacro, :defmacrop] do
     {ast, reduce_unused_variables(params, callback, acc)}
   end
 
@@ -38,6 +39,12 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
     Enum.reduce(ast, acc, fn
       {_, _, params}, param_acc when is_list(params) ->
         reduce_unused_variables(params, callback, param_acc)
+
+      tuple_ast, param_acc when tuple_size(tuple_ast) == 2 ->
+        reduce_unused_variables(Tuple.to_list(tuple_ast), callback, param_acc)
+
+      list_ast, param_acc when is_list(list_ast) ->
+        reduce_unused_variables(list_ast, callback, param_acc)
 
       param_ast, param_acc ->
         if unused_variable_ast?(param_ast) do
@@ -70,10 +77,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
   defp record_not_matching(expected, {name, meta, _}, acc) do
     case {expected, Atom.to_string(name)} do
       {:anonymous, "_" <> rest = trigger} when rest != "" ->
-        [[line_no: meta[:line], trigger: trigger] | acc]
+        [[line_no: meta[:line], column: meta[:column], trigger: trigger] | acc]
 
       {:meaningful, "_" = trigger} ->
-        [[line_no: meta[:line], trigger: trigger] | acc]
+        [[line_no: meta[:line], column: meta[:column], trigger: trigger] | acc]
 
       _ ->
         acc

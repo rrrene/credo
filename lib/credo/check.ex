@@ -171,6 +171,7 @@ defmodule Credo.Check do
     warning: 16
   }
 
+  alias Credo.Service.SourceFileScopePriorities
   alias Credo.Check
   alias Credo.Check.Params
   alias Credo.Code.Scope
@@ -193,6 +194,11 @@ defmodule Credo.Check do
     :run_on_all,
     :tags
   ]
+
+  {config, _binding} = Code.eval_file(".credo.exs")
+  %{:name => "default", :checks => %{:enabled => check_tuples}} = List.first(config[:configs])
+
+  @__default_checks__ Enum.map(check_tuples, fn {check, _params} -> check end)
 
   @doc false
   defmacro __using__(opts) do
@@ -333,8 +339,10 @@ defmodule Credo.Check do
         end
       end
 
+    module_doc = moduledoc(opts, __CALLER__.module, Mix.Project.config()[:app])
+
     quote do
-      @moduledoc unquote(moduledoc(opts))
+      @moduledoc unquote(module_doc)
       @behaviour Credo.Check
       @before_compile Credo.Check
 
@@ -392,8 +400,12 @@ defmodule Credo.Check do
 
       defp do_run_on_all_source_files(exec, source_files, params) do
         source_files
-        |> Enum.map(&Task.async(fn -> run_on_source_file(exec, &1, params) end))
-        |> Enum.each(&Task.await(&1, :infinity))
+        |> Task.async_stream(fn source -> run_on_source_file(exec, source, params) end,
+          max_concurrency: exec.max_concurrent_check_runs,
+          timeout: :infinity,
+          ordered: false
+        )
+        |> Stream.run()
 
         :ok
       end
@@ -445,11 +457,7 @@ defmodule Credo.Check do
 
       defoverridable Credo.Check
 
-      defp append_issues_and_timings([] = _issues, exec) do
-        exec
-      end
-
-      defp append_issues_and_timings([_ | _] = issues, exec) do
+      defp append_issues_and_timings(issues, exec) do
         Credo.Execution.ExecutionIssues.append(exec, issues)
       end
     end
@@ -495,12 +503,14 @@ defmodule Credo.Check do
     end
   end
 
-  defp moduledoc(opts) do
+  defp moduledoc(opts, module, app) do
     explanations = opts[:explanations]
 
     base_priority = opts_to_string(opts[:base_priority]) || 0
 
-    # category = opts_to_string(opts[:category]) || to_string(__MODULE__)
+    default_check? = module in @__default_checks__
+
+    tags = opts[:tags] || []
 
     elixir_version_hint =
       if opts[:elixir_version] do
@@ -509,6 +519,42 @@ defmodule Credo.Check do
         "requires Elixir `#{elixir_version}`"
       else
         "works with any version of Elixir"
+      end
+
+    default_check_hint =
+      if default_check? do
+        """
+        > #### This check is enabled by default. {: .tip}
+        >
+        > [Learn how to disable it](#{credo_docs_uri(app, "config_file.html#checks")}) via `.credo.exs`.
+        """
+      else
+        """
+        > #### This check is disabled by default. {: .neutral}
+        >
+        > [Learn how to enable it](#{credo_docs_uri(app, "config_file.html#checks")}) via `.credo.exs`.
+        """
+      end
+
+    # TODO: list all tags
+    tag_hint =
+      if :formatter in tags do
+        """
+        > #### This check is tagged `:formatter` {: .info}
+        >
+        > This means you can disable this check when also using Elixir's formatter.
+        """
+      else
+        if :controversial in tags do
+          """
+          > #### This check is tagged `:controversial` {: .warning}
+          >
+          > This means that this check is more opinionated than others and not for everyone's taste.
+          """
+        else
+          """
+          """
+        end
       end
 
     check_doc = opts_to_string(explanations[:check])
@@ -549,6 +595,12 @@ defmodule Credo.Check do
       end
 
     """
+    ## Basics
+
+    #{String.trim(default_check_hint)}
+
+    #{String.trim(tag_hint)}
+
     This check has a base priority of `#{base_priority}` and #{elixir_version_hint}.
 
     ## Explanation
@@ -561,11 +613,14 @@ defmodule Credo.Check do
 
     ## General Parameters
 
-    Like with all checks, [general params](check_params.html) can be applied.
+    Like with all checks, [general params](#{credo_docs_uri(app, "check_params.html")}) can be applied.
 
-    Parameters can be configured via the [`.credo.exs` config file](config_file.html).
+    Parameters can be configured via the [`.credo.exs` config file](#{credo_docs_uri(app, "config_file.html")}).
     """
   end
+
+  defp credo_docs_uri(:credo, path), do: path
+  defp credo_docs_uri(_other_app, path), do: "`e:credo:#{path}`"
 
   defp opts_to_string(value) do
     {result, _} =
@@ -630,39 +685,54 @@ defmodule Credo.Check do
   options to `format_issue/2`:
 
   - `:priority`     Sets the issue's priority.
-  - `:trigger`      Sets the issue's trigger.
+  - `:trigger`      Sets the issue's trigger, i.e. the text causing the issue (see `Credo.Check.Warning.IoInspect`).
   - `:line_no`      Sets the issue's line number. Tries to find `column` if `:trigger` is supplied.
   - `:column`       Sets the issue's column.
   - `:exit_status`  Sets the issue's exit_status.
   - `:severity`     Sets the issue's severity.
+  - `:category`     Sets the issue's category.
   """
   def format_issue(issue_meta, opts, check) do
-    params = IssueMeta.params(issue_meta)
-    issue_category = Params.category(params, check)
-    issue_base_priority = Params.priority(params, check)
-
-    format_issue(issue_meta, opts, issue_category, issue_base_priority, check)
-  end
-
-  @doc false
-  def format_issue(issue_meta, opts, issue_category, issue_priority, check) do
     source_file = IssueMeta.source_file(issue_meta)
     params = IssueMeta.params(issue_meta)
+    issue_category = opts[:category] || Params.category(params, check)
+    priority = params |> Params.priority(check) |> Priority.to_integer()
 
-    priority = Priority.to_integer(issue_priority)
+    exit_status_or_category =
+      opts[:exit_status] || Params.exit_status(params, check) || issue_category
 
-    exit_status_or_category = Params.exit_status(params, check) || issue_category
     exit_status = Check.to_exit_status(exit_status_or_category)
 
     line_no = opts[:line_no]
-    trigger = opts[:trigger]
     column = opts[:column]
     severity = opts[:severity] || Severity.default_value()
+    trigger = opts[:trigger]
+    message = to_string(opts[:message])
+
+    trigger =
+      if trigger == Issue.no_trigger() do
+        trigger
+      else
+        to_string(trigger)
+      end
+
+    message =
+      if String.valid?(message) do
+        message
+      else
+        IO.warn(
+          "#{check_name(check)} creates an Issue with a `:message` containing invalid bytes: #{inspect(message)}"
+        )
+
+        "(see warning) #{inspect(message)}"
+      end
 
     %Issue{
+      check: check,
+      category: issue_category,
       priority: priority,
       filename: source_file.filename,
-      message: opts[:message],
+      message: message,
       trigger: trigger,
       line_no: line_no,
       column: column,
@@ -671,20 +741,21 @@ defmodule Credo.Check do
     }
     |> add_line_no_options(line_no, source_file)
     |> add_column_if_missing(trigger, line_no, column, source_file)
-    |> add_check_and_category(check, issue_category)
+    |> force_priority_if_given(opts[:priority])
   end
 
-  defp add_check_and_category(issue, check, issue_category) do
-    %Issue{
+  defp force_priority_if_given(issue, nil), do: issue
+
+  defp force_priority_if_given(issue, priority) do
+    %{
       issue
-      | check: check,
-        category: issue_category
+      | priority: priority
     }
   end
 
   defp add_column_if_missing(issue, trigger, line_no, column, source_file) do
     if trigger && line_no && !column do
-      %Issue{
+      %{
         issue
         | column: SourceFile.column(source_file, line_no, trigger)
       }
@@ -697,7 +768,7 @@ defmodule Credo.Check do
     if line_no do
       {_def, scope} = scope_for(source_file, line: line_no)
 
-      %Issue{
+      %{
         issue
         | priority: issue.priority + priority_for(source_file, scope),
           scope: scope
@@ -706,6 +777,8 @@ defmodule Credo.Check do
       issue
     end
   end
+
+  defp check_name(module), do: Credo.Code.Name.full(module)
 
   # Returns the scope for the given line as a tuple consisting of the call to
   # define the scope (`:defmodule`, `:def`, `:defp` or `:defmacro`) and the
@@ -759,7 +832,18 @@ defmodule Credo.Check do
   end
 
   defp priority_for(source_file, scope) do
-    scope_prio_map = Priority.scope_priorities(source_file)
+    # Caching scope priorities, because these have to be computed only once per file. This
+    # significantly speeds up the execution time when a large number of issues are generated.
+    scope_prio_map =
+      case SourceFileScopePriorities.get(source_file) do
+        {:ok, value} ->
+          value
+
+        :notfound ->
+          result = Priority.scope_priorities(source_file)
+          SourceFileScopePriorities.put(source_file, result)
+          result
+      end
 
     scope_prio_map[scope] || 0
   end

@@ -3,6 +3,10 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
 
   @described_check Credo.Check.Refactor.AppendSingleItem
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report appending 2 items" do
     """
     defmodule CredoSampleModule do
@@ -55,6 +59,10 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     |> refute_issues()
   end
 
+  #
+  # cases raising issues
+  #
+
   test "it should report a violation" do
     """
     defmodule CredoSampleModule do
@@ -65,6 +73,8 @@ defmodule Credo.Check.Refactor.AppendSingleItemTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "++"
+    end)
   end
 end

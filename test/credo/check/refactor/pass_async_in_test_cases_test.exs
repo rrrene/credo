@@ -3,6 +3,10 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
 
   @described_check Credo.Check.Refactor.PassAsyncInTestCases
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it ignores `use` statements for modules not ending in 'Case'" do
     """
     defmodule FooTest do
@@ -15,6 +19,10 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
   end
 
   for case_name <- ~w[MyApp.DataCase ConnCase Foo.Bar.BazCase] do
+    #
+    # cases NOT raising issues
+    #
+
     @case_name case_name
 
     test "it allows `use #{@case_name}, async: true`" do
@@ -39,6 +47,10 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> refute_issues()
     end
 
+    #
+    # cases raising issues
+    #
+
     test "it does not allow `use #{@case_name}` with other options but not `async:`" do
       """
       defmodule ThingTest do
@@ -49,6 +61,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 2
+        assert issue.trigger == "use"
       end)
     end
 
@@ -63,6 +76,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
         assert issue.line_no == 3
+        assert issue.trigger == "use"
       end)
     end
   end

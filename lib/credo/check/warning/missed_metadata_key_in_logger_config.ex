@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     ],
     explanations: [
       check: """
-      Ensures custom metadata keys are included in logger config
+      Ensures custom metadata keys are included in logger config.
 
       Note that all metadata is optional and may not always be available.
 
@@ -18,34 +18,61 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
       In your app's logger configuration, you would need to include the `:error_code` key:
 
-          config :logger, :console,
-            format: "[$level] $message $metadata\n",
+          config :logger, :default_formatter,
+            format: "[$level] $message $metadata\\n",
             metadata: [:error_code, :file]
 
       That way your logs might then receive lines like this:
 
           [error] We have a problem error_code=pc_load_letter file=lib/app.ex
+
+      If you want to allow any metadata to be printed, you can use `:all` in the logger's
+      metadata config.
       """,
       params: [
-        ignore_logger_functions: "Do not raise an issue for these Logger functions.",
         metadata_keys: """
         Do not raise an issue for these Logger metadata keys.
 
-        By default, we assume the metadata keys listed under your `console`
-        backend.
+        By default, we read the metadata keys configured as the current environment's
+        `:default_formatter` (or `:console` for older versions of Elixir).
+
+        You can use this parameter to dynamically load the environment/backend you care about,
+        via `.credo.exs` (e.g. reading the `:file_log` config from `config/prod.exs`):
+
+            {Credo.Check.Warning.MissedMetadataKeyInLoggerConfig,
+              [
+                metadata_keys:
+                  "config/prod.exs"
+                  |> Config.Reader.read!()
+                  |> get_in([:logger, :file_log, :metadata])
+              ]}
         """
       ]
     ]
 
   @logger_functions ~w(alert critical debug emergency error info notice warn warning metadata log)a
+  @native_logger_metadata_keys [:ansi_color, :report_cb]
 
   @doc false
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
+    ignore_check? = find_metadata_keys(params) == :all
+
+    if ignore_check? do
+      []
+    else
+      do_run(source_file, params)
+    end
+  end
+
+  defp do_run(source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
+    metadata_keys = find_metadata_keys(params) ++ @native_logger_metadata_keys
+
     state = {false, []}
 
-    {_, issues} = Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta), state)
+    {_, issues} =
+      Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, metadata_keys), state)
 
     issues
   end
@@ -53,10 +80,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
          state,
-         issue_meta
+         issue_meta,
+         metadata_keys
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -64,10 +92,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {fun_name, meta, arguments} = ast,
          {true, _issues} = state,
-         issue_meta
+         issue_meta,
+         metadata_keys
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -75,7 +104,8 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp traverse(
          {:import, _meta, arguments} = ast,
          {_module_contains_import?, issues} = state,
-         _issue_meta
+         _issue_meta,
+         _metadata_keys
        ) do
     if logger_import?(arguments) do
       {ast, {true, issues}}
@@ -84,7 +114,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
     end
   end
 
-  defp traverse(ast, state, _issue_meta) do
+  defp traverse(ast, state, _issue_meta, _metadata_keys) do
     {ast, state}
   end
 
@@ -92,13 +122,6 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
 
   defp add_issue_to_state({module_contains_import?, issues}, issue) do
     {module_contains_import?, [issue | issues]}
-  end
-
-  defp find_issue(fun_name, arguments, meta, issue_meta) do
-    params = IssueMeta.params(issue_meta)
-    metadata_keys = find_metadata_keys(params)
-
-    issue_for_call(fun_name, arguments, meta, issue_meta, metadata_keys)
   end
 
   defp issue_for_call(:metadata, [logger_metadata], meta, issue_meta, metadata_keys) do
@@ -136,19 +159,28 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfig do
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]), do: true
   defp logger_import?(_), do: false
 
-  defp issue_for(issue_meta, line_no, missed_keys) do
-    message = "Logger metadata key #{Enum.join(missed_keys, ", ")} will be ignored in production"
-
-    format_issue(issue_meta, message: message, line_no: line_no)
-  end
-
   defp find_metadata_keys(params) do
     metadata_keys = Params.get(params, :metadata_keys, __MODULE__)
 
     if metadata_keys == [] do
-      :logger |> Application.get_env(:console, []) |> Keyword.get(:metadata, [])
+      find_metadata_keys_in_logger_config(:default_formatter) ||
+        find_metadata_keys_in_logger_config(:console) || []
     else
       metadata_keys
     end
+  end
+
+  defp find_metadata_keys_in_logger_config(key) do
+    :logger
+    |> Application.get_env(key, [])
+    |> Keyword.get(:metadata)
+  end
+
+  defp issue_for(issue_meta, line_no, [trigger | _] = missed_keys) do
+    format_issue(issue_meta,
+      message: "Logger metadata key #{Enum.join(missed_keys, ", ")} not found in Logger config.",
+      line_no: line_no,
+      trigger: trigger
+    )
   end
 end

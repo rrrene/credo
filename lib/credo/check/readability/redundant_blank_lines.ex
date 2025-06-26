@@ -23,7 +23,6 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
   alias Credo.Code.Strings
 
   @doc false
-  # TODO: consider for experimental check front-loader (text)
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
@@ -32,7 +31,7 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     source_file
     |> Charlists.replace_with_spaces("=")
     |> Sigils.replace_with_spaces("=", "=", source_file.filename)
-    |> Strings.replace_with_spaces("=", "=", source_file.filename)
+    |> Strings.replace_with_spaces("=", "=", source_file.filename, "=")
     |> Heredocs.replace_with_spaces("=", "=", "=", source_file.filename)
     |> Credo.Code.to_lines()
     |> blank_lines()
@@ -44,7 +43,8 @@ defmodule Credo.Check.Readability.RedundantBlankLines do
     format_issue(
       issue_meta,
       message: "There should be no more than #{max_blank_lines} consecutive blank lines.",
-      line_no: line
+      line_no: line,
+      trigger: Issue.no_trigger()
     )
   end
 

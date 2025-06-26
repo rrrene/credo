@@ -1,6 +1,100 @@
 # Changelog
 
-## 1.7.0-rc.2
+## 1.7.12
+
+- Fix compatibility & compiler warnings with Elixir 1.19 (dev)
+- Provide `:column` on all checks
+- Fix check docs in other project's documentation
+- `Credo.Check.Refactor.DoubleBooleanNegation` fixed false positive
+- `Credo.Check.Readability.NestedFunctionCalls` fixed false positive
+- `Credo.Check.Consistency.UnusedVariableNames` fixed duplicate issues
+
+## 1.7.11
+
+- Fix compatibility & compiler warnings with Elixir 1.18
+- Fix crashing for invalid strings in issue messages
+- Show required Elixir version for skipped checks
+- Add options `:exit_status` and `:category` to `format_issue/2` when using `Credo.Check`
+- `Credo.Check.Readability.ModuleDoc` fixed false positive
+- `Credo.Check.Warning.UnusedEnumOperation` fixed false positive
+- `Credo.Check.Refactor.ABCSize` fixed false positive for tuples and underscored matches (`_foo`)
+
+## 1.7.10
+
+- Maintenance release
+
+## 1.7.9
+
+- `Credo.Check.Refactor.ABCSize` fixed false positive for pin operator (`^`)
+- `Credo.Check.Readability.FunctionNames` fixed false positive for pow operator (`**`)
+- Fixed a bug in `Credo.Code.Parameters` when couting parameters for functions with guards
+
+## 1.7.8
+
+- `Credo.Check.Refactor.Apply` fixed false positive
+- `Credo.Check.Warning.IoInspect` fixed false positive
+- `Credo.Check.Warning.UnsafeToAtom` fixed false positive
+- `Credo.Check.Readability.FunctionNames` fixed false positive
+
+## 1.7.7
+
+- Fix compatibility & compiler warnings with Elixir 1.17
+- `Credo.Check.Design.SkipTestWithoutComment`, `Credo.Check.Refactor.PassAsyncInTestCases` and `Credo.Check.Warning.WrongTestFileExtension` now work for umbrella apps
+
+## 1.7.6
+
+- `Credo.Check.Consistency.MultiAliasImportRequireUse` fixed false positive
+- `Credo.Check.Readability.PredicateFunctionNames` now ignores functions that implement a behaviour
+- `Credo.Check.Readability.FunctionName` now supports multi-letter sigils
+- `Credo.Check.Readability.Specs` fixed false positive
+- `Credo.Check.Warning.UnusedKeywordOperation` fixed false positive
+- Fix `column` information on several checks in case there are two offending calls on the same line
+- Fix some deprecation warnings for upcoming Elixir 1.17
+
+## 1.7.5
+
+- Fix `--read-from-stdin` not respecting `:files`/`:included` param
+- `Credo.Check.Readability.NestedFunctionCalls` no longer crashes for functions with an unquoted name
+
+## 1.7.4
+
+- Add new check `Credo.Check.Refactor.UtcNowTruncate` as opt-in check (this is scheduled to become a standard check in v1.8)
+- Add lots of improvements around `:trigger` in `Credo.Issue`
+- Add new output format `short`
+- Improve docs for several checks
+- Fix another, smaller bottleneck in multicore performance
+- Fix `--read-from-stdin` not respecting `:files` param
+- Fix SARIF output format for non-string triggers
+- Fix initializing builtin commands twice
+- Fix `diff` command not recognizing a git ref as first argument
+
+## 1.7.3
+
+- `Credo.Check.Readability.AliasOrder` now supports a `:sort_method` parameter
+- `Credo.Check.Readability.PredicateFunctionNames` received fixes
+- `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig` received fixes
+
+## 1.7.2
+
+- Fix compatibility & compiler warnings with Elixir 1.16
+- Fix a bottleneck in multicore performance
+- Cache scope priorities
+- `CHANGELOG.md` is now included in the package
+- `Credo.Check.Readability.NestedFunctionCalls` no longer warns on function calls in interpolated strings
+- `Credo.Check.Readability.PredicateFunctionNames` fixed false positives
+- `Credo.Check.Readability.RedundantBlankLines` fixed a bug with double quotes multiline strings
+- `Credo.Check.Refactor.ModuleDependencies` now takes modules for `:excluded_namespaces` parameter
+- `Credo.Check.Refactor.NegatedIsNil` no longer leaks memory
+- `Credo.Check.Warning.Dbg` now warns when part of a pipeline and called without parens
+- `Credo.Check.Warning.MissedMetadataKeyInLoggerConfig` received various fixes and improvements
+
+## 1.7.1
+
+- Fix compatibility & compiler warnings with Elixir 1.15
+- Improve docs
+- `Credo.Check.Readability.Specs` works for parensless definitions
+
+## 1.7.0
 
 - `Credo.Check.Readability.ModuleDoc` works for Phoenix 1.7+ views
 - `Credo.Check.Readability.FunctionNames` now ignores custom operators
@@ -9,6 +103,7 @@
 - `Credo.Check.Readability.ModuleNames` now supports an `:ignore` parameter
 - `Credo.Check.Design.AliasUsage` now supports an `:if_referenced` parameter
 - `Credo.Check.Readability.FunctionNames` now works for acronyms in predicate functions
+- `Credo.Check.Readability.NestedFunctionCalls` now works for calls already in a pipeline and local function calls
 
 ### Add SARIF support
 

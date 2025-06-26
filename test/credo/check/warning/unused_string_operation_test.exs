@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
 
   @described_check Credo.Check.Warning.UnusedStringOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
@@ -465,8 +469,9 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     |> refute_issues()
   end
 
-  ##############################################################################
-  ##############################################################################
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation" do
     """

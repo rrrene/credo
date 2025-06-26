@@ -7,28 +7,24 @@ on:
 
 jobs:
   test_on_source:
-    runs-on: ubuntu-18.04
-    name: "[${{matrix.otp}}/${{matrix.elixir}}] Phoenix ${{matrix.repo_branch}} source code analysed by Credo [OTP/Elixir]"
+    runs-on: ubuntu-24.04
+    name: "Elixir ${{matrix.elixir}} OTP ${{matrix.otp}} - ${{matrix.repo_branch}}"
     strategy:
       fail-fast: false
       matrix:
-        otp: [21.3, 22.3, 23.3, 24.2]
-        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4, 1.14.0]
-        exclude:
-          - otp: 24.2
-            elixir: 1.10.4
-          - otp: 21.3
-            elixir: 1.12.2
-          - otp: 21.3
-            elixir: 1.13.4
-          - otp: 21.3
-            elixir: 1.14.0
-          - otp: 22.3
-            elixir: 1.14.0
         repo_url: ["https://github.com/phoenixframework/phoenix.git"]
         repo_branch: ["v1.6", "main"]
+        otp: [25.3, 26.2, 27.3]
+        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.1, 1.19.0-rc.0]
+        exclude:
+          - elixir: 1.15.7
+            otp: 27.3
+          - elixir: 1.16.2
+            otp: 27.3
+          - elixir: 1.19.0-rc.0
+            otp: 25.3
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
@@ -41,25 +37,21 @@ jobs:
       - run: mix credo tmp/${{matrix.repo_branch}} --strict --mute-exit-status
 
   test_on_new_project:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     name: "[${{matrix.otp}}/${{matrix.elixir}}] new Phoenix app analysed by Credo [OTP/Elixir]"
     strategy:
       matrix:
-        otp: [21.3, 22.3, 23.3, 24.2]
-        elixir: [1.10.4, 1.11.4, 1.12.2, 1.13.4, 1.14.0]
+        otp: [25.3, 26.2, 27.3]
+        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.1, 1.19.0-rc.0]
         exclude:
-          - otp: 24.2
-            elixir: 1.10.4
-          - otp: 21.3
-            elixir: 1.12.2
-          - otp: 21.3
-            elixir: 1.13.4
-          - otp: 21.3
-            elixir: 1.14.0
-          - otp: 22.3
-            elixir: 1.14.0
+          - elixir: 1.15.7
+            otp: 27.3
+          - elixir: 1.16.2
+            otp: 27.3
+          - elixir: 1.19.0-rc.0
+            otp: 25.3
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}

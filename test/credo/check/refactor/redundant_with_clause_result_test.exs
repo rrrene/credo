@@ -67,7 +67,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> refute_issues()
   end
 
-  test "it shouldn't check calls to functions called \"with\"" do
+  test "it should NOT report calls to functions called \"with\"" do
     """
     def some_function(parameter1, parameter2) do
       with(parameter1, parameter2)
@@ -94,7 +94,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the last clause in `with` is redundant"
+      assert issue.message == "Last clause in `with` is redundant."
     end)
   end
 
@@ -110,7 +110,8 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the last clause in `with` is redundant"
+      assert issue.line_no == 2
+      assert issue.message == "Last clause in `with` is redundant."
     end)
   end
 
@@ -125,7 +126,9 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message == "the `with` statement is redundant"
+      assert issue.line_no == 2
+      assert issue.message == "`with` statement is redundant."
+      assert issue.trigger == "with"
     end)
   end
 end

@@ -71,7 +71,7 @@ defmodule Credo.Check.Readability.StringSigils do
     line_no = meta[:line]
 
     cond do
-      is_sigil(maybe_sigil) ->
+      sigil?(maybe_sigil) ->
         {rest_ast, issues}
 
       is_binary(str) ->
@@ -95,13 +95,13 @@ defmodule Credo.Check.Readability.StringSigils do
     {ast, issues}
   end
 
-  defp is_sigil(maybe_sigil) when is_atom(maybe_sigil) do
+  defp sigil?(maybe_sigil) when is_atom(maybe_sigil) do
     maybe_sigil
     |> Atom.to_string()
     |> String.starts_with?("sigil_")
   end
 
-  defp is_sigil(_), do: false
+  defp sigil?(_), do: false
 
   defp issues_for_string_literal(
          string,

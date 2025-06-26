@@ -155,8 +155,11 @@ defmodule Credo.Check.Consistency.Collector do
       ) do
     frequencies_per_source_file =
       source_files
-      |> Enum.map(&Task.async(fn -> {&1, collector.collect_matches(&1, params)} end))
-      |> Enum.map(&Task.await(&1, :infinity))
+      |> Task.async_stream(&{&1, collector.collect_matches(&1, params)},
+        timeout: :infinity,
+        ordered: false
+      )
+      |> Enum.map(fn {:ok, frequencies} -> frequencies end)
 
     frequencies = total_frequencies(frequencies_per_source_file)
 
@@ -167,8 +170,11 @@ defmodule Credo.Check.Consistency.Collector do
       result =
         frequencies_per_source_file
         |> source_files_with_issues(most_frequent_match)
-        |> Enum.map(&Task.async(fn -> issue_formatter.(most_frequent_match, &1, params) end))
-        |> Enum.flat_map(&Task.await(&1, :infinity))
+        |> Task.async_stream(&issue_formatter.(most_frequent_match, &1, params),
+          timeout: :infinity,
+          ordered: false
+        )
+        |> Enum.flat_map(fn {:ok, issue} -> issue end)
 
       result
     else
@@ -177,7 +183,7 @@ defmodule Credo.Check.Consistency.Collector do
   end
 
   defp most_frequent_match(frequencies, supress_issues_for_single_match?, nil) do
-    {value, frequency_of_match} = Enum.max_by(frequencies, &elem(&1, 1))
+    {value, frequency_of_match} = frequencies |> Enum.sort() |> Enum.max_by(&elem(&1, 1))
     single_match? = frequency_of_match == 1
 
     if single_match? && supress_issues_for_single_match? do

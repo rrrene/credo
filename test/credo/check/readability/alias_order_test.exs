@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with __MODULE__" do
+  test "it should NOT report with __MODULE__" do
     """
     defmodule Test do
       alias __MODULE__.SubModule
@@ -77,7 +77,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with multi-alias" do
+  test "it should NOT report with multi-alias" do
     """
     defmodule Test do
       alias Detroit.Learnables.Learnable
@@ -92,7 +92,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with an intersecting `require`" do
+  test "it should NOT report with an intersecting `require`" do
     """
     defmodule Test do
       alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
@@ -106,7 +106,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> refute_issues()
   end
 
-  test "it should work with multi alias syntax" do
+  test "it should NOT report with multi alias syntax" do
     """
     defmodule Test do
       alias MyApp.Accounts.{Organization, User, UserOrganization}
@@ -115,6 +115,29 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report with case-sensitive sorting" do
+    """
+    defmodule Test do
+      alias MyApp.AlphaBravoCharlie
+      alias MyApp.AlphaBravoalpha
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
+    |> refute_issues()
+  end
+
+  test "it should NOT report with case-sensitive alias grouping" do
+    """
+    defmodule Test do
+      alias MyApp.{AlphaBravoCharlie, AlphaBravoalpha}
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
     |> refute_issues()
   end
 
@@ -226,6 +249,33 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "Sorter"
+    end)
+  end
+
+  test "it should report a violation with case-sensitive sorting" do
+    """
+    defmodule Test do
+      alias MyApp.AlphaBravoalpha
+      alias MyApp.AlphaBravoCharlie
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "MyApp.AlphaBravoalpha"
+    end)
+  end
+
+  test "it should report a violation with case-sensitive sorting in a multi-alias" do
+    """
+    defmodule Test do
+      alias MyApp.{AlphaBravoalpha, AlphaBravoCharlie}
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, sort_method: :ascii)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "AlphaBravoalpha"
     end)
   end
 end

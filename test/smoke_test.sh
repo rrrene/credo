@@ -11,6 +11,11 @@ mix credo --strict --mute-exit-status
 mix credo --strict --enable-disabled-checks . --mute-exit-status
 mix credo --debug --mute-exit-status
 mix credo --strict --format=sarif --mute-exit-status
+
+# repro for editor integrations
+# should not find any issues, therefore exit status is not muted
+mix credo lib/credo.ex --read-from-stdin --strict < lib/credo.ex
+
 mix credo list --mute-exit-status
 mix credo suggest --mute-exit-status
 mix credo diff HEAD^ --mute-exit-status

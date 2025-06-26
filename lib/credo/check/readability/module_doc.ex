@@ -3,7 +3,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     id: "EX3009",
     param_defaults: [
       ignore_names: [
-        ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View|\.\w+HTML|\.\w+JSON)$/
+        ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View|\.\w+HTML|\.\w+JSON|\.Telemetry|\.Layouts|\.Mailer)$/
       ]
     ],
     explanations: [
@@ -39,6 +39,10 @@ defmodule Credo.Check.Readability.ModuleDoc do
           @moduledoc false
 
       to make it clear that there is no intention in documenting it.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """,
       params: [
         ignore_names: "All modules matching this regex (or list of regexes) will be ignored."

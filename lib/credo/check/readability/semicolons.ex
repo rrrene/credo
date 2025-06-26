@@ -25,7 +25,6 @@ defmodule Credo.Check.Readability.Semicolons do
 
   @doc false
   @impl true
-  # TODO: consider for experimental check front-loader (tokens)
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
@@ -46,7 +45,7 @@ defmodule Credo.Check.Readability.Semicolons do
   defp issue_for(issue_meta, line_no, column) do
     format_issue(
       issue_meta,
-      message: "Don't use ; to separate statements and expressions",
+      message: "Don't use `;` to separate statements and expressions.",
       line_no: line_no,
       column: column,
       trigger: ";"

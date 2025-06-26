@@ -67,6 +67,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
       |> ConfigCommentFinder.run()
       |> Enum.flat_map(fn {_filename, config_comments} -> config_comments end)
 
-    assert [%Credo.Check.ConfigComment{instruction: "disable-for-next-line", line_no: 7}] = config_comments
+    assert [%Credo.Check.ConfigComment{instruction: "disable-for-next-line", line_no: 7}] =
+             config_comments
   end
 end

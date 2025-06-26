@@ -10,10 +10,12 @@ defmodule Credo.Execution.ExecutionIssues do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %Execution{exec | issues_pid: pid}
+    %{exec | issues_pid: pid}
   end
 
   @doc "Appends an `issue` for the specified `filename`."
+  def append(_, [] = _issues), do: :ok
+
   def append(%Execution{issues_pid: pid}, issues) when is_list(issues) do
     issues
     |> Enum.group_by(& &1.filename)

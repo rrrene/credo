@@ -67,7 +67,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
   end
 
   defp do_warn_if_check_params_invalid({check, params}) do
-    valid_param_names = check.param_names ++ Params.builtin_param_names()
+    valid_param_names = check.param_names() ++ Params.builtin_param_names()
     check = check |> to_string |> String.to_existing_atom()
 
     Enum.each(params, fn {param_name, _param_value} ->
@@ -139,6 +139,6 @@ defmodule Credo.Execution.Task.ValidateConfig do
     enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
     disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
-    %Execution{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
+    %{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
   end
 end

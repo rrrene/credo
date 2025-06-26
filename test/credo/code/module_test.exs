@@ -28,6 +28,47 @@ defmodule Credo.Code.ModuleTest do
     assert false == Module.attribute(ast, :moduledoc)
   end
 
+  test "should return the given module attribute for the top module in the given AST" do
+    {:ok, ast} =
+      """
+      defmodule CredoExample do
+        @attr_list [:atom1, :atom2]
+        @attr_string "This is a String"
+        @attr_number 42
+
+        @moduledoc false
+
+        defmodule Foo do
+          @attr_list [:atom3, :atom4]
+          @attr_string "This is another String"
+          @attr_number -1
+
+          @moduledoc "test"
+        end
+      end
+      """
+      |> Code.string_to_quoted()
+
+    assert [:atom1, :atom2] == Module.attribute(ast, :attr_list)
+    assert "This is a String" == Module.attribute(ast, :attr_string)
+    assert 42 == Module.attribute(ast, :attr_number)
+    assert false == Module.attribute(ast, :moduledoc)
+  end
+
+  test "should return the given module attribute, if found" do
+    ast =
+      {:defmodule, [line: 2, column: 3],
+       [
+         {:__aliases__, [line: 2, column: 13], [:SubModule]},
+         [do: {:__block__, [], []}]
+       ]}
+
+    assert {:error, nil} == Module.attribute(ast, :attr_list)
+    assert {:error, nil} == Module.attribute(ast, :attr_string)
+    assert {:error, nil} == Module.attribute(ast, :attr_number)
+    assert {:error, nil} == Module.attribute(ast, :moduledoc)
+  end
+
   #
   # def_count
   #
@@ -429,7 +470,9 @@ defmodule Credo.Code.ModuleTest do
     end
 
     test "recognizes module attribute" do
-      assert analyze(~s/@mod_attr 1/) == [{Test, [module_attribute: [line: 2, column: 3]]}]
+      assert analyze(~s/@mod_attr 1/) == [
+               {Test, [module_attribute: [attribute: :mod_attr, line: 2, column: 3]]}
+             ]
     end
 
     test "recognizes struct definition" do

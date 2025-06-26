@@ -7,8 +7,8 @@ on:
 
 jobs:
   test_on_new_project:
-    runs-on: ubuntu-18.04
-    name: "[${{matrix.project.name}}]"
+    runs-on: ubuntu-24.04
+    name: "${{matrix.project.name}}"
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +47,21 @@ jobs:
           -  name: benchee
              repo: https://github.com/PragTob/benchee.git
 
+          -  name: next-ls
+             repo: https://github.com/elixir-tools/next-ls.git
+
+          -  name: gen_lsp
+             repo: https://github.com/elixir-tools/gen_lsp.git
+
+          -  name: req
+             repo: https://github.com/wojtekmach/req.git
+
+          -  name: bandit
+             repo: https://github.com/mtrudel/bandit.git
+
+          -  name: decimal
+             repo: https://github.com/ericmj/decimal.git
+
           # Elixir
           -  name: elixir
              repo: https://github.com/elixir-lang/elixir.git
@@ -65,6 +80,9 @@ jobs:
 
           -  name: ecto
              repo: https://github.com/elixir-ecto/ecto.git
+
+          -  name: ecto_sql
+             repo: https://github.com/elixir-ecto/ecto_sql.git
 
           -  name: plug
              repo: https://github.com/elixir-plug/plug.git
@@ -89,12 +107,16 @@ jobs:
           -  name: nerves
              repo: https://github.com/nerves-project/nerves.git
 
+          # Nx
+          -  name: nx
+             repo: https://github.com/elixir-nx/nx.git
+
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: 24.0
-          elixir-version: 1.13.1
+          otp-version: 26.2
+          elixir-version: 1.19.0-rc.0
       - run: mix deps.get
       - run: mix deps.compile
       - run: mix compile

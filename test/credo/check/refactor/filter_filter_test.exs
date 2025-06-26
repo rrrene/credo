@@ -41,7 +41,7 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 2" do
+  test "it should report a violation /2" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
@@ -54,7 +54,7 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 3" do
+  test "it should report a violation /3" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -70,7 +70,7 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 4" do
+  test "it should report a violation /4" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -87,7 +87,7 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 5" do
+  test "it should report a violation /5" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -101,7 +101,7 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     |> assert_issue()
   end
 
-  test "it should report a violation 6" do
+  test "it should report a violation /6" do
     """
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
@@ -111,6 +111,8 @@ defmodule Credo.Check.Refactor.FilterFilterTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "|>"
+    end)
   end
 end

@@ -29,7 +29,6 @@ defmodule Credo.Check.Readability.LargeNumbers do
     ]
 
   @doc false
-  # TODO: consider for experimental check front-loader (tokens)
   def run(%SourceFile{} = source_file, params) do
     min_number = Params.get(params, :only_greater_than, __MODULE__)
     issue_meta = IssueMeta.for(source_file, Keyword.merge(params, only_greater_than: min_number))
@@ -182,12 +181,12 @@ defmodule Credo.Check.Readability.LargeNumbers do
       Enum.map(allowed_trailing_digits, fn trailing_digits ->
         if String.length(string) > trailing_digits do
           base =
-            String.slice(string, 0..(-1 * trailing_digits - 1))
+            String.slice(string, 0..(-1 * trailing_digits - 1)//1)
             |> String.reverse()
             |> String.replace(~r/(\d{3})(?=\d)/, "\\1_")
             |> String.reverse()
 
-          trailing = String.slice(string, (-1 * trailing_digits)..-1)
+          trailing = String.slice(string, (-1 * trailing_digits)..-1//1)
 
           "#{base}_#{trailing}"
         end
@@ -237,7 +236,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
     ending_of_number =
       ~r/^([0-9_\.]+)/
-      |> Regex.run(String.slice(line, (column1 + 1)..-1))
+      |> Regex.run(String.slice(line, (column1 + 1)..-1//1))
       |> List.wrap()
       |> List.last()
       |> to_string()

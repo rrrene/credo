@@ -1,4 +1,4 @@
-defmodule Credo.Check.Readability.SpaceInParenthesesTest do
+defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.SpaceInParentheses
@@ -45,7 +45,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     end
   end
   """
-  @with_spaces """
+  @with_spaces ~S"""
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     end
   end
   """
-  @with_spaces2 """
+  @with_spaces2 ~S"""
   defmodule OtherModule3 do
     defmacro foo do
         { :ok } = File.read( filename )
@@ -65,7 +65,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     end
   end
   """
-  @with_spaces_empty_params1 """
+  @with_spaces_empty_params1 ~S"""
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -74,7 +74,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     end
   end
   """
-  @with_spaces_empty_params2 """
+  @with_spaces_empty_params2 ~S"""
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -83,7 +83,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     end
   end
   """
-  @with_and_without_spaces """
+  @with_and_without_spaces ~S"""
   defmodule OtherModule3 do
     defmacro foo do
       { :ok } = File.read( filename )
@@ -99,7 +99,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
   # cases NOT raising issues
   #
 
-  test "it should report the correct result " do
+  test "it should NOT report the correct result " do
     [
       @without_spaces
     ]
@@ -108,7 +108,7 @@ defmodule Credo.Check.Readability.SpaceInParenthesesTest do
     |> refute_issues()
   end
 
-  test "it should report the correct result 1" do
+  test "it should NOT report the correct result 1" do
     [
       @with_spaces,
       @with_spaces2

@@ -5,11 +5,11 @@
 set -e
 
 DIRNAME=$( cd "$( dirname "$0" )" && pwd )
-PROJECT_ROOT=$( cd "$DIRNAME/.." && pwd )
+CREDO_ROOT=$( cd "$DIRNAME/.." && pwd )
 
 # execution
 
-cd $PROJECT_ROOT
+cd $CREDO_ROOT
 
 git checkout master lib/
 

@@ -79,7 +79,10 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
+  defp traverse({:quote, _, _}, issues, _specs, _issue_meta) do
+    {nil, issues}
+  end
+
   defp traverse(
          {keyword, meta, [{:when, _, def_ast} | _]},
          issues,
@@ -111,6 +114,13 @@ defmodule Credo.Check.Readability.Specs do
   end
 
   defp issue_for(issue_meta, line_no, trigger) do
+    trigger =
+      if is_tuple(trigger) do
+        Macro.to_string(trigger)
+      else
+        trigger
+      end
+
     format_issue(
       issue_meta,
       message: "Functions should have a @spec type specification.",

@@ -1,6 +1,6 @@
 defmodule Credo.Check.ConfigComment do
   @moduledoc """
-  `ConfigComment` structs represent comments which follow control Credo's behaviour.
+  `ConfigComment` structs represent comments which control Credo's behaviour.
 
   The following comments are supported:
 
@@ -121,7 +121,7 @@ defmodule Credo.Check.ConfigComment do
   end
 
   defp check_tuple_ignores_issue?(check_or_regex, issue) do
-    if Regex.regex?(check_or_regex) do
+    if match?(%Regex{}, check_or_regex) do
       issue.check
       |> to_string
       |> String.match?(check_or_regex)
@@ -135,7 +135,7 @@ defmodule Credo.Check.ConfigComment do
   defp value_for(param_string) do
     if regex_value?(param_string) do
       param_string
-      |> String.slice(1..-2)
+      |> String.slice(1..-2//1)
       |> Regex.compile!("i")
     else
       String.to_atom("Elixir.#{param_string}")

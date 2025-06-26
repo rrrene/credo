@@ -10,7 +10,10 @@ defmodule Credo.Check.Warning.DbgTest do
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
+      @dbg "this should be found"
+
       def some_function(parameter1, parameter2) do
+        dbg = "variables should also not be a problem"
         parameter1 + parameter2
       end
     end
@@ -66,6 +69,24 @@ defmodule Credo.Check.Warning.DbgTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
+  end
+
+  test "it should report a violation with two on the same line" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        dbg(parameter1) + dbg(parameter2)
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(fn [two, one] ->
+      assert one.line_no == 3
+      assert one.column == 5
+      assert two.line_no == 3
+      assert two.column == 23
+    end)
   end
 
   test "it should report a violation /2" do
@@ -180,5 +201,22 @@ defmodule Credo.Check.Warning.DbgTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
+  end
+
+  test "it should report a violation /10" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def headers_to_strings(headers) do
+        :x |> dbg
+        Enum.map(headers, fn {key, value} -> "#{key}: #{value}" end)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "dbg"
+    end)
   end
 end

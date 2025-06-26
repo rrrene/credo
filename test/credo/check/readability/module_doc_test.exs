@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> refute_issues()
   end
 
-  test "it should not report exception modules" do
+  test "it should NOT report exception modules" do
     """
     defmodule CredoSampleModule do
       defexception message: "Bad luck"
@@ -50,6 +50,21 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report modules or submodules when @moduledoc is present" do
+    """
+    defmodule Foo do
+      @moduledoc false
+
+      defmodule Bar do
+        @moduledoc false
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
     |> refute_issues()
   end
 
@@ -70,6 +85,20 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> assert_issue()
   end
 
+  test "it should report modules when @moduledoc is present in submodules only" do
+    """
+    defmodule Foo do
+      # distinctly no moduledoc here
+      defmodule Bar do
+        @moduledoc false
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
+    |> assert_issue()
+  end
+
   test "it should report empty strings" do
     """
     defmodule CredoSampleModule do
@@ -78,7 +107,9 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "CredoSampleModule"
+    end)
   end
 
   test "it should report empty multi line strings" do
@@ -91,15 +122,31 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "CredoSampleModule"
+    end)
   end
 
   test "it should report slightly unexpected code" do
     """
-    defmodule Person, do: def greet(), do: :howdy
+    defmodule Person, do: def(greet(), do: :howdy)
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Person"
+    end)
+  end
+
+  test "it should report controller submodules when the :ignore_names param says so" do
+    """
+    defmodule MyApp.SomePhoenixController do
+      defmodule SubModule do
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, ignore_names: [])
+    |> assert_issues()
   end
 end

@@ -52,7 +52,6 @@ defmodule Credo.Check.Readability.WithSingleClause do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
        when is_list(clauses_and_body) do
     # If clauses_and_body is a list with at least two elements in it, we think
@@ -91,7 +90,8 @@ defmodule Credo.Check.Readability.WithSingleClause do
           format_issue(issue_meta,
             message:
               "`with` contains only one <- clause and an `else` branch, consider using `case` instead",
-            line_no: line
+            line_no: line,
+            trigger: "with"
           )
         ]
 

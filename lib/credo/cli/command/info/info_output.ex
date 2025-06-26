@@ -1,10 +1,6 @@
 defmodule Credo.CLI.Command.Info.InfoOutput do
   @moduledoc false
 
-  use Credo.CLI.Output.FormatDelegator,
-    default: Credo.CLI.Command.Info.Output.Default,
-    json: Credo.CLI.Command.Info.Output.Json
-
   alias Credo.CLI.Output.UI
 
   def print(exec, info) do
@@ -12,6 +8,9 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
 
     format_mod.print(exec, info)
   end
+
+  defp format_mod(%{format: "json"}), do: Credo.CLI.Command.Info.Output.Json
+  defp format_mod(%{format: nil}), do: Credo.CLI.Command.Info.Output.Default
 
   def print_help(exec) do
     usage = ["Usage: ", :olive, "mix credo info [options]"]
@@ -40,10 +39,10 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
             --enable-disabled-checks  Re-enable disabled checks that match the given strings
             --files-included          Only include these files (accepts globs, can be used multiple times)
             --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-            --format                  Display the list in a specific format (json,flycheck,oneline)
+            --format                  Display the list in a specific format (json,flycheck,sarif,oneline)
         -i, --ignore-checks           Ignore checks that match the given strings
             --ignore                  Alias for --ignore-checks
-            --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+            --min-priority            Minimum priority to show issues (higher,high,normal,low,ignore or number)
             --only                    Alias for --checks
             --verbose                 Display more information (e.g. checked files)
 

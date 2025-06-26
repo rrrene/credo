@@ -1,31 +1,54 @@
 defmodule Credo.Mixfile do
   use Mix.Project
 
-  @version "1.7.0-rc.2"
+  @version "1.7.12"
 
   def project do
     [
       app: :credo,
       version: @version,
-      elixir: ">= 1.10.0",
+      elixir: ">= 1.13.0",
       escript: [main_module: Credo.CLI],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.html": :test,
-        "test.fast": :test,
-        "test.slow": :test
-      ],
       name: "Credo",
       description: "A static code analysis tool with a focus on code consistency and teaching.",
       package: package(),
       source_url: "https://github.com/rrrene/credo",
       docs: docs(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_ignore_filters: [
+        "test/old_credo.exs",
+        "test/regression/run_older_credo_version.exs",
+        ~r[test/credo/check/housekeeping_.+.exs],
+        ~r[/fixtures/]
+      ]
+    ] ++ project_cli_entry()
+  end
+
+  defp preferred_cli_env do
+    [
+      coveralls: :test,
+      "coveralls.html": :test,
+      "test.fast": :test,
+      "test.slow": :test
     ]
+  end
+
+  if Version.match?(System.version(), ">= 1.19.0-dev") do
+    defp project_cli_entry do
+      []
+    end
+
+    def cli do
+      [preferred_cli_env: preferred_cli_env()]
+    end
+  else
+    defp project_cli_entry do
+      [preferred_cli_env: preferred_cli_env()]
+    end
   end
 
   defp docs do
@@ -124,6 +147,7 @@ defmodule Credo.Mixfile do
         ".credo.exs",
         ".template.check.ex",
         ".template.debug.html",
+        "CHANGELOG.md",
         "lib",
         "LICENSE",
         "mix.exs",
@@ -147,12 +171,10 @@ defmodule Credo.Mixfile do
 
   defp deps do
     [
-      {:file_system, "~> 0.2.8"},
-      {:bunt, "~> 0.2.1"},
+      {:file_system, "~> 0.2 or ~> 1.0"},
+      {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.10", only: :test},
-      {:inch_ex, "~> 2.0", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
     ]
   end
 

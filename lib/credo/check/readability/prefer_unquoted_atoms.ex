@@ -36,7 +36,8 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
       atom key, this can lead to subtle bugs which are hard to discover.
 
       Like all `Readability` issues, this one is not a technical concern.
-      The code will behave identical in both ways.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 
@@ -44,7 +45,6 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
 
   @doc false
   @impl true
-  # TODO: consider for experimental check front-loader (tokens)
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
@@ -84,7 +84,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtoms do
   end
 
   defp safe_atom_name(token) when is_binary(token) do
-    ':#{token}'
+    ~c":#{token}"
     |> :elixir_tokenizer.tokenize(1, [])
     |> safe_atom_name(token)
   end

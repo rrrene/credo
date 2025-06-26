@@ -122,18 +122,23 @@ defmodule Credo.CLI.OptionsTest do
   test "command: it should work w/o command" do
     args = String.split("--strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
+    assert [] == options.args
   end
 
   test "command: it should work although folder with same name present" do
     args = String.split("cmd1 --strict --version")
-    expected = "cmd1"
-    assert expected == parse(args).command
+    options = parse(args)
+
+    assert "cmd1" == options.command
+    assert [] == options.args
   end
 
   test "unknown_args: it should work" do
     args = String.split("unknown_cmd --strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
     assert expand_path("") == options.path
     assert ["unknown_cmd"] == options.args
@@ -142,44 +147,56 @@ defmodule Credo.CLI.OptionsTest do
   test "path: it should work w/ folder named like command when trailing slash is given" do
     args = String.split("cmd1/ --strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
     assert expand_path("cmd1/") == options.path
+    assert [] == options.args
   end
 
   test "path: it should work w/ folder" do
     args = String.split("src --strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
     assert expand_path("src") == options.path
+    assert [] == options.args
   end
 
   test "path: it should work w/ file" do
     args = String.split("foo.ex --strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
     assert expand_path("") == options.path
+    assert [] == options.args
   end
 
   test "path: it should work w/ multiple files" do
     args = String.split("foo.ex foo/bar.ex foo/baz.ex")
     options = parse(args)
+
     assert is_nil(options.command)
     assert expand_path("") == options.path
     assert ~w"foo.ex foo/bar.ex foo/baz.ex" != options.switches.files_included
+    assert [] != options.args
   end
 
   test "path: it should work w/ double-dash and multiple files" do
     args = String.split("--strict --version -- foo.ex foo/bar.ex foo/baz.ex")
     options = parse(args, true)
+
     assert is_nil(options.command)
     assert expand_path("") == options.path
     assert 3 == length(options.switches[:files_included])
+    assert [] == options.args
   end
 
   test "path: it should work w/ glob" do
     args = String.split("src/**/*.ex --strict --version")
     options = parse(args)
+
     assert is_nil(options.command)
     assert ["src/**/*.ex"] == options.switches.files_included
+    assert [] == options.args
   end
 end

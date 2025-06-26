@@ -96,7 +96,7 @@ defmodule Credo.ExsLoader do
   end
 
   defp process_tuple_item(value, acc) do
-    Tuple.append(acc, process_exs(value))
+    Tuple.insert_at(acc, tuple_size(acc), process_exs(value))
   end
 
   defp process_map([], acc), do: acc

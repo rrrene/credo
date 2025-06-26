@@ -293,4 +293,21 @@ defmodule Credo.SourcesTest do
 
     assert expected == Credo.Sources.find_in_dir(dir, ["*.ex"], [~r/.ex$/])
   end
+
+  test "it matches filenames given patterns" do
+    assert Credo.Sources.filename_matches?("lib/credo/check/runner.ex", [
+             "lib/credo/check/runner.ex"
+           ])
+
+    assert Credo.Sources.filename_matches?("lib/credo/check.ex", ["lib/*/check.ex"])
+    assert Credo.Sources.filename_matches?("lib/credo/check/runner.ex", ["lib/**/runner.ex"])
+    assert Credo.Sources.filename_matches?("lib/credo/check/runner.ex", ["lib/**/*.ex"])
+
+    assert Credo.Sources.filename_matches?("lib/credo/check/foo.ex", ["lib/**/*.ex"])
+    assert Credo.Sources.filename_matches?("lib/credo/check/foo.ex", [~r/.ex$/])
+
+    refute Credo.Sources.filename_matches?("lib/credo/check/runner.ex", ["lib/*/runner.ex"])
+    refute Credo.Sources.filename_matches?("lib/credo/check/runner.ex", ["*.exs"])
+    refute Credo.Sources.filename_matches?("lib/credo/check/runner.ex", [~r/.exs$/])
+  end
 end

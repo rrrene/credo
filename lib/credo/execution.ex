@@ -42,12 +42,14 @@ defmodule Credo.Execution do
             enable_disabled_checks: nil,
             ignore_checks_tags: [],
             ignore_checks: nil,
-            max_concurrent_check_runs: nil,
             min_priority: 0,
             mute_exit_status: false,
             only_checks_tags: [],
             only_checks: nil,
             read_from_stdin: false,
+
+            # This is no longer used, but we keep it so existing plugins that use it don't break
+            max_concurrent_check_runs: nil,
 
             # state, which is accessed and changed over the course of Credo's execution
             pipeline_map: %{},
@@ -117,7 +119,7 @@ defmodule Credo.Execution do
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
-  @doc "Builds an Execution struct for the the given `argv`."
+  @doc "Builds an Execution struct for the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
 
@@ -253,14 +255,14 @@ defmodule Credo.Execution do
   """
   def tags_for_check(check, params)
 
-  def tags_for_check(check, nil), do: check.tags
-  def tags_for_check(check, []), do: check.tags
+  def tags_for_check(check, nil), do: check.tags()
+  def tags_for_check(check, []), do: check.tags()
 
   def tags_for_check(check, params) when is_list(params) do
     params
     |> Credo.Check.Params.tags(check)
     |> Enum.flat_map(fn
-      :__initial__ -> check.tags
+      :__initial__ -> check.tags()
       tag -> [tag]
     end)
   end
@@ -271,11 +273,11 @@ defmodule Credo.Execution do
   def set_strict(exec)
 
   def set_strict(%__MODULE__{strict: true} = exec) do
-    %__MODULE__{exec | all: true, min_priority: -99}
+    %{exec | all: true, min_priority: -99}
   end
 
   def set_strict(%__MODULE__{strict: false} = exec) do
-    %__MODULE__{exec | min_priority: 0}
+    %{exec | min_priority: 0}
   end
 
   def set_strict(exec), do: exec
@@ -333,17 +335,17 @@ defmodule Credo.Execution do
   def put_command(exec, _plugin_mod, name, command_mod) do
     commands = Map.put(exec.commands, name, command_mod)
 
-    %__MODULE__{exec | commands: commands}
+    %{exec | commands: commands}
     |> command_mod.init()
   end
 
   @doc false
   def set_initializing_plugin(%__MODULE__{initializing_plugin: nil} = exec, plugin_mod) do
-    %__MODULE__{exec | initializing_plugin: plugin_mod}
+    %{exec | initializing_plugin: plugin_mod}
   end
 
   def set_initializing_plugin(exec, nil) do
-    %__MODULE__{exec | initializing_plugin: nil}
+    %{exec | initializing_plugin: nil}
   end
 
   def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
@@ -373,7 +375,7 @@ defmodule Credo.Execution do
         Keyword.update(list, param_name, param_value, fn _ -> param_value end)
       end)
 
-    %__MODULE__{exec | plugins: plugins}
+    %{exec | plugins: plugins}
   end
 
   # CLI switches
@@ -394,21 +396,21 @@ defmodule Credo.Execution do
 
   @doc false
   def put_cli_switch(exec, _plugin_mod, name, type) do
-    %__MODULE__{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
+    %{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
   end
 
   @doc false
   def put_cli_switch_alias(exec, _plugin_mod, _name, nil), do: exec
 
   def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
-    %__MODULE__{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
+    %{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
   end
 
   @doc false
   def put_cli_switch_plugin_param_converter(exec, plugin_mod, cli_switch_name, plugin_param_name) do
     converter_tuple = {cli_switch_name, plugin_mod, plugin_param_name}
 
-    %__MODULE__{
+    %{
       exec
       | cli_switch_plugin_param_converters:
           exec.cli_switch_plugin_param_converters ++ [converter_tuple]
@@ -448,11 +450,11 @@ defmodule Credo.Execution do
   def put_assign(exec, name_or_list, value)
 
   def put_assign(exec, path, value) when is_list(path) do
-    %__MODULE__{exec | assigns: do_put_nested_assign(exec.assigns, path, value)}
+    %{exec | assigns: do_put_nested_assign(exec.assigns, path, value)}
   end
 
   def put_assign(exec, name, value) do
-    %__MODULE__{exec | assigns: Map.put(exec.assigns, name, value)}
+    %{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
   defp do_put_nested_assign(map, [last_key], value) do
@@ -569,7 +571,7 @@ defmodule Credo.Execution do
       # => %Credo.Execution{...}
   """
   def put_result(exec, name, value) do
-    %__MODULE__{exec | results: Map.put(exec.results, name, value)}
+    %{exec | results: Map.put(exec.results, name, value)}
   end
 
   @doc false
@@ -604,7 +606,7 @@ defmodule Credo.Execution do
       end
   """
   def halt(exec) do
-    %__MODULE__{exec | halted: true}
+    %{exec | halted: true}
   end
 
   @doc """
@@ -622,7 +624,7 @@ defmodule Credo.Execution do
       end
   """
   def halt(exec, halt_message) do
-    %__MODULE__{exec | halted: true}
+    %{exec | halted: true}
     |> put_halt_message(halt_message)
   end
 
@@ -640,7 +642,7 @@ defmodule Credo.Execution do
 
   @doc false
   def set_parent_and_current_task(exec, parent_task, current_task) do
-    %__MODULE__{exec | parent_task: parent_task, current_task: current_task}
+    %{exec | parent_task: parent_task, current_task: current_task}
   end
 
   # Running tasks
@@ -691,7 +693,7 @@ defmodule Credo.Execution do
   def put_pipeline(exec, pipeline_key, pipeline) do
     new_pipelines = Map.put(exec.pipeline_map, pipeline_key, pipeline)
 
-    %__MODULE__{exec | pipeline_map: new_pipelines}
+    %{exec | pipeline_map: new_pipelines}
   end
 
   @doc """
@@ -767,9 +769,7 @@ defmodule Credo.Execution do
 
   @doc false
   defp put_builtin_command(exec, name, command_mod) do
-    exec
-    |> command_mod.init()
-    |> put_command(Credo, name, command_mod)
+    put_command(exec, Credo, name, command_mod)
   end
 
   @doc ~S"""

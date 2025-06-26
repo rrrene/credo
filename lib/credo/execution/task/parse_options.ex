@@ -30,7 +30,7 @@ defmodule Credo.Execution.Task.ParseOptions do
         command_name = Execution.get_command_name(exec)
         command_mod = Execution.get_command(exec, command_name)
 
-        command_mod.treat_unknown_args_as_files?
+        command_mod.treat_unknown_args_as_files?()
       else
         false
       end
@@ -48,6 +48,6 @@ defmodule Credo.Execution.Task.ParseOptions do
         treat_unknown_args_as_files?
       )
 
-    %Execution{exec | cli_options: cli_options}
+    %{exec | cli_options: cli_options}
   end
 end

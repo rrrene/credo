@@ -87,7 +87,10 @@ defmodule Credo.Check.Design.TagTODOTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 4
+      assert issue.column == 3
+    end)
   end
 
   test "it should report an issue for @doc tags" do
@@ -221,7 +224,10 @@ defmodule Credo.Check.Design.TagTODOTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger =~ "# todo"
+    end)
   end
 
   test "it should report a couple of issues" do
@@ -244,7 +250,31 @@ defmodule Credo.Check.Design.TagTODOTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
+      assert Enum.count(issues) == 3
+    end)
+  end
+
+  test "it should report a couple of issues when including docs" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case # TODO: this is the first
+
+      @doc """
+      TODO: and this is an actual TODO
+      """
+      def some_fun do # TODO this is the second
+        x = ~s{also: # TODO: no comment here}
+        assert 2 == x
+        ?" # TODO: this is the third
+
+        "also: # TODO: no comment here as well"
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, include_doc: true)
+    |> assert_issues(fn issues ->
+      assert Enum.count(issues) == 4
     end)
   end
 end

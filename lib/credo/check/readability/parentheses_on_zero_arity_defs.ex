@@ -40,7 +40,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, parens?))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     # catch variables named e.g. `defp`
     defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do
@@ -74,10 +73,10 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
 
     cond do
       parens? and not enforce_parens? ->
-        issues ++ [issue_for(issue_meta, line_no, :present)]
+        [issue_for(issue_meta, name, line_no, :present) | issues]
 
       not parens? and enforce_parens? ->
-        issues ++ [issue_for(issue_meta, line_no, :missing)]
+        [issue_for(issue_meta, name, line_no, :missing) | issues]
 
       true ->
         issues
@@ -90,19 +89,19 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
     name_size = text |> to_string |> String.length()
     skip = (SourceFile.column(source_file, line_no, text) || -1) + name_size - 1
 
-    String.slice(line, skip..-1)
+    String.slice(line, skip..-1//1)
   end
 
-  defp issue_for(issue_meta, line_no, kind) do
+  defp issue_for(issue_meta, name, line_no, kind) do
     message =
       case kind do
         :present ->
           "Do not use parentheses when defining a function which has no arguments."
 
         :missing ->
-          "Use parentheses () when defining a function which has no arguments."
+          "Use parentheses when defining a function which has no arguments."
       end
 
-    format_issue(issue_meta, message: message, line_no: line_no)
+    format_issue(issue_meta, message: message, line_no: line_no, trigger: name)
   end
 end

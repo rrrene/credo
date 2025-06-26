@@ -9,7 +9,7 @@
 set -e
 
 DIRNAME=$( cd "$( dirname "$0" )" && pwd )
-PROJECT_ROOT=$( cd "$DIRNAME/.." && pwd )
+CREDO_ROOT=$( cd "$DIRNAME/.." && pwd )
 
 # script specific sources, variables and function definitions
 
@@ -18,9 +18,9 @@ PROJECT_DIRNAME=tmp/$PROJECT_NAME
 
 # setup
 
-yes | mix archive.install hex phx_new 1.4.11
+yes | mix archive.install hex phx_new
 
-cd $PROJECT_ROOT
+cd $CREDO_ROOT
 
 mkdir -p tmp
 
@@ -39,6 +39,6 @@ echo ""
 echo "--> Running Credo ..."
 echo ""
 
-cd $PROJECT_ROOT
+cd $CREDO_ROOT
 
 mix credo $PROJECT_DIRNAME

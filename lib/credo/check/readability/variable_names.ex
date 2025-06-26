@@ -40,14 +40,6 @@ defmodule Credo.Check.Readability.VariableNames do
     {ast, issues_for_lhs(lhs, issues, issue_meta)}
   end
 
-  defp traverse(
-         {:<-, _meta, [{:|, _comp_meta, [_lhs, rhs]}, _comp_rhs]} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, issues_for_lhs(rhs, issues, issue_meta)}
-  end
-
   defp traverse({:<-, _meta, [lhs, _rhs]} = ast, issues, issue_meta) do
     {ast, issues_for_lhs(lhs, issues, issue_meta)}
   end

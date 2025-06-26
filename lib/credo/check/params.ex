@@ -36,7 +36,7 @@ defmodule Credo.Check.Params do
   def get(params, field, check_mod) do
     case params[field] do
       nil ->
-        check_mod.param_defaults[field]
+        check_mod.param_defaults()[field]
 
       val ->
         val
@@ -71,12 +71,12 @@ defmodule Credo.Check.Params do
 
   @doc false
   def category(params, check_mod) do
-    params[:__category__] || params[:category] || check_mod.category
+    params[:__category__] || params[:category] || check_mod.category()
   end
 
   @doc false
   def exit_status(params, check_mod) do
-    params[:__exit_status__] || params[:exit_status] || check_mod.exit_status
+    params[:__exit_status__] || params[:exit_status] || check_mod.exit_status()
   end
 
   @doc false
@@ -95,11 +95,11 @@ defmodule Credo.Check.Params do
 
   @doc false
   def priority(params, check_mod) do
-    params[:__priority__] || params[:priority] || check_mod.base_priority
+    params[:__priority__] || params[:priority] || check_mod.base_priority()
   end
 
   @doc false
   def tags(params, check_mod) do
-    params[:__tags__] || params[:tags] || check_mod.tags
+    params[:__tags__] || params[:tags] || check_mod.tags()
   end
 end

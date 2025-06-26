@@ -42,8 +42,9 @@ defmodule Credo.Check.Readability.BlockPipe do
       and increases cognitive load on the reader. Instead, prefer introducing variables to your code or
       new functions when it may be a sign that your function is getting too complicated and/or has too many concerns.
 
-      Like all `Readability` issues, this one is not a technical concern, but you can improve the odds of others reading
-      and understanding the intent of your code by making it easier to follow.
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """,
       params: [
         exclude: "Do not raise an issue for these macros and functions."
@@ -83,7 +84,7 @@ defmodule Credo.Check.Readability.BlockPipe do
   defp issue_for(issue_meta, line_no, trigger) do
     format_issue(
       issue_meta,
-      message: "Use a variable or create a new function instead of piping to a block",
+      message: "Use a variable or create a new function instead of piping to a block.",
       trigger: trigger,
       line_no: line_no
     )

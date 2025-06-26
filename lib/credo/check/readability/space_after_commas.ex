@@ -36,13 +36,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
 
-  # Matches commas followed by non-whitespace unless preceded by
-  # a question mark that is not part of a variable or function name
-  @unspaced_commas ~r/(?<!\W\?)(\,\S)/
-
   @doc false
   @impl true
-  # TODO: consider for experimental check front-loader (text)
   def run(%SourceFile{} = source_file, params) do
     issue_meta = IssueMeta.for(source_file, params)
 
@@ -59,7 +54,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   defp issue_for(issue_meta, trigger, line_no, column) do
     format_issue(
       issue_meta,
-      message: "Space missing after comma",
+      message: "Space missing after comma.",
       trigger: trigger,
       line_no: line_no,
       column: column
@@ -67,7 +62,11 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   end
 
   defp find_issues(issue_meta, {line_no, line}) do
-    @unspaced_commas
+    # Matches commas followed by non-whitespace unless preceded by
+    # a question mark that is not part of a variable or function name
+    unspaced_commas = ~r/(?<!\W\?)(\,\S)/
+
+    unspaced_commas
     |> Regex.scan(line, capture: :all_but_first, return: :index)
     |> List.flatten()
     |> Enum.map(fn {idx, len} ->

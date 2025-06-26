@@ -14,6 +14,7 @@ Use `--format` to format the output in one of the following formats:
 
 - `--format flycheck` for [Flycheck](http://www.flycheck.org/) output
 - `--format json` for [JSON](https://www.json.org/) output
+- `--format sarif` for [SARIF](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif) output
 
 Additionally, you can deactivate the output's coloring by using `--no-color`.
 
@@ -139,10 +140,10 @@ Suggest options:
       --enable-disabled-checks  Re-enable disabled checks that match the given strings
       --files-included          Only include these files (accepts globs, can be used multiple times)
       --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-      --format                  Display the list in a specific format (json,flycheck,oneline)
+      --format                  Display the list in a specific format (json,flycheck,sarif,oneline)
   -i, --ignore-checks           Ignore checks that match the given strings
       --ignore                  Alias for --ignore-checks
-      --min-priority            Minimum priority to show issues (high,medium,normal,low,lower or number)
+      --min-priority            Minimum priority to show issues (higher,high,normal,low,ignore or number)
       --mute-exit-status        Exit with status zero even if there are issues
       --only                    Alias for --checks
       --strict                  Alias for --all-priorities

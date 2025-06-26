@@ -75,7 +75,9 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "cond"
+    end)
   end
 
   test "it should report a violation for multiple violations" do

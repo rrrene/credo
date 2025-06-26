@@ -40,7 +40,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> refute_issues()
   end
 
-  test "it should not crash with ecto query" do
+  test "it should NOT report nor crash with ecto query" do
     """
     defmodule CredoSampleModule do
 
@@ -199,6 +199,9 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "="
+    end)
   end
 end

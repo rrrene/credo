@@ -3,6 +3,10 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
 
   @described_check Credo.Check.Warning.UnusedEnumOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
@@ -133,6 +137,21 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
       catch
         values ->
           Enum.map(values, &(&1 + 1))
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when inside an anon function call" do
+    """
+    defmodule CredoSampleModule do
+      def fun(anon_func) do
+        anon_func.(Enum.random(1..10))
+
+        :ok
       end
     end
     """
@@ -614,7 +633,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   end
 
   #
-  #
+  # cases raising issues
   #
 
   test "it should report a violation when NOT the last statement in rescue block" do
@@ -881,7 +900,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert "Enum.map" == issue.trigger
+      assert issue.trigger == "Enum.map"
+      assert issue.line_no == 5
+      assert issue.column == 7
     end)
   end
 end

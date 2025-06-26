@@ -23,8 +23,27 @@ There are a couple of switches to control the diff parameters:
 | [`--from-git-merge-base`](#from-git-merge-base) | Diff from where the current HEAD branched off from the given merge base |
 | [`--since`](#since)                             | Diff from the given point in time (using Git)                           |
 
+### Using common switches
+
 To adjust the analysis all [command line switches of the `suggest` command](suggest_command.html#command-line-switches) are supported.
 
+This means you can define to run the analysis in `strict` mode just like you would without diffing:
+
+```bash
+$ mix credo diff --from-git-ref v1.3.1 --strict
+```
+
+### Using a different config
+
+This also means that you don't have to run the "before version" with its config and the "after version" with its config.
+
+In some cases you might want to enable a check and then only see the issues for that check that are added between "before" and "after".
+
+You can just "pin" the config to the current one:
+
+```bash
+$ mix credo diff --from-git-ref v1.3.1 --config-file .credo.exs
+```
 
 ## Descriptions
 

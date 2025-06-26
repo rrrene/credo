@@ -3,10 +3,16 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
 
   @described_check Credo.Check.Warning.UnusedKeywordOperation
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report expected code" do
     """
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
+        Keyword.validate!(opts, [:base_url, :meta, :receive_timeout])
+
         Keyword.values(parameter1) + parameter2
       end
 
@@ -355,6 +361,10 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     |> run_check(@described_check)
     |> refute_issues()
   end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report a violation when buried in :if, :when and :fn" do
     """

@@ -17,21 +17,21 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
 
     final_rules =
       issues
-      |> Enum.uniq_by(& &1.check.id)
+      |> Enum.uniq_by(& &1.check.id())
       |> Enum.map(fn issue ->
         %{
-          "id" => issue.check.id,
+          "id" => issue.check.id(),
           "name" => Credo.Code.Name.full(issue.check),
           "fullDescription" => %{
-            "text" => issue.check.explanation |> String.replace("`", "'"),
-            "markdown" => issue.check.explanation
+            "text" => issue.check.explanation() |> String.replace("`", "'"),
+            "markdown" => issue.check.explanation()
           },
           "properties" => %{
             "tags" => [
               issue.category
             ]
           },
-          "helpUri" => issue.check.docs_uri
+          "helpUri" => issue.check.docs_uri()
         }
       end)
 
@@ -149,23 +149,30 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
         issue.column + String.length(to_string(issue.trigger))
       end
 
+    trigger =
+      if issue.trigger == Credo.Issue.no_trigger() do
+        ""
+      else
+        to_string(issue.trigger)
+      end
+
     rule_and_issue = {
       %{
-        "id" => issue.check.id,
+        "id" => issue.check.id(),
         "name" => Credo.Code.Name.full(issue.check),
         "fullDescription" => %{
-          "text" => issue.check.explanation |> String.replace("`", "'"),
-          "markdown" => issue.check.explanation
+          "text" => issue.check.explanation() |> String.replace("`", "'"),
+          "markdown" => issue.check.explanation()
         },
         "properties" => %{
           "tags" => [
             issue.category
           ]
         },
-        "helpUri" => issue.check.docs_uri
+        "helpUri" => issue.check.docs_uri()
       },
       %{
-        "ruleId" => issue.check.id,
+        "ruleId" => issue.check.id(),
         "level" => sarif_level,
         "rank" => priority_to_sarif_rank(issue.priority),
         "message" => %{
@@ -184,7 +191,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
                 "startColumn" => issue.column || 1,
                 "endColumn" => column_end,
                 "snippet" => %{
-                  "text" => issue.trigger
+                  "text" => trigger
                 }
               }
             },
@@ -201,7 +208,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
     rule_and_issue
     |> remove_nil_endcolumn(!column_end)
     |> remove_warning_level(sarif_level == :warning)
-    |> remove_redundant_name(issue.check.id == Credo.Code.Name.full(issue.check))
+    |> remove_redundant_name(issue.check.id() == Credo.Code.Name.full(issue.check))
   end
 
   defp remove_nil_endcolumn(sarif, false), do: sarif

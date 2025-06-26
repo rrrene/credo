@@ -67,7 +67,10 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 5
+      assert issue.column == 14
+    end)
   end
 
   test "it should report a violation for module attributes" do
@@ -80,7 +83,11 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "-"
+      assert issue.line_no == 4
+      assert issue.column == 29
+    end)
   end
 
   test "it should report a violation for all defined operations" do

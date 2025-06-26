@@ -171,7 +171,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> refute_issues
   end
 
-  test "should not report infix operators" do
+  test "should NOT report infix operators" do
     """
     (1 + 2) |> IO.puts
     (1 * 2) |> IO.puts
@@ -425,7 +425,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     |> assert_issues()
   end
 
-  test "it should report a violation for a function call 2" do
+  test "it should report a violation for a function call /2" do
     """
     fun([a, b, c])
     |> something1
@@ -435,10 +435,12 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "|>"
+    end)
   end
 
-  test "it should report a violation for a function call 3" do
+  test "it should report a violation for a function call /3" do
     """
     fun.([a, b, c]) |> IO.inspect
     fun.([a, b, c]) |> Enum.join |> IO.inspect

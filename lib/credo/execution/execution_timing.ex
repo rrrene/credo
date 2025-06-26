@@ -160,7 +160,7 @@ defmodule Credo.Execution.ExecutionTiming do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %Execution{exec | timing_pid: pid}
+    %{exec | timing_pid: pid}
   end
 
   @doc false

@@ -24,8 +24,12 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
             _ -> :many
           end
 
-      If you want to disallow piping into blocks all together, use
+      If you want to disallow piping into blocks altogether, use
       `Credo.Check.Readability.BlockPipe`.
+
+      Like all `Readability` issues, this one is not a technical concern.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 
@@ -51,7 +55,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
 
   defp issue({:|>, meta, [arg, {marker, _case_meta, _case_args}]}, issue_meta)
        when marker in [:case, :if] do
-    if issue?(arg), do: issue_for(issue_meta, meta[:line]), else: nil
+    if issue?(arg), do: issue_for(issue_meta, meta[:line], marker), else: nil
   end
 
   defp issue(_, _), do: nil
@@ -70,11 +74,12 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipe do
 
   defp issue?(_), do: false
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, line_no, marker) do
     format_issue(
       issue_meta,
       message: "Avoid single pipes to a block",
-      line_no: line_no
+      line_no: line_no,
+      trigger: marker
     )
   end
 end

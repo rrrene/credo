@@ -27,13 +27,18 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
+  defp traverse({{:., meta, call}, _, args} = ast, issues, issue_meta) do
     case get_forbidden_call(call, args) do
       nil ->
         {ast, issues}
 
-      bad ->
-        {ast, issues_for_call(bad, meta, issue_meta, issues)}
+      {trigger, meta} ->
+        {ast, [issue_for(issue_meta, meta, trigger) | issues]}
+
+      "" <> trigger ->
+        [module, _function] = call
+
+        {ast, [issue_for(issue_meta, meta, trigger, module) | issues]}
     end
   end
 
@@ -41,25 +46,20 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     {ast, issues}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:System]}, :cmd], [_, _]) do
-    "System.cmd/2"
+  defp get_forbidden_call([{:__aliases__, meta, [:System]}, :cmd], [_, _]) do
+    {"System.cmd", meta}
   end
 
-  defp get_forbidden_call([{:__aliases__, _, [:System]}, :cmd], [_, _, opts])
+  defp get_forbidden_call([{:__aliases__, meta, [:System]}, :cmd], [_, _, opts])
        when is_list(opts) do
-    if Keyword.has_key?(opts, :env) do
-      nil
-    else
-      "System.cmd/3"
+    if not Keyword.has_key?(opts, :env) do
+      {"System.cmd", meta}
     end
   end
 
-  defp get_forbidden_call([:erlang, :open_port], [_, opts])
-       when is_list(opts) do
-    if Keyword.has_key?(opts, :env) do
-      nil
-    else
-      ":erlang.open_port/2"
+  defp get_forbidden_call([:erlang, :open_port], [_, opts]) when is_list(opts) do
+    if not Keyword.has_key?(opts, :env) do
+      ":erlang.open_port"
     end
   end
 
@@ -67,13 +67,20 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     nil
   end
 
-  defp issues_for_call(call, meta, issue_meta, issues) do
-    options = [
-      message: "When using #{call}, clear or overwrite sensitive environment variables",
-      trigger: call,
-      line_no: meta[:line]
-    ]
+  defp issue_for(issue_meta, meta, trigger, erlang_module \\ nil) do
+    column =
+      if erlang_module do
+        meta[:column] - String.length(":#{erlang_module}")
+      else
+        meta[:column]
+      end
 
-    [format_issue(issue_meta, options) | issues]
+    format_issue(
+      issue_meta,
+      message: "When using #{trigger}, clear or overwrite sensitive environment variables.",
+      trigger: trigger,
+      line_no: meta[:line],
+      column: column
+    )
   end
 end

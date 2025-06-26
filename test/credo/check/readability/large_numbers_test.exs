@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should allow multiple large floats on a line" do
+  test "it should NOT report multiple large floats on a line" do
     """
     def numbers do
       100_000.1 + 5_000_000.2 + 66_000.3
@@ -44,7 +44,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should allow trailing digits if configured" do
+  test "it should NOT report trailing digits if configured" do
     """
     def numbers do
       Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
@@ -55,7 +55,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should allow trailing digits if configured /2" do
+  test "it should NOT report trailing digits if configured /2" do
     """
     def numbers do
       Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
@@ -67,7 +67,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should allow trailing digits if configured /3" do
+  test "it should NOT report trailing digits if configured /3" do
     """
     def numbers do
       Money.to_string(Money.new(1_000_000_89, :COP), fractional_unit: false)  # "$1'000.000.00"
@@ -80,7 +80,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should not complain about numbers in anon function calls" do
+  test "it should NOT report numbers in anon function calls" do
     """
       defmodule Demo.LargeNumberAnonWarning do
         @moduledoc false
@@ -99,7 +99,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "it should not complain about non-decimal numbers" do
+  test "it should NOT report non-decimal numbers" do
     """
     def numbers do
       0xFFFF
@@ -113,14 +113,14 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "check old false positive is fixed /1" do
+  test "it should NOT report an old false positive that is fixed /1" do
     " defmacro oid_ansi_x9_62, do: quote do: {1,2,840,10_045}"
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
-  test "check old false positive is fixed /2" do
+  test "it should NOT report an old false positive that is fixed /2" do
     """
     %{
       bounds: [
@@ -134,7 +134,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
-  test "check old false positive is fixed /3" do
+  test "it should NOT report an old false positive that is fixed /3" do
     """
     check all integer <- integer(-10_000..-1) do
       assert is_integer(integer)
@@ -274,7 +274,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     end)
   end
 
-  test "it should detect report issues with multiple large floats on a line" do
+  test "it should report issues with multiple large floats on a line" do
     """
     def numbers do
       100_000.1 + 5_000_000.2 + 66000.3
@@ -282,7 +282,10 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 2
+      assert issue.trigger == "66000.3"
+    end)
   end
 
   test "it should report trailing digits which are not configured" do
@@ -297,7 +300,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> assert_issues()
   end
 
-  test "it should include configured `only_greater_than` values" do
+  test "it should report configured `only_greater_than` values" do
     only_greater_than = 1_000_000
 
     """

@@ -160,7 +160,7 @@ defmodule Credo.SourceFile do
       |> to_string
       |> Regex.escape()
 
-    case Regex.run(~r/(\b|\(|\)|\,)(#{regexed})(\b|\(|\)|\,)/, line, return: :index) do
+    case Regex.run(~r/(\s|\b|\(|\)|\,)(#{regexed})(\s|\b|\(|\)|\,)/, line, return: :index) do
       nil ->
         nil
 

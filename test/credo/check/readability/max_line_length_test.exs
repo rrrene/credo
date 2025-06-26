@@ -102,6 +102,42 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation if heredocs are excluded" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        IO.puts 1
+        """
+        long string, right? 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 == 2
+        """
+        IO.puts 2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80, ignore_heredocs: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation if sigils are excluded" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        IO.puts 1
+        ~s(long string, right? 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 == 2)
+        IO.puts 2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80, ignore_sigils: true)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation if strings are excluded for heredocs" do
     """
     defmodule CredoSampleModule do

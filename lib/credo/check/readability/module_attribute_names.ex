@@ -6,13 +6,13 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
       check: """
       Module attribute names are always written in snake_case in Elixir.
 
-      # snake_case
+          # snake_case
 
-      @inbox_name "incoming"
+          @inbox_name "incoming"
 
-      # not snake_case
+          # not snake_case
 
-      @inboxName "incoming"
+          @inboxName "incoming"
 
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
@@ -35,8 +35,6 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     {ast, issues}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
-  # NOTE: see above how we want to exclude certain front-loads
   defp traverse(
          {:@, _meta, [{name, meta, _arguments}]} = ast,
          issues,

@@ -19,9 +19,9 @@ defmodule Credo.Check.Runner do
       |> warn_about_ineffective_patterns(exec)
       |> fix_deprecated_notation_for_checks_without_params()
 
-    Credo.Check.Worker.run(check_tuples, exec.max_concurrent_check_runs, fn check_tuple ->
-      run_check(exec, check_tuple)
-    end)
+    check_tuples
+    |> Task.async_stream(&run_check(exec, &1), timeout: :infinity, ordered: false)
+    |> Stream.run()
 
     :ok
   end
@@ -42,12 +42,43 @@ defmodule Credo.Check.Runner do
     files_excluded = Params.files_excluded(params, check)
 
     found_relevant_files =
-      if files_included == [] and files_excluded == [] do
-        []
-      else
-        exec
-        |> Execution.working_dir()
-        |> Credo.Sources.find_in_dir(files_included, files_excluded)
+      cond do
+        files_included == [] and files_excluded == [] ->
+          []
+
+        exec.read_from_stdin ->
+          # TODO: I am unhappy with how convoluted this gets
+          #       but it is necessary to avoid hitting the filesystem when reading from STDIN
+          [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
+
+          file_included? =
+            if files_included != [] do
+              Credo.Sources.filename_matches?(filename, files_included)
+            else
+              true
+            end
+
+          file_excluded? =
+            if files_excluded != [] do
+              Credo.Sources.filename_matches?(filename, files_excluded)
+            else
+              false
+            end
+
+          if !file_included? || file_excluded? do
+            :skip_run
+          else
+            []
+          end
+
+        true ->
+          exec
+          |> Execution.working_dir()
+          |> Credo.Sources.find_in_dir(files_included, files_excluded)
+          |> case do
+            [] -> :skip_run
+            files -> files
+          end
       end
 
     source_files =
@@ -68,6 +99,10 @@ defmodule Credo.Check.Runner do
           []
         end
     end
+  end
+
+  defp filter_source_files(_source_files, :skip_run) do
+    []
   end
 
   defp filter_source_files(source_files, []) do

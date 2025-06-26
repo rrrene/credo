@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
   @described_check Credo.Check.Consistency.SpaceAroundOperators
 
-  @without_spaces """
+  @without_spaces ~S"""
   defmodule Credo.Sample1 do
     @spec f(<<_::16, _::_*8>>) :: binary
     defmodule InlineModule do
@@ -22,7 +22,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
      end
   """
 
-  @without_spaces2 """
+  @without_spaces2 ~S"""
   defmodule OtherModule3 do
     defmacro foo do
       3+4
@@ -33,7 +33,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @without_spaces3 """
+  @without_spaces3 ~S"""
   defmodule OtherModule4 do
     defp dictionary_changeset() do
       fields = ~W(
@@ -43,7 +43,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces """
+  @with_spaces ~S"""
   defmodule Credo.Sample2 do
     defmodule F do
       def f(), do: 1 + 2
@@ -151,7 +151,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces2 """
+  @with_spaces2 ~S"""
   defmodule OtherModule3 do
     defmacro foo do
       1 && 2
@@ -162,7 +162,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces3 """
+  @with_spaces3 ~S"""
   defmodule OtherModule3 do
     defmacro foo do
       case foo do
@@ -173,7 +173,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces4 """
+  @with_spaces4 ~S"""
   defmodule OtherModule3 do
     @min -1
     @max 2 + 1
@@ -187,7 +187,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces5 """
+  @with_spaces5 ~S"""
   defmodule CredoTest do
     @moduledoc ""
 
@@ -203,7 +203,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_spaces6 """
+  @with_spaces6 ~S"""
   assert -24 == MyModule.fun
   assert MyModule.fun !=  -24
   ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
@@ -215,7 +215,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     def foo, do: 1 + 1
   end
   """
-  @with_spaces8 """
+  @with_spaces8 ~S"""
   defmodule AlwaysNoSpacesInBinaryTypespecTest do
 
     def seed_collection(entity, collection, opts) when is_map(collection) do
@@ -234,7 +234,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   end
   """
 
-  @with_and_without_spaces """
+  @with_and_without_spaces ~S"""
   defmodule OtherModule3 do
     defmacro foo do
       3+4
@@ -245,7 +245,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
   """
-  @with_and_without_spaces2 """
+  @with_and_without_spaces2 ~S"""
   defmodule CredoTests do
   def bar do
   2+3
@@ -258,7 +258,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   # cases NOT raising issues
   #
 
-  test "it should not report issues when used with sigil" do
+  test "it should NOT report issues when used with sigil" do
     [
       @without_spaces3
     ]
@@ -267,7 +267,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues when operators are negative float values" do
+  test "it should NOT report issues when operators are negative float values" do
     [
       @with_spaces8
     ]
@@ -276,7 +276,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are used everywhere" do
+  test "it should NOT report issues if spaces are used everywhere" do
     [
       @with_spaces,
       @with_spaces2,
@@ -291,13 +291,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   if Version.match?(System.version(), ">= 1.12.0-rc") do
     # Elixir >= 1.12.0
     #
-    test "it should not report issues if spaces are used everywhere /2" do
+    test "it should NOT report issues if spaces are used everywhere /2" do
       [
         @with_spaces,
         @with_spaces2,
         @with_spaces3,
         @with_spaces4,
-        """
+        ~S"""
         defmodule OtherModule3_0 do
           for prio < 1..10//2 do
             # something
@@ -315,7 +315,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     end
   end
 
-  test "it should not report issues if spaces are used everywhere in a single file" do
+  test "it should NOT report issues if spaces are used everywhere in a single file" do
     [
       @with_spaces5
     ]
@@ -324,7 +324,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are used everywhere in two files" do
+  test "it should NOT report issues if spaces are used everywhere in two files" do
     [
       @with_spaces5,
       @with_spaces6
@@ -334,7 +334,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> refute_issues()
   end
 
-  test "it should not report issues if spaces are omitted everywhere" do
+  test "it should NOT report issues if spaces are omitted everywhere" do
     [
       @without_spaces,
       @without_spaces2
@@ -386,7 +386,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "+"
+    end)
   end
 
   test "it should report the correct result /6" do
@@ -432,6 +434,31 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     [@with_spaces7]
     |> to_source_files()
     |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should allow no spaces if specified in :ignore" do
+    source_files =
+      [
+        ~S"""
+        defmodule TestTest do
+          def test(a, b, c) do
+            a = fn b, c -> b+c end
+
+            a.(-30, 10)
+            a.(-3.0, 1.0)
+          end
+        end
+        """
+      ]
+      |> to_source_files()
+
+    source_files
+    |> run_check(@described_check)
+    |> assert_issue()
+
+    source_files
+    |> run_check(@described_check, ignore: [:+])
     |> refute_issues()
   end
 end

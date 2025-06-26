@@ -40,7 +40,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          nil
        ) do
     if mods == required_mod_list do
-      {ast, acc ++ [ast]}
+      {ast, [ast | acc]}
     else
       {ast, acc}
     end
@@ -53,7 +53,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          restrict_fun_names
        ) do
     if mods == required_mod_list and fun_name in restrict_fun_names do
-      {ast, acc ++ [ast]}
+      {ast, [ast | acc]}
     else
       {ast, acc}
     end
@@ -132,7 +132,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          when is_list(arguments) do
       # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
 
-      head_expression = Enum.slice(arguments, 0..-2)
+      head_expression = Enum.slice(arguments, 0..-2//1)
 
       if Credo.Code.contains_child?(head_expression, candidate) do
         {nil, :VERIFIED}
@@ -230,6 +230,22 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
     end
   end
 
+  # anon_fun.()
+  defp verify_candidate(
+         {{:., _, [{fun_name, _, nil}]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_atom(fun_name) and is_list(arguments) do
+    # IO.inspect(ast, label: "anon_fun.() (#{Macro.to_string(candidate)} #{acc})")
+
+    if Credo.Code.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
   # module.my_fun()
   defp verify_candidate(
          {{:., _, [{module, _, []}, fun_name]}, _, arguments} = ast,
@@ -277,14 +293,6 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
       {ast, acc}
     end
   end
-
-  {:., [line: 3, column: 31],
-   [
-     {{:., [line: 3, column: 22],
-       [{:__aliases__, [line: 3, column: 5], [:CredoSampleModule]}, :runner]},
-      [line: 3, column: 23], []},
-     :do_some_function
-   ]}
 
   # module.my_fun()
   defp verify_candidate(

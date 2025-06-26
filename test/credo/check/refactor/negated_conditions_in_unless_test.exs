@@ -57,6 +57,27 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnlessTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "!"
+    end)
+  end
+
+  test "it should report a violation with not" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        unless not allowed? do
+          something
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.line_no == 3
+      assert issue.trigger == "not"
+    end)
   end
 end

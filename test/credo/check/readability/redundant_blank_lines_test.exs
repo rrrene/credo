@@ -15,6 +15,13 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
       end
 
       def b do
+        foo = "
+        a
+
+
+        b
+        "
+
         2
       end
     end
@@ -51,7 +58,7 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
     |> refute_issues()
   end
 
-  test "it should not fail when file doesn't have empty lines" do
+  test "it should NOT report when file doesn't have empty lines" do
     "defmodule ModuleWithoutEmptyLines do
   def foo do
     :bar
@@ -81,10 +88,12 @@ end"
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == Credo.Issue.no_trigger()
+    end)
   end
 
-  test "it should be relative max_blank_lines param" do
+  test "it should report based on  max_blank_lines param" do
     file =
       """
       defmodule ModuleWithManyBlankLines do

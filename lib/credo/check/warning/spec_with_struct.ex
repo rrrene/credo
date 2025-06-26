@@ -29,21 +29,15 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:@, meta, [{:spec, _, args}]}, issues, issue_meta) do
+  defp traverse({:@, _, [{:spec, _, args}]}, issues, issue_meta) do
     case Macro.prewalk(args, [], &find_structs/2) do
       {ast, []} ->
         {ast, issues}
 
       {ast, structs} ->
         issues =
-          Enum.reduce(structs, issues, fn curr, acc ->
-            options = [
-              message: "Struct %#{curr}{} found in @spec",
-              trigger: "%#{curr}{}",
-              line_no: meta[:line]
-            ]
-
-            [format_issue(issue_meta, options) | acc]
+          Enum.reduce(structs, issues, fn {curr, meta}, acc ->
+            [issue_for(issue_meta, meta, curr) | acc]
           end)
 
         {ast, issues}
@@ -54,11 +48,20 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     {ast, issues}
   end
 
-  defp find_structs({:%, _, [{:__aliases__, _, _} = aliases | _]} = ast, acc) do
-    {ast, [Name.full(aliases) | acc]}
+  defp find_structs({:%, meta, [{:__aliases__, _, _} = aliases | _]} = ast, acc) do
+    {ast, [{Name.full(aliases), meta} | acc]}
   end
 
   defp find_structs(ast, acc) do
     {ast, acc}
+  end
+
+  defp issue_for(issue_meta, meta, struct) do
+    format_issue(issue_meta,
+      message: "Struct %#{struct}{} found in `@spec`.",
+      trigger: "%#{struct}{",
+      line_no: meta[:line],
+      column: meta[:column]
+    )
   end
 end

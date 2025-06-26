@@ -36,13 +36,13 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  defp traverse({:@, meta, [attribute_definition]} = ast, issues, issue_meta) do
+  defp traverse({:@, _meta, [attribute_definition]} = ast, issues, issue_meta) do
     case traverse_attribute(attribute_definition) do
       nil ->
         {ast, issues}
 
       {attribute, call} ->
-        {ast, issues_for_call(attribute, call, meta, issue_meta, issues)}
+        {ast, issues_for_call(attribute, call, issue_meta, issues)}
     end
   end
 
@@ -65,45 +65,47 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
   end
 
   defp get_forbidden_call(
-         {{:., _, [{:__aliases__, _, [:Application]}, :fetch_env]}, _meta, _args} = ast,
+         {{:., _, [{:__aliases__, meta, [:Application]}, :fetch_env]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.fetch_env/2"}
+    {ast, {meta, "Application.fetch_env/2", "Application.fetch_env"}}
   end
 
   defp get_forbidden_call(
-         {{:., _, [{:__aliases__, _, [:Application]}, :fetch_env!]}, _meta, _args} = ast,
+         {{:., _, [{:__aliases__, meta, [:Application]}, :fetch_env!]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.fetch_env!/2"}
+    {ast, {meta, "Application.fetch_env!/2", "Application.fetch_env"}}
   end
 
   defp get_forbidden_call(
-         {{:., _, [{:__aliases__, _, [:Application]}, :get_all_env]}, _meta, _args} = ast,
+         {{:., _, [{:__aliases__, meta, [:Application]}, :get_all_env]}, _meta, _args} = ast,
          _acc
        ) do
-    {ast, "Application.get_all_env/1"}
+    {ast, {meta, "Application.get_all_env/1", "Application.get_all_env"}}
   end
 
   defp get_forbidden_call(
-         {{:., _, [{:__aliases__, _, [:Application]}, :get_env]}, _meta, args} = ast,
+         {{:., _, [{:__aliases__, meta, [:Application]}, :get_env]}, _meta, args} = ast,
          _acc
        ) do
-    {ast, "Application.get_env/#{length(args)}"}
+    {ast, {meta, "Application.get_env/#{length(args)}", "Application.get_env"}}
   end
 
   defp get_forbidden_call(ast, acc) do
     {ast, acc}
   end
 
-  defp issues_for_call(attribute, call, meta, issue_meta, issues) do
-    options = [
-      message:
-        "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
-      trigger: call,
-      line_no: meta[:line]
+  defp issues_for_call(attribute, {meta, call, trigger}, issue_meta, issues) do
+    [
+      format_issue(issue_meta,
+        message:
+          "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
+        trigger: trigger,
+        line_no: meta[:line],
+        column: meta[:column]
+      )
+      | issues
     ]
-
-    [format_issue(issue_meta, options) | issues]
   end
 end

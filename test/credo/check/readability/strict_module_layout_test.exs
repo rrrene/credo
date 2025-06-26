@@ -277,4 +277,73 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       assert issue.message == "alias must appear before require"
     end
   end
+
+  describe "ignored module attributes" do
+    test "ignores custom module attributes" do
+      """
+      defmodule Test do
+        use Baz
+
+        import Bar
+
+        @trace trace_fun()
+        def test_fun() do
+          nil
+        end
+
+        @trace trace_fun()
+        def test() do
+          nil
+        end
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check,
+        order: ~w(use import module_attribute)a,
+        ignore_module_attributes: ~w/trace/a
+      )
+      |> refute_issues
+    end
+
+    test "ignores enforce_keys module attribute" do
+      """
+      defmodule Test do
+        @enforce_keys [:bar]
+        defstruct bar: nil
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, order: [:defstruct, :module_attribute])
+      |> refute_issues
+    end
+
+    test "only ignores set module attributes" do
+      """
+      defmodule Test do
+        import Bar
+
+        @trace trace_fun()
+        def test_fun() do
+          nil
+        end
+
+        @bad_attribute
+        @trace trace_fun()
+        def test() do
+          nil
+        end
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check,
+        order: ~w(import module_attribute)a,
+        ignore_module_attributes: ~w/trace/a
+      )
+      |> assert_issue(fn issue ->
+        assert issue.message == "module attribute must appear before public function"
+        # TODO: It would be nicer if the trigger was the attribute in question
+        assert issue.trigger == "Test"
+      end)
+    end
+  end
 end

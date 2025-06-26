@@ -55,8 +55,8 @@ defmodule Credo.CLI.Output do
     |> check_color
   end
 
-  def check_color(check_mod) do
-    check_mod.category
+  def check_color(%{} = issue_or_map) do
+    issue_or_map.category
     |> to_string
     |> check_color
   end
@@ -207,23 +207,39 @@ defmodule Credo.CLI.Output do
       :reset,
       :faint,
       "your version of Elixir (#{System.version()}).\n\n",
-      "You can deactivate these checks by adding this to the `checks` list in your config:\n"
+      "You can deactivate these checks by adding them to the `:checks`/`:disabled` list in your config:\n"
     ]
 
     UI.puts("")
     UI.puts(msg)
 
+    UI.puts([
+      :faint,
+      """
+        checks: %{
+          disabled: [
+      """
+      |> String.trim_trailing()
+    ])
+
     skipped_checks
-    |> Enum.map(&check_name/1)
-    |> print_disabled_check_config
-  end
+    |> Enum.flat_map(fn {check, params} ->
+      [
+        :reset,
+        :cyan,
+        "      {#{Credo.Code.Module.name(check)}, #{inspect(params)}},\t# requires Elixir #{check.elixir_version()}\n"
+      ]
+    end)
+    |> UI.puts()
 
-  defp check_name({check, _check_info}), do: check_name({check})
-
-  defp check_name({check}) do
-    check
-    |> to_string
-    |> String.replace(~r/^Elixir\./, "")
+    UI.puts([
+      :faint,
+      """
+            # ...
+          ]
+        }
+      """
+    ])
   end
 
   defp print_numbered_list(list) do
@@ -238,18 +254,5 @@ defmodule Credo.CLI.Output do
       ]
     end)
     |> UI.warn()
-  end
-
-  defp print_disabled_check_config(list) do
-    list
-    |> Enum.flat_map(fn string ->
-      [
-        :reset,
-        String.pad_leading(" ", 4),
-        :faint,
-        "{#{string}, false},\n"
-      ]
-    end)
-    |> UI.puts()
   end
 end

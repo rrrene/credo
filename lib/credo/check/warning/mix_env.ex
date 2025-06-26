@@ -18,7 +18,6 @@ defmodule Credo.Check.Warning.MixEnv do
 
   alias Credo.SourceFile
 
-  @call_string "Mix.env"
   @def_ops [:def, :defp, :defmacro]
 
   @doc false
@@ -53,7 +52,7 @@ defmodule Credo.Check.Warning.MixEnv do
 
   for op <- @def_ops do
     # catch variables named e.g. `defp`
-    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta, _parens?) do
+    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta) do
       {ast, issues}
     end
 
@@ -67,7 +66,7 @@ defmodule Credo.Check.Warning.MixEnv do
   end
 
   defp traverse_defs(
-         {{:., _, [{:__aliases__, _, [:Mix]}, :env]}, meta, _arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:Mix]}, :env]}, _, _arguments} = ast,
          issues,
          issue_meta
        ) do
@@ -79,15 +78,16 @@ defmodule Credo.Check.Warning.MixEnv do
   end
 
   defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta[:line], @call_string) | issues]
+    [issue_for(issue_meta, meta) | issues]
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
-      message: "There should be no calls to Mix.env in application code.",
-      trigger: trigger,
-      line_no: line_no
+      message: "There should be no calls to `Mix.env` in application code.",
+      trigger: "Mix.env",
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

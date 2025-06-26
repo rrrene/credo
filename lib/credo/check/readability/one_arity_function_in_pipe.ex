@@ -25,18 +25,19 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipe do
   end
 
   defp traverse({:|>, _, [_, {name, meta, nil}]} = ast, issues, issue_meta) when is_atom(name) do
-    {ast, [issue(issue_meta, meta[:line]) | issues]}
+    {ast, [issue_for(issue_meta, meta[:line], name) | issues]}
   end
 
   defp traverse(ast, issues, _) do
     {ast, issues}
   end
 
-  defp issue(meta, line) do
+  defp issue_for(issue_meta, line, name) do
     format_issue(
-      meta,
-      message: "One arity functions should have parentheses in pipes",
-      line_no: line
+      issue_meta,
+      message: "One arity functions should have parentheses in pipes.",
+      line_no: line,
+      trigger: name
     )
   end
 end

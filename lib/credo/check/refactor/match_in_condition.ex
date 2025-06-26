@@ -66,8 +66,6 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, issues}
   end
 
-  # TODO: consider for experimental check front-loader (ast)
-  # NOTE: we have to exclude the cases matching the above
   for op <- @condition_ops do
     defp traverse({unquote(op), _meta, arguments} = ast, issues, allow_tagged_tuples, issue_meta) do
       # remove do/else blocks
@@ -136,7 +134,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
   defp issue_for(op, line_no, issue_meta) do
     format_issue(
       issue_meta,
-      message: "There should be no matches in `#{op}` conditions.",
+      message: "Avoid matches in `#{op}` conditions.",
       trigger: @trigger,
       line_no: line_no
     )

@@ -74,16 +74,22 @@ defmodule Credo.Code do
 
   @doc false
   def ast(source, filename \\ "nofilename") when is_binary(source) do
-    case Code.string_to_quoted(source, line: 1, columns: true, file: filename) do
-      {:ok, value} ->
-        {:ok, value}
-
-      {:error, error} ->
-        {:error, [issue_for(error, filename)]}
+    case string_to_quoted(source, filename) do
+      {:ok, value} -> {:ok, value}
+      {:error, error} -> {:error, [issue_for(error, filename)]}
     end
   rescue
     e in UnicodeConversionError ->
       {:error, [issue_for({1, e.message, nil}, filename)]}
+  end
+
+  defp string_to_quoted(source, filename) do
+    Code.string_to_quoted(source,
+      line: 1,
+      columns: true,
+      file: filename,
+      emit_warnings: false
+    )
   end
 
   defp issue_for({line_no, error_message, _}, filename) do
@@ -141,6 +147,10 @@ defmodule Credo.Code do
       # Elixir >= 1.13
       {:ok, _, _, _, tokens} ->
         tokens
+
+      # Elixir >= 1.17
+      {:ok, _, _, _, tokens, _} ->
+        Enum.reverse(tokens)
 
       {:error, _, _, _, tokens} ->
         tokens

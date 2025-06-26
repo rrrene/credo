@@ -46,12 +46,13 @@ defmodule Credo.Check.Warning.LazyLogging do
   end
 
   defp traverse(
-         {{:., _, [{:__aliases__, _, [:Logger]}, fun_name]}, meta, arguments} = ast,
+         {{:., _, [{:__aliases__, meta, [:Logger]}, fun_name]}, _, arguments} = ast,
          state,
          issue_meta
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    trigger = "Logger.#{fun_name}"
+    issue = find_issue(fun_name, arguments, meta, issue_meta, trigger)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -62,7 +63,7 @@ defmodule Credo.Check.Warning.LazyLogging do
          issue_meta
        )
        when fun_name in @logger_functions do
-    issue = find_issue(fun_name, arguments, meta, issue_meta)
+    issue = find_issue(fun_name, arguments, meta, issue_meta, fun_name)
 
     {ast, add_issue_to_state(state, issue)}
   end
@@ -89,31 +90,33 @@ defmodule Credo.Check.Warning.LazyLogging do
     {module_contains_import?, [issue | issues]}
   end
 
-  defp find_issue(fun_name, arguments, meta, issue_meta) do
+  defp find_issue(fun_name, arguments, meta, issue_meta, trigger) do
     params = IssueMeta.params(issue_meta)
     ignored_functions = Params.get(params, :ignore, __MODULE__)
 
     unless Enum.member?(ignored_functions, fun_name) do
-      issue_for_call(arguments, meta, issue_meta)
+      issue_for_call(arguments, meta, trigger, issue_meta)
     end
   end
 
-  defp issue_for_call([{:<<>>, _, [_ | _]} | _] = _args, meta, issue_meta) do
-    issue_for(issue_meta, meta[:line])
+  defp issue_for_call([{:<<>>, _, [_ | _]} | _] = _args, meta, fun_name, issue_meta) do
+    issue_for(issue_meta, meta, fun_name)
   end
 
-  defp issue_for_call(_args, _meta, _issue_meta) do
+  defp issue_for_call(_args, _meta, _trigger, _issue_meta) do
     nil
   end
 
   defp logger_import?([{:__aliases__, _meta, [:Logger]}]), do: true
   defp logger_import?(_), do: false
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
       message: "Prefer lazy Logger calls.",
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column],
+      trigger: trigger
     )
   end
 end

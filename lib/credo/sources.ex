@@ -9,6 +9,41 @@ defmodule Credo.Sources do
   @default_sources_glob ~w(** *.{ex,exs})
   @stdin_filename "stdin"
 
+  @doc false
+  def filename_matches?(filename, patterns) do
+    patterns
+    |> List.wrap()
+    |> Enum.any?(&match_filename_pattern(filename, &1))
+  end
+
+  defp match_filename_pattern(filename, pattern) when is_binary(pattern) do
+    if String.contains?(pattern, "*") do
+      matches_glob_naively?(filename, pattern)
+    else
+      String.starts_with?(filename, pattern)
+    end
+  end
+
+  defp match_filename_pattern(filename, %Regex{} = pattern), do: String.match?(filename, pattern)
+
+  defp match_filename_pattern(_, pattern),
+    do: raise("Expected String or Regex, got: #{inspect(pattern)}")
+
+  # naively converts glob pattern to regex
+  # does not account for brace or tilde expansion or command substitution
+  # or anything other than * and **
+  defp matches_glob_naively?(filename, pattern) do
+    pattern
+    |> String.replace("/", "\\/")
+    |> String.replace("**", ".+")
+    |> String.replace("*", "[^\/]+")
+    |> Regex.compile()
+    |> case do
+      {:ok, regex} -> String.match?(filename, regex)
+      _ -> raise "Compiling glob pattern to regex failed: #{inspect(pattern)}"
+    end
+  end
+
   @doc """
   Finds sources for a given `Credo.Execution`.
 
@@ -170,24 +205,12 @@ defmodule Credo.Sources do
   end
 
   defp read_files(filenames, parse_timeout) do
-    tasks = Enum.map(filenames, &Task.async(fn -> to_source_file(&1) end))
-
-    task_dictionary =
-      tasks
-      |> Enum.zip(filenames)
-      |> Enum.into(%{})
-
-    tasks_with_results = Task.yield_many(tasks, parse_timeout)
-
-    results =
-      Enum.map(tasks_with_results, fn {task, res} ->
-        # Shutdown the tasks that did not reply nor exit
-        {task, res || Task.shutdown(task, :brutal_kill)}
-      end)
-
-    Enum.map(results, fn
-      {_task, {:ok, value}} -> value
-      {task, nil} -> SourceFile.timed_out(task_dictionary[task])
+    filenames
+    |> Task.async_stream(&to_source_file/1, timeout: parse_timeout, on_timeout: :kill_task)
+    |> Stream.zip(filenames)
+    |> Enum.map(fn
+      {{:exit, :timeout}, filename} -> SourceFile.timed_out(filename)
+      {{:ok, value}, _} -> value
     end)
   end
 

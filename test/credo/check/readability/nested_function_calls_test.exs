@@ -1,18 +1,25 @@
 defmodule Credo.Check.Readability.NestedFunctionCallsTest do
   use Credo.Test.Case
 
-  alias Credo.Check.Readability.NestedFunctionCalls
+  @described_check Credo.Check.Readability.NestedFunctionCalls
 
-  test "it should NOT code with no nested function calls" do
+  #
+  # cases NOT raising issues
+  #
+
+  test "it should NOT report code with no nested function calls" do
     """
     defmodule CredoSampleModule do
-      def some_code do
-        Enum.shuffle([1,2,3])
-      end
+      @callback callback_name :: Keyword.t(Some.remote(some_arg))
+      @macrocallback macrocallback_name :: Keyword.t(Some.remote(some_arg))
+      @spec spec_name :: Keyword.t(Some.remote(some_arg))
+      @opaque opaque_name :: Keyword.t(Some.remote(some_arg))
+      @type type_name :: Keyword.t(Some.remote(some_arg))
+      @typep typep_name :: Keyword.t(Some.remote(some_arg))
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -20,12 +27,12 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     defmodule CredoSampleModule do
       def some_code do
-        "Take 10 #{Enum.take([1,2,2,3,3], 10)}"
+        "Take 10 #{Enum.take([1, 2, 2, 3, 3], 10)}"
       end
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -33,12 +40,12 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     """
     defmodule CredoSampleModule do
       def some_code do
-        'Take 10 #{Enum.take([1,2,2,3,3], 10)}'
+        'Take 10 #{Enum.take([1, 2, 2, 3, 3], 10)}'
       end
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -51,7 +58,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -64,7 +71,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -77,7 +84,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -90,11 +97,26 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
-  test "it should NOT two nested functions calls when the inner function call takes no arguments" do
+  test "it should NOT report nested function calls when the outer function is already in a pipeline" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        [1,2,3,4]
+        |> Test.test()
+        |> Enum.map(SomeMod.some_fun(argument))
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report two nested functions calls when the inner function call takes no arguments" do
     """
     defmodule CredoSampleModule do
       def some_code do
@@ -103,9 +125,37 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> refute_issues()
   end
+
+  test "it should NOT report any issues when Kernel.to_string() is called inside a string interpolation" do
+    ~S"""
+    defmodule FeatureFlag.Adapters.Test do
+      def get(flag, context, fallback) do
+        args = {flag, context, fallback}
+        case :ets.lookup(@table, flag) do
+          [] ->
+            raise "No stubs found for #{inspect(args)}"
+
+          stubs ->
+            attempt_stubs(args, Enum.reverse(stubs))
+        end
+      end
+
+      defp attempt_stubs(args, []) do
+        raise "No stub found for args: #{inspect(args)}"
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  #
+  # cases raising issues
+  #
 
   test "it should report two nested functions calls when the inner call receives some arguments" do
     """
@@ -116,7 +166,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> assert_issue()
   end
 
@@ -129,7 +179,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls)
+    |> run_check(@described_check)
     |> assert_issues()
   end
 
@@ -142,7 +192,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls, min_pipeline_length: 1)
+    |> run_check(@described_check, min_pipeline_length: 1)
     |> assert_issue()
   end
 
@@ -155,7 +205,26 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     end
     """
     |> to_source_file()
-    |> run_check(NestedFunctionCalls, min_pipeline_length: 3)
+    |> run_check(@described_check, min_pipeline_length: 3)
     |> refute_issues()
+  end
+
+  test "it should report nested function calls inside a pipeline when the inner function calls could be a pipeline of their own" do
+    """
+    defmodule CredoSampleModule do
+      def some_code do
+        [1,2,3,4]
+        |> Test.test()
+        |> Enum.map(fn(item) ->
+          SomeMod.some_fun(another_fun(item))
+        end)
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "SomeMod.some_fun"
+    end)
   end
 end

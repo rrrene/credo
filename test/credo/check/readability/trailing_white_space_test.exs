@@ -341,11 +341,41 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues()
   end
 
-  test "it should NOT report \r line endings" do
+  test "it should NOT report \\r line endings" do
     """
     defmodule CredoSampleModule do\r
     end\r
     """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report escaped heredocs in regular heredocs" do
+    ~S'''
+    defmodule Example do
+      @moduledoc ~S"""
+      config_yaml = \"\"\"
+      apiVersion: v1
+      \"\"\"
+      """
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report escaped heredocs in regular heredocs /2" do
+    ~S'''
+    defmodule Example do
+      @moduledoc ~S"""
+      \"\"\"
+      ...
+      \"\"\"
+      """
+    end
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()

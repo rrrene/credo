@@ -36,13 +36,11 @@ defmodule Credo.CLI.Output.Summary do
     source_file_count = exec |> Execution.get_source_files() |> Enum.count()
     checks_count = count_checks(exec)
 
-    UI.puts()
-    UI.puts([:faint, @cry_for_help])
-    UI.puts()
+    print_cry_for_help(exec)
+
     UI.puts([:faint, format_time_spent(checks_count, source_file_count, time_load, time_run)])
 
     UI.puts(summary_parts(source_files, issues))
-    UI.puts()
 
     print_priority_hint(exec)
     print_first_run_hint(exec)
@@ -54,14 +52,30 @@ defmodule Credo.CLI.Output.Summary do
 
   defp print_first_run_hint(exec), do: exec
 
+  defp print_cry_for_help(%Execution{format: "short"}) do
+    nil
+  end
+
+  defp print_cry_for_help(_exec) do
+    UI.puts()
+    UI.puts([:faint, @cry_for_help])
+    UI.puts()
+  end
+
   defp count_checks(exec) do
     {result, _only_matching, _ignore_matching} = Execution.checks(exec)
 
     Enum.count(result)
   end
 
+  defp print_priority_hint(%Execution{format: "short"}) do
+    nil
+  end
+
   defp print_priority_hint(%Execution{min_priority: min_priority})
        when min_priority >= 0 do
+    UI.puts()
+
     UI.puts([
       :faint,
       "Showing priority issues: ↑ ↗ →  (use `mix credo explain` to explain issues, `mix credo --help` for options)."
@@ -69,6 +83,8 @@ defmodule Credo.CLI.Output.Summary do
   end
 
   defp print_priority_hint(_) do
+    UI.puts()
+
     UI.puts([
       :faint,
       "Use `mix credo explain` to explain issues, `mix credo --help` for options."
@@ -120,8 +136,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp category_count(issues, category) do
     issues
-    |> Enum.filter(&(&1.category == category))
-    |> Enum.count()
+    |> Enum.count(&(&1.category == category))
   end
 
   defp summary_parts(source_files, issues) do
@@ -166,13 +181,10 @@ defmodule Credo.CLI.Output.Summary do
     Credo.Code.prewalk(source_file, &scope_count_traverse/2, 0)
   end
 
-  defp scope_count([]), do: 0
-
   defp scope_count(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&Task.async(fn -> scope_count(&1) end))
-    |> Enum.map(&Task.await/1)
-    |> Enum.reduce(&(&1 + &2))
+    |> Task.async_stream(&scope_count/1, ordered: false)
+    |> Enum.reduce(0, fn {:ok, n}, sum -> n + sum end)
   end
 
   @def_ops [:defmodule, :def, :defp, :defmacro]

@@ -45,7 +45,6 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:try, _meta, _arguments} = ast, issues, issue_meta) do
     case Block.rescue_block_for(ast) do
       {:ok, ast} ->
@@ -72,19 +71,20 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   defp traverse(ast, issues, _issue_meta), do: {ast, issues}
 
   defp find_issues({:raise, meta, _arguments} = ast, issues, issue_meta) do
-    issue = issue_for(issue_meta, meta[:line])
+    issue = issue_for(issue_meta, meta)
 
-    {ast, issues ++ [issue]}
+    {ast, [issue | issues]}
   end
 
   defp find_issues(ast, issues, _), do: {ast, issues}
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
       message: "Use `reraise` inside a rescue block to preserve the original stacktrace.",
       trigger: "raise",
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

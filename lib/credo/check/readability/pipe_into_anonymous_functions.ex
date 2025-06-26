@@ -24,6 +24,14 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
 
           defp timex_2(i), do: i * 2
 
+      ... or use `then/1`:
+
+          def my_fun(foo) do
+            foo
+            |> then(fn i -> i * 2 end)
+            |> my_other_fun()
+          end
+
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
@@ -52,7 +60,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
   defp issue_for(issue_meta, line_no) do
     format_issue(
       issue_meta,
-      message: "Avoid piping into anonymous function calls",
+      message: "Avoid piping into anonymous function calls.",
       trigger: "|>",
       line_no: line_no
     )

@@ -1,4 +1,4 @@
-name: "Reproducing Test-Case Detector (experimental)"
+name: "Housekeeping: Reproducing Test-Case Detector (experimental)"
 
 on:
   pull_request:
@@ -7,19 +7,15 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     name: "Test for lib/ changes"
-    strategy:
-      matrix:
-        otp: [22.2]
-        elixir: [1.10.4]
     steps:
-      - uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
+          otp-version: 27.3
+          elixir-version: 1.19.0-rc.0
 
       - run: git fetch origin master:master
 

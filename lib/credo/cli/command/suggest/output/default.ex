@@ -31,6 +31,8 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
   @indent 8
 
   @doc "Called before the analysis is run."
+  def print_before_info(_source_files, %Execution{format: "short"}), do: nil
+
   def print_before_info(source_files, exec) do
     case Enum.count(source_files) do
       0 ->
@@ -54,21 +56,28 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
 
   @doc "Called after the analysis has run."
   def print_after_info(source_files, exec, time_load, time_run) do
+    print_issue_list_by_category(source_files, exec, time_load, time_run)
+    print_summary(source_files, exec, time_load, time_run)
+  end
+
+  defp print_issue_list_by_category(
+         _source_files,
+         %Execution{format: "short"},
+         _time_load,
+         _time_run
+       ),
+       do: nil
+
+  defp print_issue_list_by_category(source_files, exec, _time_load, _time_run) do
     term_width = Output.term_columns()
-
+    source_file_map = Enum.into(source_files, %{}, &{&1.filename, &1})
     issues = Execution.get_issues(exec)
-
-    categories =
-      issues
-      |> Enum.map(& &1.category)
-      |> Enum.uniq()
+    categories = issues |> Enum.map(& &1.category) |> Enum.uniq()
 
     issue_map =
       Enum.into(categories, %{}, fn category ->
         {category, issues |> Enum.filter(&(&1.category == category))}
       end)
-
-    source_file_map = Enum.into(source_files, %{}, &{&1.filename, &1})
 
     categories
     |> Sorter.ensure(@category_starting_order, @category_ending_order)
@@ -81,9 +90,10 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
         term_width
       )
     end)
+  end
 
-    source_files
-    |> Summary.print(exec, time_load, time_run)
+  defp print_summary(source_files, exec, time_load, time_run) do
+    Summary.print(source_files, exec, time_load, time_run)
   end
 
   defp print_issues_for_category(
@@ -240,7 +250,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       UI.edge(outer_color),
       outer_color,
       tag_style,
-      Output.check_tag(check.category),
+      Output.check_tag(check.category()),
       " ",
       priority |> Output.priority_arrow(),
       :normal,

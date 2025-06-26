@@ -83,4 +83,23 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
       assert 5 == Enum.count(issues)
     end)
   end
+
+  test "it should report a violation for `and`" do
+    """
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        x and x
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "and"
+      assert issue.line_no == 5
+      assert issue.column == 7
+    end)
+  end
 end

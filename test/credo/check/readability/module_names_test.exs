@@ -45,7 +45,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on ignored module" do
+  test "it should NOT raise on ignored module" do
     """
     defmodule Sample_Module do
     end
@@ -55,7 +55,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on ignored pattern" do
+  test "it should NOT raise on ignored pattern" do
     """
     defmodule Sample_Module do
     end
@@ -65,7 +65,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on ignored segment when multiple are present" do
+  test "it should NOT raise on ignored segment when multiple are present" do
     """
     defmodule Credo.Another_Module.SampleModule do
     end
@@ -75,7 +75,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on multiple ignored segment patterns" do
+  test "it should NOT raise on multiple ignored segment patterns" do
     """
     defmodule Credo.Another_Module.Sample_Module do
     end
@@ -85,7 +85,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on multiple ignored segment patterns for binary" do
+  test "it should NOT raise on multiple ignored segment patterns for binary" do
     """
     defmodule Credo.Another_Module.Sample_Module do
     end
@@ -95,7 +95,7 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     |> refute_issues()
   end
 
-  test "it should not raise on multiple ignored segment patterns for atom" do
+  test "it should NOT raise on multiple ignored segment patterns for atom" do
     """
     defmodule Credo.Another_Module.Sample_Module do
     end
@@ -126,7 +126,9 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Credo.Sample_Module"
+    end)
   end
 
   test "it should report a violation with multiple segments when one is invalid" do
@@ -136,6 +138,8 @@ defmodule Credo.Check.Readability.ModuleNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check, ignore: [~r/Another_Module$/])
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "Credo.Another_Module.Sample_Module"
+    end)
   end
 end

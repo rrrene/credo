@@ -7,7 +7,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
       check: """
       Avoid using custom tags for error reporting from `with` macros.
 
-      This code injects placeholder tags such as `:resource` and `:authz` for the purpose of error
+      This code injects tuple_tag tags such as `:resource` and `:authz` for the purpose of error
       reporting.
 
           with {:resource, {:ok, resource}} <- {:resource, Resource.fetch(user)},
@@ -45,38 +45,40 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
     source_file
-    |> errors()
-    |> Enum.map(&credo_error(&1, IssueMeta.for(source_file, params)))
+    |> find_issues()
+    |> Enum.map(&issue_for(&1, IssueMeta.for(source_file, params)))
   end
 
-  defp errors(source_file) do
-    {_ast, errors} = Macro.prewalk(Credo.Code.ast(source_file), MapSet.new(), &traverse/2)
-    Enum.sort_by(errors, &{&1.line, &1.column})
+  defp find_issues(source_file) do
+    {_ast, issues} = Macro.prewalk(Credo.Code.ast(source_file), MapSet.new(), &traverse/2)
+
+    Enum.sort_by(issues, &{&1.line, &1.column})
   end
 
-  defp traverse({:with, _meta, args}, errors) do
-    errors =
+  defp traverse({:with, _meta, args}, issues) do
+    issues =
       args
-      |> Stream.map(&placeholder/1)
+      |> Stream.map(&tuple_tag/1)
       |> Enum.reject(&is_nil/1)
-      |> Enum.into(errors)
+      |> Enum.into(issues)
 
-    {args, errors}
+    {args, issues}
   end
 
   defp traverse(ast, state), do: {ast, state}
 
-  defp placeholder({:<-, meta, [{placeholder, _}, {placeholder, _}]}) when is_atom(placeholder),
-    do: %{placeholder: placeholder, line: meta[:line], column: meta[:column]}
+  defp tuple_tag({:<-, meta, [{tuple_tag, _}, {tuple_tag, _}]}) when is_atom(tuple_tag),
+    do: %{tuple_tag: tuple_tag, line: meta[:line], column: meta[:column]}
 
-  defp placeholder(_), do: nil
+  defp tuple_tag(_), do: nil
 
-  defp credo_error(error, issue_meta) do
+  defp issue_for(error, issue_meta) do
     format_issue(
       issue_meta,
-      message: "Invalid usage of placeholder `#{inspect(error.placeholder)}` in with",
+      message:
+        "Avoid using tagged tuples as placeholders in `with` (found: `#{inspect(error.tuple_tag)}`).",
       line_no: error.line,
-      column: error.column
+      trigger: inspect(error.tuple_tag)
     )
   end
 end

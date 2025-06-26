@@ -25,8 +25,13 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
             _ -> :rescued
           end
 
+      This emphazises that you really want to try/rescue anything the function does,
+      which might be important for other contributors so they can reason about adding
+      code to the function.
+
       Like all `Readability` issues, this one is not a technical concern.
-      The code will behave identical in both ways.
+      But you can improve the odds of others reading and liking your code by making
+      it easier to follow.
       """
     ]
 
@@ -40,7 +45,6 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   for op <- @def_ops do
     defp traverse(
            {unquote(op), _, [{_, _, _}, [do: {:try, meta, _}]]} = ast,

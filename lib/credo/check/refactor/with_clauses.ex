@@ -37,8 +37,8 @@ defmodule Credo.Check.Refactor.WithClauses do
       """
     ]
 
-  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`"
-  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`"
+  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`."
+  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`."
 
   @doc false
   @impl true
@@ -47,7 +47,6 @@ defmodule Credo.Check.Refactor.WithClauses do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
   end
 
-  # TODO: consider for experimental check front-loader (ast)
   defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
        when is_list(clauses_and_body) do
     # If clauses_and_body is a list with at least two elements in it, we think
@@ -84,12 +83,24 @@ defmodule Credo.Check.Refactor.WithClauses do
   end
 
   defp issue_if_not_starting_with_pattern_clause(_clauses, line, issue_meta) do
-    [format_issue(issue_meta, message: @message_first_clause_not_pattern, line_no: line)]
+    [
+      format_issue(issue_meta,
+        message: @message_first_clause_not_pattern,
+        line_no: line,
+        trigger: "with"
+      )
+    ]
   end
 
   defp issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta) do
     if length(clauses) > 1 and not match?({:<-, _, _}, Enum.at(clauses, -1)) do
-      [format_issue(issue_meta, message: @message_last_clause_not_pattern, line_no: line)]
+      [
+        format_issue(issue_meta,
+          message: @message_last_clause_not_pattern,
+          line_no: line,
+          trigger: "with"
+        )
+      ]
     else
       []
     end

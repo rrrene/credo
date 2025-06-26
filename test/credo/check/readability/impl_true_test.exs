@@ -3,6 +3,10 @@ defmodule Credo.Check.Readability.ImplTrueTest do
 
   @described_check Credo.Check.Readability.ImplTrue
 
+  #
+  # cases NOT raising issues
+  #
+
   test "it should NOT report @impl Behaviour" do
     """
     defmodule CredoImplTrueTest do
@@ -28,6 +32,10 @@ defmodule Credo.Check.Readability.ImplTrueTest do
     |> refute_issues()
   end
 
+  #
+  # cases raising issues
+  #
+
   test "it should report @impl true" do
     """
     defmodule CredoTypespecTest do
@@ -37,6 +45,8 @@ defmodule Credo.Check.Readability.ImplTrueTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "@impl"
+    end)
   end
 end
