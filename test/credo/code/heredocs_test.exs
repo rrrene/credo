@@ -744,4 +744,30 @@ defmodule Credo.Code.HeredocsTest do
 
     assert result == result2, "Heredocs.replace_with_spaces/2 should be idempotent"
   end
+
+  test "should treat heredoc sigils correctly (issue #1202)" do
+    source =
+      ~S'''
+      defmodule Example do
+        @moduledoc ~S"""
+        \"\"\"
+        asdf
+        \"\"\"
+        """
+      end
+      '''
+
+    expected =
+      ~S'''
+      defmodule Example do
+        @moduledoc ~S"""
+        ......
+        ....
+        ......
+        """
+      end
+      '''
+
+    assert expected == source |> Heredocs.replace_with_spaces(".", ".", ".")
+  end
 end

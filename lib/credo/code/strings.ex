@@ -589,7 +589,7 @@ defmodule Credo.Code.Strings do
          delimiter,
          empty_line_replacement
        ) do
-    parse_heredoc(t, acc, heredoc_acc, replacement, delimiter, empty_line_replacement)
+    parse_heredoc(t, acc, heredoc_acc <> "\\\"", replacement, delimiter, empty_line_replacement)
   end
 
   defp parse_heredoc(
