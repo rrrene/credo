@@ -154,7 +154,22 @@ defmodule Credo.Check.Refactor.ABCSize do
     {nil, acc}
   end
 
+  # ignore unquote calls
+  defp traverse_abc({:unquote, _, [arg]}, acc, _excluded_functions) do
+    {arg, acc}
+  end
+
   # A - assignments
+
+  # always count module attribute call as 1
+  defp traverse_abc(
+         {:@, _meta, _args},
+         [a: a, b: b, c: c, var_names: var_names],
+         _excluded_functions
+       ) do
+    {nil, [a: a + 1, b: b, c: c, var_names: var_names]}
+  end
+
   defp traverse_abc(
          {:=, _meta, [lhs | rhs]},
          [a: a, b: b, c: c, var_names: var_names],
