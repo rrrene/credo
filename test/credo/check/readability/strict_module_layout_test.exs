@@ -227,6 +227,23 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       assert issue2.line_no == 4
     end
 
+    test "reports errors for guards" do
+      """
+      defmodule Test do
+        @moduledoc ""
+
+        defguardp is_foo(term) when term == :foo
+
+        defguard is_bar(term) when term == :bar
+
+        defguard is_baz(term) when not is_foo(term) and term == :baz
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, order: [:moduledoc, :public_guard, :private_guard])
+      |> assert_issue()
+    end
+
     test "treats `:callback_fun` as `:callback_impl` for backward compatibility" do
       [issue] =
         """
