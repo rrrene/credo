@@ -403,6 +403,11 @@ defmodule Credo.Code.Module do
     analyze(state, {clause, meta, [fun, body]})
   end
 
+  defp analyze(state, {clause, meta, [{:when, _, [fun | _rest]}]})
+       when clause in ~w/def defmacro defguard defp defmacrop defguardp/a do
+    analyze(state, {clause, meta, [fun, nil]})
+  end
+
   defp analyze(state, {clause, meta, definition})
        when clause in ~w/def defmacro defguard defp defmacrop defguardp/a do
     fun_name = fun_name(definition)
