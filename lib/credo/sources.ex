@@ -33,12 +33,14 @@ defmodule Credo.Sources do
   # does not account for brace or tilde expansion or command substitution
   # or anything other than * and **
   defp matches_glob_naively?(filename, pattern) do
-    pattern
-    |> String.replace("/", "\\/")
-    |> String.replace("**", ".+")
-    |> String.replace("*", "[^\/]+")
-    |> Regex.compile()
-    |> case do
+    string =
+      pattern
+      |> String.replace("**/*", ".+")
+      |> String.replace("/", "\\/")
+      |> String.replace("**", ".+")
+      |> String.replace("*", "[^\/]+")
+
+    case Regex.compile("#{string}$") do
       {:ok, regex} -> String.match?(filename, regex)
       _ -> raise "Compiling glob pattern to regex failed: #{inspect(pattern)}"
     end

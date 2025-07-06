@@ -310,4 +310,12 @@ defmodule Credo.SourcesTest do
     refute Credo.Sources.filename_matches?("lib/credo/check/runner.ex", ["*.exs"])
     refute Credo.Sources.filename_matches?("lib/credo/check/runner.ex", [~r/.exs$/])
   end
+
+  test "it matches filenames given patterns /2" do
+    assert Credo.Sources.filename_matches?("test/foo_test.ex", ["test/**/*_test.ex"])
+    assert Credo.Sources.filename_matches?("test/foo/bar_test.ex", ["test/**/*_test.ex"])
+
+    refute Credo.Sources.filename_matches?("test/foo_test.exs", ["test/**/*_test.ex"])
+    refute Credo.Sources.filename_matches?("test/foo/bar_test.exs", ["test/**/*_test.ex"])
+  end
 end
