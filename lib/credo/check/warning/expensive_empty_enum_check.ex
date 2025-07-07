@@ -58,6 +58,20 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     end
   end
 
+  # Catch length > 0
+  for {lhs, trigger} <- [{@length_pattern, "length"}, {@enum_count_pattern, "Enum.count"}] do
+    defp traverse({:>, _meta, [unquote(lhs), 0]} = ast, issues, issue_meta) do
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
+    end
+  end
+
+  # Catch 0 < length
+  for {rhs, trigger} <- [{@length_pattern, "length"}, {@enum_count_pattern, "Enum.count"}] do
+    defp traverse({:<, _meta, [0, unquote(rhs)]} = ast, issues, issue_meta) do
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
+    end
+  end
+
   defp traverse(ast, issues, _issue_meta) do
     {ast, issues}
   end
