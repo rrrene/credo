@@ -218,6 +218,33 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     |> Float.round(2)
   end
 
+  test "it should return the same ABC size with and without unquote call" do
+    with_unquote_source = """
+    def foo do
+      some_var = unquote(5)
+    end
+    """
+
+    without_unquote_source = """
+    def foo do
+      some_var = 5
+    end
+    """
+
+    assert abc_size(with_unquote_source) == abc_size(without_unquote_source)
+  end
+
+  @tag :current
+  test "module attributs should always be counted as 1" do
+    source = """
+    def foo do
+      @attr_name
+    end
+    """
+
+    assert abc_size(source) == 1.0
+  end
+
   test "it should return the correct ABC size for nullary function calls" do
     source = """
     def foo() do
