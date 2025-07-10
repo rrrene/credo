@@ -6,7 +6,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
   describe "default order" do
     test "no errors are reported on a successful layout" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         @shortdoc "shortdoc"
         @moduledoc "some doc"
 
@@ -30,7 +30,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "only first-level parts are analyzed" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         @x 1
 
         def some_fun(), do: @x
@@ -43,7 +43,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "custom macro invocations are ignored" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         import Foo
 
         setup do
@@ -80,7 +80,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "shortdoc must appear before moduledoc" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           @moduledoc "some doc"
           @shortdoc "shortdoc"
         end
@@ -95,7 +95,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "moduledoc must appear before behaviour" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           @behaviour GenServer
           @moduledoc "some doc"
         end
@@ -110,7 +110,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "behaviour must appear before use" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           use GenServer
           @behaviour GenServer
         end
@@ -125,7 +125,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "use must appear before import" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           import GenServer
           use GenServer
         end
@@ -140,7 +140,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "import must appear before alias" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           alias GenServer
           import GenServer
         end
@@ -155,7 +155,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "alias must appear before require" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           require GenServer
           alias GenServer
         end
@@ -170,7 +170,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "callback functions and macros are handled by the `:callback_impl` option" do
       assert [issue1, issue2] =
                """
-               defmodule Test do
+               defmodule CredoSampleModule do
                  @impl true
                  def foo
 
@@ -187,17 +187,17 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
                |> assert_issues
 
       assert issue1.message == "public function must appear before callback implementation"
-      assert issue1.scope == "Test.baz"
+      assert issue1.scope == "CredoSampleModule.baz"
 
       assert issue2.message == "public function must appear before callback implementation"
-      assert issue2.scope == "Test.qux"
+      assert issue2.scope == "CredoSampleModule.qux"
     end
   end
 
   describe "custom order" do
     test "no errors are reported on a successful layout" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         def foo, do: :ok
         defp bar, do: :ok
       end
@@ -209,7 +209,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "no errors are reported on a custom layout missing parts defined in :order" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         def foo, do: :ok
       end
       """
@@ -220,7 +220,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "no errors are reported on a custom layout with extra parts not defined in :order" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         def foo, do: :ok
 
         defp bar, do: :ok
@@ -238,7 +238,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "reports errors" do
       assert [issue1, issue2] =
                """
-               defmodule Test do
+               defmodule CredoSampleModule do
                  @moduledoc ""
                  defp bar, do: :ok
                  def foo, do: :ok
@@ -257,7 +257,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "reports errors for guards" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         @moduledoc ""
 
         defguardp is_foo(term) when term == :foo
@@ -275,7 +275,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "treats `:callback_fun` as `:callback_impl` for backward compatibility" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           @impl Foo
           def foo, do: :ok
 
@@ -293,7 +293,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
   describe "ignored parts" do
     test "no errors are reported on ignored parts" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         alias Foo
         import Bar
         use Baz
@@ -307,7 +307,9 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "no errors are reported on ignored parts for module attributes" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
+        @moduledoc ""
+
         @type foo :: :foo
 
         def hello do
@@ -333,7 +335,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     test "reports errors on non-ignored parts" do
       [issue] =
         """
-        defmodule Test do
+        defmodule CredoSampleModule do
           require Qux
           import Bar
           use Baz
@@ -351,7 +353,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
   describe "ignored module attributes" do
     test "ignores custom module attributes" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         use Baz
 
         import Bar
@@ -377,7 +379,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "ignores enforce_keys module attribute" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         @enforce_keys [:bar]
         defstruct bar: nil
       end
@@ -389,7 +391,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
     test "only ignores set module attributes" do
       """
-      defmodule Test do
+      defmodule CredoSampleModule do
         import Bar
 
         @trace trace_fun()
@@ -412,7 +414,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       |> assert_issue(fn issue ->
         assert issue.message == "module attribute must appear before public function"
         # TODO: It would be nicer if the trigger was the attribute in question
-        assert issue.trigger == "Test"
+        assert issue.trigger == "CredoSampleModule"
       end)
     end
   end
