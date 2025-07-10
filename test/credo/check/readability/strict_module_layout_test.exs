@@ -207,6 +207,34 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       |> refute_issues
     end
 
+    test "no errors are reported on a custom layout missing parts defined in :order" do
+      """
+      defmodule Test do
+        def foo, do: :ok
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, order: ~w/public_fun private_fun/a)
+      |> refute_issues
+    end
+
+    test "no errors are reported on a custom layout with extra parts not defined in :order" do
+      """
+      defmodule Test do
+        def foo, do: :ok
+
+        defp bar, do: :ok
+
+        defmacro test, do: :ok
+
+        @moduledoc ""
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check, order: ~w/public_fun private_fun/a)
+      |> refute_issues
+    end
+
     test "reports errors" do
       assert [issue1, issue2] =
                """
@@ -274,6 +302,31 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       """
       |> to_source_file
       |> run_check(@described_check, ignore: ~w/use import/a)
+      |> refute_issues
+    end
+
+    test "no errors are reported on ignored parts for module attributes" do
+      """
+      defmodule Test do
+        @type foo :: :foo
+
+        def hello do
+          :world
+        end
+
+        @foo :foo
+
+        @spec foo() :: foo()
+        def foo() do
+          @foo
+        end
+      end
+      """
+      |> to_source_file
+      |> run_check(@described_check,
+        order: [:moduledoc, :public_fun],
+        ignore: [:type, :module_attribute]
+      )
       |> refute_issues
     end
 
