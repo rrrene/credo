@@ -7,7 +7,22 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
   # cases NOT raising issues
   #
 
-  test "it should NOT report code with no nested function calls" do
+  test "it should NOT report code with nested guard calls" do
+    """
+    defmodule CredoSampleModule do
+      defguardp nested_guardp(data) when is_atom(hd(data))
+      defguard nested_guard(data) when nested_guardp(data) or is_binary(hd(data))
+
+      def nested_guard_def(data) when nested_guard_defp(data) or is_binary(hd(data))
+      defp nested_guard_defp(data) when is_atom(hd(data))
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report code with nested type calls inside" do
     """
     defmodule CredoSampleModule do
       @callback callback_name :: Keyword.t(Some.remote(some_arg))
