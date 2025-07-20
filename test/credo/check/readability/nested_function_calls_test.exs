@@ -10,11 +10,13 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
   test "it should NOT report code with nested guard calls" do
     """
     defmodule CredoSampleModule do
-      defguardp nested_guardp(data) when is_atom(hd(data))
-      defguard nested_guard(data) when nested_guardp(data) or is_binary(hd(data))
+      # Note: for some reason test does not fail when using local functions
+      #       that's why I've added "Kernel." prefix for each case
+      defguardp nested_guardp(data) when Kernel.is_atom(hd(hd(data)))
+      defguard nested_guard(data) when nested_guardp(data) or Kernel.is_binary(hd(hd(data)))
 
-      def nested_guard_def(data) when nested_guard_defp(data) or is_binary(hd(data))
-      defp nested_guard_defp(data) when is_atom(hd(data))
+      def nested_guard_def(data) when nested_guard_defp(data) or Kernel.is_binary(hd(hd(data)))
+      defp nested_guard_defp(data) when Kernel.is_atom(hd(hd(data)))
     end
     """
     |> to_source_file()
