@@ -22,7 +22,7 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> refute_issues()
   end
 
-  test "it should NOT report code with nested type calls inside" do
+  test "it should NOT report code with nested type calls" do
     """
     defmodule CredoSampleModule do
       @callback callback_name :: Keyword.t(Some.remote(some_arg))
