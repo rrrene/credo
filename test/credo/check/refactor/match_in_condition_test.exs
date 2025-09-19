@@ -131,6 +131,21 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> assert_issue()
   end
 
+  test "it should report a violation /4" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        if contents = parameter1.contents && parameter2 do
+          do_something()
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report a violation when wrapped in parens" do
     """
     defmodule CredoSampleModule do
