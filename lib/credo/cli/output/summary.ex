@@ -221,9 +221,11 @@ defmodule Credo.CLI.Output.Summary do
     total_issues = Enum.count(issues)
 
     issue_type_counts
-    |> Enum.each(fn {category, count} ->
+    |> Enum.reduce(0, fn {category, count}, cumulative_count ->
       color = Output.check_color(category)
       percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+      new_cumulative = cumulative_count + count
+      cumulative_percentage = if total_issues > 0, do: Float.round(new_cumulative / total_issues * 100, 1), else: 0.0
 
       UI.puts([
         "  ",
@@ -238,8 +240,14 @@ defmodule Credo.CLI.Output.Summary do
         :faint,
         "#{percentage}%",
         :reset,
+        ", cumulative: ",
+        :faint,
+        "#{cumulative_percentage}%",
+        :reset,
         ")"
       ])
+
+      new_cumulative
     end)
   end
 
@@ -262,11 +270,13 @@ defmodule Credo.CLI.Output.Summary do
     total_issues = Enum.count(issues)
 
     issue_name_counts
-    |> Enum.each(fn {check, count} ->
+    |> Enum.reduce(0, fn {check, count}, cumulative_count ->
       check_name = check |> to_string() |> String.replace("Elixir.", "")
       category = check.category()
       color = Output.check_color(category)
       percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+      new_cumulative = cumulative_count + count
+      cumulative_percentage = if total_issues > 0, do: Float.round(new_cumulative / total_issues * 100, 1), else: 0.0
 
       UI.puts([
         "  ",
@@ -281,8 +291,14 @@ defmodule Credo.CLI.Output.Summary do
         :faint,
         "#{percentage}%",
         :reset,
+        ", cumulative: ",
+        :faint,
+        "#{cumulative_percentage}%",
+        :reset,
         ")"
       ])
+
+      new_cumulative
     end)
   end
 
@@ -312,8 +328,10 @@ defmodule Credo.CLI.Output.Summary do
 
     file_issue_counts
     |> Enum.with_index(1)
-    |> Enum.each(fn {{filename, count}, index} ->
+    |> Enum.reduce(0, fn {{filename, count}, index}, cumulative_count ->
       percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+      new_cumulative = cumulative_count + count
+      cumulative_percentage = if total_issues > 0, do: Float.round(new_cumulative / total_issues * 100, 1), else: 0.0
 
       UI.puts([
         "  ",
@@ -332,8 +350,14 @@ defmodule Credo.CLI.Output.Summary do
         :faint,
         "#{percentage}%",
         :reset,
+        ", cumulative: ",
+        :faint,
+        "#{cumulative_percentage}%",
+        :reset,
         ")"
       ])
+
+      new_cumulative
     end)
 
     UI.puts()
