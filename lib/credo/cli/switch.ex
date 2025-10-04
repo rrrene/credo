@@ -11,6 +11,10 @@ defmodule Credo.CLI.Switch do
     from_keywords(name, Keyword.put(keywords, :type, :string))
   end
 
+  def integer(name, keywords \\ []) when is_atom(name) or is_binary(name) do
+    from_keywords(name, Keyword.put(keywords, :type, :integer))
+  end
+
   def keep(name, keywords \\ []) when is_atom(name) or is_binary(name) do
     from_keywords(name, Keyword.put(keywords, :type, :keep))
   end

@@ -30,6 +30,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.string("only"),
       Switch.boolean("read_from_stdin"),
       Switch.boolean("strict"),
+      Switch.integer("top_files"),
       Switch.boolean("verbose"),
       Switch.boolean("watch")
     ]

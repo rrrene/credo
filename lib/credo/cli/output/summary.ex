@@ -42,6 +42,10 @@ defmodule Credo.CLI.Output.Summary do
 
     UI.puts(summary_parts(source_files, issues))
 
+    print_issue_type_summary(issues, exec)
+    print_issue_name_summary(issues, exec)
+    print_top_files_summary(issues, exec)
+
     print_priority_hint(exec)
     print_first_run_hint(exec)
   end
@@ -197,4 +201,165 @@ defmodule Credo.CLI.Output.Summary do
   defp scope_count_traverse(ast, count) do
     {ast, count}
   end
+
+  defp print_issue_type_summary([], _exec), do: nil
+
+  defp print_issue_type_summary(_issues, %Execution{format: "short"}), do: nil
+
+  defp print_issue_type_summary(issues, _exec) do
+    UI.puts()
+    UI.puts([:bright, "Issue Type Summary:"])
+
+    issue_type_counts =
+      issues
+      |> Enum.group_by(& &1.category)
+      |> Enum.map(fn {category, category_issues} ->
+        {category, Enum.count(category_issues)}
+      end)
+      |> Enum.sort_by(fn {_category, count} -> count end, :desc)
+
+    total_issues = Enum.count(issues)
+
+    issue_type_counts
+    |> Enum.each(fn {category, count} ->
+      color = Output.check_color(category)
+      percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+
+      UI.puts([
+        "  ",
+        color,
+        String.pad_trailing("#{category}", 15),
+        :reset,
+        ": ",
+        :bright,
+        String.pad_leading("#{count}", 5),
+        :reset,
+        " (",
+        :faint,
+        "#{percentage}%",
+        :reset,
+        ")"
+      ])
+    end)
+  end
+
+  defp print_issue_name_summary([], _exec), do: nil
+
+  defp print_issue_name_summary(_issues, %Execution{format: "short"}), do: nil
+
+  defp print_issue_name_summary(issues, _exec) do
+    UI.puts()
+    UI.puts([:bright, "Issue Name Summary:"])
+
+    issue_name_counts =
+      issues
+      |> Enum.group_by(& &1.check)
+      |> Enum.map(fn {check, check_issues} ->
+        {check, Enum.count(check_issues)}
+      end)
+      |> Enum.sort_by(fn {_check, count} -> count end, :desc)
+
+    total_issues = Enum.count(issues)
+
+    issue_name_counts
+    |> Enum.each(fn {check, count} ->
+      check_name = check |> to_string() |> String.replace("Elixir.", "")
+      category = check.category()
+      color = Output.check_color(category)
+      percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+
+      UI.puts([
+        "  ",
+        color,
+        String.pad_trailing(check_name, 60),
+        :reset,
+        " ",
+        :bright,
+        String.pad_leading("#{count}", 5),
+        :reset,
+        " (",
+        :faint,
+        "#{percentage}%",
+        :reset,
+        ")"
+      ])
+    end)
+  end
+
+  defp print_top_files_summary([], _exec), do: nil
+
+  defp print_top_files_summary(_issues, %Execution{format: "short"}), do: nil
+
+  defp print_top_files_summary(issues, exec) do
+    top_files_count = get_top_files_count(exec)
+
+    UI.puts()
+    UI.puts([:bright, "Top #{top_files_count} Files with Issues:"])
+
+    file_issue_counts =
+      issues
+      |> Enum.group_by(& &1.filename)
+      |> Enum.map(fn {filename, file_issues} ->
+        {filename, Enum.count(file_issues)}
+      end)
+      |> Enum.sort_by(fn {_filename, count} -> count end, :desc)
+      |> Enum.take(top_files_count)
+
+    total_issues = Enum.count(issues)
+    top_files_issues = file_issue_counts |> Enum.map(&elem(&1, 1)) |> Enum.sum()
+    top_files_percentage =
+      if total_issues > 0, do: Float.round(top_files_issues / total_issues * 100, 1), else: 0.0
+
+    file_issue_counts
+    |> Enum.with_index(1)
+    |> Enum.each(fn {{filename, count}, index} ->
+      percentage = if total_issues > 0, do: Float.round(count / total_issues * 100, 1), else: 0.0
+
+      UI.puts([
+        "  ",
+        :faint,
+        String.pad_leading("#{index}.", 4),
+        :reset,
+        " ",
+        :cyan,
+        String.pad_trailing(Path.relative_to_cwd(filename), 60),
+        :reset,
+        " ",
+        :bright,
+        String.pad_leading("#{count}", 5),
+        :reset,
+        " (",
+        :faint,
+        "#{percentage}%",
+        :reset,
+        ")"
+      ])
+    end)
+
+    UI.puts()
+    UI.puts([
+      "  ",
+      :bright,
+      "Total in top #{top_files_count} files:",
+      :reset,
+      " ",
+      :bright,
+      "#{top_files_issues}",
+      :reset,
+      " / ",
+      "#{total_issues}",
+      " (",
+      :faint,
+      "#{top_files_percentage}%",
+      :reset,
+      ")"
+    ])
+  end
+
+  defp get_top_files_count(%Execution{top_files: count})
+       when is_integer(count) and count > 0 do
+    count
+  end
+
+  defp get_top_files_count(_exec), do: 10
 end

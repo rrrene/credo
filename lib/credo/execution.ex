@@ -33,6 +33,7 @@ defmodule Credo.Execution do
             # options, set by the command line
             format: nil,
             help: false,
+            top_files: 10,
             verbose: false,
             version: false,
 
