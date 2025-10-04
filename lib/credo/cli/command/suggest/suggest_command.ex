@@ -20,6 +20,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
       Switch.keep("checks_without_tag"),
       Switch.string("checks", alias: :c),
       Switch.string("enable_disabled_checks"),
+      Switch.integer("folder_depth"),
       Switch.string("min_priority"),
       Switch.boolean("mute_exit_status"),
       Switch.boolean("first_run"),

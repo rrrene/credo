@@ -44,6 +44,7 @@ defmodule Credo.CLI.Output.Summary do
 
     print_issue_type_summary(issues, exec)
     print_issue_name_summary(issues, exec)
+    print_folder_summary(issues, exec)
     print_top_files_summary(issues, exec)
 
     print_priority_hint(exec)
@@ -386,4 +387,114 @@ defmodule Credo.CLI.Output.Summary do
   end
 
   defp get_top_files_count(_exec), do: 10
+
+  defp print_folder_summary([], _exec), do: nil
+
+  defp print_folder_summary(_issues, %Execution{format: "short"}), do: nil
+
+  defp print_folder_summary(issues, exec) do
+    tree_depth = get_folder_tree_depth(exec)
+
+    UI.puts()
+    UI.puts([:bright, "Folder Summary (depth: #{tree_depth}):"])
+
+    folder_tree = build_folder_tree(issues, tree_depth)
+    total_issues = Enum.count(issues)
+
+    print_folder_tree(folder_tree, total_issues, "", 0, tree_depth)
+  end
+
+  defp get_folder_tree_depth(%Execution{cli_options: %{switches: %{folder_depth: depth}}})
+       when is_integer(depth) and depth > 0 do
+    depth
+  end
+
+  defp get_folder_tree_depth(_exec), do: 3
+
+  defp build_folder_tree(issues, max_depth) do
+    issues
+    |> Enum.group_by(fn issue ->
+      issue.filename
+      |> Path.dirname()
+      |> String.split("/")
+      |> Enum.take(max_depth)
+      |> Enum.join("/")
+    end)
+    |> Enum.map(fn {folder, folder_issues} ->
+      {folder, Enum.count(folder_issues)}
+    end)
+    |> build_hierarchical_tree()
+  end
+
+  defp build_hierarchical_tree(folder_counts) do
+    folder_counts
+    |> Enum.reduce(%{}, fn {path, count}, acc ->
+      path_parts = String.split(path, "/", trim: true)
+      insert_into_tree(acc, path_parts, count)
+    end)
+  end
+
+  defp insert_into_tree(tree, [], _count), do: tree
+
+  defp insert_into_tree(tree, [part | rest], count) do
+    current = Map.get(tree, part, %{count: 0, children: %{}})
+
+    updated_current =
+      if rest == [] do
+        %{current | count: current.count + count}
+      else
+        updated_children = insert_into_tree(current.children, rest, count)
+        %{current | count: current.count + count, children: updated_children}
+      end
+
+    Map.put(tree, part, updated_current)
+  end
+
+  defp print_folder_tree(_tree, _total_issues, _prefix, depth, max_depth) when depth >= max_depth do
+    # Stop at max depth
+    :ok
+  end
+
+  defp print_folder_tree(tree, total_issues, prefix, depth, max_depth) do
+    tree
+    |> Enum.sort_by(fn {_name, data} -> -data.count end)
+    |> Enum.with_index()
+    |> Enum.each(fn {{name, data}, index} ->
+      is_last = index == map_size(tree) - 1
+      percentage = if total_issues > 0, do: Float.round(data.count / total_issues * 100, 1), else: 0.0
+
+      # Tree drawing characters
+      connector = if is_last, do: "└── ", else: "├── "
+      child_prefix = if is_last, do: "    ", else: "│   "
+
+      UI.puts([
+        prefix,
+        :faint,
+        connector,
+        :reset,
+        :cyan,
+        name,
+        :reset,
+        " ",
+        :bright,
+        "(#{data.count})",
+        :reset,
+        " ",
+        :faint,
+        "#{percentage}%",
+        :reset
+      ])
+
+      # Recursively print children
+      if map_size(data.children) > 0 and depth + 1 < max_depth do
+        print_folder_tree(
+          data.children,
+          total_issues,
+          prefix <> child_prefix,
+          depth + 1,
+          max_depth
+        )
+      end
+    end)
+  end
 end
