@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.13
+
+- Fix compatibility & compiler warnings with Elixir 1.19
+- `Credo.Check.Refactor.ABCSize` fixed false positive
+
 ## 1.7.12
 
 - Fix compatibility & compiler warnings with Elixir 1.19 (dev)
