@@ -1,4 +1,4 @@
-name: "Housekeeping"
+name: "Housekeeping: Regressions"
 on:
   push:
     branches:
