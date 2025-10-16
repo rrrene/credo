@@ -1,0 +1,44 @@
+name: "Housekeeping"
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  format:
+    name: "used mix format"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 27.3
+          elixir-version: 1.19.0
+      - run: mix deps.get
+      - run: mix compile
+      - run: ./test/check_formatted.sh
+
+  compare_to_latest_credo:
+    name: "resulting issues are still the same (optional)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 27.3
+          elixir-version: 1.18.4
+      - run: mix deps.get
+      - run: mix credo --mute-exit-status
+      - run: mkdir tmp
+      - run: elixir test/old_credo.exs
+      - run: elixir test/old_credo.exs > tmp/old_credo.txt
+      - run: mix credo --mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline > tmp/new_credo.txt
+      - run: diff tmp/old_credo.txt tmp/new_credo.txt
