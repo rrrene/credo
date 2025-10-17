@@ -32,6 +32,10 @@ defmodule Credo.Check.Refactor.MatchInCondition do
             do_something(contents)
           end
 
+          if contents = file.contents && allowed? do
+            do_something(contents)
+          end
+
       If you want to match for something and execute another block otherwise,
       consider using a `case` statement:
 
@@ -103,9 +107,17 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     assignment_in_body? = Enum.member?(op_arguments, ast)
 
     case arguments do
-      [{atom, _, nil}, _right] when is_atom(atom) ->
-        if assignment_in_body? do
-          {ast, issues}
+      [{atom, _, nil}, right] when is_atom(atom) ->
+        # Check if right side contains boolean operators mixed with assignment
+        has_boolean_ops? = contains_boolean_operators?(right)
+
+        if assignment_in_body? or has_boolean_ops? do
+          if has_boolean_ops? do
+            new_issue = issue_for(op, meta[:line], issue_meta)
+            {ast, issues ++ [new_issue]}
+          else
+            {ast, issues}
+          end
         else
           new_issue = issue_for(op, meta[:line], issue_meta)
 
@@ -129,6 +141,14 @@ defmodule Credo.Check.Refactor.MatchInCondition do
 
   defp traverse_condition(ast, issues, _op, _op_arguments, _allow_tagged_tuples, _issue_meta) do
     {ast, issues}
+  end
+
+  defp contains_boolean_operators?(ast) do
+    case ast do
+      {op, _, _} when op in [:&&, :||, :and, :or] -> true
+      {_, _, args} when is_list(args) -> Enum.any?(args, &contains_boolean_operators?/1)
+      _ -> false
+    end
   end
 
   defp issue_for(op, line_no, issue_meta) do
