@@ -32,10 +32,6 @@ defmodule Credo.Check.Refactor.MatchInCondition do
             do_something(contents)
           end
 
-          if contents = file.contents && allowed? do
-            do_something(contents)
-          end
-
       If you want to match for something and execute another block otherwise,
       consider using a `case` statement:
 
@@ -53,9 +49,6 @@ defmodule Credo.Check.Refactor.MatchInCondition do
       ]
     ]
 
-  @condition_ops [:if, :unless]
-  @trigger "="
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -65,81 +58,74 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     Credo.Code.prewalk(source_file, &traverse(&1, &2, allow_tagged_tuples, issue_meta))
   end
 
-  # Skip if arguments is not enumerable
-  defp traverse({_op, _meta, nil} = ast, issues, _allow_tagged_tuples, _source_file) do
+  defp traverse({op, _, nil} = ast, issues, _allow_tagged_tuples, _issue_meta)
+       when op in [:if, :unless] do
     {ast, issues}
   end
 
-  for op <- @condition_ops do
-    defp traverse({unquote(op), _meta, arguments} = ast, issues, allow_tagged_tuples, issue_meta) do
-      # remove do/else blocks
-      condition_arguments = Enum.reject(arguments, &Keyword.keyword?/1)
+  defp traverse({op, _, arguments} = ast, issues, allow_tagged_tuples, issue_meta)
+       when op in [:if, :unless] do
+    condition_head = Enum.reject(arguments, &Keyword.keyword?/1)
 
-      new_issues =
-        Credo.Code.prewalk(
-          condition_arguments,
-          &traverse_condition(
-            &1,
-            &2,
-            unquote(op),
-            condition_arguments,
-            allow_tagged_tuples,
-            issue_meta
-          )
-        )
+    new_issues =
+      Credo.Code.prewalk(
+        condition_head,
+        &find_match(&1, &2, op, condition_head, allow_tagged_tuples, issue_meta)
+      )
 
-      {ast, issues ++ new_issues}
-    end
+    {ast, issues ++ new_issues}
   end
 
   defp traverse(ast, issues, _allow_tagged_tuples, _source_file) do
     {ast, issues}
   end
 
-  defp traverse_condition(
-         {:=, meta, arguments} = ast,
+  defp find_match(
+         {:=, meta, [{var_name, _, nil}, rhs]} = ast,
          issues,
          op,
          op_arguments,
-         allow_tagged_tuples?,
+         _allow_tagged_tuples?,
          issue_meta
-       ) do
+       )
+       when is_atom(var_name) do
     assignment_in_body? = Enum.member?(op_arguments, ast)
+    has_boolean_ops? = contains_boolean_operators?(rhs)
 
-    case arguments do
-      [{atom, _, nil}, right] when is_atom(atom) ->
-        # Check if right side contains boolean operators mixed with assignment
-        has_boolean_ops? = contains_boolean_operators?(right)
-
-        if assignment_in_body? or has_boolean_ops? do
-          if has_boolean_ops? do
-            new_issue = issue_for(op, meta[:line], issue_meta)
-            {ast, issues ++ [new_issue]}
-          else
-            {ast, issues}
-          end
-        else
-          new_issue = issue_for(op, meta[:line], issue_meta)
-
-          {ast, issues ++ [new_issue]}
-        end
-
-      [{tag_atom, {atom, _, nil}}, _right] when is_atom(atom) and is_atom(tag_atom) ->
-        if allow_tagged_tuples? do
-          {ast, issues}
-        else
-          new_issue = issue_for(op, meta[:line], issue_meta)
-
-          {ast, issues ++ [new_issue]}
-        end
-
-      _ ->
-        new_issue = issue_for(op, meta[:line], issue_meta)
-        {ast, issues ++ [new_issue]}
+    if assignment_in_body? or has_boolean_ops? do
+      if has_boolean_ops? do
+        {ast, issues ++ [issue_for(op, meta[:line], issue_meta)]}
+      else
+        {ast, issues}
+      end
+    else
+      {ast, issues ++ [issue_for(op, meta[:line], issue_meta)]}
     end
   end
 
-  defp traverse_condition(ast, issues, _op, _op_arguments, _allow_tagged_tuples, _issue_meta) do
+  defp find_match(
+         {:=, meta, [{tag_atom, {var_name, _, nil}}, _rhs]} = ast,
+         issues,
+         op,
+         _op_args,
+         allow_tagged_tuples?,
+         issue_meta
+       )
+       when is_atom(var_name) and is_atom(tag_atom) do
+    if allow_tagged_tuples? do
+      {ast, issues}
+    else
+      new_issue = issue_for(op, meta[:line], issue_meta)
+
+      {ast, issues ++ [new_issue]}
+    end
+  end
+
+  defp find_match({:=, meta, _} = ast, issues, op, _op_args, _allow_tagged_tuples, issue_meta) do
+    {ast, issues ++ [issue_for(op, meta[:line], issue_meta)]}
+  end
+
+  defp find_match(ast, issues, _op, _op_args, _allow_tagged_tuples, _issue_meta) do
     {ast, issues}
   end
 
@@ -155,7 +141,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     format_issue(
       issue_meta,
       message: "Avoid matches in `#{op}` conditions.",
-      trigger: @trigger,
+      trigger: "=",
       line_no: line_no
     )
   end
