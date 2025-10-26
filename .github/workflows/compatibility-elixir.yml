@@ -16,13 +16,13 @@ jobs:
         repo_url: ["https://github.com/elixir-lang/elixir.git"]
         repo_branch: ["v1.18", "main"]
         otp: [25.3, 26.2, 27.3]
-        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.4, 1.19.0]
+        elixir: [1.15.7, 1.16.2, 1.17.3, 1.18.4, 1.19.1]
         exclude:
           - elixir: 1.15.7
             otp: 27.3
           - elixir: 1.16.2
             otp: 27.3
-          - elixir: 1.19.0
+          - elixir: 1.19.1
             otp: 25.3
     steps:
       - uses: actions/checkout@v4

@@ -15,7 +15,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.0
+          elixir-version: 1.19.1
 
       - run: git fetch origin master:master
 
