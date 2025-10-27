@@ -78,7 +78,7 @@ defmodule Credo.Check do
             |> do_something_crazy()
             |> do_something_crazier()
 
-          append_issues_and_timings(exec, issues)
+          append_issues_and_timings(issues, exec)
 
           :ok
         end
