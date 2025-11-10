@@ -1,4 +1,23 @@
-# Mix.install([{:credo, "~> 1.7"}])
-Mix.install([{:credo, github: "rrrene/credo", ref: "v1.7.13"}])
+{argv, additional_credo_args} =
+  case Enum.split_while(System.argv(), &(&1 != "--")) do
+    {argv, []} -> {argv, []}
+    {argv, ["--" | rest]} -> {argv, rest}
+  end
 
-Credo.run(~w"--mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline")
+old_credo_ref = List.first(argv) || "v1.7.12"
+
+if old_credo_ref == "." do
+  Mix.install([{:credo, path: "."}])
+else
+  Mix.install([{:credo, github: "rrrene/credo", ref: old_credo_ref}])
+end
+
+IO.puts(:stderr, "\n[version] credo #{Credo.version()} (installed from #{old_credo_ref})\n")
+
+args =
+  ~w"--mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline" ++
+    additional_credo_args
+
+IO.puts(:stderr, "[run] $ mix credo #{Enum.join(args, " ")}\n")
+
+Credo.run(args)
