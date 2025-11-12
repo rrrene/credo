@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -19,14 +19,14 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report redefining operators" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -35,14 +35,14 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
       def x && x, do: true
       def _ && _, do: false
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report redefining operators with guards" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @moduledoc false
 
@@ -52,7 +52,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
 
       def d && d when is_ternary(d), do: d
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -63,7 +63,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
   #
 
   test "it should report a violation for all defined operations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -76,7 +76,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
           x # on different lines
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
@@ -85,7 +85,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
   end
 
   test "it should report a violation for `and`" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -93,7 +93,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
         x and x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

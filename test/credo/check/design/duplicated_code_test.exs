@@ -10,7 +10,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   #
 
   test "should NOT raise an issue for duplicated code via macros if macros are in :excluded_macros param" do
-    s1 = """
+    s1 = ~S'''
     defmodule M1 do
       test "something is duplicated" do
         if p1 == p2 do
@@ -25,9 +25,9 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
-    s2 = """
+    s2 = ~S'''
     defmodule M2 do
       test "something is duplicated" do
         if p1 == p2 do
@@ -42,7 +42,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
     [s1, s2]
     |> to_source_files
@@ -55,7 +55,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   #
 
   test "should raise an issue for duplicated code" do
-    s1 = """
+    s1 = ~S'''
     defmodule M1 do
       def myfun(p1, p2) when is_list(p2) do
         if p1 == p2 do
@@ -65,9 +65,9 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
-    s2 = """
+    s2 = ~S'''
     defmodule M2 do
       def myfun(p1, p2) when is_list(p2) do
         if p1 == p2 do
@@ -77,7 +77,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
     [s1, s2]
     |> to_source_files
@@ -86,7 +86,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   end
 
   test "should raise an issue for duplicated code via macros" do
-    s1 = """
+    s1 = ~S'''
     defmodule M1 do
       test "something is duplicated" do
         if p1 == p2 do
@@ -101,9 +101,9 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
-    s2 = """
+    s2 = ~S'''
     defmodule M2 do
       test "something is duplicated" do
         if p1 == p2 do
@@ -118,7 +118,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
     [s1, s2]
     |> to_source_files
@@ -127,7 +127,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
   end
 
   test "should raise an issue for duplicated code with different line numbers and external function call" do
-    s1 = """
+    s1 = ~S'''
     defmodule M1 do
       def myfun(p1, p2) when is_list(p2) do
         if p1 == p2 do
@@ -137,9 +137,9 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
-    s2 = """
+    s2 = ~S'''
     defmodule M2 do
       # additional line here
       def myfun(p1, p2) when is_list(p2) do
@@ -150,7 +150,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         end
       end
     end
-    """
+    '''
 
     [s1, s2]
     |> to_source_files
@@ -162,7 +162,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct hashes, prunes and masses" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule M1 do
         def myfun(p1, p2) when is_list(p2) do
           if p1 == p2 do
@@ -182,7 +182,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     mass_threshold = 16
@@ -199,7 +199,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct hashes, prunes and masses for multiple sources" do
     {:ok, ast1} =
-      """
+      ~S'''
       defmodule M1 do
         def myfun(p1, p2) when is_list(p2) do
           if p1 == p2 do
@@ -209,11 +209,11 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     {:ok, ast2} =
-      """
+      ~S'''
       defmodule M2 do
         def myfun(p1, p2) when is_list(p2) do
           if p1 == p2 do
@@ -223,7 +223,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     mass_threshold = 16
@@ -243,7 +243,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct hashes" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule M1 do
         def myfun(p1, p2) when is_list(p2) do
           if p1 == p2 do
@@ -263,7 +263,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     DuplicatedCode.calculate_hashes(ast)
@@ -271,7 +271,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct mass" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule M1 do
         def myfun(p1, p2) do
           if p1 == p2 do
@@ -281,7 +281,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 18 == DuplicatedCode.mass(ast)
@@ -324,13 +324,13 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct hash" do
     {:ok, ast} =
-      """
+      ~S'''
       if p1 == p2 do
         p1
       else
         p2 + p1
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = "6717D763C5F93296274CAD8867D61690CD4F0E9D64D2217FC4C20540C2826CF4"
@@ -340,7 +340,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns correct hash and mass /2" do
     {:ok, ast} =
-      """
+      ~S'''
       test "returns {:ok, result} when reply and :DOWN in message queue" do
         task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
         send(self(), {task.ref, :result})
@@ -348,7 +348,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         assert Task.yield_many([task], 0) == [{task, {:ok, :result}}]
         refute_received {:DOWN, _, _, _, _}
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     ast_expected =
@@ -427,7 +427,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
 
   test "returns different hashes for different code snippets" do
     {:ok, ast} =
-      """
+      ~S'''
       test "returns {:ok, result} when reply and :DOWN in message queue" do
         task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
         send(self(), {task.ref, :result})
@@ -435,12 +435,12 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         assert Task.yield_many([task], 0) == [{task, {:ok, :result}}]
         refute_received {:DOWN, _, _, _, _}
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     # uses `Task.yield` instead of `Task.yield_many`
     {:ok, ast2} =
-      """
+      ~S'''
       test "returns {:ok, result} when reply and :DOWN in message queue" do
         task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
         send(self(), {task.ref, :result})
@@ -448,7 +448,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
         assert Task.yield(task, 0) == {:ok, :result}
         refute_received {:DOWN, _, _, _, _}
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert ast != ast2

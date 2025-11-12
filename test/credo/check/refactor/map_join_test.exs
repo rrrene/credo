@@ -8,13 +8,13 @@ defmodule Credo.Check.Refactor.MapJoinTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.map_join([:a, :b, :c], ", ", &inspect/1)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -25,7 +25,7 @@ defmodule Credo.Check.Refactor.MapJoinTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:a, :b, :c]
@@ -33,27 +33,27 @@ defmodule Credo.Check.Refactor.MapJoinTest do
         |> Enum.join(", ")
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
         Enum.join(Enum.map([:a, :b, :c], &inspect/1), ", ")
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:a, :b, :c]
@@ -62,14 +62,14 @@ defmodule Credo.Check.Refactor.MapJoinTest do
         |> Enum.join(", ")
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:a, :b, :c]
@@ -79,34 +79,34 @@ defmodule Credo.Check.Refactor.MapJoinTest do
         |> String.downcase()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.map([:a, :b, :c], &inspect/1)
         |> Enum.join(", ")
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.join([:a, :b, :c] |> Enum.map(&inspect/1), ", ")
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

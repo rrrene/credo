@@ -39,13 +39,13 @@ defmodule Credo.PriorityTest do
 
   test "it should NOT report expected code 2" do
     source_file =
-      """
+      ~S'''
       defmodule Credo.Sample.Module do
         def some_function(p1, p2, p3, p4, p5) do
           some_value = parameter1 + parameter2
         end
       end
-      """
+      '''
       |> to_source_file
 
     expected = %{
@@ -58,7 +58,7 @@ defmodule Credo.PriorityTest do
 
   test "it should assign priorities based on many_functions" do
     source_file =
-      """
+      ~S'''
       defmodule Credo.Sample.Module do
         def fun0, do: 1
         def fun1(p1), do: 2
@@ -67,7 +67,7 @@ defmodule Credo.PriorityTest do
         def fun4(p1, p2, p3, p4), do: 5
         def fun5(p1, p2, p3, p4, p5), do: 5
       end
-      """
+      '''
       |> to_source_file
 
     expected = %{
@@ -85,11 +85,11 @@ defmodule Credo.PriorityTest do
 
   test "it should not crash if @def_ops attributes provided and should return correct scope_priorities" do
     source_file =
-      """
+      ~S'''
       defmodule Credo.Sample.Module do
-        @def \"""
+        @def """
         Returns a list of `TimeSlice` structs based on the provided `time_slice_selector`.
-        \"""
+        """
         def fun0, do: 1
         def fun1(p1), do: 2
         def fun2(p1, p2), do: 3
@@ -103,7 +103,7 @@ defmodule Credo.PriorityTest do
         @defp "and another strange module attribute"
         @defmacro "and another one"
       end
-      """
+      '''
       |> to_source_file
 
     expected = %{

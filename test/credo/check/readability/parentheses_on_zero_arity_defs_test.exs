@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         parameter1 + parameter2
@@ -18,26 +18,26 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
         defp = 18
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def foo!, do: impl().foo!()
       def foo?, do: impl().foo?()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation with no parens if parens: true" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def good?() do
         :ok
@@ -47,14 +47,14 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
         :nok
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, parens: true)
     |> refute_issues()
   end
 
   test "it should NOT report or crash on macros creating zero arity functions" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       defmacro dynamic_methoder(attribute, value) do
         quote do
@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -73,25 +73,25 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
   #
 
   test "it should report a violation with no parens if parens: true /2" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def foo!, do: impl().foo!()
       def foo?, do: impl().foo?()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, parens: true)
     |> assert_issues()
   end
 
   test "it should report a violation with parens (by default)" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run() do
         21
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -100,13 +100,13 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
   end
 
   test "it should report a violation with no parens if parens: true" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run do
         21
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, parens: true)
     |> assert_issue(fn issue ->

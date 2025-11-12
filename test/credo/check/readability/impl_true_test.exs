@@ -8,25 +8,25 @@ defmodule Credo.Check.Readability.ImplTrueTest do
   #
 
   test "it should NOT report @impl Behaviour" do
-    """
+    ~S'''
     defmodule CredoImplTrueTest do
       @behaviour MyBehaviour
 
       @impl MyBehaviour
       def foo, do: :bar
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when no @impl found" do
-    """
+    ~S'''
     defmodule CredoImplTrueTest do
       def foo, do: :bar
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> refute_issues()
@@ -37,12 +37,12 @@ defmodule Credo.Check.Readability.ImplTrueTest do
   #
 
   test "it should report @impl true" do
-    """
+    ~S'''
     defmodule CredoTypespecTest do
       @impl true
       def foo, do: :bar
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

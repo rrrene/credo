@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
   #
 
   test "it should NOT report violation for a valid pipe" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg |> foo() |> bar()
@@ -20,14 +20,14 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
         |> bar()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report violation for a valid pipe with a block" do
-    """
+    ~S'''
     defmodule Test do
       def other_function(arg) do
         arg
@@ -39,7 +39,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
         |> bar()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -50,7 +50,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
   #
 
   test "it should report a violation for missing parentheses" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -59,7 +59,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
         |> baz()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -68,7 +68,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
   end
 
   test "it should report violations for missing parentheses" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -76,7 +76,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
         |> bar
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

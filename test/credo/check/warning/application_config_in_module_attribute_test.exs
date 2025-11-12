@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
   #
 
   test "it should NOT report an issue if compile_env and compile_env! are used" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @config_1 Application.compile_env!(:my_app, :key)
       @config_2 Application.compile_env(:my_app, :key, :default)
@@ -19,7 +19,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
         parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -30,11 +30,11 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @config_1 Application.fetch_env(:my_app, :key)
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -44,7 +44,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
 
   test "it should report a violation when bad calls are made" do
     issues =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @config_1 Application.fetch_env(:my_app, :key)
         @config_2 :valid
@@ -60,7 +60,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
           IO.inspect parameter1 + parameter2
         end
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
 

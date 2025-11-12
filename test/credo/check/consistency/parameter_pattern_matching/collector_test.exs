@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.CollectorTest do
 
   alias Credo.Check.Consistency.ParameterPatternMatching.Collector
 
-  @special_cases """
+  @special_cases ~S'''
   defmodule SpecialCases do
     def foo([bar, _] = baz), do: :ok
     defp foo(baz = [bar, _]), do: :ok
@@ -23,7 +23,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatching.CollectorTest do
       end
     end
   end
-  """
+  '''
 
   @tag :to_be_implemented
   test "it should report correct frequencies for special cases" do

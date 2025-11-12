@@ -8,34 +8,34 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     def valid? do
     end
     defp has_attachment? do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code with arity on function" do
-    """
+    ~S'''
     def valid?(a) do
     end
     defp has_attachment?(a) do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation with defmacro" do
-    """
+    ~S'''
     defmacro is_user(cookie) do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -82,7 +82,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
   end
 
   test "it should NOT report a violation with callback" do
-    """
+    ~S'''
     defmodule Foo do
       @callback is_bar
       @callback is_bar(a)
@@ -103,41 +103,41 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
       def is_bar(a) do
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should report a violation with false negatives" do
-    """
+    ~S'''
     defmodule FooImpl do
       def impl(false), do: false
       def impl(true), do: true
       def is_bar do
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation with false negatives /2" do
-    """
+    ~S'''
     defmodule FooImpl do
       impl(true)
       def is_bar do
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation with false negatives /3" do
-    """
+    ~S'''
     defmodule Foo do
       @impl is_bar(a)
     end
@@ -145,14 +145,14 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
       def is_bar do
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation with false negatives /4" do
-    """
+    ~S'''
     defmodule Foo do
       @impl true
     end
@@ -160,7 +160,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
       def is_bar do
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
@@ -171,32 +171,32 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     def is_valid? do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     def is_valid do
     end
     defp is_attachment? do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()
   end
 
   test "it should report a violation with arity" do
-    """
+    ~S'''
     def is_valid?(a) do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -205,10 +205,10 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
   end
 
   test "it should report a violation with arity /2" do
-    """
+    ~S'''
     def is_valid(a) do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

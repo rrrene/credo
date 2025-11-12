@@ -5,13 +5,13 @@ defmodule Credo.Test.SourceFilesTest do
 
   test "it should convert valid code to source file" do
     source_file =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def some_function(parameter1, parameter2) do
           some_value = parameter1 + parameter2
         end
       end
-      """
+      '''
       |> to_source_file("example.ex")
 
     assert source_file.status == :valid
@@ -20,20 +20,20 @@ defmodule Credo.Test.SourceFilesTest do
   test "it should convert valid code to list of source files" do
     source_files =
       [
-        """
+        ~S'''
         defmodule CredoSampleModule do
           def some_function(parameter1, parameter2) do
             some_value = parameter1 + parameter2
           end
         end
-        """,
-        """
+        ''',
+        ~S'''
         defmodule CredoSampleModule do
           def some_function(parameter1, parameter2) do
             some_value = parameter1 + parameter2
           end
         end
-        """
+        '''
       ]
       |> to_source_files()
 
@@ -43,25 +43,25 @@ defmodule Credo.Test.SourceFilesTest do
   end
 
   test "it should report a violation" do
-    s1 = """
+    s1 = ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         someValue = parameter1 +
     end
-    """
+    '''
 
     assert_raise(RuntimeError, fn -> to_source_file(s1, "example.ex") end)
   end
 
   test "it should return line and column correctly" do
     source_file =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def some_function(parameter1, parameter2) do
           some_value = parameter1 + parameter2
         end
       end
-      """
+      '''
       |> to_source_file
 
     assert "    some_value = parameter1 + parameter2" == Credo.SourceFile.line_at(source_file, 3)
@@ -72,13 +72,13 @@ defmodule Credo.Test.SourceFilesTest do
 
   test "it should return line and column correctly with same term in line" do
     source_file =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def prune_hashes(hashes, parameter2) do
           some_hashes = hashes + parameter2
         end
       end
-      """
+      '''
       |> to_source_file
 
     assert 20 == Credo.SourceFile.column(source_file, 2, :hashes)

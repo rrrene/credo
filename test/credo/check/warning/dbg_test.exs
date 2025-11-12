@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.DbgTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @dbg "this should be found"
 
@@ -17,14 +17,14 @@ defmodule Credo.Check.Warning.DbgTest do
         parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when defining dbg fn" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def dbg(my_param1, my_param2, myparam3) do
         my_param
@@ -34,21 +34,21 @@ defmodule Credo.Check.Warning.DbgTest do
         dbg(param1 + param2, param3 * 4, false)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues
   end
 
   test "it should NOT report when assigning and using dbg var" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun(param1, param2) do
         dbg = param1 + param2
         param3 = dbg + 4
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues
@@ -59,26 +59,26 @@ defmodule Credo.Check.Warning.DbgTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         dbg parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation with two on the same line" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         dbg(parameter1) + dbg(parameter2)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn [two, one] ->
@@ -90,46 +90,46 @@ defmodule Credo.Check.Warning.DbgTest do
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         parameter1 + parameter2 |> dbg()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(a, b, c) do
         map([a,b,c], &dbg(&1))
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Kernel.dbg(parameter1 + parameter2)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def dbg(my_param, my_param2, my_param3) do
         my_param
@@ -140,41 +140,41 @@ defmodule Credo.Check.Warning.DbgTest do
         dbg(param1, AnotherModule.another_fun(param2), param1 + param2)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun(params) do
         dbg = dbg(params)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /7" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun(params) do
         dbg()
         params
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /8" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun(params) do
         dbg = params + 1
@@ -182,14 +182,14 @@ defmodule Credo.Check.Warning.DbgTest do
         dbg()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /9" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmodule CredoSampleModule do
         def some_function(parameter1, parameter2) do
@@ -197,7 +197,7 @@ defmodule Credo.Check.Warning.DbgTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()

@@ -4,30 +4,30 @@ defmodule Credo.Code.HeredocsTest do
   alias Credo.Code.Heredocs
 
   test "it should return the source without string literals 2" do
-    source = """
-    @moduledoc \"\"\"
+    source = ~S'''
+    @moduledoc """
     this is an example # TODO: and this is no actual comment
-    \"\"\"
+    """
 
     x = ~s{also: # TODO: no comment here}
     ?" # TODO: this is the third
     # "
 
     "also: # TODO: no comment here as well"
-    """
+    '''
 
     expected =
-      """
-      @moduledoc \"\"\"
+      ~S'''
+      @moduledoc """
       @@EMPTY_STRING@@
-      \"\"\"
+      """
 
       x = ~s{also: # TODO: no comment here}
       ?" # TODO: this is the third
       # "
 
       "also: # TODO: no comment here as well"
-      """
+      '''
       |> String.replace(
         "@@EMPTY_STRING@@",
         "                                                        "
@@ -37,35 +37,35 @@ defmodule Credo.Code.HeredocsTest do
   end
 
   test "it should return the source without string sigils 2" do
-    source = """
+    source = ~S'''
       should "not error for a quote in a heredoc" do
         errors = ~s(
-        \"\"\"
+        """
     this is an example " TODO: and this is no actual comment
-        \"\"\") |> lint
+        """) |> lint
         assert [] == errors
       end
-    """
+    '''
 
     result = source |> Heredocs.replace_with_spaces()
     assert source == result
   end
 
   test "it should work with nested heredocs" do
-    source = """
+    source = ~S[
     defmodule HereDocDemo do
       @doc ~S'''
       José suggested using an outer sigil so the inner sigil was more normal in the documentation
 
-        ~E\"\"\"
+        ~E"""
         but Credo didn't like it at all
-        \"\"\"
+        """
       '''
       def demo, do: :ok
     end
-    """
+    ]
 
-    expected = """
+    expected = ~S[
     defmodule HereDocDemo do
       @doc ~S'''
       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -76,13 +76,13 @@ defmodule Credo.Code.HeredocsTest do
       '''
       def demo, do: :ok
     end
-    """
+    ]
 
     assert expected == Heredocs.replace_with_spaces(source, "@")
   end
 
   test "it should return the source without string literals 3" do
-    source = """
+    source = ~S'''
     x =   "↑ ↗ →"
     x = ~s|text|
     x = ~s"text"
@@ -99,7 +99,7 @@ defmodule Credo.Code.HeredocsTest do
     x = ~S{text}
     x = ~S<text>
     ?" # <-- this is not a string
-    """
+    '''
 
     assert source == source |> Heredocs.replace_with_spaces()
   end
@@ -122,26 +122,26 @@ defmodule Credo.Code.HeredocsTest do
   end
 
   test "it should return the source without the strings and replace the contents" do
-    source = """
-      t = ~S\"\"\"
+    source = ~S'''
+      t = ~S"""
       abc
       我是中國人
-      \"\"\"
-    """
+      """
+    '''
 
-    expected = """
-      t = ~S\"\"\"
+    expected = ~S'''
+      t = ~S"""
       ...
       .....
-      \"\"\"
-    """
+      """
+    '''
 
     result = source |> Heredocs.replace_with_spaces(".")
     assert expected == result
   end
 
   test "it should NOT report expected code /2" do
-    source = ~S"""
+    source = ~S'''
     defmodule CredoSampleModule do
       def escape_subsection(""), do: "\"\""
 
@@ -174,7 +174,7 @@ defmodule Credo.Code.HeredocsTest do
         do: escape_subsection_impl(remainder, [c | reversed_result])
 
     end
-    """
+    '''
 
     expected = source
 
@@ -182,34 +182,34 @@ defmodule Credo.Code.HeredocsTest do
   end
 
   test "it should return the source without string sigils and replace the contents including interpolation" do
-    source = """
+    source = ~S'''
     def fun() do
-      a = \"\"\"
-      MyModule.\#{fun(Module.value() + 1)}.SubModule.\#{name}"
-      \"\"\"
+      a = """
+      MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
+      """
     end
-    """
+    '''
 
-    expected = """
+    expected = ~S'''
     def fun() do
-      a = \"\"\"
+      a = """
       ......................................................
-      \"\"\"
+      """
     end
-    """
+    '''
 
     result = source |> Heredocs.replace_with_spaces(".")
     assert expected == result
   end
 
   test "it should not modify commented out code" do
-    source = """
+    source = ~S'''
     defmodule Foo do
       defmodule Bar do
-        # @doc \"\"\"
+        # @doc """
         # Reassign a student to a discussion group.
         # This will un-assign student from the current discussion group
-        # \"\"\"
+        # """
         # def assign_group(leader = %User{}, student = %User{}) do
         #   cond do
         #     leader.role == :student ->
@@ -233,7 +233,7 @@ defmodule Credo.Code.HeredocsTest do
         def baz, do: 123
       end
     end
-    """
+    '''
 
     expected = source
 
@@ -242,7 +242,7 @@ defmodule Credo.Code.HeredocsTest do
 
   test "it should overwrite whitespace in heredocs" do
     source =
-      """
+      ~S"""
       defmodule CredoSampleModule do
         @doc '''
         Foo++
@@ -252,7 +252,7 @@ defmodule Credo.Code.HeredocsTest do
       """
       |> String.replace("++", "  ")
 
-    expected = """
+    expected = ~S"""
     defmodule CredoSampleModule do
       @doc '''
       .....
@@ -704,7 +704,7 @@ defmodule Credo.Code.HeredocsTest do
   end
 
   test "should treat heredoc sigils correctly (issue #732)" do
-    foo = """
+    foo = ~S'''
     defmodule InflictParserError do
       @moduledoc false
 
@@ -714,11 +714,11 @@ defmodule Credo.Code.HeredocsTest do
         ~S([)
       end
 
-      @doc \"\"\"
-      \"\"\"
+      @doc """
+      """
       def another_method, do: nil
     end
-    """
+    '''
 
     assert foo ==
              foo

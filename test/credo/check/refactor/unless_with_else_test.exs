@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         unless allowed? do
@@ -21,7 +21,7 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -32,7 +32,7 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         unless allowed? do
@@ -42,7 +42,7 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

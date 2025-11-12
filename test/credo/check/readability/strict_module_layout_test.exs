@@ -5,7 +5,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
   describe "default order" do
     test "no errors are reported on a successful layout" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @shortdoc "shortdoc"
         @moduledoc "some doc"
@@ -22,27 +22,27 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
         require GenServer
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> refute_issues
     end
 
     test "only first-level parts are analyzed" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @x 1
 
         def some_fun(), do: @x
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> refute_issues
     end
 
     test "custom macro invocations are ignored" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         import Foo
 
@@ -51,14 +51,14 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
           use Foo
         end
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> refute_issues
     end
 
     test "no errors are reported on surface import calls" do
-      """
+      ~S'''
       defmodule HygeiaWeb.ImportLive.Header do
         @moduledoc false
 
@@ -71,19 +71,19 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
         prop import, :map, required: true
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> refute_issues
     end
 
     test "shortdoc must appear before moduledoc" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @moduledoc "some doc"
         @shortdoc "shortdoc"
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -92,12 +92,12 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "moduledoc must appear before behaviour" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @behaviour GenServer
         @moduledoc "some doc"
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -106,12 +106,12 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "behaviour must appear before use" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use GenServer
         @behaviour GenServer
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -120,12 +120,12 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "use must appear before import" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         import GenServer
         use GenServer
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -134,12 +134,12 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "import must appear before alias" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         alias GenServer
         import GenServer
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -148,12 +148,12 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "alias must appear before require" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         require GenServer
         alias GenServer
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
@@ -162,7 +162,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "callback functions and macros are handled by the `:callback_impl` option" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @impl true
         def foo
@@ -174,7 +174,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
         def qux, do: :ok
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun callback_impl/a)
       |> assert_issues(fn [issue1, issue2] ->
@@ -193,30 +193,30 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
   describe "custom order" do
     test "no errors are reported on a successful layout" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def foo, do: :ok
         defp bar, do: :ok
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun private_fun/a)
       |> refute_issues
     end
 
     test "no errors are reported on a custom layout missing parts defined in :order" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def foo, do: :ok
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun private_fun/a)
       |> refute_issues
     end
 
     test "no errors are reported on a custom layout with extra parts not defined in :order" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def foo, do: :ok
 
@@ -226,20 +226,20 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
         @moduledoc ""
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun private_fun/a)
       |> refute_issues
     end
 
     test "reports errors" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @moduledoc ""
         defp bar, do: :ok
         def foo, do: :ok
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun private_fun/a)
       |> assert_issues(fn [issue1, issue2] ->
@@ -252,7 +252,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "reports errors for guards" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @moduledoc ""
 
@@ -262,21 +262,21 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
         defguard is_baz(term) when not is_foo(term) and term == :baz
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: [:moduledoc, :public_guard, :private_guard])
       |> assert_issue()
     end
 
     test "treats `:callback_fun` as `:callback_impl` for backward compatibility" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @impl Foo
         def foo, do: :ok
 
         def bar, do: :ok
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun callback_fun/a)
       |> assert_issue(fn issue ->
@@ -287,21 +287,21 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
   describe "ignored parts" do
     test "no errors are reported on ignored parts" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         alias Foo
         import Bar
         use Baz
         require Qux
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, ignore: ~w/use import/a)
       |> refute_issues
     end
 
     test "no errors are reported on ignored parts for module attributes" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @moduledoc ""
 
@@ -318,7 +318,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
           @foo
         end
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check,
         order: [:moduledoc, :public_fun],
@@ -328,14 +328,14 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "reports errors on non-ignored parts" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         require Qux
         import Bar
         use Baz
         alias Foo
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, ignore: ~w/use import/a)
       |> assert_issue(fn issue ->
@@ -346,7 +346,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
 
   describe "ignored module attributes" do
     test "ignores custom module attributes" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use Baz
 
@@ -362,7 +362,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
           nil
         end
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check,
         order: ~w(use import module_attribute)a,
@@ -372,19 +372,19 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
     end
 
     test "ignores enforce_keys module attribute" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         @enforce_keys [:bar]
         defstruct bar: nil
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check, order: [:defstruct, :module_attribute])
       |> refute_issues
     end
 
     test "only ignores set module attributes" do
-      """
+      ~S'''
       defmodule CredoSampleModule do
         import Bar
 
@@ -399,7 +399,7 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
           nil
         end
       end
-      """
+      '''
       |> to_source_file
       |> run_check(@described_check,
         order: ~w(import module_attribute)a,

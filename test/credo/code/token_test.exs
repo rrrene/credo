@@ -3,13 +3,13 @@ defmodule Credo.Code.TokenTest do
 
   alias Credo.Code.Token
 
-  @heredoc_interpolations_source """
+  @heredoc_interpolations_source ~S'''
   def fun() do
-    a = \"\"\"
-    MyModule.\#{fun(Module.value() + 1)}.SubModule.\#{name}"
-    \"\"\"
+    a = """
+    MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
+    """
   end
-  """
+  '''
   @heredoc_interpolations_position {1, 5, 1, 60}
 
   @multiple_interpolations_source ~S[a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"]

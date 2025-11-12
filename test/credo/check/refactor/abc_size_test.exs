@@ -8,30 +8,30 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     def some_function do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 0)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /x" do
-    """
+    ~S'''
     def some_function do
       if 1 == 1 or 2 == 2 do
         my_options = %{}
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for __using__ macro" do
-    ~S"""
+    ~S'''
     defmodule Credo.Check do
       defmacro __using__(opts) do
         quote do
@@ -91,14 +91,14 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report ecto functions when Ecto.Query is imported" do
-    """
+    ~S'''
     defmodule CredoEctoQueryModule do
       import Ecto.Query
 
@@ -114,7 +114,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         |> Repo.all()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
     |> refute_issues()
@@ -125,18 +125,18 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   #
 
   test "it should report a violation here" do
-    """
+    ~S'''
     def some_function do
       x = 1
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 0)
     |> assert_issue()
   end
 
   test "it should report a violation" do
-    """
+    ~S'''
     def some_function do
       if true == true or false == 2 do
         my_options = MyHash.create
@@ -147,14 +147,14 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         IO.puts value
       end)
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
     |> assert_issue()
   end
 
   test "it should report count ecto functions when Ecto.Query is NOT imported" do
-    """
+    ~S'''
     defmodule CredoEctoQueryModule do
 
       def foobar() do
@@ -169,7 +169,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         |> Repo.all()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
     |> assert_issue(fn issue ->
@@ -178,7 +178,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   end
 
   test "it should NOT report count ecto functions when ecto functions are excluded via :excluded_functions" do
-    """
+    ~S'''
     defmodule CredoEctoQueryModule do
 
       def foobar() do
@@ -193,7 +193,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         |> Repo.all()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check,
       max_size: 3,
@@ -219,120 +219,120 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
   end
 
   test "it should return the same ABC size with and without unquote call" do
-    with_unquote_source = """
+    with_unquote_source = ~S'''
     def foo do
       some_var = unquote(5)
     end
-    """
+    '''
 
-    without_unquote_source = """
+    without_unquote_source = ~S'''
     def foo do
       some_var = 5
     end
-    """
+    '''
 
     assert abc_size(with_unquote_source) == abc_size(without_unquote_source)
   end
 
   @tag :current
   test "module attributs should always be counted as 1" do
-    source = """
+    source = ~S'''
     def foo do
       @attr_name
     end
-    """
+    '''
 
     assert abc_size(source) == 1.0
   end
 
   test "it should return the correct ABC size for nullary function calls" do
-    source = """
+    source = ~S'''
     def foo() do
       baz()
     end
-    """
+    '''
 
     assert rounded_abc_size(source) == 1.0
   end
 
   test "it should return the correct ABC size for regular function calls" do
-    source = """
+    source = ~S'''
     def foo() do
       baz 1, 2
     end
-    """
+    '''
 
     assert rounded_abc_size(source) == 1.0
   end
 
   test "it should return the correct ABC size for value assignment" do
-    source = """
+    source = ~S'''
     def first_fun do
       x = 1
     end
-    """
+    '''
 
     # sqrt(1*1 + 0 + 0) = 1
     assert rounded_abc_size(source) == 1.0
   end
 
   test "it should return the correct ABC size for value assignment 2" do
-    source = """
+    source = ~S'''
     def first_fun(name) do
       x = "__#\{name}__"
     end
-    """
+    '''
 
     # sqrt(1*1 + 0 + 0) = 1
     assert rounded_abc_size(source) == 1.0
   end
 
   test "it should return the correct ABC size for assignment to fun call" do
-    source = """
+    source = ~S'''
     def first_fun do
       x = call_other_fun
     end
-    """
+    '''
 
     # sqrt(1*1 + 1*1 + 0) = 1.41
     assert rounded_abc_size(source) == 1.41
   end
 
   test "it should return the correct ABC size for assignment to module fun call" do
-    source = """
+    source = ~S'''
     def first_fun do
       x = Some.Other.Module.call_other_fun
     end
-    """
+    '''
 
     # sqrt(1*1 + 1*1 + 0) = 1.41
     assert rounded_abc_size(source) == 1.41
   end
 
   test "it should return the correct ABC size /3" do
-    source = """
+    source = ~S'''
     def first_fun do
       if some_other_fun, do: call_third_fun
     end
-    """
+    '''
 
     # sqrt(0 + 2*2 + 1*1) = 2.236
     assert rounded_abc_size(source) == 2.24
   end
 
   test "it should return the correct ABC size /4" do
-    source = """
+    source = ~S'''
     def first_fun do
       if Some.Other.Module.some_other_fun, do: Some.Other.Module.call_third_fun
     end
-    """
+    '''
 
     # sqrt(0 + 2*2 + 1*1) = 2.236
     assert rounded_abc_size(source) == 2.24
   end
 
   test "it should return the correct ABC size /5" do
-    source = """
+    source = ~S'''
     def some_function(foo, bar) do
       if true == true or false == 2 do
         my_options = MyHash.create
@@ -343,14 +343,14 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
         IO.puts value
       end)
     end
-    """
+    '''
 
     # sqrt(1*1 + 5*5 + 2*2) = 5.48
     assert rounded_abc_size(source) == 5.48
   end
 
   test "it should NOT count map/struct field access with dot notation for abc size" do
-    source = """
+    source = ~S'''
       def test do
         %{
           foo: foo.bar,
@@ -358,13 +358,13 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
           baz: bux.bus
         }
       end
-    """
+    '''
 
     assert rounded_abc_size(source) == 3
   end
 
   test "it should NOT count pin operators (^) for abc size" do
-    source = """
+    source = ~S'''
       def test(param, foo) do
         case param do
           ^foo -> foo.bar
@@ -372,13 +372,13 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
           "baz" -> bux.bus
         end
       end
-    """
+    '''
 
     assert rounded_abc_size(source) == 6
   end
 
   test "it should NOT count functions given to ignore for abc size" do
-    source = """
+    source = ~S'''
     def fun() do
       Favorite
       |> where(user_id: ^user.id)
@@ -390,27 +390,27 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
       |> distinct(true)
       |> Repo.all()
     end
-    """
+    '''
 
     assert rounded_abc_size(source, ["where", "join", "select", "distinct"]) == 1
   end
 
   test "it should return the same ABC size for equivalently complex code" do
-    source1 = """
+    source1 = ~S'''
     def call(ast) do
       if match?({:fn, _meta, _args}, ast) do
         # ...
       end
     end
-    """
+    '''
 
-    source2 = """
+    source2 = ~S'''
     def call(ast) do
       if {:fn, _meta, _args} = ast do
         # ...
       end
     end
-    """
+    '''
 
     assert rounded_abc_size(source1) == rounded_abc_size(source2)
   end

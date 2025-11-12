@@ -2,7 +2,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
   use Credo.Test.Case
 
   @described_check Credo.Check.Consistency.ParameterPatternMatching
-  @left_and_right_mix ~S"""
+  @left_and_right_mix ~S'''
   defmodule Credo.Sample do
     defmodule InlineModule do
       def list_after([bar, baz] = foo), do: :ok
@@ -14,64 +14,64 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
       defp map_after(%{bar: baz} = foo), do: :ok
     end
   end
-  """
-  @var_left_list ~S"""
+  '''
+  @var_left_list ~S'''
   defmodule Test do
     def test(foo = [x, y, x]) do
       nil
     end
   end
-  """
-  @var_left_tuple ~S"""
+  '''
+  @var_left_tuple ~S'''
   defmodule Test do
     def test(foo = {x, y, x}) do
       nil
     end
   end
-  """
-  @var_left_struct ~S"""
+  '''
+  @var_left_struct ~S'''
   defmodule Test do
     def test(foo = %Foo{hello: "world"}) do
       nil
     end
   end
-  """
-  @var_left_map ~S"""
+  '''
+  @var_left_map ~S'''
   defmodule Test do
     def test(foo = %{abc: def}) do
       nil
     end
   end
-  """
+  '''
 
-  @var_right_list ~S"""
+  @var_right_list ~S'''
   defmodule Test do
     def test([x, y, x] = foo) do
       nil
     end
   end
-  """
-  @var_right_tuple ~S"""
+  '''
+  @var_right_tuple ~S'''
   defmodule Test do
     def test({x, y, x} = foo) do
       nil
     end
   end
-  """
-  @var_right_struct ~S"""
+  '''
+  @var_right_struct ~S'''
   defmodule Test do
     def test(%Foo{hello: "world"} = foo) do
       nil
     end
   end
-  """
-  @var_right_map ~S"""
+  '''
+  @var_right_map ~S'''
   defmodule Test do
     def test(%{abc: def} = foo) do
       nil
     end
   end
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -92,7 +92,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
   end
 
   test "it should NOT break when input has a function without bindings or private funs" do
-    module_with_fun_without_bindings = ~S"""
+    module_with_fun_without_bindings = ~S'''
     defmodule SurviveThisIfYouCan do
       def start do
         GenServer.start(__MODULE__, [])
@@ -102,7 +102,7 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
         bar + 1
       end
     end
-    """
+    '''
 
     [module_with_fun_without_bindings]
     |> to_source_files
