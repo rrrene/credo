@@ -4,7 +4,7 @@ defmodule Credo.ExsLoaderTest do
   @exec %Credo.Execution{}
 
   test "Credo.Execution.parse_exs should work" do
-    exs_string = """
+    exs_string = ~S'''
       %{combine: {:hex, :combine, "0.5.2"},
         cowboy: {:hex, :cowboy, "1.0.2"},
         dirs: ["lib", "src", "test"],
@@ -14,7 +14,7 @@ defmodule Credo.ExsLoaderTest do
           {Style.TrailingBlankLine},
         ]
       }
-    """
+    '''
 
     expected = %{
       combine: {:hex, :combine, "0.5.2"},
@@ -32,9 +32,9 @@ defmodule Credo.ExsLoaderTest do
   end
 
   test "Credo.Execution.parse_exs should work for regex across Erlang versions" do
-    exs_string = """
+    exs_string = ~S'''
       %{regex: ~r(lib src test)}
-    """
+    '''
 
     expected = %{regex: ~r(lib src test)}
 
@@ -46,7 +46,7 @@ defmodule Credo.ExsLoaderTest do
   end
 
   test "Credo.Execution.parse_exs should return error tuple" do
-    exs_string = """
+    exs_string = ~S'''
     %{
       configs: [
         %{
@@ -61,7 +61,7 @@ defmodule Credo.ExsLoaderTest do
         }
       ]
     }
-    """
+    '''
 
     expected = {:error, {9, "syntax error before: ", "checks"}}
 

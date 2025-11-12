@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         # comparison should not affect this check in any way
@@ -34,14 +34,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report nor crash with ecto query" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
 
       def some_function(parameter1) do
@@ -55,14 +55,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
       end
 
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation with :allow_tagged_tuples" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if {:foo, value} = parameter1 do
@@ -70,7 +70,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, allow_tagged_tuples: true)
     |> refute_issues()
@@ -81,7 +81,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if {:ok, value} = parameter1 do
@@ -89,14 +89,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if String.match?(name, ~r/^[a-z]/) do
@@ -110,14 +110,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if condition? && {:ok, value} = parameter1 do
@@ -125,14 +125,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if (contents = parameter1.contents) && parameter2 do
@@ -140,14 +140,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if contents = parameter1.contents && parameter2 do
@@ -155,14 +155,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(a, b) do
         if foo = bar(a && b) do
@@ -170,14 +170,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when wrapped in parens" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if( {:ok, value} = parameter1 ) do
@@ -185,14 +185,14 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for :unless" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         unless {:ok, value} = parameter1 do
@@ -200,27 +200,27 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for :if with nested match" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if !is_nil(baz = Map.get(foo, :bar)), do: baz
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for :if with nested match /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if allowed? && !is_nil(baz = Map.get(foo, :bar)) do
@@ -228,20 +228,20 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for :unless with nested match" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         unless !(x = Map.get(foo, :bar)), do: x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

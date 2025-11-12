@@ -8,19 +8,19 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   #
 
   test "it should NOT report when commas have spaces" do
-    """
+    ~S'''
     # comments should not matter [[[,]]]
     defmodule CredoSampleModule do
       @attribute {:foo, :bar}
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when commas are in interpolations" do
-    ~S"""
+    ~S'''
     defmodule SpaceMissing1 do
       @moduledoc false
 
@@ -33,7 +33,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
         _ = ~r"," # comma is reported
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -43,8 +43,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     ~S[
     defmodule SpaceMissingInBinary do
       custom_sigil =
-        ~X"""
-        """
+        ~X'''
+        '''
 
       string = ","
     end
@@ -55,50 +55,50 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   end
 
   test "it should NOT report when commas have newlines" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defstruct foo: nil,
                 bar: nil
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report commas in sigils" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def fun(value) do
-        Regex.match?(~r/^\\d{1,2}\\/\\d{1,2}\\/\\d{4}$/, value)
+        Regex.match?(~r/^\d{1,2}\/\d{1,2}\/\d{4}$/, value)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT require spaces after commas preceded by the `?` operator" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @some_char_codes [?,, ?;]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it does not get confused by ' in a comment" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def fun do
         # '
         ','
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -109,11 +109,11 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   #
 
   test "it should report when commas are not followed by spaces" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @attribute {:foo,:bar}
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -123,11 +123,11 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   end
 
   test "it should report when there are many commas not followed by spaces" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @attribute [1,2,"three",4,5]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues ->
@@ -138,33 +138,33 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
   end
 
   test "it requires spaces after commas preceded by the `?,`" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @some_char_codes [?,,?;]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it requires spaces after commas preceded by variables ending with a ?" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @attribute [question?,answer]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it requires spaces after commas followed by [" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @attribute [foo,[bar]]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()

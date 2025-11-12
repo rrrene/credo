@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
   #
 
   test "it should NOT report violation for valid pipes" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -20,14 +20,14 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report violation for valid pipes to if-expr" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -40,14 +40,14 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report violation for longer pipes" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -59,7 +59,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         |> to_string()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -70,7 +70,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
   #
 
   test "it should report violation for single pipes to block" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -80,7 +80,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -89,7 +89,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
   end
 
   test "it should report violation for single pipes to case with function" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -100,14 +100,14 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violation for single pipes to if-expr with function" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         arg
@@ -119,14 +119,14 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violation for single pipes starting with a list" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         [arg]
@@ -137,14 +137,14 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violation for single pipes starting with a map" do
-    """
+    ~S'''
     defmodule Test do
       def some_function(arg) do
         %{a: 5}
@@ -155,7 +155,7 @@ defmodule Credo.Check.Readability.SingleFunctionToBlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()

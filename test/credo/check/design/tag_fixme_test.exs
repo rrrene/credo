@@ -8,7 +8,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -16,7 +16,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
         assert x == x + 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -27,7 +27,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
   #
 
   test "it should report an issue" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case # TODO: this should not appear in the FIXME test
 
@@ -37,21 +37,21 @@ defmodule Credo.Check.Design.TagFIXMETest do
         assert x == x + 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report an issue when lower case" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         # fixme blah blah
         Repo.preload(:comments)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

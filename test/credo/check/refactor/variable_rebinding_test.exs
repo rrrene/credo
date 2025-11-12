@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         a = 1
@@ -31,21 +31,21 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
         <<from::binary-size(xxx), ^subname::binary>> = something
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report rebinding opt-in bang sigils" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         a! = 1
         a! = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, allow_bang: true)
     |> refute_issues()
@@ -56,21 +56,21 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         a = 1
         a = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report two violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function() do
         var_1 = 1 + 3
@@ -80,14 +80,14 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
         var_b = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(&(length(&1) == 2))
   end
 
   test "it should report violations when using destructuring tuples" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function() do
         something = "ABABAB"
@@ -95,63 +95,63 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
         {a, a} = {2, 2} # this should _not_ trigger it
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violations when using destructuring with nested assignments" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function() do
         {a = b, a = b} = {1, 2}
         b = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violations when using destructuring lists" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function() do
         [a, b] = [1, 2]
         b = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violations when using destructuring maps" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(opts) do
         %{a: foo, b: bar} = opts
         bar = 3
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report rebinding bang sigils is forbidden without the :allow_bang option" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         a! = 1
         a! = 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

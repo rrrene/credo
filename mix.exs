@@ -33,7 +33,8 @@ defmodule Credo.Mixfile do
       coveralls: :test,
       "coveralls.html": :test,
       "test.fast": :test,
-      "test.slow": :test
+      "test.slow": :test,
+      "test.watch": :test
     ]
   end
 
@@ -174,7 +175,8 @@ defmodule Credo.Mixfile do
       {:file_system, "~> 0.2 or ~> 1.0"},
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
   #
 
   test "it should NOT report violation" do
-    """
+    ~S'''
     defmodule Test do
       def run(user, resource) do
         with {:ok, resource} <- Resource.fetch(user),
@@ -16,7 +16,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
              do: SomeMod.do_something(resource)
       end
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> refute_issues()
@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Test do
       def run(user, resource) do
         with {:resource, {:ok, resource}} <- {:resource, Resource.fetch(user)},
@@ -39,7 +39,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issues(fn issues ->

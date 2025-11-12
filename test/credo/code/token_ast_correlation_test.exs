@@ -1,7 +1,7 @@
 defmodule Credo.Code.TokenAstCorrelationTest do
   use Credo.Test.Case
 
-  @source_example1 """
+  @source_example1 ~S'''
   defmodule Credo.Sample do
     @test_attribute :foo
 
@@ -15,9 +15,9 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       end
     end
   end
-  """
+  '''
 
-  @source_example2 """
+  @source_example2 ~S'''
   defmodule Credo.Sample do
     defmodule InlineModule do
       def foobar(x) do
@@ -25,7 +25,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       end
     end
   end
-  """
+  '''
 
   test "should give correct ast for source_example1" do
     source = @source_example1

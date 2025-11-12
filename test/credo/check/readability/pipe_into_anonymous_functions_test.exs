@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
         |> do_something_else
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -29,7 +29,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -39,7 +39,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
         |> do_something
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -48,7 +48,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
   end
 
   test "it should report a violation for multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -58,7 +58,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
         |> (fn x -> x * 2 end).()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

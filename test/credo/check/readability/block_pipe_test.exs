@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -24,14 +24,14 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report ignored functions or macros" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -41,7 +41,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, exclude: [:case])
     |> refute_issues()
@@ -52,7 +52,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   #
 
   test "it should report a violation for case" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -62,7 +62,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -71,7 +71,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
   end
 
   test "it should report a violation for if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -82,14 +82,14 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for unless" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -98,14 +98,14 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for try" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -116,14 +116,14 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         some_val
@@ -152,7 +152,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

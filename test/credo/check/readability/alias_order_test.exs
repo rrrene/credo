@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   #
 
   test "it should NOT report violation" do
-    """
+    ~S'''
     defmodule Test do
       alias App.Module1
       alias App.Module2
@@ -21,14 +21,14 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias Credo.CLI.ExitStatus
       alias Credo.Issue
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report violation for independent blocks of alpha-ordered aliases" do
-    """
+    ~S'''
     defmodule Test do
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
@@ -37,14 +37,14 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias App.Module1
       alias App.Module2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report violation for multi-aliases when they are alpha-ordered" do
-    """
+    ~S'''
     defmodule Test do
       alias App.CLI.{Filename,Sorter}
       alias App.Foo.{Bar,Baz}
@@ -56,14 +56,14 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias App.Module1
       alias App.Module2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with __MODULE__" do
-    """
+    ~S'''
     defmodule Test do
       alias __MODULE__.SubModule
 
@@ -71,14 +71,14 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias Credo.CLI.Filename
       alias Credo.CLI.Sorter
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with multi-alias" do
-    """
+    ~S'''
     defmodule Test do
       alias Detroit.Learnables.Learnable
       alias DetroitWeb.{ContainerCell, WizardNavigationCell, Zzzzz}
@@ -86,56 +86,56 @@ defmodule Credo.Check.Readability.AliasOrderTest do
 
       alias Detroit.Abc
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with an intersecting `require`" do
-    """
+    ~S'''
     defmodule Test do
       alias OMG.API.State.{Transaction, Transaction.Recovered, Transaction.Signed}
       alias OMG.API.Utxo
       require Utxo
       alias OMG.Watcher.Repo
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with multi alias syntax" do
-    """
+    ~S'''
     defmodule Test do
       alias MyApp.Accounts.{Organization, User, UserOrganization}
       alias MyApp.Repo
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with case-sensitive sorting" do
-    """
+    ~S'''
     defmodule Test do
       alias MyApp.AlphaBravoCharlie
       alias MyApp.AlphaBravoalpha
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
     |> refute_issues()
   end
 
   test "it should NOT report with case-sensitive alias grouping" do
-    """
+    ~S'''
     defmodule Test do
       alias MyApp.{AlphaBravoCharlie, AlphaBravoalpha}
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
     |> refute_issues()
@@ -146,13 +146,13 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias Credo.CLI.Sorter
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -161,12 +161,12 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with as option" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias App.Module2
       alias App.Module1, as: Module3
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -175,7 +175,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with alias groups" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias Credo.CLI.Command
       alias Credo.CLI.Filename
@@ -184,7 +184,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias App.Module2
       alias App.Module1
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -193,7 +193,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with multi-alias" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias App.CLI.{Bar,Baz}
       alias App.Foo.{
@@ -209,7 +209,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias App.Module1
       alias App.Module2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -218,12 +218,12 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with multi-alias /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias Surface.Components.Form
       alias Surface.Components.Form.{DateInput, TextInput, TextArea}
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -232,7 +232,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with multi-alias /3" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias App.CLI.{Bar,Baz}
       alias App.Foo.{Sorter,Command,Filename}
@@ -244,7 +244,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
       alias App.Module1
       alias App.Module2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -253,12 +253,12 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with case-sensitive sorting" do
-    """
+    ~S'''
     defmodule Test do
       alias MyApp.AlphaBravoalpha
       alias MyApp.AlphaBravoCharlie
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
     |> assert_issue(fn issue ->
@@ -267,11 +267,11 @@ defmodule Credo.Check.Readability.AliasOrderTest do
   end
 
   test "it should report a violation with case-sensitive sorting in a multi-alias" do
-    """
+    ~S'''
     defmodule Test do
       alias MyApp.{AlphaBravoalpha, AlphaBravoCharlie}
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
     |> assert_issue(fn issue ->

@@ -5,7 +5,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
 
   test "it should report correct frequencies for operators surrounded by spaces" do
     result =
-      """
+      ~S'''
       defmodule Credo.Sample1 do
         defmodule InlineModule do
           def foobar do
@@ -34,7 +34,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
           end
         end
       end
-      """
+      '''
       |> to_source_file()
       |> Collector.collect_matches([])
 
@@ -43,9 +43,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
 
   test "it should report correct frequencies for operators surrounded by spaces /2" do
     result =
-      """
+      ~S'''
       a = b + c + compare_fn.(-d, 0)
-      """
+      '''
       |> to_source_file()
       |> Collector.collect_matches([])
 
@@ -54,9 +54,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
 
   test "it should report correct frequencies for operators surrounded by spaces /3" do
     result =
-      """
+      ~S'''
       a = b + c + compare_fn.(-d, 0)
-      """
+      '''
       |> to_source_file()
       |> Collector.collect_matches([])
 
@@ -65,13 +65,13 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
 
   test "it should report correct frequencies for operators not surrounded by spaces" do
     result =
-      """
+      ~S'''
       defmodule Credo.Sample2 do
         def foobar do
           1+2
         end
       end
-      """
+      '''
       |> to_source_file()
       |> Collector.collect_matches([])
 
@@ -80,14 +80,14 @@ defmodule Credo.Check.Consistency.SpaceAroundOperators.CollectorTest do
 
   test "it should report correct frequencies for mixed cases" do
     result =
-      """
+      ~S'''
       defmodule Credo.Sample3 do
         def foobar do
           1+ 2
           3 *4
         end
       end
-      """
+      '''
       |> to_source_file()
       |> Collector.collect_matches([])
 
