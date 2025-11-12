@@ -27,27 +27,26 @@ defmodule Credo.Check.Warning.StructFieldAmount do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    max_fields = Params.get(params, :max_fields, __MODULE__)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_fields))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:defstruct, meta, [fields]} = ast, issues, issue_meta, max_fields) do
-    if length(fields) > max_fields do
-      {ast, [issue_for(issue_meta, meta, max_fields) | issues]}
+  defp walk({:defstruct, meta, [fields]} = ast, ctx) do
+    if length(fields) > ctx.params.max_fields do
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_fields) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, meta, max_fields) do
-    format_issue(issue_meta,
-      message: "Struct has more than #{max_fields} fields.",
+  defp issue_for(ctx, meta) do
+    format_issue(ctx,
+      message: "Struct has more than #{ctx.params.max_fields} fields.",
       trigger: "defstruct",
       line_no: meta[:line],
       column: meta[:column]
