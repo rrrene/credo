@@ -1,6 +1,4 @@
 defmodule Credo.Check.Warning.StructFieldAmount do
-  @moduledoc false
-
   use Credo.Check,
     id: "EX5026",
     base_priority: :normal,
