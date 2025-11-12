@@ -44,59 +44,43 @@ defmodule Credo.Check.Readability.WithSingleClause do
       """
     ]
 
+  alias Credo.Code.Block
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
-       when is_list(clauses_and_body) do
-    # If clauses_and_body is a list with at least two elements in it, we think
-    # this might be a call to the special form "with". To be sure of that,
-    # we get the last element of clauses_and_body and check that it's a keyword
-    # list with a :do key in it (the body).
+  defp walk({:with, meta, [_, _ | _] = clauses_and_body} = ast, ctx) do
+    if Block.do_block?(ast) && Block.else_block?(ast) do
+      {clauses, [_body]} = Enum.split(clauses_and_body, -1)
 
-    # We can hard-match on [maybe_body] here since we know that clauses_and_body
-    # has at least two elements.
-    {maybe_clauses, [maybe_body]} = Enum.split(clauses_and_body, -1)
+      contains_unquote_splicing? = Enum.any?(clauses, &match?({:unquote_splicing, _, _}, &1))
+      pattern_clauses_count = Enum.count(clauses, &match?({:<-, _, _}, &1))
 
-    if Keyword.keyword?(maybe_body) and Keyword.has_key?(maybe_body, :do) do
-      issue =
-        issue_if_one_pattern_clause_with_else(maybe_clauses, maybe_body, meta[:line], issue_meta)
-
-      {ast, issue ++ issues}
+      if contains_unquote_splicing? == false && pattern_clauses_count <= 1 do
+        {ast, put_issue(ctx, issue_for(meta, ctx))}
+      else
+        {ast, ctx}
+      end
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_if_one_pattern_clause_with_else(clauses, body, line, issue_meta) do
-    contains_unquote_splicing? = Enum.any?(clauses, &match?({:unquote_splicing, _, _}, &1))
-    pattern_clauses_count = Enum.count(clauses, &match?({:<-, _, _}, &1))
-
-    cond do
-      contains_unquote_splicing? ->
-        []
-
-      pattern_clauses_count <= 1 and Keyword.has_key?(body, :else) ->
-        [
-          format_issue(issue_meta,
-            message:
-              "`with` contains only one <- clause and an `else` branch, consider using `case` instead",
-            line_no: line,
-            trigger: "with"
-          )
-        ]
-
-      true ->
-        []
-    end
+  defp issue_for(meta, ctx) do
+    format_issue(ctx,
+      message:
+        "`with` contains only one <- clause and an `else` branch, consider using `case` instead",
+      trigger: "with",
+      line_no: meta[:line]
+    )
   end
 end

@@ -11,7 +11,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "should return the given module attribute" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoExample do
         @attr_list [:atom1, :atom2]
         @attr_string "This is a String"
@@ -19,7 +19,7 @@ defmodule Credo.Code.ModuleTest do
 
         @moduledoc false
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:atom1, :atom2] == Module.attribute(ast, :attr_list)
@@ -30,7 +30,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "should return the given module attribute for the top module in the given AST" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoExample do
         @attr_list [:atom1, :atom2]
         @attr_string "This is a String"
@@ -46,7 +46,7 @@ defmodule Credo.Code.ModuleTest do
           @moduledoc "test"
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:atom1, :atom2] == Module.attribute(ast, :attr_list)
@@ -75,28 +75,28 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the correct parameter counts" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Foobar do
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 0 == Module.def_count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1 do
       1
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 1 == Module.def_count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -104,7 +104,7 @@ defmodule Credo.Code.ModuleTest do
       defp fun2, do: 42
       defmacro funny_macro, do: quote(true)
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 4 == Module.def_count(ast)
@@ -112,13 +112,13 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns correct def_count if @def_ops attributes found in source file" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       @doc "some description"
 
-      @def \"""
+      @def """
       Returns a list of `TimeSlice` structs based on the provided `time_slice_selector`.
-      \"""
+      """
 
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -134,7 +134,7 @@ defmodule Credo.Code.ModuleTest do
       end
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 4 == Module.def_count(ast)
@@ -227,28 +227,28 @@ defmodule Credo.Code.ModuleTest do
 
   test ".def_names returns the correct function/macro names" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Foobar do
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [] == Module.def_names(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1 do
       1
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:fun1] == Module.def_names(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -256,7 +256,7 @@ defmodule Credo.Code.ModuleTest do
       defp fun2, do: 42
       defmacro funny_macro, do: quote(true)
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:fun1, :fun2, :funny_macro] == Module.def_names(ast)
@@ -264,7 +264,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "should ignore @def_ops module attributes" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -274,7 +274,7 @@ defmodule Credo.Code.ModuleTest do
       @defp "fun12"
       @def funX, do: 42
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:fun1, :fun2, :funny_macro] == Module.def_names(ast)
@@ -286,7 +286,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the correct names with defining op" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -295,7 +295,7 @@ defmodule Credo.Code.ModuleTest do
       defmacro funny_macro, do: quote(true)
       @defmacro funny_macro2, do: quote(true)
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = [{:fun1, :def}, {:fun2, :defp}, {:funny_macro, :defmacro}]
@@ -304,7 +304,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the correct names with defining op and arity" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
       def fun1(nil), do: 1
       def fun1(x), do: fun2 + 1
@@ -317,7 +317,7 @@ defmodule Credo.Code.ModuleTest do
       end
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected0 = [{:fun2, :defp}, {:funny_macro, :defmacro}]
@@ -333,7 +333,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the list of modules used in a given module source code when using multi alias" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Test do
       alias Exzmq.{Socket, Tcp}
 
@@ -342,7 +342,7 @@ defmodule Credo.Code.ModuleTest do
       Exzmq.Socket.test2
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = ["Socket", "Exzmq.Socket"]
@@ -351,7 +351,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the list of modules used in a given module source code" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Test do
       alias Exzmq.Socket
       alias Exzmq.Tcp
@@ -361,7 +361,7 @@ defmodule Credo.Code.ModuleTest do
       Exzmq.Socket.test2
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = ["Socket", "Exzmq.Socket"]
@@ -374,7 +374,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the list of aliases used in a given module source code when using multi alias" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Test do
       alias Exzmq.{Socket, Tcp}
 
@@ -383,7 +383,7 @@ defmodule Credo.Code.ModuleTest do
       Exzmq.Socket.test2
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = ["Exzmq.Socket", "Exzmq.Tcp"]
@@ -392,7 +392,7 @@ defmodule Credo.Code.ModuleTest do
 
   test "returns the list of aliases used in a given module source code" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Test do
       alias Exzmq.Socket
       alias Exzmq.Tcp
@@ -403,7 +403,7 @@ defmodule Credo.Code.ModuleTest do
       Exzmq.Socket.test2
       end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     expected = ["Exzmq.Socket", "Exzmq.Tcp", "Some.Very.Long.Name"]
@@ -555,7 +555,7 @@ defmodule Credo.Code.ModuleTest do
     end
 
     test "deduplicates multiclauses" do
-      assert analyze("""
+      assert analyze(~S'''
              def a(1), do: true
              def a(2), do: false
 
@@ -575,7 +575,7 @@ defmodule Credo.Code.ModuleTest do
              def e(nil), do: false
              def e(x) when is_integer(x) and x > 10, do: true
              def e(1), do: true
-             """) == [
+             ''') == [
                {Test,
                 public_fun: [line: 2, column: 3],
                 callback_fun: [line: 6, column: 3],
@@ -587,7 +587,7 @@ defmodule Credo.Code.ModuleTest do
 
     test "handles multiple modules" do
       full_source =
-        """
+        ~S'''
         defmodule Foo do
           @shortdoc "foo"
         end
@@ -595,7 +595,7 @@ defmodule Credo.Code.ModuleTest do
         defmodule Bar do
           @moduledoc "bar"
         end
-        """
+        '''
         |> to_string()
 
       {:ok, ast} = Credo.Code.ast(full_source)
@@ -609,7 +609,7 @@ defmodule Credo.Code.ModuleTest do
 
     test "handles nested modules" do
       full_source =
-        """
+        ~S'''
         defmodule Foo do
           @shortdoc "foo"
 
@@ -623,7 +623,7 @@ defmodule Credo.Code.ModuleTest do
 
           use GenServer
         end
-        """
+        '''
         |> to_string()
 
       {:ok, ast} = Credo.Code.ast(full_source)
@@ -643,7 +643,7 @@ defmodule Credo.Code.ModuleTest do
 
     test "handles dynamic module names" do
       full_source =
-        """
+        ~S'''
         module = Foo
 
         defmodule module do
@@ -657,7 +657,7 @@ defmodule Credo.Code.ModuleTest do
           defmodule __MODULE__.Qux do
           end
         end
-        """
+        '''
         |> to_string()
 
       {:ok, ast} = Credo.Code.ast(full_source)

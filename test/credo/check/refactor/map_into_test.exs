@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.into([:apple, :banana, :carrot], %{}, &({&1, to_string(&1)}))
@@ -20,7 +20,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
         Enum.into(Enum.map(my_list, &square/1), %{}, &to_tuple/1)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -31,7 +31,7 @@ defmodule Credo.Check.Refactor.MapIntoTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:apple, :banana, :carrot]
@@ -39,27 +39,27 @@ defmodule Credo.Check.Refactor.MapIntoTest do
         |> Enum.into(%{})
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
         Enum.into(Enum.map([:a, :b, :c], &({&1, to_string(&1)})), %{})
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:apple, :banana, :carrot]
@@ -68,14 +68,14 @@ defmodule Credo.Check.Refactor.MapIntoTest do
         |> Enum.into(%{})
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         [:apple, :banana, :carrot]
@@ -84,34 +84,34 @@ defmodule Credo.Check.Refactor.MapIntoTest do
         |> Map.keys()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.map([:apple, :banana, :carrot], &({&1, to_string(&1)}))
         |> Enum.into(%{})
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         Enum.into([:apple, :banana, :carrot] |> Enum.map(&({&1, to_string(&1)})), %{})
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

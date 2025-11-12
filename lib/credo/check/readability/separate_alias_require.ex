@@ -42,16 +42,16 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:defmodule, _, _} = ast, issues, issue_meta) do
+  defp walk({:defmodule, _, _} = ast, ctx) do
     {_previous_calls, issues} =
       ast
       |> Block.calls_in_do_block()
-      |> Enum.reduce({[], issues}, fn
+      |> Enum.reduce({[], []}, fn
         {macro_name, meta, args}, {previous_calls, issues}
         when is_atom(macro_name) and is_list(args) ->
           cond do
@@ -59,7 +59,7 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
               {previous_calls, issues}
 
             macro_name in [:alias, :require] and Enum.member?(previous_calls, macro_name) ->
-              {previous_calls, issues ++ [issue_for(issue_meta, meta[:line], macro_name)]}
+              {previous_calls, issues ++ [issue_for(ctx, meta, macro_name)]}
 
             true ->
               {previous_calls ++ [macro_name], issues}
@@ -69,18 +69,18 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
           memo
       end)
 
-    {ast, issues}
+    {ast, put_issue(ctx, issues)}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, macro_name) do
-    format_issue(issue_meta,
+  defp issue_for(ctx, meta, macro_name) do
+    format_issue(ctx,
       message: message(macro_name),
-      line_no: line_no,
-      trigger: macro_name
+      trigger: macro_name,
+      line_no: meta[:line]
     )
   end
 

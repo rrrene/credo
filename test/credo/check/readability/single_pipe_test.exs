@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -18,7 +18,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
         |> do_something_else
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -29,7 +29,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -37,7 +37,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
         some_val |> do_something
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -46,7 +46,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
   end
 
   test "it should report a violation for multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -56,14 +56,14 @@ defmodule Credo.Check.Readability.SinglePipeTest do
         |> do_something
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()
   end
 
   test "it should report a violation if piping a 0-arity function and such functions not allowed" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmodule OtherModule do
         def foo, do: nil
@@ -87,14 +87,14 @@ defmodule Credo.Check.Readability.SinglePipeTest do
         def bar(nil), do: nil
       end
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issues()
   end
 
   test "it should NOT report violation when piping 0-arity function and such functions allowed" do
-    """
+    ~S'''
     defmodule OtherModule do
       def foo, do: nil
       def bar(nil), do: nil
@@ -116,14 +116,14 @@ defmodule Credo.Check.Readability.SinglePipeTest do
       def foo(), do: nil
       def bar(nil), do: nil
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check, allow_0_arity_functions: true)
     |> refute_issues()
   end
 
   test "it should report violation when piping non-function and 0-arity functions allowed" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def test do
         :foo |> bar()
@@ -134,7 +134,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
 
       def bar(_), do: nil
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check, allow_0_arity_functions: true)
     |> assert_issues()

@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
   @described_check Credo.Check.Consistency.SpaceAroundOperators
 
-  @without_spaces ~S"""
+  @without_spaces ~S'''
   defmodule Credo.Sample1 do
     @spec f(<<_::16, _::_*8>>) :: binary
     defmodule InlineModule do
@@ -20,9 +20,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       end
     end
      end
-  """
+  '''
 
-  @without_spaces2 ~S"""
+  @without_spaces2 ~S'''
   defmodule OtherModule3 do
     defmacro foo do
       3+4
@@ -32,8 +32,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       6*7
     end
   end
-  """
-  @without_spaces3 ~S"""
+  '''
+  @without_spaces3 ~S'''
   defmodule OtherModule4 do
     defp dictionary_changeset() do
       fields = ~W(
@@ -42,8 +42,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       )a
     end
   end
-  """
-  @with_spaces ~S"""
+  '''
+  @with_spaces ~S'''
   defmodule Credo.Sample2 do
     defmodule F do
       def f(), do: 1 + 2
@@ -150,8 +150,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       end
     end
   end
-  """
-  @with_spaces2 ~S"""
+  '''
+  @with_spaces2 ~S'''
   defmodule OtherModule3 do
     defmacro foo do
       1 && 2
@@ -161,8 +161,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       :ok
     end
   end
-  """
-  @with_spaces3 ~S"""
+  '''
+  @with_spaces3 ~S'''
   defmodule OtherModule3 do
     defmacro foo do
       case foo do
@@ -172,8 +172,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       end
     end
   end
-  """
-  @with_spaces4 ~S"""
+  '''
+  @with_spaces4 ~S'''
   defmodule OtherModule3 do
     @min -1
     @max 2 + 1
@@ -186,8 +186,8 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       # something
     end
   end
-  """
-  @with_spaces5 ~S"""
+  '''
+  @with_spaces5 ~S'''
   defmodule CredoTest do
     @moduledoc ""
 
@@ -202,20 +202,20 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       1 + 1 = 2
     end
   end
-  """
-  @with_spaces6 ~S"""
+  '''
+  @with_spaces6 ~S'''
   assert -24 == MyModule.fun
   assert MyModule.fun !=  -24
   ExUnit.assert -12 == MyApp.fun_that_should_return_a_negative
-  """
-  @with_spaces7 """
+  '''
+  @with_spaces7 ~S'''
   defmodule AlwaysNoSpacesInBinaryTypespecTest do
     @callback foo() :: <<_::_*8>>
 
     def foo, do: 1 + 1
   end
-  """
-  @with_spaces8 ~S"""
+  '''
+  @with_spaces8 ~S'''
   defmodule AlwaysNoSpacesInBinaryTypespecTest do
 
     def seed_collection(entity, collection, opts) when is_map(collection) do
@@ -232,9 +232,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       }
     end
   end
-  """
+  '''
 
-  @with_and_without_spaces ~S"""
+  @with_and_without_spaces ~S'''
   defmodule OtherModule3 do
     defmacro foo do
       3+4
@@ -244,15 +244,15 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
       6 *7
     end
   end
-  """
-  @with_and_without_spaces2 ~S"""
+  '''
+  @with_and_without_spaces2 ~S'''
   defmodule CredoTests do
   def bar do
   2+3
   4 + 5
   end
   end
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -297,7 +297,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
         @with_spaces2,
         @with_spaces3,
         @with_spaces4,
-        ~S"""
+        ~S'''
         defmodule OtherModule3_0 do
           for prio < 1..10//2 do
             # something
@@ -307,7 +307,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
             # something
           end
         end
-        """
+        '''
       ]
       |> to_source_files()
       |> run_check(@described_check)
@@ -403,7 +403,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
   test "it should report the correct result /7" do
     [
-      ~S"""
+      ~S'''
       defmodule TestTest do
         def test do
           a = fn b, c -> b + c end
@@ -412,7 +412,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
           a.(-3.0, 1.0)
         end
       end
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -421,9 +421,9 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
 
   test "it should not crash for issue #731" do
     [
-      ~S"""
+      ~S'''
       %{acc | "#{date_type}_dates": :foo}
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -440,7 +440,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
   test "it should allow no spaces if specified in :ignore" do
     source_files =
       [
-        ~S"""
+        ~S'''
         defmodule TestTest do
           def test(a, b, c) do
             a = fn b, c -> b+c end
@@ -449,7 +449,7 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
             a.(-3.0, 1.0)
           end
         end
-        """
+        '''
       ]
       |> to_source_files()
 

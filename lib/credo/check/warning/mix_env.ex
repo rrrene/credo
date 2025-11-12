@@ -22,25 +22,47 @@ defmodule Credo.Check.Warning.MixEnv do
 
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    case ignore_path?(source_file.filename, excluded_paths) do
+    case ignore_path?(source_file.filename, ctx.params.excluded_paths) do
       true ->
         []
 
       false ->
-        issue_meta = IssueMeta.for(source_file, params)
+        case Path.extname(filename) do
+          ".exs" ->
+            []
 
-        filename
-        |> Path.extname()
-        |> case do
-          ".exs" -> []
-          _ -> Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+          _ ->
+            result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+            result.issues
         end
     end
   end
 
-  # Check if analyzed module path is within ignored paths
+  for op <- @def_ops do
+    # catch variables named e.g. `defp`
+    defp walk({unquote(op), _, nil} = ast, ctx) do
+      {ast, ctx}
+    end
+
+    defp walk({unquote(op), _, _body} = ast, ctx) do
+      {ast, Credo.Code.prewalk(ast, &traverse_defs/2, ctx)}
+    end
+  end
+
+  defp walk(ast, ctx) do
+    {ast, ctx}
+  end
+
+  defp traverse_defs({{:., _, [{:__aliases__, meta, [:Mix]}, :env]}, _, _arguments} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
+  end
+
+  defp traverse_defs(ast, ctx) do
+    {ast, ctx}
+  end
+
   defp ignore_path?(filename, excluded_paths) do
     directory = Path.dirname(filename)
 
@@ -49,37 +71,6 @@ defmodule Credo.Check.Warning.MixEnv do
 
   defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
   defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
-
-  for op <- @def_ops do
-    # catch variables named e.g. `defp`
-    defp traverse({unquote(op), _, nil} = ast, issues, _issue_meta) do
-      {ast, issues}
-    end
-
-    defp traverse({unquote(op), _, _body} = ast, issues, issue_meta) do
-      {ast, issues ++ Credo.Code.prewalk(ast, &traverse_defs(&1, &2, issue_meta))}
-    end
-  end
-
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
-  end
-
-  defp traverse_defs(
-         {{:., _, [{:__aliases__, meta, [:Mix]}, :env]}, _, _arguments} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
-  end
-
-  defp traverse_defs(ast, issues, _issue_meta) do
-    {ast, issues}
-  end
-
-  defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta) | issues]
-  end
 
   defp issue_for(issue_meta, meta) do
     format_issue(

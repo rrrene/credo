@@ -18,71 +18,57 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
       """
     ]
 
-  @ops [:and, :or, :&&, :||]
+  @bool_ops [:and, :or, :&&, :||]
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:defmodule, _meta, _} = ast, issues, issue_meta) do
-    redefined_ops = Credo.Code.prewalk(ast, &traverse_for_operator_redef(&1, &2))
+  defp walk({:defmodule, _meta, _} = ast, ctx) do
+    redefined_ops = Credo.Code.prewalk(ast, &find_bool_op_redefinition(&1, &2))
+    ctx = Map.merge(ctx, %{redefined_ops: redefined_ops})
 
-    {ast, Credo.Code.prewalk(ast, &traverse_module(&1, &2, redefined_ops, issue_meta), issues)}
+    {ast, Credo.Code.prewalk(ast, &walk_module/2, ctx)}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  for op <- @ops do
-    defp traverse_module({unquote(op), meta, [lhs, rhs]} = ast, issues, redefined_ops, issue_meta) do
-      op_not_redefined? = unquote(op) not in redefined_ops
+  for op <- @bool_ops do
+    defp walk_module({unquote(op), meta, [lhs, rhs]} = ast, ctx) do
+      op_not_redefined? = unquote(op) not in ctx.redefined_ops
 
       if op_not_redefined? && Credo.Code.remove_metadata(lhs) === Credo.Code.remove_metadata(rhs) do
-        new_issue = issue_for(issue_meta, meta, unquote(op))
-        {ast, [new_issue | issues]}
+        {ast, put_issue(ctx, issue_for(ctx, meta, unquote(op)))}
       else
-        {ast, issues}
+        {ast, ctx}
       end
     end
   end
 
-  defp traverse_module(ast, issues, _redefined_ops, _issue_meta) do
-    {ast, issues}
+  defp walk_module(ast, ctx) do
+    {ast, ctx}
   end
 
-  for op <- @ops do
-    defp traverse_for_operator_redef(
-           {:def, _,
-            [
-              {unquote(op), _, [_ | _]},
-              [_ | _]
-            ]} = ast,
-           acc
-         ) do
+  for op <- @bool_ops do
+    defp find_bool_op_redefinition({:def, _, [{unquote(op), _, [_ | _]}, [_ | _]]} = ast, acc) do
       {ast, acc ++ [unquote(op)]}
     end
 
-    defp traverse_for_operator_redef(
-           {:def, _,
-            [
-              {:when, _,
-               [
-                 {unquote(op), _, _} | _
-               ]}
-              | _
-            ]} = ast,
+    defp find_bool_op_redefinition(
+           {:def, _, [{:when, _, [{unquote(op), _, _} | _]} | _]} = ast,
            acc
          ) do
       {ast, acc ++ [unquote(op)]}
     end
   end
 
-  defp traverse_for_operator_redef(ast, acc) do
+  defp find_bool_op_redefinition(ast, acc) do
     {ast, acc}
   end
 

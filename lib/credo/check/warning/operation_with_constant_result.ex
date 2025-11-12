@@ -25,46 +25,34 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # skip references to functions
-  defp traverse({:&, _, _}, issues, _) do
-    {nil, issues}
+  defp walk({:&, _, _}, ctx) do
+    {nil, ctx}
   end
 
   # skip specs
-  defp traverse({:@, _, [{:spec, _, _}]}, issues, _) do
-    {nil, issues}
+  defp walk({:@, _, [{:spec, _, _}]}, ctx) do
+    {nil, ctx}
   end
 
   for {op, constant_result, operand} <- @ops_and_constant_results do
-    defp traverse(
-           {unquote(op), meta, [_lhs, unquote(operand)]} = ast,
-           issues,
-           issue_meta
-         ) do
-      new_issue =
-        issue_for(
-          issue_meta,
-          meta,
-          unquote(op),
-          unquote(constant_result)
-        )
-
-      {ast, [new_issue | issues]}
+    defp walk({unquote(op), meta, [_lhs, unquote(operand)]} = ast, ctx) do
+      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(op), unquote(constant_result)))}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, meta, trigger, constant_result) do
+  defp issue_for(ctx, meta, trigger, constant_result) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Operation will always return #{constant_result}.",
       trigger: trigger,
       line_no: meta[:line],

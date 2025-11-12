@@ -46,32 +46,32 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:when, meta, [_, {negation, _, [{:is_nil, _, _}]}]} = ast, issues, issue_meta)
+  defp walk({:when, _, [_, {negation, meta, [{:is_nil, _, _}]}]} = ast, ctx)
        when negation in [:!, :not] do
     trigger = to_string(negation)
 
     issue =
       format_issue(
-        issue_meta,
+        ctx,
         message: "Avoid negated `is_nil/1` in guard clauses.",
         trigger: trigger,
         line_no: meta[:line]
       )
 
-    {ast, [issue | issues]}
+    {ast, put_issue(ctx, issue)}
   end
 
-  defp traverse({:when, meta, [fun, {_, _, [first_op | second_op]}]} = ast, issues, issue_meta) do
-    {_, first_op_issues} = traverse({:when, meta, [fun, first_op]}, [], issue_meta)
-    {_, second_op_issues} = traverse({:when, meta, [fun, second_op]}, [], issue_meta)
+  defp walk({:when, meta, [fun, {_, _, [first_op | second_op]}]} = ast, ctx) do
+    {_, ctx} = walk({:when, meta, [fun, first_op]}, ctx)
+    {_, ctx} = walk({:when, meta, [fun, second_op]}, ctx)
 
-    {ast, first_op_issues ++ second_op_issues ++ issues}
+    {ast, ctx}
   end
 
-  defp traverse(ast, issues, _), do: {ast, issues}
+  defp walk(ast, ctx), do: {ast, ctx}
 end

@@ -8,7 +8,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
   #
 
   test "it should NOT report when comment precedes the tag" do
-    """
+    ~S'''
     defmodule CredoSampleModuleTest do
       alias ExUnit.Case
 
@@ -25,7 +25,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file("foo_test.exs")
     |> run_check(@described_check)
     |> refute_issues()
@@ -37,7 +37,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
 
   # @tag :skip
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModuleTest do
       alias ExUnit.Case
 
@@ -46,7 +46,7 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file("foo_test.exs")
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

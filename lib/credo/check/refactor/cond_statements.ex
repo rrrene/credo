@@ -31,12 +31,12 @@ defmodule Credo.Check.Refactor.CondStatements do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:cond, meta, arguments} = ast, issues, issue_meta) do
+  defp walk({:cond, meta, arguments} = ast, ctx) do
     conditions =
       arguments
       |> Credo.Code.Block.do_block_for!()
@@ -48,14 +48,14 @@ defmodule Credo.Check.Refactor.CondStatements do
       count <= 2 && contains_always_matching_condition?(conditions)
 
     if should_be_written_as_if_else_block? do
-      {ast, issues ++ [issue_for(issue_meta, meta[:line], :cond)]}
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp contains_always_matching_condition?(conditions) do
@@ -71,13 +71,13 @@ defmodule Credo.Check.Refactor.CondStatements do
     end)
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
       message:
         "Cond statements should contain at least two conditions besides `true`, consider using `if` instead.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "cond",
+      line_no: meta[:line]
     )
   end
 end

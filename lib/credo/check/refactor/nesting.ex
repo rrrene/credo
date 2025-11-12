@@ -35,55 +35,42 @@ defmodule Credo.Check.Refactor.Nesting do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    max_nesting = Params.get(params, :max_nesting, __MODULE__)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, max_nesting))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   for op <- @def_ops do
-    defp traverse(
+    defp walk(
            {unquote(op) = op, meta, arguments} = ast,
-           issues,
-           issue_meta,
-           max_nesting
+           %{params: %{max_nesting: max_nesting}} = ctx
          )
          when is_list(arguments) do
       arguments
       |> find_depth([], meta[:line], op)
-      |> handle_depth(ast, issue_meta, issues, max_nesting)
+      |> handle_depth(ast, ctx, max_nesting)
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_nesting) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp handle_depth(nil, ast, _issue_meta, issues, _max_nesting) do
-    {ast, issues}
+  defp handle_depth(nil, ast, ctx, _max_nesting) do
+    {ast, ctx}
   end
 
-  defp handle_depth(
-         {depth, line_no, trigger},
-         ast,
-         issue_meta,
-         issues,
-         max_nesting
-       ) do
-    if depth > max_nesting do
-      {
-        ast,
-        issues ++ [issue_for(issue_meta, line_no, trigger, max_nesting, depth)]
-      }
-    else
-      {ast, issues}
-    end
+  defp handle_depth({depth, line_no, trigger}, ast, ctx, max_nesting) when depth > max_nesting do
+    {ast, put_issue(ctx, issue_for(ctx, line_no, trigger, max_nesting, depth))}
+  end
+
+  defp handle_depth(_, ast, ctx, _max_nesting) do
+    {ast, ctx}
   end
 
   # Searches for the depth level and returns a tuple `{depth, line_no, trigger}`
   # where the greatest depth was reached.
-  defp find_depth(arguments, nest_list, line_no, trigger)
-       when is_list(arguments) do
+  defp find_depth(arguments, nest_list, line_no, trigger) when is_list(arguments) do
     arguments
     |> Credo.Code.Block.all_blocks_for!()
     |> Enum.flat_map(fn block ->
@@ -96,12 +83,7 @@ defmodule Credo.Check.Refactor.Nesting do
   end
 
   for op <- @nest_ops do
-    defp find_depth(
-           {unquote(op) = op, meta, arguments},
-           nest_list,
-           _line_no,
-           _trigger
-         )
+    defp find_depth({unquote(op) = op, meta, arguments}, nest_list, _, _)
          when is_list(arguments) do
       arguments
       |> Enum.map(&find_depth(&1, nest_list ++ [op], meta[:line], op))
@@ -122,9 +104,9 @@ defmodule Credo.Check.Refactor.Nesting do
     {Enum.count(nest_list), line_no, trigger}
   end
 
-  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(ctx, line_no, trigger, max_value, actual_value) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "Function body is nested too deep (max depth is #{max_value}, was #{actual_value}).",
       line_no: line_no,

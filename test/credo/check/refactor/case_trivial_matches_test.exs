@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatchesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         case some_value do
@@ -19,14 +19,14 @@ defmodule Credo.Check.Refactor.CaseTrivialMatchesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code 2" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5) do
         case some_value do
@@ -35,7 +35,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatchesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -46,7 +46,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatchesTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Credo.Sample.Module do
       def some_function(p1, p2, p3, p4, p5, p6) do
         case some_value do
@@ -55,7 +55,7 @@ defmodule Credo.Check.Refactor.CaseTrivialMatchesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()

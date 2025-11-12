@@ -8,13 +8,13 @@ defmodule Credo.Check.Warning.IExPryTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -25,14 +25,14 @@ defmodule Credo.Check.Warning.IExPryTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         x = parameter1 + parameter2
         IEx.pry
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -42,13 +42,13 @@ defmodule Credo.Check.Warning.IExPryTest do
   end
 
   test "it should report a violation with two on the same line" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         IEx.pry(); IEx.pry()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn [two, one] ->

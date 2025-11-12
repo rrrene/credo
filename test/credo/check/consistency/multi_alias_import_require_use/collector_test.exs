@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
 
   alias Credo.Check.Consistency.MultiAliasImportRequireUse.Collector
 
-  @single """
+  @single ~S'''
   defmodule Credo.Sample1 do
     alias Foo.Bar
     import Foo.Bar
@@ -15,25 +15,25 @@ defmodule Credo.Check.Consistency.MultiAliasImportRequireUse.CollectorTest do
     use Foo.Baz, with_params: true # use with params does not count
     use Foo # use with single module alias does not count
   end
-  """
+  '''
 
-  @multi """
+  @multi ~S'''
   defmodule Credo.Sample2 do
     alias Foo.{Bar, Baz}
     import Foo.{Bar, Baz}
     require Foo.{Bar, Baz}
     use Foo.{Bar, Baz}
   end
-  """
+  '''
 
-  @mixed """
+  @mixed ~S'''
   defmodule Credo.Sample2 do
     import Foo.Bar
     alias Foo.{Bar, Baz}
     import Foo.Baz
     import Bar.Baz
   end
-  """
+  '''
 
   test "it should report correct frequencies for single imports" do
     result =

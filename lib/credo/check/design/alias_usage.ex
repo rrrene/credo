@@ -70,213 +70,107 @@ defmodule Credo.Check.Design.AliasUsage do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    excluded_namespaces = Params.get(params, :excluded_namespaces, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
 
-    excluded_lastnames = Params.get(params, :excluded_lastnames, __MODULE__)
-
-    if_nested_deeper_than = Params.get(params, :if_nested_deeper_than, __MODULE__)
-
-    if_called_more_often_than = Params.get(params, :if_called_more_often_than, __MODULE__)
-
-    only = Params.get(params, :only, __MODULE__)
-
-    if_referenced? = Params.get(params, :if_referenced, __MODULE__)
-
-    source_file
-    |> Credo.Code.prewalk(
-      &traverse(&1, &2, issue_meta, excluded_namespaces, excluded_lastnames, only, if_referenced?)
-    )
-    |> filter_issues_if_called_more_often_than(if_called_more_often_than)
-    |> filter_issues_if_nested_deeper_than(if_nested_deeper_than)
+    result.issues
+    |> filter_issues_if_called_more_often_than(ctx.params.if_called_more_often_than)
+    |> filter_issues_if_nested_deeper_than(ctx.params.if_nested_deeper_than)
   end
 
-  defp traverse(
-         {:defmodule, _, _} = ast,
-         issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames,
-         only,
-         if_referenced?
-       ) do
+  defp walk({:defmodule, _, _} = ast, ctx) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
 
-    new_issues =
+    ctx =
       Credo.Code.prewalk(
         ast,
-        &find_issues(
-          &1,
-          &2,
-          issue_meta,
-          excluded_namespaces,
-          excluded_lastnames,
-          only,
-          aliases,
-          mod_deps,
-          if_referenced?
-        )
+        &find_issues/2,
+        Map.merge(ctx, %{aliases: aliases, mod_deps: mod_deps})
       )
 
-    {ast, issues ++ new_issues}
+    {ast, ctx}
   end
 
-  defp traverse(
-         ast,
-         issues,
-         _source_file,
-         _excluded_namespaces,
-         _excluded_lastnames,
-         _only,
-         _if_referenced?
-       ) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   # Ignore module attributes
-  defp find_issues({:@, _, _}, issues, _, _, _, _, _, _, _) do
-    {nil, issues}
+  defp find_issues({:@, _, _}, ctx) do
+    {nil, ctx}
   end
 
   # Ignore multi alias call
-  defp find_issues(
-         {:., _, [{:__aliases__, _, _}, :{}]} = ast,
-         issues,
-         _,
-         _,
-         _,
-         _,
-         _,
-         _,
-         _
-       ) do
-    {ast, issues}
+  defp find_issues({:., _, [{:__aliases__, _, _}, :{}]} = ast, ctx) do
+    {ast, ctx}
   end
 
   # Ignore alias containing an `unquote` call
-  defp find_issues(
-         {:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast,
-         issues,
-         _,
-         _,
-         _,
-         _,
-         _,
-         _,
-         _
-       )
+  defp find_issues({:., _, [{:__aliases__, _, mod_list}, :unquote]} = ast, ctx)
        when is_list(mod_list) do
-    {ast, issues}
+    {ast, ctx}
   end
 
-  defp find_issues(
-         {:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast,
-         issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames,
-         only,
-         aliases,
-         mod_deps,
-         _if_referenced?
-       )
+  defp find_issues({:., _, [{:__aliases__, meta, mod_list}, fun_atom]} = ast, ctx)
        when is_list(mod_list) and is_atom(fun_atom) do
-    do_find_issues(
-      ast,
-      mod_list,
-      meta,
-      issues,
-      issue_meta,
-      excluded_namespaces,
-      excluded_lastnames,
-      only,
-      aliases,
-      mod_deps
-    )
+    do_find_issues(ast, mod_list, meta, ctx)
   end
 
   defp find_issues(
          {fun_atom, _, [{:__aliases__, meta, mod_list}]} = ast,
-         issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames,
-         only,
-         aliases,
-         mod_deps,
-         true
+         %{params: %{if_referenced: true}} = ctx
        )
        when is_list(mod_list) and is_atom(fun_atom) and fun_atom not in @keywords do
-    do_find_issues(
-      ast,
-      mod_list,
-      meta,
-      issues,
-      issue_meta,
-      excluded_namespaces,
-      excluded_lastnames,
-      only,
-      aliases,
-      mod_deps
-    )
+    do_find_issues(ast, mod_list, meta, ctx)
   end
 
-  defp find_issues(ast, issues, _, _, _, _, _, _, _) do
-    {ast, issues}
+  defp find_issues(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp do_find_issues(
-         ast,
-         mod_list,
-         meta,
-         issues,
-         issue_meta,
-         excluded_namespaces,
-         excluded_lastnames,
-         only,
-         aliases,
-         mod_deps
-       ) do
+  defp do_find_issues(ast, mod_list, meta, ctx) do
+    %{
+      params: %{
+        excluded_namespaces: excluded_namespaces,
+        excluded_lastnames: excluded_lastnames,
+        only: only
+      },
+      aliases: aliases,
+      mod_deps: mod_deps
+    } = ctx
+
     cond do
       Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
-        {ast, issues}
+        {ast, ctx}
 
       Enum.any?(mod_list, &unquote?/1) ->
-        {ast, issues}
+        {ast, ctx}
 
-      excluded_lastname_or_namespace?(
-        mod_list,
-        excluded_namespaces,
-        excluded_lastnames
-      ) ->
-        {ast, issues}
+      excluded_lastname_or_namespace?(mod_list, excluded_namespaces, excluded_lastnames) ->
+        {ast, ctx}
 
       excluded_with_only?(mod_list, only) ->
-        {ast, issues}
+        {ast, ctx}
 
       conflicting_with_aliases?(mod_list, aliases) ->
-        {ast, issues}
+        {ast, ctx}
 
       conflicting_with_other_modules?(mod_list, mod_deps) ->
-        {ast, issues}
+        {ast, ctx}
 
       true ->
         trigger = Credo.Code.Name.full(mod_list)
 
-        {ast, issues ++ [issue_for(issue_meta, meta[:line], trigger)]}
+        {ast, put_issue(ctx, issue_for(ctx, trigger, meta))}
     end
   end
 
   defp unquote?({:unquote, _, arguments}) when is_list(arguments), do: true
   defp unquote?(_), do: false
 
-  defp excluded_lastname_or_namespace?(
-         mod_list,
-         excluded_namespaces,
-         excluded_lastnames
-       ) do
+  defp excluded_lastname_or_namespace?(mod_list, excluded_namespaces, excluded_lastnames) do
     first_name = Credo.Code.Name.first(mod_list)
     last_name = Credo.Code.Name.last(mod_list)
 
@@ -349,12 +243,12 @@ defmodule Credo.Check.Design.AliasUsage do
     end)
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, trigger, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Nested modules could be aliased at the top of the invoking module.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

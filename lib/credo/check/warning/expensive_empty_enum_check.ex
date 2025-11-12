@@ -45,7 +45,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {@length_pattern, 0, "length"},
     {0, @length_pattern, "length"}
   ]
-  @operators [:==, :===]
+  @operators [:==, :!=, :===, :!==, :>, :<]
 
   for {lhs, rhs, trigger} <- @comparisons,
       operator <- @operators do

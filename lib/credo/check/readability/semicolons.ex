@@ -26,25 +26,25 @@ defmodule Credo.Check.Readability.Semicolons do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__)
 
     source_file
     |> Credo.Code.to_tokens()
-    |> collect_issues([], issue_meta)
+    |> collect_issues([], ctx)
   end
 
-  defp collect_issues([], acc, _issue_meta), do: acc
+  defp collect_issues([], acc, _ctx), do: acc
 
-  defp collect_issues([{:";", {line_no, column1, _}} | rest], acc, issue_meta) do
-    acc = [issue_for(issue_meta, line_no, column1) | acc]
-    collect_issues(rest, acc, issue_meta)
+  defp collect_issues([{:";", {line_no, column1, _}} | rest], acc, ctx) do
+    acc = [issue_for(ctx, line_no, column1) | acc]
+    collect_issues(rest, acc, ctx)
   end
 
-  defp collect_issues([_ | rest], acc, issue_meta), do: collect_issues(rest, acc, issue_meta)
+  defp collect_issues([_ | rest], acc, ctx), do: collect_issues(rest, acc, ctx)
 
-  defp issue_for(issue_meta, line_no, column) do
+  defp issue_for(ctx, line_no, column) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Don't use `;` to separate statements and expressions.",
       line_no: line_no,
       column: column,

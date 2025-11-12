@@ -23,47 +23,42 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
 
   @doc false
   def run(source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # DateTime.truncate(DateTime.utc_now(), _)
   # DateTime.truncate(DateTime.utc_now(_), _)
   # DateTime.truncate(DateTime.utc_now(_, _), _)
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
           [
             {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
             _
-          ]} =
-           ast,
-         issues,
-         issue_meta
+          ]} = ast,
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # DateTime.utc_now() |> DateTime.truncate(_)
   # DateTime.utc_now(_) |> DateTime.truncate(_)
   # DateTime.utc_now(_, _) |> DateTime.truncate(_)
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
             {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # DateTime.truncate(_ |> DateTime.utc_now(), _)
   # DateTime.truncate(_ |> DateTime.utc_now(_), _)
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
           [
             {:|>, _,
@@ -73,16 +68,14 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
              ]},
             _
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # _ |> DateTime.utc_now() |> DateTime.truncate(_)
   # _ |> DateTime.utc_now(_) |> DateTime.truncate(_)
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {:|>, _,
@@ -92,49 +85,43 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
              ]},
             {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "DateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(), _)
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(_), _)
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(_, _), _)
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
           [
             {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
             _
           ]} =
            ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # NaiveDateTime.utc_now() |> NaiveDateTime.truncate(_)
   # NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
   # NaiveDateTime.utc_now(_, _) |> NaiveDateTime.truncate(_)
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
             {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # NaiveDateTime.truncate(_ |> NaiveDateTime.utc_now(), _)
   # NaiveDateTime.truncate(_ |> NaiveDateTime.utc_now(_), _)
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
           [
             {:|>, _,
@@ -144,16 +131,14 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
              ]},
             _
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # _ |> NaiveDateTime.utc_now() |> NaiveDateTime.truncate(_)
   # _ |> NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {:|>, _,
@@ -163,24 +148,22 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
              ]},
             {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "NaiveDateTime")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, module) do
+  defp issue_for(ctx, meta, mod_name) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
-        "Pass time unit to `#{module}.utc_now` instead of composing with `#{module}.truncate/2`.",
-      trigger: "#{module}.truncate",
-      line_no: line_no
+        "Pass time unit to `#{mod_name}.utc_now` instead of composing with `#{mod_name}.truncate/2`.",
+      trigger: "#{mod_name}.truncate",
+      line_no: meta[:line]
     )
   end
 end

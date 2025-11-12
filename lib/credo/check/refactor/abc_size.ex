@@ -32,22 +32,17 @@ defmodule Credo.Check.Refactor.ABCSize do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    ignore_ecto? = imports_ecto_query?(source_file)
-    issue_meta = IssueMeta.for(source_file, params)
-    max_abc_size = Params.get(params, :max_size, __MODULE__)
-    excluded_functions = Params.get(params, :excluded_functions, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    excluded_functions =
-      if ignore_ecto? do
-        @ecto_functions ++ excluded_functions
+    ctx =
+      if imports_ecto_query?(source_file) do
+        put_param(ctx, :excluded_functions, @ecto_functions ++ ctx.params.excluded_functions)
       else
-        excluded_functions
+        ctx
       end
 
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, max_abc_size, excluded_functions)
-    )
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   defp imports_ecto_query?(source_file),
@@ -60,46 +55,29 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   defp traverse_for_ecto(ast, false), do: {ast, false}
 
-  defp traverse(
-         {:defmacro, _, [{:__using__, _, _}, _]} = ast,
-         issues,
-         _issue_meta,
-         _max_abc_size,
-         _excluded_functions
-       ) do
-    {ast, issues}
+  defp walk({:defmacro, _, [{:__using__, _, _}, _]} = ast, ctx) do
+    {ast, ctx}
   end
 
   for op <- @def_ops do
-    defp traverse(
-           {unquote(op), meta, arguments} = ast,
-           issues,
-           issue_meta,
-           max_abc_size,
-           excluded_functions
-         )
-         when is_list(arguments) do
+    defp walk({unquote(op), meta, arguments} = ast, ctx) when is_list(arguments) do
       abc_size =
         ast
-        |> abc_size_for(excluded_functions)
+        |> abc_size_for(ctx.params.excluded_functions)
         |> round
 
-      if abc_size > max_abc_size do
+      if abc_size > ctx.params.max_size do
         fun_name = Credo.Code.Module.def_name(ast)
 
-        {ast,
-         [
-           issue_for(issue_meta, meta[:line], fun_name, max_abc_size, abc_size)
-           | issues
-         ]}
+        {ast, put_issue(ctx, issue_for(ctx, meta, fun_name, abc_size))}
       else
-        {ast, issues}
+        {ast, ctx}
       end
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_abc_size, _excluded_functions) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   @doc """
@@ -282,12 +260,14 @@ defmodule Credo.Check.Refactor.ABCSize do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(ctx, meta, trigger, actual_value) do
+    max_value = ctx.params.max_size
+
     format_issue(
-      issue_meta,
+      ctx,
       message: "Function is too complex (ABC size is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
-      line_no: line_no,
+      line_no: meta[:line],
       severity: Severity.compute(actual_value, max_value)
     )
   end

@@ -8,20 +8,20 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         File.read(parameter1) + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when result is piped" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         File.read(parameter1)
@@ -30,28 +30,28 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when end of pipe AND return value" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       parameter1 + parameter2
       |> File.read(parameter1)
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of pipe" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       parameter1 + parameter2
@@ -61,14 +61,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
       :ok
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside an assignment" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       offset = File.stat(line)
@@ -76,14 +76,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
       parameter1 + parameter2 + offset
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a condition" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       if File.stat(x1) > File.stat(x2) do
@@ -106,14 +106,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
       parameter1 + parameter2 + offset
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a quote" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     defp category_body(nil) do
       quote do
@@ -123,14 +123,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
       end
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a catch" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp category_body(nil) do
         throw [1, 2, 3, 4]
@@ -139,14 +139,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
           File.stat(values)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of assignment" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
       pos =
@@ -174,14 +174,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
     end
 
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block but is the last call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -191,14 +191,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block and is not the last call, but the result is assigned to a variable" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         result =
@@ -211,14 +211,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         IO.puts "8"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when buried in :if, :when and :fn 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -234,14 +234,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for parser <- parsers do
@@ -252,14 +252,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when part of a function call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for parser <- parsers do
@@ -270,40 +270,40 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for x <- File.open(bin, &(&1.blob)), x != "", do: x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp sum(_) do
         for x <- [1..3, 5..10], sum=File.sum(x), do: sum
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in :after block" do
-    """
+    ~S'''
       defp my_function(fun, opts) do
         try do
           :fprof.analyse(
@@ -321,14 +321,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
           StringIO.close(analyse_dest)
         end
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call" do
-    """
+    ~S'''
       def my_function(url) when is_binary(url) do
         if info.userinfo do
           destructure [username, password], File.read(info.userinfo)
@@ -336,31 +336,31 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
 
         File.join(opts, fn {_k, v} -> is_nil(v) end)
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call 2" do
-    """
+    ~S'''
       defp print_process(pid_atom, stat, own) do
         IO.puts([?", File.read(own, "-")])
         IO.write format_item(Path.read(path, item), File.open(item, width))
         print_row(["s", "B", "s", ".3f", "s"], [stat, "", own, ""])
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in list that is returned" do
-    """
-    defp indent_line(str, indentation, with \\\\ " ") do
+    ~S'''
+    defp indent_line(str, indentation, with \\ " ") do
       [File.read(with, indentation), str]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -371,7 +371,7 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
   #
 
   test "it should report a violation when buried in :if, :when and :fn" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -390,14 +390,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         IO.puts "x"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -409,14 +409,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a tuple" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -428,14 +428,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a list" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -447,14 +447,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a keyword list" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -466,14 +466,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a map" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -485,14 +485,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for ++ in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -504,14 +504,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for this" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         if File.empty?(configs) do
@@ -522,14 +522,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should report a violation when buried in :for" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(w) do
         for x <- [1, 2, 3] do
@@ -539,14 +539,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -560,14 +560,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :else" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -578,14 +578,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -597,14 +597,14 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         IO.puts
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -615,7 +615,7 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->

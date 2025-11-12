@@ -27,36 +27,30 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, _, [{:unless, _, _}]}, issues, _issue_meta) do
-    {nil, issues}
+  defp walk({:@, _, [{:unless, _, _}]}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse(
-         {:unless, _meta, [{negator, meta, _arguments} | _]} = ast,
-         issues,
-         issue_meta
-       )
+  defp walk({:unless, _meta, [{negator, meta, _arguments} | _]} = ast, ctx)
        when negator in [:!, :not] do
-    issue = issue_for(issue_meta, meta[:line], negator)
-
-    {ast, issues ++ List.wrap(issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, negator))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid negated conditions in unless blocks.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

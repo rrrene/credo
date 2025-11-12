@@ -8,7 +8,7 @@ defmodule Credo.CheckTest do
   @generated_lines 1000
   test "it should determine the correct scope for long modules in reasonable time" do
     source_file =
-      """
+      ~s'''
       # some_file.ex
       defmodule AliasTest do
         def test do
@@ -20,7 +20,7 @@ defmodule Credo.CheckTest do
           Any.Thing.test()
         end
       end
-      """
+      '''
       |> to_source_file
 
     {time_in_microseconds, result} =
@@ -76,13 +76,13 @@ defmodule Credo.CheckTest do
   end
 
   test "it should use format_issue/2" do
-    """
+    ~S'''
     defmodule AliasTest do
       def test do
         Any.Thing.foobar()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(MyCustomCheck1)
     |> assert_issue(fn issue ->

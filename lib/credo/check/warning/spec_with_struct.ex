@@ -25,27 +25,28 @@ defmodule Credo.Check.Warning.SpecWithStruct do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, _, [{:spec, _, args}]}, issues, issue_meta) do
+  defp walk({:@, _, [{:spec, _, args}]}, ctx) do
     case Macro.prewalk(args, [], &find_structs/2) do
       {ast, []} ->
-        {ast, issues}
+        {ast, ctx}
 
       {ast, structs} ->
         issues =
-          Enum.reduce(structs, issues, fn {curr, meta}, acc ->
-            [issue_for(issue_meta, meta, curr) | acc]
+          Enum.reduce(structs, [], fn {curr, meta}, acc ->
+            [issue_for(ctx, meta, curr) | acc]
           end)
 
-        {ast, issues}
+        {ast, put_issue(ctx, issues)}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp find_structs({:%, meta, [{:__aliases__, _, _} = aliases | _]} = ast, acc) do
@@ -56,8 +57,8 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     {ast, acc}
   end
 
-  defp issue_for(issue_meta, meta, struct) do
-    format_issue(issue_meta,
+  defp issue_for(ctx, meta, struct) do
+    format_issue(ctx,
       message: "Struct %#{struct}{} found in `@spec`.",
       trigger: "%#{struct}{",
       line_no: meta[:line],

@@ -7,7 +7,7 @@ defmodule Credo.Code.ScopeTest do
 
   test "it should report the correct scope" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Credo.Sample do
         @test_attribute :foo
 
@@ -35,7 +35,7 @@ defmodule Credo.Code.ScopeTest do
           :ok
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 1)
@@ -53,7 +53,7 @@ defmodule Credo.Code.ScopeTest do
 
   test "it should report the correct scope even if the file does not start with defmodule" do
     {:ok, ast} =
-      """
+      ~S'''
       if some_compile_time_check do
         defmodule Credo.Sample do
           @test_attribute :foo
@@ -79,7 +79,7 @@ defmodule Credo.Code.ScopeTest do
           end
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 2)
@@ -96,7 +96,7 @@ defmodule Credo.Code.ScopeTest do
   @tag :to_be_implemented
   test "it should report the correct scope (pedanticly)" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Credo.Sample do
         @test_attribute :foo
 
@@ -120,7 +120,7 @@ defmodule Credo.Code.ScopeTest do
           :ok
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:defmodule, "Credo.Sample"} == Scope.name(ast, line: 1)
@@ -156,13 +156,13 @@ defmodule Credo.Code.ScopeTest do
 
   test "it should report the correct scope even outside of modules" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule Bar do
       end
 
       require Foo
       IO.puts Foo.message
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:defmodule, "Bar"} == Scope.name(ast, line: 1)
@@ -171,9 +171,9 @@ defmodule Credo.Code.ScopeTest do
 
   test "it should report the correct scope even outside of modules 2" do
     {:ok, ast} =
-      """
+      ~S'''
       [my_app: [key: :value]]
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {nil, ""} == Scope.name(ast, line: 1)
@@ -187,7 +187,7 @@ defmodule Credo.Code.ScopeTest do
 
   test "it should give a list of scope names" do
     {:ok, ast} =
-      """
+      ~S'''
       # some_file.ex
       defmodule AliasTest do
         def test do
@@ -211,7 +211,7 @@ defmodule Credo.Code.ScopeTest do
           Any.Thing.test()
         end
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:def, "AliasTest.test"} == Scope.name(ast, line: 21)

@@ -5,7 +5,7 @@ defmodule Credo.Check.Design.TagHelperTest do
 
   test "it should NOT report expected code" do
     tags =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use ExUnit.Case
 
@@ -13,7 +13,7 @@ defmodule Credo.Check.Design.TagHelperTest do
           assert x == x + 2
         end
       end
-      """
+      '''
       |> to_source_file
       |> TagHelper.tags(:TODO, true)
 
@@ -22,7 +22,7 @@ defmodule Credo.Check.Design.TagHelperTest do
 
   test "it should return a tag with colon" do
     tags =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use ExUnit.Case
 
@@ -30,7 +30,7 @@ defmodule Credo.Check.Design.TagHelperTest do
           assert x == x + 2
         end
       end
-      """
+      '''
       |> to_source_file
       |> TagHelper.tags(:TODO, true)
 
@@ -47,7 +47,7 @@ defmodule Credo.Check.Design.TagHelperTest do
 
   test "it should return a tag without colon" do
     tags =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use ExUnit.Case
 
@@ -55,7 +55,7 @@ defmodule Credo.Check.Design.TagHelperTest do
           assert x == x + 2
         end
       end
-      """
+      '''
       |> to_source_file
       |> TagHelper.tags(:TODO, true)
 
@@ -72,7 +72,7 @@ defmodule Credo.Check.Design.TagHelperTest do
 
   test "it should report a violation when lower case" do
     tags =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use ExUnit.Case
 
@@ -81,7 +81,7 @@ defmodule Credo.Check.Design.TagHelperTest do
           assert x == x + 2
         end
       end
-      """
+      '''
       |> to_source_file
       |> TagHelper.tags(:TODO, true)
 
@@ -98,12 +98,12 @@ defmodule Credo.Check.Design.TagHelperTest do
 
   test "it should report a violation for all defined operations" do
     tags =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         use ExUnit.Case # TODO: this is the first
-        @moduledoc \"\"\"
+        @moduledoc """
           this is an example # TODO: and this is no actual comment
-        \"\"\"
+        """
 
         def some_fun do # TODO this is the second
           x = ~s{also: # TODO: no comment here}
@@ -115,7 +115,7 @@ defmodule Credo.Check.Design.TagHelperTest do
           "also: # TODO: no comment here as well"
         end
       end
-      """
+      '''
       |> to_source_file
       |> TagHelper.tags(:TODO, true)
 

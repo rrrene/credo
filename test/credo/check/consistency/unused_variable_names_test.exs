@@ -9,7 +9,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should NOT report correct behaviour" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(_, %{foo: foo} = _, _) do
@@ -17,8 +17,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(list) do
@@ -26,7 +26,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -35,13 +35,13 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should NOT report correct behaviour (only one unused variable, the other a special variable)" do
     [
-      """
+      ~S'''
       defmodule UnusedVariableModule do
         defp a do
           _ = __MODULE__
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -50,18 +50,18 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should NOT report correct behaviour (only one unused variable)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(_, _, _) do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -70,7 +70,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should NOT report functions starting with `_` (only variables)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def __some_function__(var1, var2) do
@@ -83,13 +83,13 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           def bar5(x1, x2, x3), do: nil
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         def _some_other_function(var1, var2) do
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -102,15 +102,15 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes (expects anonymous)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(_, _, _) do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(list) do
@@ -118,7 +118,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -130,22 +130,22 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes with guards (expects anonymous)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(_, _, _) do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(_, x2, _x3) when is_nil(x2) do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -157,7 +157,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(name, _) do
@@ -169,8 +169,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(list) do
@@ -178,7 +178,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -190,7 +190,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes with guards (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(name, _) when is_binary(name) do
@@ -202,8 +202,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(list) do
@@ -211,7 +211,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -223,7 +223,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes in a two elem tuple match (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(x1, x2) do
@@ -232,8 +232,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(x1, x2) do
@@ -242,7 +242,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -256,7 +256,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes with a map match (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(%{a: _a, b: _b, c: _}) do
@@ -264,8 +264,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(map) do
@@ -276,7 +276,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -290,7 +290,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes with a list match (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(list) do
@@ -301,8 +301,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar([_a, _b | rest]) do
@@ -310,7 +310,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -322,7 +322,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for different naming schemes with a macro (expects meaningful)" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           defmacro __using__(_) do
@@ -332,15 +332,15 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
         def bar(_opts) do
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           defmacrop bar(_opts) do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files()
     |> run_check(@described_check)
@@ -352,7 +352,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation for naming schemes other than the forced one" do
     [
-      """
+      ~S'''
       defmodule Credo.SampleOne do
         defmodule Foo do
           def bar(name, _) when is_binary(name) do
@@ -364,8 +364,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule Credo.SampleTwo do
         defmodule Foo do
           def bar(list) do
@@ -373,7 +373,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
           end
         end
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check, force: :anonymous)
@@ -392,12 +392,12 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
 
   test "it should report a violation once" do
     [
-      """
+      ~S'''
       defmodule Foo do
         def bar(["a" <> _a] = assigns), do: :ok
         def baz(["a" <> _] = assigns), do: :ok
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)

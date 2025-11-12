@@ -44,31 +44,29 @@ defmodule Credo.Check.Readability.AliasAs do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, IssueMeta.for(source_file, params)))
-    |> Enum.reverse()
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(ast, issues, issue_meta), do: {ast, add_issue(issues, issue(ast, issue_meta))}
-
-  defp add_issue(issues, nil), do: issues
-  defp add_issue(issues, issue), do: [issue | issues]
-
-  defp issue({:alias, _, [{:__MODULE__, _, nil}, [as: {_, meta, _}]]}, issue_meta),
-    do: issue_for(issue_meta, meta[:line])
-
-  defp issue({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, issue_meta) do
-    issue_for(issue_meta, meta[:line])
+  defp walk({:alias, _, [{:__MODULE__, _, nil}, [as: {_, meta, _}]]}, ctx) do
+    {nil, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp issue(_ast, _issue_meta), do: nil
+  defp walk({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, ctx) do
+    {nil, put_issue(ctx, issue_for(ctx, meta))}
+  end
 
-  defp issue_for(issue_meta, line_no) do
+  defp walk(ast, ctx) do
+    {ast, ctx}
+  end
+
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid using the `:as` option with `alias`.",
       trigger: "as:",
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

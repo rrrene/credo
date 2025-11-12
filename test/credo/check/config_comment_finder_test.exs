@@ -6,7 +6,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
   test "it should report the correct scope" do
     source_files =
       [
-        """
+        ~S'''
         defmodule OtherModule do
           # credo:disable-for-next-line
           defmacro fooBarCool do
@@ -29,7 +29,7 @@ defmodule Credo.Check.ConfigCommentFinderTest do
           end
           # credo:disable-for-lines:-3 Credo.Check.Readability.MaxLineLength
         end
-        """
+        '''
       ]
       |> to_source_files
 
@@ -48,17 +48,17 @@ defmodule Credo.Check.ConfigCommentFinderTest do
   test "it finds config comments after sigils with heredoc delimiter" do
     source_files =
       [
-        """
+        ~S'''
         defmodule MyModule do
           def render do
-            ~F\"\"\"
-            \"\"\"
+            ~F"""
+            """
           end
 
           # credo:disable-for-next-line
           def foo, do: :ok
         end
-        """
+        '''
       ]
       |> to_source_files
 

@@ -27,31 +27,29 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
 
   alias Credo.Code.Block
 
-  @redundant_with "`with` statement is redundant."
-  @redundant_clause "Last clause in `with` is redundant."
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:with, meta, clauses_and_body} = ast, issues, issue_meta) do
+  defp walk({:with, meta, clauses_and_body} = ast, ctx) do
     case split(clauses_and_body) do
       {:ok, clauses, body} ->
-        case issue_for({clauses, body}, meta, issue_meta) do
-          nil -> {ast, issues}
-          issue -> {ast, [issue | issues]}
+        case issue_for({clauses, body}, meta, ctx) do
+          nil -> {ast, ctx}
+          issue -> {ast, put_issue(ctx, issue)}
         end
 
       :error ->
-        {ast, issues}
+        {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp split(clauses_and_body) do
@@ -65,14 +63,18 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
     end
   end
 
-  defp issue_for({clauses, body}, meta, issue_meta) do
+  defp issue_for({clauses, body}, meta, ctx) do
     case {redundant?(List.last(clauses), body), length(clauses)} do
       {true, 1} ->
-        format_issue(issue_meta, message: @redundant_with, line_no: meta[:line], trigger: "with")
+        format_issue(ctx,
+          message: "`with` statement is redundant.",
+          line_no: meta[:line],
+          trigger: "with"
+        )
 
       {true, _length} ->
-        format_issue(issue_meta,
-          message: @redundant_clause,
+        format_issue(ctx,
+          message: "Last clause in `with` is redundant.",
           line_no: meta[:line],
           trigger: "with"
         )

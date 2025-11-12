@@ -39,56 +39,60 @@ defmodule Credo.Check.Readability.SinglePipe do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    allow_0_arity_functions = Params.get(params, :allow_0_arity_functions, __MODULE__)
-
-    {_continue, issues} =
-      Credo.Code.prewalk(
-        source_file,
-        &traverse(&1, &2, issue_meta, allow_0_arity_functions),
-        {true, []}
-      )
-
-    issues
+    ctx = Context.build(source_file, params, __MODULE__, %{continue: true})
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:|>, _, [{:|>, _, _} | _]} = ast, {_, issues}, _, _) do
-    {ast, {false, issues}}
+  defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+    {ast, %{ctx | continue: false}}
   end
 
-  defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta, false) do
+  defp walk(
+         {:|>, meta, _} = ast,
+         %{continue: true, params: %{allow_0_arity_functions: false}} = ctx
+       ) do
     {
       ast,
-      {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
+      put_issue(%{ctx | continue: false}, issue_for(ctx, meta))
     }
   end
 
-  defp traverse({:|>, _, [{{:., _, _}, _, []}, _]} = ast, {true, issues}, _, true) do
-    {ast, {false, issues}}
+  defp walk(
+         {:|>, _, [{{:., _, _}, _, []}, _]} = ast,
+         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+       ) do
+    {ast, %{ctx | continue: false}}
   end
 
-  defp traverse({:|>, _, [{fun, _, []}, _]} = ast, {true, issues}, _, true) when is_atom(fun) do
-    {ast, {false, issues}}
+  defp walk(
+         {:|>, _, [{fun, _, []}, _]} = ast,
+         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+       )
+       when is_atom(fun) do
+    {ast, %{ctx | continue: false}}
   end
 
-  defp traverse({:|>, meta, _} = ast, {true, issues}, issue_meta, true) do
+  defp walk(
+         {:|>, meta, _} = ast,
+         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+       ) do
     {
       ast,
-      {false, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
+      put_issue(%{ctx | continue: false}, issue_for(ctx, meta))
     }
   end
 
-  defp traverse(ast, {_, issues}, _issue_meta, _allow_functions) do
-    {ast, {true, issues}}
+  defp walk(ast, ctx) do
+    {ast, %{ctx | continue: true}}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Use a function call when a pipeline is only one function long.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "|>",
+      line_no: meta[:line]
     )
   end
 end

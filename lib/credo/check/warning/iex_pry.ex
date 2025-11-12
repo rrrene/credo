@@ -12,42 +12,29 @@ defmodule Credo.Check.Warning.IExPry do
       """
     ]
 
-  @call_string "IEx.pry"
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {
-           {:., _, [{:__aliases__, meta, [:IEx]}, :pry]},
-           _,
-           _arguments
-         } = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+  defp walk({{:., _, [{:__aliases__, meta, [:IEx]}, :pry]}, _, _arguments} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issues_for_call(meta, issues, issue_meta) do
-    new_issue =
-      format_issue(
-        issue_meta,
-        message: "There should be no calls to `IEx.pry/0`.",
-        trigger: @call_string,
-        line_no: meta[:line],
-        column: meta[:column]
-      )
-
-    [new_issue | issues]
+  defp issue_for(ctx, meta) do
+    format_issue(
+      ctx,
+      message: "There should be no calls to `IEx.pry/0`.",
+      trigger: "IEx.pry",
+      line_no: meta[:line],
+      column: meta[:column]
+    )
   end
 end

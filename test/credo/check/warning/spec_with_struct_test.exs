@@ -3,19 +3,19 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   @described_check Credo.Check.Warning.SpecWithStruct
 
-  @my_struct_module """
+  @my_struct_module ~S'''
   defmodule MyApp.MyStruct do
     @type t :: %__MODULE__{id: integer, name: String.t()}
     defstruct [:id, :name]
   end
-  """
+  '''
 
-  @a_struct_module """
+  @a_struct_module ~S'''
   defmodule AStruct do
     @type t :: %__MODULE__{a: any}
     defstruct [:a]
   end
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -23,7 +23,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should NOT report an issue if t() is used in a spec" do
     [
-      """
+      ~S'''
       defmodule CorrectUsage do
         @spec f(MyApp.MyStruct.t()) :: any
         def f(_) do
@@ -35,7 +35,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
           "yay"
         end
       end
-      """,
+      ''',
       @my_struct_module,
       @a_struct_module
     ]
@@ -46,7 +46,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should NOT report an issue for functions, macros, or variables named spec" do
     [
-      """
+      ~S'''
       defmodule IgnoredFunction do
         def spec(%AStruct{}) do
           "okay"
@@ -56,21 +56,21 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
           arg
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule IgnoredMacro do
         defmacro spec(arg) do
           arg
         end
       end
-      """,
-      """
+      ''',
+      ~S'''
       defmodule IgnoredVariable do
         def spec(id) do
           spec = %AStruct{id: id}
         end
       end
-      """,
+      ''',
       @a_struct_module
     ]
     |> to_source_files()
@@ -84,14 +84,14 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report an issue if a struct is used as a parameter in a spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         @spec f(any, %MyApp.MyStruct{}, any) :: any
         def f(_, _, _) do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module
     ]
     |> to_source_files()
@@ -105,14 +105,14 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report an issue if a struct is used as a return value in a spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         @spec f() :: %AStruct{}
         def f do
           "oops"
         end
       end
-      """,
+      ''',
       @a_struct_module
     ]
     |> to_source_files()
@@ -126,7 +126,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report an issue if a struct is part of a union in a spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         alias MyApp.MyStruct, as: MS
         @spec f(String.t() | %MS{} | integer) :: any
@@ -134,7 +134,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module
     ]
     |> to_source_files()
@@ -147,7 +147,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report an issue if a struct is used as an argument in a spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         alias MyApp.MyStruct
         @spec f(arg) :: any when arg: %MyStruct{}
@@ -155,7 +155,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module
     ]
     |> to_source_files()
@@ -168,14 +168,14 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report an issue if a struct has an argument name in a spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         @spec f(my_struct :: %MyApp.MyStruct{}) :: any
         def f(_) do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module
     ]
     |> to_source_files()
@@ -188,7 +188,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report multiple issues in separate specs" do
     [
-      """
+      ~S'''
       defmodule Offender do
         @spec f(my_struct :: %MyApp.MyStruct{}) :: any
         def f(_) do
@@ -200,7 +200,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module,
       @a_struct_module
     ]
@@ -211,14 +211,14 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
 
   test "it should report multiple issues in a single spec" do
     [
-      """
+      ~S'''
       defmodule Offender do
         @spec f(a_struct :: %AStruct{}, my_struct :: %MyApp.MyStruct{}) :: any
         def f(_, _) do
           "oops"
         end
       end
-      """,
+      ''',
       @my_struct_module,
       @a_struct_module
     ]

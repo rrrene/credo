@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -23,14 +23,14 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -40,7 +40,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -51,7 +51,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
   #
 
   test "it should report a violation when raise appears inside of a rescue block" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -65,7 +65,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -76,7 +76,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
   end
 
   test "it should report a violation when raise appears inside of a rescue block for an implicit try" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -88,7 +88,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
           raise e
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -99,7 +99,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
   end
 
   test "it should report a violation when raise appears inside of an expression in rescue" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -111,7 +111,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
@@ -122,7 +122,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
   end
 
   test "it should report multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -150,7 +150,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
           end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues(fn issues -> assert Enum.count(issues) == 4 end)

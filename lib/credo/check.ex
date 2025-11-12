@@ -349,6 +349,7 @@ defmodule Credo.Check do
       @use_deprecated_run_on_all? false
 
       alias Credo.Check
+      alias Credo.Check.Context
       alias Credo.Check.Params
       alias Credo.CLI.ExitStatus
       alias Credo.CLI.Output.UI
@@ -359,6 +360,8 @@ defmodule Credo.Check do
       alias Credo.Priority
       alias Credo.Severity
       alias Credo.SourceFile
+
+      import Credo.Check.Context, except: [build: 4]
 
       unquote(def_base_priority)
       unquote(def_category)
