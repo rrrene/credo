@@ -37,37 +37,33 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, _, [{:unless, _, _}]}, issues, _issue_meta) do
-    {nil, issues}
+  defp walk({:@, _, [{:unless, _, _}]}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse({:unless, meta, _arguments} = ast, issues, issue_meta) do
-    new_issue = issue_for_else_block(Credo.Code.Block.else_block_for!(ast), meta, issue_meta)
-
-    {ast, issues ++ List.wrap(new_issue)}
+  defp walk({:unless, meta, _arguments} = ast, ctx) do
+    if Credo.Code.Block.else_block?(ast) do
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
+    else
+      {ast, ctx}
+    end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for_else_block(nil, _meta, _issue_meta), do: nil
-
-  defp issue_for_else_block(_else_block, meta, issue_meta) do
-    issue_for(issue_meta, meta[:line], "unless")
-  end
-
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Unless conditions should avoid having an `else` block.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "unless",
+      line_no: meta[:line]
     )
   end
 end

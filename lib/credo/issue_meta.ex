@@ -17,17 +17,14 @@ defmodule Credo.IssueMeta do
   @doc "Returns the source file for the given `issue_meta`."
   def source_file(issue_meta)
 
-  def source_file({__MODULE__, source_file, _params}) do
-    source_file
-  end
-
-  def source_file(%SourceFile{} = source_file) do
-    source_file
-  end
+  def source_file(%{source_file: source_file, params: _}), do: source_file
+  def source_file({__MODULE__, source_file, _params}), do: source_file
+  def source_file(%SourceFile{} = source_file), do: source_file
 
   @doc "Returns the check params for the given `issue_meta`."
   def params(issue_meta)
 
+  def params(%{source_file: _, params: check_params}), do: check_params
   def params({__MODULE__, _source_file, check_params}), do: check_params
   def params(%SourceFile{}), do: []
 end

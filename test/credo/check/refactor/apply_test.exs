@@ -173,6 +173,20 @@ defmodule Credo.Check.Refactor.ApplyTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation for apply/2 when defining local apply/2" do
+    ~S'''
+    defmodule Test do
+      @spec apply(fun, [any]) :: any
+      def apply(fun, args) do
+        :erlang.apply(fun, args)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

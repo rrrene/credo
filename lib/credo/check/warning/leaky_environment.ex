@@ -22,28 +22,28 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({{:., meta, call}, _, args} = ast, issues, issue_meta) do
+  defp walk({{:., meta, call}, _, args} = ast, ctx) do
     case get_forbidden_call(call, args) do
       nil ->
-        {ast, issues}
+        {ast, ctx}
 
       {trigger, meta} ->
-        {ast, [issue_for(issue_meta, meta, trigger) | issues]}
+        {ast, put_issue(ctx, issue_for(ctx, meta, trigger))}
 
       "" <> trigger ->
         [module, _function] = call
 
-        {ast, [issue_for(issue_meta, meta, trigger, module) | issues]}
+        {ast, put_issue(ctx, issue_for(ctx, meta, trigger, module))}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp get_forbidden_call([{:__aliases__, meta, [:System]}, :cmd], [_, _]) do
@@ -67,7 +67,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
     nil
   end
 
-  defp issue_for(issue_meta, meta, trigger, erlang_module \\ nil) do
+  defp issue_for(ctx, meta, trigger, erlang_module \\ nil) do
     column =
       if erlang_module do
         meta[:column] - String.length(":#{erlang_module}")
@@ -76,7 +76,7 @@ defmodule Credo.Check.Warning.LeakyEnvironment do
       end
 
     format_issue(
-      issue_meta,
+      ctx,
       message: "When using #{trigger}, clear or overwrite sensitive environment variables.",
       trigger: trigger,
       line_no: meta[:line],

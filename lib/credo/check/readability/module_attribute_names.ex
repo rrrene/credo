@@ -25,46 +25,35 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # ignore non-alphanumeric @ ASTs, for when you're redefining the @ macro.
-  defp traverse({:@, _meta, [{:{}, _, _}]} = ast, issues, _) do
-    {ast, issues}
+  defp walk({:@, _meta, [{:{}, _, _}]} = ast, ctx) do
+    {ast, ctx}
   end
 
-  defp traverse(
-         {:@, _meta, [{name, meta, _arguments}]} = ast,
-         issues,
-         issue_meta
-       ) do
-    case issue_for_name(issue_meta, name, meta) do
-      nil -> {ast, issues}
-      val -> {ast, issues ++ [val]}
+  defp walk({:@, meta, [{name, _, _arguments}]} = ast, ctx) when is_atom(name) do
+    if name |> to_string |> Name.snake_case?() do
+      {ast, ctx}
+    else
+      {ast, put_issue(ctx, issue_for(ctx, meta, "@#{name}"))}
     end
   end
 
-  defp traverse(ast, issues, _source_file) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for_name(issue_meta, name, meta)
-       when is_binary(name) or is_atom(name) do
-    unless name |> to_string |> Name.snake_case?() do
-      issue_for(issue_meta, meta[:line], "@#{name}")
-    end
-  end
-
-  defp issue_for_name(_, _, _), do: nil
-
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Module attribute names should be written in snake_case.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

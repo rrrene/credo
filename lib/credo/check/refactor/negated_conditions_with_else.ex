@@ -43,25 +43,23 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:if, meta, arguments} = ast, issues, issue_meta) do
+  defp walk({:if, meta, arguments} = ast, ctx) do
     negator = negated_condition(arguments)
 
     if negator && Credo.Code.Block.else_block?(ast) do
-      new_issue = issue_for(issue_meta, meta[:line], negator)
-
-      {ast, issues ++ [new_issue]}
+      {ast, put_issue(ctx, issue_for(ctx, meta, negator))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp negated_condition({:!, _, _}), do: "!"
@@ -79,12 +77,12 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
 
   defp negated_condition(_), do: nil
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid negated conditions in if-else blocks.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

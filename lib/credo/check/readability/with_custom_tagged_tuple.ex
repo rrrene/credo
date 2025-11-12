@@ -44,41 +44,35 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    source_file
-    |> find_issues()
-    |> Enum.map(&issue_for(&1, IssueMeta.for(source_file, params)))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp find_issues(source_file) do
-    {_ast, issues} = Macro.prewalk(Credo.Code.ast(source_file), MapSet.new(), &traverse/2)
-
-    Enum.sort_by(issues, &{&1.line, &1.column})
-  end
-
-  defp traverse({:with, _meta, args}, issues) do
+  defp walk({:with, _meta, args}, ctx) do
     issues =
       args
-      |> Stream.map(&tuple_tag/1)
+      |> Stream.map(&issue_or_nil(&1, ctx))
       |> Enum.reject(&is_nil/1)
-      |> Enum.into(issues)
 
-    {args, issues}
+    {args, put_issue(ctx, issues)}
   end
 
-  defp traverse(ast, state), do: {ast, state}
+  defp walk(ast, ctx), do: {ast, ctx}
 
-  defp tuple_tag({:<-, meta, [{tuple_tag, _}, {tuple_tag, _}]}) when is_atom(tuple_tag),
-    do: %{tuple_tag: tuple_tag, line: meta[:line], column: meta[:column]}
+  defp issue_or_nil({:<-, meta, [{tuple_tag, _}, {tuple_tag, _}]}, ctx) when is_atom(tuple_tag) do
+    issue_for(tuple_tag, meta, ctx)
+  end
 
-  defp tuple_tag(_), do: nil
+  defp issue_or_nil(_, _), do: nil
 
-  defp issue_for(error, issue_meta) do
+  defp issue_for(tuple_tag, meta, ctx) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
-        "Avoid using tagged tuples as placeholders in `with` (found: `#{inspect(error.tuple_tag)}`).",
-      line_no: error.line,
-      trigger: inspect(error.tuple_tag)
+        "Avoid using tagged tuples as placeholders in `with` (found: `#{inspect(tuple_tag)}`).",
+      trigger: inspect(tuple_tag),
+      line_no: meta[:line]
     )
   end
 end

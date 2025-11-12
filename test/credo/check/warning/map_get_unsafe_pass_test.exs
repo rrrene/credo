@@ -105,6 +105,25 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
   test "it should report a violation /3" do
     ~S'''
     defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        some_map = %{}
+
+        Map.get(some_map, :items)
+        |> Enum.map(fn x -> x["id"] end)
+        |> foo(:bar)
+        |> baz()
+
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation /4" do
+    ~S'''
+    defmodule CredoSampleModule do
       def some_function(a, b, c) do
 
         a
@@ -125,5 +144,22 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
       assert issue.column == 22
       assert issue.trigger == "Map.get"
     end)
+  end
+
+  test "it should report a violation with a longer pipe as start" do
+    """
+    defmodule CredoSampleModule do
+      def some_function() do
+        %{}
+        |> foo(:bar)
+        |> baz()
+        |> Map.get(:foo)
+        |> Enum.sum
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
   end
 end

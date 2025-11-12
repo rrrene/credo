@@ -37,17 +37,15 @@ defmodule Credo.Check.Refactor.WithClauses do
       """
     ]
 
-  @message_first_clause_not_pattern "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`."
-  @message_last_clause_not_pattern "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`."
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:with, meta, [_, _ | _] = clauses_and_body} = ast, issues, issue_meta)
+  defp walk({:with, meta, [_, _ | _] = clauses_and_body} = ast, ctx)
        when is_list(clauses_and_body) do
     # If clauses_and_body is a list with at least two elements in it, we think
     # this might be a call to the special form "with". To be sure of that,
@@ -59,46 +57,48 @@ defmodule Credo.Check.Refactor.WithClauses do
     {maybe_clauses, [maybe_body]} = Enum.split(clauses_and_body, -1)
 
     if Keyword.keyword?(maybe_body) and Keyword.has_key?(maybe_body, :do) do
-      {ast, issues_for_with(maybe_clauses, meta[:line], issue_meta) ++ issues}
+      {ast, put_issue(ctx, issues_for_with(maybe_clauses, meta[:line], ctx))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issues_for_with(clauses, line, issue_meta) do
-    issue_if_not_starting_with_pattern_clause(clauses, line, issue_meta) ++
-      issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta)
+  defp issues_for_with(clauses, line, ctx) do
+    issue_if_not_starting_with_pattern_clause(clauses, line, ctx) ++
+      issue_if_not_ending_with_pattern_clause(clauses, line, ctx)
   end
 
   defp issue_if_not_starting_with_pattern_clause(
          [{:<-, _meta, _args} | _rest],
          _line,
-         _issue_meta
+         _ctx
        ) do
     []
   end
 
-  defp issue_if_not_starting_with_pattern_clause(_clauses, line, issue_meta) do
+  defp issue_if_not_starting_with_pattern_clause(_clauses, line, ctx) do
     [
-      format_issue(issue_meta,
-        message: @message_first_clause_not_pattern,
-        line_no: line,
-        trigger: "with"
+      format_issue(ctx,
+        message:
+          "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`.",
+        trigger: "with",
+        line_no: line
       )
     ]
   end
 
-  defp issue_if_not_ending_with_pattern_clause(clauses, line, issue_meta) do
+  defp issue_if_not_ending_with_pattern_clause(clauses, line, ctx) do
     if length(clauses) > 1 and not match?({:<-, _, _}, Enum.at(clauses, -1)) do
       [
-        format_issue(issue_meta,
-          message: @message_last_clause_not_pattern,
-          line_no: line,
-          trigger: "with"
+        format_issue(ctx,
+          message:
+            "`with` doesn't end with a <- clause, move the non-pattern <- clauses inside the body of the `with`.",
+          trigger: "with",
+          line_no: line
         )
       ]
     else

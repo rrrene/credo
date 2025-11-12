@@ -32,14 +32,17 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   @doc false
   @impl true
   def run(source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    source_file
-    |> Credo.Code.clean_charlists_strings_and_sigils()
-    |> String.split("\n")
-    |> Enum.with_index(1)
-    |> Enum.map(&transform_line/1)
-    |> check_lines([], issue_meta)
+    result =
+      source_file
+      |> Credo.Code.clean_charlists_strings_and_sigils()
+      |> String.split("\n")
+      |> Enum.with_index(1)
+      |> Enum.map(&transform_line/1)
+      |> check_lines(ctx)
+
+    result.issues
   end
 
   defp transform_line({line, line_number}) do
@@ -53,20 +56,20 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
     end
   end
 
-  defp check_lines([{:tag_skip, line_number} | rest], issues, issue_meta) do
-    check_lines(rest, [issue_for(issue_meta, line_number) | issues], issue_meta)
+  defp check_lines([{:tag_skip, line_number} | rest], ctx) do
+    check_lines(rest, put_issue(ctx, issue_for(ctx, line_number)))
   end
 
-  defp check_lines([{:comment, _}, {:tag_skip, _} | rest], issues, issue_meta) do
-    check_lines(rest, issues, issue_meta)
+  defp check_lines([{:comment, _}, {:tag_skip, _} | rest], ctx) do
+    check_lines(rest, ctx)
   end
 
-  defp check_lines([_hd | tl], issues, issue_meta), do: check_lines(tl, issues, issue_meta)
-  defp check_lines([], issues, _issue_meta), do: issues
+  defp check_lines([_hd | tl], ctx), do: check_lines(tl, ctx)
+  defp check_lines([], ctx), do: ctx
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(ctx, line_no) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`.",
       trigger: "@tag :skip",
       line_no: line_no

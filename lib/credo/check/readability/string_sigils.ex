@@ -42,13 +42,12 @@ defmodule Credo.Check.Readability.StringSigils do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
     case remove_heredocs_and_convert_to_ast(source_file) do
       {:ok, ast} ->
-        Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
+        result = Credo.Code.prewalk(ast, &walk/2, ctx)
+        result.issues
 
       {:error, errors} ->
         IO.warn("Unexpected error while parsing #{source_file.filename}: #{inspect(errors)}")
@@ -62,37 +61,36 @@ defmodule Credo.Check.Readability.StringSigils do
     |> Credo.Code.ast()
   end
 
-  defp traverse(
+  defp walk(
          {maybe_sigil, meta, [str | rest_ast]} = ast,
-         issues,
-         issue_meta,
-         maximum_allowed_quotes
+         ctx
        ) do
     line_no = meta[:line]
 
     cond do
       sigil?(maybe_sigil) ->
-        {rest_ast, issues}
+        {rest_ast, ctx}
 
       is_binary(str) ->
+        maximum_allowed_quotes = ctx.params.maximum_allowed_quotes
+
+        issue =
+          if too_many_quotes?(str, maximum_allowed_quotes) do
+            issue_for(ctx, line_no, str, maximum_allowed_quotes)
+          end
+
         {
           rest_ast,
-          issues_for_string_literal(
-            str,
-            maximum_allowed_quotes,
-            issues,
-            issue_meta,
-            line_no
-          )
+          put_issue(ctx, issue)
         }
 
       true ->
-        {ast, issues}
+        {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp sigil?(maybe_sigil) when is_atom(maybe_sigil) do
@@ -102,20 +100,6 @@ defmodule Credo.Check.Readability.StringSigils do
   end
 
   defp sigil?(_), do: false
-
-  defp issues_for_string_literal(
-         string,
-         maximum_allowed_quotes,
-         issues,
-         issue_meta,
-         line_no
-       ) do
-    if too_many_quotes?(string, maximum_allowed_quotes) do
-      [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
-    else
-      issues
-    end
-  end
 
   defp too_many_quotes?(string, limit) do
     too_many_quotes?(string, 0, limit)
@@ -142,9 +126,9 @@ defmodule Credo.Check.Readability.StringSigils do
     false
   end
 
-  defp issue_for(issue_meta, line_no, trigger, maximum_allowed_quotes) do
+  defp issue_for(ctx, line_no, trigger, maximum_allowed_quotes) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "More than #{maximum_allowed_quotes} quotes found inside string literal, consider using a sigil instead.",
       trigger: trigger,

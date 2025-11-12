@@ -26,32 +26,32 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # [a] ++ b is OK
-  defp traverse({:++, _, [[_], _]} = ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk({:++, _, [[_], _]} = ast, ctx) do
+    {ast, ctx}
   end
 
   # a ++ [b] is not
-  defp traverse({:++, meta, [_, [_]]} = ast, issues, issue_meta) do
-    {ast, [issue_for(issue_meta, meta[:line], :++) | issues]}
+  defp walk({:++, meta, [_, [_]]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "Appending a single item to a list is inefficient, use `[head | tail]` notation (and `Enum.reverse/1` when order matters).",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "++",
+      line_no: meta[:line]
     )
   end
 end

@@ -36,34 +36,17 @@ defmodule Credo.Check.Readability.ModuleNames do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    ignored_patterns = Credo.Check.Params.get(params, :ignore, __MODULE__)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, ignored_patterns))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:defmodule, _meta, arguments} = ast, issues, issue_meta, ignored_patterns) do
-    {ast, issues_for_def(arguments, issues, issue_meta, ignored_patterns)}
-  end
+  defp walk({:defmodule, _meta, [{:__aliases__, meta, names} | _]} = ast, ctx) do
+    name =
+      names
+      |> Enum.filter(&String.Chars.impl_for/1)
+      |> Enum.join(".")
 
-  defp traverse(ast, issues, _issue_meta, _ignored_patterns) do
-    {ast, issues}
-  end
-
-  defp issues_for_def(body, issues, issue_meta, ignored_patterns) do
-    case Enum.at(body, 0) do
-      {:__aliases__, meta, names} ->
-        names
-        |> Enum.filter(&String.Chars.impl_for/1)
-        |> Enum.join(".")
-        |> issues_for_name(meta, issues, issue_meta, ignored_patterns)
-
-      _ ->
-        issues
-    end
-  end
-
-  defp issues_for_name(name, meta, issues, issue_meta, ignored_patterns) do
     module_name = Name.full(name)
 
     pascal_case? =
@@ -71,19 +54,24 @@ defmodule Credo.Check.Readability.ModuleNames do
       |> String.split(".")
       |> Enum.all?(&Name.pascal_case?/1)
 
-    if pascal_case? or ignored_module?(ignored_patterns, module_name) do
-      issues
+    if pascal_case? or ignored_module?(ctx.params.ignore, module_name) do
+      {ast, ctx}
     else
-      [issue_for(issue_meta, meta[:line], name) | issues]
+      {ast, put_issue(ctx, issue_for(ctx, meta, name))}
     end
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp walk(ast, ctx) do
+    {ast, ctx}
+  end
+
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Module names should be written in PascalCase.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 

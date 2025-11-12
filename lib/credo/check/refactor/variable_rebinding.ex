@@ -49,18 +49,18 @@ defmodule Credo.Check.Refactor.VariableRebinding do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse([do: {:__block__, _, ast}], issues, {_, _, opt} = issue_meta) do
+  defp walk([do: {:__block__, _, ast}], ctx) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
       |> List.flatten()
       |> Enum.filter(&only_variables(&1))
-      |> Enum.reject(&bang_sigil(&1, opt[:allow_bang]))
+      |> Enum.reject(&bang_sigil(&1, ctx.params.allow_bang))
 
     duplicates =
       variables
@@ -72,18 +72,18 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
     new_issues =
       Enum.map(duplicates, fn {variable_name, line} ->
-        issue_for(issue_meta, Atom.to_string(variable_name), line)
+        issue_for(ctx, variable_name, line)
       end)
 
     if length(new_issues) > 0 do
-      {ast, issues ++ new_issues}
+      {ast, put_issue(ctx, new_issues)}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp find_assignments({:=, _, [lhs, _rhs]}) do
@@ -137,15 +137,6 @@ defmodule Credo.Check.Refactor.VariableRebinding do
 
   defp find_variables(_), do: nil
 
-  defp issue_for(issue_meta, trigger, line) do
-    format_issue(
-      issue_meta,
-      message: "Variable \"#{trigger}\" was declared more than once.",
-      trigger: trigger,
-      line_no: line
-    )
-  end
-
   defp get_variable_name({name, _line}), do: name
   defp get_variable_name(nil), do: nil
 
@@ -163,5 +154,14 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       name
       |> Atom.to_string()
       |> String.ends_with?("!")
+  end
+
+  defp issue_for(ctx, trigger, line_no) do
+    format_issue(
+      ctx,
+      message: "Variable \"#{trigger}\" was declared more than once.",
+      trigger: trigger,
+      line_no: line_no
+    )
   end
 end

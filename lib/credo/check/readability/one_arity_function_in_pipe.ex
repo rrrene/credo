@@ -21,23 +21,25 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipe do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, IssueMeta.for(source_file, params)))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:|>, _, [_, {name, meta, nil}]} = ast, issues, issue_meta) when is_atom(name) do
-    {ast, [issue_for(issue_meta, meta[:line], name) | issues]}
+  defp walk({:|>, _, [_, {name, meta, nil}]} = ast, ctx) when is_atom(name) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, name))}
   end
 
-  defp traverse(ast, issues, _) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line, name) do
+  defp issue_for(ctx, meta, name) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "One arity functions should have parentheses in pipes.",
-      line_no: line,
-      trigger: name
+      trigger: name,
+      line_no: meta[:line]
     )
   end
 end

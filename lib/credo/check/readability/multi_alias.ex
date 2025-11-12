@@ -25,30 +25,28 @@ defmodule Credo.Check.Readability.MultiAlias do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {:alias, _, [{{_, _, [{alias, opts, _base_alias}, :{}]}, _, [multi_alias | _]}]} = ast,
-         issues,
-         issue_meta
+  defp walk(
+         {:alias, _,
+          [{{_, _, [{alias_op, meta, _base_alias}, :{}]}, _, [{:__aliases__, _, mod_list} | _]}]} =
+           ast,
+         ctx
        )
-       when alias in [:__aliases__, :__MODULE__] do
-    {:__aliases__, _, module} = multi_alias
-    module = Enum.join(module, ".")
+       when alias_op in [:__aliases__, :__MODULE__] do
+    module = Credo.Code.Name.full(mod_list)
 
-    new_issue = issue_for(issue_meta, Keyword.get(opts, :line), module)
-
-    {ast, [new_issue | issues]}
+    {ast, put_issue(ctx, issue_for(ctx, meta[:line], module))}
   end
 
-  defp traverse(ast, issues, _issue_meta), do: {ast, issues}
+  defp walk(ast, ctx), do: {ast, ctx}
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, line_no, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "Avoid grouping aliases in '{ ... }'; please specify one fully-qualified alias per line.",
       trigger: trigger,

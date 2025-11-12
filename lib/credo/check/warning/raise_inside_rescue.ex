@@ -40,47 +40,34 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:try, _meta, _arguments} = ast, issues, issue_meta) do
+  defp walk({:try, _meta, _arguments} = ast, ctx) do
     case Block.rescue_block_for(ast) do
-      {:ok, ast} ->
-        issues_found = Credo.Code.prewalk(ast, &find_issues(&1, &2, issue_meta))
-
-        {ast, issues ++ issues_found}
-
-      _ ->
-        {ast, issues}
+      {:ok, rescue_block} -> {ast, Credo.Code.prewalk(rescue_block, &find_issues/2, ctx)}
+      _ -> {ast, ctx}
     end
   end
 
-  defp traverse(
-         {op, _meta, [_def, [do: _do, rescue: rescue_block]]},
-         issues,
-         issue_meta
-       )
+  defp walk({op, _meta, [_def, [do: _do, rescue: rescue_block]]}, ctx)
        when op in @def_ops do
-    issues_found = Credo.Code.prewalk(rescue_block, &find_issues(&1, &2, issue_meta))
-
-    {rescue_block, issues ++ issues_found}
+    {rescue_block, Credo.Code.prewalk(rescue_block, &find_issues/2, ctx)}
   end
 
-  defp traverse(ast, issues, _issue_meta), do: {ast, issues}
+  defp walk(ast, ctx), do: {ast, ctx}
 
-  defp find_issues({:raise, meta, _arguments} = ast, issues, issue_meta) do
-    issue = issue_for(issue_meta, meta)
-
-    {ast, [issue | issues]}
+  defp find_issues({:raise, meta, _arguments} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp find_issues(ast, issues, _), do: {ast, issues}
+  defp find_issues(ast, ctx), do: {ast, ctx}
 
-  defp issue_for(issue_meta, meta) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Use `reraise` inside a rescue block to preserve the original stacktrace.",
       trigger: "raise",
       line_no: meta[:line],

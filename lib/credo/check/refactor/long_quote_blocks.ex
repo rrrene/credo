@@ -72,34 +72,29 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
       ]
     ]
 
-  alias Credo.IssueMeta
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    max_line_count = Params.get(params, :max_line_count, __MODULE__)
-    ignore_comments = Params.get(params, :ignore_comments, __MODULE__)
-
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, max_line_count, ignore_comments)
-    )
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
+  defp walk(
          {:quote, meta, arguments} = ast,
-         issues,
-         issue_meta,
-         max_line_count,
-         ignore_comments
+         %{
+           params: %{
+             max_line_count: max_line_count,
+             ignore_comments: ignore_comments
+           }
+         } = ctx
        ) do
     max_line_no = Credo.Code.prewalk(arguments, &find_max_line_no(&1, &2), 0)
     line_count = max_line_no - meta[:line]
 
     issue =
       if line_count > max_line_count do
-        source_file = IssueMeta.source_file(issue_meta)
+        source_file = ctx.source_file
 
         lines =
           source_file
@@ -116,15 +111,15 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
           end
 
         if Enum.count(lines) > max_line_count do
-          issue_for(issue_meta, meta[:line])
+          issue_for(ctx, meta)
         end
       end
 
-    {ast, issues ++ List.wrap(issue)}
+    {ast, put_issue(ctx, issue)}
   end
 
-  defp traverse(ast, issues, _issue_meta, _max_line_count, _ignore_comments) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp find_max_line_no({_, meta, _} = ast, max_line_no) do
@@ -141,12 +136,12 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
     {ast, max_line_no}
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid long quote blocks.",
       trigger: "quote",
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

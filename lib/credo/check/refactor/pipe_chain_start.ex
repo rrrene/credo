@@ -52,50 +52,33 @@ defmodule Credo.Check.Refactor.PipeChainStart do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    excluded_functions = Params.get(params, :excluded_functions, __MODULE__)
-
-    excluded_argument_types = Params.get(params, :excluded_argument_types, __MODULE__)
-
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, excluded_functions, excluded_argument_types)
-    )
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {:|>, _, [{:|>, _, _} | _]} = ast,
-         issues,
-         _issue_meta,
-         _excluded_functions,
-         _excluded_argument_types
-       ) do
-    {ast, issues}
+  defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+    {ast, ctx}
   end
 
-  defp traverse(
+  defp walk(
          {:|>, meta, [lhs | _rhs]} = ast,
-         issues,
-         issue_meta,
-         excluded_functions,
-         excluded_argument_types
+         %{
+           params: %{
+             excluded_functions: excluded_functions,
+             excluded_argument_types: excluded_argument_types
+           }
+         } = ctx
        ) do
     if valid_chain_start?(lhs, excluded_functions, excluded_argument_types) do
-      {ast, issues}
+      {ast, ctx}
     else
-      {ast, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
     end
   end
 
-  defp traverse(
-         ast,
-         issues,
-         _issue_meta,
-         _excluded_functions,
-         _excluded_argument_types
-       ) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp valid_chain_start?(
@@ -312,12 +295,12 @@ defmodule Credo.Check.Refactor.PipeChainStart do
 
   defp argument_type(v), do: [:credo_type_error, v]
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Pipe chain should start with a raw value.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "|>",
+      line_no: meta[:line]
     )
   end
 end
