@@ -333,12 +333,125 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
       """
       |> Code.string_to_quoted()
 
-    # Elixir <= 1.5.x
-    expected = "E9FD5824275A94E20A327BCB1253F6DEA816ECD20AC4A58F2184345F3D422532"
+    expected = "6717D763C5F93296274CAD8867D61690CD4F0E9D64D2217FC4C20540C2826CF4"
 
-    # Elixir >= 1.6.0
-    expected_160 = "100B2E81FB13BEEFDC7E514AC56F10385340A7DC6535144A0FBC8EB74C37AEEB"
+    assert expected == DuplicatedCode.to_hash(ast)
+  end
 
-    assert expected == DuplicatedCode.to_hash(ast) or expected_160 == DuplicatedCode.to_hash(ast)
+  test "returns correct hash and mass /2" do
+    {:ok, ast} =
+      """
+      test "returns {:ok, result} when reply and :DOWN in message queue" do
+        task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
+        send(self(), {task.ref, :result})
+        send(self(), {:DOWN, task.ref, :process, self(), :abnormal})
+        assert Task.yield_many([task], 0) == [{task, {:ok, :result}}]
+        refute_received {:DOWN, _, _, _, _}
+      end
+      """
+      |> Code.string_to_quoted()
+
+    ast_expected =
+      {:test, [line: 1],
+       [
+         "returns {:ok, result} when reply and :DOWN in message queue",
+         [
+           do:
+             {:__block__, [],
+              [
+                {:=, [line: 2],
+                 [
+                   {:task, [line: 2], nil},
+                   {:%, [line: 2],
+                    [
+                      {:__aliases__, [line: 2], [:Task]},
+                      {:%{}, [line: 2],
+                       [
+                         ref: {:make_ref, [line: 2], []},
+                         owner: {:self, [line: 2], []},
+                         pid: nil,
+                         mfa: {:{}, [line: 2], [{:__MODULE__, [line: 2], nil}, :test, 1]}
+                       ]}
+                    ]}
+                 ]},
+                {:send, [line: 3],
+                 [
+                   {:self, [line: 3], []},
+                   {{{:., [line: 3], [{:task, [line: 3], nil}, :ref]}, [no_parens: true, line: 3],
+                     []}, :result}
+                 ]},
+                {:send, [line: 4],
+                 [
+                   {:self, [line: 4], []},
+                   {:{}, [line: 4],
+                    [
+                      :DOWN,
+                      {{:., [line: 4], [{:task, [line: 4], nil}, :ref]},
+                       [no_parens: true, line: 4], []},
+                      :process,
+                      {:self, [line: 4], []},
+                      :abnormal
+                    ]}
+                 ]},
+                {:assert, [line: 5],
+                 [
+                   {:==, [line: 5],
+                    [
+                      {{:., [line: 5], [{:__aliases__, [line: 5], [:Task]}, :yield_many]},
+                       [line: 5], [[{:task, [line: 5], nil}], 0]},
+                      [{{:task, [line: 5], nil}, {:ok, :result}}]
+                    ]}
+                 ]},
+                {:refute_received, [line: 6],
+                 [
+                   {:{}, [line: 6],
+                    [
+                      :DOWN,
+                      {:_, [line: 6], nil},
+                      {:_, [line: 6], nil},
+                      {:_, [line: 6], nil},
+                      {:_, [line: 6], nil}
+                    ]}
+                 ]}
+              ]}
+         ]
+       ]}
+
+    assert ast_expected == ast
+
+    expected =
+      "8A00FB049ABAAC6444CDAD783246B6C715BD994FF9B59F1546BC009EE0F93469"
+
+    assert expected == DuplicatedCode.to_hash(ast)
+  end
+
+  test "returns different hashes for different code snippets" do
+    {:ok, ast} =
+      """
+      test "returns {:ok, result} when reply and :DOWN in message queue" do
+        task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
+        send(self(), {task.ref, :result})
+        send(self(), {:DOWN, task.ref, :process, self(), :abnormal})
+        assert Task.yield_many([task], 0) == [{task, {:ok, :result}}]
+        refute_received {:DOWN, _, _, _, _}
+      end
+      """
+      |> Code.string_to_quoted()
+
+    # uses `Task.yield` instead of `Task.yield_many`
+    {:ok, ast2} =
+      """
+      test "returns {:ok, result} when reply and :DOWN in message queue" do
+        task = %Task{ref: make_ref(), owner: self(), pid: nil, mfa: {__MODULE__, :test, 1}}
+        send(self(), {task.ref, :result})
+        send(self(), {:DOWN, task.ref, :process, self(), :abnormal})
+        assert Task.yield(task, 0) == {:ok, :result}
+        refute_received {:DOWN, _, _, _, _}
+      end
+      """
+      |> Code.string_to_quoted()
+
+    assert ast != ast2
+    assert DuplicatedCode.to_hash(ast) != DuplicatedCode.to_hash(ast2)
   end
 end

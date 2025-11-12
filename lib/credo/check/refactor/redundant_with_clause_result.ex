@@ -27,8 +27,6 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
 
   alias Credo.Code.Block
 
-  require Logger
-
   @redundant_with "`with` statement is redundant."
   @redundant_clause "Last clause in `with` is redundant."
 
