@@ -49,4 +49,29 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
   #
   # cases raising issues
   #
+
+  if Version.match?(System.version(), "< 1.7.0-dev") do
+    #
+
+    test "it should report cases where a quoted atom is used and could be unquoted" do
+      """
+      :"quoted_atom"
+      """
+      |> to_source_file
+      |> run_check(@described_check)
+      |> assert_issue(fn issue ->
+        assert issue.trigger == ~s(:"quoted_atom")
+      end)
+    end
+
+    test "it should report cases where a quoted keyword identifier is used and could be unquoted" do
+      """
+      ["quoted_atom": 1]
+      %{"quoted_atom": 1}
+      """
+      |> to_source_file
+      |> run_check(@described_check)
+      |> assert_issues()
+    end
+  end
 end
