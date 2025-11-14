@@ -46,7 +46,7 @@ defmodule Credo.Check.Readability.OnePipePerLine do
 
   defp walk({:|>, meta, [{:|>, meta2, _} | _]} = ast, ctx) do
     if meta[:line] == meta2[:line] do
-      {ast, push(ctx, :issue_candidates, meta)}
+      {ast, push(ctx, :issue_candidates, meta[:line])}
     else
       {ast, ctx}
     end
@@ -56,12 +56,12 @@ defmodule Credo.Check.Readability.OnePipePerLine do
     {ast, ctx}
   end
 
-  defp issue_for(ctx, meta) do
+  defp issue_for(ctx, line_no) do
     format_issue(
       ctx,
       message: "Avoid using multiple pipes (`|>`) on the same line.",
       trigger: "|>",
-      line_no: meta[:line]
+      line_no: line_no
     )
   end
 end

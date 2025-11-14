@@ -58,6 +58,26 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issues()
+    |> assert_issues(fn issues ->
+      assert 2 == length(issues)
+    end)
+  end
+
+  test "it should report multiple violations when having multiples pipes /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        assert map == ast |> Macro.postwalk([], &{&1, [&1 | &2]}) |> elem(1) |> Enum.reverse()
+        {var |> Atom.to_string() |> string() |> color_doc(:variable, state.inspect_opts), state}
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
+      assert 2 == length(issues)
+    end)
   end
 end
