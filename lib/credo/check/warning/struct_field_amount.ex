@@ -30,9 +30,11 @@ defmodule Credo.Check.Warning.StructFieldAmount do
     result.issues
   end
 
-  defp walk({:defstruct, meta, [fields]} = ast, ctx) do
-    if length(fields) > ctx.params.max_fields do
-      {ast, put_issue(ctx, issue_for(ctx, meta))}
+  defp walk({:defstruct, meta, [fields]} = ast, ctx) when is_list(fields) do
+    count = length(fields)
+
+    if count > ctx.params.max_fields do
+      {ast, put_issue(ctx, issue_for(ctx, meta, count))}
     else
       {ast, ctx}
     end
@@ -42,9 +44,9 @@ defmodule Credo.Check.Warning.StructFieldAmount do
     {ast, ctx}
   end
 
-  defp issue_for(ctx, meta) do
+  defp issue_for(ctx, meta, count) do
     format_issue(ctx,
-      message: "Struct has more than #{ctx.params.max_fields} fields.",
+      message: "Struct has more than #{ctx.params.max_fields} fields (#{count} found).",
       trigger: "defstruct",
       line_no: meta[:line],
       column: meta[:column]
