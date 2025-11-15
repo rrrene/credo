@@ -438,6 +438,74 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     |> assert_issue()
   end
 
+  test "it should report when checking if length is greater or equal to 1" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(some_list) do
+        if length(some_list) >= 1 do
+          "not empty"
+        else
+          "empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report when checking if length is greater or equal to 1 backwards" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(some_list) do
+        if 1 <= length(some_list) do
+          "not empty"
+        else
+          "empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report when checking if Enum.count is greater or equal to 1" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(some_list) do
+        if Enum.count(some_list) >= 1 do
+          "not empty"
+        else
+          "empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report when checking if Enum.count is greater or equal to 1 backwards" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(some_list) do
+        if 1 <= Enum.count(some_list) do
+          "not empty"
+        else
+          "empty"
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
   test "it should report when multiple issues (see #1184)" do
     """
     defmodule Test do
