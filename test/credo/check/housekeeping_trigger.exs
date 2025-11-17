@@ -32,6 +32,13 @@ defmodule Credo.Check.HousekeepingTriggerTest do
                           {ast, acc}
                       end)
 
+                    {:%{}, _, keywords}, acc ->
+                      if Keyword.has_key?(keywords, :trigger) do
+                        {nil, [{:ok, filename}] ++ acc}
+                      else
+                        {nil, acc}
+                      end
+
                     ast, acc ->
                       {ast, acc}
                   end)
