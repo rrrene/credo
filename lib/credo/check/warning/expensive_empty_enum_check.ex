@@ -40,17 +40,43 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
                             }
   @length_pattern quote do: {:length, _, [_]}
   @comparisons [
-    {@enum_count_pattern, 0, "Enum.count"},
-    {0, @enum_count_pattern, "Enum.count"},
-    {@length_pattern, 0, "length"},
-    {0, @length_pattern, "length"}
+    {@enum_count_pattern, "Enum.count"},
+    {@length_pattern, "length"}
   ]
-  @operators [:==, :!=, :===, :!==, :>, :<]
+  @eq_operators [:==, :!=, :===, :!==, :>, :<]
 
-  for {lhs, rhs, trigger} <- @comparisons,
-      operator <- @operators do
+  # Comparisons against 0
+  for {pattern, trigger} <- @comparisons,
+      operator <- @eq_operators do
     defp traverse(
-           {unquote(operator), _meta, [unquote(lhs), unquote(rhs)]} = ast,
+           {unquote(operator), _meta, [unquote(pattern), 0]} = ast,
+           issues,
+           issue_meta
+         ) do
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
+    end
+
+    defp traverse(
+           {unquote(operator), _meta, [0, unquote(pattern)]} = ast,
+           issues,
+           issue_meta
+         ) do
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
+    end
+  end
+
+  # Comparisons against 1
+  for {pattern, trigger} <- @comparisons do
+    defp traverse(
+           {:>=, _meta, [unquote(pattern), 1]} = ast,
+           issues,
+           issue_meta
+         ) do
+      {ast, issues_for_call(unquote(trigger), issues, issue_meta, ast)}
+    end
+
+    defp traverse(
+           {:<=, _meta, [1, unquote(pattern)]} = ast,
            issues,
            issue_meta
          ) do
@@ -67,13 +93,13 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     [issue_for(issue_meta, meta, trigger, suggest(ast)) | issues]
   end
 
-  defp suggest({_op, _, [0, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
-  defp suggest({_op, _, [{_pattern, _, args}, 0]}), do: suggest_for_arity(Enum.count(args))
+  defp suggest({_op, _, [_, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
+  defp suggest({_op, _, [{_pattern, _, args}, _]}), do: suggest_for_arity(Enum.count(args))
 
-  defp get_meta({_op, _, [0, {{:., _, [{:__aliases__, meta, _}, _]}, _, _}]}), do: meta
-  defp get_meta({_op, _, [0, {_, meta, _}]}), do: meta
-  defp get_meta({_op, _, [{{:., _, [{:__aliases__, meta, _}, _]}, _, _}, 0]}), do: meta
-  defp get_meta({_op, _, [{_, meta, _}, 0]}), do: meta
+  defp get_meta({_op, _, [_, {{:., _, [{:__aliases__, meta, _}, _]}, _, _}]}), do: meta
+  defp get_meta({_op, _, [_, {_, meta, _}]}), do: meta
+  defp get_meta({_op, _, [{{:., _, [{:__aliases__, meta, _}, _]}, _, _}, _]}), do: meta
+  defp get_meta({_op, _, [{_, meta, _}, _]}), do: meta
 
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
   defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"
