@@ -176,7 +176,7 @@ defmodule Credo.Mixfile do
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:inch_ex, path: "../../inch_ex", only: [:dev, :test], runtime: false},
+      {:inch_ex, "~> 2.1", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
