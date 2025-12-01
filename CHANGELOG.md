@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.14
+
+- Fixed regression for `DuplicatedCode`
+- Expanded `Credo.Check.Warning.ExpensiveEmptyEnumCheck` to cover less obvious cases
+- New Check: `Credo.Check.Warning.StructFieldAmount`
+
 ## 1.7.13
 
 - Fix compatibility & compiler warnings with Elixir 1.19
