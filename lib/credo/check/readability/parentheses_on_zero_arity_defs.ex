@@ -47,7 +47,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefs do
       {ast, ctx}
     end
 
-    defp walk({unquote(op), _, [{_, _, args} | _]} = ast, ctx) when length(args) > 0 do
+    defp walk({unquote(op), _, [{_, _, [_at_least_one_arg | _rest]} | _]} = ast, ctx) do
       {ast, ctx}
     end
 

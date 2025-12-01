@@ -75,11 +75,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
         issue_for(ctx, variable_name, line)
       end)
 
-    if length(new_issues) > 0 do
-      {ast, put_issue(ctx, new_issues)}
-    else
-      {ast, ctx}
-    end
+    {ast, put_issue(ctx, new_issues)}
   end
 
   defp walk(ast, ctx) do
