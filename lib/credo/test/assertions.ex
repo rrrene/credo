@@ -45,7 +45,7 @@ defmodule Credo.Test.Assertions do
   end
 
   def to_inspected(value) when is_list(value) do
-    value |> Enum.map(&to_inspected/1) |> Enum.join("\n")
+    Enum.map_join(value, "\n", &to_inspected/1)
   end
 
   def to_inspected(%Credo.Issue{} = issue) do
