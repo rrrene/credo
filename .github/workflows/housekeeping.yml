@@ -19,7 +19,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.3
+          elixir-version: 1.19.4
       - run: mix deps.get
       - run: mix compile
       - run: ./test/check_formatted.sh
@@ -34,7 +34,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.3
+          elixir-version: 1.19.4
       - run: mix deps.get
       - run: mix test test/credo/check/housekeeping_trigger.exs
 
@@ -48,7 +48,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.3
+          elixir-version: 1.19.4
       - run: mix deps.get
       - run: mix test test/credo/check/housekeeping_params.exs
 
@@ -62,7 +62,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.3
+          elixir-version: 1.19.4
       - run: mix deps.get
       - run: ASSERT_TRIGGERS=1 mix test
 
@@ -76,6 +76,6 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 27.3
-          elixir-version: 1.19.3
+          elixir-version: 1.19.4
       - run: mix deps.get
       - run: mix deps.compile 2>&1 | ./test/error_if_warnings.sh
