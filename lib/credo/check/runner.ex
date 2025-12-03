@@ -38,12 +38,13 @@ defmodule Credo.Check.Runner do
   defp do_run_check(exec, {check, params}) do
     rerun_files_that_changed = Params.get_rerun_files_that_changed(params)
 
-    files_included = Params.files_included(params, check)
+    known_files = exec |> Execution.get_source_files() |> Enum.map(& &1.filename)
+    files_included = Params.files_included(params, check, known_files)
     files_excluded = Params.files_excluded(params, check)
 
     found_relevant_files =
       cond do
-        files_included == [] and files_excluded == [] ->
+        files_included == known_files and files_excluded == [] ->
           []
 
         exec.read_from_stdin ->
@@ -52,7 +53,7 @@ defmodule Credo.Check.Runner do
           [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
 
           file_included? =
-            if files_included != [] do
+            if files_included != known_files do
               Credo.Sources.filename_matches?(filename, files_included)
             else
               true
