@@ -28,7 +28,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__) |> Map.put(:handled_guards, MapSet.new())
+    ctx = Context.build(source_file, params, __MODULE__)
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
     result.issues
   end
@@ -50,7 +50,10 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
   # Handles cases like `when is_list(enum) and not is_map(enum) and length(enum) == 0`
   defp walk({:when, _meta, [_, guard_expr]} = ast, ctx) do
-    {ast, find_length_comparisons_in_guard(guard_expr, ctx)}
+    case find_in_guard(guard_expr, ctx) do
+      [] -> {ast, ctx}
+      issues -> {nil, Enum.reduce(issues, ctx, fn issue, ctx -> put_issue(ctx, issue) end)}
+    end
   end
 
   for {pattern, trigger} <- @comparisons do
@@ -88,39 +91,25 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
             # >= 1 is equivalent to != 0
             {:>=, @length_pattern, 1}
           ] do
-    defp find_length_comparisons_in_guard(
-           {unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]},
-           ctx
-         ) do
-      mark_guard_issue(ctx, comp_meta)
+    defp find_in_guard({unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]}, ctx) do
+      [issue_for(ctx, comp_meta, "length", "comparing against the empty list")]
     end
   end
 
   # Recurse into conjunction expressions
-  defp find_length_comparisons_in_guard({conjunction, _, args}, ctx)
+  defp find_in_guard({conjunction, _, args}, ctx)
        when conjunction in [:and, :or, :&&, :||] and is_list(args) do
-    Enum.reduce(args, ctx, &find_length_comparisons_in_guard/2)
+    Enum.flat_map(args, &find_in_guard(&1, ctx))
   end
 
-  defp find_length_comparisons_in_guard({negation, _, [arg]}, ctx) when negation in [:not, :!] do
-    find_length_comparisons_in_guard(arg, ctx)
+  defp find_in_guard({negation, _, [arg]}, ctx) when negation in [:not, :!] do
+    find_in_guard(arg, ctx)
   end
 
-  defp find_length_comparisons_in_guard(_, ctx), do: ctx
-
-  defp mark_guard_issue(ctx, comp_meta) do
-    key = {comp_meta[:line], comp_meta[:column]}
-    ctx = %{ctx | handled_guards: MapSet.put(ctx.handled_guards, key)}
-    put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list"))
-  end
+  defp find_in_guard(_ast, _ctx), do: []
 
   defp handle_non_guard_comparison(ast, ctx, meta, trigger) do
-    # Skip if this comparison was already handled in a guard clause
-    if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
-      {ast, ctx}
-    else
-      {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast)))}
-    end
+    {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast)))}
   end
 
   defp suggest({_op, _, [_, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))

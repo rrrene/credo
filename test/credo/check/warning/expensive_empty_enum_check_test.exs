@@ -598,4 +598,19 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
       |> refute_issues()
     end
   end
+
+  test "finds issues in both guards and function body" do
+    """
+    defmodule Test do
+      def test(enum) when length(enum) == 0 do
+        length(enum) > 0
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
+      assert length(issues) == 2
+    end)
+  end
 end
