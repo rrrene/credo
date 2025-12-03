@@ -34,7 +34,7 @@ defmodule Credo.Test.Assertions do
   end
 
   def assert_issues(issues, callback \\ nil) do
-    assert Enum.count(issues) > 0, "There should be multiple issues, got none."
+    refute Enum.empty?(issues), "There should be multiple issues, got none."
 
     assert Enum.count(issues) > 1,
            "There should be more than one issue, got:\n\n#{to_inspected(issues)}"
