@@ -110,10 +110,13 @@ defmodule Credo.Check.Params do
   end
 
   @doc false
-  def files_included(params, check_mod) do
+  def files_included(params, check_mod, known_files) do
     files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
 
-    List.wrap(files[:included])
+    case files[:included] do
+      nil -> known_files
+      included -> included
+    end
   end
 
   @doc false
