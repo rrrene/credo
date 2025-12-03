@@ -536,7 +536,6 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
   end
 
   for problem_guard <- [
-        "0 == length(enum)",
         "length(enum) == 0",
         "length(enum) != 0",
         "length(enum) !== 0",
@@ -544,8 +543,17 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
         "length(enum) >= 0",
         "length(enum) < 0",
         "length(enum) <= 0",
+        "0 == length(enum)",
+        "0 != length(enum)",
+        "0 > length(enum)",
+        "0 < length(enum)",
         "length(enum) < 1",
-        "length(enum) >= 1"
+        "length(enum) >= 1",
+        "1 <= length(enum)",
+        "is_list(enum) and 0 == length(enum)",
+        "is_list(enum) or length(enum) == 0",
+        "is_list(enum) and not is_map(enum) and length(enum) < 1",
+        "is_list(enum) or length(enum) >= 1"
       ] do
     @tag problem_guard: problem_guard
     test "suggests comparing against the empty list in guards (`#{problem_guard}`)", %{

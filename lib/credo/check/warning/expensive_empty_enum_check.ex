@@ -48,28 +48,9 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   # >= 0 is always true, but should be flagged.
   @operators_for_zero [:==, :!=, :===, :!==, :>, :>=, :<, :<=]
 
-  # Match guard clauses directly - check the guard expression for length comparisons
-  for {op, lhs, rhs} <-
-        Enum.flat_map(@operators_for_zero, &[{&1, @length_pattern, 0}, {&1, 0, @length_pattern}]) ++
-          [
-            # < 1 is equivalent to == 0
-            {:<, @length_pattern, 1},
-            # 1 <= length is equivalent to > 0
-            {:<=, 1, @length_pattern},
-            # >= 1 is equivalent to != 0
-            {:>=, @length_pattern, 1}
-          ] do
-    defp walk({:when, _meta, [_, {unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]}]}, ctx) do
-      handle_guard_comparison(ctx, comp_meta)
-    end
-  end
-
-  defp handle_guard_comparison(ctx, comp_meta) do
-    # Mark this comparison as handled to prevent duplicate issues
-    key = {comp_meta[:line], comp_meta[:column]}
-    ctx = %{ctx | handled_guards: MapSet.put(ctx.handled_guards, key)}
-    issue = issue_for(ctx, comp_meta, "length", "comparing against the empty list", true)
-    {nil, put_issue(ctx, issue)}
+  # Handles cases like `when is_list(enum) and not is_map(enum) and length(enum) == 0`
+  defp walk({:when, _meta, [_, guard_expr]} = ast, ctx) do
+    {ast, find_length_comparisons_in_guard(guard_expr, ctx)}
   end
 
   for {pattern, trigger} <- @comparisons do
@@ -92,6 +73,47 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     end
   end
 
+  defp walk(ast, ctx) do
+    {ast, ctx}
+  end
+
+  # Match guard clauses directly - check the guard expression for length comparisons
+  for {op, lhs, rhs} <-
+        Enum.flat_map(@operators_for_zero, &[{&1, @length_pattern, 0}, {&1, 0, @length_pattern}]) ++
+          [
+            # < 1 is equivalent to == 0
+            {:<, @length_pattern, 1},
+            # 1 <= length is equivalent to > 0
+            {:<=, 1, @length_pattern},
+            # >= 1 is equivalent to != 0
+            {:>=, @length_pattern, 1}
+          ] do
+    defp find_length_comparisons_in_guard(
+           {unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]},
+           ctx
+         ) do
+      mark_guard_issue(ctx, comp_meta)
+    end
+  end
+
+  # Recurse into conjunction expressions
+  defp find_length_comparisons_in_guard({conjunction, _, args}, ctx)
+       when conjunction in [:and, :or, :&&, :||] and is_list(args) do
+    Enum.reduce(args, ctx, &find_length_comparisons_in_guard/2)
+  end
+
+  defp find_length_comparisons_in_guard({negation, _, [arg]}, ctx) when negation in [:not, :!] do
+    find_length_comparisons_in_guard(arg, ctx)
+  end
+
+  defp find_length_comparisons_in_guard(_, ctx), do: ctx
+
+  defp mark_guard_issue(ctx, comp_meta) do
+    key = {comp_meta[:line], comp_meta[:column]}
+    ctx = %{ctx | handled_guards: MapSet.put(ctx.handled_guards, key)}
+    put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))
+  end
+
   defp handle_non_guard_comparison(ast, ctx, meta, trigger) do
     # Skip if this comparison was already handled in a guard clause
     if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
@@ -99,10 +121,6 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     else
       {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast), false))}
     end
-  end
-
-  defp walk(ast, ctx) do
-    {ast, ctx}
   end
 
   defp suggest({_op, _, [_, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
