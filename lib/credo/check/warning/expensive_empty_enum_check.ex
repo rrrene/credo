@@ -28,7 +28,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__) |> Map.put(:handled_guards, MapSet.new())
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
     result.issues
   end
@@ -45,23 +45,54 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   ]
   @operators [:==, :!=, :===, :!==, :>, :<]
 
+  # Match guard clauses directly - check the guard expression for length comparisons
+  defp walk({:when, _meta, [_, {op, comp_meta, [unquote(@length_pattern), 0]}]} = ast, ctx)
+       when op in @operators do
+    # Mark this comparison as handled to prevent duplicate issues
+    key = {comp_meta[:line], comp_meta[:column]}
+    ctx = Map.update(ctx, :handled_guards, MapSet.new([key]), &MapSet.put(&1, key))
+
+    {ast,
+     put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))}
+  end
+
+  defp walk({:when, _meta, [_, {op, comp_meta, [0, unquote(@length_pattern)]}]} = ast, ctx)
+       when op in @operators do
+    # Mark this comparison as handled to prevent duplicate issues
+    key = {comp_meta[:line], comp_meta[:column]}
+    ctx = Map.update(ctx, :handled_guards, MapSet.new([key]), &MapSet.put(&1, key))
+
+    {ast,
+     put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))}
+  end
+
   for {pattern, trigger} <- @comparisons do
-    # Comparisons against 0
+    # Comparisons against 0 (not in guards - guards are handled above)
     defp walk({op, meta, [unquote(pattern), 0]} = ast, ctx) when op in @operators do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      # Skip if this comparison was already handled in a guard clause
+      if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
+        {ast, ctx}
+      else
+        {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
+      end
     end
 
     defp walk({op, meta, [0, unquote(pattern)]} = ast, ctx) when op in @operators do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      # Skip if this comparison was already handled in a guard clause
+      if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
+        {ast, ctx}
+      else
+        {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
+      end
     end
 
     # Comparisons against 1
     defp walk({:>=, meta, [unquote(pattern), 1]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
     end
 
     defp walk({:<=, meta, [1, unquote(pattern)]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
     end
   end
 
@@ -75,10 +106,17 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
   defp suggest_for_arity(1), do: "`Enum.empty?/1`"
 
-  defp issue_for(ctx, meta, trigger, suggestion) do
+  defp issue_for(ctx, meta, trigger, suggestion, in_guard) do
+    message =
+      if in_guard do
+        "Using `#{trigger}/1` is expensive, prefer #{suggestion}."
+      else
+        "Using `#{trigger}/1` is expensive, prefer #{suggestion}."
+      end
+
     format_issue(
       ctx,
-      message: "Using `#{trigger}/1` is expensive, prefer #{suggestion}.",
+      message: message,
       trigger: trigger,
       line_no: meta[:line]
     )
