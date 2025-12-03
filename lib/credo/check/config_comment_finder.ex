@@ -17,54 +17,35 @@ defmodule Credo.Check.ConfigCommentFinder do
     |> Enum.reject(&is_nil/1)
   end
 
-  def find_and_set_in_source_file(source_file) do
+  def find_and_set_in_source_file(%Credo.SourceFile{status: :valid} = source_file) do
     case find_config_comments(source_file) do
-      [] ->
-        nil
-
-      config_comments ->
-        {source_file.filename, config_comments}
+      [] -> nil
+      config_comments -> {source_file.filename, config_comments}
     end
   end
+
+  def find_and_set_in_source_file(_), do: nil
 
   defp find_config_comments(source_file) do
     source = SourceFile.source(source_file)
 
     if source =~ config_comment_format() do
       case Code.string_to_quoted_with_comments(source) do
-        {:ok, _ast, comments} -> find_config_comments_fast(comments)
-        # If we couldn't parse, fall back to the old method of doing string manipulation
-        {:error, _} -> find_config_comments_slow(source)
+        {:ok, _ast, comments} -> extract_config_comments(comments)
+        {:error, _} -> []
       end
     else
       []
     end
   end
 
-  defp find_config_comments_fast(parsed_comments) do
-    Enum.flat_map(parsed_comments, fn %{text: text, line: line} ->
+  defp extract_config_comments(comments) do
+    Enum.flat_map(comments, fn %{text: text, line: line_no} ->
       case Regex.run(config_comment_format(), text) do
         nil -> []
-        [_, instruction, param_string] -> [ConfigComment.new(instruction, param_string, line)]
+        [_, instruction, param_string] -> [ConfigComment.new(instruction, param_string, line_no)]
       end
     end)
-  end
-
-  defp find_config_comments_slow(source) do
-    source
-    |> Credo.Code.clean_charlists_strings_and_sigils()
-    |> Credo.Code.to_lines()
-    |> Enum.reduce([], &find_config_comment/2)
-  end
-
-  defp find_config_comment({line_no, string}, memo) do
-    case Regex.run(config_comment_format(), string) do
-      nil ->
-        memo
-
-      [_, instruction, param_string] ->
-        memo ++ [ConfigComment.new(instruction, param_string, line_no)]
-    end
   end
 
   # moved to private function due to deprecation of regexes
