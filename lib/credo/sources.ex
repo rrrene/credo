@@ -210,8 +210,6 @@ defmodule Credo.Sources do
   end
 
   defp non_wildcard_elixir_file_path?(path) do
-    # If the path is an Elixir file and contains none of the wildcard characters
-    # documented in Path.wildcard/1, we should avoid hitting the filesystem entirely.
     wildcard_characters = ["*", "{", "}", "?", "[", "]"]
     String.ends_with?(path, [".ex", ".exs"]) and not String.contains?(path, wildcard_characters)
   end
