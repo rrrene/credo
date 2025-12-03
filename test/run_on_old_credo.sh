@@ -30,9 +30,9 @@ echo ""
 echo "Diffing old and new issues ..."
 echo ""
 
-elixir test/old_credo.exs
+elixir test/old_credo.exs -- $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5 $CREDO_ARG6 $CREDO_ARG7 $CREDO_ARG8 $CREDO_ARG9
 
-elixir test/old_credo.exs .
+elixir test/old_credo.exs . -- $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5 $CREDO_ARG6 $CREDO_ARG7 $CREDO_ARG8 $CREDO_ARG9
 
 elixir test/old_credo.exs -- $CREDO_ARG1 $CREDO_ARG2 $CREDO_ARG3 $CREDO_ARG4 $CREDO_ARG5 $CREDO_ARG6 $CREDO_ARG7 $CREDO_ARG8 $CREDO_ARG9 > tmp/old_credo.txt
 

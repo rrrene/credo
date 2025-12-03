@@ -12,7 +12,8 @@ defmodule Credo.Check.ConfigCommentFinder do
   @doc false
   def run(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&find_and_set_in_source_file/1)
+    |> Task.async_stream(&find_and_set_in_source_file/1, ordered: false, timeout: :infinity)
+    |> Enum.map(fn {:ok, value} -> value end)
     |> Enum.reject(&is_nil/1)
   end
 

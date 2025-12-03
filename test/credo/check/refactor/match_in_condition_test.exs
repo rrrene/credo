@@ -121,6 +121,40 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation for operators in function calls with :allow_operators /3" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(foo, parameter2) do
+        if value = map |> Map.get(key) do
+          value
+        else
+          default
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow_operators: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation for operators in function calls with :allow_operators /4" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(foo, parameter2) do
+        if contents = File.read(input <> \".txt\") do
+          value
+        else
+          default
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check, allow_operators: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -331,6 +365,40 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
       def some_function(foo, parameter2) do
         if baz = allowed?(Map.get(foo, :bar) &&& parameter2) do
           baz
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation for operators in function calls /3" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(foo, parameter2) do
+        if value = map |> Map.get(key) do
+          value
+        else
+          default
+        end
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation for operators in function calls /4" do
+    """
+    defmodule CredoSampleModule do
+      def some_function(foo, parameter2) do
+        if contents = File.read(input <> \".txt\") do
+          value
+        else
+          default
         end
       end
     end
