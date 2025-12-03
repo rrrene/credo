@@ -111,7 +111,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp mark_guard_issue(ctx, comp_meta) do
     key = {comp_meta[:line], comp_meta[:column]}
     ctx = %{ctx | handled_guards: MapSet.put(ctx.handled_guards, key)}
-    put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))
+    put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list"))
   end
 
   defp handle_non_guard_comparison(ast, ctx, meta, trigger) do
@@ -119,7 +119,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
       {ast, ctx}
     else
-      {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast), false))}
+      {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast)))}
     end
   end
 
@@ -127,19 +127,12 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp suggest({_op, _, [{_pattern, _, args}, _]}), do: suggest_for_arity(Enum.count(args))
 
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
-  defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"
+  defp suggest_for_arity(1), do: "`Enum.empty?/1`"
 
-  defp issue_for(ctx, meta, trigger, suggestion, in_guard) do
-    message =
-      if in_guard do
-        "Using `#{trigger}/1` is expensive, prefer #{suggestion}."
-      else
-        "Using `#{trigger}/1` is expensive, prefer #{suggestion}."
-      end
-
+  defp issue_for(ctx, meta, trigger, suggestion) do
     format_issue(
       ctx,
-      message: message,
+      message: "Using `#{trigger}/1` is expensive, prefer #{suggestion}.",
       trigger: trigger,
       line_no: meta[:line]
     )
