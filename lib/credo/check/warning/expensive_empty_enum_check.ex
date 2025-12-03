@@ -73,7 +73,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
   defp suggest({_op, _, [{_pattern, _, args}, _]}), do: suggest_for_arity(Enum.count(args))
 
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
-  defp suggest_for_arity(1), do: "`Enum.empty?/1`"
+  defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"
 
   defp issue_for(ctx, meta, trigger, suggestion) do
     format_issue(
