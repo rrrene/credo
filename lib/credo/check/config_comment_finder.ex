@@ -31,13 +31,30 @@ defmodule Credo.Check.ConfigCommentFinder do
     source = SourceFile.source(source_file)
 
     if source =~ config_comment_format() do
-      source
-      |> Credo.Code.clean_charlists_strings_and_sigils()
-      |> Credo.Code.to_lines()
-      |> Enum.reduce([], &find_config_comment/2)
+      case Code.string_to_quoted_with_comments(source) do
+        {:ok, _ast, comments} -> find_config_comments_fast(comments)
+        # If we couldn't parse, fall back to the old method of doing string manipulation
+        {:error, _} -> find_config_comments_slow(source)
+      end
     else
       []
     end
+  end
+
+  defp find_config_comments_fast(parsed_comments) do
+    Enum.flat_map(parsed_comments, fn %{text: text, line: line} ->
+      case Regex.run(config_comment_format(), text) do
+        nil -> []
+        [_, instruction, param_string] -> [ConfigComment.new(instruction, param_string, line)]
+      end
+    end)
+  end
+
+  defp find_config_comments_slow(source) do
+    source
+    |> Credo.Code.clean_charlists_strings_and_sigils()
+    |> Credo.Code.to_lines()
+    |> Enum.reduce([], &find_config_comment/2)
   end
 
   defp find_config_comment({line_no, string}, memo) do
