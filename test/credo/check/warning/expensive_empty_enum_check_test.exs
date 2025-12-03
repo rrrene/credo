@@ -536,6 +536,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
   end
 
   for problem_guard <- [
+        "0 == length(enum)",
         "length(enum) == 0",
         "length(enum) != 0",
         "length(enum) !== 0",
@@ -568,6 +569,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
 
   for okay_guard <- [
         "length(enum) > 1",
+        "length(enum) <= 1",
         "length(enum) > 2",
         "length(enum) <= 2",
         "length(enum) == 1",

@@ -43,56 +43,61 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {@enum_count_pattern, "Enum.count"},
     {@length_pattern, "length"}
   ]
-  @operators [:==, :!=, :===, :!==, :>, :<]
+
+  # <= 0 is equivalent to == 0
+  # >= 0 is always true, but should be flagged.
+  @operators_for_zero [:==, :!=, :===, :!==, :>, :>=, :<, :<=]
 
   # Match guard clauses directly - check the guard expression for length comparisons
-  defp walk({:when, _meta, [_, {op, comp_meta, [unquote(@length_pattern), 0]}]} = ast, ctx)
-       when op in @operators do
-    # Mark this comparison as handled to prevent duplicate issues
-    key = {comp_meta[:line], comp_meta[:column]}
-    ctx = Map.update(ctx, :handled_guards, MapSet.new([key]), &MapSet.put(&1, key))
-
-    {ast,
-     put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))}
+  for {op, lhs, rhs} <-
+        Enum.flat_map(@operators_for_zero, &[{&1, @length_pattern, 0}, {&1, 0, @length_pattern}]) ++
+          [
+            # < 1 is equivalent to == 0
+            {:<, @length_pattern, 1},
+            # 1 <= length is equivalent to > 0
+            {:<=, 1, @length_pattern},
+            # >= 1 is equivalent to != 0
+            {:>=, @length_pattern, 1}
+          ] do
+    defp walk({:when, _meta, [_, {unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]}]}, ctx) do
+      handle_guard_comparison(ctx, comp_meta)
+    end
   end
 
-  defp walk({:when, _meta, [_, {op, comp_meta, [0, unquote(@length_pattern)]}]} = ast, ctx)
-       when op in @operators do
+  defp handle_guard_comparison(ctx, comp_meta) do
     # Mark this comparison as handled to prevent duplicate issues
     key = {comp_meta[:line], comp_meta[:column]}
-    ctx = Map.update(ctx, :handled_guards, MapSet.new([key]), &MapSet.put(&1, key))
-
-    {ast,
-     put_issue(ctx, issue_for(ctx, comp_meta, "length", "comparing against the empty list", true))}
+    ctx = %{ctx | handled_guards: MapSet.put(ctx.handled_guards, key)}
+    issue = issue_for(ctx, comp_meta, "length", "comparing against the empty list", true)
+    {nil, put_issue(ctx, issue)}
   end
 
   for {pattern, trigger} <- @comparisons do
     # Comparisons against 0 (not in guards - guards are handled above)
-    defp walk({op, meta, [unquote(pattern), 0]} = ast, ctx) when op in @operators do
-      # Skip if this comparison was already handled in a guard clause
-      if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
-        {ast, ctx}
-      else
-        {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
-      end
+    defp walk({op, meta, [unquote(pattern), 0]} = ast, ctx) when op in @operators_for_zero do
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
-    defp walk({op, meta, [0, unquote(pattern)]} = ast, ctx) when op in @operators do
-      # Skip if this comparison was already handled in a guard clause
-      if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
-        {ast, ctx}
-      else
-        {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
-      end
+    defp walk({op, meta, [0, unquote(pattern)]} = ast, ctx) when op in @operators_for_zero do
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
     # Comparisons against 1
     defp walk({:>=, meta, [unquote(pattern), 1]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
     defp walk({:<=, meta, [1, unquote(pattern)]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast), false))}
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
+    end
+  end
+
+  defp handle_non_guard_comparison(ast, ctx, meta, trigger) do
+    # Skip if this comparison was already handled in a guard clause
+    if MapSet.member?(ctx.handled_guards, {meta[:line], meta[:column]}) do
+      {ast, ctx}
+    else
+      {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast), false))}
     end
   end
 
