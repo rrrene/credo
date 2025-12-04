@@ -43,25 +43,36 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {@enum_count_pattern, "Enum.count"},
     {@length_pattern, "length"}
   ]
-  @operators [:==, :!=, :===, :!==, :>, :<]
+
+  # <= 0 is equivalent to == 0
+  # >= 0 is always true, but should be flagged.
+  @operators_for_zero [:==, :!=, :===, :!==, :>, :>=, :<, :<=]
+
+  # Handles cases like `when is_list(enum) and not is_map(enum) and length(enum) == 0`
+  defp walk({:when, _meta, [_, guard_expr]} = ast, ctx) do
+    case find_in_guard(guard_expr, ctx) do
+      [] -> {ast, ctx}
+      issues -> {nil, Enum.reduce(issues, ctx, fn issue, ctx -> put_issue(ctx, issue) end)}
+    end
+  end
 
   for {pattern, trigger} <- @comparisons do
-    # Comparisons against 0
-    defp walk({op, meta, [unquote(pattern), 0]} = ast, ctx) when op in @operators do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+    # Comparisons against 0 (not in guards - guards are handled above)
+    defp walk({op, meta, [unquote(pattern), 0]} = ast, ctx) when op in @operators_for_zero do
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
-    defp walk({op, meta, [0, unquote(pattern)]} = ast, ctx) when op in @operators do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+    defp walk({op, meta, [0, unquote(pattern)]} = ast, ctx) when op in @operators_for_zero do
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
     # Comparisons against 1
     defp walk({:>=, meta, [unquote(pattern), 1]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
 
     defp walk({:<=, meta, [1, unquote(pattern)]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(ast)))}
+      handle_non_guard_comparison(ast, ctx, meta, unquote(trigger))
     end
   end
 
@@ -69,11 +80,43 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
     {ast, ctx}
   end
 
+  # Match guard clauses directly - check the guard expression for length comparisons
+  for {op, lhs, rhs} <-
+        Enum.flat_map(@operators_for_zero, &[{&1, @length_pattern, 0}, {&1, 0, @length_pattern}]) ++
+          [
+            # < 1 is equivalent to == 0
+            {:<, @length_pattern, 1},
+            # 1 <= length is equivalent to > 0
+            {:<=, 1, @length_pattern},
+            # >= 1 is equivalent to != 0
+            {:>=, @length_pattern, 1}
+          ] do
+    defp find_in_guard({unquote(op), comp_meta, [unquote(lhs), unquote(rhs)]}, ctx) do
+      [issue_for(ctx, comp_meta, "length", "comparing against the empty list")]
+    end
+  end
+
+  # Recurse into conjunction expressions
+  defp find_in_guard({conjunction, _, args}, ctx)
+       when conjunction in [:and, :or, :&&, :||] and is_list(args) do
+    Enum.flat_map(args, &find_in_guard(&1, ctx))
+  end
+
+  defp find_in_guard({negation, _, [arg]}, ctx) when negation in [:not, :!] do
+    find_in_guard(arg, ctx)
+  end
+
+  defp find_in_guard(_ast, _ctx), do: []
+
+  defp handle_non_guard_comparison(ast, ctx, meta, trigger) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, trigger, suggest(ast)))}
+  end
+
   defp suggest({_op, _, [_, {_pattern, _, args}]}), do: suggest_for_arity(Enum.count(args))
   defp suggest({_op, _, [{_pattern, _, args}, _]}), do: suggest_for_arity(Enum.count(args))
 
   defp suggest_for_arity(2), do: "`not Enum.any?/2`"
-  defp suggest_for_arity(1), do: "`Enum.empty?/1` or `list == []`"
+  defp suggest_for_arity(1), do: "`Enum.empty?/1`"
 
   defp issue_for(ctx, meta, trigger, suggestion) do
     format_issue(
