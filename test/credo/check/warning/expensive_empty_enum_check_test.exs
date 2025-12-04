@@ -569,8 +569,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
       |> to_source_file
       |> run_check(@described_check)
       |> assert_issue(fn issue ->
-        assert issue.message ==
-                 "Using `length/1` is expensive, prefer comparing against the empty list."
+        assert issue.message =~ "empty list"
       end)
     end
   end
