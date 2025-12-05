@@ -134,6 +134,17 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report snake case sigil-prefixed functions" do
+    """
+    defp sigil_z_support_fun(input, args) do
+      # ...
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report expected code (for operators) /6" do
     ~S'''
     defmacro @expr2
@@ -346,6 +357,17 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
       assert issue.trigger == "clean_HTTP_url"
+    end)
+  end
+
+  test "it should report a violation /16" do
+    """
+    def sigil_sampleSigil(0), do: :ok
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(fn issue ->
+      assert issue.trigger == "sigil_sampleSigil"
     end)
   end
 end

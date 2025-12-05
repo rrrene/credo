@@ -122,12 +122,18 @@ defmodule Credo.Check.Readability.FunctionNames do
          meta,
          ctx
        ) do
-    multi_letter_sigil? = String.match?(sigil_letters, ~r/^[A-Z]+$/)
+    cond do
+      # multi-letter sigil
+      String.match?(sigil_letters, ~r/^[A-Z]+$/) ->
+        ctx
 
-    if multi_letter_sigil? do
-      ctx
-    else
-      add_issue_with_signature(ctx, name, args, issue_for(ctx, meta[:line], name))
+      Name.snake_case?(name, ctx.params.allow_acronyms) ->
+        ctx
+
+      true ->
+        issue = issue_for(ctx, meta[:line], name)
+
+        add_issue_with_signature(ctx, name, args, issue)
     end
   end
 
