@@ -27,6 +27,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
   end
   '''
 
+  @tag needs_elixir: "1.17.0"
   test "should give correct ast for source_example1" do
     source = @source_example1
     {:ok, ast} = Credo.Code.ast(source)
@@ -470,6 +471,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
     assert expected == tokens
   end
 
+  @tag needs_elixir: "1.17.0"
   test "should give correct ast for source_example2" do
     source = @source_example2
     {:ok, ast} = Credo.Code.ast(source)
