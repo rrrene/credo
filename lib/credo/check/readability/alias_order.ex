@@ -55,208 +55,131 @@ defmodule Credo.Check.Readability.AliasOrder do
       ]
     ]
 
-  alias Credo.Code.Name
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    sort_method = Params.get(params, :sort_method, __MODULE__)
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__, %{alias_memo: [], alias_groups: []})
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, sort_method))
+    Credo.Code.prewalk(source_file, &walk/2, ctx)
+    |> extract_group_from_memo()
+    |> find_issues()
   end
 
-  defp traverse({:defmodule, _, _} = ast, issues, issue_meta, sort_method) do
-    new_issues =
-      ast
-      |> extract_alias_groups()
-      |> Enum.reduce([], &traverse_groups(&1, &2, issue_meta, sort_method))
+  defp walk(
+         {:alias, _, [{:__aliases__, meta, mod_list} | _]},
+         %{params: %{sort_method: sort_method}} = ctx
+       ) do
+    fullname = Credo.Code.Name.full(mod_list)
+    line = meta[:line]
 
-    {ast, issues ++ new_issues}
+    candidate =
+      {{compare_name(fullname, sort_method), line, line},
+       module: fullname, trigger: fullname, column: meta[:column]}
+
+    {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end
 
-  defp traverse(ast, issues, _, _), do: {ast, issues}
+  defp walk(
+         {:alias, _, [{{:., _, [{:__aliases__, _, base_mod_list}, :{}]}, meta, multi_mod_list}]},
+         %{params: %{sort_method: sort_method}} = ctx
+       ) do
+    candidates = multi_candidates(base_mod_list, multi_mod_list, sort_method)
+    line = meta[:line]
+    {{compare, _, _}, _} = List.first(candidates)
 
-  defp traverse_groups(group, acc, issue_meta, sort_method) do
-    group
-    |> Enum.chunk_every(2, 1)
-    |> Enum.reduce_while(nil, fn chunk, _ -> process_group(sort_method, chunk) end)
-    |> case do
-      nil ->
-        acc
+    candidate =
+      {{compare, line, meta[:closing][:line]}, [multi_aliases: candidates]}
 
-      line ->
-        acc ++ [issue_for(issue_meta, line)]
-    end
+    {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end
 
-  defp process_group(:alpha, [
-         {line_no, mod_list_second, a},
-         {_line_no, _mod_list_second, b}
-       ])
-       when a > b do
-    module =
-      case mod_list_second do
-        {base, _} -> base
-        value -> value
-      end
-
-    issue_opts = issue_opts(line_no, module, module)
-
-    {:halt, issue_opts}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp process_group(:ascii, [
-         {line_no, {a, []}, _},
-         {_line_no, {b, []}, _}
-       ])
-       when a > b do
-    {:halt, issue_opts(line_no, a, a)}
-  end
+  defp multi_candidates(base_mod_list, multi_mod_list, sort_method) do
+    Enum.map(multi_mod_list, fn {:__aliases__, meta, mod_list} ->
+      fullname = Credo.Code.Name.full(base_mod_list ++ mod_list)
+      trigger = Credo.Code.Name.full(mod_list)
 
-  defp process_group(sort_method, [{line_no1, mod_list_first, _}, {line_no2, mod_list_second, _}]) do
-    issue_opts =
-      cond do
-        issue = inner_group_order_issue(sort_method, line_no1, mod_list_first) ->
-          issue
-
-        issue = inner_group_order_issue(sort_method, line_no2, mod_list_second) ->
-          issue
-
-        true ->
-          nil
-      end
-
-    if issue_opts do
-      {:halt, issue_opts}
-    else
-      {:cont, nil}
-    end
-  end
-
-  defp process_group(sort_method, [{line_no1, mod_list_first, _}]) do
-    if issue_opts = inner_group_order_issue(sort_method, line_no1, mod_list_first) do
-      {:halt, issue_opts}
-    else
-      {:cont, nil}
-    end
-  end
-
-  defp process_group(_, _), do: {:cont, nil}
-
-  defp inner_group_order_issue(_sort_method, _line_no, {_base, []}), do: nil
-
-  defp inner_group_order_issue(:ascii = _sort_method, line_no, {base, mod_list}) do
-    sorted_mod_list = Enum.sort(mod_list)
-
-    if mod_list != sorted_mod_list do
-      issue_opts(line_no, base, mod_list, mod_list, sorted_mod_list)
-    end
-  end
-
-  defp inner_group_order_issue(_sort_method, line_no, {base, mod_list}) do
-    downcased_mod_list = Enum.map(mod_list, &String.downcase(to_string(&1)))
-    sorted_downcased_mod_list = Enum.sort(downcased_mod_list)
-
-    if downcased_mod_list != sorted_downcased_mod_list do
-      issue_opts(line_no, base, mod_list, downcased_mod_list, sorted_downcased_mod_list)
-    end
-  end
-
-  defp issue_opts(line_no, base, mod_list, comparison_mod_list, sorted_comparison_mod_list) do
-    trigger =
-      comparison_mod_list
-      |> Enum.with_index()
-      |> Enum.find_value(fn {comparison_mod_entry, index} ->
-        if comparison_mod_entry != Enum.at(sorted_comparison_mod_list, index) do
-          Enum.at(mod_list, index)
-        end
-      end)
-
-    issue_opts(line_no, [base, trigger], trigger)
-  end
-
-  defp issue_opts(line_no, module, trigger) do
-    %{
-      line_no: line_no,
-      trigger: trigger,
-      module: module
-    }
-  end
-
-  defp extract_alias_groups({:defmodule, _, _} = ast) do
-    ast
-    |> Credo.Code.postwalk(&find_alias_groups/2)
-    |> Enum.reverse()
-    |> Enum.reduce([[]], fn definition, acc ->
-      case definition do
-        nil ->
-          [[]] ++ acc
-
-        definition ->
-          [group | groups] = acc
-          [group ++ [definition]] ++ groups
-      end
+      {{compare_name(fullname, sort_method), meta[:line], meta[:line]},
+       module: fullname, trigger: trigger, column: meta[:column]}
     end)
-    |> Enum.reverse()
   end
 
-  defp find_alias_groups(
-         {:alias, _, [{:__aliases__, meta, mod_list} | _]} = ast,
-         aliases
-       ) do
-    compare_name = compare_name(ast)
-    modules = [{meta[:line], {Name.full(mod_list), []}, compare_name}]
+  defp extract_group_and_add_candidate(ctx, candidate, line) do
+    ctx =
+      if new_group?(ctx, line) do
+        extract_group_from_memo(ctx)
+      else
+        ctx
+      end
 
-    accumulate_alias_into_group(ast, modules, meta[:line], aliases)
+    unshift(ctx, :alias_memo, candidate)
   end
 
-  defp find_alias_groups(
-         {:alias, _,
-          [
-            {{:., _, [{:__aliases__, meta, mod_list}, :{}]}, _, multi_mod_list}
-          ]} = ast,
-         aliases
-       ) do
-    multi_mod_list =
-      multi_mod_list
-      |> Enum.map(fn {:__aliases__, _, mod_list} -> mod_name(mod_list) end)
-
-    compare_name = compare_name(ast)
-    modules = [{meta[:line], {Name.full(mod_list), multi_mod_list}, compare_name}]
-
-    accumulate_alias_into_group(ast, modules, meta[:line], aliases)
+  defp extract_group_from_memo(ctx) do
+    ctx
+    |> unshift(:alias_groups, ctx.alias_memo)
+    |> Map.put(:alias_memo, [])
   end
 
-  defp find_alias_groups(ast, aliases), do: {ast, aliases}
+  defp new_group?(%{alias_memo: []}, _line), do: true
 
-  defp mod_name(mod_list) do
-    Enum.map_join(mod_list, ".", &to_string/1)
+  defp new_group?(%{alias_memo: [{{_, _, line_end}, _} | _]}, line) do
+    line != line_end + 1
   end
 
-  defp compare_name(value) do
+  defp compare_name(value, :alpha) do
     value
-    |> Macro.to_string()
     |> String.downcase()
+    |> compare_name(nil)
+  end
+
+  defp compare_name(value, _sort_method) do
+    value
     |> String.replace(~r/[\{\}]/, "")
     |> String.replace(~r/,.+/, "")
   end
 
-  defp accumulate_alias_into_group(ast, modules, line, [{line_no, _, _} | _] = aliases)
-       when line_no != 0 and line_no != line - 1 do
-    {ast, modules ++ [nil] ++ aliases}
+  defp find_issues(ctx) do
+    Enum.flat_map(ctx.alias_groups, fn group ->
+      group = Enum.reverse(group)
+
+      find_multi_alias_issues(ctx, group) ++ List.wrap(find_issue(ctx, group))
+    end)
   end
 
-  defp accumulate_alias_into_group(ast, modules, _, aliases) do
-    {ast, modules ++ aliases}
+  defp find_multi_alias_issues(ctx, group) do
+    Enum.map(group, fn {_pos_tuple, meta} ->
+      if meta[:multi_aliases] do
+        find_issue(ctx, meta[:multi_aliases])
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
-  defp issue_for(issue_meta, %{line_no: line_no, trigger: trigger, module: module}) do
+  defp find_issue(ctx, group) do
+    sorted = Enum.sort(group)
+
+    if group != sorted do
+      {first_mismatch, _} =
+        Enum.zip(group, sorted)
+        |> Enum.find(fn {a, b} -> a != b end)
+
+      {{_, line_no, _}, meta} = first_mismatch
+
+      issue_for(ctx, line_no, meta[:column], meta[:trigger], meta[:module])
+    end
+  end
+
+  defp issue_for(ctx, line_no, column, trigger, module) do
     format_issue(
-      issue_meta,
-      message: "The alias `#{Name.full(module)}` is not alphabetically ordered among its group.",
+      ctx,
+      message: "The alias `#{module}` is not alphabetically ordered among its group.",
       trigger: trigger,
-      line_no: line_no
+      line_no: line_no,
+      column: column
     )
   end
 end
