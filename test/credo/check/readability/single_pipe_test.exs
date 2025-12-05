@@ -183,6 +183,24 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> assert_issues()
   end
 
+  test "it should report a violation when piping from a function/macro" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
+        |> ExecutionTiming.append(exec,
+          task: exec.current_task,
+          check: __MODULE__,
+          filename: source_file.filename
+        )
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_blocks: true)
+    |> assert_issue()
+  end
+
   test "it should report a violation when piping from a block function/macro" do
     ~S'''
     defmodule CredoSampleModule do

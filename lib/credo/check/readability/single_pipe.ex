@@ -50,11 +50,14 @@ defmodule Credo.Check.Readability.SinglePipe do
   end
 
   defp walk(
-         {:|>, _, [{_block_op, _, block_args}, _]} = ast,
+         {:|>, meta, [{_block_op, _, block_args} = call, _]} = ast,
          %{continue: true, params: %{allow_blocks: true}} = ctx
        )
        when is_list(block_args) and block_args != [] do
-    {ast, %{ctx | continue: false}}
+    case Credo.Code.Block.do_block_for(call) do
+      nil -> {ast, put_issue(%{ctx | continue: false}, issue_for(ctx, meta))}
+      _val -> {ast, %{ctx | continue: false}}
+    end
   end
 
   defp walk(
