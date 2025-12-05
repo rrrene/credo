@@ -4,7 +4,7 @@
     {argv, ["--" | rest]} -> {argv, rest}
   end
 
-old_credo_ref = List.first(argv) || "e78cb4e5"
+old_credo_ref = List.first(argv) || "db3ec988e498dd8c706e4ebc4125860d610161c4"
 
 if old_credo_ref == "." do
   Mix.install([{:credo, path: "."}])
