@@ -7,6 +7,7 @@
 - `Credo.Check.Warning.ExpensiveEmptyEnumCheck` have better issue messages
 - `Credo.Check.Refactor.MatchInCondition` add new param `:allow_operators`
 - `Credo.Check.Readability.AliasOrder` fix false positive
+- `Credo.Check.Readability.FunctionNames` fix false positive
 - `Credo.Check.Readability.SinglePipe` add new param `:allow_blocks` (defaults to `true`)
 
 ## 1.7.14
