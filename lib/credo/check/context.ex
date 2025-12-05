@@ -33,7 +33,7 @@ defmodule Credo.Check.Context do
   end
 
   @doc false
-  def push(ctx, field, item) do
+  def unshift(ctx, field, item) do
     list = Map.get(ctx, field, [])
     Map.put(ctx, field, [item | list])
   end

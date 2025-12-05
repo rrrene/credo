@@ -137,10 +137,10 @@ defmodule Credo.Check.Readability.PredicateFunctionNames do
 
     cond do
       String.starts_with?(name, "is_") && String.ends_with?(name, "?") ->
-        push(ctx, :issue_candidates, issue_candidate_for(ctx, meta, name, args))
+        unshift(ctx, :issue_candidates, issue_candidate_for(ctx, meta, name, args))
 
       String.starts_with?(name, "is_") && op != :defmacro ->
-        push(ctx, :issue_candidates, issue_candidate_for(ctx, meta, name, args))
+        unshift(ctx, :issue_candidates, issue_candidate_for(ctx, meta, name, args))
 
       true ->
         ctx

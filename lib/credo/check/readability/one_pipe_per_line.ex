@@ -46,7 +46,7 @@ defmodule Credo.Check.Readability.OnePipePerLine do
 
   defp walk({:|>, meta, [{:|>, meta2, _} | _]} = ast, ctx) do
     if meta[:line] == meta2[:line] do
-      {ast, push(ctx, :issue_candidates, meta[:line])}
+      {ast, unshift(ctx, :issue_candidates, meta[:line])}
     else
       {ast, ctx}
     end
