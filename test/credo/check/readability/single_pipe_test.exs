@@ -24,6 +24,78 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code when piping from a block function/macro" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        for {major, patches} <- versions do
+          # ...
+        end
+        |> Enum.reverse()
+        |> List.flatten()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation when piping 0-arity function and such functions allowed" do
+    ~S'''
+    defmodule OtherModule do
+      def foo, do: nil
+      def bar(nil), do: nil
+    end
+
+    defmodule CredoSampleModule do
+      def test do
+        OtherModule.foo() |> bar()
+        foo() |> OtherModule.bar()
+        foo() |> bar()
+
+        foo_anonymous = fn ->
+          nil
+        end
+
+        foo_anonymous.() |> bar()
+      end
+
+      def foo(), do: nil
+      def bar(nil), do: nil
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check, allow_0_arity_functions: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when piping from a block function/macro with :allow_blocks" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        for {major, patches} <- versions do
+          # ...
+        end
+        |> Enum.reverse()
+
+        Anther.block_op(1, 2, 3) do
+          # ...
+        end
+        |> Enum.reverse()
+
+        SomeOther.block_op do
+          # ...
+        end
+        |> Enum.reverse()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -93,35 +165,6 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> assert_issues()
   end
 
-  test "it should NOT report violation when piping 0-arity function and such functions allowed" do
-    ~S'''
-    defmodule OtherModule do
-      def foo, do: nil
-      def bar(nil), do: nil
-    end
-
-    defmodule CredoSampleModule do
-      def test do
-        OtherModule.foo() |> bar()
-        foo() |> OtherModule.bar()
-        foo() |> bar()
-
-        foo_anonymous = fn ->
-          nil
-        end
-
-        foo_anonymous.() |> bar()
-      end
-
-      def foo(), do: nil
-      def bar(nil), do: nil
-    end
-    '''
-    |> to_source_file()
-    |> run_check(@described_check, allow_0_arity_functions: true)
-    |> refute_issues()
-  end
-
   test "it should report violation when piping non-function and 0-arity functions allowed" do
     ~S'''
     defmodule CredoSampleModule do
@@ -138,5 +181,21 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> to_source_file()
     |> run_check(@described_check, allow_0_arity_functions: true)
     |> assert_issues()
+  end
+
+  test "it should report a violation when piping from a block function/macro" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        for {major, patches} <- versions do
+          # ...
+        end
+        |> Enum.reverse()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_blocks: false)
+    |> assert_issue()
   end
 end

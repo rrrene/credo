@@ -3,7 +3,7 @@ defmodule Credo.Check.Readability.SinglePipe do
     id: "EX3023",
     base_priority: :high,
     tags: [:controversial],
-    param_defaults: [allow_0_arity_functions: false],
+    param_defaults: [allow_0_arity_functions: false, allow_blocks: true],
     explanations: [
       check: """
       Pipes (`|>`) should only be used when piping data through multiple calls.
@@ -32,7 +32,8 @@ defmodule Credo.Check.Readability.SinglePipe do
       it easier to follow.
       """,
       params: [
-        allow_0_arity_functions: "Allow 0-arity functions"
+        allow_0_arity_functions: "Allow 0-arity functions",
+        allow_blocks: "Allow block functions/macro like `for`, `if` or `case`"
       ]
     ]
 
@@ -45,6 +46,14 @@ defmodule Credo.Check.Readability.SinglePipe do
   end
 
   defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+    {ast, %{ctx | continue: false}}
+  end
+
+  defp walk(
+         {:|>, _, [{_block_op, _, block_args}, _]} = ast,
+         %{continue: true, params: %{allow_blocks: true}} = ctx
+       )
+       when is_list(block_args) and block_args != [] do
     {ast, %{ctx | continue: false}}
   end
 
