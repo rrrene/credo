@@ -88,7 +88,8 @@ defmodule Credo.Code do
       line: 1,
       columns: true,
       file: filename,
-      emit_warnings: false
+      emit_warnings: false,
+      token_metadata: true
     )
   end
 
