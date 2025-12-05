@@ -1,9 +1,18 @@
 # Changelog
 
+## 1.7.15-dev
+
+- Improve performance on large projects
+- Parse token_metadata for source files
+- `Credo.Check.Warning.ExpensiveEmptyEnumCheck` have better issue messages
+- `Credo.Check.Refactor.MatchInCondition` add new param `:allow_operators`
+- `Credo.Check.Readability.AliasOrder` fix false positive
+- `Credo.Check.Readability.SinglePipe` add new param `:allow_blocks` (defaults to `true`)
+
 ## 1.7.14
 
-- Fixed regression for `DuplicatedCode`
-- Expanded `Credo.Check.Warning.ExpensiveEmptyEnumCheck` to cover less obvious cases
+- Fix regression for `DuplicatedCode`
+- Expand `Credo.Check.Warning.ExpensiveEmptyEnumCheck` to cover less obvious cases
 - New Check: `Credo.Check.Warning.StructFieldAmount`
 
 ## 1.7.13
