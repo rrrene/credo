@@ -230,7 +230,6 @@ defmodule Credo.Code.TokenTest do
       @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}
     end
 
-    @tag needs_elixir: "1.7.0"
     test "should give correct token position for map" do
       source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
       tokens = Credo.Code.to_tokens(source)
