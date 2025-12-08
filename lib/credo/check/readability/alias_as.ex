@@ -3,6 +3,9 @@ defmodule Credo.Check.Readability.AliasAs do
     id: "EX3001",
     base_priority: :low,
     tags: [:experimental],
+    param_defaults: [
+      ignore: []
+    ],
     explanations: [
       check: """
       Aliases can be "renamed" using the `:as` option, but that sometimes
@@ -38,19 +41,32 @@ defmodule Credo.Check.Readability.AliasAs do
       Like all `Readability` issues, this one is not a technical concern.
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
-      """
+      """,
+      params: [
+        ignore: "List of modules to ignore and allow to `alias Module, as: ...`"
+      ]
     ]
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
     ctx = Context.build(source_file, params, __MODULE__)
+    ctx = %{ctx | params: %{ignore: Enum.map(ctx.params.ignore, &Credo.Code.Name.full/1)}}
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
     result.issues
   end
 
-  defp walk({:alias, _, [{:__MODULE__, _, nil}, [as: {_, meta, _}]]}, ctx) do
-    {nil, put_issue(ctx, issue_for(ctx, meta))}
+  defp walk(
+         {:alias, _, [{_, _, _} = name, [as: {_, meta, _}]]},
+         %{params: %{ignore: ignore}} = ctx
+       ) do
+    fullname = Credo.Code.Name.full(name)
+
+    if Enum.member?(ignore, fullname) do
+      {nil, ctx}
+    else
+      {nil, put_issue(ctx, issue_for(ctx, meta))}
+    end
   end
 
   defp walk({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, ctx) do
