@@ -1,6 +1,8 @@
 defmodule Credo.CodeTest do
   use Credo.Test.Case
 
+  require Credo.Code
+
   test "it should NOT report expected code" do
     lines =
       ~S'''
@@ -47,7 +49,7 @@ defmodule Credo.CodeTest do
     assert "invalid encoding starting at <<233, 34>>" == message
   end
 
-  test "it should return true" do
+  test "contains_child?/2 should return true" do
     parent = {
       {:., [line: 5],
        [
@@ -63,7 +65,7 @@ defmodule Credo.CodeTest do
     assert Credo.Code.contains_child?(parent, child)
   end
 
-  test "it should return true /2" do
+  test "contains_child?/2 should return true /2" do
     parent =
       {{:., [line: 3, column: 22],
         [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
@@ -72,6 +74,19 @@ defmodule Credo.CodeTest do
     child = [{:value, [line: 3, column: 34], nil}]
 
     assert Credo.Code.contains_child?(parent, child)
+  end
+
+  test "find_child/2 should return true when using a match expression" do
+    parent =
+      {{:., [line: 3, column: 22],
+        [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
+       [{:value, [line: 3, column: 34], nil}]}
+
+    child = [{:value, [line: 3, column: 34], nil}]
+
+    assert child == Credo.Code.find_child(parent, [{:value, _, nil}])
+
+    refute Credo.Code.find_child(parent, [{:value, _, []}])
   end
 
   test "it should return the function name" do

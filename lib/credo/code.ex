@@ -163,12 +163,34 @@ defmodule Credo.Code do
   `parent` AST node.
   """
   def contains_child?(parent, child) do
-    Credo.Code.prewalk(parent, &find_child(&1, &2, child), false)
+    Credo.Code.prewalk(parent, &do_contains_child?(&1, &2, child), false)
   end
 
-  defp find_child({parent, _meta, child}, _acc, child), do: {parent, true}
+  defp do_contains_child?({parent, _meta, child}, _acc, child), do: {parent, true}
 
-  defp find_child(parent, acc, child), do: {parent, acc || parent == child}
+  defp do_contains_child?(parent, acc, child), do: {parent, acc || parent == child}
+
+  @doc """
+  Returns the first child that matches the given `pattern` in the `parent` AST node.
+  """
+  defmacro find_child(parent, pattern) do
+    quote do
+      Credo.Code.prewalk(
+        unquote(parent),
+        fn
+          ast, {false, acc} -> {nil, {false, acc}}
+          unquote(pattern) = result, {true, acc} -> {nil, {true, [result | acc]}}
+          {_, _, unquote(pattern) = result}, {true, acc} -> {nil, {true, [result | acc]}}
+          ast, {continue?, acc} -> {ast, {continue?, acc}}
+        end,
+        {true, []}
+      )
+      |> case do
+        {_continue, []} -> nil
+        {_continue, [child]} -> child
+      end
+    end
+  end
 
   @doc """
   Takes a SourceFile and returns its source code stripped of all Strings and
