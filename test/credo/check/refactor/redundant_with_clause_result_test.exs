@@ -67,6 +67,20 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     |> refute_issues()
   end
 
+  test "it should NOT report clauses containing a map match" do
+    ~S'''
+    def test do
+      with :ok <- check(),
+          {:ok, %{id: id}} <- much_data() do
+        {:ok, %{id: id}}
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report calls to functions called \"with\"" do
     ~S'''
     def some_function(parameter1, parameter2) do

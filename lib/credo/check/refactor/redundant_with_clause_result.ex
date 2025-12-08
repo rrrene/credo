@@ -27,6 +27,8 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
 
   alias Credo.Code.Block
 
+  require Credo.Code
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -64,7 +66,10 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
   end
 
   defp issue_for({clauses, body}, meta, ctx) do
-    case {redundant?(List.last(clauses), body), length(clauses)} do
+    last_clause = List.last(clauses)
+    redundant_and_not_map_match? = redundant?(last_clause, body) && not map_match?(last_clause)
+
+    case {redundant_and_not_map_match?, length(clauses)} do
       {true, 1} ->
         format_issue(ctx,
           message: "`with` statement is redundant.",
@@ -82,6 +87,10 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
       _else ->
         nil
     end
+  end
+
+  defp map_match?({:<-, _meta, [lhs, _rhs]}) do
+    !!Credo.Code.find_child(lhs, {:%{}, _, _})
   end
 
   defp redundant?({:<-, _meta, [body, _expr]}, body), do: true
