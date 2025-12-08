@@ -64,8 +64,6 @@ defmodule Credo.Check.Readability.MultiAliasTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Module1.Submodule1"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "Module1.Submodule1"})
   end
 end

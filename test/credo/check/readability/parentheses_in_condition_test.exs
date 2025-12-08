@@ -151,9 +151,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "unless"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "unless"})
   end
 
   test "it should report violations with spaces before the parentheses" do

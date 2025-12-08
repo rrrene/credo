@@ -177,17 +177,17 @@ defmodule Credo.Check.Readability.StrictModuleLayoutTest do
       '''
       |> to_source_file
       |> run_check(@described_check, order: ~w/public_fun callback_impl/a)
-      |> assert_issues(fn [issue1, issue2] ->
-        assert issue1.message ==
-                 "public function must appear before callback implementation"
-
-        assert issue1.scope == "CredoSampleModule.baz"
-
-        assert issue2.message ==
-                 "public function must appear before callback implementation"
-
-        assert issue2.scope == "CredoSampleModule.qux"
-      end)
+      |> assert_issues(2)
+      |> assert_issues_match([
+        %{
+          message: "public function must appear before callback implementation",
+          scope: "CredoSampleModule.baz"
+        },
+        %{
+          message: "public function must appear before callback implementation",
+          scope: "CredoSampleModule.qux"
+        }
+      ])
     end
   end
 

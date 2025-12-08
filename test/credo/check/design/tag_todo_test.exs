@@ -87,10 +87,7 @@ defmodule Credo.Check.Design.TagTODOTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 4
-      assert issue.column == 3
-    end)
+    |> assert_issue(%{line_no: 4, column: 3})
   end
 
   test "it should report an issue for @doc tags" do
@@ -224,10 +221,7 @@ defmodule Credo.Check.Design.TagTODOTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger =~ "# todo"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "# todo blah blah"})
   end
 
   test "it should report a couple of issues" do
@@ -249,9 +243,7 @@ defmodule Credo.Check.Design.TagTODOTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 3
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a couple of issues when including docs" do
@@ -273,8 +265,6 @@ defmodule Credo.Check.Design.TagTODOTest do
     '''
     |> to_source_file
     |> run_check(@described_check, include_doc: true)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 4
-    end)
+    |> assert_issues(4)
   end
 end

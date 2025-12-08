@@ -97,6 +97,7 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "run"
     end)
+    |> assert_issue(%{line_no: 2, trigger: "run"})
   end
 
   test "it should report a violation with no parens if parens: true" do
@@ -112,5 +113,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     |> assert_issue(fn issue ->
       assert issue.trigger == "run"
     end)
+    |> assert_issue(%{line_no: 2, trigger: "run"})
   end
 end

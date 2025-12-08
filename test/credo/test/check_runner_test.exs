@@ -2,6 +2,7 @@ defmodule Credo.Test.CheckRunnerTest do
   use ExUnit.Case, async: true
 
   import Credo.Test.CheckRunner
+  import Credo.Test.Assertions
 
   alias Credo.Issue
   alias Credo.SourceFile
@@ -27,20 +28,20 @@ defmodule Credo.Test.CheckRunnerTest do
   end
 
   test "it should run the check" do
-    issues = run_check(@source_file, FakeTestCheck, [])
-
-    assert issues == []
+    @source_file
+    |> run_check(FakeTestCheck, [])
+    |> refute_issues()
   end
 
   test "it should run the check /2" do
-    issues = run_check(@source_file, FakeTestCheck, issue_count: 1)
-
-    assert Enum.count(issues) == 1
+    @source_file
+    |> run_check(FakeTestCheck, issue_count: 1)
+    |> assert_issue()
   end
 
   test "it should run the check /3" do
-    issues = run_check(@source_file, FakeTestCheck, issue_count: 3)
-
-    assert Enum.count(issues) == 3
+    @source_file
+    |> run_check(FakeTestCheck, issue_count: 3)
+    |> assert_issues(3)
   end
 end

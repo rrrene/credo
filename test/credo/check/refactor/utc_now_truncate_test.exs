@@ -273,7 +273,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.trigger == "DateTime.truncate" end)
+    |> assert_issue(%{line_no: 3, trigger: "DateTime.truncate"})
   end
 
   test "should report a violaton with a correct trigger value for NaiveDateTime.truncate/2" do
@@ -286,7 +286,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.trigger == "NaiveDateTime.truncate" end)
+    |> assert_issue(%{line_no: 3, trigger: "NaiveDateTime.truncate"})
   end
 
   test "should report a violaton with a correct line_no value for DateTime.truncate/2" do
@@ -301,7 +301,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.line_no == 5 end)
+    |> assert_issue(%{line_no: 5, trigger: "DateTime.truncate"})
   end
 
   test "should report a violaton with a correct line_no value for NaiveDateTime.truncate/2" do
@@ -316,6 +316,6 @@ defmodule Credo.Check.Refactor.UtcNowTruncateTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.line_no == 5 end)
+    |> assert_issue(%{line_no: 5, trigger: "NaiveDateTime.truncate"})
   end
 end

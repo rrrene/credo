@@ -182,8 +182,6 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "CredoSampleModule"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "CredoSampleModule"})
   end
 end

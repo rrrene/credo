@@ -53,17 +53,13 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
     [@unix_line_endings, @windows_line_endings]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "\r\n"
-    end)
+    |> assert_issue(%{trigger: "\r\n"})
   end
 
   test "it should report an issue here when there is no problem, but the :force param specifies the other kind of line ending" do
     [@windows_line_endings]
     |> to_source_files
     |> run_check(@described_check, force: :unix)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "\r\n"
-    end)
+    |> assert_issue(%{trigger: "\r\n"})
   end
 end

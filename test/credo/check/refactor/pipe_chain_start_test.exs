@@ -435,9 +435,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{trigger: "|>"})
   end
 
   test "it should report a violation for a function call /3" do

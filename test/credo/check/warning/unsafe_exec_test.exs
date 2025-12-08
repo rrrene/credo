@@ -42,10 +42,7 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-    end)
+    |> assert_issue(%{line_no: 3, column: 5, trigger: ":os.cmd"})
   end
 
   test "it should report a violation /2" do
@@ -58,11 +55,7 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == ":os.cmd"
-    end)
+    |> assert_issue(%{line_no: 3, column: 5, trigger: ":os.cmd"})
   end
 
   test "it should report a violation /3" do
@@ -75,10 +68,6 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == ":erlang.open_port"
-    end)
+    |> assert_issue(%{line_no: 3, column: 5, trigger: ":erlang.open_port"})
   end
 end

@@ -65,9 +65,7 @@ defmodule Credo.Check.Readability.BlockPipeTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "|>"})
   end
 
   test "it should report a violation for if" do

@@ -282,10 +282,7 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "66000.3"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "66000.3"})
   end
 
   test "it should report trailing digits which are not configured" do

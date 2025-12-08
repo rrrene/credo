@@ -528,9 +528,7 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "List.to_tuple" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "List.to_tuple"})
   end
 
   test "it should report several violations" do
@@ -552,9 +550,7 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
@@ -570,8 +566,6 @@ defmodule Credo.Check.Warning.UnusedListOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "List.flatten" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "List.flatten"})
   end
 end

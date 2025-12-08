@@ -83,7 +83,7 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(&(length(&1) == 2))
+    |> assert_issues(2)
   end
 
   test "it should report violations when using destructuring tuples" do
@@ -154,9 +154,6 @@ defmodule Credo.Check.Refactor.VariableRebindingTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 4
-      assert issue.trigger == "a!"
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "a!"})
   end
 end

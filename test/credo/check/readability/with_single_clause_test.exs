@@ -83,9 +83,6 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "with"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "with"})
   end
 end

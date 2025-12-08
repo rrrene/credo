@@ -146,9 +146,7 @@ defmodule Credo.Check.Refactor.CyclomaticComplexityTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_complexity: 4)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "foobar"
-    end)
+    |> assert_issue(%{trigger: "foobar"})
   end
 
   #

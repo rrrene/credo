@@ -59,10 +59,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       '''
       |> to_source_file()
       |> run_check(@described_check)
-      |> assert_issue(fn issue ->
-        assert issue.line_no == 2
-        assert issue.trigger == "use"
-      end)
+      |> assert_issue(%{line_no: 2, trigger: "use"})
     end
 
     test "it does not allow `use #{@case_name}` without options" do
@@ -74,10 +71,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       '''
       |> to_source_file()
       |> run_check(@described_check)
-      |> assert_issue(fn issue ->
-        assert issue.line_no == 3
-        assert issue.trigger == "use"
-      end)
+      |> assert_issue(%{line_no: 3, trigger: "use"})
     end
   end
 end

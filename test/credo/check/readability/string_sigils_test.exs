@@ -154,9 +154,7 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> create_snippet()
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "f\"\"b\"\""
-    end)
+    |> assert_issue(%{trigger: "f\"\"b\"\""})
   end
 
   test "should report for more than :maximum_allowed_quotes quotes" do
@@ -164,9 +162,7 @@ defmodule Credo.Check.Readability.StringSigilsTest do
     |> create_snippet()
     |> to_source_file
     |> run_check(@described_check, maximum_allowed_quotes: 5)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "f\"\"b\"\"\"\""
-    end)
+    |> assert_issue(%{trigger: "f\"\"b\"\"\"\""})
   end
 
   test "doesn't crash on #729" do

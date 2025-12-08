@@ -47,10 +47,7 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "some_function"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "some_function"})
   end
 
   test "it should report a violation for :unless" do
@@ -63,10 +60,7 @@ defmodule Credo.Check.Refactor.FunctionArityTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_arity: 4)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "some_function"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "some_function"})
   end
 
   test "it should report a violation for defp's" do

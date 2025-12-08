@@ -62,9 +62,7 @@ defmodule Credo.Check.Readability.OneArityFunctionInPipeTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "bar"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "bar"})
   end
 
   test "it should report violations for missing parentheses" do

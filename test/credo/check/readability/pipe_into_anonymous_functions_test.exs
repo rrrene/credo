@@ -42,9 +42,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{line_no: 6, trigger: "|>"})
   end
 
   test "it should report a violation for multiple violations" do
@@ -61,6 +59,6 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctionsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues()
+    |> assert_issues(2)
   end
 end

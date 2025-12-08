@@ -31,8 +31,6 @@ defmodule Credo.Check.Readability.SemicolonsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == ";"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: ";"})
   end
 end

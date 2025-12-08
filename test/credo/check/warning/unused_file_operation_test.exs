@@ -618,8 +618,6 @@ defmodule Credo.Check.Warning.UnusedFileOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "File.read" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "File.read"})
   end
 end

@@ -112,9 +112,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{trigger: "|>"})
   end
 
   test "it should report a violation for multiple violations" do

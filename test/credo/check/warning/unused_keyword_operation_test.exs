@@ -527,9 +527,7 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Keyword.values" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Keyword.values"})
   end
 
   test "it should report several violations" do
@@ -551,9 +549,7 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
@@ -569,8 +565,6 @@ defmodule Credo.Check.Warning.UnusedKeywordOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Keyword.split" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Keyword.split"})
   end
 end

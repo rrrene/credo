@@ -172,9 +172,7 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_size: 3)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "foobar"
-    end)
+    |> assert_issue(%{trigger: "foobar"})
   end
 
   test "it should NOT report count ecto functions when ecto functions are excluded via :excluded_functions" do

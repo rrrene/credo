@@ -136,9 +136,7 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
       '''
       |> to_source_file
       |> run_check(@described_check)
-      |> assert_issue(fn issue ->
-        assert issue.line_no == 5
-      end)
+      |> assert_issue(%{line_no: 5, trigger: "key"})
     end
   end
 
@@ -155,13 +153,11 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [two, one] ->
-      assert one.trigger == "user_id"
-      assert one.line_no == 4
-
-      assert two.trigger == "key"
-      assert two.line_no == 6
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 4, column: 21, trigger: "user_id"},
+      %{line_no: 6, column: 42, trigger: "key"}
+    ])
   end
 
   test "it should report a violation when Logger.log/3 is used with disallowed metadata" do
@@ -176,8 +172,6 @@ defmodule Credo.Check.Warning.MissedMetadataKeyInLoggerConfigTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "key"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "key"})
   end
 end

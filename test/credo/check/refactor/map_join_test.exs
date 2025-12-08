@@ -109,8 +109,6 @@ defmodule Credo.Check.Refactor.MapJoinTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{trigger: "|>"})
   end
 end

@@ -603,9 +603,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.duplicate" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.duplicate"})
   end
 
   test "it should report several violations" do
@@ -627,9 +625,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
@@ -646,9 +642,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.upcase" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.upcase"})
   end
 
   test "it should report a violation when not last call in rescue" do
@@ -667,9 +661,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.to_float" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.to_float"})
   end
 
   test "it should report a violation when in rescue /2" do
@@ -696,9 +688,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.to_float" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.to_float"})
   end
 
   test "it should report a violation when in rescue /3" do
@@ -725,9 +715,7 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.to_float" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.to_float"})
   end
 
   test "it should report a violation when in rescue /4" do
@@ -749,8 +737,6 @@ defmodule Credo.Check.Warning.UnusedStringOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "String.to_float" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "String.to_float"})
   end
 end

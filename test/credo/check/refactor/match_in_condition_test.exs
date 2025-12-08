@@ -327,6 +327,7 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
       assert issue.line_no == 3
       assert issue.trigger == "="
     end)
+    |> assert_issue(%{line_no: 3, trigger: "="})
   end
 
   test "it should report a violation for operators in simple assignments" do

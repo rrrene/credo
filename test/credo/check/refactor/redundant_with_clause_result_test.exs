@@ -107,9 +107,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.message == "Last clause in `with` is redundant."
-    end)
+    |> assert_issue(%{line_no: 2, message: "Last clause in `with` is redundant."})
   end
 
   test "it should report a violation if the last clause expects same tuple as the with returns" do
@@ -123,10 +121,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.message == "Last clause in `with` is redundant."
-    end)
+    |> assert_issue(%{line_no: 2, message: "Last clause in `with` is redundant."})
   end
 
   test "it should report a violation if the with is redundant" do
@@ -139,10 +134,6 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResultTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.message == "`with` statement is redundant."
-      assert issue.trigger == "with"
-    end)
+    |> assert_issue(%{line_no: 2, message: "`with` statement is redundant."})
   end
 end

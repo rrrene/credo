@@ -59,9 +59,7 @@ defmodule Credo.Check.Readability.PreferUnquotedAtomsTest do
       """
       |> to_source_file
       |> run_check(@described_check)
-      |> assert_issue(fn issue ->
-        assert issue.trigger == ~s(:"quoted_atom")
-      end)
+      |> assert_issue(%{line_no: 2, trigger: ~s(:"quoted_atom")})
     end
 
     test "it should report cases where a quoted keyword identifier is used and could be unquoted" do
