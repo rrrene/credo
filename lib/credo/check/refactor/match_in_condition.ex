@@ -53,7 +53,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     ]
 
   # all non-special-form operators
-  @all_nonspecial_operators ~W(! && ++ -- .. <> =~ @ |> || != !== * + - / ** < <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~ +++ ---)a
+  @all_nonspecial_operators ~W(! && ++ -- .. <> =~ |> || != !== * + - / ** < <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~ +++ ---)a
 
   @doc false
   @impl true
@@ -91,6 +91,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
 
     if assignment_in_body? or has_illegal_ops? do
       if has_illegal_ops? do
+        dbg(rhs)
         {ast, put_issue(ctx, issue_for(op, meta, ctx))}
       else
         {ast, ctx}

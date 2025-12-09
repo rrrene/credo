@@ -61,6 +61,24 @@ defmodule Credo.Check.Refactor.MatchInConditionTest do
     |> refute_issues()
   end
 
+  test "it should NOT report bracket access" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(parameter1) do
+        if token = cookies[@remember_me_cookie] do
+          # ...
+        end
+        if token = cookies[:remember_me] do
+          # ...
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation with :allow_tagged_tuples" do
     ~S'''
     defmodule CredoSampleModule do
