@@ -364,8 +364,6 @@ defmodule Credo.Check.Readability.FunctionNamesTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "sigil_sampleSigil"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "sigil_sampleSigil"})
   end
 end

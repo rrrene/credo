@@ -94,9 +94,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "run"
-    end)
     |> assert_issue(%{line_no: 2, trigger: "run"})
   end
 
@@ -110,9 +107,6 @@ defmodule Credo.Check.Readability.ParenthesesOnZeroArityDefsTest do
     '''
     |> to_source_file
     |> run_check(@described_check, parens: true)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "run"
-    end)
     |> assert_issue(%{line_no: 2, trigger: "run"})
   end
 end

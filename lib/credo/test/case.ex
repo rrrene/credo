@@ -225,7 +225,7 @@ defmodule Credo.Test.Case do
         }
       ])
 
-    One can combine this with `assert_issues/2` to make sure there are the issues one expects:
+    One can combine this with `assert_issues/2` to make sure there are only the issues one expects:
 
       source_file
       |> run_check(FooBar)
@@ -342,7 +342,7 @@ defmodule Credo.Test.Case do
   end
 
   @doc false
-  def get_issue_inline(issue) do
+  def get_issue_inline(issue, reset_color \\ :red) do
     source_files = test_source_files()
     source_line = get_source_line(source_files, issue)
 
@@ -355,8 +355,8 @@ defmodule Credo.Test.Case do
       end
 
     """
-    #{IO.ANSI.cyan()}#{String.pad_leading("#{issue.line_no} |", 6)}#{IO.ANSI.red()} #{source_line}
-    #{IO.ANSI.cyan()}#{String.pad_leading("", 6)} #{marker}#{IO.ANSI.red()}
+    #{IO.ANSI.cyan()}#{String.pad_leading("#{issue.line_no} |", 6)}#{IO.ANSI.format([reset_color])} #{source_line}
+    #{IO.ANSI.cyan()}#{String.pad_leading("", 6)} #{marker}#{IO.ANSI.format([reset_color])}
     """
   end
 

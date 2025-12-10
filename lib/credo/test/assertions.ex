@@ -2,6 +2,7 @@ defmodule Credo.Test.Assertions do
   @moduledoc false
 
   import ExUnit.Assertions
+  import IO.ANSI
 
   def assert_trigger(issue, trigger)
 
@@ -15,16 +16,16 @@ defmodule Credo.Test.Assertions do
 
   def refute_issues(issues) do
     assert [] == issues,
-           "There should be no issues, got #{Enum.count(issues)}:\n\n#{to_inspected(issues)}"
+           "#{red()}There should be no issues, got #{Enum.count(issues)}:#{reset()}\n\n#{to_inspected(issues) |> indent(4)}"
 
     issues
   end
 
   def assert_issue(issues, callback \\ nil) do
-    refute match?([], issues), "There should be one issue, got none."
+    refute match?([], issues), "#{red()}There should be one issue, got none."
 
     assert match?([_only_issue], issues),
-           "There should be only 1 issue, got #{Enum.count(issues)}:\n\n#{to_inspected(issues)}"
+           "#{red()}There should be only 1 issue, got #{Enum.count(issues)}:#{reset()}\n\n#{to_inspected(issues) |> indent(4)}"
 
     case callback do
       callback when is_function(callback) ->
@@ -54,16 +55,17 @@ defmodule Credo.Test.Assertions do
 
   def assert_issues(issues, count) when is_integer(count) do
     assert_issues(issues, fn issues ->
-      assert length(issues) == count, "There should be #{count} issues, got #{length(issues)}."
+      assert length(issues) == count,
+             "#{red()}There should be #{count} issues, got #{length(issues)}."
     end)
   end
 
   def assert_issues(issues, callback)
       when (is_list(issues) and is_nil(callback)) or is_function(callback, 1) do
-    refute match?([], issues), "There should be multiple issues, got none."
+    refute match?([], issues), "#{red()}There should be multiple issues, got none."
 
     refute match?([_only_issue], issues),
-           "There should be more than one issue, got:\n\n#{to_inspected(issues)}"
+           "#{red()}There should be more than one issue, got:#{reset()}\n\n#{to_inspected(issues) |> indent(4)}"
 
     if callback, do: callback.(issues)
 
@@ -75,14 +77,57 @@ defmodule Credo.Test.Assertions do
     |> List.wrap()
     |> Enum.each(&assert_issue_matches(issues, &1))
 
+    pattern_count = length(patterns)
+    issue_count = length(issues)
+
+    assert pattern_count == issue_count,
+           "#{red()}All patterns matched, but there are #{pattern_count} patterns and #{issue_count} issues."
+
     issues
   end
 
   def assert_issue_matches(issues, pattern) do
-    assert matches_any_issue?(issues, pattern),
-           "No issue found matching:\n\n#{inspect(pattern, pretty: true)}\n\nIssues:\n\n#{to_inspected(issues)}"
+    assert matches_any_issue?(issues, pattern), assert_issue_matches_message(issues, pattern)
 
     issues
+  end
+
+  defp assert_issue_matches_message(issues, pattern) do
+    non_matching_fields =
+      Enum.map(pattern, fn {key, value} ->
+        if not matches_any_issue?(issues, Map.new([{key, value}])) do
+          {key, value}
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    inspected_pattern =
+      pattern
+      |> inspect(pretty: true)
+      |> indent(4)
+      |> highlight_fields_in_inspected_pattern(non_matching_fields)
+
+    """
+    #{red()}
+    No issue found matching this pattern:
+    #{reset()}
+    #{inspected_pattern}
+
+    Issues:
+
+    #{to_inspected(issues) |> indent(4)}
+    """
+    |> String.trim_leading()
+  end
+
+  defp highlight_fields_in_inspected_pattern(inspected_pattern, fields) do
+    Enum.reduce(fields, inspected_pattern, fn {key, _}, memo ->
+      String.replace(
+        memo,
+        ~r/(\s*)(#{key}:)(.+)$/mi,
+        "\\1#{red()}\\2#{reset()}\\3#{faint()} # <-- matches no issue#{reset()}"
+      )
+    end)
   end
 
   defp matches_any_issue?(issues, pattern) do
@@ -124,8 +169,16 @@ defmodule Credo.Test.Assertions do
 
       #{Credo.Test.Case.get_issue_inline(issue)}
       """
+      |> String.trim()
     else
       inspected
     end
+  end
+
+  defp indent(string, count) do
+    string
+    |> String.split("\n")
+    |> Enum.map(&"#{String.pad_leading("", count)}#{&1}")
+    |> Enum.join("\n")
   end
 end

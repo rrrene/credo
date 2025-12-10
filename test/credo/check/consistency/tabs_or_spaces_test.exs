@@ -79,7 +79,12 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issues_match([%{trigger: "\t"}])
+    |> assert_issues_match([
+      %{trigger: "\t"},
+      %{trigger: "\t"},
+      %{trigger: "\t"},
+      %{trigger: "\t"}
+    ])
   end
 
   @tag :to_be_implemented

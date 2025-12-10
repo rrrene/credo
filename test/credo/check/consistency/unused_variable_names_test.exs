@@ -351,19 +351,13 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check, force: :anonymous)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 4
-
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "_name"
-             end)
-
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "_item"
-             end)
-    end)
     |> assert_issues(4)
-    |> assert_issues_match([%{line_no: 6, trigger: "_name"}, %{line_no: 7, trigger: "_name"}])
+    |> assert_issues_match([
+      %{line_no: 5, trigger: "_name"},
+      %{line_no: 6, trigger: "_name"},
+      %{line_no: 7, trigger: "_name"},
+      %{line_no: 4, trigger: "_item"}
+    ])
   end
 
   test "it should report a violation once" do
