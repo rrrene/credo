@@ -107,9 +107,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "CredoSampleModule"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "CredoSampleModule"})
   end
 
   test "it should report empty multi line strings" do
@@ -122,9 +120,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "CredoSampleModule"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "CredoSampleModule"})
   end
 
   test "it should report slightly unexpected code" do
@@ -133,9 +129,7 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Person"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "Person"})
   end
 
   test "it should report controller submodules when the :ignore_names param says so" do

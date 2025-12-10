@@ -53,6 +53,11 @@ defmodule Credo.Check.Refactor.IoPutsTest do
       assert two.line_no == 3
       assert two.column == 26
     end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 3, column: 5},
+      %{line_no: 3, column: 26}
+    ])
   end
 
   test "it should report a violation /2" do
@@ -66,10 +71,7 @@ defmodule Credo.Check.Refactor.IoPutsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 4
-      assert issue.trigger == "IO.puts"
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "IO.puts"})
   end
 
   test "it should report a violation /3" do
@@ -82,9 +84,6 @@ defmodule Credo.Check.Refactor.IoPutsTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "IO.puts"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "IO.puts"})
   end
 end

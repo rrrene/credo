@@ -85,15 +85,15 @@ defmodule Credo.CheckTest do
     '''
     |> to_source_file
     |> run_check(MyCustomCheck1)
-    |> assert_issue(fn issue ->
-      assert issue.priority == 113
-      assert issue.trigger == "foobar"
-      assert issue.line_no == 3
-      assert issue.column == 15
-      assert issue.exit_status == 23
-      assert issue.severity == 11
-      assert issue.category == :custom_category
-    end)
+    |> assert_issue(%{
+      priority: 113,
+      trigger: "foobar",
+      line_no: 3,
+      column: 15,
+      exit_status: 23,
+      severity: 11,
+      category: :custom_category
+    })
   end
 
   defmodule IssueInvalidMessageTestCheck do

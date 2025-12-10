@@ -111,8 +111,6 @@ defmodule Credo.Check.Refactor.RejectRejectTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "|>"})
   end
 end

@@ -183,9 +183,85 @@ defmodule Credo.Test.Case do
         assert Enum.count(issues) == 3
       end)
 
+  If a number is given, checks that the count of issues matches:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues(3)
+
   """
   def assert_issues(issues, callback \\ nil) do
     Assertions.assert_issues(issues, callback)
+  end
+
+  @doc """
+  Asserts the presence of one or more issues based on the given patterns.
+
+  This is useful for saying "in this snippet, there should be issues looking like this":
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues_match([
+        %{line_no: 3},
+        %{line_no: 6}
+      ])
+
+  The given patterns can contain all fields of `Credo.Issue`:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues_match([
+        %{
+          message: "Module attribute @config_7 causes trouble",
+          trigger: "@config_7",
+          line_no: 8,
+          column: 13
+        },
+        %{
+          message: "Module attribute @config_9 causes trouble",
+          trigger: "@config_9",
+          line_no: 10,
+          column: 13
+        }
+      ])
+
+    One can combine this with `assert_issues/2` to make sure there are only the issues one expects:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issues(2)
+      |> assert_issues_match([
+        %{line_no: 3},
+        %{line_no: 6}
+      ])
+
+  """
+  def assert_issues_match(issues, patterns) do
+    Assertions.assert_issues_match(issues, patterns)
+  end
+
+  @doc """
+  Asserts the presence of one or more issues based on the given patterns.
+
+  This is useful for saying "in this snippet, there should be at least one issue looking like this":
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue_matches(%{line_no: 3})
+
+  The given patterns can contain all fields of `Credo.Issue`:
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue_matches(%{
+          message: "Module attribute @config_7 causes trouble",
+          trigger: "@config_7",
+          line_no: 8,
+          column: 13
+        })
+  """
+  def assert_issue_matches(issues, pattern) do
+    Assertions.assert_issue_matches(issues, pattern)
   end
 
   @doc false
@@ -266,7 +342,7 @@ defmodule Credo.Test.Case do
   end
 
   @doc false
-  def get_issue_inline(issue) do
+  def get_issue_inline(issue, reset_color \\ :red) do
     source_files = test_source_files()
     source_line = get_source_line(source_files, issue)
 
@@ -279,8 +355,8 @@ defmodule Credo.Test.Case do
       end
 
     """
-    #{source_line}
-    #{marker}
+    #{IO.ANSI.cyan()}#{String.pad_leading("#{issue.line_no} |", 6)}#{IO.ANSI.format([reset_color])} #{source_line}
+    #{IO.ANSI.cyan()}#{String.pad_leading("", 6)} #{marker}#{IO.ANSI.format([reset_color])}
     """
   end
 

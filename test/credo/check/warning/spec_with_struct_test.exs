@@ -96,11 +96,12 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert %{line_no: 2, message: "Struct %MyApp.MyStruct{} found in `@spec`."} = issue
-      assert issue.trigger == "%MyApp.MyStruct{"
-      assert issue.column == 16
-    end)
+    |> assert_issue(%{
+      line_no: 2,
+      column: 16,
+      trigger: "%MyApp.MyStruct{",
+      message: "Struct %MyApp.MyStruct{} found in `@spec`."
+    })
   end
 
   test "it should report an issue if a struct is used as a return value in a spec" do
@@ -117,11 +118,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.column == 16
-      assert issue.trigger == "%AStruct{"
-    end)
+    |> assert_issue(%{line_no: 2, column: 16, trigger: "%AStruct{"})
   end
 
   test "it should report an issue if a struct is part of a union in a spec" do
@@ -139,10 +136,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 24
-    end)
+    |> assert_issue(%{line_no: 3, column: 24})
   end
 
   test "it should report an issue if a struct is used as an argument in a spec" do
@@ -160,10 +154,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 33
-    end)
+    |> assert_issue(%{line_no: 3, column: 33})
   end
 
   test "it should report an issue if a struct has an argument name in a spec" do
@@ -180,10 +171,7 @@ defmodule Credo.Check.Warning.SpecWithStructTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.column == 24
-    end)
+    |> assert_issue(%{line_no: 2, column: 24})
   end
 
   test "it should report multiple issues in separate specs" do

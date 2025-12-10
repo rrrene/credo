@@ -240,8 +240,6 @@ defmodule Credo.Check.Refactor.ApplyTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "apply"
-    end)
+    |> assert_issue(%{trigger: "apply"})
   end
 end

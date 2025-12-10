@@ -37,9 +37,7 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Application.fetch_env"
-    end)
+    |> assert_issue(%{trigger: "Application.fetch_env"})
   end
 
   test "it should report a violation when forbidden calls are made" do
@@ -62,47 +60,43 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert length(issues) == 5
-
-      expected_issues = [
-        {
+    |> assert_issues(5)
+    |> assert_issues_match([
+      %{
+        message:
           "Module attribute @config_1 makes use of unsafe Application configuration call Application.fetch_env/2",
-          {2, 13},
-          "Application.fetch_env"
-        },
-        {
+        line_no: 2,
+        column: 13,
+        trigger: "Application.fetch_env"
+      },
+      %{
+        message:
           "Module attribute @config_3 makes use of unsafe Application configuration call Application.fetch_env!/2",
-          {4, 13},
-          "Application.fetch_env"
-        },
-        {
+        line_no: 4,
+        column: 13,
+        trigger: "Application.fetch_env"
+      },
+      %{
+        message:
           "Module attribute @config_5 makes use of unsafe Application configuration call Application.get_all_env/1",
-          {6, 13},
-          "Application.get_all_env"
-        },
-        {
+        line_no: 6,
+        column: 13,
+        trigger: "Application.get_all_env"
+      },
+      %{
+        message:
           "Module attribute @config_7 makes use of unsafe Application configuration call Application.get_env/2",
-          {8, 13},
-          "Application.get_env"
-        },
-        {
+        line_no: 8,
+        column: 13,
+        trigger: "Application.get_env"
+      },
+      %{
+        message:
           "Module attribute @config_9 makes use of unsafe Application configuration call Application.get_env/3",
-          {10, 13},
-          "Application.get_env"
-        }
-      ]
-
-      Enum.each(expected_issues, fn {message, {line_no, column}, trigger} ->
-        assert issue_exists?(issues, message, {line_no, column}, trigger)
-      end)
-    end)
-  end
-
-  defp issue_exists?(issues, message, {line_no, column}, trigger) do
-    Enum.any?(
-      issues,
-      &match?(%{message: ^message, line_no: ^line_no, column: ^column, trigger: ^trigger}, &1)
-    )
+        line_no: 10,
+        column: 13,
+        trigger: "Application.get_env"
+      }
+    ])
   end
 end

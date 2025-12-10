@@ -229,10 +229,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_length: 80)
-    |> assert_issue(fn issue ->
-      assert 81 == issue.column
-      assert "2" == issue.trigger
-    end)
+    |> assert_issue(%{column: 81, trigger: "2"})
   end
 
   test "it should report a violation /2" do
@@ -247,10 +244,7 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_length: 80)
-    |> assert_issue(fn issue ->
-      assert 81 == issue.column
-      assert issue.message =~ ~r/max is 80, was 112/
-    end)
+    |> assert_issue(%{column: 81, message: ~r/max is 80, was 112/})
   end
 
   test "it should report a violation /3" do

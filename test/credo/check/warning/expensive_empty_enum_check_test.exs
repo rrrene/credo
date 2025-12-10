@@ -129,11 +129,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "length"
-      assert issue.line_no == 3
-      assert issue.column == 8
-    end)
+    |> assert_issue(%{
+      trigger: "length",
+      line_no: 3,
+      column: 8
+    })
   end
 
   test "it should report when checking if length is 0 backwards" do
@@ -150,11 +150,11 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "length"
-      assert issue.line_no == 3
-      assert issue.column == 13
-    end)
+    |> assert_issue(%{
+      trigger: "length",
+      line_no: 3,
+      column: 13
+    })
   end
 
   test "it should report when checking if Enum.count/1 is 0" do
@@ -171,12 +171,12 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Enum.count"
-      assert issue.message =~ "Enum.empty"
-      assert issue.line_no == 3
-      assert issue.column == 8
-    end)
+    |> assert_issue(%{
+      message: ~r/Enum.empty/,
+      trigger: "Enum.count",
+      line_no: 3,
+      column: 8
+    })
   end
 
   test "it should report when checking if Enum.count/1 is 0 backwards" do
@@ -193,11 +193,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.message =~ "Enum.empty"
-      assert issue.line_no == 3
-      assert issue.column == 13
-    end)
+    |> assert_issue(%{line_no: 3, column: 13, message: ~r/Enum.empty/})
   end
 
   test "it should report when checking if Enum.count/2 is 0" do
@@ -214,7 +210,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.message =~ "Enum.any" end)
+    |> assert_issue(%{message: ~r/Enum.any/})
   end
 
   test "it should report when checking if Enum.count/2 is 0 backwards" do
@@ -231,7 +227,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue -> assert issue.message =~ "Enum.any" end)
+    |> assert_issue(%{message: ~r/Enum.any/})
   end
 
   test "it should report when checking if length is 0 with triple-equals" do
@@ -530,9 +526,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert length(issues) == 3
-    end)
+    |> assert_issues(3)
   end
 
   for problem_guard <- [
@@ -568,9 +562,7 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
       """
       |> to_source_file
       |> run_check(@described_check)
-      |> assert_issue(fn issue ->
-        assert issue.message =~ "empty list"
-      end)
+      |> assert_issue(%{message: ~r/empty list/})
     end
   end
 
@@ -608,8 +600,6 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheckTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert length(issues) == 2
-    end)
+    |> assert_issues(2)
   end
 end

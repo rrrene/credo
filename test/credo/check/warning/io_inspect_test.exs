@@ -48,6 +48,7 @@ defmodule Credo.Check.Warning.IoInspectTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
+    |> assert_issue(%{line_no: 3, trigger: "IO.inspect"})
   end
 
   test "it should report a violation with two on the same line" do
@@ -60,13 +61,11 @@ defmodule Credo.Check.Warning.IoInspectTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [first, second] ->
-      assert first.line_no == 3
-      assert first.column == 48
-
-      assert second.line_no == 3
-      assert second.column == 9
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 3, column: 9},
+      %{line_no: 3, column: 48}
+    ])
   end
 
   test "it should report a violation /2" do
@@ -80,10 +79,7 @@ defmodule Credo.Check.Warning.IoInspectTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 4
-      assert issue.trigger == "IO.inspect"
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "IO.inspect"})
   end
 
   test "it should report a violation /3" do

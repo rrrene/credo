@@ -179,9 +179,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Credo.CLI.Sorter"
-    end)
+    |> assert_issue(%{trigger: "Credo.CLI.Sorter"})
   end
 
   test "it should report a violation with as option" do
@@ -193,9 +191,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "App.Module2"
-    end)
+    |> assert_issue(%{trigger: "App.Module2"})
   end
 
   test "it should report a violation with alias groups" do
@@ -211,9 +207,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "App.Module2"
-    end)
+    |> assert_issue(%{trigger: "App.Module2"})
   end
 
   test "it should report a violation for unsorted alias before multi-alias" do
@@ -250,10 +244,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Sorter"
-      assert issue.line_no == 5
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "Sorter"})
   end
 
   test "it should report a violation with multi-alias /2" do
@@ -265,9 +256,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "TextInput"
-    end)
+    |> assert_issue(%{trigger: "TextInput"})
   end
 
   test "it should report a violation with multi-alias /3" do
@@ -286,9 +275,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Sorter"
-    end)
+    |> assert_issue(%{trigger: "Sorter"})
   end
 
   test "it should report a violation with case-sensitive sorting" do
@@ -300,9 +287,7 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "MyApp.AlphaBravoalpha"
-    end)
+    |> assert_issue(%{trigger: "MyApp.AlphaBravoalpha"})
   end
 
   test "it should report a violation with case-sensitive sorting in a multi-alias" do
@@ -313,8 +298,6 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     '''
     |> to_source_file
     |> run_check(@described_check, sort_method: :ascii)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "AlphaBravoalpha"
-    end)
+    |> assert_issue(%{trigger: "AlphaBravoalpha"})
   end
 end

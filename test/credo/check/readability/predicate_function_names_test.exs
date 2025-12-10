@@ -199,9 +199,7 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "is_valid?"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "is_valid?"})
   end
 
   test "it should report a violation with arity /2" do
@@ -211,8 +209,6 @@ defmodule Credo.Check.Readability.PredicateFunctionNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "is_valid"
-    end)
+    |> assert_issue(%{line_no: 1, trigger: "is_valid"})
   end
 end

@@ -517,9 +517,7 @@ defmodule Credo.Check.Warning.UnusedTupleOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Tuple.to_list" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Tuple.to_list"})
   end
 
   test "it should report several violations" do
@@ -541,9 +539,7 @@ defmodule Credo.Check.Warning.UnusedTupleOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
@@ -559,8 +555,6 @@ defmodule Credo.Check.Warning.UnusedTupleOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Tuple.insert_at" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Tuple.insert_at"})
   end
 end

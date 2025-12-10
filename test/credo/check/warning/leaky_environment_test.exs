@@ -38,11 +38,7 @@ defmodule Credo.Check.Warning.LeakyEnvironmentTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == "System.cmd"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "System.cmd"})
   end
 
   test "it should report a violation /2" do
@@ -55,11 +51,7 @@ defmodule Credo.Check.Warning.LeakyEnvironmentTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == "System.cmd"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "System.cmd"})
   end
 
   test "it should report a violation /3" do
@@ -72,10 +64,6 @@ defmodule Credo.Check.Warning.LeakyEnvironmentTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == ":erlang.open_port"
-    end)
+    |> assert_issue(%{line_no: 3, column: 5, trigger: ":erlang.open_port"})
   end
 end

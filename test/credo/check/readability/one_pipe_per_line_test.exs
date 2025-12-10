@@ -40,9 +40,7 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "|>"})
   end
 
   test "it should report multiple violations when having multiples pipes" do
@@ -58,9 +56,7 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 2 == length(issues)
-    end)
+    |> assert_issues(2)
   end
 
   test "it should report multiple violations when having multiples pipes /2" do
@@ -76,8 +72,6 @@ defmodule Credo.Check.Readability.OnePipePerLineTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 2 == length(issues)
-    end)
+    |> assert_issues(2)
   end
 end

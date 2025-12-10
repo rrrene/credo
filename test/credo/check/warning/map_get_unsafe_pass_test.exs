@@ -76,10 +76,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.column == 8
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "Map.get"})
   end
 
   test "it should report a violation /2" do
@@ -96,10 +93,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.column == 5
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "Map.get"})
   end
 
   test "it should report a violation /3" do
@@ -139,11 +133,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePassTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 7
-      assert issue.column == 22
-      assert issue.trigger == "Map.get"
-    end)
+    |> assert_issue(%{line_no: 7, column: 22, trigger: "Map.get"})
   end
 
   test "it should report a violation with a longer pipe as start" do

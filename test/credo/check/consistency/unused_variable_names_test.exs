@@ -122,10 +122,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_item" == issue.trigger
-      assert 4 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "_item"})
   end
 
   test "it should report a violation for different naming schemes with guards (expects anonymous)" do
@@ -149,10 +146,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_x3" == issue.trigger
-      assert 3 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "_x3"})
   end
 
   test "it should report a violation for different naming schemes (expects meaningful)" do
@@ -182,10 +176,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_" == issue.trigger
-      assert 3 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "_"})
   end
 
   test "it should report a violation for different naming schemes with guards (expects meaningful)" do
@@ -215,10 +206,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_" == issue.trigger
-      assert 3 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "_"})
   end
 
   test "it should report a violation for different naming schemes in a two elem tuple match (expects meaningful)" do
@@ -246,12 +234,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert length(issues) == 2
-
-      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 5}, &1))
-      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 4}, &1))
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([%{line_no: 4, trigger: "_"}, %{line_no: 5, trigger: "_"}])
   end
 
   test "it should report a violation for different naming schemes with a map match (expects meaningful)" do
@@ -280,12 +264,8 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert length(issues) == 2
-
-      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 3}, &1))
-      assert Enum.find(issues, &match?(%{trigger: "_", line_no: 5}, &1))
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([%{line_no: 3, trigger: "_"}, %{line_no: 5, trigger: "_"}])
   end
 
   test "it should report a violation for different naming schemes with a list match (expects meaningful)" do
@@ -314,10 +294,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_" == issue.trigger
-      assert 6 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 6, trigger: "_"})
   end
 
   test "it should report a violation for different naming schemes with a macro (expects meaningful)" do
@@ -344,10 +321,7 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "_" == issue.trigger
-      assert 3 == issue.line_no
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "_"})
   end
 
   test "it should report a violation for naming schemes other than the forced one" do
@@ -377,17 +351,13 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check, force: :anonymous)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 4
-
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "_name"
-             end)
-
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "_item"
-             end)
-    end)
+    |> assert_issues(4)
+    |> assert_issues_match([
+      %{line_no: 5, trigger: "_name"},
+      %{line_no: 6, trigger: "_name"},
+      %{line_no: 7, trigger: "_name"},
+      %{line_no: 4, trigger: "_item"}
+    ])
   end
 
   test "it should report a violation once" do

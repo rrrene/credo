@@ -45,8 +45,6 @@ defmodule Credo.Check.Readability.ImplTrueTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "@impl"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "@impl"})
   end
 end

@@ -116,10 +116,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 19 == issue.column
-      assert ",:" == issue.trigger
-    end)
+    |> assert_issue(%{column: 19, trigger: ",:"})
   end
 
   test "it should report when there are many commas not followed by spaces" do
@@ -130,11 +127,13 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 4 == Enum.count(issues)
-      assert [16, 18, 26, 28] == Enum.map(issues, & &1.column)
-      assert [",2", ",\"", ",4", ",5"] == Enum.map(issues, & &1.trigger)
-    end)
+    |> assert_issues(4)
+    |> assert_issues_match([
+      %{column: 16, trigger: ",2"},
+      %{column: 18, trigger: ",\""},
+      %{column: 26, trigger: ",4"},
+      %{column: 28, trigger: ",5"}
+    ])
   end
 
   test "it requires spaces after commas preceded by the `?,`" do

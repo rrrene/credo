@@ -106,10 +106,7 @@ defmodule Credo.Check.Refactor.NegatedIsNilTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "!"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "!"})
   end
 
   test "it should report only one violation in a module with multiple functions when only one is problematic" do
@@ -122,10 +119,7 @@ defmodule Credo.Check.Refactor.NegatedIsNilTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "not"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "not"})
   end
 
   test "it should report two violations in a module with multiple functions when two are problematic" do
@@ -140,6 +134,6 @@ defmodule Credo.Check.Refactor.NegatedIsNilTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+    |> assert_issues(2)
   end
 end

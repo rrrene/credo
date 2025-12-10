@@ -56,9 +56,7 @@ defmodule Credo.Check.Warning.OperationWithConstantResultTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "*"
-    end)
+    |> assert_issue(%{trigger: "*"})
   end
 
   test "it should report a violation for all defined operations" do
@@ -74,14 +72,10 @@ defmodule Credo.Check.Warning.OperationWithConstantResultTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [two, one] ->
-      assert one.trigger == "*"
-      assert one.line_no == 5
-      assert one.column == 7
-
-      assert two.trigger == "*"
-      assert two.line_no == 6
-      assert two.column == 7
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 5, column: 7, trigger: "*"},
+      %{line_no: 6, column: 7, trigger: "*"}
+    ])
   end
 end

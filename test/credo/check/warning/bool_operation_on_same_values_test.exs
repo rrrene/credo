@@ -79,9 +79,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 5 == Enum.count(issues)
-    end)
+    |> assert_issues(5)
   end
 
   test "it should report a violation for `and`" do
@@ -96,10 +94,6 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValuesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "and"
-      assert issue.line_no == 5
-      assert issue.column == 7
-    end)
+    |> assert_issue(%{line_no: 5, column: 7, trigger: "and"})
   end
 end

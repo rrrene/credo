@@ -145,10 +145,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.trigger == "UndefinedResponse"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "UndefinedResponse"})
   end
 
   test "it should report a violation for different naming schemes (prefixes)" do
@@ -173,8 +170,6 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "UndefinedDataFormat"
-    end)
+    |> assert_issue(%{trigger: "UndefinedDataFormat"})
   end
 end

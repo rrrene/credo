@@ -49,8 +49,6 @@ defmodule Credo.Check.Design.SkipTestWithoutCommentTest do
     '''
     |> to_source_file("foo_test.exs")
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "@tag :skip"
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "@tag :skip"})
   end
 end

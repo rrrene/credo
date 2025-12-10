@@ -60,10 +60,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "!"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "!"})
   end
 
   test "it should report a violation with not/2 as well" do
@@ -80,9 +77,6 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "not"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "not"})
   end
 end

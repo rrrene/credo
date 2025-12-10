@@ -118,67 +118,52 @@ defmodule Credo.Check.Consistency.ParameterPatternMatchingTest do
     [@left_and_right_mix]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "foo_left" && issue.line_no == 5
-             end)
-
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "foo_left" && issue.line_no == 8
-             end)
-
-      assert 2 == Enum.count(issues)
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 5, trigger: "foo_left"},
+      %{line_no: 8, trigger: "foo_left"}
+    ])
   end
 
   test "it should report issues when variable declarations are inconsistent throughout sourcefiles" do
-    issues =
-      [
-        @var_right_map,
-        @var_right_struct,
-        @var_right_tuple,
-        @var_right_list,
-        @var_left_map,
-        @var_left_tuple,
-        @var_left_list
-      ]
-      |> to_source_files
-      |> run_check(@described_check)
-      |> assert_issues()
-
-    assert 3 == Enum.count(issues)
+    [
+      @var_right_map,
+      @var_right_struct,
+      @var_right_tuple,
+      @var_right_list,
+      @var_left_map,
+      @var_left_tuple,
+      @var_left_list
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> assert_issues(3)
   end
 
   test "it should report issues when variable declarations are inconsistent throughout sourcefiles (preffering left side)" do
-    issues =
-      [
-        @var_right_map,
-        @var_right_struct,
-        @var_right_list,
-        @var_left_map,
-        @var_left_struct,
-        @var_left_tuple,
-        @var_left_list
-      ]
-      |> to_source_files
-      |> run_check(@described_check)
-      |> assert_issues()
-
-    assert 3 == Enum.count(issues)
+    [
+      @var_right_map,
+      @var_right_struct,
+      @var_right_list,
+      @var_left_map,
+      @var_left_struct,
+      @var_left_tuple,
+      @var_left_list
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> assert_issues(3)
   end
 
   test "it should report issues when variable declarations are inconsistent throughout sourcefiles (forcing left side)" do
-    issues =
-      [
-        @var_right_map,
-        @var_right_struct,
-        @var_right_list,
-        @var_left_map
-      ]
-      |> to_source_files
-      |> run_check(@described_check, force: :before)
-      |> assert_issues()
-
-    assert 3 == Enum.count(issues)
+    [
+      @var_right_map,
+      @var_right_struct,
+      @var_right_list,
+      @var_left_map
+    ]
+    |> to_source_files
+    |> run_check(@described_check, force: :before)
+    |> assert_issues(3)
   end
 end

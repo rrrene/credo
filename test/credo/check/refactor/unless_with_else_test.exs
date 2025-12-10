@@ -45,9 +45,6 @@ defmodule Credo.Check.Refactor.UnlessWithElseTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "unless"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "unless"})
   end
 end

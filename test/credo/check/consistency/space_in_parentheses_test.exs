@@ -139,10 +139,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 7 == issue.line_no
-      assert "{:" == issue.trigger
-    end)
+    |> assert_issue(%{line_no: 7, trigger: "{:"})
   end
 
   test "it should trigger error with no config on empty map" do
@@ -151,10 +148,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 4 == issue.line_no
-      assert "{}" == issue.trigger
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "{}"})
   end
 
   test "it should trigger error with no config on empty array" do
@@ -163,10 +157,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 4 == issue.line_no
-      assert "[]" == issue.trigger
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "[]"})
   end
 
   test "it should not trigger error with config on empty params" do

@@ -427,9 +427,6 @@ defmodule Credo.Check.Warning.UnsafeToAtomTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "Jason.decode!"
-    end)
+    |> assert_issue(%{line_no: 3, column: 5, trigger: "Jason.decode!"})
   end
 end

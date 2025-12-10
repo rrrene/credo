@@ -81,12 +81,11 @@ defmodule Credo.Check.Warning.DbgTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [two, one] ->
-      assert one.line_no == 3
-      assert one.column == 5
-      assert two.line_no == 3
-      assert two.column == 23
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 3, column: 5},
+      %{line_no: 3, column: 23}
+    ])
   end
 
   test "it should report a violation /2" do
@@ -214,9 +213,6 @@ defmodule Credo.Check.Warning.DbgTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "dbg"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "dbg"})
   end
 end

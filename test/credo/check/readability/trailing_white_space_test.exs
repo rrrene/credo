@@ -389,10 +389,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     "defmodule CredoSampleModule do\n@test true   \nend"
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 11 == issue.column
-      assert "   " == issue.trigger
-    end)
+    |> assert_issue(%{column: 11, trigger: "   "})
   end
 
   test "it should report multiple violations" do

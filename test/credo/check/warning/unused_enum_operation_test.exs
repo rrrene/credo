@@ -855,9 +855,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Enum.join" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Enum.join"})
   end
 
   test "it should report several violations" do
@@ -879,9 +877,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
@@ -899,10 +895,6 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Enum.map"
-      assert issue.line_no == 5
-      assert issue.column == 7
-    end)
+    |> assert_issue(%{line_no: 5, column: 7, trigger: "Enum.map"})
   end
 end

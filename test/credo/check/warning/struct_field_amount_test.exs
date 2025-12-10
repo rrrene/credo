@@ -85,9 +85,7 @@ defmodule Credo.Check.Warning.StructFieldAmountTest do
     """
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert match?(%{line_no: 2, column: 3, trigger: "defstruct"}, issue)
-    end)
+    |> assert_issue(%{line_no: 2, column: 3, trigger: "defstruct"})
   end
 
   test "it should report an issue if the struct has more than :max_fields fields" do

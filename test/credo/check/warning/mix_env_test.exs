@@ -122,10 +122,7 @@ defmodule Credo.Check.Warning.MixEnvTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "Mix.env"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "Mix.env"})
   end
 
   test "it should report a violation with two on the same line" do
@@ -138,12 +135,11 @@ defmodule Credo.Check.Warning.MixEnvTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn [two, one] ->
-      assert one.line_no == 3
-      assert one.column == 5
-      assert two.line_no == 3
-      assert two.column == 16
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 3, column: 5},
+      %{line_no: 3, column: 16}
+    ])
   end
 
   test "it should report violations from variables named like def operations" do

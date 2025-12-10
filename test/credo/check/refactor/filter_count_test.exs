@@ -108,10 +108,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.trigger == "count"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "count"})
   end
 
   test "it should report a violation when filter-count pipeline is part of a larger pipeline" do
@@ -141,10 +138,7 @@ defmodule Credo.Check.Refactor.FilterCountTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "count"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "count"})
   end
 
   test "it should report a violation when applying Enum.filter/2 to two arguments and passing result to Enum.count/1" do

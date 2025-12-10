@@ -68,11 +68,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "raise" == issue.trigger
-      assert 10 == issue.line_no
-      assert 9 == issue.column
-    end)
+    |> assert_issue(%{line_no: 10, column: 9, trigger: "raise"})
   end
 
   test "it should report a violation when raise appears inside of a rescue block for an implicit try" do
@@ -91,11 +87,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "raise" == issue.trigger
-      assert 9 == issue.line_no
-      assert 7 == issue.column
-    end)
+    |> assert_issue(%{line_no: 9, column: 7, trigger: "raise"})
   end
 
   test "it should report a violation when raise appears inside of an expression in rescue" do
@@ -114,11 +106,7 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "raise" == issue.trigger
-      assert 8 == issue.line_no
-      assert 53 == issue.column
-    end)
+    |> assert_issue(%{line_no: 8, column: 53, trigger: "raise"})
   end
 
   test "it should report multiple violations" do
@@ -153,6 +141,6 @@ defmodule Credo.Check.Warning.RaiseInsideRescueTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert Enum.count(issues) == 4 end)
+    |> assert_issues(4)
   end
 end
