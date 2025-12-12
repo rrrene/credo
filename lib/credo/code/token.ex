@@ -34,6 +34,10 @@ defmodule Credo.Code.Token do
   """
   def position(token)
 
+  def position({{_, _}, {_, _, _, _} = pos, _, _}) do
+    pos
+  end
+
   def position({_, {line_no, col_start, _}, atom_or_charlist, _, _, _}) do
     position_tuple(atom_or_charlist, line_no, col_start)
   end
@@ -342,9 +346,15 @@ defmodule Credo.Code.Token do
   @doc false
   def reduce(string_or_source_file, callback, acc \\ [])
 
-  def reduce(string_or_source_file, callback, acc) do
-    string_or_source_file
-    |> Credo.Code.to_tokens()
+  def reduce(%Credo.SourceFile{} = source_file, callback, acc) do
+    source_file
+    |> Credo.SourceFile.source()
+    |> reduce(callback, acc)
+  end
+
+  def reduce("" <> string, callback, acc) do
+    string
+    |> CredoTokenizer.tokenize!()
     |> do_reduce(callback, acc)
   end
 
@@ -356,5 +366,5 @@ defmodule Credo.Code.Token do
     do_reduce([current | [next | rest]], callback, acc)
   end
 
-  defp do_reduce(_tokens, _callback, acc), do: acc
+  defp do_reduce(tokens, _callback, acc) when is_list(tokens), do: acc
 end

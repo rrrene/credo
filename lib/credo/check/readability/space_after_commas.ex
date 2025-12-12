@@ -31,6 +31,8 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       """
     ]
 
+  import CredoTokenizer.Guards
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -41,43 +43,22 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
     |> Enum.map(&issue_for(issue_meta, &1))
   end
 
-  defp collect(_prev, {:",", {line, col, _}}, {:atom, {_line, col2, _}, _value}, acc) do
-    do_collect(line, col, col2, ":", acc)
-  end
-
-  defp collect(_prev, {:",", {line, col, _}}, {:bin_string, {_line, col2, _}, _value}, acc) do
-    do_collect(line, col, col2, "\"", acc)
-  end
-
-  defp collect(_prev, {:",", {line, col, _}}, {:list_string, {_line, col2, _}, _value}, acc) do
-    do_collect(line, col, col2, "'", acc)
-  end
-
-  defp collect(_prev, {:",", {line, col, _}}, {_, {_line, col2, value}, _}, acc) do
-    do_collect(line, col, col2, value, acc)
-  end
-
-  defp collect(_prev, {:",", {line, col, _}}, {value, {_line, col2, _}}, acc) do
-    do_collect(line, col, col2, value, acc)
+  defp collect(_prev, {{:",", _}, {line, col, _, _}, _, _} = left, {kind, {_, _, _, _}, value, _} = right, acc)
+       when no_space_between(left, right) and not is_eol(right) do
+    acc ++ [{line, col, trigger(kind, value)}]
   end
 
   defp collect(_prev, _current, _next, acc), do: acc
 
-  defp do_collect(line, col, col2, value, acc) do
-    if col2 == col + 1 do
-      acc ++ [{line, col, ",#{value}"}]
-    else
-      acc
-    end
-  end
+  defp trigger({:string, :binary}, _), do: ",\""
+  defp trigger({:string, :list}, _), do: ",'"
+  defp trigger({:char, nil}, _), do: ",?"
+  defp trigger({:atom, nil}, _), do: ",:"
+  defp trigger({:%{}, nil}, _), do: ",%"
+
+  defp trigger(_, value), do: ",#{String.first(to_string(value))}"
 
   defp issue_for(issue_meta, {line_no, column, trigger}) do
-    format_issue(
-      issue_meta,
-      message: "Space missing after comma.",
-      trigger: trigger,
-      line_no: line_no,
-      column: column
-    )
+    format_issue(issue_meta, message: "Space missing after comma.", trigger: trigger, line_no: line_no, column: column)
   end
 end

@@ -122,6 +122,21 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     end)
   end
 
+  test "it should report when commas are not followed by spaces /2" do
+    """
+    defmodule CredoSampleModule do
+      @attribute {:foo,{:bar}}
+      @attribute {:foo,[:bar]}
+      @attribute {:foo,%{:bar}}
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(fn issues ->
+      assert [",%", ",[", ",{"] == issues |> Enum.map(& &1.trigger) |> Enum.sort()
+    end)
+  end
+
   test "it should report when there are many commas not followed by spaces" do
     """
     defmodule CredoSampleModule do

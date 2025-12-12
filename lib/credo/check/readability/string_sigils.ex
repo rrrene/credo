@@ -1,7 +1,4 @@
 defmodule Credo.Check.Readability.StringSigils do
-  alias Credo.Code.Heredocs
-  alias Credo.SourceFile
-
   use Credo.Check,
     id: "EX3027",
     base_priority: :low,
@@ -46,76 +43,21 @@ defmodule Credo.Check.Readability.StringSigils do
 
     maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
 
-    case remove_heredocs_and_convert_to_ast(source_file) do
-      {:ok, ast} ->
-        Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, maximum_allowed_quotes))
-
-      {:error, errors} ->
-        IO.warn("Unexpected error while parsing #{source_file.filename}: #{inspect(errors)}")
-        []
-    end
-  end
-
-  defp remove_heredocs_and_convert_to_ast(source_file) do
     source_file
-    |> Heredocs.replace_with_spaces()
-    |> Credo.Code.ast()
+    |> Credo.Code.Token.reduce(&collect(&1, &2, &3, &4, issue_meta, maximum_allowed_quotes))
+    |> Enum.reverse()
   end
 
-  defp traverse(
-         {maybe_sigil, meta, [str | rest_ast]} = ast,
-         issues,
-         issue_meta,
-         maximum_allowed_quotes
-       ) do
-    line_no = meta[:line]
-
-    cond do
-      sigil?(maybe_sigil) ->
-        {rest_ast, issues}
-
-      is_binary(str) ->
-        {
-          rest_ast,
-          issues_for_string_literal(
-            str,
-            maximum_allowed_quotes,
-            issues,
-            issue_meta,
-            line_no
-          )
-        }
-
-      true ->
-        {ast, issues}
-    end
-  end
-
-  defp traverse(ast, issues, _issue_meta, _maximum_allowed_quotes) do
-    {ast, issues}
-  end
-
-  defp sigil?(maybe_sigil) when is_atom(maybe_sigil) do
-    maybe_sigil
-    |> Atom.to_string()
-    |> String.starts_with?("sigil_")
-  end
-
-  defp sigil?(_), do: false
-
-  defp issues_for_string_literal(
-         string,
-         maximum_allowed_quotes,
-         issues,
-         issue_meta,
-         line_no
-       ) do
-    if too_many_quotes?(string, maximum_allowed_quotes) do
-      [issue_for(issue_meta, line_no, string, maximum_allowed_quotes) | issues]
+  defp collect({{:string, _}, {line_no, _, _, _}, [value], _}, _, _, acc, issue_meta, maximum_allowed_quotes)
+       when is_binary(value) do
+    if too_many_quotes?(value, maximum_allowed_quotes) do
+      [issue_for(issue_meta, line_no, value, maximum_allowed_quotes) | acc]
     else
-      issues
+      acc
     end
   end
+
+  defp collect(_prev, _current, _next, acc, _issue_meta, _maximum_allowed_quotes), do: acc
 
   defp too_many_quotes?(string, limit) do
     too_many_quotes?(string, 0, limit)

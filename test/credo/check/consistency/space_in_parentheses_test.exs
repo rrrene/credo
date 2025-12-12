@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
 
   @described_check Credo.Check.Consistency.SpaceInParentheses
 
-  @without_spaces ~S"""
+  @without_spaces ~S'''
   defmodule Credo.Sample1 do
     @default_sources_glob ~w(** *.{ex,exs})
     @username_regex ~r/^[A-z0-9 ]+$/
@@ -44,7 +44,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       foo = 'and here are some ( parenthesis )'
     end
   end
-  """
+  '''
   @with_spaces ~S"""
   defmodule Credo.Sample2 do
     defmodule InlineModule do
