@@ -24,12 +24,12 @@ defmodule Credo.Check.Refactor.FilterCount do
 
   @doc false
   def run(source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {:|>, _,
@@ -39,60 +39,52 @@ defmodule Credo.Check.Refactor.FilterCount do
              ]},
             {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "count")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
           [
             {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "count")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _},
             {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "count")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
           [
             {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}]}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "count")
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "`Enum.count/2` is more efficient than `Enum.filter/2 |> Enum.count/1`.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "count",
+      line_no: meta[:line]
     )
   end
 end

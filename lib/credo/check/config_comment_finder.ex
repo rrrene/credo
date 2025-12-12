@@ -12,19 +12,19 @@ defmodule Credo.Check.ConfigCommentFinder do
   @doc false
   def run(source_files) when is_list(source_files) do
     source_files
-    |> Enum.map(&find_and_set_in_source_file/1)
+    |> Task.async_stream(&find_and_set_in_source_file/1, ordered: false, timeout: :infinity)
+    |> Enum.map(fn {:ok, value} -> value end)
     |> Enum.reject(&is_nil/1)
   end
 
-  def find_and_set_in_source_file(source_file) do
+  def find_and_set_in_source_file(%Credo.SourceFile{status: :valid} = source_file) do
     case find_config_comments(source_file) do
-      [] ->
-        nil
-
-      config_comments ->
-        {source_file.filename, config_comments}
+      [] -> nil
+      config_comments -> {source_file.filename, config_comments}
     end
   end
+
+  def find_and_set_in_source_file(_), do: nil
 
   defp find_config_comments(source_file) do
     {_ast, comments} = SourceFile.ast_with_comments(source_file)

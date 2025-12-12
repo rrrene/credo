@@ -15,68 +15,44 @@ defmodule Credo.Check.Warning.Dbg do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {:@, _, [{:dbg, _, _}]},
-         issues,
-         _issue_meta
-       ) do
-    {nil, issues}
+  defp walk({:@, _, [{:dbg, _, _}]}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse(
-         {:dbg, meta, []} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
+  defp walk({:dbg, meta, []} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
 
-  defp traverse(
-         {:dbg, meta, [_single_param]} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
+  defp walk({:dbg, meta, [_single_param]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
 
-  defp traverse(
-         {:dbg, meta, [_first_param, _second_param]} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
+  defp walk({:dbg, meta, [_first_param, _second_param]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
 
-  defp traverse(
+  defp walk(
          {{:., _, [{:__aliases__, meta, [:"Elixir", :Kernel]}, :dbg]}, _, _args} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    {ast, [issue_for(issue_meta, meta, "Elixir.Kernel.dbg") | issues]}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "Elixir.Kernel.dbg"))}
   end
 
-  defp traverse(
-         {{:., _, [{:__aliases__, meta, [:Kernel]}, :dbg]}, _, _args} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta, "Kernel.dbg") | issues]}
+  defp walk({{:., _, [{:__aliases__, meta, [:Kernel]}, :dbg]}, _, _args} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "Kernel.dbg"))}
   end
 
-  defp traverse(
-         {:|>, _, [_, {:dbg, meta, nil}]} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta, "dbg") | issues]}
+  defp walk({:|>, _, [_, {:dbg, meta, nil}]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp issue_for(issue_meta, meta, trigger) do

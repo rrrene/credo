@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro __using__(opts) do
         quote do
@@ -18,14 +18,14 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation if comments are ignored" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro __using__(opts) do
         quote do
@@ -47,7 +47,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_line_count: 7, ignore_comments: true)
     |> refute_issues()
@@ -58,7 +58,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro __using__(opts) do
         quote do
@@ -72,14 +72,14 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_line_count: 2)
     |> assert_issue()
   end
 
   test "it should report a violation if comments are NOT ignored" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro __using__(opts) do
         quote do
@@ -101,12 +101,9 @@ defmodule Credo.Check.Refactor.LongQuoteBlocksTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_line_count: 7)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "quote"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "quote"})
   end
 end

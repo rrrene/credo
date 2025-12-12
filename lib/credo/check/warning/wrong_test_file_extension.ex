@@ -21,14 +21,14 @@ defmodule Credo.Check.Warning.WrongTestFileExtension do
   @doc false
   def run(%SourceFile{} = source_file, params \\ []) do
     source_file
-    |> IssueMeta.for(params)
+    |> Context.build(params, __MODULE__)
     |> issue_for()
     |> List.wrap()
   end
 
-  defp issue_for(issue_meta) do
+  defp issue_for(ctx) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Test files should end with `_test.exs`.",
       line_no: 1,
       trigger: Issue.no_trigger()

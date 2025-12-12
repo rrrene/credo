@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -16,14 +16,14 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
         assert x == x + 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report operator definitions" do
-    """
+    ~S'''
     defmodule Red do
       @moduledoc false
       @spec number - number :: number
@@ -31,21 +31,21 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
         a + 1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report for function calls" do
-    """
+    ~S'''
     defmodule Red do
       def my_fun do
         a() - a()
         Float.round(((:rand.uniform - :rand.uniform) / 100), 13)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -56,7 +56,7 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
   #
 
   test "it should report a violation for ==" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -64,34 +64,27 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
         assert x == x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.column == 14
-    end)
+    |> assert_issue(%{line_no: 5, column: 14, trigger: "=="})
   end
 
   test "it should report a violation for module attributes" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
       @a 5
       @some_module_attribute @a - @a
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "-"
-      assert issue.line_no == 4
-      assert issue.column == 29
-    end)
+    |> assert_issue(%{line_no: 4, column: 29, trigger: "-"})
   end
 
   test "it should report a violation for all defined operations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -108,11 +101,9 @@ defmodule Credo.Check.Warning.OperationOnSameValuesTest do
         y - y + x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 9 == Enum.count(issues)
-    end)
+    |> assert_issues(9)
   end
 end

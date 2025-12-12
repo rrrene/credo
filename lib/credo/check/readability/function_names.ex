@@ -40,68 +40,44 @@ defmodule Credo.Check.Readability.FunctionNames do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-    allow_acronyms? = Credo.Check.Params.get(params, :allow_acronyms, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__, %{issues: %{}})
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
 
-    source_file
-    |> Credo.Code.prewalk(&traverse(&1, &2, issue_meta, allow_acronyms?), empty_issues())
-    |> issues_list()
-  end
-
-  defp empty_issues, do: %{}
-
-  defp add_issue(issues, name, arity, issue), do: Map.put_new(issues, {name, arity}, issue)
-
-  defp issues_list(issues) do
-    issues
-    |> Map.values()
-    |> Enum.sort_by(& &1.line_no)
+    Map.values(result.issues)
   end
 
   # Ignore sigil definitions
   for sigil <- @all_sigil_atoms do
-    defp traverse(
-           {op, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast,
-           issues,
-           _issue_meta,
-           _allow_acronyms?
-         )
+    defp walk({op, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast, ctx)
          when op in [:def, :defp, :defmacro, :defmacrop] do
-      {ast, issues}
+      {ast, ctx}
     end
 
-    defp traverse(
+    defp walk(
            {op, _op_meta,
             [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
-           issues,
-           _issue_meta,
-           _allow_acronyms?
+           ctx
          )
          when op in [:def, :defp, :defmacro, :defmacrop] do
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
   # NOTE: see above for how we want to avoid `sigil_X` definitions
   for op <- @def_ops do
     # Ignore variables named e.g. `defp`
-    defp traverse({unquote(op), _meta, nil} = ast, issues, _issue_meta, _allow_acronyms?) do
-      {ast, issues}
+    defp walk({unquote(op), _meta, nil} = ast, ctx) do
+      {ast, ctx}
     end
 
     # ignore non-special-form (overridable) operators
-    defp traverse(
-           {unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast,
-           issues,
-           _issue_meta,
-           _allow_acronyms?
-         )
+    defp walk({unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast, ctx)
          when operator in @all_nonspecial_operators do
-      {ast, issues}
+      {ast, ctx}
     end
 
     # ignore non-special-form (overridable) operators
-    defp traverse(
+    defp walk(
            {unquote(op), _meta,
             [
               {:when, _,
@@ -110,86 +86,81 @@ defmodule Credo.Check.Readability.FunctionNames do
                ]}
               | _
             ]} = ast,
-           issues,
-           _issue_meta,
-           _allow_acronyms?
+           ctx
          )
          when operator in @all_nonspecial_operators do
-      {ast, issues}
+      {ast, ctx}
     end
 
-    defp traverse({unquote(op), _meta, arguments} = ast, issues, issue_meta, allow_acronyms?) do
-      {ast, issues_for_definition(arguments, issues, issue_meta, allow_acronyms?)}
+    defp walk(
+           {unquote(op), _meta, [{:when, _when_meta, [{name, meta, args} | _guard]} | _]} = ast,
+           ctx
+         ) do
+      {ast, process_call(name, args, meta, ctx)}
+    end
+
+    defp walk({unquote(op), _meta, [{name, meta, args} | _]} = ast, ctx) when is_atom(name) do
+      {ast, process_call(name, args, meta, ctx)}
+    end
+
+    defp walk({unquote(op), _meta, _} = ast, ctx) do
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _allow_acronyms?) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issues_for_definition(
-         [{:when, _when_meta, [{name, meta, args} | _guard]} | _],
-         issues,
-         issue_meta,
-         allow_acronyms?
-       ) do
-    issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
+  defp process_call({:unquote, _, _}, _args, _meta, ctx) do
+    ctx
   end
 
-  defp issues_for_definition([{name, meta, args} | _], issues, issue_meta, allow_acronyms?)
-       when is_atom(name) do
-    issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?)
-  end
-
-  defp issues_for_definition(_body, issues, _issue_meta, _allow_acronyms?) do
-    issues
-  end
-
-  defp issues_for_name({:unquote, _, _}, _args, _meta, issues, _issue_meta, _allow_acronyms?) do
-    issues
-  end
-
-  defp issues_for_name(
+  defp process_call(
          "sigil_" <> sigil_letters = name,
          args,
          meta,
-         issues,
-         issue_meta,
-         _allow_acronyms?
+         ctx
        ) do
-    multi_letter_sigil? = String.match?(sigil_letters, ~r/^[A-Z]+$/)
+    cond do
+      # multi-letter sigil
+      String.match?(sigil_letters, ~r/^[A-Z]+$/) ->
+        ctx
 
-    if multi_letter_sigil? do
-      issues
-    else
-      issue = issue_for(issue_meta, meta[:line], name)
-      arity = length(args || [])
+      Name.snake_case?(name, ctx.params.allow_acronyms) ->
+        ctx
 
-      add_issue(issues, name, arity, issue)
+      true ->
+        issue = issue_for(ctx, meta[:line], name)
+
+        add_issue_with_signature(ctx, name, args, issue)
     end
   end
 
-  defp issues_for_name("" <> name, args, meta, issues, issue_meta, allow_acronyms?) do
-    if Name.snake_case?(name, allow_acronyms?) do
-      issues
+  defp process_call("" <> name, args, meta, ctx) do
+    if Name.snake_case?(name, ctx.params.allow_acronyms) do
+      ctx
     else
-      issue = issue_for(issue_meta, meta[:line], name)
-      arity = length(args || [])
-
-      add_issue(issues, name, arity, issue)
+      add_issue_with_signature(ctx, name, args, issue_for(ctx, meta[:line], name))
     end
   end
 
-  defp issues_for_name(name, args, meta, issues, issue_meta, allow_acronyms?) do
-    name |> to_string |> issues_for_name(args, meta, issues, issue_meta, allow_acronyms?)
+  defp process_call(name, args, meta, ctx) do
+    name |> to_string |> process_call(args, meta, ctx)
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, line_no, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Function/macro/guard names should be written in snake_case.",
       trigger: trigger,
       line_no: line_no
     )
+  end
+
+  def add_issue_with_signature(ctx, name, args, issue) do
+    key = "#{name}/#{Enum.count(List.wrap(args))}"
+
+    %{ctx | issues: Map.put(ctx.issues, key, issue)}
   end
 end

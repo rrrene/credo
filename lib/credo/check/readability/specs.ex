@@ -37,10 +37,11 @@ defmodule Credo.Check.Readability.Specs do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
     specs = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, specs, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__, %{specs: specs})
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   defp find_specs(
@@ -79,63 +80,44 @@ defmodule Credo.Check.Readability.Specs do
     {ast, issues}
   end
 
-  defp traverse({:quote, _, _}, issues, _specs, _issue_meta) do
-    {nil, issues}
+  defp walk({:quote, _, _}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse(
-         {keyword, meta, [{:when, _, def_ast} | _]},
-         issues,
-         specs,
-         issue_meta
-       )
-       when keyword in [:def, :defp] do
-    traverse({keyword, meta, def_ast}, issues, specs, issue_meta)
+  defp walk({keyword, meta, [{:when, _, def_ast} | _]}, ctx) when keyword in [:def, :defp] do
+    walk({keyword, meta, def_ast}, ctx)
   end
 
-  defp traverse(
-         {keyword, meta, [{name, _, args} | _]} = ast,
-         issues,
-         specs,
-         issue_meta
-       )
-       when is_list(args) or is_nil(args) do
+  defp walk({:defp, _, [{_, _, _} | _]} = ast, %{params: %{include_defp: false}} = ctx) do
+    {ast, ctx}
+  end
+
+  defp walk({keyword, meta, [{name, _, args} | _]} = ast, ctx)
+       when keyword in [:def, :defp] and (is_list(args) or is_nil(args)) do
     args = with nil <- args, do: []
+    has_spec? = {name, length(args)} in ctx.specs
 
-    if keyword not in enabled_keywords(issue_meta) or {name, length(args)} in specs do
-      {ast, issues}
+    if has_spec? do
+      {ast, ctx}
     else
-      {ast, [issue_for(issue_meta, meta[:line], name) | issues]}
+      {ast, put_issue(ctx, issue_for(ctx, meta, name))}
     end
   end
 
-  defp traverse(ast, issues, _specs, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
-    trigger =
-      if is_tuple(trigger) do
-        Macro.to_string(trigger)
-      else
-        trigger
-      end
+  defp issue_for(ctx, meta, trigger) when is_tuple(trigger) do
+    issue_for(ctx, meta, Macro.to_string(trigger))
+  end
 
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Functions should have a @spec type specification.",
       trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line]
     )
-  end
-
-  defp enabled_keywords(issue_meta) do
-    issue_meta
-    |> IssueMeta.params()
-    |> Params.get(:include_defp, __MODULE__)
-    |> case do
-      true -> [:def, :defp]
-      _ -> [:def]
-    end
   end
 end

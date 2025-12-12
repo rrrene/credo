@@ -1,7 +1,7 @@
 defmodule Credo.Code.TokenAstCorrelationTest do
   use Credo.Test.Case
 
-  @source_example1 """
+  @source_example1 ~S'''
   defmodule Credo.Sample do
     @test_attribute :foo
 
@@ -15,9 +15,9 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       end
     end
   end
-  """
+  '''
 
-  @source_example2 """
+  @source_example2 ~S'''
   defmodule Credo.Sample do
     defmodule InlineModule do
       def foobar(x) do
@@ -25,56 +25,62 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       end
     end
   end
-  """
+  '''
 
+  @tag needs_elixir: "1.17.0"
   test "should give correct ast for source_example1" do
     source = @source_example1
     {:ok, ast} = Credo.Code.ast(source)
 
     expected = {
       :defmodule,
-      [line: 1, column: 1],
       [
-        {
-          :__aliases__,
-          [line: 1, column: 11],
-          [:Credo, :Sample]
-        },
+        {:end_of_expression, [newlines: 1, line: 13, column: 4]},
+        {:do, [line: 1, column: 24]},
+        {:end, [line: 13, column: 1]},
+        {:line, 1},
+        {:column, 1}
+      ],
+      [
+        {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}],
+         [:Credo, :Sample]},
         [
           do: {
             :__block__,
-            ~c"",
+            [],
             [
               {
                 :@,
-                [line: 2, column: 3],
                 [
-                  {
-                    :test_attribute,
-                    [line: 2, column: 4],
-                    [:foo]
-                  }
-                ]
+                  {:end_of_expression, [newlines: 2, line: 2, column: 23]},
+                  {:line, 2},
+                  {:column, 3}
+                ],
+                [{:test_attribute, [line: 2, column: 4], [:foo]}]
               },
               {
                 :def,
-                [line: 4, column: 3],
+                [
+                  {:end_of_expression, [newlines: 2, line: 6, column: 6]},
+                  {:do, [line: 4, column: 25]},
+                  {:end, [line: 6, column: 3]},
+                  {:line, 4},
+                  {:column, 3}
+                ],
                 [
                   {
                     :foobar,
-                    [line: 4, column: 7],
-                    [
-                      {
-                        :parameter,
-                        [line: 4, column: 14],
-                        nil
-                      }
-                    ]
+                    [{:closing, [line: 4, column: 23]}, {:line, 4}, {:column, 7}],
+                    [{:parameter, [line: 4, column: 14], nil}]
                   },
                   [
                     do: {
                       :+,
-                      [line: 5, column: 29],
+                      [
+                        {:end_of_expression, [newlines: 1, line: 5, column: 40]},
+                        {:line, 5},
+                        {:column, 29}
+                      ],
                       [
                         {
                           {
@@ -83,26 +89,16 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                             [
                               {
                                 :__aliases__,
-                                [line: 5, column: 5],
+                                [{:last, [line: 5, column: 5]}, {:line, 5}, {:column, 5}],
                                 [:String]
                               },
                               :split
                             ]
                           },
-                          [line: 5, column: 12],
-                          [
-                            {
-                              :parameter,
-                              [line: 5, column: 18],
-                              nil
-                            }
-                          ]
+                          [{:closing, [line: 5, column: 27]}, {:line, 5}, {:column, 12}],
+                          [{:parameter, [line: 5, column: 18], nil}]
                         },
-                        {
-                          :parameter,
-                          [line: 5, column: 31],
-                          nil
-                        }
+                        {:parameter, [line: 5, column: 31], nil}
                       ]
                     }
                   ]
@@ -110,17 +106,26 @@ defmodule Credo.Code.TokenAstCorrelationTest do
               },
               {
                 :defmodule,
-                [line: 8, column: 3],
                 [
-                  {
-                    :__aliases__,
-                    [line: 8, column: 13],
-                    [:InlineModule]
-                  },
+                  {:end_of_expression, [newlines: 1, line: 12, column: 6]},
+                  {:do, [line: 8, column: 26]},
+                  {:end, [line: 12, column: 3]},
+                  {:line, 8},
+                  {:column, 3}
+                ],
+                [
+                  {:__aliases__, [{:last, [line: 8, column: 13]}, {:line, 8}, {:column, 13}],
+                   [:InlineModule]},
                   [
                     do: {
                       :def,
-                      [line: 9, column: 5],
+                      [
+                        {:end_of_expression, [newlines: 1, line: 11, column: 8]},
+                        {:do, [line: 9, column: 35]},
+                        {:end, [line: 11, column: 5]},
+                        {:line, 9},
+                        {:column, 5}
+                      ],
                       [
                         {
                           :when,
@@ -128,38 +133,28 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                           [
                             {
                               :foobar,
-                              [line: 9, column: 9],
-                              [
-                                {
-                                  :v,
-                                  [line: 9, column: 16],
-                                  nil
-                                }
-                              ]
+                              [{:closing, [line: 9, column: 17]}, {:line, 9}, {:column, 9}],
+                              [{:v, [line: 9, column: 16], nil}]
                             },
                             {
                               :is_atom,
-                              [line: 9, column: 24],
-                              [
-                                {
-                                  :v,
-                                  [line: 9, column: 32],
-                                  nil
-                                }
-                              ]
+                              [{:closing, [line: 9, column: 33]}, {:line, 9}, {:column, 24}],
+                              [{:v, [line: 9, column: 32], nil}]
                             }
                           ]
                         },
                         [
                           do: {
                             :=,
-                            [line: 10, column: 13],
                             [
-                              {
-                                :{},
-                                [line: 10, column: 7],
-                                [:ok]
-                              },
+                              {:end_of_expression, [newlines: 1, line: 10, column: 24]},
+                              {:line, 10},
+                              {:column, 13}
+                            ],
+                            [
+                              {:{},
+                               [{:closing, [line: 10, column: 11]}, {:line, 10}, {:column, 7}],
+                               [:ok]},
                               {
                                 {
                                   :.,
@@ -167,18 +162,18 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                                   [
                                     {
                                       :__aliases__,
-                                      [line: 10, column: 15],
+                                      [
+                                        {:last, [line: 10, column: 15]},
+                                        {:line, 10},
+                                        {:column, 15}
+                                      ],
                                       [:File]
                                     },
                                     :read
                                   ]
                                 },
-                                [
-                                  {:no_parens, true},
-                                  {:line, 10},
-                                  {:column, 20}
-                                ],
-                                ~c""
+                                [no_parens: true, line: 10, column: 20],
+                                []
                               }
                             ]
                           }
@@ -476,66 +471,151 @@ defmodule Credo.Code.TokenAstCorrelationTest do
     assert expected == tokens
   end
 
+  @tag needs_elixir: "1.17.0"
   test "should give correct ast for source_example2" do
     source = @source_example2
     {:ok, ast} = Credo.Code.ast(source)
 
     expected =
-      {:defmodule, [line: 1, column: 1],
-       [
-         {:__aliases__, [line: 1, column: 11], [:Credo, :Sample]},
-         [
-           do:
-             {:defmodule, [line: 2, column: 3],
+      {
+        :defmodule,
+        [
+          {:end_of_expression, [newlines: 1, line: 7, column: 4]},
+          {:do, [line: 1, column: 24]},
+          {:end, [line: 7, column: 1]},
+          {:line, 1},
+          {:column, 1}
+        ],
+        [
+          {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}],
+           [:Credo, :Sample]},
+          [
+            do: {
+              :defmodule,
               [
-                {:__aliases__, [line: 2, column: 13], [:InlineModule]},
+                {:end_of_expression, [newlines: 1, line: 6, column: 6]},
+                {:do, [line: 2, column: 26]},
+                {:end, [line: 6, column: 3]},
+                {:line, 2},
+                {:column, 3}
+              ],
+              [
+                {:__aliases__, [{:last, [line: 2, column: 13]}, {:line, 2}, {:column, 13}],
+                 [:InlineModule]},
                 [
-                  do:
-                    {:def, [line: 3, column: 5],
-                     [
-                       {:foobar, [line: 3, column: 9], [{:x, [line: 3, column: 16], nil}]},
-                       [
-                         do:
-                           {:=, [line: 4, column: 9],
-                            [
-                              {:x, [line: 4, column: 7], nil},
-                              {:f, [line: 4, column: 11],
-                               [
-                                 {:g, [line: 4, column: 13],
+                  do: {
+                    :def,
+                    [
+                      {:end_of_expression, [newlines: 1, line: 5, column: 8]},
+                      {:do, [line: 3, column: 19]},
+                      {:end, [line: 5, column: 5]},
+                      {:line, 3},
+                      {:column, 5}
+                    ],
+                    [
+                      {
+                        :foobar,
+                        [{:closing, [line: 3, column: 17]}, {:line, 3}, {:column, 9}],
+                        [{:x, [line: 3, column: 16], nil}]
+                      },
+                      [
+                        do: {
+                          :=,
+                          [
+                            {:end_of_expression, [newlines: 1, line: 4, column: 51]},
+                            {:line, 4},
+                            {:column, 9}
+                          ],
+                          [
+                            {:x, [line: 4, column: 7], nil},
+                            {
+                              :f,
+                              [{:closing, [line: 4, column: 50]}, {:line, 4}, {:column, 11}],
+                              [
+                                {
+                                  :g,
+                                  [{:closing, [line: 4, column: 22]}, {:line, 4}, {:column, 13}],
                                   [
-                                    {:h, [line: 4, column: 15],
-                                     [{:a, [line: 4, column: 17], nil}]},
+                                    {
+                                      :h,
+                                      [
+                                        {:closing, [line: 4, column: 18]},
+                                        {:line, 4},
+                                        {:column, 15}
+                                      ],
+                                      [{:a, [line: 4, column: 17], nil}]
+                                    },
                                     {:b, [line: 4, column: 21], nil}
-                                  ]},
-                                 {:*, [line: 4, column: 44],
+                                  ]
+                                },
+                                {
+                                  :*,
+                                  [line: 4, column: 44],
                                   [
-                                    {:k, [line: 4, column: 25],
-                                     [
-                                       {:+, [line: 4, column: 34],
-                                        [
-                                          {:i, [line: 4, column: 27],
-                                           [
-                                             {:-, [line: 4, column: 30],
-                                              [{:c, [line: 4, column: 29], nil}, 1]}
-                                           ]},
-                                          {:j, [line: 4, column: 36],
-                                           [
-                                             {:-, [line: 4, column: 39],
-                                              [{:d, [line: 4, column: 38], nil}, 2]}
-                                           ]}
-                                        ]}
-                                     ]},
-                                    {:l, [line: 4, column: 46],
-                                     [{:e, [line: 4, column: 48], nil}]}
-                                  ]}
-                               ]}
-                            ]}
-                       ]
-                     ]}
+                                    {
+                                      :k,
+                                      [
+                                        {:closing, [line: 4, column: 42]},
+                                        {:line, 4},
+                                        {:column, 25}
+                                      ],
+                                      [
+                                        {
+                                          :+,
+                                          [line: 4, column: 34],
+                                          [
+                                            {
+                                              :i,
+                                              [
+                                                {:closing, [line: 4, column: 32]},
+                                                {:line, 4},
+                                                {:column, 27}
+                                              ],
+                                              [
+                                                {:-, [line: 4, column: 30],
+                                                 [{:c, [line: 4, column: 29], nil}, 1]}
+                                              ]
+                                            },
+                                            {
+                                              :j,
+                                              [
+                                                {:closing, [line: 4, column: 41]},
+                                                {:line, 4},
+                                                {:column, 36}
+                                              ],
+                                              [
+                                                {:-, [line: 4, column: 39],
+                                                 [{:d, [line: 4, column: 38], nil}, 2]}
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      :l,
+                                      [
+                                        {:closing, [line: 4, column: 49]},
+                                        {:line, 4},
+                                        {:column, 46}
+                                      ],
+                                      [{:e, [line: 4, column: 48], nil}]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
                 ]
-              ]}
-         ]
-       ]}
+              ]
+            }
+          ]
+        ]
+      }
 
     assert expected == ast
   end

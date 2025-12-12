@@ -25,61 +25,61 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
-    forbidden_modules =
-      params
-      |> Params.get(:modules, __MODULE__)
-      |> Enum.map(fn
-        {key, value} -> {Name.full(key), value}
-        key -> {Name.full(key), nil}
-      end)
-      |> Map.new()
-
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, forbidden_modules, IssueMeta.for(source_file, params))
-    )
+    ctx = Context.build(source_file, params, __MODULE__)
+    ctx = put_param(ctx, :modules, prepare_modules(ctx.params.modules))
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:__aliases__, meta, modules} = ast, issues, forbidden_modules, issue_meta) do
+  defp walk({:__aliases__, meta, modules} = ast, ctx) do
     module = Name.full(modules)
 
-    issues = put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, module)
+    issue = issue_if_forbidden(ctx, meta, module, module)
 
-    {ast, issues}
+    {ast, put_issue(ctx, issue)}
   end
 
-  defp traverse(
+  defp walk(
          {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]} = ast,
-         issues,
-         forbidden_modules,
-         issue_meta
+         ctx
        ) do
     issues =
-      Enum.reduce(aliases, issues, fn {:__aliases__, meta, module}, issues ->
+      Enum.reduce(aliases, [], fn {:__aliases__, meta, module}, issues ->
         full_module = Name.full([base_alias, module])
         module = Name.full(module)
 
-        put_issue_if_forbidden(issues, issue_meta, meta, full_module, forbidden_modules, module)
+        if issue = issue_if_forbidden(ctx, meta, full_module, module) do
+          [issue | issues]
+        else
+          issues
+        end
       end)
 
-    {ast, issues}
+    {ast, put_issue(ctx, issues)}
   end
 
-  defp traverse(ast, issues, _, _), do: {ast, issues}
+  defp walk(ast, ctx), do: {ast, ctx}
 
-  defp put_issue_if_forbidden(issues, issue_meta, meta, module, forbidden_modules, trigger) do
-    if Map.has_key?(forbidden_modules, module) do
-      [issue_for(issue_meta, meta, module, forbidden_modules, trigger) | issues]
-    else
-      issues
+  defp issue_if_forbidden(ctx, meta, module, trigger) do
+    if Map.has_key?(ctx.params.modules, module) do
+      issue_for(ctx, meta, module, trigger)
     end
   end
 
-  defp issue_for(issue_meta, meta, module, forbidden_modules, trigger) do
-    message = forbidden_modules[module] || "The `#{trigger}` module is not allowed."
+  defp prepare_modules(modules) do
+    modules
+    |> Enum.map(fn
+      {module, message} -> {Name.full(module), message}
+      module -> {Name.full(module), nil}
+    end)
+    |> Map.new()
+  end
+
+  defp issue_for(ctx, meta, module, trigger) do
+    message = ctx.params.modules[module] || "The `#{trigger}` module is not allowed."
 
     format_issue(
-      issue_meta,
+      ctx,
       message: message,
       trigger: trigger,
       line_no: meta[:line],

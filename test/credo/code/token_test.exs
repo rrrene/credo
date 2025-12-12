@@ -3,13 +3,13 @@ defmodule Credo.Code.TokenTest do
 
   alias Credo.Code.Token
 
-  @heredoc_interpolations_source """
+  @heredoc_interpolations_source ~S'''
   def fun() do
-    a = \"\"\"
-    MyModule.\#{fun(Module.value() + 1)}.SubModule.\#{name}"
-    \"\"\"
+    a = """
+    MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
+    """
   end
-  """
+  '''
   @heredoc_interpolations_position {1, 5, 1, 60}
 
   @multiple_interpolations_source ~S[a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"]
@@ -230,7 +230,6 @@ defmodule Credo.Code.TokenTest do
       @kw_identifier_token {:kw_identifier, {1, 3, nil}, :"some-atom-with-quotes"}
     end
 
-    @tag needs_elixir: "1.7.0"
     test "should give correct token position for map" do
       source = ~S(%{"some-atom-with-quotes": "#{filename} world"})
       tokens = Credo.Code.to_tokens(source)

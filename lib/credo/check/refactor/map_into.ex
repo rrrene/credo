@@ -30,51 +30,42 @@ defmodule Credo.Check.Refactor.MapInto do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
+  defp walk(
          {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _,
           [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "Enum.into")
-
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.into"))}
   end
 
-  defp traverse(
+  defp walk(
          {:|>, _,
           [
             {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
             {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, _}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "Enum.into")
-
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.into"))}
   end
 
-  defp traverse(
+  defp walk(
          {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
           [
             {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
             _
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        ) do
-    new_issue = issue_for(issue_meta, meta[:line], "|>")
-
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "|>"))}
   end
 
-  defp traverse(
+  defp walk(
          {:|>, meta,
           [
             {:|>, _,
@@ -84,25 +75,22 @@ defmodule Credo.Check.Refactor.MapInto do
              ]},
             {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, into_args}
           ]} = ast,
-         issues,
-         issue_meta
+         ctx
        )
        when length(into_args) == 1 do
-    new_issue = issue_for(issue_meta, meta[:line], "|>")
-
-    {ast, issues ++ List.wrap(new_issue)}
+    {ast, put_issue(ctx, issue_for(ctx, meta, "|>"))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "`Enum.into/3` is more efficient than `Enum.map/2 |> Enum.into/2`.",
-      trigger: trigger,
-      line_no: line_no
+      line_no: meta[:line],
+      trigger: trigger
     )
   end
 end

@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
 
   @described_check Credo.Check.Consistency.LineEndings
 
-  @unix_line_endings ~S"""
+  @unix_line_endings ~S'''
   defmodule Credo.Sample do
     defmodule InlineModule do
       def foobar do
@@ -11,8 +11,8 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
       end
     end
   end
-  """
-  @unix_line_endings2 ~S"""
+  '''
+  @unix_line_endings2 ~S'''
   defmodule OtherModule do
     defmacro foo do
       {:ok} = File.read
@@ -22,10 +22,10 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
       :ok
     end
   end
-  """
-  @windows_line_endings ~s"""
+  '''
+  @windows_line_endings ~s'''
   defmodule Credo.Sample do\r\n@test_attribute :foo\r\nend
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -53,17 +53,13 @@ defmodule Credo.Check.Consistency.LineEndingsTest do
     [@unix_line_endings, @windows_line_endings]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "\r\n"
-    end)
+    |> assert_issue(%{trigger: "\r\n"})
   end
 
   test "it should report an issue here when there is no problem, but the :force param specifies the other kind of line ending" do
     [@windows_line_endings]
     |> to_source_files
     |> run_check(@described_check, force: :unix)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "\r\n"
-    end)
+    |> assert_issue(%{trigger: "\r\n"})
   end
 end

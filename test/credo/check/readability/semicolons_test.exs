@@ -8,12 +8,12 @@ defmodule Credo.Check.Readability.SemicolonsTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     def fun_name do
       statement1
       statement2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -24,15 +24,13 @@ defmodule Credo.Check.Readability.SemicolonsTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     def fun_name() do
       statement1; statement2
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == ";"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: ";"})
   end
 end

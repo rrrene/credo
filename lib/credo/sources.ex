@@ -33,12 +33,14 @@ defmodule Credo.Sources do
   # does not account for brace or tilde expansion or command substitution
   # or anything other than * and **
   defp matches_glob_naively?(filename, pattern) do
-    pattern
-    |> String.replace("/", "\\/")
-    |> String.replace("**", ".+")
-    |> String.replace("*", "[^\/]+")
-    |> Regex.compile()
-    |> case do
+    string =
+      pattern
+      |> String.replace("**/*", ".+")
+      |> String.replace("/", "\\/")
+      |> String.replace("**", ".+")
+      |> String.replace("*", "[^\/]+")
+
+    case Regex.compile("#{string}$") do
       {:ok, regex} -> String.match?(filename, regex)
       _ -> raise "Compiling glob pattern to regex failed: #{inspect(pattern)}"
     end
@@ -187,6 +189,9 @@ defmodule Credo.Sources do
   defp recurse_path(path) do
     paths =
       cond do
+        non_wildcard_elixir_file_path?(path) ->
+          [path]
+
         File.regular?(path) ->
           [path]
 
@@ -202,6 +207,11 @@ defmodule Credo.Sources do
       end
 
     Enum.map(paths, &Path.expand/1)
+  end
+
+  defp non_wildcard_elixir_file_path?(path) do
+    wildcard_characters = ["*", "{", "}", "?", "[", "]"]
+    String.ends_with?(path, [".ex", ".exs"]) and not String.contains?(path, wildcard_characters)
   end
 
   defp read_files(filenames, parse_timeout) do

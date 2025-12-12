@@ -41,57 +41,32 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    max_complexity = Params.get(params, :max_complexity, __MODULE__)
-
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, issue_meta, max_complexity)
-    )
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # exception for `__using__` macros
-  defp traverse({:defmacro, _, [{:__using__, _, _}, _]} = ast, issues, _, _) do
-    {ast, issues}
+  defp walk({:defmacro, _, [{:__using__, _, _}, _]} = ast, ctx) do
+    {ast, ctx}
   end
 
   for op <- @def_ops do
-    defp traverse(
-           {unquote(op), meta, arguments} = ast,
-           issues,
-           issue_meta,
-           max_complexity
-         )
-         when is_list(arguments) do
-      complexity =
-        ast
-        |> complexity_for
-        |> round
+    defp walk({unquote(op), meta, arguments} = ast, ctx) when is_list(arguments) do
+      complexity = round(complexity_for(ast))
 
-      if complexity > max_complexity do
+      if complexity > ctx.params.max_complexity do
         fun_name = Credo.Code.Module.def_name(ast)
 
-        {
-          ast,
-          issues ++
-            [
-              issue_for(
-                issue_meta,
-                meta[:line],
-                fun_name,
-                max_complexity,
-                complexity
-              )
-            ]
-        }
+        {ast, put_issue(ctx, issue_for(ctx, meta, fun_name, complexity))}
       else
-        {ast, issues}
+        {ast, ctx}
       end
     end
   end
 
-  defp traverse(ast, issues, _source_file, _max_complexity) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   @doc """
@@ -111,20 +86,14 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
   end
 
   for op <- @def_ops do
-    defp traverse_complexity(
-           {unquote(op) = op, _meta, arguments} = ast,
-           complexity
-         )
+    defp traverse_complexity({unquote(op) = op, _meta, arguments} = ast, complexity)
          when is_list(arguments) do
       {ast, complexity + @op_complexity_map[op]}
     end
   end
 
   for op <- @double_condition_ops do
-    defp traverse_complexity(
-           {unquote(op) = op, _meta, arguments} = ast,
-           complexity
-         )
+    defp traverse_complexity({unquote(op) = op, _meta, arguments} = ast, complexity)
          when is_list(arguments) do
       {ast, complexity + @op_complexity_map[op]}
     end
@@ -164,13 +133,15 @@ defmodule Credo.Check.Refactor.CyclomaticComplexity do
     count * @op_complexity_map[op]
   end
 
-  defp issue_for(issue_meta, line_no, trigger, max_value, actual_value) do
+  defp issue_for(ctx, meta, trigger, actual_value) do
+    max_value = ctx.params.max_complexity
+
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "Function is too complex (cyclomatic complexity is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
-      line_no: line_no,
+      line_no: meta[:line],
       severity: Severity.compute(actual_value, max_value)
     )
   end

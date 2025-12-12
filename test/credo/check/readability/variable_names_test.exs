@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.VariableNamesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         some_value = parameter1 + parameter2
@@ -22,7 +22,7 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         latency_μs = 5
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -33,124 +33,124 @@ defmodule Credo.Check.Readability.VariableNamesTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         someValue = parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         someOtherValue = parameter1 + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         {true, someValue} = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         [1, someValue] = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         [someValue | tail] = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         "e" <> someValue = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /7" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         ^someValue = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /8" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         %{some_value: someValue} = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /9" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(oneParam, twoParam) do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /11" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(param) do
         for someValue <- param do
@@ -158,14 +158,14 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /12" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(param) do
         case param do
@@ -175,14 +175,14 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /13" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(_param) do
         try do
@@ -192,14 +192,14 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /14" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(param) do
         receive do
@@ -208,14 +208,14 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /15" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(timeOut) do
         receive do
@@ -225,29 +225,27 @@ defmodule Credo.Check.Readability.VariableNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /16" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(param) do
         fn (otherParam) -> param + otherParam end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "otherParam"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "otherParam"})
   end
 
   test "it should report a violation /17" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(param) do
         with {:ok, v1} <- M.f1(param),
@@ -256,23 +254,20 @@ defmodule Credo.Check.Readability.VariableNamesTest do
              do: M.f0(someValue)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.trigger == "someValue"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "someValue"})
   end
 
   test "it should report multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         %{some_value: someValue, other_value: otherValue} = parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

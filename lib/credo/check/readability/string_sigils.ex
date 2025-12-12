@@ -39,25 +39,24 @@ defmodule Credo.Check.Readability.StringSigils do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    maximum_allowed_quotes = Params.get(params, :maximum_allowed_quotes, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
     source_file
-    |> Credo.Code.Token.reduce(&collect(&1, &2, &3, &4, issue_meta, maximum_allowed_quotes))
+    |> Credo.Code.Token.reduce(&collect/4, ctx)
+    |> then(& &1.issues)
     |> Enum.reverse()
   end
 
-  defp collect({{:string, _}, {line_no, _, _, _}, [value], _}, _, _, acc, issue_meta, maximum_allowed_quotes)
+  defp collect({{:string, _}, {line_no, _, _, _}, [value], _}, _, _, ctx)
        when is_binary(value) do
-    if too_many_quotes?(value, maximum_allowed_quotes) do
-      [issue_for(issue_meta, line_no, value, maximum_allowed_quotes) | acc]
+    if too_many_quotes?(value, ctx.params.maximum_allowed_quotes) do
+      put_issue(ctx, issue_for(ctx, line_no, value))
     else
-      acc
+      ctx
     end
   end
 
-  defp collect(_prev, _current, _next, acc, _issue_meta, _maximum_allowed_quotes), do: acc
+  defp collect(_prev, _current, _next, ctx), do: ctx
 
   defp too_many_quotes?(string, limit) do
     too_many_quotes?(string, 0, limit)
@@ -84,11 +83,11 @@ defmodule Credo.Check.Readability.StringSigils do
     false
   end
 
-  defp issue_for(issue_meta, line_no, trigger, maximum_allowed_quotes) do
+  defp issue_for(ctx, line_no, trigger) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
-        "More than #{maximum_allowed_quotes} quotes found inside string literal, consider using a sigil instead.",
+        "More than #{ctx.params.maximum_allowed_quotes} quotes found inside string literal, consider using a sigil instead.",
       trigger: trigger,
       line_no: line_no
     )

@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
   #
 
   test "it should NOT report implicit use of `try`" do
-    """
+    ~S'''
     defmodule ModuleWithImplicitTry do
       def failing_function(first) do
         to_string(first)
@@ -16,14 +16,14 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
         _ -> :rescued
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation in cases where we need `try`" do
-    """
+    ~S'''
     defmodule ModuleWithExplicitTry do
       def failing_function(first) do
         other_function()
@@ -38,7 +38,7 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
         to_atom(string)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -49,7 +49,7 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
   #
 
   test "it should report cases where a `try` block is the entire body of the function" do
-    """
+    ~S'''
     defmodule ModuleWithExplicitTry do
       def failing_function(first) do
         try do
@@ -59,14 +59,14 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report cases where a `try` block is the entire body of a private function" do
-    """
+    ~S'''
     defmodule ModuleWithExplicitTry do
       defp failing_function(first) do
         try do
@@ -76,14 +76,14 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report cases where a `try` block is the entire body of macro definition" do
-    """
+    ~S'''
     defmodule ModuleWithExplicitTry do
       defmacro failing_function(first) do
         try do
@@ -93,12 +93,9 @@ defmodule Credo.Check.Readability.PreferImplicitTryTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "try"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "try"})
   end
 end

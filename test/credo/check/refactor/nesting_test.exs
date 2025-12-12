@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.NestingTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if parameter1 do
@@ -16,14 +16,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when there are multiple if's on the same level" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if parameter1 do
@@ -34,14 +34,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when there are multiple if's on the same level 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if parameter1 do
@@ -57,14 +57,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when :max_nesting is used properly" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp foo() do
         if true do
@@ -80,7 +80,7 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, max_nesting: 4)
     |> refute_issues()
@@ -91,7 +91,7 @@ defmodule Credo.Check.Refactor.NestingTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if parameter1 do
@@ -104,14 +104,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         case parameter1 do
@@ -125,14 +125,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /3" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if parameter1 do
@@ -144,17 +144,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 7
-      assert issue.trigger == "if"
-    end)
+    |> assert_issue(%{line_no: 7, trigger: "if"})
   end
 
   test "it should report a violation /4" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.reduce(var1, list, fn({_hash, nodes}, list) ->
@@ -168,14 +165,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation /5" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp foo() do
         if true do
@@ -191,16 +188,14 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "if"
-    end)
+    |> assert_issue(%{trigger: "if"})
   end
 
   test "it should report a violation /6" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp foo() do
         if true do
@@ -216,11 +211,9 @@ defmodule Credo.Check.Refactor.NestingTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "if"
-    end)
+    |> assert_issue(%{trigger: "if"})
   end
 end

@@ -32,33 +32,32 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
   @doc false
   @impl true
   def run(source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
     {ast, comments} = SourceFile.ast_with_comments(source_file)
+    ctx = Context.build(source_file, params, __MODULE__, %{comments: comments})
 
-    Credo.Code.prewalk(ast, &traverse(&1, &2, issue_meta, comments))
+    result = Credo.Code.prewalk(ast, &traverse/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, meta, [{:tag, _, [:skip]} | _]} = ast, issues, issue_meta, comments) do
+  defp traverse({:@, meta, [{:tag, _, [:skip]} | _]} = ast, ctx) do
     line_no = meta[:line] - 1
 
-    found_comment? = Enum.any?(comments, fn %{line: line_no2} -> line_no2 == line_no end)
+    found_comment? = Enum.any?(ctx.comments, fn %{line: line_no2} -> line_no2 == line_no end)
 
     if found_comment? do
-      {ast, issues}
+      {ast, ctx}
     else
-      issue = issue_for(issue_meta, line_no)
-      {ast, [issue | issues]}
+      {ast, put_issue(ctx, issue_for(ctx, meta[:line]))}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta, _comments) do
-    {ast, issues}
+  defp traverse(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(ctx, line_no) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Tests tagged to be skipped should have a comment preceding the `@tag :skip`.",
       trigger: "@tag :skip",
       line_no: line_no

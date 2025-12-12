@@ -8,7 +8,7 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   #
 
   test "it should NOT report with default params" do
-    """
+    ~S'''
     defmodule CredoReplicateIssue do
       alias __MODULE__.Module
 
@@ -20,19 +20,19 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     defmodule CredoReplicateIssue.Module do
       def hello, do: :world
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report with default params /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias CredoSampleModule.ForbiddenModule
       def some_function, do: ForbiddenModule.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -43,103 +43,89 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
   #
 
   test "it should report on inline fully qualified usage" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.column == 26
-    end)
+    |> assert_issue(%{line_no: 2, column: 26})
   end
 
   test "it should report on aliases" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias CredoSampleModule.ForbiddenModule
       def some_function, do: ForbiddenModule.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.column == 9
-    end)
+    |> assert_issue(%{line_no: 2, column: 9})
   end
 
   test "it should report on grouped aliases" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       alias CredoSampleModule.{AllowedModule, ForbiddenModule, ForbiddenModule2}
       def some_function, do: ForbiddenModule.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check,
       modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]
     )
-    |> assert_issues(fn [two, one] ->
-      assert one.trigger == "ForbiddenModule"
-      assert one.line_no == 2
-      assert one.column == 43
-      assert two.trigger == "ForbiddenModule2"
-      assert two.line_no == 2
-      assert two.column == 60
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 2, column: 43, trigger: "ForbiddenModule"},
+      %{line_no: 2, column: 60, trigger: "ForbiddenModule2"}
+    ])
   end
 
   test "it should report on import" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       import CredoSampleModule.ForbiddenModule
       def some_function, do: another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
   test "it should report on import only" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       import CredoSampleModule.ForbiddenModule, only: [another_function: 0]
       def some_function, do: another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, modules: [CredoSampleModule.ForbiddenModule])
     |> assert_issue()
   end
 
   test "it should display a custom message" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function, do:
         CredoSampleModule.ForbiddenModule.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, modules: [{CredoSampleModule.ForbiddenModule, "my message"}])
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.column == 5
-      assert issue.trigger == "CredoSampleModule.ForbiddenModule"
-      assert issue.message == "my message"
-    end)
+    |> assert_issue(%{message: "my message"})
   end
 
   test "it should work with multiple forbidden modules" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function, do: CredoSampleModule.ForbiddenModule.another_function()
       def some_function2, do: CredoSampleModule.ForbiddenModule2.another_function()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check,
       modules: [CredoSampleModule.ForbiddenModule, CredoSampleModule.ForbiddenModule2]

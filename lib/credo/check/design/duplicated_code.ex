@@ -206,11 +206,7 @@ defmodule Credo.Check.Design.DuplicatedCode do
   Returns a hash-value for a given +ast+.
   """
   def to_hash(ast) do
-    string =
-      ast
-      |> Inspect.Algebra.to_doc(%Inspect.Opts{})
-      |> Inspect.Algebra.format(80)
-      |> Enum.join("")
+    string = inspect(ast, limit: :infinity)
 
     :sha256
     |> :crypto.hash(string)

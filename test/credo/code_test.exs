@@ -1,15 +1,17 @@
 defmodule Credo.CodeTest do
   use Credo.Test.Case
 
+  require Credo.Code
+
   test "it should NOT report expected code" do
     lines =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def some_function(parameter1, parameter2) do
           some_value = parameter1 + parameter2
         end
       end
-      """
+      '''
       |> Credo.Code.to_lines()
 
     expected = [
@@ -26,13 +28,13 @@ defmodule Credo.CodeTest do
 
   test "it should parse source" do
     {:ok, ast} =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def some_function(parameter1, parameter2) do
           some_value = parameter1 + parameter2
         end
       end
-      """
+      '''
       |> Credo.Code.ast()
 
     refute is_nil(ast)
@@ -47,7 +49,7 @@ defmodule Credo.CodeTest do
     assert "invalid encoding starting at <<233, 34>>" == message
   end
 
-  test "it should return true" do
+  test "contains_child?/2 should return true" do
     parent = {
       {:., [line: 5],
        [
@@ -63,7 +65,7 @@ defmodule Credo.CodeTest do
     assert Credo.Code.contains_child?(parent, child)
   end
 
-  test "it should return true /2" do
+  test "contains_child?/2 should return true /2" do
     parent =
       {{:., [line: 3, column: 22],
         [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
@@ -74,43 +76,57 @@ defmodule Credo.CodeTest do
     assert Credo.Code.contains_child?(parent, child)
   end
 
+  test "find_child/2 should return true when using a match expression" do
+    parent =
+      {{:., [line: 3, column: 22],
+        [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
+       [{:value, [line: 3, column: 34], nil}]}
+
+    child = [{:value, [line: 3, column: 34], nil}]
+
+    assert child == Credo.Code.find_child(parent, [{:value, _, nil}])
+
+    refute Credo.Code.find_child(parent, [{:value, _, []}])
+  end
+
   test "it should return the function name" do
     ast =
-      """
+      ~S'''
       defp foobar(v) do
         List.wrap(v)
         something
       end
-      """
+      '''
       |> Code.string_to_quoted!()
 
     assert :foobar == Credo.Code.Module.def_name(ast)
 
     ast =
-      """
+      ~S'''
       defp foobar(v), do: List.wrap(v)
-      """
+      '''
       |> Code.string_to_quoted!()
 
     assert :foobar == Credo.Code.Module.def_name(ast)
 
     ast =
-      """
+      ~S'''
       defp foobar(v) when is_atom(v) or is_nil(v), do: List.wrap(v)
-      """
+      '''
       |> Code.string_to_quoted!()
 
     assert :foobar == Credo.Code.Module.def_name(ast)
   end
 
   test "it should NOT report expected code /1" do
-    source = """
-    defmodule CredoSampleModule do
-      def some_function(parameter1, parameter2) do
-        parameter1 + " this is a string" # WARNING: NÃO ESTÁ A FUNCIONAR
+    source =
+      ~S'''
+      defmodule CredoSampleModule do
+        def some_function(parameter1, parameter2) do
+          parameter1 + " this is a string" # WARNING: NÃO ESTÁ A FUNCIONAR
+        end
       end
-    end
-    """
+      '''
 
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \" \n  end\nend\n"
@@ -119,27 +135,27 @@ defmodule Credo.CodeTest do
   end
 
   test "it should NOT report expected code 4" do
-    input = ~S"""
+    input = ~S'''
     defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
     do: escape_charlist('"\\' ++ reversed_result, remainder, needs_quote?)
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     defp escape_charlist(reversed_result, [?" | remainder], needs_quote?),
     do: escape_charlist('   ' ++ reversed_result, remainder, needs_quote?)
-    """
+    '''
 
     assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(input)
   end
 
   test "it should NOT report expected code 3" do
-    source = """
+    source = ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         parameter1 + " this is a string"# tell the most browser´s to open
       end
     end
-    """
+    '''
 
     expected =
       "defmodule CredoSampleModule do\n  def some_function(parameter1, parameter2) do\n    parameter1 + \"                 \"\n  end\nend\n"
@@ -148,7 +164,7 @@ defmodule Credo.CodeTest do
   end
 
   test "it should NOT report expected code on clean_charlists_strings_and_sigils" do
-    source = ~S"""
+    source = ~S'''
     defmodule Foo do
       def foo(a) do
         "#{a} #{a}"
@@ -158,9 +174,9 @@ defmodule Credo.CodeTest do
         " )"
       end
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     defmodule Foo do
       def foo(a) do
         "         "
@@ -170,13 +186,13 @@ defmodule Credo.CodeTest do
         "  "
       end
     end
-    """
+    '''
 
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments" do
-    source = ~S"""
+    source = ~S'''
     defmodule Foo do
       def foo(a) do
         "#{a} #{a}"
@@ -186,9 +202,9 @@ defmodule Credo.CodeTest do
         " )"
       end
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     defmodule Foo do
       def foo(a) do
         "         "
@@ -198,30 +214,30 @@ defmodule Credo.CodeTest do
         "  "
       end
     end
-    """
+    '''
 
     assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
   end
 
   test "it should NOT report expected code on clean_charlists_strings_sigils_and_comments /2" do
-    source = """
+    source = ~S'''
     defmodule CredoSampleModule do
       def fun do
         # '
         ','
       end
     end
-    """
+    '''
 
     expected =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def fun do
           *
           ' '
         end
       end
-      """
+      '''
       |> String.replace("*", "")
 
     assert expected == Credo.Code.clean_charlists_strings_sigils_and_comments(source)
@@ -229,33 +245,32 @@ defmodule Credo.CodeTest do
 
   test "it should NOT report expected code on clean_charlists_strings_and_sigils /2" do
     expected =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def fun do
           # '
           ' '
         end
       end
-      """
+      '''
       |> String.replace("*", "")
 
     source_file =
-      """
+      ~S'''
       defmodule CredoSampleModule do
         def fun do
           # '
           ','
         end
       end
-      """
+      '''
       |> to_source_file
 
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
   end
 
-  @tag needs_elixir: "1.9.0"
   test "it should NOT report expected code on clean_charlists_strings_and_sigils /3" do
-    expected = ~S"""
+    expected = ~S'''
     defmodule Domain do
       def create_domain(name, as, check \\ nil) do
         execute(
@@ -273,10 +288,10 @@ defmodule Credo.CodeTest do
 
       def execute(_, _), do: nil
     end
-    """
+    '''
 
     source_file =
-      ~S"""
+      ~S'''
       defmodule Domain do
         def create_domain(name, as, check \\ nil) do
           execute(
@@ -294,7 +309,7 @@ defmodule Credo.CodeTest do
 
         def execute(_, _), do: nil
       end
-      """
+      '''
       |> to_source_file
 
     assert expected == Credo.Code.clean_charlists_strings_and_sigils(source_file)
@@ -358,13 +373,13 @@ defmodule Credo.CodeTest do
   end
 
   test "it should produce valid code /6" do
-    source = ~S"""
+    source = ~S'''
     file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     file_patt   = "                                  "
-    """
+    '''
 
     result = Credo.Code.clean_charlists_strings_sigils_and_comments(source)
     result2 = Credo.Code.clean_charlists_strings_sigils_and_comments(result)
@@ -375,13 +390,13 @@ defmodule Credo.CodeTest do
   end
 
   test "it should produce valid code /7" do
-    source = ~S"""
+    source = ~S'''
     file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     file_patt   = "                                  "
-    """
+    '''
 
     result = Credo.Code.clean_charlists_strings_and_sigils(source)
     result2 = Credo.Code.clean_charlists_strings_and_sigils(result)
@@ -392,15 +407,15 @@ defmodule Credo.CodeTest do
   end
 
   test "it should produce valid code /8" do
-    source = ~S"""
+    source = ~S'''
     file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"
     defp remove_illegal_characters(string), do: String.replace(string, ~r{<>:"/\\\?\*}, "")
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     file_patt   = "                                  "
     defp remove_illegal_characters(string), do: String.replace(string, ~r{           }, "")
-    """
+    '''
 
     result = Credo.Code.clean_charlists_strings_and_sigils(source)
     result2 = Credo.Code.clean_charlists_strings_and_sigils(result)
@@ -411,15 +426,15 @@ defmodule Credo.CodeTest do
   end
 
   test "it should produce valid code /9" do
-    source = """
-    x = Regex.match?(~r/\\"/, value)
-    ~r{<>:"/\\\\\\?\\*}
-    """
+    source = ~S'''
+    x = Regex.match?(~r/\"/, value)
+    ~r{<>:"/\\\?\*}
+    '''
 
-    expected = """
+    expected = ~S'''
     x = Regex.match?(~r/  /, value)
     ~r{           }
-    """
+    '''
 
     result = Credo.Code.clean_charlists_strings_and_sigils(source)
     assert expected == result

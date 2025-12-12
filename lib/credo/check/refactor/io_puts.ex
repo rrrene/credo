@@ -13,37 +13,27 @@ defmodule Credo.Check.Refactor.IoPuts do
       """
     ]
 
-  @call_string "IO.puts"
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {{:., _, [{:__aliases__, meta, [:IO]}, :puts]}, _, _arguments} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, issues_for_call(meta, issues, issue_meta)}
+  defp walk({{:., _, [{:__aliases__, meta, [:IO]}, :puts]}, _, _} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issues_for_call(meta, issues, issue_meta) do
-    [issue_for(issue_meta, meta, @call_string) | issues]
-  end
-
-  defp issue_for(issue_meta, meta, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "There should be no calls to `IO.puts/1`.",
-      trigger: trigger,
+      trigger: "IO.puts",
       line_no: meta[:line],
       column: meta[:column]
     )

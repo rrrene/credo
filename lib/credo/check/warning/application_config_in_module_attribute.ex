@@ -31,32 +31,26 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, _meta, [attribute_definition]} = ast, issues, issue_meta) do
+  defp walk({:@, _meta, [attribute_definition]} = ast, ctx) do
     case traverse_attribute(attribute_definition) do
-      nil ->
-        {ast, issues}
-
-      {attribute, call} ->
-        {ast, issues_for_call(attribute, call, issue_meta, issues)}
+      nil -> {ast, ctx}
+      {attribute, call} -> {ast, put_issue(ctx, issue_for(attribute, call, ctx))}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp traverse_attribute({attribute, _, _} = ast) do
     case Macro.prewalk(ast, nil, &get_forbidden_call/2) do
-      {_ast, nil} ->
-        nil
-
-      {_ast, call} ->
-        {attribute, call}
+      {_ast, nil} -> nil
+      {_ast, call} -> {attribute, call}
     end
   end
 
@@ -96,16 +90,13 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
     {ast, acc}
   end
 
-  defp issues_for_call(attribute, {meta, call, trigger}, issue_meta, issues) do
-    [
-      format_issue(issue_meta,
-        message:
-          "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
-        trigger: trigger,
-        line_no: meta[:line],
-        column: meta[:column]
-      )
-      | issues
-    ]
+  defp issue_for(attribute, {meta, call, trigger}, ctx) do
+    format_issue(ctx,
+      message:
+        "Module attribute @#{Atom.to_string(attribute)} makes use of unsafe Application configuration call #{call}",
+      trigger: trigger,
+      line_no: meta[:line],
+      column: meta[:column]
+    )
   end
 end

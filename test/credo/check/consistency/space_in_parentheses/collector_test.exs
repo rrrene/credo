@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
 
   alias Credo.Check.Consistency.SpaceInParentheses.Collector
 
-  @without_spaces """
+  @without_spaces ~S'''
   defmodule Credo.Sample1 do
     defmodule InlineModule do
       def foobar do
@@ -15,8 +15,8 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
       end
     end
   end
-  """
-  @with_spaces """
+  '''
+  @with_spaces ~S'''
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -24,16 +24,32 @@ defmodule Credo.Check.Consistency.SpaceInParentheses.CollectorTest do
       end
     end
   end
-  """
-  @heredoc_example """
-  string = ~s\"\"\"
-  "[]"
-  \"\"\"
+  '''
+  @with_spaces_empty_enum ~S'''
+    defmodule Credo.Sample2 do
+      defmodule InlineModule do
+        def foobar do
+          exists = File.exists?(filename)
+          { result, %{} } = File.read( filename )
+        end
 
-  another_string = ~s\"\"\"
-  "[ ]"
-  \"\"\"
+        def barfoo do
+          exists = File.exists?(filename)
+          { result, [] } = File.read( filename )
+        end
+      end
+    end
+  '''
+
+  @heredoc_example ~S'''
+  string = ~s"""
+  "[]"
   """
+
+  another_string = ~s"""
+  "[ ]"
+  """
+  '''
 
   test "it should report correct frequencies for without_spaces" do
     without_spaces =

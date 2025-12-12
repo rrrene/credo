@@ -36,30 +36,32 @@ defmodule Credo.Check.Readability.OnePipePerLine do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__, %{issue_candidates: []})
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
 
-    source_file
-    |> Credo.Code.prewalk(&traverse/2)
+    result.issue_candidates
     |> Enum.uniq()
-    |> Enum.map(&issue_for(issue_meta, &1))
+    |> Enum.map(&issue_for(ctx, &1))
   end
 
-  defp traverse({:|>, meta, [{:|>, meta2, _} | _]} = ast, acc) do
+  defp walk({:|>, meta, [{:|>, meta2, _} | _]} = ast, ctx) do
     if meta[:line] == meta2[:line] do
-      {ast, [meta[:line] | acc]}
+      {ast, unshift(ctx, :issue_candidates, meta[:line])}
     else
-      {ast, acc}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, acc), do: {ast, acc}
+  defp walk(ast, ctx) do
+    {ast, ctx}
+  end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(ctx, line_no) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid using multiple pipes (`|>`) on the same line.",
-      line_no: line_no,
-      trigger: "|>"
+      trigger: "|>",
+      line_no: line_no
     )
   end
 end

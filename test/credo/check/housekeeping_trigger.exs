@@ -1,6 +1,7 @@
 defmodule Credo.Check.HousekeepingTriggerTest do
   use Credo.Test.Case
 
+  @assert_ops [:assert_issue, :assert_issues, :assert_issues_match]
   @tag housekeeping: :trigger
   test "find trigger assertions" do
     errors =
@@ -21,7 +22,7 @@ defmodule Credo.Check.HousekeepingTriggerTest do
           Macro.prewalk(ast, [], fn
             {:test, _, [_ | _] = args}, acc ->
               Macro.prewalk(args, acc, fn
-                {op, _, [_ | _] = args2}, acc when op in [:assert_issue, :assert_issues] ->
+                {op, _, [_ | _] = args2}, acc when op in @assert_ops ->
                   Macro.prewalk(args2, acc, fn
                     {:fn, _, args3}, acc ->
                       Macro.prewalk(args3, acc, fn
@@ -31,6 +32,13 @@ defmodule Credo.Check.HousekeepingTriggerTest do
                         ast, acc ->
                           {ast, acc}
                       end)
+
+                    {:%{}, _, keywords}, acc ->
+                      if Keyword.has_key?(keywords, :trigger) do
+                        {nil, [{:ok, filename}] ++ acc}
+                      else
+                        {nil, acc}
+                      end
 
                     ast, acc ->
                       {ast, acc}

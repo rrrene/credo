@@ -20,47 +20,43 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     ]
 
   def run(source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # `use` with options
-  defp traverse(
-         {:use, meta, [{_, _meta, module_namespace}, [_ | _] = options]} = ast,
-         issues,
-         issue_meta
-       ) do
+  defp walk({:use, meta, [{_, _meta, module_namespace}, [_ | _] = options]} = ast, ctx) do
     module_name = Credo.Code.Name.last(module_namespace)
 
     if String.ends_with?(module_name, "Case") and !Keyword.has_key?(options, :async) do
-      {ast, issues ++ [issue_for(meta[:line], issue_meta)]}
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
   # `use` without options
-  defp traverse({:use, meta, [{_op, _meta, module_namespace}]} = ast, issues, issue_meta) do
+  defp walk({:use, meta, [{_op, _meta, module_namespace}]} = ast, ctx) do
     module_name = Credo.Code.Name.last(module_namespace)
 
     if String.ends_with?(module_name, "Case") do
-      {ast, issues ++ [issue_for(meta[:line], issue_meta)]}
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
-      {ast, issues}
+      {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(line_no, issue_meta) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Pass an `:async` boolean option to `use` a test case module.",
       trigger: "use",
-      line_no: line_no
+      line_no: meta[:line]
     )
   end
 end

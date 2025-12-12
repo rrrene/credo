@@ -8,18 +8,18 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @some_foobar
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT fail on a dynamic attribute" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro define(key, value) do
         quote do
@@ -27,14 +27,14 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT fail when redefining the @ operator" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defmacro @{_, _, _} do
         quote do
@@ -42,7 +42,7 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -53,16 +53,13 @@ defmodule Credo.Check.Readability.ModuleAttributeNamesTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       @someFoobar false
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 2
-      assert issue.trigger == "@someFoobar"
-    end)
+    |> assert_issue(%{line_no: 2, trigger: "@someFoobar"})
   end
 end

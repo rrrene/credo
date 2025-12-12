@@ -351,6 +351,36 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues()
   end
 
+  test "it should NOT report escaped heredocs in regular heredocs" do
+    ~S'''
+    defmodule Example do
+      @moduledoc ~S"""
+      config_yaml = \"\"\"
+      apiVersion: v1
+      \"\"\"
+      """
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report escaped heredocs in regular heredocs /2" do
+    ~S'''
+    defmodule Example do
+      @moduledoc ~S"""
+      \"\"\"
+      ...
+      \"\"\"
+      """
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -359,10 +389,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     "defmodule CredoSampleModule do\n@test true   \nend"
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 11 == issue.column
-      assert "   " == issue.trigger
-    end)
+    |> assert_issue(%{column: 11, trigger: "   "})
   end
 
   test "it should report multiple violations" do

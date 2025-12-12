@@ -31,17 +31,16 @@ defmodule Credo.Check.Design.TagTODO do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    include_doc? = Params.get(params, :include_doc, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
     source_file
-    |> TagHelper.find_tags(@tag_name, include_doc?)
-    |> Enum.map(&issue_for(issue_meta, &1))
+    |> TagHelper.find_tags(@tag_name, ctx.params.include_doc)
+    |> Enum.map(&issue_for(ctx, &1))
   end
 
-  defp issue_for(issue_meta, {{line_no, column}, _line, trigger}) do
+  defp issue_for(ctx, {{line_no, column}, _line, trigger}) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Found a #{@tag_name} tag in a comment: #{trigger}",
       line_no: line_no,
       column: column,

@@ -1,9 +1,11 @@
 ExUnit.start()
 
 check_version =
-  ~w(1.6.5 1.7.0 1.9.0)
-  |> Enum.reduce([], fn version, acc ->
+  17..20
+  |> Enum.reduce([], fn minor, acc ->
     # allow -dev versions so we can test before the Elixir release.
+    version = "1.#{minor}.0"
+
     if System.version() |> Version.match?("< #{version}-dev") do
       acc ++ [needs_elixir: version]
     else

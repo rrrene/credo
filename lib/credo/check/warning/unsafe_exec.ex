@@ -29,25 +29,25 @@ defmodule Credo.Check.Warning.UnsafeExec do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({{:., meta, call}, _, args} = ast, issues, issue_meta) do
+  defp walk({{:., meta, call}, _, args} = ast, ctx) do
     case get_forbidden_call(call, args) do
       {bad, suggestion, trigger} ->
         [module, _function] = call
 
-        {ast, [issue_for(bad, suggestion, trigger, meta, module, issue_meta) | issues]}
+        {ast, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger, module))}
 
       nil ->
-        {ast, issues}
+        {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp get_forbidden_call([:os, :cmd], [_]) do
@@ -67,10 +67,10 @@ defmodule Credo.Check.Warning.UnsafeExec do
     nil
   end
 
-  defp issue_for(call, suggestion, trigger, meta, erlang_module, issue_meta) do
+  defp issue_for(ctx, meta, call, suggestion, trigger, erlang_module) do
     column = meta[:column] - String.length(":#{erlang_module}")
 
-    format_issue(issue_meta,
+    format_issue(ctx,
       message: "Prefer #{suggestion} over #{call} to prevent command injection.",
       trigger: trigger,
       line_no: meta[:line],

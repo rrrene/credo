@@ -3,7 +3,7 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
 
   @described_check Credo.Check.Consistency.TabsOrSpaces
 
-  @with_tabs """
+  @with_tabs ~s'''
   defmodule Credo.Sample do
   \t@test_attribute :foo
 
@@ -11,8 +11,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
   \t\tString.split(parameter1) + parameter2
   \tend
   end
-  """
-  @with_spaces """
+  '''
+  @with_spaces ~S'''
   defmodule Credo.Sample do
     defmodule InlineModule do
       def foobar do
@@ -20,8 +20,8 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       end
     end
   end
-  """
-  @with_spaces2 """
+  '''
+  @with_spaces2 ~S'''
   defmodule OtherModule do
     defmacro foo do
       {:ok} = File.read
@@ -31,7 +31,7 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
       :ok
     end
   end
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -79,11 +79,12 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == "\t"
-             end)
-    end)
+    |> assert_issues_match([
+      %{trigger: "\t"},
+      %{trigger: "\t"},
+      %{trigger: "\t"},
+      %{trigger: "\t"}
+    ])
   end
 
   @tag :to_be_implemented
@@ -94,10 +95,6 @@ defmodule Credo.Check.Consistency.TabsOrSpacesTest do
     ]
     |> to_source_files
     |> run_check(@described_check, force: :tabs)
-    |> assert_issues(fn issues ->
-      assert Enum.any?(issues, fn issue ->
-               issue.trigger == " "
-             end)
-    end)
+    |> assert_issues_match([%{trigger: " "}])
   end
 end

@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         with :ok <- parameter1,
@@ -19,12 +19,12 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
 
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         with :ok <- parameter1 do
@@ -32,25 +32,25 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report calls to functions called \"with\"" do
-    """
+    ~S'''
     def some_function(parameter1, parameter2) do
       with(parameter1, parameter2)
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when using unquote_splicing" do
-    """
+    ~S'''
     quote do
       with unquote_splicing(cases) do
         {:ok, unquote(ret)}
@@ -58,7 +58,7 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
         _ -> :error
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -69,7 +69,7 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
   #
 
   test "it should report a violation for a single <- clause if there's an else branch" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         with :ok <- parameter1 do
@@ -80,12 +80,9 @@ defmodule Credo.Check.Readability.WithSingleClauseTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger == "with"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "with"})
   end
 end

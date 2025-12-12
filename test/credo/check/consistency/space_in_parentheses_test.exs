@@ -45,7 +45,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     end
   end
   '''
-  @with_spaces ~S"""
+  @with_spaces ~S'''
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -53,8 +53,8 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       end
     end
   end
-  """
-  @with_spaces2 ~S"""
+  '''
+  @with_spaces2 ~S'''
   defmodule OtherModule3 do
     defmacro foo do
         { :ok } = File.read( filename )
@@ -64,8 +64,8 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       :ok
     end
   end
-  """
-  @with_spaces_empty_params1 ~S"""
+  '''
+  @with_spaces_empty_params1 ~S'''
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -73,8 +73,8 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       end
     end
   end
-  """
-  @with_spaces_empty_params2 ~S"""
+  '''
+  @with_spaces_empty_params2 ~S'''
   defmodule Credo.Sample2 do
     defmodule InlineModule do
       def foobar do
@@ -82,8 +82,8 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       end
     end
   end
-  """
-  @with_and_without_spaces ~S"""
+  '''
+  @with_and_without_spaces ~S'''
   defmodule OtherModule3 do
     defmacro foo do
       { :ok } = File.read( filename )
@@ -93,7 +93,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
       {:ok, :test}
     end
   end
-  """
+  '''
 
   #
   # cases NOT raising issues
@@ -167,9 +167,11 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert Enum.any?(issues, &(7 == &1.line_no && &1.trigger == "{"))
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 7, trigger: "{"},
+      %{line_no: 7, trigger: "}"}
+    ])
   end
 
   test "it should report with no config on empty map" do
@@ -178,10 +180,7 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 4 == issue.line_no
-      assert "%{}" == issue.trigger
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "%{}"})
   end
 
   test "it should report with no config on empty array" do
@@ -190,9 +189,6 @@ defmodule Credo.Check.Consistency.SpaceInParenthesesTest do
     ]
     |> to_source_files()
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert 4 == issue.line_no
-      assert "[]" == issue.trigger
-    end)
+    |> assert_issue(%{line_no: 4, trigger: "[]"})
   end
 end

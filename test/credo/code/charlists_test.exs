@@ -4,60 +4,60 @@ defmodule Credo.Code.CharlistsTest do
   alias Credo.Code.Charlists
 
   test "it should return the source unchanged if there are no charlists" do
-    source = """
+    source = ~S'''
     "it should report a violation if the with doesn't start with <- clauses"
-    \"\"\"
+    """
     def some_function(parameter1, parameter2) do
       with IO.puts("not a <- clause"),
            :ok <- parameter1 do
         parameter2
       end
     end
-    \"\"\"
-    ~s("with" doesn't start with a <- clause)
     """
+    ~s("with" doesn't start with a <- clause)
+    '''
 
     assert source == Charlists.replace_with_spaces(source)
   end
 
   test "it should return the source without string literals 2" do
-    source = """
+    source = ~S'''
     x = "this 'should not be' removed!"
     y = 'also: # TODO: no comment here'
     ?' # TODO: this is the third
     # '
 
-    \"\"\"
+    """
     inside_heredoc = 'also: # TODO: no comment here'
-    \"\"\"
-
-    'also: # TODO: no comment here as well'
     """
 
-    expected = """
+    'also: # TODO: no comment here as well'
+    '''
+
+    expected = ~S'''
     x = "this 'should not be' removed!"
     y = '                             '
     ?' # TODO: this is the third
     # '
 
-    \"\"\"
+    """
     inside_heredoc = 'also: # TODO: no comment here'
-    \"\"\"
+    """
 
     '                                     '
-    """
+    '''
 
     assert expected == source |> Charlists.replace_with_spaces()
   end
 
   test "it should not modify commented out code" do
-    source = """
+    source = ~S'''
     defmodule Foo do
       defmodule Bar do
-        # @doc \"\"\"
+        # @doc """
         # Reassign a student to a discussion group.
         # This will un-assign student from the current discussion group
-        # \"\"\"
+        # """
         # def assign_group(leader = %User{}, student = %User{}) do
         #   cond do
         #     leader.role == :student ->
@@ -81,7 +81,7 @@ defmodule Credo.Code.CharlistsTest do
         def baz, do: 123
       end
     end
-    """
+    '''
 
     expected = source
 
@@ -122,23 +122,23 @@ defmodule Credo.Code.CharlistsTest do
   end
 
   test "it should NOT report expected code with multiline strings" do
-    input = ~S"""
+    input = ~S'''
     foo = '
     a
 
 
     b
     '
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     foo = '
     .
     .
     .
     .
     '
-    """
+    '''
 
     assert expected ==
              Charlists.replace_with_spaces(
@@ -151,23 +151,23 @@ defmodule Credo.Code.CharlistsTest do
   end
 
   test "it should NOT report expected code with multiline string sigils" do
-    input = ~S"""
+    input = ~S'''
     foo = ~c"
     a
 
 
     b
     "
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     foo = ~c"
     .
     .
     .
     .
     "
-    """
+    '''
 
     assert expected ==
              Charlists.replace_with_spaces(

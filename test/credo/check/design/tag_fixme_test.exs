@@ -8,7 +8,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -16,7 +16,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
         assert x == x + 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -27,7 +27,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
   #
 
   test "it should report an issue" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case # TODO: this should not appear in the FIXME test
 
@@ -37,27 +37,24 @@ defmodule Credo.Check.Design.TagFIXMETest do
         assert x == x + 2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report an issue when lower case" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_fun do
         # fixme blah blah
         Repo.preload(:comments)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 3
-      assert issue.trigger =~ "# fixme"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "# fixme blah blah"})
   end
 
   test "it should report a couple of issues" do
@@ -79,9 +76,7 @@ defmodule Credo.Check.Design.TagFIXMETest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 3
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a couple of issues when including docstrings" do
@@ -103,8 +98,6 @@ defmodule Credo.Check.Design.TagFIXMETest do
     '''
     |> to_source_file
     |> run_check(@described_check, include_doc: true)
-    |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 4
-    end)
+    |> assert_issues(4)
   end
 end

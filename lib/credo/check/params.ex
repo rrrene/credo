@@ -44,6 +44,29 @@ defmodule Credo.Check.Params do
   end
 
   @doc false
+  def get(params, check_mod) when is_atom(check_mod) do
+    Enum.reduce(
+      param_names(params, check_mod),
+      %{},
+      fn param_name, map ->
+        Map.put(map, param_name, get(params, param_name, check_mod))
+      end
+    )
+  end
+
+  @doc false
+  def param_names(params, check_mod) do
+    all_known_params =
+      List.wrap(check_mod.explanations()[:params]) ++
+        List.wrap(check_mod.param_defaults()) ++
+        List.wrap(params)
+
+    all_known_params
+    |> Keyword.keys()
+    |> Enum.uniq()
+  end
+
+  @doc false
   def get_rerun_files_that_changed(params) do
     List.wrap(params[:__rerun_files_that_changed__])
   end
@@ -87,10 +110,13 @@ defmodule Credo.Check.Params do
   end
 
   @doc false
-  def files_included(params, check_mod) do
+  def files_included(params, check_mod, known_files) do
     files = get(params, :__files__, check_mod) || get(params, :files, check_mod)
 
-    List.wrap(files[:included])
+    case files[:included] do
+      nil -> known_files
+      included -> included
+    end
   end
 
   @doc false

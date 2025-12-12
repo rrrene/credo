@@ -39,50 +39,46 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:@, _, _}, issues, _) do
-    {nil, issues}
+  defp walk({:@, _, _}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse({:unquote, _, [_ | _] = _args}, issues, _) do
-    {nil, issues}
+  defp walk({:unquote, _, [_ | _] = _args}, ctx) do
+    {nil, ctx}
   end
 
   # module.unquote(:"some_atom")
-  defp traverse({{:., _, [_, :unquote]}, _, [_ | _] = _args}, issues, _) do
-    {nil, issues}
+  defp walk({{:., _, [_, :unquote]}, _, [_ | _] = _args}, ctx) do
+    {nil, ctx}
   end
 
-  defp traverse(
-         {:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast,
-         issues,
-         issue_meta
-       ) do
+  defp walk({:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast, ctx) do
     case get_forbidden_pipe(call, args) do
       {bad, suggestion, trigger} ->
-        {ast, issues_for_call(bad, suggestion, trigger, meta, issue_meta, issues)}
+        {ast, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger))}
 
       nil ->
-        {ast, issues}
+        {ast, ctx}
     end
   end
 
-  defp traverse({{:., _loc, call}, meta, args} = ast, issues, issue_meta) do
+  defp walk({{:., _loc, call}, meta, args} = ast, ctx) do
     case get_forbidden_call(call, args) do
       {bad, suggestion, trigger} ->
-        {ast, issues_for_call(bad, suggestion, trigger, meta, issue_meta, issues)}
+        {ast, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger))}
 
       nil ->
-        {ast, issues}
+        {ast, ctx}
     end
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   defp get_forbidden_call([:erlang, :list_to_atom], [_]) do
@@ -149,14 +145,11 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     nil
   end
 
-  defp issues_for_call(call, suggestion, trigger, meta, issue_meta, issues) do
-    [
-      format_issue(issue_meta,
-        message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime.",
-        trigger: trigger,
-        line_no: meta[:line]
-      )
-      | issues
-    ]
+  defp issue_for(ctx, meta, call, suggestion, trigger) do
+    format_issue(ctx,
+      message: "Prefer #{suggestion} over #{call} to avoid creating atoms at runtime.",
+      trigger: trigger,
+      line_no: meta[:line]
+    )
   end
 end

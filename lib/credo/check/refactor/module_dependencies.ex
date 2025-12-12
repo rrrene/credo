@@ -31,33 +31,34 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    max_deps = Params.get(params, :max_deps, __MODULE__)
-    dependency_namespaces = Params.get(params, :dependency_namespaces, __MODULE__)
-
-    excluded_namespaces =
-      params |> Params.get(:excluded_namespaces, __MODULE__) |> Enum.map(&to_string/1)
-
-    excluded_paths = Params.get(params, :excluded_paths, __MODULE__)
-
-    case ignore_path?(source_file.filename, excluded_paths) do
-      true ->
-        []
-
-      false ->
-        Credo.Code.prewalk(
-          source_file,
-          &traverse(
-            &1,
-            &2,
-            issue_meta,
-            dependency_namespaces,
-            excluded_namespaces,
-            max_deps
-          )
-        )
+    if ignore_path?(source_file.filename, ctx.params.excluded_paths) do
+      []
+    else
+      result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+      result.issues
     end
+  end
+
+  defp walk({:defmodule, meta, [mod | _]} = ast, ctx) do
+    module_name = Name.full(mod)
+
+    if has_namespace?(module_name, ctx.params.excluded_namespaces) do
+      {ast, ctx}
+    else
+      module_dependencies = get_dependencies(ast, ctx.params.dependency_namespaces)
+
+      {ast,
+       put_issue(
+         ctx,
+         issue_for_module(module_dependencies, ctx.params.max_deps, ctx, meta, module_name)
+       )}
+    end
+  end
+
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   # Check if analyzed module path is within ignored paths
@@ -70,32 +71,6 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
   defp matches?(directory, %Regex{} = regex), do: Regex.match?(regex, directory)
   defp matches?(directory, path) when is_binary(path), do: String.starts_with?(directory, path)
 
-  defp traverse(
-         {:defmodule, meta, [mod | _]} = ast,
-         issues,
-         issue_meta,
-         dependency_namespaces,
-         excluded_namespaces,
-         max
-       ) do
-    module_name = Name.full(mod)
-
-    new_issues =
-      if has_namespace?(module_name, excluded_namespaces) do
-        []
-      else
-        module_dependencies = get_dependencies(ast, dependency_namespaces)
-
-        issues_for_module(module_dependencies, max, issue_meta, meta, module_name)
-      end
-
-    {ast, issues ++ new_issues}
-  end
-
-  defp traverse(ast, issues, _issues_meta, _dependency_namespaces, _excluded_namespaces, _max) do
-    {ast, issues}
-  end
-
   defp get_dependencies(ast, dependency_namespaces) do
     aliases = Module.aliases(ast)
 
@@ -104,20 +79,6 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     |> with_fullnames(aliases)
     |> filter_namespaces(dependency_namespaces)
   end
-
-  defp issues_for_module(deps, max_deps, issue_meta, meta, module_name)
-       when length(deps) > max_deps do
-    [
-      format_issue(
-        issue_meta,
-        message: "Module has too many dependencies: #{length(deps)} (max is #{max_deps})",
-        trigger: module_name,
-        line_no: meta[:line]
-      )
-    ]
-  end
-
-  defp issues_for_module(_, _, _, _, _), do: []
 
   # Resolve dependencies to full module names
   defp with_fullnames(dependencies, aliases) do
@@ -148,4 +109,15 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       full_name -> full_name
     end
   end
+
+  defp issue_for_module(deps, max_deps, ctx, meta, module_name) when length(deps) > max_deps do
+    format_issue(
+      ctx,
+      message: "Module has too many dependencies: #{length(deps)} (max is #{max_deps})",
+      trigger: module_name,
+      line_no: meta[:line]
+    )
+  end
+
+  defp issue_for_module(_, _, _, _, _), do: nil
 end

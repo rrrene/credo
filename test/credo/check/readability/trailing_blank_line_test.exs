@@ -8,10 +8,10 @@ defmodule Credo.Check.Readability.TrailingBlankLineTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -25,8 +25,6 @@ defmodule Credo.Check.Readability.TrailingBlankLineTest do
     "defmodule CredoSampleModule do\nend"
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == Credo.Issue.no_trigger()
-    end)
+    |> assert_issue(%{trigger: Credo.Issue.no_trigger()})
   end
 end

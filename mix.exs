@@ -1,7 +1,7 @@
 defmodule Credo.Mixfile do
   use Mix.Project
 
-  @version "1.7.12"
+  @version "1.7.14"
 
   def project do
     [
@@ -33,7 +33,8 @@ defmodule Credo.Mixfile do
       coveralls: :test,
       "coveralls.html": :test,
       "test.fast": :test,
-      "test.slow": :test
+      "test.slow": :test,
+      "test.watch": :test
     ]
   end
 
@@ -171,11 +172,13 @@ defmodule Credo.Mixfile do
 
   defp deps do
     [
-      {:credo_tokenizer, path: "../../credo_tokenizer"},
+      {:credo_tokenizer, "~> 0.2"},
       {:file_system, "~> 0.2 or ~> 1.0"},
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},
-      {:ex_doc, "~> 0.25", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.25", only: :dev, runtime: false},
+      {:inch_ex, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

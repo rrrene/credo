@@ -177,19 +177,19 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
     if is_nil(state.current_part) or
          order(state.current_part, expected_order) <= order(part, expected_order),
        do: state,
-       else: add_error(state, part, file_pos, issue_meta)
+       else: put_issue(state, part, file_pos, issue_meta)
   end
 
   defp order(part, expected_order), do: Map.get(expected_order, part, map_size(expected_order))
 
-  defp add_error(state, part, file_pos, issue_meta) do
+  defp put_issue(state, part, file_pos, issue_meta) do
     update_in(
       state.errors,
-      &[error(issue_meta, part, state.current_part, state.module, file_pos) | &1]
+      &[issue_for(issue_meta, part, state.current_part, state.module, file_pos) | &1]
     )
   end
 
-  defp error(issue_meta, part, current_part, module, file_pos) do
+  defp issue_for(issue_meta, part, current_part, module, file_pos) do
     format_issue(
       issue_meta,
       message: "#{part_to_string(part)} must appear before #{part_to_string(current_part)}",
@@ -203,6 +203,7 @@ defmodule Credo.Check.Readability.StrictModuleLayout do
   defp part_to_string(:public_macro), do: "public macro"
   defp part_to_string(:public_fun), do: "public function"
   defp part_to_string(:private_fun), do: "private function"
+  defp part_to_string(:private_guard), do: "private guard"
   defp part_to_string(:callback_impl), do: "callback implementation"
   defp part_to_string(part), do: "#{part}"
 end

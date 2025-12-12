@@ -25,67 +25,50 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
       """
     ]
 
-  @call_string "Map.get"
-  @unsafe_modules [:Enum]
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse({:|>, _meta, _args} = ast, issues, issue_meta) do
-    pipe_issues =
-      ast
-      |> Macro.unpipe()
-      |> Enum.with_index()
-      |> find_pipe_issues(issue_meta)
-
-    {ast, issues ++ pipe_issues}
+  defp walk(
+         {:|>, _,
+          [
+            {:|>, _,
+             [
+               _pipe_start,
+               {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_single]}
+             ]},
+            {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
+          ]} = ast,
+         ctx
+       ) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _issue_meta) do
-    {ast, issues}
+  defp walk(
+         {:|>, _,
+          [
+            {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_first, _second]},
+            {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
+          ]} = ast,
+         ctx
+       ) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp find_pipe_issues(pipe, issue_meta) do
-    pipe
-    |> Enum.reduce([], fn {expr, idx}, acc ->
-      required_length = required_argument_length(idx)
-      {next_expr, _} = Enum.at(pipe, idx + 1, {nil, nil})
-
-      case {expr, nil_safe?(next_expr)} do
-        {{{{:., _, [{_, meta, [:Map]}, :get]}, _, args}, _}, false}
-        when length(args) != required_length ->
-          [issue_for(issue_meta, meta, @call_string) | acc]
-
-        _ ->
-          acc
-      end
-    end)
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp required_argument_length(idx) when idx == 0, do: 3
-  defp required_argument_length(_), do: 2
-
-  defp nil_safe?(expr) do
-    case expr do
-      {{{:., _, [{_, _, [module]}, _]}, _, _}, _} ->
-        !(module in @unsafe_modules)
-
-      _ ->
-        true
-    end
-  end
-
-  defp issue_for(issue_meta, meta, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "`Map.get` with no default return value is potentially unsafe in pipes, use `Map.get/3` instead.",
-      trigger: trigger,
+      trigger: "Map.get",
       line_no: meta[:line],
       column: meta[:column]
     )

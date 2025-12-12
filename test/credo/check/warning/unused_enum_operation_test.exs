@@ -8,20 +8,20 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.join(parameter1) + parameter2
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report when result is piped" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.join(parameter1)
@@ -30,28 +30,28 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when end of pipe AND return value" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       parameter1 + parameter2
       |> Enum.join(parameter1)
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of pipe" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       parameter1 + parameter2
@@ -61,14 +61,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
       :ok
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside an assignment" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     def some_function(parameter1, parameter2) do
       offset = Enum.count(line)
@@ -76,14 +76,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
       parameter1 + parameter2 + offset
     end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a condition" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         if Enum.count(x1) > Enum.count(x2) do
@@ -106,14 +106,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1 + parameter2 + offset
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a quote" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp category_body(nil) do
         quote do
@@ -123,14 +123,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside a catch" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp category_body(nil) do
         throw [1, 2, 3, 4]
@@ -139,14 +139,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           Enum.map(values, &(&1 + 1))
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside an anon function call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def fun(anon_func) do
         anon_func.(Enum.random(1..10))
@@ -154,14 +154,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when inside of assignment" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
     defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
       pos =
@@ -189,14 +189,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     end
 
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block but is the last call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -206,14 +206,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when call is buried in else block and is not the last call, but the result is assigned to a variable" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         result =
@@ -226,14 +226,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         IO.puts "8"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when buried in :if, :when and :fn 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -249,14 +249,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for parser <- parsers do
@@ -267,14 +267,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when part of a function call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for parser <- parsers do
@@ -285,40 +285,40 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for and :case 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp convert_parsers(parsers) do
         for x <- Enum.flat_map(bin, &(&1.blob)), x != "", do: x
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when :for 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp sum(_) do
         for x <- [1..3, 5..10], sum=Enum.sum(x), do: sum
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in :after block" do
-    """
+    ~S'''
       defp my_function(fun, opts) do
         try do
           :fprof.analyse(
@@ -336,14 +336,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           StringIO.close(analyse_dest)
         end
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call" do
-    """
+    ~S'''
       def my_function(url) when is_binary(url) do
         if info.userinfo do
           destructure [username, password], Enum.join(info.userinfo, ":")
@@ -351,38 +351,38 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
 
         Enum.reject(opts, fn {_k, v} -> is_nil(v) end)
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in function call /2" do
-    """
+    ~S'''
       defp print_process(pid_atom, count, own) do
         IO.puts([?", Enum.join(own, "-")])
         IO.write format_item(Path.join(path, item), Enum.take(item, width))
         print_row(["s", "B", "s", ".3f", "s"], [count, "", own, ""])
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation when in list that is returned" do
-    """
-    defp indent_line(str, indentation, with \\\\ " ") do
+    ~S'''
+    defp indent_line(str, indentation, with \\ " ") do
       [Enum.join(with, indentation), str]
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should report a violation when buried in :if, :when and :fn" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -401,14 +401,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         IO.puts "x"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -420,14 +420,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a tuple" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -439,14 +439,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a list" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -458,14 +458,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a keyword list" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -477,14 +477,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for |> in :if when part of a map" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -496,14 +496,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for ++ in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def sort_column(col, query) do
         cols = result_columns(query)
@@ -515,14 +515,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for this" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         if Enum.empty?(configs) do
@@ -534,14 +534,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for Enum.map inside Agent.update" do
-    """
+    ~S'''
     defmodule CredoTest do
       def agent_update do
         Agent.start_link(fn -> 0 end, name: __MODULE__)
@@ -553,14 +553,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         Agent.get(__MODULE__, fn val -> val end)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for last statement before rescue" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         Enum.empty?(configs)
@@ -569,14 +569,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
           raise "whatever"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for last statement before rescue /2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         try do
@@ -587,14 +587,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for function calls to erlang modules" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         :ets.insert(table, Enum.map([1, 2, 3, 4], fn i -> i + 1 end))
@@ -602,14 +602,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for function calls that are ignored" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         fields
@@ -626,7 +626,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         :ok
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, ignore: [:reduce])
     |> refute_issues()
@@ -637,7 +637,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
   #
 
   test "it should report a violation when NOT the last statement in rescue block" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def testcase(configs) do
         try do
@@ -650,14 +650,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for Enum.map inside Agent.update" do
-    """
+    ~S'''
     defmodule CredoTest do
       def agent_update do
         Agent.start_link(fn -> 0 end, name: __MODULE__)
@@ -671,14 +671,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         Agent.get(__MODULE__, fn val -> val end)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation for Enum.map inside assigned :if" do
-    """
+    ~S'''
     defmodule CredoTest do
       def agent_update do
         Agent.start_link(fn -> 0 end, name: __MODULE__)
@@ -696,14 +696,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         Agent.get(__MODULE__, fn val -> val end)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         x = parameter1 + parameter2
@@ -713,14 +713,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when end of pipe" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         parameter1 + parameter2
@@ -729,14 +729,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         parameter1
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :for" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(w) do
         for x <- [1, 2, 3] do
@@ -747,14 +747,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :if" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -769,14 +769,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :else" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -787,14 +787,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when buried in :if, :when and :fn 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -814,14 +814,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         IO.puts "x"
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -833,14 +833,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         IO.puts
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report a violation when call is buried in else block but is the last call 2" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp print_issue(%Issue{check: check, message: message, filename: filename, priority: priority} = issue, source_file) do
         if issue.column do
@@ -852,16 +852,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert "Enum.join" == issue.trigger
-    end)
+    |> assert_issue(%{trigger: "Enum.join"})
   end
 
   test "it should report several violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         Enum.reject(parameter1, &is_nil/1)
@@ -876,16 +874,14 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
          parameter1
        end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      assert 3 == Enum.count(issues)
-    end)
+    |> assert_issues(3)
   end
 
   test "it should report a violation when used incorrectly, even inside a :for" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       defp something(bin) do
         for segment <- Enum.flat_map(segment, &(&1.blob)), segment != "" do
@@ -896,13 +892,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "Enum.map"
-      assert issue.line_no == 5
-      assert issue.column == 7
-    end)
+    |> assert_issue(%{line_no: 5, column: 7, trigger: "Enum.map"})
   end
 end

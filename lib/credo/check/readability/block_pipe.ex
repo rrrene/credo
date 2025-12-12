@@ -54,39 +54,30 @@ defmodule Credo.Check.Readability.BlockPipe do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    excluded_functions = Params.get(params, :exclude, __MODULE__)
-
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(
-      source_file,
-      &traverse(&1, &2, excluded_functions, issue_meta)
-    )
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {:|>, meta, [_, {function, _, [[{:do, _} | _]]}]} = ast,
-         issues,
-         excluded_functions,
-         issue_meta
-       ) do
-    if Enum.member?(excluded_functions, function) do
-      {ast, issues}
+  defp walk({:|>, meta, [_, {function, _, [[{:do, _} | _]]}]} = ast, ctx) do
+    if Enum.member?(ctx.params.exclude, function) do
+      {ast, ctx}
     else
-      {nil, issues ++ [issue_for(issue_meta, meta[:line], "|>")]}
+      {nil, put_issue(ctx, issue_for(ctx, meta))}
     end
   end
 
-  defp traverse(ast, issues, _excluded_functions, _issue_meta) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no, trigger) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Use a variable or create a new function instead of piping to a block.",
-      trigger: trigger,
-      line_no: line_no
+      trigger: "|>",
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

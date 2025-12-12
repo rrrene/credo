@@ -5,7 +5,7 @@ defmodule Credo.Code.BlockTest do
 
   test "it should return all the blocks" do
     {:ok, ast} =
-      """
+      ~S'''
       try do
         call_in_try
       else
@@ -15,7 +15,7 @@ defmodule Credo.Code.BlockTest do
       after
         call_in_after
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 4 ==
@@ -62,7 +62,7 @@ defmodule Credo.Code.BlockTest do
 
   test "it should return both the do and else blocks" do
     {:ok, ast} =
-      """
+      ~S'''
       if something? do
         some_action
         IO.puts "HA"
@@ -70,7 +70,7 @@ defmodule Credo.Code.BlockTest do
         some_other_action
         IO.puts "Yay!"
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert {:__block__, [],
@@ -96,13 +96,13 @@ defmodule Credo.Code.BlockTest do
 
   test "it should return whether an `ast` has a do and/or else block with just one operation in it" do
     {:ok, ast} =
-      """
+      ~S'''
       if something? do
         true
       else
         false
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert Block.do_block?(ast)
@@ -112,12 +112,12 @@ defmodule Credo.Code.BlockTest do
 
   test "it should return whether an `ast` has a do and/or else block" do
     {:ok, ast} =
-      """
+      ~S'''
       if something? do
         some_action
         IO.puts "HA"
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert Block.do_block?(ast)

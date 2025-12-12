@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
   #
 
   test "it should NOT report violation" do
-    """
+    ~S'''
     defmodule Test do
       def run(user, resource) do
         with {:ok, resource} <- Resource.fetch(user),
@@ -16,7 +16,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
              do: SomeMod.do_something(resource)
       end
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
     |> refute_issues()
@@ -27,7 +27,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Test do
       def run(user, resource) do
         with {:resource, {:ok, resource}} <- {:resource, Resource.fetch(user)},
@@ -39,21 +39,19 @@ defmodule Credo.Check.Readability.WithCustomTaggedTupleTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issues(fn issues ->
-      [issue1, issue2] = issues
-
-      assert issue1.message ==
-               "Avoid using tagged tuples as placeholders in `with` (found: `:resource`)."
-
-      assert issue1.trigger == ":resource"
-
-      assert issue2.message ==
-               "Avoid using tagged tuples as placeholders in `with` (found: `:authz`)."
-
-      assert issue2.trigger == ":authz"
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{
+        message: "Avoid using tagged tuples as placeholders in `with` (found: `:resource`).",
+        trigger: ":resource"
+      },
+      %{
+        message: "Avoid using tagged tuples as placeholders in `with` (found: `:authz`).",
+        trigger: ":authz"
+      }
+    ])
   end
 end

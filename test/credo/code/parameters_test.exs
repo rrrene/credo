@@ -9,68 +9,68 @@ defmodule Credo.Code.ParametersTest do
 
   test "returns the correct parameter names" do
     {:ok, ast} =
-      """
-        def some_function(p1, p2, p3, p4, p5), do: :ok
-      """
+      ~S'''
+      def some_function(p1, p2, p3, p4, p5), do: :ok
+      '''
       |> Code.string_to_quoted()
 
     assert [:p1, :p2, :p3, :p4, :p5] == Parameters.names(ast)
 
     {:ok, ast} =
-      """
-      def foobar(parameter1, parameter2 \\\\ false) do
+      ~S'''
+      def foobar(parameter1, parameter2 \\ false) do
         :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:parameter1, :parameter2] == Parameters.names(ast)
 
     {:ok, ast} =
-      """
-      def foobar(parameter2 \\\\ false, line: line, column: column) do
-      :ok
+      ~S'''
+      def foobar(parameter2 \\ false, line: line, column: column) do
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [:parameter2, [:line, :column]] == Parameters.names(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not(prev in ?A..?Z) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [[:h, :t], :prev] == Parameters.names(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defp foobar(<<?-, t :: binary>>, _) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert [[:t], :_] == Parameters.names(ast)
 
-    #    {:ok, ast} = """
+    #    {:ok, ast} = '''
     # fn(a, b) ->
     #  :ok
     # end
-    #    """ |> Code.string_to_quoted
+    #    ''' |> Code.string_to_quoted
     #    assert [:a, :b] == Parameters.names(ast)
   end
 
   test "returns the correct parameter names for pattern matches with structs" do
     {:ok, ast} =
-      """
+      ~S'''
       def foobar(%{} = source_file, %Issue{line: line, column: column} = issue) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
@@ -80,11 +80,11 @@ defmodule Credo.Code.ParametersTest do
 
   test "returns the correct parameter names for pattern matches with structs 2" do
     {:ok, ast} =
-      """
+      ~S'''
       def foobar(%{ast: my_ast} = source_file, %Issue{line: line, column: column} = issue) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
@@ -98,49 +98,49 @@ defmodule Credo.Code.ParametersTest do
 
   test "returns the correct parameter counts" do
     {:ok, ast} =
-      """
+      ~S'''
         def some_function(p1, p2, p3, p4, p5), do: :ok
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 5 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
-      def foobar(parameter1, parameter2 \\\\ false) do
-      :ok
+      ~S'''
+      def foobar(parameter1, parameter2 \\ false) do
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
-      def foobar(parameter2 \\\\ false, line: line) do
-      :ok
+      ~S'''
+      def foobar(parameter2 \\ false, line: line) do
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defp foobar(<<h, t :: binary>>, prev) when h in ?A..?Z and not(prev in ?A..?Z) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       defp foobar(<<?-, t :: binary>>, _) do
-      :ok
+        :ok
       end
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 2 == Parameters.count(ast)
@@ -148,25 +148,25 @@ defmodule Credo.Code.ParametersTest do
 
   test "returns the correct paramter counts for a function with a guard condition" do
     {:ok, ast} =
-      """
+      ~S'''
       def foobar(a, b, c, d) when is_integer(a), do: :ok
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 4 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       def foobar(a, b, c, d, e) when is_integer(a) and is_map(b), do: :ok
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 5 == Parameters.count(ast)
 
     {:ok, ast} =
-      """
+      ~S'''
       def foobar when is_integer(@a), do: :ok
-      """
+      '''
       |> Code.string_to_quoted()
 
     assert 0 == Parameters.count(ast)

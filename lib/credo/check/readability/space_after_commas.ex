@@ -36,11 +36,11 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    ctx = Context.build(source_file, params, __MODULE__)
 
     source_file
     |> Credo.Code.Token.reduce(&collect(&1, &2, &3, &4))
-    |> Enum.map(&issue_for(issue_meta, &1))
+    |> Enum.map(&issue_for(ctx, &1))
   end
 
   defp collect(_prev, {{:",", _}, {line, col, _, _}, _, _} = left, {kind, {_, _, _, _}, value, _} = right, acc)
@@ -58,7 +58,13 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
 
   defp trigger(_, value), do: ",#{String.first(to_string(value))}"
 
-  defp issue_for(issue_meta, {line_no, column, trigger}) do
-    format_issue(issue_meta, message: "Space missing after comma.", trigger: trigger, line_no: line_no, column: column)
+  defp issue_for(ctx, {line_no, column, trigger}) do
+    format_issue(
+      ctx,
+      message: "Space missing after comma.",
+      trigger: trigger,
+      line_no: line_no,
+      column: column
+    )
   end
 end

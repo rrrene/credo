@@ -22,7 +22,7 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
             |> my_other_fun()
           end
 
-          defp timex_2(i), do: i * 2
+          defp times_2(i), do: i * 2
 
       ... or use `then/1`:
 
@@ -40,29 +40,26 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
 
   @impl true
   def run(source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta))
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp traverse(
-         {:|>, meta, [_, {{:., _, [{:fn, _, _} | _]}, _, _}]} = ast,
-         issues,
-         issue_meta
-       ) do
-    {ast, [issue_for(issue_meta, meta[:line]) | issues]}
+  defp walk({:|>, meta, [_, {{:., _, [{:fn, _, _} | _]}, _, _}]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp traverse(ast, issues, _) do
-    {ast, issues}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp issue_for(issue_meta, line_no) do
+  defp issue_for(ctx, meta) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "Avoid piping into anonymous function calls.",
       trigger: "|>",
-      line_no: line_no
+      line_no: meta[:line],
+      column: meta[:column]
     )
   end
 end

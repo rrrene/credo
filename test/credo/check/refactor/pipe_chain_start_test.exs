@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   #
 
   test "it should NOT report expected code" do
-    ~S"""
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         "Fahrenheit 451" |> String.to_charlist |> IO.inspect
@@ -128,14 +128,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> IO.inspect
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
-    ~S"""
+    ~S'''
     defmodule CredoTest do
       defmacro a ~> b do
         quote do
@@ -150,14 +150,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> Kernel.*(2)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues
   end
 
   test "it should NOT report stepped ranges" do
-    ~S"""
+    ~S'''
     defmodule CredoTest do
       def test do
         1..limit//1
@@ -165,14 +165,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> join_cells()
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues
   end
 
   test "should NOT report infix operators" do
-    """
+    ~S'''
     (1 + 2) |> IO.puts
     (1 * 2) |> IO.puts
     (1 - 2) |> IO.puts
@@ -184,14 +184,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
     (1 <= 2) |> IO.puts
     (not foo) |> IO.puts
     (bar and foo) |> IO.puts
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_functions: ["+"])
     |> refute_issues
   end
 
   test "it should NOT report expected code /3" do
-    ~S"""
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         jobs = Stream.repeatedly(fn ->
@@ -208,7 +208,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
                |> Enum.take(2)
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check,
       excluded_functions: ["Stream.repeatedly"]
@@ -217,9 +217,9 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   end
 
   test "it should NOT report a violation for an excluded function call" do
-    """
+    ~S'''
     String.trim("users") |> String.upcase
-    """
+    '''
     |> to_source_file
     |> run_check(
       @described_check,
@@ -229,11 +229,11 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   end
 
   test "it should NOT report a violation for an excluded function call /2" do
-    """
+    ~S'''
     table("users")
     |> insert(%{name: "Bob Jones"})
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(
       @described_check,
@@ -243,10 +243,10 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   end
 
   test "it should NOT report a violation for an excluded function call /3" do
-    """
+    ~S'''
     put_in(users["john"][:age], 28)
     |> some_other_fun()
-    """
+    '''
     |> to_source_file
     |> run_check(
       @described_check,
@@ -256,7 +256,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   end
 
   test "it should NOT report a violation for an excluded function call /4" do
-    """
+    ~S'''
     :crypto.hash(:md5, "test")
     |> Base.encode16(case: :lower)
 
@@ -265,7 +265,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
 
     Module.some_other_fun(5)
     |> to_something()
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check,
       excluded_functions: ~w(:crypto.hash some_fun Module.some_other_fun)
@@ -274,7 +274,7 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   end
 
   test "it should NOT report a violation for ++" do
-    """
+    ~S'''
       def build(%Ecto.Query{} = query) do
         document_pred(query)
         ++ wheres_preds(query)
@@ -282,27 +282,27 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> Enum.join("")
         |> wrap()
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for --" do
-    """
+    ~S'''
       def test do
         [1,2,3]
         -- [2]
         |> Enum.max
       end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for string concatenation" do
-    """
+    ~S'''
     defmodule Test do
       def test do
         "hello"
@@ -310,14 +310,14 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
         |> String.captialize
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for captures" do
-    """
+    ~S'''
     defmodule Test do
       def test do
         foo = %{bar: %{}}
@@ -326,84 +326,84 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
           |> Map.put(:a, :b))
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type" do
-    """
+    ~S'''
     table(~r/regex/)
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:regex])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /2" do
-    """
+    ~S'''
     table(~R/regex/)
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:sigil_R])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /3" do
-    """
+    ~S'''
     Namespace.Module.table2("users", %{name: "Bob Jones"}, {123}, true, ~r/regex/)
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:binary])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /4" do
-    """
+    ~S'''
     table(~f(special sigil))
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:sigil_f])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /5" do
-    """
+    ~S'''
     table(fn -> :stuff end)
     |> DB.run
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:fn])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /6" do
-    """
+    ~S'''
     max(0, interval - elapsed_time) |> schedule_events()
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:number])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /7" do
-    """
+    ~S'''
     insert(:event) |> schedule_events()
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:atom])
     |> refute_issues()
   end
 
   test "it should NOT report a violation for an excluded argument type /8" do
-    """
+    ~S'''
     foo(nil) |> bar()
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check, excluded_argument_types: [:atom])
     |> refute_issues()
@@ -414,40 +414,38 @@ defmodule Credo.Check.Refactor.PipeChainStartTest do
   #
 
   test "it should report a violation for a function call" do
-    """
+    ~S'''
     String.trim("nope") |> String.upcase
     String.trim("nope")
     |> String.downcase
     |> String.trim
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()
   end
 
   test "it should report a violation for a function call /2" do
-    """
+    ~S'''
     fun([a, b, c])
     |> something1
     |> something2
     |> something3
     |> IO.inspect
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "|>"
-    end)
+    |> assert_issue(%{trigger: "|>"})
   end
 
   test "it should report a violation for a function call /3" do
-    """
+    ~S'''
     fun.([a, b, c]) |> IO.inspect
     fun.([a, b, c]) |> Enum.join |> IO.inspect
     fun.([a, b, c])
     |> Enum.join
     |> IO.inspect
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

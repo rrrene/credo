@@ -8,7 +8,7 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -32,14 +32,14 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code without an always true statement" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -50,7 +50,7 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -61,7 +61,7 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -72,16 +72,14 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "cond"
-    end)
+    |> assert_issue(%{trigger: "cond"})
   end
 
   test "it should report a violation for multiple violations" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       use ExUnit.Case
 
@@ -95,7 +93,7 @@ defmodule Credo.Check.Refactor.CondStatementsTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

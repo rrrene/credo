@@ -29,8 +29,6 @@ defmodule Credo.Plugin do
 
   """
 
-  require Credo.Execution
-
   pipeline_main_group_names_as_bullet_list = """
   - `:parse_cli_options`
   - `:initialize_plugins`

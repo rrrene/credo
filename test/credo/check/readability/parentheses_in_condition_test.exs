@@ -8,7 +8,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
   #
 
   test "it should NOT report expected code" do
-    """
+    ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         unless allowed? do
@@ -54,38 +54,38 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
     		foo
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /2" do
-    """
+    ~S'''
     props =
       if(valid?(username), do: [:authorized]) ++
       unless(admin?(username), do: [:restricted])
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /3" do
-    """
+    ~S'''
     if (assocs != [] or prepare != []) and
        Keyword.get(opts, :skip_transaction) != true and
        function_exported?(adapter, :transaction, 3) do
       some_fun()
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
   end
 
   test "it should NOT report expected code /4" do
-    """
+    ~S'''
     defmodule Foo do
       def bar(a, b) do
         if (a + b) / 100 > threshold(), do: :high, else: :low
@@ -96,7 +96,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
       end
       def threshold, do: 50
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> refute_issues()
@@ -107,7 +107,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
   #
 
   test "it should report a violation" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run(argv) do
         if( allowed? ) do
@@ -117,28 +117,28 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
   end
 
   test "it should report violations with one-liners if used with parentheses" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run(argv) do
         if (allowed?), do: true
         unless (!allowed?), do: true
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()
   end
 
   test "it should report a violation if used with parentheses" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run(argv) do
         unless( !allowed? ) do
@@ -148,16 +148,14 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "unless"
-    end)
+    |> assert_issue(%{line_no: 3, trigger: "unless"})
   end
 
   test "it should report violations with spaces before the parentheses" do
-    """
+    ~S'''
     defmodule Mix.Tasks.Credo do
       def run(argv) do
         if ( allowed? ) do
@@ -171,7 +169,7 @@ defmodule Credo.Check.Readability.ParenthesesInConditionTest do
         end
       end
     end
-    """
+    '''
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issues()

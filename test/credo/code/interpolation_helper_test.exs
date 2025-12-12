@@ -26,41 +26,38 @@ defmodule Credo.Code.InterpolationHelperTest do
   @no_interpolations_source ~S[134 + 145]
   @no_interpolations_positions []
 
-  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character" do
-    source = ~S"""
+    source = ~S'''
     def fun() do
       "x #{if check, do: "CHECK (#{check})"} y"
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     def fun() do
       "x $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ y"
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character /3" do
-    source = ~S"""
+    source = ~S'''
     def fun() do
       ~s"x #{if check, do: "CHECK (#{check})"} y"
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     def fun() do
       ~s"x $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ y"
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.9.0"
   test "should replace string interpolations with given character /4" do
     source = ~S'''
     def fun() do
@@ -82,101 +79,101 @@ defmodule Credo.Code.InterpolationHelperTest do
   end
 
   test "should replace string interpolations in binary with given character " do
-    source = ~S"""
+    source = ~S'''
     def fun() do
       a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     def fun() do
       a = "MyModule.$$$$$$$$$$$$$$$$$$$$$$$$$$.SubModule.$$$$$$$"
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
   test "should replace string interpolations with given non-character" do
-    source = ~S"""
+    source = ~S'''
     def fun() do
       a = "MyModule.#{fun(Module.value() + 1)}.SubModule.#{name}"
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     def fun() do
       a = "MyModule..SubModule."
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "")
   end
 
   test "should replace string interpolations in binaries with given character /3" do
-    source = ~S"""
+    source = ~S'''
     case category_count(issues, category) do
       0 -> []
       1 -> [color, "1 #{singular}, "]
       x -> [color, "#{x} #{ x } #{x} #{plural}, "]
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     case category_count(issues, category) do
       0 -> []
       1 -> [color, "1 $$$$$$$$$$$, "]
       x -> [color, "$$$$ $$$$$$ $$$$ $$$$$$$$$, "]
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
   test "should replace sigil interpolations with given character" do
-    source = ~S"""
+    source = ~S'''
     def fun() do
       a = ~s" MyModule.#{fun(Module.value() + 1)}.SubModule.#{name} "
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     def fun() do
       a = ~s" MyModule.$$$$$$$$$$$$$$$$$$$$$$$$$$.SubModule.$$$$$$$ "
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
   test "should replace sigil interpolations with given character /2" do
-    source = ~S"""
+    source = ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         values = ~s{ #{"}"} }
       end
     end
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         values = ~s{ $$$$$$ }
       end
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
   test "should replace interpolations in map keys" do
-    source = ~S"""
+    source = ~S'''
     %{acc | "#{date_type}_dates": :foo}
-    """
+    '''
 
-    expected = ~S"""
+    expected = ~S'''
     %{acc | "$$$$$$$$$$$$_dates": :foo}
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
@@ -191,14 +188,14 @@ defmodule Credo.Code.InterpolationHelperTest do
     end
     '''
 
-    expected = """
+    expected = ~S'''
     def fun() do
-      a = \"\"\"
+      a = """
       MyModule.$$$$$$$$$$$$$$$$$$$$$$$$$$.SubModule.$$$$$$$"
       MyModule.SubModule.$$$$$$$(1 + 3)
-      \"\"\"
+      """
     end
-    """
+    '''
 
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
@@ -457,7 +454,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "")
   end
 
-  @tag needs_elixir: "1.6.5"
   test "it should replace a single interpolation after a sigil w/ modifier" do
     source = ~S"""
     ~x"sigil content"s == "#{foo}"
@@ -470,7 +466,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.6.5"
   test "it should replace a single interpolation after a sigil w/ multiple modifiers" do
     source = ~S"""
     ~x"sigil content"si == "#{foo}"
@@ -483,7 +478,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.6.5"
   test "it should replace a single interpolation after a sigil w/o modifier" do
     source = ~S"""
     ~x"sigil content" == "#{foo}"
@@ -496,7 +490,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.7.0"
   test "it should replace a single interpolation in a value of a map" do
     source = ~S"""
     %{"some-atom-with-quotes": "#{filename} world"}
@@ -509,7 +502,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.7.0"
   test "it should replace a single interpolation in a value of a map /2" do
     source = ~S"""
     %{some_atom_wo_quotes: "#{filename} world"}
@@ -522,7 +514,6 @@ defmodule Credo.Code.InterpolationHelperTest do
     assert expected == InterpolationHelper.replace_interpolations(source, "$")
   end
 
-  @tag needs_elixir: "1.7.0"
   test "it should replace a single interpolation in a string" do
     source = ~S"""
     file_patt   = "*.{#{ Enum.join(file_exts, ",") }}"

@@ -9,12 +9,12 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should NOT report modules without defexception" do
     [
-      ~S"""
+      ~S'''
       defmodule UriParserError
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule SomeOtherException
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -23,18 +23,18 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should NOT report correct behaviour (same suffix)" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.Sample do
         defmodule UriParserError do
           defexception [:message]
         end
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule SomeOtherError do
         defexception [:message]
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -43,18 +43,18 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should NOT report correct behaviour (same prefix)" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.Sample do
         defmodule InvalidSomething do
           defexception [:message]
         end
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule InvalidResponse do
         defexception [:message]
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -63,16 +63,16 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should NOT report correct behaviour (only one exception class)" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.SampleError do
         defexception [:message]
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule SomeModule do
 
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -81,18 +81,18 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should NOT report a violation for different naming schemes for 1:1 situations" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.Sample do
         defmodule SomeError do
           defexception [:message]
         end
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule UndefinedResponse do
         defexception [:message]
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -101,7 +101,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should not report (prefixes)" do
     [
-      ~S"""
+      ~S'''
         defmodule FactoryUndefined do
           defexception [:message]
 
@@ -114,7 +114,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
         defmodule SaveUndefined do
           defexception [:message]
         end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
@@ -127,7 +127,7 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
 
   test "it should report a violation for different naming schemes (suffixes)" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.Sample do
         defmodule SomeException do
           defexception [:message]
@@ -136,45 +136,40 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
           defexception [:message]
         end
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule InputValidationException do
         defexception [:message]
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.line_no == 5
-      assert issue.trigger == "UndefinedResponse"
-    end)
+    |> assert_issue(%{line_no: 5, trigger: "UndefinedResponse"})
   end
 
   test "it should report a violation for different naming schemes (prefixes)" do
     [
-      ~S"""
+      ~S'''
       defmodule Credo.Sample do
         defmodule InvalidDataRequest do
           defexception [:message]
         end
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule InvalidReponseFromServer do
         defexception [:message]
       end
-      """,
-      ~S"""
+      ''',
+      ~S'''
       defmodule UndefinedDataFormat do    # <--- does not have the prefix "Invalid"
         defexception [:message]
       end
-      """
+      '''
     ]
     |> to_source_files
     |> run_check(@described_check)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == "UndefinedDataFormat"
-    end)
+    |> assert_issue(%{trigger: "UndefinedDataFormat"})
   end
 end
