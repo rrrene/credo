@@ -124,7 +124,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommasTest do
     defmodule CredoSampleModule do
       @attribute {:foo,{:bar}}
       @attribute {:foo,[:bar]}
-      @attribute {:foo,%{:bar}}
+      @attribute {:foo,%{:bar => true}}
     end
     """
     |> to_source_file
