@@ -79,7 +79,9 @@ defmodule Credo.Code.Sigils do
 
     source
     |> InterpolationHelper.replace_interpolations(interpolation_replacement, filename)
-    |> parse_code("", replacement, empty_line_replacement)
+    |> parse_code([], replacement, empty_line_replacement)
+    |> Enum.reverse()
+    |> IO.iodata_to_binary()
   end
 
   defp parse_code("", acc, _replacement, _empty_line_replacement) do
@@ -87,27 +89,27 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "\\\"", replacement, empty_line_replacement)
+    parse_code(t, ["\\\"" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<"\\\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "\\\'", replacement, empty_line_replacement)
+    parse_code(t, ["\\\'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<"?'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "?'", replacement, empty_line_replacement)
+    parse_code(t, ["?'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<"'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_charlist(t, acc <> "'", replacement, empty_line_replacement)
+    parse_charlist(t, ["'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<"?\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "?\"", replacement, empty_line_replacement)
+    parse_code(t, ["?\"" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<"#"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_comment(t, acc <> "#", replacement, empty_line_replacement)
+    parse_comment(t, ["#" | acc], replacement, empty_line_replacement)
   end
 
   for {sigil_start, sigil_end} <- removable_sigils do
@@ -119,7 +121,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_removable_sigil(
         t,
-        acc <> unquote(sigil_start),
+        [unquote(sigil_start) | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -136,7 +138,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_heredoc(
         t,
-        acc <> unquote(sigil_start),
+        [unquote(sigil_start) | acc],
         replacement,
         unquote(sigil_end),
         empty_line_replacement
@@ -145,11 +147,11 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_code(<<"\"\"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s("""), replacement, ~s("""), empty_line_replacement)
+    parse_heredoc(t, [~s(""") | acc], replacement, ~s("""), empty_line_replacement)
   end
 
   defp parse_code(<<"\'\'\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_heredoc(t, acc <> ~s('''), replacement, ~s('''), empty_line_replacement)
+    parse_heredoc(t, [~s(''') | acc], replacement, ~s('''), empty_line_replacement)
   end
 
   for {sigil_start, sigil_end} <- all_string_sigils do
@@ -161,7 +163,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_removable_sigil(
         t,
-        acc <> unquote(sigil_start),
+        [unquote(sigil_start) | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -170,17 +172,17 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_code(<<"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc <> "\"", replacement, empty_line_replacement)
+    parse_string_literal(t, ["\"" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(<<h::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> <<h::utf8>>, replacement, empty_line_replacement)
+    parse_code(t, [<<h::utf8>> | acc], replacement, empty_line_replacement)
   end
 
   defp parse_code(str, acc, replacement, empty_line_replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
 
-    parse_code(t, acc <> h, replacement, empty_line_replacement)
+    parse_code(t, [h | acc], replacement, empty_line_replacement)
   end
 
   #
@@ -192,25 +194,25 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_charlist(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_charlist(t, acc <> "\\\\", replacement, empty_line_replacement)
+    parse_charlist(t, ["\\\\" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_charlist(<<"\\\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_charlist(t, acc <> "\\\'", replacement, empty_line_replacement)
+    parse_charlist(t, ["\\\'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_charlist(<<"\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "'", replacement, empty_line_replacement)
+    parse_code(t, ["'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_charlist(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_charlist(t, acc <> "\n", replacement, empty_line_replacement)
+    parse_charlist(t, ["\n" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_charlist(str, acc, replacement, empty_line_replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
 
-    parse_charlist(t, acc <> h, replacement, empty_line_replacement)
+    parse_charlist(t, [h | acc], replacement, empty_line_replacement)
   end
 
   #
@@ -222,13 +224,17 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_comment(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> "\n", replacement, empty_line_replacement)
+    parse_code(t, ["\n" | acc], replacement, empty_line_replacement)
+  end
+
+  defp parse_comment(<<h::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_comment(t, [<<h::utf8>> | acc], replacement, empty_line_replacement)
   end
 
   defp parse_comment(str, acc, replacement, empty_line_replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
 
-    parse_comment(t, acc <> h, replacement, empty_line_replacement)
+    parse_comment(t, [h | acc], replacement, empty_line_replacement)
   end
 
   #
@@ -240,24 +246,28 @@ defmodule Credo.Code.Sigils do
   end
 
   defp parse_string_literal(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc <> "\\\\", replacement, empty_line_replacement)
+    parse_string_literal(t, ["\\\\" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc <> "\\\"", replacement, empty_line_replacement)
+    parse_string_literal(t, ["\\\"" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(<<"\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_code(t, acc <> ~s("), replacement, empty_line_replacement)
+    parse_code(t, [~s(") | acc], replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(<<"\n"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
-    parse_string_literal(t, acc <> "\n", replacement, empty_line_replacement)
+    parse_string_literal(t, ["\n" | acc], replacement, empty_line_replacement)
+  end
+
+  defp parse_string_literal(<<h::utf8, t>>, acc, replacement, empty_line_replacement) do
+    parse_string_literal(t, [<<h::utf8>> | acc], replacement, empty_line_replacement)
   end
 
   defp parse_string_literal(str, acc, replacement, empty_line_replacement) when is_binary(str) do
     {h, t} = String.next_codepoint(str)
-    parse_string_literal(t, acc <> h, replacement, empty_line_replacement)
+    parse_string_literal(t, [h | acc], replacement, empty_line_replacement)
   end
 
   #
@@ -280,7 +290,7 @@ defmodule Credo.Code.Sigils do
 
       parse_removable_sigil(
         t,
-        acc <> replacement <> replacement,
+        [replacement, replacement | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -297,7 +307,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_removable_sigil(
         t,
-        acc <> replacement <> replacement,
+        [replacement, replacement | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -313,7 +323,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_removable_sigil(
         t,
-        acc <> replacement <> replacement,
+        [replacement, replacement | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -327,7 +337,7 @@ defmodule Credo.Code.Sigils do
            replacement,
            empty_line_replacement
          ) do
-      parse_code(t, acc <> unquote(sigil_end), replacement, empty_line_replacement)
+      parse_code(t, [unquote(sigil_end) | acc], replacement, empty_line_replacement)
     end
 
     if sigil_end != "\"" do
@@ -340,7 +350,7 @@ defmodule Credo.Code.Sigils do
            ) do
         parse_removable_sigil(
           t,
-          acc <> replacement,
+          [replacement | acc],
           unquote(sigil_end),
           replacement,
           empty_line_replacement
@@ -356,15 +366,15 @@ defmodule Credo.Code.Sigils do
            empty_line_replacement
          ) do
       acc =
-        if String.last(acc) == "\n" do
-          acc <> empty_line_replacement
+        if List.first(acc) == "\n" do
+          [empty_line_replacement | acc]
         else
           acc
         end
 
       parse_removable_sigil(
         t,
-        acc <> "\n",
+        ["\n" | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -380,7 +390,7 @@ defmodule Credo.Code.Sigils do
          ) do
       parse_removable_sigil(
         t,
-        acc <> replacement,
+        [replacement | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement
@@ -399,7 +409,7 @@ defmodule Credo.Code.Sigils do
          "\"\"\"",
          empty_line_replacement
        ) do
-    parse_code(t, acc <> "\"\"\"", replacement, empty_line_replacement)
+    parse_code(t, ["\"\"\"" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_heredoc(
@@ -409,7 +419,7 @@ defmodule Credo.Code.Sigils do
          "\'\'\'",
          empty_line_replacement
        ) do
-    parse_code(t, acc <> "\'\'\'", replacement, empty_line_replacement)
+    parse_code(t, ["\'\'\'" | acc], replacement, empty_line_replacement)
   end
 
   defp parse_heredoc("", acc, _replacement, _delimiter, _empty_line_replacement) do
@@ -423,7 +433,7 @@ defmodule Credo.Code.Sigils do
          delimiter,
          empty_line_replacement
        ) do
-    parse_heredoc(t, acc <> "\\\\", replacement, delimiter, empty_line_replacement)
+    parse_heredoc(t, ["\\\\" | acc], replacement, delimiter, empty_line_replacement)
   end
 
   defp parse_heredoc(
@@ -433,7 +443,7 @@ defmodule Credo.Code.Sigils do
          delimiter,
          empty_line_replacement
        ) do
-    parse_heredoc(t, acc <> "\\\"", replacement, delimiter, empty_line_replacement)
+    parse_heredoc(t, ["\\\"" | acc], replacement, delimiter, empty_line_replacement)
   end
 
   defp parse_heredoc(
@@ -443,12 +453,16 @@ defmodule Credo.Code.Sigils do
          delimiter,
          empty_line_replacement
        ) do
-    parse_heredoc(t, acc <> "\n", replacement, delimiter, empty_line_replacement)
+    parse_heredoc(t, ["\n" | acc], replacement, delimiter, empty_line_replacement)
+  end
+
+  defp parse_heredoc(<<h::utf8, t::binary>>, acc, replacement, delimiter, empty_line_replacement) do
+    parse_heredoc(t, [<<h::utf8>> | acc], replacement, delimiter, empty_line_replacement)
   end
 
   defp parse_heredoc(str, acc, replacement, delimiter, empty_line_replacement)
        when is_binary(str) do
     {h, t} = String.next_codepoint(str)
-    parse_heredoc(t, acc <> h, replacement, delimiter, empty_line_replacement)
+    parse_heredoc(t, [h | acc], replacement, delimiter, empty_line_replacement)
   end
 end
