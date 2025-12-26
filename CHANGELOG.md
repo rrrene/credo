@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.15-dev
+## 1.7.15
 
 - Improve performance on large projects
 - Parse token_metadata for source files
