@@ -7,7 +7,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       max_deps: 10,
       dependency_namespaces: [],
       excluded_namespaces: [],
-      excluded_paths: [~r"/test/", ~r"^test/"]
+      excluded_paths: [~r"/test/", ~r"^test"]
     ],
     explanations: [
       check: """
