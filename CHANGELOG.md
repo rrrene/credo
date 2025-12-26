@@ -6,9 +6,11 @@
 - Parse token_metadata for source files
 - `Credo.Check.Warning.ExpensiveEmptyEnumCheck` have better issue messages
 - `Credo.Check.Refactor.MatchInCondition` add new param `:allow_operators`
+- `Credo.Check.Refactor.MatchInCondition` fix false positive
 - `Credo.Check.Readability.AliasOrder` fix false positive
 - `Credo.Check.Readability.FunctionNames` fix false positive
 - `Credo.Check.Readability.SinglePipe` add new param `:allow_blocks` (defaults to `true`)
+- `Credo.Check.Refactor.ModuleDependencies` fix false positive
 
 ## 1.7.14
 
