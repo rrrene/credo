@@ -7,7 +7,7 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
       max_deps: 10,
       dependency_namespaces: [],
       excluded_namespaces: [],
-      excluded_paths: [~r"/test/", ~r"^test"]
+      excluded_paths: [~r"/test/", "test"]
     ],
     explanations: [
       check: """
@@ -61,7 +61,6 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     {ast, ctx}
   end
 
-  # Check if analyzed module path is within ignored paths
   defp ignore_path?(filename, excluded_paths) do
     directory = Path.dirname(filename)
 
@@ -80,14 +79,12 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     |> filter_namespaces(dependency_namespaces)
   end
 
-  # Resolve dependencies to full module names
   defp with_fullnames(dependencies, aliases) do
     dependencies
     |> Enum.map(&full_name(&1, aliases))
     |> Enum.uniq()
   end
 
-  # Keep only dependencies which are within specified namespaces
   defp filter_namespaces(dependencies, namespaces) do
     Enum.filter(dependencies, &keep?(&1, namespaces))
   end
@@ -100,7 +97,6 @@ defmodule Credo.Check.Refactor.ModuleDependencies do
     Enum.any?(namespaces, &String.starts_with?(module_name, &1))
   end
 
-  # Get full module name from list of aliases (if present)
   defp full_name(dep, aliases) do
     aliases
     |> Enum.find(&String.ends_with?(&1, dep))
