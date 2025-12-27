@@ -54,7 +54,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
 
   defp indent(lines) do
     {_, string} = List.last(lines)
-    [{_line, indent}] = Regex.run(~r/^\s+/, string, return: :index)
+    [{_column, indent}] = Regex.run(~r/^\s*/, string, return: :index)
     indent
   end
 
