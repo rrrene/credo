@@ -97,11 +97,8 @@ defmodule Credo.SourceFile do
 
   def lines(%__MODULE__{} = source_file) do
     case SourceFileLines.get(source_file) do
-      {:ok, lines} ->
-        lines
-
-      _ ->
-        raise "Could not get source from ETS: #{source_file.filename}"
+      {:ok, lines} -> lines
+      _ -> raise "Could not get source from ETS: #{source_file.filename}"
     end
   end
 

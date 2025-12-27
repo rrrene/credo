@@ -344,6 +344,19 @@ defmodule Credo.Code.Token do
   end
 
   @doc false
+  def tokenize!(string_or_source_file)
+
+  def tokenize!(%Credo.SourceFile{} = source_file) do
+    source_file
+    |> Credo.SourceFile.source()
+    |> CredoTokenizer.tokenize!()
+  end
+
+  def tokenize!("" <> source) do
+    CredoTokenizer.tokenize!(source)
+  end
+
+  @doc false
   def reduce(string_or_source_file, callback, acc \\ [])
 
   def reduce(%Credo.SourceFile{} = source_file, callback, acc) do
