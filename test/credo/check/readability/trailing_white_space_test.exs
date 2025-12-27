@@ -381,6 +381,22 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues()
   end
 
+  test "it should NOT report trailing whitespace inside heredocs if :ignore_strings is true, but the white-space is part of the indent" do
+    """
+    defmodule CredoSampleModule do
+      @doc '''
+      Foo
+      @@
+      Bar
+      '''
+    end
+    """
+    |> String.replace("@@", "")
+    |> to_source_file
+    |> run_check(@described_check, ignore_strings: false)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -411,6 +427,52 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> String.replace("++", "  ")
     |> to_source_file
     |> run_check(@described_check, ignore_strings: false)
-    |> assert_issue()
+    |> assert_issue(%{trigger: "  "})
+  end
+
+  test "it should report trailing whitespace inside heredocs with interpolation if :ignore_strings is false" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @doc """
+      Test
+      #{Foo.Bar.something(
+      )
+      }++
+      Foo
+      Bar++
+      """
+    end
+    '''
+    |> String.replace("++", "  ")
+    |> to_source_file
+    |> run_check(@described_check, ignore_strings: false)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 6, trigger: "  "},
+      %{line_no: 8, trigger: "  "}
+    ])
+  end
+
+  test "it should report trailing whitespace inside doube-quoted string with interpolation if :ignore_strings is false" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @doc "
+      Test
+      #{Foo.Bar.something(
+      )
+      }++
+      Foo
+      Bar++
+      "
+    end
+    '''
+    |> String.replace("++", "  ")
+    |> to_source_file
+    |> run_check(@described_check, ignore_strings: false)
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{line_no: 6, trigger: "  "},
+      %{line_no: 8, trigger: "  "}
+    ])
   end
 end
