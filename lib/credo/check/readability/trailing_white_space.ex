@@ -21,53 +21,73 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
       ]
     ]
 
-  alias Credo.Code.Heredocs
-  alias Credo.Code.Strings
-
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
+    ctx = Context.build(source_file, params, __MODULE__)
 
-    source_file
-    |> to_lines(ignore_strings)
-    |> traverse_line([], issue_meta)
+    result = Credo.Code.Token.reduce(source_file, &collect/4, ctx)
+    result.issues
   end
 
-  defp to_lines(source_file, true) do
-    source_file
-    |> Strings.replace_with_spaces(".", ".")
-    |> Heredocs.replace_with_spaces(".", ".", ".", source_file.filename)
-    |> Credo.Code.to_lines()
+  defp collect(
+         _prev,
+         {{type, _}, {line, _, line2, _}, [first | _], _},
+         _next,
+         %{params: %{ignore_strings: false}} = ctx
+       )
+       when type in [:string, :heredoc] and not is_integer(first) do
+    do_collect_from_string(ctx, line, line2)
   end
 
-  defp to_lines(source_file, false) do
-    SourceFile.lines(source_file)
+  defp collect(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col, _, _}, _, _}, ctx) do
+    ctx
   end
 
-  defp traverse_line([{line_no, line} | tail], issues, issue_meta) do
-    issues =
+  defp collect(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col2, _, _}, _, _}, ctx) do
+    put_issue(ctx, issue_for(ctx, line, col, col2))
+  end
+
+  defp collect(_prev, _current, _next, ctx) do
+    ctx
+  end
+
+  defp indent(lines) do
+    {_, string} = List.last(lines)
+    [{_line, indent}] = Regex.run(~r/^\s+/, string, return: :index)
+    indent
+  end
+
+  defp do_collect_from_string(ctx, line, line2) do
+    lines =
+      Enum.map(line..line2, fn line_no ->
+        {line_no, SourceFile.line_at(ctx.source_file, line_no)}
+      end)
+
+    indent = indent(lines)
+
+    Enum.reduce(lines, ctx, fn {line_no, line}, ctx ->
       case Regex.run(~r/\h+$/u, line, return: :index) do
-        [{column, line_length}] ->
-          [issue_for(issue_meta, line_no, column + 1, line_length) | issues]
+        [{column, trailing_spaces}] ->
+          if column > indent do
+            put_issue(ctx, issue_for(ctx, line_no, column + 1, column + 1 + trailing_spaces))
+          else
+            ctx
+          end
 
         nil ->
-          issues
+          ctx
       end
-
-    traverse_line(tail, issues, issue_meta)
+    end)
   end
 
-  defp traverse_line([], issues, _issue_meta), do: issues
-
-  defp issue_for(issue_meta, line_no, column, line_length) do
+  defp issue_for(ctx, line_no, column, line_length) do
     format_issue(
-      issue_meta,
+      ctx,
       message: "There should be no trailing white-space at the end of a line.",
       line_no: line_no,
       column: column,
-      trigger: String.duplicate(" ", line_length)
+      trigger: String.duplicate(" ", line_length - column)
     )
   end
 end
