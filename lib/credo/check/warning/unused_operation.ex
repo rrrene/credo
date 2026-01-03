@@ -1,4 +1,69 @@
 defmodule Credo.Check.Warning.UnusedOperation do
+  use Credo.Check,
+    id: "EX5019",
+    base_priority: :high,
+    explanations: [
+      check: """
+      The result of a call to some functions has to be used.
+
+      This is a generic check that you can configure to your needs.
+
+      While this is correct ...
+
+          def clean_and_verify_options!(map) do
+            map = Map.delete(map, :debug)
+
+            if Enum.length(map) == 0, do: raise "OMG!!!1"
+
+            map
+          end
+
+      ... we forgot to save the result in this example:
+
+          def clean_and_verify_options!(map) do
+            Map.delete(map, :debug)
+
+            if Enum.length(map) == 0, do: raise "OMG!!!1"
+
+            map
+          end
+
+      Most operations never work on the variable you pass in, but return a new
+      variable which has to be used somehow.
+      """
+    ]
+
+  @doc false
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
+    ctx = Context.build(source_file, params, __MODULE__)
+
+    ctx = %{ctx | params: normalize_params(ctx.params)}
+
+    Enum.flat_map(ctx.params.modules, fn {mod, fun_list, issue_message} ->
+      issues = run(source_file, params, mod, fun_list, &format_issue/2)
+
+      case issue_message do
+        "" <> message -> Enum.map(issues, fn issue -> %{issue | message: message} end)
+        nil -> issues
+      end
+    end)
+  end
+
+  defp normalize_params(params) do
+    modules =
+      Enum.map(params.modules, fn
+        {mod, fun_list} -> {normalize_mod(mod), fun_list, nil}
+        {mod, fun_list, issue_message} -> {normalize_mod(mod), fun_list, issue_message}
+      end)
+
+    Map.put(params, :modules, modules)
+  end
+
+  defp normalize_mod(mod) do
+    mod
+  end
+
   # The result of a call to the provided module's functions has to be used.
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper
@@ -21,7 +86,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
       UnusedFunctionReturnHelper.find_unused_calls(
         source_file,
         params,
-        [checked_module],
+        List.wrap(checked_module),
         relevant_funs
       )
 
