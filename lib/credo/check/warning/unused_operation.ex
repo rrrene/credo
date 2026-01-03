@@ -1,36 +1,21 @@
 defmodule Credo.Check.Warning.UnusedOperation do
   use Credo.Check,
-    id: "EX5019",
+    id: "EX5029",
     base_priority: :high,
+    param_defaults: [modules: []],
     explanations: [
       check: """
       The result of a call to some functions has to be used.
 
       This is a generic check that you can configure to your needs.
 
-      While this is correct ...
-
-          def clean_and_verify_options!(map) do
-            map = Map.delete(map, :debug)
-
-            if Enum.length(map) == 0, do: raise "OMG!!!1"
-
-            map
-          end
-
-      ... we forgot to save the result in this example:
-
-          def clean_and_verify_options!(map) do
-            Map.delete(map, :debug)
-
-            if Enum.length(map) == 0, do: raise "OMG!!!1"
-
-            map
-          end
-
       Most operations never work on the variable you pass in, but return a new
       variable which has to be used somehow.
-      """
+      """,
+      params: [
+        modules:
+          "The modules and functions that should trigger this check. Format: `{module, list_of_function_names}` or `{module, list_of_function_names, issue_message}`"
+      ]
     ]
 
   @doc false

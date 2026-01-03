@@ -1,6 +1,6 @@
 defmodule Credo.Check.Warning.StructFieldAmount do
   use Credo.Check,
-    id: "EX5026",
+    id: "EX5027",
     base_priority: :normal,
     category: :warning,
     param_defaults: [max_fields: 31],

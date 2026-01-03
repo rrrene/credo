@@ -1,6 +1,6 @@
 defmodule Credo.Check.Warning.UnusedMapOperation do
   use Credo.Check,
-    id: "EX5019",
+    id: "EX5028",
     base_priority: :high,
     explanations: [
       check: """

@@ -57,6 +57,6 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
         {:Keywords, [:get, :fetch]}
       ]
     )
-    |> assert_issue(%{message: ~r/special/})
+    |> assert_issue(%{trigger: "Map.take", message: ~r/special/})
   end
 end
