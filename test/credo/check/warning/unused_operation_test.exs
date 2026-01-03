@@ -27,8 +27,8 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
     |> to_source_file
     |> run_check(@described_check,
       modules: [
-        {:Map, [:get, :fetch]},
-        {:Keywords, [:get, :fetch], "My special issue message"}
+        {Map, [:get, :fetch]},
+        {Keywords, [:get, :fetch], "My special issue message"}
       ]
     )
     |> refute_issues()
@@ -53,8 +53,8 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
     |> to_source_file
     |> run_check(@described_check,
       modules: [
-        {:Map, [:get, :take], "My special issue message"},
-        {:Keywords, [:get, :fetch]}
+        {Map, [:get, :take], "My special issue message"},
+        {Keywords, [:get, :fetch]}
       ]
     )
     |> assert_issue(%{trigger: "Map.take", message: ~r/special/})

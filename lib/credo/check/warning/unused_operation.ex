@@ -29,7 +29,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
       issues = run(source_file, params, mod, fun_list, &format_issue/2)
 
       case issue_message do
-        "" <> message -> Enum.map(issues, fn issue -> %{issue | message: message} end)
+        "" <> message -> Enum.map(issues, fn %Issue{} = issue -> %{issue | message: message} end)
         nil -> issues
       end
     end)
@@ -47,6 +47,8 @@ defmodule Credo.Check.Warning.UnusedOperation do
 
   defp normalize_mod(mod) do
     mod
+    |> Module.split()
+    |> Enum.map(&String.to_atom/1)
   end
 
   # The result of a call to the provided module's functions has to be used.
@@ -86,6 +88,11 @@ defmodule Credo.Check.Warning.UnusedOperation do
 
       [issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) | issues]
     end)
+  end
+
+  defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module)
+       when is_list(checked_module) do
+    issue_for(format_issue_fun, issue_meta, meta, trigger, Module.concat(checked_module))
   end
 
   defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) do
