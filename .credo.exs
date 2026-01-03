@@ -156,6 +156,8 @@
           {Credo.Check.Warning.UnusedFileOperation, []},
           {Credo.Check.Warning.UnusedKeywordOperation, []},
           {Credo.Check.Warning.UnusedListOperation, []},
+          {Credo.Check.Warning.UnusedMapOperation, []},
+          {Credo.Check.Warning.UnusedOperation, []},
           {Credo.Check.Warning.UnusedPathOperation, []},
           {Credo.Check.Warning.UnusedRegexOperation, []},
           {Credo.Check.Warning.UnusedStringOperation, []},
