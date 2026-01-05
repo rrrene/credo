@@ -296,9 +296,9 @@ defmodule Credo.Test.Case do
       |> to_source_file()
       |> run_check(MyProject.MyCheck, foo_parameter: "bar")
   """
-  def run_check(source_files, check, params \\ []) do
+  def run_check(source_files, check, params \\ [], exec \\ Credo.Execution.build()) do
     Process.put(:credo_test_source_files, source_files)
-    issues = CheckRunner.run_check(source_files, check, params)
+    issues = CheckRunner.run_check(source_files, check, params, exec)
 
     check_on_malformed_issues(source_files, issues)
 

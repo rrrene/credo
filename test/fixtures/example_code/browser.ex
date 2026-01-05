@@ -112,6 +112,11 @@ defmodule Wallaby.Browser do
   alias Wallaby.Session
   alias Wallaby.StaleReferenceError
 
+  # NOTE: this config comment has no effect and is just here for testing
+  #
+  # credo:disable-for-this-file Credo.Check.Warning.IoInspect
+  #
+
   @type t :: any()
 
   @typep session :: Session.t()

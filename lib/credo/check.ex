@@ -160,6 +160,9 @@ defmodule Credo.Check do
   @callback id() :: binary()
 
   @doc false
+  @callback scheduled_in_group() :: integer()
+
+  @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
 
@@ -465,6 +468,9 @@ defmodule Credo.Check do
       def run(%SourceFile{} = source_file, params) do
         throw("Implement me")
       end
+
+      @impl true
+      def scheduled_in_group, do: 1
 
       defoverridable Credo.Check
 

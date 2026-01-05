@@ -13,15 +13,26 @@ defmodule Credo.Check.Runner do
   Runs all checks on all source files (according to the config).
   """
   def run(source_files, exec) when is_list(source_files) do
-    check_tuples =
+    all_check_tuples =
       exec
       |> Execution.checks()
       |> warn_about_ineffective_patterns(exec)
       |> fix_deprecated_notation_for_checks_without_params()
 
-    check_tuples
-    |> Task.async_stream(&run_check(exec, &1), timeout: :infinity, ordered: false)
-    |> Stream.run()
+    check_tuples_grouped_by_group =
+      all_check_tuples
+      |> Enum.group_by(fn {check, _params} -> check.scheduled_in_group() end)
+      |> Enum.sort_by(fn {key, _check_tuples} -> key end)
+      |> Enum.map(fn {_key, check_tuples} -> check_tuples end)
+
+    Enum.each(check_tuples_grouped_by_group, fn check_tuples ->
+      check_tuples
+      |> Task.async_stream(&run_check(exec, &1),
+        timeout: :infinity,
+        ordered: false
+      )
+      |> Stream.run()
+    end)
 
     :ok
   end

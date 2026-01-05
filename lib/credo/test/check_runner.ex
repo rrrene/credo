@@ -2,9 +2,7 @@ defmodule Credo.Test.CheckRunner do
   alias Credo.Execution
   alias Credo.Execution.ExecutionIssues
 
-  def run_check(source_files, check, params \\ []) do
-    exec = Execution.build()
-
+  def run_check(source_files, check, params \\ [], exec \\ Execution.build()) do
     source_files
     |> List.wrap()
     |> issues_for(check, exec, params)

@@ -91,6 +91,10 @@
           #
           {Credo.Check.Design.TagTODO, [exit_status: 2]},
 
+          # Uncomment the following if you want to find redundant config comments that
+          # are not/no longer ignoring issues.
+          {Credo.Check.Design.RedundantConfigComments, []},
+
           #
           ## Readability Checks
           #

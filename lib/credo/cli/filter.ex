@@ -22,8 +22,8 @@ defmodule Credo.CLI.Filter do
     |> Enum.any?(&important?(&1, exec))
   end
 
-  def valid_issues(list, exec) when is_list(list) do
-    Enum.reject(list, fn issue ->
+  def valid_issues(issues, exec) when is_list(issues) do
+    Enum.reject(issues, fn issue ->
       ignored_by_config_comment?(issue, exec)
     end)
   end
@@ -32,8 +32,10 @@ defmodule Credo.CLI.Filter do
     config_comment_map = Execution.get_private(exec, :config_comment_map)
 
     case config_comment_map[issue.filename] do
-      list when is_list(list) ->
-        Enum.any?(list, &ConfigComment.ignores_issue?(&1, issue))
+      config_comments when is_list(config_comments) ->
+        Enum.any?(config_comments, fn config_comment ->
+          ConfigComment.ignores_issue?(config_comment, issue)
+        end)
 
       _ ->
         false
