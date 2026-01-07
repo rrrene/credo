@@ -9,12 +9,16 @@ defmodule Credo.Check.Warning.UnusedOperation do
 
       This is a generic check that you can configure to your needs.
 
-      Most operations never work on the variable you pass in, but return a new
-      variable which has to be used somehow.
+      With checks like `UnusedFileOperation` you can catch instances where you call
+      `File.read/1`, but do not use the result.
+
+      With this check you can do the same for your modules and functions.
       """,
       params: [
         modules:
-          "The modules and functions that should trigger this check. Format: `{module, list_of_function_names}` or `{module, list_of_function_names, issue_message}`"
+          "The modules and functions that should trigger this check.
+
+          Format: `{module, list_of_function_names}` or `{module, list_of_function_names, issue_message}`"
       ]
     ]
 
