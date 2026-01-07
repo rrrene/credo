@@ -216,4 +216,42 @@ defmodule Credo.Check.Refactor.NestingTest do
     |> run_check(@described_check)
     |> assert_issue(%{trigger: "if"})
   end
+
+  test "it should report a violation /7" do
+    ~S'''
+    defmodule CredoSampleModule do
+      defp foo() do
+        for a <- list do
+          for b <- a do
+            for c <- b do
+              d * 2
+            end
+          end
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "for"})
+  end
+
+  test "it should report a violation /8" do
+    ~S'''
+    defmodule CredoSampleModule do
+      defp foo(p) do
+        with {:ok, a} <- list(p) do
+          for b <- a do
+            if match?({:ok, _}, b) do
+              d * 2
+            end
+          end
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "if"})
+  end
 end

@@ -30,7 +30,7 @@ defmodule Credo.Check.Refactor.Nesting do
     ]
 
   @def_ops [:def, :defp, :defmacro]
-  @nest_ops [:if, :unless, :case, :cond, :fn]
+  @nest_ops [:if, :unless, :case, :cond, :fn, :for, :with]
 
   @doc false
   @impl true
