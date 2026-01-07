@@ -118,4 +118,12 @@ defmodule Credo.CheckTest do
     assert stderr_output != ""
     assert stderr_output =~ "containing invalid bytes"
   end
+
+  test "it should recognize defined checks" do
+    assert Check.defined?(Credo.Check.Refactor.Nesting)
+  end
+
+  test "it should not recognize defined modules as checks" do
+    refute Check.defined?(Credo.Check.Refactor.EnumHelpers)
+  end
 end

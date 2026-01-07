@@ -889,7 +889,7 @@ defmodule Credo.Check do
 
   def defined?(module) when is_atom(module) do
     case Code.ensure_compiled(module) do
-      {:module, _} -> true
+      {:module, _} -> function_exported?(module, :base_priority, 0)
       {:error, _} -> false
     end
   end
