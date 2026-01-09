@@ -77,7 +77,7 @@ defmodule Credo.Code.Module do
   def attribute({:defmodule, _, _arguments} = ast, attr_name) do
     arguments =
       case Credo.Code.Block.do_block_for!(ast) do
-        {:__block__, [], arguments} -> arguments
+        {:__block__, _meta, arguments} -> arguments
         value -> List.wrap(value)
       end
 
