@@ -42,10 +42,10 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
           {ast, ctx}
 
         {:ok, false} ->
-          if not ctx.params[:force_comment_on_explicit_false] or has_comment?(ctx, meta[:line]) do
-            {ast, ctx}
-          else
+          if ctx.params[:force_comment_on_explicit_false] and not has_comment?(ctx, meta[:line]) do
             {ast, put_issue(ctx, issue_for(ctx, meta))}
+          else
+            {ast, ctx}
           end
       end
     else
