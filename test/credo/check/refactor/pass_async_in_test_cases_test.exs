@@ -47,6 +47,18 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> refute_issues()
     end
 
+    test "it allows `use #{@case_name}, async: false` with a commit" do
+      ~s'''
+      defmodule FooTest do
+        # a comment explaining why async is false
+        use #{@case_name}, async: false
+      end
+      '''
+      |> to_source_file()
+      |> run_check(@described_check, force_comment_on_explicit_false: true)
+      |> refute_issues()
+    end
+
     #
     # cases raising issues
     #
@@ -72,6 +84,17 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> to_source_file()
       |> run_check(@described_check)
       |> assert_issue(%{line_no: 3, trigger: "use"})
+    end
+
+    test "it does not allow `use #{@case_name}` with `async: false`" do
+      ~s'''
+      defmodule FooTest do
+        use #{@case_name}, async: false
+      end
+      '''
+      |> to_source_file()
+      |> run_check(@described_check, force_comment_on_explicit_false: true)
+      |> assert_issue(%{line_no: 2, trigger: "use"})
     end
   end
 end
