@@ -9,7 +9,7 @@ defmodule Credo.Code.ModuleTest do
   # exception
   #
 
-  test "returns boolean" do
+  test "should return boolean indicating whether the only argument is a module AST with an defexception/1 DSL call" do
     ast =
       quote do
         defmodule MyAppError do
