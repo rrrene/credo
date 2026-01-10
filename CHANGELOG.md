@@ -2,7 +2,8 @@
 
 ## 1.7.14
 
-- Fix compatibility & compiler warnings with Elixir 1.19 (dev)
+- Fix compatibility & compiler warnings with Elixir 1.20.0-rc.0
+- `Credo.Check.Refactor.PassAsyncInTestCases` add new param `:force_comment_on_explicit_false` (defaults to `false`)
 - New Check: `Credo.Check.Warning.UnusedMapOperation`
 - New Check: `Credo.Check.Warning.UnusedOperation`
 

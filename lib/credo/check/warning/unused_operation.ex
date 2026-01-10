@@ -8,9 +8,14 @@ defmodule Credo.Check.Warning.UnusedOperation do
       The result of a call to some functions has to be used.
 
       This is a generic check that you can configure to your needs.
+      With checks like `UnusedEnumOperation` you can catch instances where you call
+      e.g. `Enum.reject/1`, but accidentally do not use the result:
 
-      With checks like `UnusedFileOperation` you can catch instances where you call
-      `File.read/1`, but do not use the result.
+          def prepend_my_username(my_username, usernames) do
+            Enum.reject(usernames, &is_nil/1)
+
+            [my_username] ++ usernames
+          end
 
       With this check you can do the same for your modules and functions.
       """,
