@@ -307,7 +307,6 @@ defmodule Credo.Code.Module do
 
   def name(_), do: "<Unknown Module Name>"
 
-  # TODO: write unit test
   def exception?({:defmodule, _, [{:__aliases__, _, _name_list}, arguments]}) do
     arguments
     |> Block.calls_in_do_block()

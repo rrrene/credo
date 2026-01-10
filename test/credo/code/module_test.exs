@@ -6,6 +6,22 @@ defmodule Credo.Code.ModuleTest do
   doctest Credo.Code.Module
 
   #
+  # exception
+  #
+
+  test "should return boolean indicating whether the only argument is a module AST with an defexception/1 DSL call" do
+    ast =
+      quote do
+        defmodule MyAppError do
+          defexception [:message]
+        end
+      end
+
+    assert Module.exception?(ast)
+    refute Module.exception?(nil)
+  end
+
+  #
   # attribute
   #
 
