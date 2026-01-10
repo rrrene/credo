@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.14
+
+- Fix compatibility & compiler warnings with Elixir 1.19 (dev)
+- New Check: `Credo.Check.Warning.UnusedMapOperation`
+- New Check: `Credo.Check.Warning.UnusedOperation`
+
 ## 1.7.15
 
 - Improve performance on large projects

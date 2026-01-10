@@ -42,11 +42,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
           {ast, ctx}
 
         {:ok, false} ->
-          if ctx.params[:force_comment_on_explicit_false] and not has_comment?(ctx, meta[:line]) do
-            {ast, put_issue(ctx, issue_for(ctx, meta))}
-          else
-            {ast, ctx}
-          end
+          handle_explicit_async_false(ast, ctx)
       end
     else
       {ast, ctx}
@@ -66,6 +62,14 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
 
   defp walk(ast, ctx) do
     {ast, ctx}
+  end
+
+  defp handle_explicit_async_false({:use, meta, _} = ast, ctx) do
+    if ctx.params.force_comment_on_explicit_false and not has_comment?(ctx, meta[:line]) do
+      {ast, put_issue(ctx, issue_for(ctx, meta))}
+    else
+      {ast, ctx}
+    end
   end
 
   defp has_comment?(ctx, line) do
