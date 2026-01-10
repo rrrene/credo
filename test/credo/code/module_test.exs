@@ -25,6 +25,26 @@ defmodule Credo.Code.ModuleTest do
   # attribute
   #
 
+  test "1.20.x block AST compatibility" do
+    doc = "1.20.x compatible"
+
+    ast =
+      {:defmodule, [context: Elixir, imports: [{2, Kernel}]],
+       [
+         {:__aliases__, [alias: false], [:Example]},
+         [
+           do:
+             {:__block__, [line: 1, column: 1],
+              [
+                {:@, [context: Elixir, imports: [{1, Kernel}]],
+                 [{:moduledoc, [context: Elixir], [doc]}]}
+              ]}
+         ]
+       ]}
+
+    assert doc == Module.attribute(ast, :moduledoc)
+  end
+
   test "should return the given module attribute" do
     {:ok, ast} =
       ~S'''
