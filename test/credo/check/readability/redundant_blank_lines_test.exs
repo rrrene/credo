@@ -14,6 +14,8 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
         1
       end
 
+      # this is a test comment
+
       def b do
         foo = "
         a
