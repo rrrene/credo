@@ -15,6 +15,7 @@ defmodule Credo.Execution do
               color: :boolean,
               config_name: :string,
               config_file: :string,
+              profile: :boolean,
               working_dir: :string
             ],
             cli_aliases: [C: :config_name, D: :debug],
@@ -33,6 +34,7 @@ defmodule Credo.Execution do
             # options, set by the command line
             format: nil,
             help: false,
+            profile: false,
             verbose: false,
             version: false,
 
@@ -122,8 +124,13 @@ defmodule Credo.Execution do
   @doc "Builds an Execution struct for the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
+    profile? = "--profile" in argv
 
-    %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
+    %__MODULE__{
+      argv: argv,
+      max_concurrent_check_runs: max_concurrent_check_runs,
+      profile: profile?
+    }
     |> put_pipeline(@execution_pipeline_key, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
     |> put_builtin_command("diff", Credo.CLI.Command.Diff.DiffCommand)
