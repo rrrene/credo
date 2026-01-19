@@ -344,7 +344,11 @@ defmodule Credo.Check do
     default_check? = caller_module in @__default_checks__
 
     quote do
-      @moduledoc Credo.Check.__build_moduledoc__(unquote(opts),unquote(default_check?),unquote(app))
+      @moduledoc Credo.Check.__build_moduledoc__(
+                   unquote(opts),
+                   unquote(default_check?),
+                   unquote(app)
+                 )
 
       @behaviour Credo.Check
       @before_compile Credo.Check
