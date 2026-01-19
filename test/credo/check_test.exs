@@ -135,7 +135,7 @@ defmodule Credo.CheckTest do
       category: :warning,
       explanations: [
         check: @check_explanation,
-        params: [some_param: @param_explanation]
+        params: [some_param: @param_explanation, other_param: "<#{@param_explanation}>"]
       ],
       param_defaults: [some_param: 42]
 
@@ -148,5 +148,6 @@ defmodule Credo.CheckTest do
     explanations = ModuleAttributeTestCheck.explanations()
     assert explanations[:check] == "This is stored in a module attribute"
     assert explanations[:params][:some_param] == "Parameter from module attribute"
+    assert explanations[:params][:other_param] == "<Parameter from module attribute>"
   end
 end
