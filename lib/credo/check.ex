@@ -339,10 +339,17 @@ defmodule Credo.Check do
         end
       end
 
-    module_doc = moduledoc(opts, __CALLER__.module, Mix.Project.config()[:app])
+    caller_module = __CALLER__.module
+    app = Mix.Project.config()[:app]
+    default_check? = caller_module in @__default_checks__
 
     quote do
-      @moduledoc unquote(module_doc)
+      @moduledoc Credo.Check.__build_moduledoc__(
+                   unquote(opts),
+                   unquote(default_check?),
+                   unquote(app)
+                 )
+
       @behaviour Credo.Check
       @before_compile Credo.Check
 
@@ -506,19 +513,15 @@ defmodule Credo.Check do
     end
   end
 
-  defp moduledoc(opts, module, app) do
-    explanations = opts[:explanations]
-
-    base_priority = opts_to_string(opts[:base_priority]) || 0
-
-    default_check? = module in @__default_checks__
-
+  @doc false
+  def __build_moduledoc__(opts, default_check?, app) do
+    base_priority = opts[:base_priority] || 0
+    explanations = opts[:explanations] || []
+    param_defaults = opts[:param_defaults] || []
     tags = opts[:tags] || []
 
     elixir_version_hint =
-      if opts[:elixir_version] do
-        elixir_version = opts_to_string(opts[:elixir_version])
-
+      if elixir_version = opts[:elixir_version] do
         "requires Elixir `#{elixir_version}`"
       else
         "works with any version of Elixir"
@@ -560,9 +563,8 @@ defmodule Credo.Check do
         end
       end
 
-    check_doc = opts_to_string(explanations[:check])
-    params = explanations[:params] |> opts_to_string() |> List.wrap()
-    param_defaults = opts_to_string(opts[:param_defaults])
+    check_doc = explanations[:check]
+    params = List.wrap(explanations[:params])
 
     params_doc =
       if params == [] do
@@ -577,7 +579,7 @@ defmodule Credo.Check do
                 "*This parameter defaults to* `#{default_value}`."
               end
 
-            value = value |> String.split("\n") |> Enum.map_join("\n", &"  #{&1}")
+            value = value |> to_string() |> String.split("\n") |> Enum.map_join("\n", &"  #{&1}")
 
             """
             ### `:#{key}`
@@ -624,15 +626,6 @@ defmodule Credo.Check do
 
   defp credo_docs_uri(:credo, path), do: path
   defp credo_docs_uri(_other_app, path), do: "`e:credo:#{path}`"
-
-  defp opts_to_string(value) do
-    {result, _} =
-      value
-      |> Macro.to_string()
-      |> Code.eval_string()
-
-    result
-  end
 
   defp deprecated_def_default_params(env) do
     default_params = Module.get_attribute(env.module, :default_params)

@@ -126,4 +126,28 @@ defmodule Credo.CheckTest do
   test "it should not recognize defined modules as checks" do
     refute Check.defined?(Credo.Check.Refactor.EnumHelpers)
   end
+
+  defmodule ModuleAttributeTestCheck do
+    @check_explanation "This is stored in a module attribute"
+    @param_explanation "Parameter from module attribute"
+
+    use Credo.Check,
+      category: :warning,
+      explanations: [
+        check: @check_explanation,
+        params: [some_param: @param_explanation, other_param: "<#{@param_explanation}>"]
+      ],
+      param_defaults: [some_param: 42]
+
+    def run(%SourceFile{} = _source_file, _params \\ []) do
+      []
+    end
+  end
+
+  test "it should allow module attributes in use Credo.Check options" do
+    explanations = ModuleAttributeTestCheck.explanations()
+    assert explanations[:check] == "This is stored in a module attribute"
+    assert explanations[:params][:some_param] == "Parameter from module attribute"
+    assert explanations[:params][:other_param] == "<Parameter from module attribute>"
+  end
 end
