@@ -47,6 +47,10 @@ defmodule Credo.Check.Warning.Dbg do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Kernel.dbg"))}
   end
 
+  defp walk({:&, _, [{:/, _, [{:dbg, meta, _}, 1]}]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
+  end
+
   defp walk({:|>, _, [_, {:dbg, meta, nil}]} = ast, ctx) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
