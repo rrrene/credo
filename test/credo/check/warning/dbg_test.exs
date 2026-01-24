@@ -54,6 +54,35 @@ defmodule Credo.Check.Warning.DbgTest do
     |> refute_issues
   end
 
+  test "it should NOT report captured &dbg/1 when using :allow_capture" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        params
+        |> tap(&dbg/1)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_capture: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report captured &dbg/1 when using :allow_capture /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        dbg = &dbg/1
+
+        dbg.(params)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_capture: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
