@@ -3,7 +3,7 @@ defmodule Credo.Check.Warning.Dbg do
     id: "EX5026",
     base_priority: :high,
     elixir_version: ">= 1.14.0-dev",
-    param_defaults: [allow_capture: false],
+    param_defaults: [allow_captures: false],
     explanations: [
       check: """
       Calls to dbg/0 and dbg/2 should mostly be used during debugging sessions.
@@ -12,7 +12,7 @@ defmodule Credo.Check.Warning.Dbg do
       in error.
       """,
       params: [
-        allow_capture: "Allow using a capture, e.g. `&dbg/1`."
+        allow_captures: "Allow using a capture, e.g. `&dbg/1`."
       ]
     ]
 
@@ -53,7 +53,7 @@ defmodule Credo.Check.Warning.Dbg do
 
   defp walk(
          {:&, _, [{:/, _, [{:dbg, _meta, _}, _arity]}]} = ast,
-         %{params: %{allow_capture: true}} = ctx
+         %{params: %{allow_captures: true}} = ctx
        ) do
     {ast, ctx}
   end
