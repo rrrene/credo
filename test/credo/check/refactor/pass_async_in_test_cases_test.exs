@@ -94,7 +94,10 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       '''
       |> to_source_file()
       |> run_check(@described_check, force_comment_on_explicit_false: true)
-      |> assert_issue(%{line_no: 2, trigger: "use"})
+      |> assert_issue(fn issue ->
+        assert %{line_no: 2, trigger: "use"} = issue
+        assert issue.message =~ "comment explaining why"
+      end)
     end
   end
 end
