@@ -716,7 +716,9 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(fn issue ->
+      assert issue.message =~ "There should be no unused return values for Enum functions."
+    end)
   end
 
   test "it should report a violation when end of pipe" do

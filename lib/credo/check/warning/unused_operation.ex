@@ -23,7 +23,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
         modules:
           "The modules and functions that should trigger this check.
 
-          Format: `{module, list_of_function_names}` or `{module, list_of_function_names, issue_message}`"
+          Format: `module` (for all functions in the module), `{module, issue_message}`, `{module, list_of_function_names}`, or `{module, list_of_function_names, issue_message}`"
       ]
     ]
 
@@ -47,6 +47,8 @@ defmodule Credo.Check.Warning.UnusedOperation do
   defp normalize_params(params) do
     modules =
       Enum.map(params.modules, fn
+        mod when is_atom(mod) -> {normalize_mod(mod), nil, nil}
+        {mod, "" <> _ = issue_message} -> {normalize_mod(mod), nil, issue_message}
         {mod, fun_list} -> {normalize_mod(mod), fun_list, nil}
         {mod, fun_list, issue_message} -> {normalize_mod(mod), fun_list, issue_message}
       end)
@@ -105,9 +107,17 @@ defmodule Credo.Check.Warning.UnusedOperation do
   end
 
   defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) do
+    # If the module passed in was like `MyApp.MyModule`, the stringified version would be `Elixir.MyApp.MyModule`.
+    # However, callers may explicitly be passing in a non-module like `:Enum`, which we want to display as `Enum`.
+    module_name =
+      case to_string(checked_module) do
+        "Elixir." <> rest when byte_size(rest) > 0 -> rest
+        str -> str
+      end
+
     format_issue_fun.(
       issue_meta,
-      message: "There should be no unused return values for #{checked_module} functions.",
+      message: "There should be no unused return values for #{module_name} functions.",
       trigger: trigger,
       line_no: meta[:line],
       column: meta[:column]
