@@ -36,7 +36,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     if String.ends_with?(module_name, "Case") do
       case Keyword.fetch(options, :async) do
         :error ->
-          {ast, put_issue(ctx, issue_for(ctx, meta))}
+          {ast, put_issue(ctx, issue_for(ctx, meta, :default))}
 
         {:ok, true} ->
           {ast, ctx}
@@ -54,7 +54,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     module_name = Credo.Code.Name.last(module_namespace)
 
     if String.ends_with?(module_name, "Case") do
-      {ast, put_issue(ctx, issue_for(ctx, meta))}
+      {ast, put_issue(ctx, issue_for(ctx, meta, :default))}
     else
       {ast, ctx}
     end
@@ -66,7 +66,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
 
   defp handle_explicit_async_false({:use, meta, _} = ast, ctx) do
     if ctx.params.force_comment_on_explicit_false and not has_comment?(ctx, meta[:line]) do
-      {ast, put_issue(ctx, missing_comment_issue_for(ctx, meta))}
+      {ast, put_issue(ctx, issue_for(ctx, meta, :missing_comment))}
     else
       {ast, ctx}
     end
@@ -84,22 +84,19 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     end
   end
 
-  defp issue_for(ctx, meta) do
-    format_issue(
+  defp issue_for(ctx, meta, :default) do
+    issue_for(ctx, meta, "Pass an `:async` boolean option to `use` a test case module.")
+  end
+
+  defp issue_for(ctx, meta, :missing_comment) do
+    issue_for(
       ctx,
-      message: "Pass an `:async` boolean option to `use` a test case module.",
-      trigger: "use",
-      line_no: meta[:line]
+      meta,
+      "Tests with `async: false` need a comment explaining why they can't be run asynchronously."
     )
   end
 
-  defp missing_comment_issue_for(ctx, meta) do
-    format_issue(
-      ctx,
-      message:
-        "Tests with `async: false` need a comment explaining why they can't be run asynchronously.",
-      trigger: "use",
-      line_no: meta[:line]
-    )
+  defp issue_for(ctx, meta, "" <> message) do
+    format_issue(ctx, message: message, trigger: "use", line_no: meta[:line])
   end
 end
