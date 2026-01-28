@@ -66,7 +66,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
 
   defp handle_explicit_async_false({:use, meta, _} = ast, ctx) do
     if ctx.params.force_comment_on_explicit_false and not has_comment?(ctx, meta[:line]) do
-      {ast, put_issue(ctx, issue_for(ctx, meta))}
+      {ast, put_issue(ctx, missing_comment_issue_for(ctx, meta))}
     else
       {ast, ctx}
     end
@@ -88,6 +88,16 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
     format_issue(
       ctx,
       message: "Pass an `:async` boolean option to `use` a test case module.",
+      trigger: "use",
+      line_no: meta[:line]
+    )
+  end
+
+  defp missing_comment_issue_for(ctx, meta) do
+    format_issue(
+      ctx,
+      message:
+        "Tests with `async: false` need a comment explaining why they can't be run asynchronously.",
       trigger: "use",
       line_no: meta[:line]
     )
