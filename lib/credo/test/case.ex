@@ -152,6 +152,23 @@ defmodule Credo.Test.Case do
       |> run_check(FooBar)
       |> assert_issue()
 
+  Giving a pattern, you can say "in this snippet, there should be one issue looking like this":
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue(%{line_no: 3})
+
+  The given patterns can contain all fields of `Credo.Issue`
+  (`:message` can either be a string or a regex):
+
+      source_file
+      |> run_check(FooBar)
+      |> assert_issue(%{
+          message: ~r/should reference/,
+          trigger: "foo",
+          line_no: 3
+        })
+
   If `callback` is given, calls it with the found issue:
 
       source_file
