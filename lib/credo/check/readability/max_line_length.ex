@@ -6,6 +6,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     param_defaults: [
       max_length: 120,
       ignore_definitions: true,
+      ignore_definition_args: false,
       ignore_heredocs: true,
       ignore_specs: false,
       ignore_sigils: true,
@@ -25,6 +26,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
       params: [
         max_length: "The maximum number of characters a line may consist of.",
         ignore_definitions: "Set to `true` to ignore lines including function definitions.",
+        ignore_definition_args:
+          "Set to `true` to ignore pattern matching clauses and arguments in function definitions.",
         ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
         ignore_sigils: "Set to `true` to ignore lines that are sigils, e.g. regular expressions.",
         ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
@@ -45,6 +48,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     max_length = Params.get(params, :max_length, __MODULE__)
 
     ignore_definitions = Params.get(params, :ignore_definitions, __MODULE__)
+    ignore_definition_args = Params.get(params, :ignore_definition_args, __MODULE__)
 
     ignore_specs = Params.get(params, :ignore_specs, __MODULE__)
     ignore_sigils = Params.get(params, :ignore_sigils, __MODULE__)
@@ -52,7 +56,9 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
     ignore_urls = Params.get(params, :ignore_urls, __MODULE__)
 
-    definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
+    definitions =
+      Credo.Code.prewalk(source_file, &find_definitions(&1, &2, ignore_definition_args))
+
     specs = Credo.Code.prewalk(source_file, &find_specs/2)
 
     source =
@@ -105,14 +111,37 @@ defmodule Credo.Check.Readability.MaxLineLength do
   end
 
   for op <- @def_ops do
-    defp find_definitions({unquote(op), meta, arguments} = ast, definitions)
+    defp find_definitions({unquote(op), meta, arguments} = ast, definitions, ignore_args)
          when is_list(arguments) do
-      {ast, [meta[:line] | definitions]}
+      lines =
+        if ignore_args do
+          last_line = find_last_line_of_definition(arguments, meta[:line])
+          Enum.to_list(meta[:line]..last_line)
+        else
+          [meta[:line]]
+        end
+
+      {ast, lines ++ definitions}
     end
   end
 
-  defp find_definitions(ast, definitions) do
+  defp find_definitions(ast, definitions, _ignore_args) do
     {ast, definitions}
+  end
+
+  defp find_last_line_of_definition(ast, initial) do
+    {_, max} =
+      Macro.prewalk(ast, initial, fn
+        {_, meta, _} = node, acc ->
+          line = meta[:line]
+          acc = if line && line > acc, do: line, else: acc
+          {node, acc}
+
+        node, acc ->
+          {node, acc}
+      end)
+
+    max
   end
 
   defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
