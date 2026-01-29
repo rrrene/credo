@@ -32,11 +32,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
       ]
     ]
 
-  alias Credo.Code.Heredocs
-  alias Credo.Code.Sigils
-  alias Credo.Code.Strings
-
-  @def_ops [:def, :defp, :defmacro]
+  import CredoTokenizer.Guards
 
   @doc false
   @impl true
@@ -52,103 +48,117 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
     ignore_urls = Params.get(params, :ignore_urls, __MODULE__)
 
-    definitions = Credo.Code.prewalk(source_file, &find_definitions/2)
-    specs = Credo.Code.prewalk(source_file, &find_specs/2)
+    tokens = Credo.Code.Token.tokenize!(source_file)
 
-    source =
+    tokens_by_line =
+      Enum.reduce(tokens, [[]], fn
+        token, [current_line | memo] when is_eol(token) -> [[] | [[token | current_line] | memo]]
+        token, [current_line | memo] -> [[token | current_line] | memo]
+      end)
+      |> Enum.filter(fn
+        [{_type, {_line, column, _, _}, _value, _info} = _eol | _tokens] -> column > max_length
+        [] -> false
+      end)
+
+    # We need fewer iterations here by reducing this to one `reduce` call
+
+    tokens_by_line =
       if ignore_heredocs do
-        Heredocs.replace_with_spaces(source_file, "")
+        Enum.reject(tokens_by_line, fn line_tokens ->
+          Enum.any?(line_tokens, &match?({{:heredoc, _}, _, _, _}, &1))
+        end)
       else
-        SourceFile.source(source_file)
+        tokens_by_line
       end
 
-    source =
+    tokens_by_line =
       if ignore_sigils do
-        Sigils.replace_with_spaces(source, "")
+        Enum.reject(tokens_by_line, fn line_tokens ->
+          Enum.any?(line_tokens, &match?({{:sigil, _}, _, _, _}, &1))
+        end)
       else
-        source
+        tokens_by_line
       end
 
-    lines = Credo.Code.to_lines(source)
-
-    lines_for_comparison =
+    tokens_by_line =
       if ignore_strings do
-        source
-        |> Strings.replace_with_spaces("", " ", source_file.filename)
-        |> Credo.Code.to_lines()
+        Enum.reject(tokens_by_line, fn
+          [_eol | [{{:string, _}, {_, column, _, _}, _, _} | _tokens]] -> column < max_length
+          _ -> false
+        end)
       else
-        lines
+        tokens_by_line
       end
 
-    url_regex = ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
-
-    lines_for_comparison =
+    tokens_by_line =
       if ignore_urls do
-        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ url_regex end)
+        Enum.reject(tokens_by_line, fn line_tokens ->
+          Enum.any?(line_tokens, fn
+            {{type, _}, _, contents, _} when type in [:string, :heredoc, :atom, :comment] -> contains_url?(contents)
+            _ -> false
+          end)
+        end)
       else
-        lines_for_comparison
+        tokens_by_line
       end
 
-    Enum.reduce(lines_for_comparison, [], fn {line_no, line_for_comparison}, issues ->
-      if String.length(line_for_comparison) > max_length do
-        if refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
-          issues
+    tokens_by_line =
+      if ignore_specs do
+        Enum.reject(tokens_by_line, fn line_tokens ->
+          match?(
+            [{{:at_op, nil}, _, :@, nil} | [{{:identifier, nil}, _, :spec, nil} | _tokens]],
+            Enum.reverse(line_tokens)
+          )
+        end)
+      else
+        tokens_by_line
+      end
+
+    tokens_by_line =
+      if ignore_definitions do
+        Enum.reject(tokens_by_line, fn line_tokens ->
+          match?(
+            [{{:identifier, nil}, _, :def, nil} | [{{:paren_identifier, nil}, _, _, nil} | _tokens]],
+            Enum.reverse(line_tokens)
+          )
+        end)
+      else
+        tokens_by_line
+      end
+
+    Enum.reduce(tokens_by_line, [], fn
+      [{_type, {line, column, _, _}, _value, _info} = _eol | _tokens], issues ->
+        if column > max_length do
+          [issue_for(issue_meta, line, column, max_length) | issues]
         else
-          {_, line} = Enum.at(lines, line_no - 1)
-
-          [issue_for(line_no, max_length, line, issue_meta) | issues]
+          issues
         end
-      else
+
+      _, issues ->
         issues
-      end
     end)
   end
 
-  for op <- @def_ops do
-    defp find_definitions({unquote(op), meta, arguments} = ast, definitions)
-         when is_list(arguments) do
-      {ast, [meta[:line] | definitions]}
-    end
+  defp contains_url?("" <> contents) do
+    url_regex = ~r/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
+
+    String.match?(contents, url_regex)
   end
 
-  defp find_definitions(ast, definitions) do
-    {ast, definitions}
-  end
+  defp contains_url?([_ | _] = contents), do: Enum.any?(contents, &contains_url?/1)
+  defp contains_url?([]), do: false
 
-  defp find_specs({:spec, meta, arguments} = ast, specs) when is_list(arguments) do
-    {ast, [meta[:line] | specs]}
-  end
+  defp contains_url?({_, _, [_ | _] = contents, _}), do: Enum.any?(contents, &contains_url?/1)
+  defp contains_url?({_, _, _, _}), do: false
 
-  defp find_specs(ast, specs) do
-    {ast, specs}
-  end
-
-  defp refute_issue?(line_no, definitions, ignore_definitions, specs, ignore_specs) do
-    ignore_definitions? =
-      if ignore_definitions do
-        Enum.member?(definitions, line_no)
-      else
-        false
-      end
-
-    ignore_specs? =
-      if ignore_specs do
-        Enum.member?(specs, line_no)
-      else
-        false
-      end
-
-    ignore_definitions? || ignore_specs?
-  end
-
-  defp issue_for(line_no, max_length, line, issue_meta) do
-    line_length = String.length(line)
+  defp issue_for(issue_meta, line_no, line_length, max_length) do
     column = max_length + 1
-    trigger = String.slice(line, max_length, line_length - max_length)
+    actual_length = line_length - 1
+    trigger = SourceFile.line_at(IssueMeta.source_file(issue_meta), line_no, column, line_length)
 
     format_issue(
       issue_meta,
-      message: "Line is too long (max is #{max_length}, was #{line_length}).",
+      message: "Line is too long (max is #{max_length}, was #{actual_length}).",
       line_no: line_no,
       column: column,
       trigger: trigger

@@ -83,14 +83,36 @@ defmodule Credo.Code do
       {:error, [issue_for({1, e.message, nil}, filename)]}
   end
 
+  @doc false
+  def ast_with_comments(string_or_source_file)
+
+  def ast_with_comments(%SourceFile{filename: filename} = source_file) do
+    source_file
+    |> SourceFile.source()
+    |> ast(filename)
+  end
+
+  @doc false
+  def ast_with_comments(source, filename \\ "nofilename") when is_binary(source) do
+    case string_to_quoted_with_comments(source, filename) do
+      {:ok, ast, comments} -> {:ok, {ast, comments}}
+      {:error, error} -> {:error, [issue_for(error, filename)]}
+    end
+  rescue
+    e in UnicodeConversionError ->
+      {:error, [issue_for({1, e.message, nil}, filename)]}
+  end
+
   defp string_to_quoted(source, filename) do
-    Code.string_to_quoted(source,
-      line: 1,
-      columns: true,
-      file: filename,
-      emit_warnings: false,
-      token_metadata: true
-    )
+    Code.string_to_quoted(source, string_to_quoted_opts(filename))
+  end
+
+  defp string_to_quoted_opts(filename) do
+    [file: filename, line: 1, columns: true, emit_warnings: false, token_metadata: true]
+  end
+
+  defp string_to_quoted_with_comments(source, filename) do
+    Code.string_to_quoted_with_comments(source, string_to_quoted_opts(filename))
   end
 
   defp issue_for({line_no, error_message, _}, filename) do
