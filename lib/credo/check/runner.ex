@@ -19,15 +19,28 @@ defmodule Credo.Check.Runner do
       |> warn_about_ineffective_patterns(exec)
       |> fix_deprecated_notation_for_checks_without_params()
 
+    max_concurrency = if exec.profile, do: 1, else: System.schedulers_online()
+
     check_tuples
-    |> Task.async_stream(&run_check(exec, &1), timeout: :infinity, ordered: false)
+    |> Task.async_stream(&run_check(exec, &1),
+      timeout: :infinity,
+      ordered: not exec.profile,
+      max_concurrency: max_concurrency
+    )
     |> Stream.run()
 
     :ok
   end
 
-  defp run_check(%Execution{debug: true} = exec, {check, params}) do
+  defp run_check(%Execution{} = exec, {check, params}) when exec.profile or exec.debug do
     ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
+    |> tap(fn
+      {_, usec, _} when usec > 10_000 and exec.profile ->
+        IO.puts("#{check} took #{usec / 1000}ms")
+
+      _ ->
+        :ok
+    end)
     |> ExecutionTiming.append(exec, task: exec.current_task, check: check)
   end
 
