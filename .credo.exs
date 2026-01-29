@@ -191,6 +191,7 @@
           {Credo.Check.Readability.WithCustomTaggedTuple, []},
           {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.AppendSingleItem, []},
+          {Credo.Check.Refactor.CondInsteadOfIfElse, [allow_one_liners: true]},
           {Credo.Check.Refactor.DoubleBooleanNegation, []},
           {Credo.Check.Refactor.FilterReject, []},
           {Credo.Check.Refactor.IoPuts, []},

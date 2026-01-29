@@ -25,6 +25,8 @@ defmodule Credo.Check.Refactor.CondStatements do
             1
           end
 
+      NOTE: This check is mutually exclusive with `Credo.Check.Refactor.CondInsteadOfIfElse`,
+      which recommends the opposite. Enable only one of these checks.
       """
     ]
 
