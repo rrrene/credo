@@ -20,10 +20,13 @@ defmodule Credo.Check.Warning.UnusedOperation do
       With this check you can do the same for your modules and functions.
       """,
       params: [
-        modules:
-          "The modules and functions that should trigger this check.
+        modules: """
+        The modules and functions that should trigger this check.
 
-          Format: `module` (for all functions in the module), `{module, issue_message}`, `{module, list_of_function_names}`, or `{module, list_of_function_names, issue_message}`"
+        Format: `{module, functions}` or `{module, functions, issue_message}`
+
+        `functions` can be a list of functions names as atoms or `:all` to include all functions of `module`.
+        """
       ]
     ]
 
@@ -47,8 +50,6 @@ defmodule Credo.Check.Warning.UnusedOperation do
   defp normalize_params(params) do
     modules =
       Enum.map(params.modules, fn
-        mod when is_atom(mod) -> {normalize_mod(mod), nil, nil}
-        {mod, "" <> _ = issue_message} -> {normalize_mod(mod), nil, issue_message}
         {mod, fun_list} -> {normalize_mod(mod), fun_list, nil}
         {mod, fun_list, issue_message} -> {normalize_mod(mod), fun_list, issue_message}
       end)
@@ -68,7 +69,13 @@ defmodule Credo.Check.Warning.UnusedOperation do
   alias Credo.IssueMeta
 
   @doc false
-  def run(source_file, params \\ [], checked_module, funs_with_return_value, format_issue_fun) do
+  def run(source_file, params \\ [], checked_module, funs_with_return_value, format_issue_fun)
+
+  def run(source_file, params, checked_module, :all, format_issue_fun) do
+    run(source_file, params, checked_module, nil, format_issue_fun)
+  end
+
+  def run(source_file, params, checked_module, funs_with_return_value, format_issue_fun) do
     issue_meta = IssueMeta.for(source_file, params)
 
     relevant_funs =
@@ -107,17 +114,11 @@ defmodule Credo.Check.Warning.UnusedOperation do
   end
 
   defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) do
-    # If the module passed in was like `MyApp.MyModule`, the stringified version would be `Elixir.MyApp.MyModule`.
-    # However, callers may explicitly be passing in a non-module like `:Enum`, which we want to display as `Enum`.
-    module_name =
-      case to_string(checked_module) do
-        "Elixir." <> rest when byte_size(rest) > 0 -> rest
-        str -> str
-      end
+    module_name = Credo.Code.Name.full(checked_module)
 
     format_issue_fun.(
       issue_meta,
-      message: "There should be no unused return values for #{module_name} functions.",
+      message: "There should be no unused return values for `#{module_name}` functions.",
       trigger: trigger,
       line_no: meta[:line],
       column: meta[:column]

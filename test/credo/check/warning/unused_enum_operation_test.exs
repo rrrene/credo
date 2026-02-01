@@ -653,7 +653,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(%{message: ~r/`Enum`/})
   end
 
   test "it should report a violation for Enum.map inside Agent.update" do
@@ -717,7 +717,7 @@ defmodule Credo.Check.Warning.UnusedEnumOperationTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(fn issue ->
-      assert issue.message =~ "There should be no unused return values for Enum functions."
+      assert issue.message =~ "There should be no unused return values for `Enum` functions."
     end)
   end
 

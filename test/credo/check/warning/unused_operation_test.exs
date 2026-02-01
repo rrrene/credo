@@ -37,8 +37,8 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
       modules: [
         {Map, [:get, :fetch]},
         {Keywords, [:get, :fetch], "My special issue message"},
-        MyModule,
-        {OtherModule, "My special issue message"}
+        {MyModule, :all},
+        {OtherModule, :all, "My special issue message"}
       ]
     )
     |> refute_issues()
@@ -82,18 +82,22 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
     end
     '''
     |> to_source_file
-    |> run_check(@described_check, modules: [MyModule, {OtherModule, "My special issue message"}])
-    |> assert_issues(fn issues ->
-      assert [
-               %{
-                 trigger: "MyModule.transform",
-                 message: "There should be no unused return values for MyModule" <> _
-               },
-               %{
-                 trigger: "OtherModule.do_something",
-                 message: "My special issue message"
-               }
-             ] = Enum.sort_by(issues, & &1.trigger)
-    end)
+    |> run_check(@described_check,
+      modules: [
+        {MyModule, :all},
+        {OtherModule, :all, "My special issue message"}
+      ]
+    )
+    |> assert_issues(2)
+    |> assert_issues_match([
+      %{
+        trigger: "MyModule.transform",
+        message: ~r/`MyModule`/
+      },
+      %{
+        trigger: "OtherModule.do_something",
+        message: "My special issue message"
+      }
+    ])
   end
 end
