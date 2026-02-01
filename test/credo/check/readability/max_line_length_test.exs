@@ -69,6 +69,27 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code if function definition arguments are excluded" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun(
+            %{"name" => name, "value" => value, "timestamp" => timestamp} = map_variable,
+            %MyStruct{some_id: MyConst.some_id(:some_long_atom_name), other_id: MyConst.other_id(:another_long_name)} =
+              struct_variable,
+            other_arguments
+          )
+          when name in @some_attributes do
+        assert 1 + 1 == 2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80, ignore_definition_args: true)
+    |> refute_issues()
+  end
+
   test "it should NOT report expected code if @spec's are excluded" do
     ~S'''
     defmodule CredoSampleModule do
