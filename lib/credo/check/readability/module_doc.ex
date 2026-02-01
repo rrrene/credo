@@ -56,77 +56,46 @@ defmodule Credo.Check.Readability.ModuleDoc do
     if Path.extname(filename) == ".exs" do
       []
     else
-      issue_meta = IssueMeta.for(source_file, params)
-      ignore_names = Params.get(params, :ignore_names, __MODULE__)
-
-      {_continue, issues} =
-        Credo.Code.prewalk(
-          source_file,
-          &traverse(&1, &2, issue_meta, ignore_names),
-          {true, []}
-        )
-
-      issues
+      ctx = Context.build(source_file, params, __MODULE__)
+      result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+      result.issues
     end
   end
 
-  defp traverse(
-         {:defmodule, meta, _arguments} = ast,
-         {true, issues},
-         issue_meta,
-         ignore_names
-       ) do
+  defp walk({:defmodule, _meta, _arguments} = ast, ctx) do
     mod_name = Module.name(ast)
 
-    if matches_any?(mod_name, ignore_names) do
-      {ast, {false, issues}}
+    if matches_any?(mod_name, ctx.params.ignore_names) do
+      {nil, ctx}
     else
-      exception? = Module.exception?(ast)
-
-      case Module.attribute(ast, :moduledoc) do
-        {:error, _} when not exception? ->
-          {
-            ast,
-            {true,
-             [
-               issue_for(
-                 "Modules should have a @moduledoc tag.",
-                 issue_meta,
-                 meta[:line],
-                 mod_name
-               )
-             ] ++ issues}
-          }
-
-        string when is_binary(string) ->
-          if String.trim(string) == "" do
-            {
-              ast,
-              {true,
-               [
-                 issue_for(
-                   "Use `@moduledoc false` if a module will not be documented.",
-                   issue_meta,
-                   meta[:line],
-                   mod_name
-                 )
-               ] ++ issues}
-            }
-          else
-            {ast, {true, issues}}
-          end
-
-        _ ->
-          {ast, {true, issues}}
-      end
+      handle_moduledoc(ast, mod_name, ctx)
     end
   end
 
-  defp traverse(ast, {continue, issues}, _issue_meta, _ignore_names) do
-    {ast, {continue, issues}}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
-  defp matches_any?(name, list) when is_list(list) do
+  defp handle_moduledoc({:defmodule, meta, _arguments} = ast, mod_name, ctx) do
+    exception? = Module.exception?(ast)
+
+    case Module.attribute(ast, :moduledoc) do
+      {:error, _} when not exception? ->
+        {ast, put_issue(ctx, issue_for(ctx, meta, mod_name, :default))}
+
+      "" <> string ->
+        if String.trim(string) == "" do
+          {ast, put_issue(ctx, issue_for(ctx, meta, mod_name, :empty))}
+        else
+          {ast, ctx}
+        end
+
+      _ ->
+        {ast, ctx}
+    end
+  end
+
+  defp matches_any?("" <> name, list) when is_list(list) do
     Enum.any?(list, &matches_any?(name, &1))
   end
 
@@ -138,12 +107,15 @@ defmodule Credo.Check.Readability.ModuleDoc do
     String.match?(name, regex)
   end
 
-  defp issue_for(message, issue_meta, line_no, trigger) do
-    format_issue(
-      issue_meta,
-      message: message,
-      trigger: trigger,
-      line_no: line_no
-    )
+  defp issue_for(ctx, meta, trigger, :default) do
+    issue_for(ctx, meta, trigger, "Modules should have a @moduledoc tag.")
+  end
+
+  defp issue_for(ctx, meta, trigger, :empty) do
+    issue_for(ctx, meta, trigger, "Use `@moduledoc false` if a module will not be documented.")
+  end
+
+  defp issue_for(ctx, meta, trigger, "" <> message) do
+    format_issue(ctx, line_no: meta[:line], trigger: trigger, message: message)
   end
 end
