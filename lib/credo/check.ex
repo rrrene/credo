@@ -171,6 +171,7 @@ defmodule Credo.Check do
     warning: 16
   }
 
+  alias Credo.Execution
   alias Credo.Service.SourceFileScopePriorities
   alias Credo.Check
   alias Credo.Check.Params
@@ -411,7 +412,7 @@ defmodule Credo.Check do
       defp do_run_on_all_source_files(exec, source_files, params) do
         source_files
         |> Task.async_stream(fn source -> run_on_source_file(exec, source, params) end,
-          max_concurrency: exec.max_concurrent_check_runs,
+          max_concurrency: Execution.get_private(exec, :max_concurrent_check_runs),
           timeout: :infinity,
           ordered: false
         )

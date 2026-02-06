@@ -7,37 +7,21 @@ defmodule Credo.Execution do
   @doc """
   The `Credo.Execution` struct is created and manipulated via the `Credo.Execution` module.
   """
-  defstruct argv: [],
-            cli_options: nil,
-            # TODO: these initial switches should also be %Credo.CLI.Switch{} struct
-            cli_switches: [
-              debug: :boolean,
-              color: :boolean,
-              config_name: :string,
-              config_file: :string,
-              working_dir: :string
-            ],
-            cli_aliases: [C: :config_name, D: :debug],
-            cli_switch_plugin_param_converters: [],
+  defstruct cli_options: nil,
 
-            # config
-            files: nil,
-            color: true,
-            debug: false,
-            checks: nil,
+            # TODO: 1.8 - maybe move these to new `config` field
             requires: [],
             plugins: [],
             parse_timeout: 5000,
+            checks: nil,
+            files: nil,
+            debug: false,
             strict: false,
-
-            # options, set by the command line
+            color: true,
             format: nil,
             help: false,
             verbose: false,
             version: false,
-
-            # options, that are kept here for legacy reasons
-            all: false,
             crash_on_error: true,
             enable_disabled_checks: nil,
             ignore_checks_tags: [],
@@ -48,25 +32,38 @@ defmodule Credo.Execution do
             only_checks: nil,
             read_from_stdin: false,
 
-            # This is no longer used, but we keep it so existing plugins that use it don't break
-            max_concurrent_check_runs: nil,
-
             # state, which is accessed and changed over the course of Credo's execution
-            pipeline_map: %{},
-            commands: %{},
-            config_files: [],
-            current_task: nil,
-            parent_task: nil,
-            initializing_plugin: nil,
             halted: false,
-            config_files_pid: nil,
-            source_files_pid: nil,
-            issues_pid: nil,
-            timing_pid: nil,
-            skipped_checks: nil,
             assigns: %{},
             results: %{},
-            config_comment_map: %{}
+            current_task: nil,
+            parent_task: nil,
+            private: nil
+
+  defmodule Private do
+    @moduledoc false
+
+    @doc false
+    defstruct commands: %{},
+              config_comment_map: %{},
+              pipeline_map: %{},
+              initializing_plugin: nil,
+              cli_switches: [
+                debug: :boolean,
+                color: :boolean,
+                config_name: :string,
+                config_file: :string,
+                working_dir: :string
+              ],
+              cli_aliases: [C: :config_name, D: :debug],
+              cli_switch_plugin_param_converters: [],
+              skipped_checks: nil,
+              config_files_pid: nil,
+              source_files_pid: nil,
+              issues_pid: nil,
+              timing_pid: nil,
+              max_concurrent_check_runs: nil
+  end
 
   @typedoc false
   @type t :: %__MODULE__{}
@@ -119,11 +116,16 @@ defmodule Credo.Execution do
   alias Credo.Execution.ExecutionSourceFiles
   alias Credo.Execution.ExecutionTiming
 
+  alias Credo.CLI.Options
+
   @doc "Builds an Execution struct for the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
 
-    %__MODULE__{argv: argv, max_concurrent_check_runs: max_concurrent_check_runs}
+    %__MODULE__{
+      cli_options: %Options{argv: argv},
+      private: %__MODULE__.Private{max_concurrent_check_runs: max_concurrent_check_runs}
+    }
     |> put_pipeline(@execution_pipeline_key, @execution_pipeline)
     |> put_builtin_command("categories", Credo.CLI.Command.Categories.CategoriesCommand)
     |> put_builtin_command("diff", Credo.CLI.Command.Diff.DiffCommand)
@@ -140,7 +142,7 @@ defmodule Credo.Execution do
 
   @doc false
   def build(%__MODULE__{} = previous_exec, files_that_changed) when is_list(files_that_changed) do
-    previous_exec.argv
+    previous_exec.cli_options.argv
     |> build()
     |> put_rerun(previous_exec, files_that_changed)
   end
@@ -156,6 +158,16 @@ defmodule Credo.Execution do
     |> ExecutionIssues.start_server()
     |> ExecutionSourceFiles.start_server()
     |> ExecutionTiming.start_server()
+  end
+
+  @doc false
+  def put_private(exec, private_field, value) do
+    Map.put(exec, :private, Map.put(exec.private, private_field, value))
+  end
+
+  @doc false
+  def get_private(exec, private_field) do
+    Map.get(exec.private, private_field)
   end
 
   @doc """
@@ -267,13 +279,19 @@ defmodule Credo.Execution do
     end)
   end
 
+  @all_min_priority -99
+
+  def show_all?(%__MODULE__{} = exec) do
+    exec.min_priority <= @all_min_priority
+  end
+
   @doc """
   Sets the exec values which `strict` implies (if applicable).
   """
   def set_strict(exec)
 
   def set_strict(%__MODULE__{strict: true} = exec) do
-    %{exec | all: true, min_priority: -99}
+    %{exec | min_priority: @all_min_priority}
   end
 
   def set_strict(%__MODULE__{strict: false} = exec) do
@@ -312,8 +330,8 @@ defmodule Credo.Execution do
       # => ["categories", "diff", "explain", "gen.check", "gen.config", "help", "info",
       #     "list", "suggest", "version"]
   """
-  def get_valid_command_names(%__MODULE__{} = exec) do
-    Map.keys(exec.commands)
+  def get_valid_command_names(exec) do
+    exec |> get_private(:commands) |> Map.keys()
   end
 
   @doc """
@@ -322,33 +340,40 @@ defmodule Credo.Execution do
       Credo.Execution.get_command(exec, "explain")
       # => Credo.CLI.Command.Explain.ExplainCommand
   """
-  def get_command(%__MODULE__{} = exec, name) do
-    Map.get(exec.commands, name) ||
+  def get_command(exec, name) do
+    commands = get_private(exec, :commands)
+
+    Map.get(commands, name) ||
       raise """
       Command not found: "#{inspect(name)}"
 
-      Registered commands: #{inspect(exec.commands, pretty: true)}
+      Registered commands: #{inspect(commands, pretty: true)}
       """
   end
 
   @doc false
-  def put_command(%__MODULE__{} = exec, _plugin_mod, name, command_mod) do
-    commands = Map.put(exec.commands, name, command_mod)
+  def put_command(exec, _plugin_mod, name, command_mod) do
+    commands = get_private(exec, :commands)
+    commands = Map.put(commands, name, command_mod)
 
-    %{exec | commands: commands}
+    exec
+    |> put_private(:commands, commands)
     |> command_mod.init()
   end
 
   @doc false
-  def set_initializing_plugin(%__MODULE__{initializing_plugin: nil} = exec, plugin_mod) do
-    %{exec | initializing_plugin: plugin_mod}
+  def set_initializing_plugin(
+        %__MODULE__{private: %{initializing_plugin: nil}} = exec,
+        plugin_mod
+      ) do
+    put_private(exec, :initializing_plugin, plugin_mod)
   end
 
-  def set_initializing_plugin(%__MODULE__{} = exec, nil) do
-    %{exec | initializing_plugin: nil}
+  def set_initializing_plugin(exec, nil) do
+    put_private(exec, :initializing_plugin, nil)
   end
 
-  def set_initializing_plugin(%__MODULE__{initializing_plugin: mod1}, mod2) do
+  def set_initializing_plugin(%__MODULE__{private: %{initializing_plugin: mod1}}, mod2) do
     raise "Attempting to initialize plugin #{inspect(mod2)}, " <>
             "while already initializing plugin #{mod1}"
   end
@@ -395,15 +420,17 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_cli_switch(%__MODULE__{} = exec, _plugin_mod, name, type) do
-    %{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
+  def put_cli_switch(%__MODULE__{private: %{cli_switches: cli_switches}} = exec, _plugin_mod, name, type) do
+    put_private(exec, :cli_switches, cli_switches ++ [{name, type}])
   end
 
   @doc false
   def put_cli_switch_alias(%__MODULE__{} = exec, _plugin_mod, _name, nil), do: exec
 
-  def put_cli_switch_alias(%__MODULE__{} = exec, _plugin_mod, name, alias_name) do
-    %{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
+  def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
+    cli_aliases = get_private(exec, :cli_aliases) ++ [{alias_name, name}]
+
+    put_private(exec, :cli_aliases, cli_aliases)
   end
 
   @doc false
@@ -415,11 +442,10 @@ defmodule Credo.Execution do
       ) do
     converter_tuple = {cli_switch_name, plugin_mod, plugin_param_name}
 
-    %{
-      exec
-      | cli_switch_plugin_param_converters:
-          exec.cli_switch_plugin_param_converters ++ [converter_tuple]
-    }
+    cli_switch_plugin_param_converters =
+      get_private(exec, :cli_switch_plugin_param_converters) ++ [converter_tuple]
+
+    put_private(exec, :cli_switch_plugin_param_converters, cli_switch_plugin_param_converters)
   end
 
   # Assigns
@@ -660,16 +686,20 @@ defmodule Credo.Execution do
   # Pipelines
 
   @doc false
-  defp get_pipeline(%__MODULE__{} = exec, pipeline_key) do
-    case exec.pipeline_map[get_pipeline_key(exec, pipeline_key)] do
+  defp get_pipeline(exec, pipeline_key) do
+    pipeline_map = get_private(exec, :pipeline_map)
+
+    case pipeline_map[get_pipeline_key(exec, pipeline_key)] do
       nil -> raise "Could not find execution pipeline for '#{pipeline_key}'"
       pipeline -> pipeline
     end
   end
 
   @doc false
-  defp get_pipeline_key(%__MODULE__{} = exec, pipeline_key) do
-    case exec.pipeline_map[pipeline_key] do
+  defp get_pipeline_key(exec, pipeline_key) do
+    pipeline_map = get_private(exec, :pipeline_map)
+
+    case pipeline_map[pipeline_key] do
       nil -> @execution_pipeline_key_backwards_compatibility_map[pipeline_key]
       _ -> pipeline_key
     end
@@ -695,10 +725,11 @@ defmodule Credo.Execution do
         print_results: [ {MyProject.PrintResults, []} ]
       )
   """
-  def put_pipeline(%__MODULE__{} = exec, pipeline_key, pipeline) do
-    new_pipelines = Map.put(exec.pipeline_map, pipeline_key, pipeline)
+  def put_pipeline(exec, pipeline_key, pipeline) do
+    pipeline_map = get_private(exec, :pipeline_map)
+    pipeline_map = Map.put(pipeline_map, pipeline_key, pipeline)
 
-    %{exec | pipeline_map: new_pipelines}
+    put_private(exec, :pipeline_map, pipeline_map)
   end
 
   @doc """

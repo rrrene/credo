@@ -7,7 +7,8 @@ defmodule Credo.CLI.Options do
 
   alias Credo.Priority
 
-  defstruct command: nil,
+  defstruct argv: nil,
+            command: nil,
             path: nil,
             args: [],
             switches: nil,
@@ -70,7 +71,8 @@ defmodule Credo.CLI.Options do
       given_command_name,
       ignored_args,
       switches_definition,
-      treat_unknown_args_as_files?
+      treat_unknown_args_as_files?,
+      argv
     )
   end
 
@@ -93,7 +95,8 @@ defmodule Credo.CLI.Options do
       given_command_name,
       ignored_args,
       [],
-      treat_unknown_args_as_files?
+      treat_unknown_args_as_files?,
+      argv
     )
   end
 
@@ -104,7 +107,8 @@ defmodule Credo.CLI.Options do
          given_command_name,
          ignored_args,
          switches_definition,
-         treat_unknown_args_as_files?
+         treat_unknown_args_as_files?,
+         argv
        ) do
     args = Enum.reject(args, &Enum.member?(ignored_args, &1))
 
@@ -161,6 +165,7 @@ defmodule Credo.CLI.Options do
       end
 
     %__MODULE__{
+      argv: argv,
       command: command || given_command_name,
       path: path,
       args: args,

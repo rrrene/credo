@@ -119,7 +119,8 @@ defmodule Credo.Plugin do
 
   This example would have the effect that typing `mix credo` would no longer run the built-in `Suggest` command, but rather our plugin's `Demo` command.
   """
-  def append_task(%Execution{initializing_plugin: plugin_mod} = exec, group_name, task_mod) do
+  def append_task(%Execution{} = exec, group_name, task_mod) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.append_task(exec, plugin_mod, nil, group_name, task_mod)
   end
 
@@ -164,11 +165,12 @@ defmodule Credo.Plugin do
   This example would have the effect that running `mix credo suggest` would write the issue count in a JSON file.
   """
   def append_task(
-        %Execution{initializing_plugin: plugin_mod} = exec,
+        %Execution{} = exec,
         pipeline_key,
         group_name,
         task_mod
       ) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.append_task(exec, plugin_mod, pipeline_key, group_name, task_mod)
   end
 
@@ -213,7 +215,8 @@ defmodule Credo.Plugin do
 
   This example would have the effect that typing `mix credo` would no longer run the built-in `Suggest` command, but rather our plugin's `Demo` command.
   """
-  def prepend_task(%Execution{initializing_plugin: plugin_mod} = exec, group_name, task_mod) do
+  def prepend_task(%Execution{} = exec, group_name, task_mod) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.prepend_task(exec, plugin_mod, nil, group_name, task_mod)
   end
 
@@ -258,11 +261,12 @@ defmodule Credo.Plugin do
   This example would have the effect that running `mix credo suggest` would write the issue count in a JSON file.
   """
   def prepend_task(
-        %Execution{initializing_plugin: plugin_mod} = exec,
+        %Execution{} = exec,
         pipeline_key,
         group_name,
         task_mod
       ) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.prepend_task(exec, plugin_mod, pipeline_key, group_name, task_mod)
   end
 
@@ -359,12 +363,14 @@ defmodule Credo.Plugin do
 
   """
   def register_cli_switch(
-        %Execution{initializing_plugin: plugin_mod} = exec,
+        %Execution{} = exec,
         name,
         type,
         alias_name \\ nil,
         convert_to_param \\ true
       ) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
+
     exec
     |> Execution.put_cli_switch(plugin_mod, name, type)
     |> Execution.put_cli_switch_alias(plugin_mod, name, alias_name)
@@ -422,7 +428,8 @@ defmodule Credo.Plugin do
 
   This example would have the effect that typing `mix credo lib/my_file.ex:42` would no longer run the built-in `Explain` command, but rather our plugin's `MyBetterExplain` command.
   """
-  def register_command(%Execution{initializing_plugin: plugin_mod} = exec, name, command_mod) do
+  def register_command(%Execution{} = exec, name, command_mod) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.put_command(exec, plugin_mod, name, command_mod)
   end
 
@@ -442,9 +449,10 @@ defmodule Credo.Plugin do
       end
   """
   def register_default_config(
-        %Execution{initializing_plugin: plugin_mod} = exec,
+        %Execution{} = exec,
         config_file_string
       ) do
+    plugin_mod = Execution.get_private(exec, :initializing_plugin)
     Execution.append_config_file(exec, {:plugin, plugin_mod, config_file_string})
   end
 end

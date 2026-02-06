@@ -8,14 +8,18 @@ defmodule Credo.Execution.ExecutionSourceFiles do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %{exec | source_files_pid: pid}
+    Execution.put_private(exec, :source_files_pid, pid)
   end
 
-  def put(%Execution{source_files_pid: pid}, list) do
+  def put(%Execution{} = exec, list) do
+    pid = Execution.get_private(exec, :source_files_pid)
+
     GenServer.call(pid, {:put, list})
   end
 
-  def get(%Execution{source_files_pid: pid}) do
+  def get(%Execution{} = exec) do
+    pid = Execution.get_private(exec, :source_files_pid)
+
     GenServer.call(pid, :get)
   end
 

@@ -65,7 +65,6 @@ defmodule Credo.ConfigBuilder do
 
   defp add_switches_to_exec(%Execution{} = exec, switches) do
     exec
-    |> add_switch_all(switches)
     |> add_switch_color(switches)
     |> add_switch_crash_on_error(switches)
     |> add_switch_debug(switches)
@@ -85,14 +84,6 @@ defmodule Credo.ConfigBuilder do
     |> add_switch_verbose(switches)
     |> add_switch_version(switches)
   end
-
-  # add_switch_all
-
-  defp add_switch_all(exec, %{all: true}) do
-    %{exec | all: true}
-  end
-
-  defp add_switch_all(exec, _), do: exec
 
   # add_switch_files_included
 
@@ -279,11 +270,9 @@ defmodule Credo.ConfigBuilder do
   defp add_switch_ignore(exec, _), do: exec
 
   defp run_cli_switch_plugin_param_converters(exec) do
-    Enum.reduce(
-      exec.cli_switch_plugin_param_converters,
-      exec,
-      &reduce_converters/2
-    )
+    exec
+    |> Execution.get_private(:cli_switch_plugin_param_converters)
+    |> Enum.reduce(exec, &reduce_converters/2)
   end
 
   defp reduce_converters({_switch_name, _plugin_mod, false}, exec) do

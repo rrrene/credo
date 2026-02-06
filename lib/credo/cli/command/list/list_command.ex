@@ -1,6 +1,4 @@
 defmodule Credo.CLI.Command.List.ListCommand do
-  @moduledoc false
-
   use Credo.CLI.Command,
     short_description: "List all issues grouped by files",
     treat_unknown_args_as_files: true,

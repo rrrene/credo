@@ -159,8 +159,13 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
     |> do_print_issues(source_file_map, exec, term_width)
   end
 
-  defp per_category(%Execution{all: true}), do: 1_000_000
-  defp per_category(%Execution{all: false}), do: @per_category
+  defp per_category(%Execution{} = exec) do
+    if Execution.show_all?(exec) do
+      1_000_000
+    else
+      @per_category
+    end
+  end
 
   defp do_print_issues(
          issues,

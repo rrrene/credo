@@ -3,6 +3,8 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
 
   use Credo.Execution.Task
 
+  alias Credo.Execution
+
   def call(exec, _opts \\ []) do
     source_files = Execution.get_source_files(exec)
 
@@ -19,7 +21,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
       |> Credo.Check.ConfigCommentFinder.run()
       |> Enum.into(%{})
 
-    %{exec | config_comment_map: config_comment_map}
+    Execution.put_private(exec, :config_comment_map, config_comment_map)
   end
 
   defp enable_disabled_checks_if_applicable(%Execution{enable_disabled_checks: nil} = exec) do
@@ -71,11 +73,8 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
     skipped_checks = Enum.reject(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
     checks = Enum.filter(exec.checks.enabled, &matches_requirement?(&1, elixir_version))
 
-    %{
-      exec
-      | checks: %{enabled: checks, disabled: exec.checks.disabled},
-        skipped_checks: skipped_checks
-    }
+    %{exec | checks: %{enabled: checks, disabled: exec.checks.disabled}}
+    |> Execution.put_private(:skipped_checks, skipped_checks)
   end
 
   defp matches_requirement?({check, _}, elixir_version) do
