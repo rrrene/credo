@@ -284,12 +284,12 @@ defmodule Credo.Execution do
 
   @doc false
   @deprecated "Use `Execution.working_dir/1` instead"
-  def get_path(exec) do
+  def get_path(%__MODULE__{} = exec) do
     exec.cli_options.path
   end
 
   @doc false
-  def working_dir(exec) do
+  def working_dir(%__MODULE__{} = exec) do
     Path.expand(exec.cli_options.path)
   end
 
@@ -301,7 +301,7 @@ defmodule Credo.Execution do
       Credo.Execution.get_command_name(exec)
       # => "suggest"
   """
-  def get_command_name(exec) do
+  def get_command_name(%__MODULE__{} = exec) do
     exec.cli_options.command
   end
 
@@ -312,7 +312,7 @@ defmodule Credo.Execution do
       # => ["categories", "diff", "explain", "gen.check", "gen.config", "help", "info",
       #     "list", "suggest", "version"]
   """
-  def get_valid_command_names(exec) do
+  def get_valid_command_names(%__MODULE__{} = exec) do
     Map.keys(exec.commands)
   end
 
@@ -322,7 +322,7 @@ defmodule Credo.Execution do
       Credo.Execution.get_command(exec, "explain")
       # => Credo.CLI.Command.Explain.ExplainCommand
   """
-  def get_command(exec, name) do
+  def get_command(%__MODULE__{} = exec, name) do
     Map.get(exec.commands, name) ||
       raise """
       Command not found: "#{inspect(name)}"
@@ -332,7 +332,7 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_command(exec, _plugin_mod, name, command_mod) do
+  def put_command(%__MODULE__{} = exec, _plugin_mod, name, command_mod) do
     commands = Map.put(exec.commands, name, command_mod)
 
     %{exec | commands: commands}
@@ -344,7 +344,7 @@ defmodule Credo.Execution do
     %{exec | initializing_plugin: plugin_mod}
   end
 
-  def set_initializing_plugin(exec, nil) do
+  def set_initializing_plugin(%__MODULE__{} = exec, nil) do
     %{exec | initializing_plugin: nil}
   end
 
@@ -364,12 +364,12 @@ defmodule Credo.Execution do
       Credo.Execution.get_command(exec, CredoDemoPlugin, "foo", 42)
       # => 42
   """
-  def get_plugin_param(exec, plugin_mod, param_name) do
+  def get_plugin_param(%__MODULE__{} = exec, plugin_mod, param_name) do
     exec.plugins[plugin_mod][param_name]
   end
 
   @doc false
-  def put_plugin_param(exec, plugin_mod, param_name, param_value) do
+  def put_plugin_param(%__MODULE__{} = exec, plugin_mod, param_name, param_value) do
     plugins =
       Keyword.update(exec.plugins, plugin_mod, [], fn list ->
         Keyword.update(list, param_name, param_value, fn _ -> param_value end)
@@ -386,7 +386,7 @@ defmodule Credo.Execution do
       Credo.Execution.get_given_cli_switch(exec, "foo")
       # => "bar"
   """
-  def get_given_cli_switch(exec, switch_name) do
+  def get_given_cli_switch(%__MODULE__{} = exec, switch_name) do
     if Map.has_key?(exec.cli_options.switches, switch_name) do
       {:ok, exec.cli_options.switches[switch_name]}
     else
@@ -395,19 +395,24 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_cli_switch(exec, _plugin_mod, name, type) do
+  def put_cli_switch(%__MODULE__{} = exec, _plugin_mod, name, type) do
     %{exec | cli_switches: exec.cli_switches ++ [{name, type}]}
   end
 
   @doc false
-  def put_cli_switch_alias(exec, _plugin_mod, _name, nil), do: exec
+  def put_cli_switch_alias(%__MODULE__{} = exec, _plugin_mod, _name, nil), do: exec
 
-  def put_cli_switch_alias(exec, _plugin_mod, name, alias_name) do
+  def put_cli_switch_alias(%__MODULE__{} = exec, _plugin_mod, name, alias_name) do
     %{exec | cli_aliases: exec.cli_aliases ++ [{alias_name, name}]}
   end
 
   @doc false
-  def put_cli_switch_plugin_param_converter(exec, plugin_mod, cli_switch_name, plugin_param_name) do
+  def put_cli_switch_plugin_param_converter(
+        %__MODULE__{} = exec,
+        plugin_mod,
+        cli_switch_name,
+        plugin_param_name
+      ) do
     converter_tuple = {cli_switch_name, plugin_mod, plugin_param_name}
 
     %{
@@ -430,14 +435,14 @@ defmodule Credo.Execution do
   """
   def get_assign(exec, name_or_list, default \\ nil)
 
-  def get_assign(exec, path, default) when is_list(path) do
+  def get_assign(%__MODULE__{} = exec, path, default) when is_list(path) do
     case get_in(exec.assigns, path) do
       nil -> default
       value -> value
     end
   end
 
-  def get_assign(exec, name, default) do
+  def get_assign(%__MODULE__{} = exec, name, default) do
     Map.get(exec.assigns, name, default)
   end
 
@@ -449,11 +454,11 @@ defmodule Credo.Execution do
   """
   def put_assign(exec, name_or_list, value)
 
-  def put_assign(exec, path, value) when is_list(path) do
+  def put_assign(%__MODULE__{} = exec, path, value) when is_list(path) do
     %{exec | assigns: do_put_nested_assign(exec.assigns, path, value)}
   end
 
-  def put_assign(exec, name, value) do
+  def put_assign(%__MODULE__{} = exec, name, value) do
     %{exec | assigns: Map.put(exec.assigns, name, value)}
   end
 
@@ -473,12 +478,12 @@ defmodule Credo.Execution do
   # Config Files
 
   @doc false
-  def get_config_files(exec) do
+  def get_config_files(%__MODULE__{} = exec) do
     Credo.Execution.ExecutionConfigFiles.get(exec)
   end
 
   @doc false
-  def append_config_file(exec, {_, _, _} = config_file) do
+  def append_config_file(%__MODULE__{} = exec, {_, _, _} = config_file) do
     config_files = get_config_files(exec) ++ [config_file]
 
     ExecutionConfigFiles.put(exec, config_files)
@@ -495,12 +500,12 @@ defmodule Credo.Execution do
       # => [%SourceFile<lib/my_project.ex>,
       #     %SourceFile<lib/credo/my_project/foo.ex>]
   """
-  def get_source_files(exec) do
+  def get_source_files(%__MODULE__{} = exec) do
     Credo.Execution.ExecutionSourceFiles.get(exec)
   end
 
   @doc false
-  def put_source_files(exec, source_files) do
+  def put_source_files(%__MODULE__{} = exec, source_files) do
     ExecutionSourceFiles.put(exec, source_files)
 
     exec
@@ -511,7 +516,7 @@ defmodule Credo.Execution do
   @doc """
   Returns all issues for the given `exec` struct.
   """
-  def get_issues(exec) do
+  def get_issues(%__MODULE__{} = exec) do
     exec
     |> ExecutionIssues.to_map()
     |> Map.values()
@@ -521,14 +526,14 @@ defmodule Credo.Execution do
   @doc """
   Returns all issues grouped by filename for the given `exec` struct.
   """
-  def get_issues_grouped_by_filename(exec) do
+  def get_issues_grouped_by_filename(%__MODULE__{} = exec) do
     ExecutionIssues.to_map(exec)
   end
 
   @doc """
   Returns all issues for the given `exec` struct that relate to the given `filename`.
   """
-  def get_issues(exec, filename) do
+  def get_issues(%__MODULE__{} = exec, filename) do
     exec
     |> ExecutionIssues.to_map()
     |> Map.get(filename, [])
@@ -537,7 +542,7 @@ defmodule Credo.Execution do
   @doc """
   Sets the issues for the given `exec` struct, overwriting any existing issues.
   """
-  def put_issues(exec, issues) do
+  def put_issues(%__MODULE__{} = exec, issues) do
     ExecutionIssues.set(exec, issues)
 
     exec
@@ -545,7 +550,7 @@ defmodule Credo.Execution do
 
   @doc false
   @deprecated "Use put_issues/2 instead"
-  def set_issues(exec, issues) do
+  def set_issues(%__MODULE__{} = exec, issues) do
     put_issues(exec, issues)
   end
 
@@ -560,7 +565,7 @@ defmodule Credo.Execution do
       Credo.Execution.get_result(exec, "foo", 42)
       # => 42
   """
-  def get_result(exec, name, default \\ nil) do
+  def get_result(%__MODULE__{} = exec, name, default \\ nil) do
     Map.get(exec.results, name, default)
   end
 
@@ -570,17 +575,17 @@ defmodule Credo.Execution do
       Credo.Execution.put_result(exec, "foo", 42)
       # => %Credo.Execution{...}
   """
-  def put_result(exec, name, value) do
+  def put_result(%__MODULE__{} = exec, name, value) do
     %{exec | results: Map.put(exec.results, name, value)}
   end
 
   @doc false
-  def put_exit_status(exec, exit_status) do
+  def put_exit_status(%__MODULE__{} = exec, exit_status) do
     put_assign(exec, "credo.exit_status", exit_status)
   end
 
   @doc false
-  def get_exit_status(exec) do
+  def get_exit_status(%__MODULE__{} = exec) do
     get_assign(exec, "credo.exit_status", 0)
   end
 
@@ -605,7 +610,7 @@ defmodule Credo.Execution do
         end
       end
   """
-  def halt(exec) do
+  def halt(%__MODULE__{} = exec) do
     %{exec | halted: true}
   end
 
@@ -623,39 +628,39 @@ defmodule Credo.Execution do
         end
       end
   """
-  def halt(exec, halt_message) do
+  def halt(%__MODULE__{} = exec, halt_message) do
     %{exec | halted: true}
     |> put_halt_message(halt_message)
   end
 
   @doc false
-  def get_halt_message(exec) do
+  def get_halt_message(%__MODULE__{} = exec) do
     get_assign(exec, "credo.halt_message")
   end
 
   @doc false
-  def put_halt_message(exec, halt_message) do
+  def put_halt_message(%__MODULE__{} = exec, halt_message) do
     put_assign(exec, "credo.halt_message", halt_message)
   end
 
   # Task tracking
 
   @doc false
-  def set_parent_and_current_task(exec, parent_task, current_task) do
+  def set_parent_and_current_task(%__MODULE__{} = exec, parent_task, current_task) do
     %{exec | parent_task: parent_task, current_task: current_task}
   end
 
   # Running tasks
 
   @doc false
-  def run(exec) do
+  def run(%__MODULE__{} = exec) do
     run_pipeline(exec, __MODULE__)
   end
 
   # Pipelines
 
   @doc false
-  defp get_pipeline(exec, pipeline_key) do
+  defp get_pipeline(%__MODULE__{} = exec, pipeline_key) do
     case exec.pipeline_map[get_pipeline_key(exec, pipeline_key)] do
       nil -> raise "Could not find execution pipeline for '#{pipeline_key}'"
       pipeline -> pipeline
@@ -663,7 +668,7 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  defp get_pipeline_key(exec, pipeline_key) do
+  defp get_pipeline_key(%__MODULE__{} = exec, pipeline_key) do
     case exec.pipeline_map[pipeline_key] do
       nil -> @execution_pipeline_key_backwards_compatibility_map[pipeline_key]
       _ -> pipeline_key
@@ -690,7 +695,7 @@ defmodule Credo.Execution do
         print_results: [ {MyProject.PrintResults, []} ]
       )
   """
-  def put_pipeline(exec, pipeline_key, pipeline) do
+  def put_pipeline(%__MODULE__{} = exec, pipeline_key, pipeline) do
     new_pipelines = Map.put(exec.pipeline_map, pipeline_key, pipeline)
 
     %{exec | pipeline_map: new_pipelines}
@@ -724,15 +729,16 @@ defmodule Credo.Execution do
   @doc false
   def prepend_task(exec, plugin_mod, pipeline_key, group_name, task_tuple)
 
-  def prepend_task(exec, plugin_mod, nil, group_name, task_tuple) do
+  def prepend_task(%__MODULE__{} = exec, plugin_mod, nil, group_name, task_tuple) do
     prepend_task(exec, plugin_mod, @execution_pipeline_key, group_name, task_tuple)
   end
 
-  def prepend_task(exec, plugin_mod, pipeline_key, group_name, task_mod) when is_atom(task_mod) do
+  def prepend_task(%__MODULE__{} = exec, plugin_mod, pipeline_key, group_name, task_mod)
+      when is_atom(task_mod) do
     prepend_task(exec, plugin_mod, pipeline_key, group_name, {task_mod, []})
   end
 
-  def prepend_task(exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
+  def prepend_task(%__MODULE__{} = exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
     pipeline =
       exec
       |> get_pipeline(pipeline_key)
@@ -747,15 +753,16 @@ defmodule Credo.Execution do
   @doc false
   def append_task(exec, plugin_mod, pipeline_key, group_name, task_tuple)
 
-  def append_task(exec, plugin_mod, nil, group_name, task_tuple) do
+  def append_task(%__MODULE__{} = exec, plugin_mod, nil, group_name, task_tuple) do
     append_task(exec, plugin_mod, __MODULE__, group_name, task_tuple)
   end
 
-  def append_task(exec, plugin_mod, pipeline_key, group_name, task_mod) when is_atom(task_mod) do
+  def append_task(%__MODULE__{} = exec, plugin_mod, pipeline_key, group_name, task_mod)
+      when is_atom(task_mod) do
     append_task(exec, plugin_mod, pipeline_key, group_name, {task_mod, []})
   end
 
-  def append_task(exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
+  def append_task(%__MODULE__{} = exec, _plugin_mod, pipeline_key, group_name, task_tuple) do
     pipeline =
       exec
       |> get_pipeline(pipeline_key)
@@ -768,7 +775,7 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  defp put_builtin_command(exec, name, command_mod) do
+  defp put_builtin_command(%__MODULE__{} = exec, name, command_mod) do
     put_command(exec, Credo, name, command_mod)
   end
 
@@ -790,14 +797,14 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def get_rerun(exec) do
+  def get_rerun(%__MODULE__{} = exec) do
     case get_assign(exec, "credo.rerun.previous_execution") do
       nil -> :notfound
       previous_exec -> {previous_exec, get_assign(exec, "credo.rerun.files_that_changed")}
     end
   end
 
-  defp put_rerun(exec, previous_exec, files_that_changed) do
+  defp put_rerun(%__MODULE__{} = exec, previous_exec, files_that_changed) do
     exec
     |> put_assign("credo.rerun.previous_execution", previous_exec)
     |> put_assign(
