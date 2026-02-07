@@ -69,8 +69,15 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
          forbidden_map
        )
        when is_atom(function) and is_list(module_parts) do
-    module = Module.concat(module_parts)
-    {ast, append_issue_if_forbidden({module, function}, forbidden_map, issues, issue_meta, meta)}
+    issues =
+      if Enum.all?(module_parts, &is_atom/1) do
+        module = Credo.Code.Name.full(module_parts)
+        append_issue_if_forbidden({module, function}, forbidden_map, issues, issue_meta, meta)
+      else
+        issues
+      end
+
+    {ast, issues}
   end
 
   defp traverse(ast, issues, _issue_meta, _forbidden_map), do: {ast, issues}
