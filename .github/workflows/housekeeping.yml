@@ -24,7 +24,7 @@ jobs:
       - run: mix compile
       - run: mix format --check-formatted
 
-  trigger:
+  check_trigger:
     name: "tested that for each check there is at least one trigger assertion"
     runs-on: ubuntu-24.04
     steps:
@@ -36,9 +36,23 @@ jobs:
           otp-version: 27.3
           elixir-version: 1.19.5
       - run: mix deps.get
-      - run: mix test test/credo/check/housekeeping_trigger.exs
+      - run: mix test test/credo/check/housekeeping_check_trigger.exs
 
-  params:
+  check_ids:
+    name: "tested that all check ids are unique"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 27.3
+          elixir-version: 1.19.5
+      - run: mix deps.get
+      - run: mix test test/credo/check/housekeeping_check_ids.exs
+
+  check_params:
     name: "tested that for each check all params are covered by tests"
     runs-on: ubuntu-24.04
     steps:
@@ -50,7 +64,7 @@ jobs:
           otp-version: 27.3
           elixir-version: 1.19.5
       - run: mix deps.get
-      - run: mix test test/credo/check/housekeeping_params.exs
+      - run: mix test test/credo/check/housekeeping_check_params.exs
 
   assert_triggers:
     name: "all triggers are looked up and confirmed"
