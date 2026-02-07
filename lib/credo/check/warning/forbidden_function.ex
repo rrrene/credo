@@ -1,5 +1,6 @@
 defmodule Credo.Check.Warning.ForbiddenFunction do
   use Credo.Check,
+    id: "EX5030",
     base_priority: :high,
     category: :warning,
     param_defaults: [
@@ -35,11 +36,15 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
   @doc false
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params \\ []) do
-    issue_meta = IssueMeta.for(source_file, params)
-    functions = Params.get(params, :functions, __MODULE__)
-    forbidden_map = build_forbidden_map(functions)
+    case Params.get(params, :functions, __MODULE__) do
+      [_ | _] = functions ->
+        issue_meta = IssueMeta.for(source_file, params)
+        forbidden_map = build_forbidden_map(functions)
+        Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, forbidden_map))
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, forbidden_map))
+      [] ->
+        []
+    end
   end
 
   defp build_forbidden_map(functions) do
