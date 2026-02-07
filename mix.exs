@@ -20,6 +20,7 @@ defmodule Credo.Mixfile do
       docs: docs(),
       aliases: aliases(),
       test_ignore_filters: [
+        "test/all_checks_with_ids_and_params.exs",
         "test/old_credo.exs",
         "test/regression/run_older_credo_version.exs",
         ~r[test/credo/check/housekeeping_.+.exs],
