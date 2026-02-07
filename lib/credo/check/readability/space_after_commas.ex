@@ -31,10 +31,7 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
       """
     ]
 
-  alias Credo.Code.Charlists
-  alias Credo.Code.Heredocs
-  alias Credo.Code.Sigils
-  alias Credo.Code.Strings
+  import CredoTokenizer.Guards
 
   @doc false
   @impl true
@@ -42,30 +39,26 @@ defmodule Credo.Check.Readability.SpaceAfterCommas do
     ctx = Context.build(source_file, params, __MODULE__)
 
     source_file
-    |> Sigils.replace_with_spaces(" ", " ", source_file.filename)
-    |> Strings.replace_with_spaces(" ", " ", source_file.filename)
-    |> Heredocs.replace_with_spaces(" ", " ", "", source_file.filename)
-    |> Charlists.replace_with_spaces(" ", " ", source_file.filename)
-    |> String.replace(~r/(\A|[^\?])#.+/, "\\1")
-    |> Credo.Code.to_lines()
-    |> Enum.flat_map(&find_issues(ctx, &1))
+    |> Credo.Code.Token.reduce(&collect(&1, &2, &3, &4))
+    |> Enum.map(&issue_for(ctx, &1))
   end
 
-  defp find_issues(ctx, {line_no, line}) do
-    # Matches commas followed by non-whitespace unless preceded by
-    # a question mark that is not part of a variable or function name
-    unspaced_commas = ~r/(?<!\W\?)(\,\S)/
-
-    unspaced_commas
-    |> Regex.scan(line, capture: :all_but_first, return: :index)
-    |> List.flatten()
-    |> Enum.map(fn {idx, len} ->
-      trigger = String.slice(line, idx, len)
-      issue_for(ctx, trigger, line_no, idx + 1)
-    end)
+  defp collect(_prev, {{:",", _}, {line, col, _, _}, _, _} = left, {kind, {_, _, _, _}, value, _} = right, acc)
+       when no_space_between(left, right) and not is_eol(right) do
+    acc ++ [{line, col, trigger(kind, value)}]
   end
 
-  defp issue_for(ctx, trigger, line_no, column) do
+  defp collect(_prev, _current, _next, acc), do: acc
+
+  defp trigger({:string, :binary}, _), do: ",\""
+  defp trigger({:string, :list}, _), do: ",'"
+  defp trigger({:char, nil}, _), do: ",?"
+  defp trigger({:atom, nil}, _), do: ",:"
+  defp trigger({:%{}, nil}, _), do: ",%"
+
+  defp trigger(_, value), do: ",#{String.first(to_string(value))}"
+
+  defp issue_for(ctx, {line_no, column, trigger}) do
     format_issue(
       ctx,
       message: "Space missing after comma.",

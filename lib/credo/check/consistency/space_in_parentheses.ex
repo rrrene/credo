@@ -40,19 +40,12 @@ defmodule Credo.Check.Consistency.SpaceInParentheses do
     issue_meta = IssueMeta.for(source_file, params)
     allow_empty_enums = Params.get(params, :allow_empty_enums, __MODULE__)
 
-    lines_with_issues =
-      @collector.find_locations_not_matching(expected, source_file, allow_empty_enums)
+    lines_with_issues = @collector.find_locations_not_matching(expected, source_file, allow_empty_enums)
 
-    lines_with_issues
-    |> Enum.filter(&create_issue?(expected, &1[:trigger]))
-    |> Enum.map(fn location ->
+    Enum.map(lines_with_issues, fn location ->
       format_issue(issue_meta, [{:message, message_for(expected)} | location])
     end)
   end
-
-  # Don't create issues for `&Mod.fun/4`
-  defp create_issue?(:without_space, ", ]"), do: false
-  defp create_issue?(_expected, _trigger), do: true
 
   defp message_for(:without_space = _expected) do
     "There is no whitespace around parentheses/brackets most of the time, but here there is."

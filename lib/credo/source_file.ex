@@ -31,13 +31,10 @@ defmodule Credo.SourceFile do
 
     lines = Credo.Code.to_lines(source)
 
-    {valid, ast} =
-      case Credo.Code.ast(source) do
-        {:ok, ast} ->
-          {true, ast}
-
-        {:error, _errors} ->
-          {false, []}
+    {status, ast_with_comments} =
+      case Credo.Code.ast_with_comments(source) do
+        {:ok, value} -> {:valid, value}
+        {:error, _errors} -> {:invalid, []}
       end
 
     hash =
@@ -48,10 +45,10 @@ defmodule Credo.SourceFile do
     source_file = %Credo.SourceFile{
       filename: filename,
       hash: hash,
-      status: if(valid, do: :valid, else: :invalid)
+      status: status
     }
 
-    SourceFileAST.put(source_file, ast)
+    SourceFileAST.put(source_file, ast_with_comments)
     SourceFileLines.put(source_file, lines)
     SourceFileSource.put(source_file, source)
 
@@ -74,8 +71,21 @@ defmodule Credo.SourceFile do
 
   def ast(%__MODULE__{} = source_file) do
     case SourceFileAST.get(source_file) do
-      {:ok, ast} ->
+      {:ok, {ast, _comments}} ->
         ast
+
+      _ ->
+        raise "Could not get source from ETS: #{source_file.filename}"
+    end
+  end
+
+  @doc false
+  def ast_with_comments(source_file)
+
+  def ast_with_comments(%__MODULE__{} = source_file) do
+    case SourceFileAST.get(source_file) do
+      {:ok, ast_with_comments} ->
+        ast_with_comments
 
       _ ->
         raise "Could not get source from ETS: #{source_file.filename}"
@@ -87,11 +97,8 @@ defmodule Credo.SourceFile do
 
   def lines(%__MODULE__{} = source_file) do
     case SourceFileLines.get(source_file) do
-      {:ok, lines} ->
-        lines
-
-      _ ->
-        raise "Could not get source from ETS: #{source_file.filename}"
+      {:ok, lines} -> lines
+      _ -> raise "Could not get source from ETS: #{source_file.filename}"
     end
   end
 

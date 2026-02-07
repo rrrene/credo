@@ -173,6 +173,7 @@ defmodule Credo.Mixfile do
 
   defp deps do
     [
+      {:credo_tokenizer, "~> 0.2"},
       {:file_system, "~> 0.2 or ~> 1.0"},
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},

@@ -5,9 +5,21 @@ defmodule Credo.Check.Design.TagHelper do
 
   alias Credo.SourceFile
 
+  alias Credo.Check.Design.TagHelperDeprecated
+
+  @deprecated "Use find_tags/3 instead"
   def tags(source_file, tag_name, include_doc?) do
+    do_tags(source_file, tag_name, include_doc?)
+  end
+
+  @doc false
+  def do_tags(source_file, tag_name, include_doc?) do
+    TagHelperDeprecated.tags(source_file, tag_name, include_doc?)
+  end
+
+  def find_tags(source_file, tag_name, include_doc?) do
     tags_from_module_attributes(source_file, tag_name, include_doc?) ++
-      tags_from_comments(source_file, tag_name)
+      tags_from_comments_new(source_file, tag_name)
   end
 
   defp tags_from_module_attributes(source_file, tag_name, true) do
@@ -20,28 +32,44 @@ defmodule Credo.Check.Design.TagHelper do
     []
   end
 
-  defp tags_from_comments(source_file, tag_name) do
+  defp tags_from_comments_new(source_file, tag_name) do
     regex = Regex.compile!("(\\A|[^\\?])#\\s*#{tag_name}:?\\s*.+", "i")
-    source = SourceFile.source(source_file)
 
-    if source =~ regex do
-      source
-      |> Credo.Code.clean_charlists_strings_and_sigils()
-      |> String.split("\n")
-      |> Enum.with_index()
-      |> Enum.map(&find_tag_in_line(&1, regex))
-      |> Enum.filter(&tags?/1)
+    {_ast, comments} = SourceFile.ast_with_comments(source_file)
+
+    Enum.reduce(comments, [], &find_tags_in_comments(&1, &2, regex))
+  end
+
+  defp find_tags_in_comments(%{text: string} = comment, memo, regex) do
+    if string =~ regex do
+      trigger =
+        regex
+        |> Regex.run(string)
+        |> List.wrap()
+        |> Enum.map(&String.trim/1)
+        |> List.first()
+
+      memo ++ [{{comment.line, comment.column}, string, trigger}]
     else
-      []
+      memo
     end
   end
 
-  defp traverse({:@, _, [{name, meta, [string]} | _]} = ast, memo, regex)
+  defp traverse({:@, at_meta, [{name, meta, [string]} | _]} = ast, memo, regex)
        when name in @doc_attribute_names and is_binary(string) do
     if string =~ regex do
       trimmed = String.trim_trailing(string)
+      is_heredoc? = String.match?(string, ~r/\n/)
 
-      {nil, memo ++ [{meta[:line], trimmed, trimmed}]}
+      location =
+        if is_heredoc? do
+          {at_meta[:line] + 1, at_meta[:column]}
+        else
+          # TODO: calculate the column for single line strings
+          {meta[:line], nil}
+        end
+
+      {nil, memo ++ [{location, trimmed, trimmed}]}
     else
       {ast, memo}
     end
@@ -50,17 +78,4 @@ defmodule Credo.Check.Design.TagHelper do
   defp traverse(ast, memo, _regex) do
     {ast, memo}
   end
-
-  defp find_tag_in_line({line, index}, regex) do
-    tag_list =
-      regex
-      |> Regex.run(line)
-      |> List.wrap()
-      |> Enum.map(&String.trim/1)
-
-    {index + 1, line, List.first(tag_list)}
-  end
-
-  defp tags?({_line_no, _line, nil}), do: false
-  defp tags?({_line_no, _line, _tag}), do: true
 end

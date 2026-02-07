@@ -365,8 +365,7 @@ defmodule Credo.Test.Case do
 
     marker =
       if issue.column && issue.trigger != Credo.Issue.no_trigger() do
-        String.duplicate(" ", issue.column - 1) <>
-          String.duplicate("^", String.length(to_string(issue.trigger)))
+        String.duplicate(" ", issue.column - 1) <> String.duplicate("^", String.length(to_string(issue.trigger)))
       else
         ""
       end
@@ -387,8 +386,7 @@ defmodule Credo.Test.Case do
     Credo.SourceFile.line_at(source_file, issue.line_no)
   end
 
-  defp find_source_file(source_files, %Credo.Issue{filename: filename})
-       when is_list(source_files) do
+  defp find_source_file(source_files, %Credo.Issue{filename: filename}) when is_list(source_files) do
     Enum.find(source_files, &(&1.filename == filename)) || raise "Could not find source file"
   end
 
