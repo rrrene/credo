@@ -1,6 +1,6 @@
 defmodule Credo.Check.Readability.ImplTrue do
   use Credo.Check,
-    id: "EX3004",
+    id: "EX3036",
     base_priority: :normal,
     explanations: [
       check: """
