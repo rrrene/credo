@@ -1,6 +1,6 @@
 defmodule Credo.Check.Warning.WrongTestFilename do
   use Credo.Check,
-    id: "EX5029",
+    id: "EX5030",
     base_priority: :high,
     category: :warning,
     param_defaults: [
