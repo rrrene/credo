@@ -7,6 +7,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
       max_length: 120,
       ignore_definitions: true,
       ignore_heredocs: true,
+      ignore_comments: false,
       ignore_specs: false,
       ignore_sigils: true,
       ignore_strings: true,
@@ -26,6 +27,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
         max_length: "The maximum number of characters a line may consist of.",
         ignore_definitions: "Set to `true` to ignore lines including function definitions.",
         ignore_specs: "Set to `true` to ignore lines including `@spec`s.",
+        ignore_comments: "Set to `true` to ignore lines that are purely comments.",
         ignore_sigils: "Set to `true` to ignore lines that are sigils, e.g. regular expressions.",
         ignore_strings: "Set to `true` to ignore lines that are strings or in heredocs.",
         ignore_urls: "Set to `true` to ignore lines that contain urls."
@@ -47,6 +49,7 @@ defmodule Credo.Check.Readability.MaxLineLength do
     ignore_definitions = Params.get(params, :ignore_definitions, __MODULE__)
 
     ignore_specs = Params.get(params, :ignore_specs, __MODULE__)
+    ignore_comments = Params.get(params, :ignore_comments, __MODULE__)
     ignore_sigils = Params.get(params, :ignore_sigils, __MODULE__)
     ignore_strings = Params.get(params, :ignore_strings, __MODULE__)
     ignore_heredocs = Params.get(params, :ignore_heredocs, __MODULE__)
@@ -85,6 +88,13 @@ defmodule Credo.Check.Readability.MaxLineLength do
     lines_for_comparison =
       if ignore_urls do
         Enum.reject(lines_for_comparison, fn {_, line} -> line =~ url_regex end)
+      else
+        lines_for_comparison
+      end
+
+    lines_for_comparison =
+      if ignore_comments do
+        Enum.reject(lines_for_comparison, fn {_, line} -> line =~ ~r/^\s*#/ end)
       else
         lines_for_comparison
       end
