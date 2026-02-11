@@ -94,6 +94,17 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> refute_issues()
   end
 
+  test "it should report modules when :ignore_names string does not exactly match" do
+    ~S'''
+    defmodule MyApp.Web do
+      def some_fun, do: :ok
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check, ignore_names: ["Web"])
+    |> assert_issue()
+  end
+
   test "it should NOT report modules when the :ignore_using param matches" do
     source_file =
       ~S'''
@@ -207,6 +218,17 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     '''
     |> to_source_file
     |> run_check(@described_check, ignore_using: ["MyApp.Web"])
+    |> assert_issue()
+  end
+
+  test "it should report modules when :ignore_using string does not exactly match" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use MyApp.Web, :controller
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check, ignore_using: ["Web"])
     |> assert_issue()
   end
 

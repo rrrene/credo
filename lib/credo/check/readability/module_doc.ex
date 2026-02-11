@@ -135,7 +135,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   end
 
   defp matches?(name, string_matcher) when is_binary(string_matcher) do
-    String.contains?(name, string_matcher)
+    name == string_matcher
   end
 
   defp matches?(name, regex_matcher) when is_struct(regex_matcher, Regex) do
