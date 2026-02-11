@@ -53,8 +53,6 @@ defmodule Credo.Check.Readability.ModuleDoc do
       ]
     ]
 
-  alias Credo.Code.Module
-
   @doc false
   def run(%SourceFile{filename: filename} = source_file, params \\ []) do
     if Path.extname(filename) == ".exs" do
@@ -67,7 +65,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
   end
 
   defp walk({:defmodule, _meta, _arguments} = ast, ctx) do
-    mod_name = Module.name(ast)
+    mod_name = Credo.Code.Module.name(ast)
 
     cond do
       matches_any?(mod_name, ctx.params.ignore_names) ->
@@ -86,13 +84,13 @@ defmodule Credo.Check.Readability.ModuleDoc do
   end
 
   defp handle_moduledoc({:defmodule, meta, _arguments} = ast, mod_name, ctx) do
-    exception? = Module.exception?(ast)
+    exception? = Credo.Code.Module.exception?(ast)
 
-    case Module.attribute(ast, :moduledoc) do
+    case Credo.Code.Module.attribute(ast, :moduledoc) do
       {:error, _} when not exception? ->
         {ast, put_issue(ctx, issue_for(ctx, meta, mod_name, :default))}
 
-      "" <> string ->
+      string when is_binary(string) ->
         if String.trim(string) == "" do
           {ast, put_issue(ctx, issue_for(ctx, meta, mod_name, :empty))}
         else
@@ -111,34 +109,37 @@ defmodule Credo.Check.Readability.ModuleDoc do
     |> Credo.Code.Block.calls_in_do_block()
     |> Enum.any?(fn
       {:use, _, _} = use_ast ->
-        use_name = extract_use_module_name(use_ast)
-        use_name != nil and matches_any?(use_name, ignore_using)
+        use_ast
+        |> extract_used_module_full_name()
+        |> matches_any?(ignore_using)
 
       _ ->
         false
     end)
   end
 
-  defp extract_use_module_name({:use, _, [{:__aliases__, _, mod_list} | _]}) do
+  defp extract_used_module_full_name({:use, _, [{:__aliases__, _, mod_list} | _]}) do
     Credo.Code.Name.full(mod_list)
   end
 
-  defp extract_use_module_name(_), do: nil
+  defp extract_used_module_full_name(_), do: nil
 
-  defp matches_any?("" <> name, list) when is_list(list) do
-    Enum.any?(list, &matches_any?(name, &1))
+  defp matches_any?(nil, _list), do: false
+
+  defp matches_any?(name, list) when is_list(list) do
+    Enum.any?(list, &matches?(name, &1))
   end
 
-  defp matches_any?(name, atom) when is_atom(atom) do
-    matches_any?(name, Credo.Code.Name.full(atom))
+  defp matches?(name, atom_matcher) when is_atom(atom_matcher) do
+    matches?(name, Credo.Code.Name.full(atom_matcher))
   end
 
-  defp matches_any?(name, string) when is_binary(string) do
-    String.contains?(name, string)
+  defp matches?(name, string_matcher) when is_binary(string_matcher) do
+    String.contains?(name, string_matcher)
   end
 
-  defp matches_any?(name, regex) do
-    String.match?(name, regex)
+  defp matches?(name, regex_matcher) when is_struct(regex_matcher, Regex) do
+    String.match?(name, regex_matcher)
   end
 
   defp issue_for(ctx, meta, trigger, :default) do
@@ -149,7 +150,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     issue_for(ctx, meta, trigger, "Use `@moduledoc false` if a module will not be documented.")
   end
 
-  defp issue_for(ctx, meta, trigger, "" <> message) do
+  defp issue_for(ctx, meta, trigger, message) when is_binary(message) do
     format_issue(ctx, line_no: meta[:line], trigger: trigger, message: message)
   end
 end
