@@ -68,6 +68,73 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> refute_issues()
   end
 
+  test "it should NOT report modules when using :ignore_names matches" do
+    source_file =
+      ~S'''
+      defmodule CredoSampleModule do
+        def some_fun, do: :ok
+      end
+      '''
+      |> to_source_file
+
+    source_file
+    |> run_check(@described_check, ignore_names: [CredoSampleModule])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_names: ["CredoSampleModule"])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_names: [~r/SampleModule$/])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_names: [CredoSampleModule, "MyApp.Web", ~r/Other/])
+    |> refute_issues()
+  end
+
+  test "it should NOT report modules when using :ignore_modules_using matches" do
+    source_file =
+      ~S'''
+      defmodule CredoSampleModule do
+        use MyApp.Web, :controller
+      end
+      '''
+      |> to_source_file()
+
+    source_file
+    |> run_check(@described_check, ignore_modules_using: [MyApp.Web])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_modules_using: ["MyApp.Web"])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_modules_using: [~r/\.Web$/])
+    |> refute_issues()
+
+    source_file
+    |> run_check(@described_check, ignore_modules_using: [GenServer, "MyApp.Web", ~r/Other/])
+    |> refute_issues()
+  end
+
+  test "it should NOT report submodules when using :ignore_modules_using matches" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @moduledoc "Parent"
+
+      defmodule Child do
+        use MyApp.Web, :controller
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check, ignore_modules_using: ["MyApp.Web"])
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -132,7 +199,29 @@ defmodule Credo.Check.Readability.ModuleDocTest do
     |> assert_issue(%{line_no: 1, trigger: "Person"})
   end
 
-  test "it should report controller submodules when the :ignore_names param says so" do
+  test "it should report modules when using :ignore_modules_using does not match" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use SomethingElse
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, ignore_modules_using: ["MyApp.Web"])
+    |> assert_issue()
+  end
+
+  test "it should report modules when using empty :ignore_modules_using" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use MyApp.Web, :controller
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, ignore_modules_using: [])
+    |> assert_issue()
+  end
+
+  test "it should report controller submodules when using :ignore_names" do
     ~S'''
     defmodule MyApp.SomePhoenixController do
       defmodule SubModule do

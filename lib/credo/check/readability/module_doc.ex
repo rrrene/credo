@@ -4,7 +4,8 @@ defmodule Credo.Check.Readability.ModuleDoc do
     param_defaults: [
       ignore_names: [
         ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View|\.\w+HTML|\.\w+JSON|\.Telemetry|\.Layouts|\.Mailer)$/
-      ]
+      ],
+      ignore_modules_using: []
     ],
     explanations: [
       check: """
@@ -45,7 +46,10 @@ defmodule Credo.Check.Readability.ModuleDoc do
       it easier to follow.
       """,
       params: [
-        ignore_names: "All modules matching this regex (or list of regexes) will be ignored."
+        ignore_names:
+          "List of modules to ignore based on their name. Accepts atoms, strings and regexes.",
+        ignore_modules_using:
+          "List of modules to ignore based on their `use` declarations. Accepts atoms, strings and regexes."
       ]
     ]
 
@@ -65,10 +69,15 @@ defmodule Credo.Check.Readability.ModuleDoc do
   defp walk({:defmodule, _meta, _arguments} = ast, ctx) do
     mod_name = Module.name(ast)
 
-    if matches_any?(mod_name, ctx.params.ignore_names) do
-      {nil, ctx}
-    else
-      handle_moduledoc(ast, mod_name, ctx)
+    cond do
+      matches_any?(mod_name, ctx.params.ignore_names) ->
+        {nil, ctx}
+
+      uses_matching_module?(ast, ctx.params.ignore_modules_using) ->
+        {nil, ctx}
+
+      true ->
+        handle_moduledoc(ast, mod_name, ctx)
     end
   end
 
@@ -95,15 +104,37 @@ defmodule Credo.Check.Readability.ModuleDoc do
     end
   end
 
+  defp uses_matching_module?(_ast, []), do: false
+
+  defp uses_matching_module?(ast, ignored_usings) do
+    ast
+    |> Credo.Code.Block.calls_in_do_block()
+    |> Enum.any?(fn
+      {:use, _, [{:__aliases__, _, mod_list} | _]} ->
+        mod_list
+        |> Credo.Code.Name.full()
+        |> matches_any?(ignored_usings)
+
+      _ ->
+        false
+    end)
+  end
+
+  defp matches_any?(_name, []), do: false
+
   defp matches_any?("" <> name, list) when is_list(list) do
     Enum.any?(list, &matches_any?(name, &1))
+  end
+
+  defp matches_any?(name, atom) when is_atom(atom) do
+    matches_any?(name, Credo.Code.Name.full(atom))
   end
 
   defp matches_any?(name, string) when is_binary(string) do
     String.contains?(name, string)
   end
 
-  defp matches_any?(name, regex) do
+  defp matches_any?(name, %Regex{} = regex) do
     String.match?(name, regex)
   end
 
