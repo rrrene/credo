@@ -41,7 +41,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
           end
       end)
 
-    checks = Keyword.merge(exec.checks.enabled, enable_disabled_checks)
+    checks = Keyword.merge(exec.config.checks.enabled, enable_disabled_checks)
 
     Execution.put_config(exec, :checks, %{enabled: checks, disabled: exec.config.checks.disabled})
   end
