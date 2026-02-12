@@ -5,7 +5,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       ignore_names: [
         ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View|\.\w+HTML|\.\w+JSON|\.Telemetry|\.Layouts|\.Mailer)$/
       ],
-      ignore_using: []
+      ignore_modules_using: []
     ],
     explanations: [
       check: """
@@ -47,9 +47,9 @@ defmodule Credo.Check.Readability.ModuleDoc do
       """,
       params: [
         ignore_names:
-          "List of modules to ignore based on their name. Accepts atoms, strings, and regexes.",
-        ignore_using:
-          "List of modules to ignore based on their `use` declarations. Accepts atoms, strings, and regexes."
+          "List of modules to ignore based on their name. Accepts atoms, strings and regexes.",
+        ignore_modules_using:
+          "List of modules to ignore based on their `use` declarations. Accepts atoms, strings and regexes."
       ]
     ]
 
@@ -73,7 +73,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       matches_any?(mod_name, ctx.params.ignore_names) ->
         {nil, ctx}
 
-      uses_matching_module?(ast, ctx.params.ignore_using) ->
+      uses_matching_module?(ast, ctx.params.ignore_modules_using) ->
         {nil, ctx}
 
       true ->
@@ -106,24 +106,21 @@ defmodule Credo.Check.Readability.ModuleDoc do
 
   defp uses_matching_module?(_ast, []), do: false
 
-  defp uses_matching_module?(ast, ignore_using) do
+  defp uses_matching_module?(ast, ignored_usings) do
     ast
     |> Credo.Code.Block.calls_in_do_block()
     |> Enum.any?(fn
-      {:use, _, _} = use_ast ->
-        use_name = extract_use_module_name(use_ast)
-        use_name != nil and matches_any?(use_name, ignore_using)
+      {:use, _, [{:__aliases__, _, mod_list} | _]} ->
+        mod_list
+        |> Credo.Code.Name.full()
+        |> matches_any?(ignored_usings)
 
       _ ->
         false
     end)
   end
 
-  defp extract_use_module_name({:use, _, [{:__aliases__, _, mod_list} | _]}) do
-    Credo.Code.Name.full(mod_list)
-  end
-
-  defp extract_use_module_name(_), do: nil
+  defp matches_any?(_name, []), do: false
 
   defp matches_any?("" <> name, list) when is_list(list) do
     Enum.any?(list, &matches_any?(name, &1))
@@ -137,7 +134,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     String.contains?(name, string)
   end
 
-  defp matches_any?(name, regex) do
+  defp matches_any?(name, %Regex{} = regex) do
     String.match?(name, regex)
   end
 
