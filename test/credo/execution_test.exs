@@ -4,7 +4,7 @@ defmodule Credo.ExecutionTest do
   alias Credo.Execution
 
   setup do
-    [exec: %Execution{private: %Execution.Private{}}]
+    [exec: %Execution{config: %Execution.RuntimeConfig{}, private: %Execution.Private{}}]
   end
 
   test "it should work for put_assign & get_assign", %{exec: exec} do

@@ -8,37 +8,43 @@ defmodule Credo.Execution do
   The `Credo.Execution` struct is created and manipulated via the `Credo.Execution` module.
   """
   defstruct cli_options: nil,
-
-            # TODO: 1.8 - maybe move these to new `config` field
-            requires: [],
-            plugins: [],
-            parse_timeout: 5000,
-            checks: nil,
-            files: nil,
-            debug: false,
-            strict: false,
-            color: true,
-            format: nil,
-            help: false,
-            verbose: false,
-            version: false,
-            crash_on_error: true,
-            enable_disabled_checks: nil,
-            ignore_checks_tags: [],
-            ignore_checks: nil,
-            min_priority: 0,
-            mute_exit_status: false,
-            only_checks_tags: [],
-            only_checks: nil,
-            read_from_stdin: false,
-
-            # state, which is accessed and changed over the course of Credo's execution
+            # runtime config resulting from config files and CLI parameters
+            config: nil,
+            # private state like registered pipelines, pids of GenServers, etc.
+            private: nil,
+            # state, which is changed over the course of Credo's execution
             halted: false,
             assigns: %{},
             results: %{},
             current_task: nil,
-            parent_task: nil,
-            private: nil
+            parent_task: nil
+
+  defmodule RuntimeConfig do
+    @moduledoc false
+
+    @doc false
+    defstruct color: true,
+              checks: nil,
+              crash_on_error: true,
+              debug: false,
+              enable_disabled_checks: nil,
+              files: nil,
+              format: nil,
+              help: false,
+              min_priority: 0,
+              mute_exit_status: false,
+              only_checks_tags: [],
+              only_checks: nil,
+              ignore_checks_tags: [],
+              ignore_checks: nil,
+              parse_timeout: nil,
+              plugins: [],
+              read_from_stdin: false,
+              requires: [],
+              strict: false,
+              verbose: false,
+              version: false
+  end
 
   defmodule Private do
     @moduledoc false
@@ -124,6 +130,7 @@ defmodule Credo.Execution do
 
     %__MODULE__{
       cli_options: %Options{argv: argv},
+      config: %__MODULE__.RuntimeConfig{},
       private: %__MODULE__.Private{max_concurrent_check_runs: max_concurrent_check_runs}
     }
     |> put_pipeline(@execution_pipeline_key, @execution_pipeline)
@@ -161,13 +168,23 @@ defmodule Credo.Execution do
   end
 
   @doc false
-  def put_private(exec, private_field, value) do
+  def put_private(%__MODULE__{} = exec, private_field, value) do
     Map.put(exec, :private, Map.put(exec.private, private_field, value))
   end
 
   @doc false
-  def get_private(exec, private_field) do
+  def get_private(%__MODULE__{} = exec, private_field) do
     Map.get(exec.private, private_field)
+  end
+
+  @doc false
+  def get_config(%__MODULE__{} = exec, config_field) do
+    Map.get(exec.config, config_field)
+  end
+
+  @doc false
+  def put_config(%__MODULE__{} = exec, config_field, value) do
+    Map.put(exec, :config, Map.put(exec.config, config_field, value))
   end
 
   @doc """
@@ -178,16 +195,18 @@ defmodule Credo.Execution do
   """
   def checks(exec)
 
-  def checks(%__MODULE__{checks: nil}) do
+  def checks(%__MODULE__{config: %{checks: nil}}) do
     {[], [], []}
   end
 
   def checks(%__MODULE__{
-        checks: %{enabled: checks},
-        only_checks: only_checks,
-        only_checks_tags: only_checks_tags,
-        ignore_checks: ignore_checks,
-        ignore_checks_tags: ignore_checks_tags
+        config: %{
+          checks: %{enabled: checks},
+          ignore_checks_tags: ignore_checks_tags,
+          ignore_checks: ignore_checks,
+          only_checks_tags: only_checks_tags,
+          only_checks: only_checks
+        }
       }) do
     only_matching =
       checks |> filter_only_checks_by_tags(only_checks_tags) |> filter_only_checks(only_checks)
@@ -282,7 +301,7 @@ defmodule Credo.Execution do
   @all_min_priority -99
 
   def show_all?(%__MODULE__{} = exec) do
-    exec.min_priority <= @all_min_priority
+    exec.config.min_priority <= @all_min_priority
   end
 
   @doc """
@@ -290,12 +309,12 @@ defmodule Credo.Execution do
   """
   def set_strict(exec)
 
-  def set_strict(%__MODULE__{strict: true} = exec) do
-    %{exec | min_priority: @all_min_priority}
+  def set_strict(%__MODULE__{config: %{strict: true}} = exec) do
+    put_config(exec, :min_priority, @all_min_priority)
   end
 
-  def set_strict(%__MODULE__{strict: false} = exec) do
-    %{exec | min_priority: 0}
+  def set_strict(%__MODULE__{config: %{strict: false}} = exec) do
+    put_config(exec, :min_priority, 0)
   end
 
   def set_strict(exec), do: exec
@@ -389,18 +408,18 @@ defmodule Credo.Execution do
       Credo.Execution.get_command(exec, CredoDemoPlugin, "foo", 42)
       # => 42
   """
-  def get_plugin_param(%__MODULE__{} = exec, plugin_mod, param_name) do
-    exec.plugins[plugin_mod][param_name]
+  def get_plugin_param(exec, plugin_mod, param_name) do
+    exec.config.plugins[plugin_mod][param_name]
   end
 
   @doc false
   def put_plugin_param(%__MODULE__{} = exec, plugin_mod, param_name, param_value) do
     plugins =
-      Keyword.update(exec.plugins, plugin_mod, [], fn list ->
+      Keyword.update(exec.config.plugins, plugin_mod, [], fn list ->
         Keyword.update(list, param_name, param_value, fn _ -> param_value end)
       end)
 
-    %{exec | plugins: plugins}
+    put_config(exec, :plugins, plugins)
   end
 
   # CLI switches

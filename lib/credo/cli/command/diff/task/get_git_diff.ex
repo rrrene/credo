@@ -146,7 +146,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   def store_resulting_execution(
-        %Execution{debug: true} = exec,
+        %Execution{config: %{debug: true}} = exec,
         previous_git_ref,
         previous_dirname,
         previous_exec,

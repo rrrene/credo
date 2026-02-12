@@ -425,7 +425,7 @@ defmodule Credo.Check do
       @impl true
       def run_on_source_file(exec, source_file, params \\ [])
 
-      def run_on_source_file(%Execution{debug: true} = exec, source_file, params) do
+      def run_on_source_file(%Execution{config: %{debug: true}} = exec, source_file, params) do
         ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
         |> ExecutionTiming.append(exec,
           task: exec.current_task,
@@ -446,7 +446,7 @@ defmodule Credo.Check do
             error ->
               UI.warn("Error while running #{__MODULE__} on #{source_file.filename}")
 
-              if exec.crash_on_error do
+              if exec.config.crash_on_error do
                 reraise error, __STACKTRACE__
               else
                 []
@@ -717,9 +717,7 @@ defmodule Credo.Check do
       if String.valid?(message) do
         message
       else
-        IO.warn(
-          "#{check_name(check)} creates an Issue with a `:message` containing invalid bytes: #{inspect(message)}"
-        )
+        IO.warn("#{check_name(check)} creates an Issue with a `:message` containing invalid bytes: #{inspect(message)}")
 
         "(see warning) #{inspect(message)}"
       end

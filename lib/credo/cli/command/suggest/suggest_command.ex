@@ -46,7 +46,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
     )
   end
 
-  def call(%Execution{help: true} = exec, _opts), do: SuggestOutput.print_help(exec)
+  def call(%Execution{config: %{help: true}} = exec, _opts), do: SuggestOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   defmodule PrintBeforeInfo do
@@ -114,7 +114,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
 
     def modify_config_to_only_include_needed_checks(%Credo.Execution{} = exec, files_that_changed) do
       checks =
-        Enum.map(exec.checks, fn {check, params} ->
+        Enum.map(exec.config.checks, fn {check, params} ->
           if check.category() == :consistency do
             {check, params}
           else
@@ -122,7 +122,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestCommand do
           end
         end)
 
-      %{exec | checks: checks}
+      Execution.put_config(exec, :checks, checks)
     end
   end
 end

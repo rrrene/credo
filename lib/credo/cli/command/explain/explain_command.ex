@@ -43,7 +43,7 @@ defmodule Credo.CLI.Command.Explain.ExplainCommand do
   end
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts), do: Output.print_help(exec)
+  def call(%Execution{config: %{help: true}} = exec, _opts), do: Output.print_help(exec)
 
   def call(exec, _opts) do
     filename = get_filename_from_args(exec)

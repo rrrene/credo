@@ -8,12 +8,12 @@ defmodule Credo.CLI.Filter do
   alias Credo.Issue
   alias Credo.SourceFile
 
-  def important(list, exec) when is_list(list) do
+  def important(list, %Execution{} = exec) when is_list(list) do
     Enum.filter(list, &important?(&1, exec))
   end
 
   def important?(%Issue{} = issue, exec) do
-    issue.priority >= exec.min_priority
+    issue.priority >= exec.config.min_priority
   end
 
   def important?(%SourceFile{filename: filename}, exec) do

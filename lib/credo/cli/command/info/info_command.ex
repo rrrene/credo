@@ -24,7 +24,7 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
   end
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts), do: InfoOutput.print_help(exec)
+  def call(%Execution{config: %{help: true}} = exec, _opts), do: InfoOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   defmodule PrintInfo do
@@ -50,7 +50,7 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
     end
 
     defp plugins(exec) do
-      Enum.map(exec.plugins, fn {name, params} ->
+      Enum.map(exec.config.plugins, fn {name, params} ->
         %{"name" => name, "params" => Enum.into(params, %{})}
       end)
     end

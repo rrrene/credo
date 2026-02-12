@@ -2,15 +2,58 @@ defmodule Credo.SourcesTest do
   use ExUnit.Case
 
   alias Credo.CLI.Options
+  alias Credo.Execution
 
   @moduletag slow: :disk_io
 
   @fixture_integration_test_config "test/fixtures/integration_test_config"
 
-  test "it finds all files inside directories recursively" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: ["lib/mix"]}
+  setup do
+    [exec: %Execution{config: %Execution.RuntimeConfig{}, private: %Execution.Private{}}]
+  end
+
+  test "it finds all files inside directories recursively", %{exec: exec} do
+    exec = %{exec | cli_options: %Options{path: "."}, config: %{files: %{excluded: [], included: ["lib/mix"]}}}
+
+    expected = [
+      "lib/mix/tasks/credo.ex",
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
+
+    assert expected == files
+  end
+
+  test "it accepts glob patterns that expand to files", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [], included: ["lib/mix/**/*gen*.ex"]}}
+    }
+
+    expected = [
+      "lib/mix/tasks/credo.gen.check.ex",
+      "lib/mix/tasks/credo.gen.config.ex"
+    ]
+
+    files =
+      exec
+      |> Credo.Sources.find()
+      |> Enum.map(& &1.filename)
+
+    assert expected == files
+  end
+
+  test "it accepts glob patterns that expand to directories", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [], included: ["lib/**/tasks/"]}}
     }
 
     expected = [
@@ -27,51 +70,13 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it accepts glob patterns that expand to files" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: ["lib/mix/**/*gen*.ex"]}
-    }
-
-    expected = [
-      "lib/mix/tasks/credo.gen.check.ex",
-      "lib/mix/tasks/credo.gen.config.ex"
-    ]
-
-    files =
-      exec
-      |> Credo.Sources.find()
-      |> Enum.map(& &1.filename)
-
-    assert expected == files
-  end
-
-  test "it accepts glob patterns that expand to directories" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: ["lib/**/tasks/"]}
-    }
-
-    expected = [
-      "lib/mix/tasks/credo.ex",
-      "lib/mix/tasks/credo.gen.check.ex",
-      "lib/mix/tasks/credo.gen.config.ex"
-    ]
-
-    files =
-      exec
-      |> Credo.Sources.find()
-      |> Enum.map(& &1.filename)
-
-    assert expected == files
-  end
-
-  test "it accepts full file paths" do
+  test "it accepts full file paths", %{exec: exec} do
     full_paths = ["lib/credo.ex", "lib/mix/tasks/credo.ex"]
 
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: full_paths}
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [], included: full_paths}}
     }
 
     files =
@@ -82,16 +87,17 @@ defmodule Credo.SourcesTest do
     assert full_paths == files
   end
 
-  test "it rejects duplicate paths" do
+  test "it rejects duplicate paths", %{exec: exec} do
     paths = [
       "lib/mix/tasks/credo.ex",
       "lib/mix",
       "lib/mix/tasks/credo.gen.check.ex"
     ]
 
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: paths}
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [], included: paths}}
     }
 
     expected = [
@@ -108,19 +114,21 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it reads and parses found source files" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [], included: ["lib/mix/tasks/credo.ex"]}
+  test "it reads and parses found source files", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [], included: ["lib/mix/tasks/credo.ex"]}}
     }
 
     [%Credo.SourceFile{status: :valid}] = Credo.Sources.find(exec)
   end
 
-  test "it excludes paths that match the `excluded` patterns" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: [~r/chec/, ~r/conf/], included: ["lib/mix"]}
+  test "it excludes paths that match the `excluded` patterns", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: [~r/chec/, ~r/conf/], included: ["lib/mix"]}}
     }
 
     expected = ["lib/mix/tasks/credo.ex"]
@@ -133,10 +141,11 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it excludes paths from the `excluded` directories" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: ["lib/credo"], included: ["lib"]}
+  test "it excludes paths from the `excluded` directories", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: ["lib/credo"], included: ["lib"]}}
     }
 
     expected = [
@@ -154,10 +163,11 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it excludes paths that match the `excluded` file globs" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: ["lib/**/*gen*.ex"], included: ["lib/mix"]}
+  test "it excludes paths that match the `excluded` file globs", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: ["lib/**/*gen*.ex"], included: ["lib/mix"]}}
     }
 
     expected = ["lib/mix/tasks/credo.ex"]
@@ -170,10 +180,11 @@ defmodule Credo.SourcesTest do
     assert expected == files
   end
 
-  test "it excludes paths that match the `excluded` directory globs" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{excluded: ["lib/**/credo/"], included: ["lib"]}
+  test "it excludes paths that match the `excluded` directory globs", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{files: %{excluded: ["lib/**/credo/"], included: ["lib"]}}
     }
 
     expected = [
@@ -218,24 +229,27 @@ defmodule Credo.SourcesTest do
     assert expected == Credo.Sources.find(path)
   end
 
-  test "it does not break" do
-    exec = %Credo.Execution{
-      cli_options: %Options{path: "."},
-      files: %{
-        included: ["lib/", "src/", "web/", "apps/"],
-        excluded: [
-          ~r"/_build/",
-          ~r"/deps/",
-          "apps/foo/mix.exs",
-          "apps/foo/test/",
-          "apps/bar/mix.exs",
-          "apps/bar/test/",
-          "apps/baz/mix.exs",
-          "apps/baz/test/",
-          "apps/bat/test/",
-          "apps/bat/mix.exs"
-        ]
-      }
+  test "it does not break", %{exec: exec} do
+    exec = %{
+      exec
+      | cli_options: %Options{path: "."},
+        config: %{
+          files: %{
+            included: ["lib/", "src/", "web/", "apps/"],
+            excluded: [
+              ~r"/_build/",
+              ~r"/deps/",
+              "apps/foo/mix.exs",
+              "apps/foo/test/",
+              "apps/bar/mix.exs",
+              "apps/bar/test/",
+              "apps/baz/mix.exs",
+              "apps/baz/test/",
+              "apps/bat/test/",
+              "apps/bat/mix.exs"
+            ]
+          }
+        }
     }
 
     files =
