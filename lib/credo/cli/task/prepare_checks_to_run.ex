@@ -32,7 +32,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
     enable_disabled_checks_regexes = to_match_regexes(exec.config.enable_disabled_checks)
 
     enable_disabled_checks =
-      Enum.map(exec.checks.disabled, fn
+      Enum.map(exec.config.checks.disabled, fn
         {check, params} ->
           if matches?(to_string(check), enable_disabled_checks_regexes) do
             {check, params}
