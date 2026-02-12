@@ -17,6 +17,15 @@ defmodule Credo.ConfigFile do
 
   alias Credo.Execution
 
+  # name
+  # files
+  # plugins
+  # requires
+  # strict
+  # parse_timeout
+  # color
+  # checks
+
   defstruct origin: nil,
             filename: nil,
             config_name_found?: nil,

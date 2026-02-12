@@ -5,8 +5,9 @@ defmodule Credo.Execution.Task.RequireRequires do
 
   alias Credo.Sources
 
-  def call(%Execution{requires: requires} = exec, _opts) do
-    requires
+  def call(%Execution{} = exec, _opts) do
+    exec
+    |> Execution.get_config(:requires)
     |> Sources.find()
     |> Enum.each(&Code.require_file/1)
 

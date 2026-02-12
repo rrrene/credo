@@ -1,6 +1,4 @@
 defmodule Credo.CLI.Command.List.ListCommand do
-  @moduledoc false
-
   use Credo.CLI.Command,
     short_description: "List all issues grouped by files",
     treat_unknown_args_as_files: true,
@@ -35,7 +33,7 @@ defmodule Credo.CLI.Command.List.ListCommand do
   end
 
   @doc false
-  def call(%Execution{help: true} = exec, _opts), do: ListOutput.print_help(exec)
+  def call(%Execution{config: %{help: true}} = exec, _opts), do: ListOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   defmodule PrintBeforeInfo do
