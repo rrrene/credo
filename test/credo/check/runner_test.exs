@@ -84,7 +84,8 @@ defmodule Credo.Check.RunnerTest do
 
       :ok =
         run_checks(Execution.build(), source_files, [
-          {CollectFilenamesCheck, [files: %{included: ["test/fixtures/**/*.ex"], excluded: ["**/clean.ex"]}, test_pid: test_pid]}
+          {CollectFilenamesCheck,
+           [files: %{included: ["test/fixtures/**/*.ex"], excluded: ["**/clean.ex"]}, test_pid: test_pid]}
         ])
 
       assert_receive {:checked_files, [^foo]}
@@ -174,11 +175,7 @@ defmodule Credo.Check.RunnerTest do
   end
 
   defp run_checks(exec, source_files, enabled_checks) do
-    exec =
-      exec
-      |> Map.update!(:cli_options, &Map.put(&1, :path, "."))
-      |> Execution.put_config(:checks, %{enabled: enabled_checks, disabled: []})
-
+    exec = Execution.put_config(exec, :checks, %{enabled: enabled_checks, disabled: []})
     ExecutionSourceFiles.put(exec, source_files)
     Runner.run(source_files, exec)
   end

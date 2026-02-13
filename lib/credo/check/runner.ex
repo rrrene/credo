@@ -45,55 +45,14 @@ defmodule Credo.Check.Runner do
   defp do_run_check(exec, {check, params}) do
     rerun_files_that_changed = Params.get_rerun_files_that_changed(params)
 
-    known_files = exec |> Execution.get_source_files() |> Enum.map(& &1.filename)
-    files_included = Params.files_included(params, check, known_files)
+    files_included = Params.files_included(params, check)
     files_excluded = Params.files_excluded(params, check)
-
-    found_relevant_files =
-      cond do
-        files_included == known_files and files_excluded == [] ->
-          []
-
-        exec.config.read_from_stdin ->
-          # TODO: I am unhappy with how convoluted this gets
-          #       but it is necessary to avoid hitting the filesystem when reading from STDIN
-          [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
-
-          file_included? =
-            if files_included != known_files do
-              Credo.Sources.filename_matches?(filename, files_included)
-            else
-              true
-            end
-
-          file_excluded? =
-            if files_excluded != [] do
-              Credo.Sources.filename_matches?(filename, files_excluded)
-            else
-              false
-            end
-
-          if !file_included? || file_excluded? do
-            :skip_run
-          else
-            []
-          end
-
-        true ->
-          exec
-          |> Execution.working_dir()
-          |> Credo.Sources.find_in_dir(files_included, files_excluded)
-          |> case do
-            [] -> :skip_run
-            files -> files
-          end
-      end
 
     source_files =
       exec
       |> Execution.get_source_files()
       |> filter_source_files(rerun_files_that_changed)
-      |> filter_source_files(found_relevant_files)
+      |> filter_source_files_for_check(files_included, files_excluded)
 
     try do
       check.run_on_all_source_files(exec, source_files, params)
@@ -109,17 +68,25 @@ defmodule Credo.Check.Runner do
     end
   end
 
-  defp filter_source_files(_source_files, :skip_run) do
-    []
-  end
-
   defp filter_source_files(source_files, []) do
     source_files
   end
 
-  defp filter_source_files(source_files, files_included) do
+  defp filter_source_files(source_files, files_that_changed) do
     Enum.filter(source_files, fn source_file ->
-      Enum.member?(files_included, Path.expand(source_file.filename))
+      Enum.member?(files_that_changed, Path.expand(source_file.filename))
+    end)
+  end
+
+  defp filter_source_files_for_check(source_files, nil, []) do
+    source_files
+  end
+
+  defp filter_source_files_for_check(source_files, files_included, files_excluded) do
+    Enum.filter(source_files, fn %{filename: filename} ->
+      included? = is_nil(files_included) or Credo.Sources.filename_matches?(filename, files_included)
+      excluded? = files_excluded != [] and Credo.Sources.filename_matches?(filename, files_excluded)
+      included? and not excluded?
     end)
   end
 
