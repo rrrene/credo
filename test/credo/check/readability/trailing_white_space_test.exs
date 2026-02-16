@@ -406,6 +406,14 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues()
   end
 
+  @fixture File.read!("test/fixtures/1235-trailing-whitespace/lib/credotest.ex")
+  test "it should NOT report empty lines as trailing whitespace #1235" do
+    @fixture
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
