@@ -103,7 +103,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
 
   defp run_credo_on_dir(exec, dirname, previous_git_ref, given_ref) do
     {previous_argv, _last_arg} =
-      exec.argv
+      exec.cli_options.argv
       |> Enum.slice(1..-1//1)
       |> Enum.reduce({[], nil}, fn
         _, {argv, "--working-dir"} -> {Enum.slice(argv, 1..-2//1), nil}
@@ -146,7 +146,7 @@ defmodule Credo.CLI.Command.Diff.Task.GetGitDiff do
   end
 
   def store_resulting_execution(
-        %Execution{debug: true} = exec,
+        %Execution{config: %{debug: true}} = exec,
         previous_git_ref,
         previous_dirname,
         previous_exec,

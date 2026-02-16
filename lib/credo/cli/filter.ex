@@ -8,12 +8,12 @@ defmodule Credo.CLI.Filter do
   alias Credo.Issue
   alias Credo.SourceFile
 
-  def important(list, exec) when is_list(list) do
+  def important(list, %Execution{} = exec) when is_list(list) do
     Enum.filter(list, &important?(&1, exec))
   end
 
   def important?(%Issue{} = issue, exec) do
-    issue.priority >= exec.min_priority
+    issue.priority >= exec.config.min_priority
   end
 
   def important?(%SourceFile{filename: filename}, exec) do
@@ -29,7 +29,9 @@ defmodule Credo.CLI.Filter do
   end
 
   def ignored_by_config_comment?(%Issue{} = issue, exec) do
-    case exec.config_comment_map[issue.filename] do
+    config_comment_map = Execution.get_private(exec, :config_comment_map)
+
+    case config_comment_map[issue.filename] do
       list when is_list(list) ->
         Enum.any?(list, &ConfigComment.ignores_issue?(&1, issue))
 

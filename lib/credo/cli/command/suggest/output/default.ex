@@ -31,7 +31,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
   @indent 8
 
   @doc "Called before the analysis is run."
-  def print_before_info(_source_files, %Execution{format: "short"}), do: nil
+  def print_before_info(_source_files, %Execution{config: %{format: "short"}}), do: nil
 
   def print_before_info(source_files, exec) do
     case Enum.count(source_files) do
@@ -62,7 +62,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
 
   defp print_issue_list_by_category(
          _source_files,
-         %Execution{format: "short"},
+         %Execution{config: %{format: "short"}},
          _time_load,
          _time_run
        ),
@@ -159,13 +159,18 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
     |> do_print_issues(source_file_map, exec, term_width)
   end
 
-  defp per_category(%Execution{all: true}), do: 1_000_000
-  defp per_category(%Execution{all: false}), do: @per_category
+  defp per_category(%Execution{} = exec) do
+    if Execution.show_all?(exec) do
+      1_000_000
+    else
+      @per_category
+    end
+  end
 
   defp do_print_issues(
          issues,
          source_file_map,
-         %Execution{format: _} = exec,
+         %Execution{} = exec,
          term_width
        ) do
     Enum.each(issues, fn %Issue{filename: filename} = issue ->
@@ -183,7 +188,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
            priority: priority
          } = issue,
          source_file,
-         %Execution{format: _, verbose: verbose} = exec,
+         %Execution{config: %{verbose: verbose}} = exec,
          term_width
        ) do
     outer_color = Output.check_color(issue)
@@ -231,7 +236,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
     ]
     |> UI.puts()
 
-    if exec.verbose do
+    if exec.config.verbose do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
       UI.puts_edge([outer_color, :faint])

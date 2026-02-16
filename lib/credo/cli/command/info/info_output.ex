@@ -9,8 +9,8 @@ defmodule Credo.CLI.Command.Info.InfoOutput do
     format_mod.print(exec, info)
   end
 
-  defp format_mod(%{format: "json"}), do: Credo.CLI.Command.Info.Output.Json
-  defp format_mod(%{format: nil}), do: Credo.CLI.Command.Info.Output.Default
+  defp format_mod(%{config: %{format: "json"}}), do: Credo.CLI.Command.Info.Output.Json
+  defp format_mod(%{config: %{format: nil}}), do: Credo.CLI.Command.Info.Output.Default
 
   def print_help(exec) do
     usage = ["Usage: ", :olive, "mix credo info [options]"]

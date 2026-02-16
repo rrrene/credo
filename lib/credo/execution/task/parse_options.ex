@@ -20,9 +20,9 @@ defmodule Credo.Execution.Task.ParseOptions do
 
     cli_aliases =
       if add_common_aliases? do
-        exec.cli_aliases ++ [h: :help, v: :version]
+        exec.private.cli_aliases ++ [h: :help, v: :version]
       else
-        exec.cli_aliases
+        exec.private.cli_aliases
       end
 
     treat_unknown_args_as_files? =
@@ -38,12 +38,12 @@ defmodule Credo.Execution.Task.ParseOptions do
     cli_options =
       Options.parse(
         use_strict_parser?,
-        exec.argv,
+        exec.cli_options.argv,
         File.cwd!(),
         command_names,
         given_command_name,
         [UI.edge()],
-        exec.cli_switches,
+        exec.private.cli_switches,
         cli_aliases,
         treat_unknown_args_as_files?
       )

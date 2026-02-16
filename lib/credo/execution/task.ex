@@ -106,7 +106,7 @@ defmodule Credo.Execution.Task do
   @doc false
   def run(task, exec, opts \\ [])
 
-  def run(task, %Credo.Execution{debug: true} = exec, opts) do
+  def run(task, %Credo.Execution{config: %{debug: true}} = exec, opts) do
     run_with_timing(task, exec, opts)
   end
 

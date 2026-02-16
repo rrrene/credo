@@ -4,7 +4,7 @@ defmodule Credo.CLI.Command.Info.Output.Json do
   alias Credo.CLI.Output.Formatter.JSON
   alias Credo.Execution
 
-  def print(%Execution{verbose: true}, info) do
+  def print(%Execution{config: %{verbose: true}}, info) do
     info
     |> verbose_info()
     |> JSON.print_map()

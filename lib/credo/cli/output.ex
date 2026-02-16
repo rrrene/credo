@@ -193,9 +193,9 @@ defmodule Credo.CLI.Output do
     print_numbered_list(large_source_filenames)
   end
 
-  def print_skipped_checks(%Execution{skipped_checks: []}), do: nil
+  def print_skipped_checks(%Execution{private: %{skipped_checks: []}}), do: nil
 
-  def print_skipped_checks(%Execution{skipped_checks: skipped_checks}) do
+  def print_skipped_checks(%Execution{private: %{skipped_checks: skipped_checks}}) do
     msg = [
       :reset,
       :bright,

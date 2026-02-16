@@ -53,30 +53,29 @@ defmodule Credo.Sources do
   patterns. For `included`, patterns can be file paths, directory paths and globs.
   For `excluded`, patterns can also be specified as regular expressions.
 
-      iex> Sources.find(%Credo.Execution{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}})
+      iex> Sources.find(%Credo.Execution{config: %{files: %{excluded: ["not_me.ex"], included: ["*.ex"]}}})
 
-      iex> Sources.find(%Credo.Execution{files: %{excluded: [~r/messy/], included: ["lib/mix", "root.ex"]}})
+      iex> Sources.find(%Credo.Execution{config: %{files: %{excluded: [~r/messy/], included: ["lib/mix", "root.ex"]}}})
   """
   def find(exec)
 
-  def find(%Execution{read_from_stdin: true, files: %{included: [filename]}}) do
+  def find(%Execution{config: %{read_from_stdin: true, files: %{included: [filename]}}}) do
     filename
     |> source_file_from_stdin()
     |> List.wrap()
   end
 
-  def find(%Execution{read_from_stdin: true}) do
+  def find(%Execution{config: %{read_from_stdin: true}}) do
     @stdin_filename
     |> source_file_from_stdin()
     |> List.wrap()
   end
 
-  def find(%Execution{files: files, parse_timeout: parse_timeout} = exec) do
+  def find(%Execution{config: %{files: files}} = exec) do
     parse_timeout =
-      if is_nil(parse_timeout) do
-        :infinity
-      else
-        parse_timeout
+      case Execution.get_config(exec, :parse_timeout) do
+        nil -> :infinity
+        value -> value
       end
 
     working_dir = Execution.working_dir(exec)

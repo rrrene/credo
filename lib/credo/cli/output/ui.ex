@@ -42,8 +42,8 @@ defmodule Credo.CLI.Output.UI do
   @doc "Returns the edge (`┃`) which is used in much of Credo's output as a binary."
   def edge, do: @edge
 
-  def use_colors(exec) do
-    @shell_service.use_colors(exec.color)
+  def use_colors(%Credo.Execution{} = exec) do
+    @shell_service.use_colors(exec.config.color)
 
     exec
   end

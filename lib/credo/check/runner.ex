@@ -26,7 +26,7 @@ defmodule Credo.Check.Runner do
     :ok
   end
 
-  defp run_check(%Execution{debug: true} = exec, {check, params}) do
+  defp run_check(%Execution{config: %{debug: true}} = exec, {check, params}) do
     ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
     |> ExecutionTiming.append(exec, task: exec.current_task, check: check)
   end
@@ -47,7 +47,7 @@ defmodule Credo.Check.Runner do
         files_included == known_files and files_excluded == [] ->
           []
 
-        exec.read_from_stdin ->
+        exec.config.read_from_stdin ->
           # TODO: I am unhappy with how convoluted this gets
           #       but it is necessary to avoid hitting the filesystem when reading from STDIN
           [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
@@ -94,7 +94,7 @@ defmodule Credo.Check.Runner do
       error ->
         warn_about_failed_run(check, source_files)
 
-        if exec.crash_on_error do
+        if exec.config.crash_on_error do
           reraise error, __STACKTRACE__
         else
           []
@@ -133,7 +133,7 @@ defmodule Credo.Check.Runner do
 
   defp warn_about_ineffective_patterns(
          {checks, _included_checks, []},
-         %Execution{ignore_checks: [_ | _] = ignore_checks}
+         %Execution{config: %{ignore_checks: [_ | _] = ignore_checks}}
        ) do
     UI.warn([
       :red,

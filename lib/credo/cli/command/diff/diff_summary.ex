@@ -18,14 +18,14 @@ defmodule Credo.CLI.Command.Diff.DiffSummary do
 
   def print(
         _source_files,
-        %Execution{format: "flycheck"},
+        %Execution{config: %{format: "flycheck"}},
         _time_load,
         _time_run
       ) do
     nil
   end
 
-  def print(_source_files, %Execution{format: "oneline"}, _time_load, _time_run) do
+  def print(_source_files, %Execution{config: %{format: "oneline"}}, _time_load, _time_run) do
     nil
   end
 
@@ -71,7 +71,7 @@ defmodule Credo.CLI.Command.Diff.DiffSummary do
     Enum.count(result)
   end
 
-  defp print_priority_hint(%Execution{min_priority: min_priority})
+  defp print_priority_hint(%Execution{config: %{min_priority: min_priority}})
        when min_priority >= 0 do
     UI.puts([
       :faint,

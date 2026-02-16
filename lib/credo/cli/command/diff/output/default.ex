@@ -168,21 +168,25 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
 
     issues
     |> Enum.sort_by(fn issue ->
-      {sort_weight[issue.diff_marker], issue.priority, issue.severity, issue.filename,
-       issue.line_no}
+      {sort_weight[issue.diff_marker], issue.priority, issue.severity, issue.filename, issue.line_no}
     end)
     |> Enum.reverse()
     |> Enum.take(count)
     |> do_print_issues(source_file_map, exec, term_width)
   end
 
-  defp per_category(%Execution{all: true}), do: 1_000_000
-  defp per_category(%Execution{all: false}), do: @per_category
+  defp per_category(%Execution{} = exec) do
+    if Execution.show_all?(exec) do
+      1_000_000
+    else
+      @per_category
+    end
+  end
 
   defp do_print_issues(
          issues,
          source_file_map,
-         %Execution{format: _} = exec,
+         %Execution{config: %{format: _}} = exec,
          term_width
        ) do
     Enum.each(issues, fn %Issue{filename: filename} = issue ->
@@ -200,7 +204,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
            priority: priority
          } = issue,
          source_file,
-         %Execution{format: _, verbose: verbose} = exec,
+         %Execution{config: %{format: _, verbose: verbose}} = exec,
          term_width
        ) do
     new_issue? = issue.diff_marker == :new
@@ -288,7 +292,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
     ]
     |> UI.puts()
 
-    if exec.verbose && issue.diff_marker == :new do
+    if exec.config.verbose && issue.diff_marker == :new do
       print_issue_line(issue, source_file, inner_color, outer_color, term_width)
 
       [
