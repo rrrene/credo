@@ -201,6 +201,7 @@
           {Credo.Check.Refactor.PassAsyncInTestCases, []},
           {Credo.Check.Refactor.PipeChainStart, []},
           {Credo.Check.Refactor.RejectFilter, []},
+          {Credo.Check.Refactor.WithAssignment, []},
           {Credo.Check.Refactor.VariableRebinding, []},
           {Credo.Check.Warning.LazyLogging, []},
           {Credo.Check.Warning.LeakyEnvironment, []},
