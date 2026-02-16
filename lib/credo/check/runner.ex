@@ -43,43 +43,17 @@ defmodule Credo.Check.Runner do
     files_excluded = Params.files_excluded(params, check)
 
     found_relevant_files =
-      cond do
-        files_included == known_files and files_excluded == [] ->
-          []
-
-        exec.read_from_stdin ->
-          # TODO: I am unhappy with how convoluted this gets
-          #       but it is necessary to avoid hitting the filesystem when reading from STDIN
-          [%Credo.SourceFile{filename: filename}] = Execution.get_source_files(exec)
-
-          file_included? =
-            if files_included != known_files do
-              Credo.Sources.filename_matches?(filename, files_included)
-            else
-              true
-            end
-
-          file_excluded? =
-            if files_excluded != [] do
-              Credo.Sources.filename_matches?(filename, files_excluded)
-            else
-              false
-            end
-
-          if !file_included? || file_excluded? do
-            :skip_run
-          else
-            []
-          end
-
-        true ->
-          exec
-          |> Execution.working_dir()
-          |> Credo.Sources.find_in_dir(files_included, files_excluded)
-          |> case do
-            [] -> :skip_run
-            files -> files
-          end
+      if files_included == known_files and files_excluded == [] do
+        []
+      else
+        known_files
+        |> Enum.map(&Path.expand/1)
+        |> Enum.filter(&Credo.Sources.filename_matches?(&1, files_included))
+        |> Enum.reject(&Credo.Sources.filename_matches?(&1, files_excluded))
+        |> case do
+          [] -> :skip_run
+          files -> files
+        end
       end
 
     source_files =
