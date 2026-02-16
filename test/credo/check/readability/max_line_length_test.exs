@@ -213,6 +213,22 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation if comments are excluded" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        # This is a very long comment line that should definitely be ignored if the ignore_comments parameter is set to true.
+        assert 1 + 1 == 2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80, ignore_comments: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -245,6 +261,22 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> to_source_file
     |> run_check(@described_check, max_length: 80)
     |> assert_issue(%{column: 81, message: ~r/max is 80, was 112/})
+  end
+
+  test "it should report a violation if comments are NOT excluded" do
+    ~S'''
+    defmodule CredoSampleModule do
+      use ExUnit.Case
+
+      def some_fun do
+        # This is a very long comment line that should definitely NOT be ignored if the ignore_comments parameter is set to false.
+        assert 1 + 1 == 2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80, ignore_comments: false)
+    |> assert_issue()
   end
 
   test "it should report a violation /3" do
