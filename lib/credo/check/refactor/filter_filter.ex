@@ -3,7 +3,7 @@ defmodule Credo.Check.Refactor.FilterFilter do
     id: "EX4008",
     explanations: [
       check: """
-      One `Enum.filter/2` is more efficient than `Enum.filter/2 |> Enum.filter/2`.
+      One `Enum.filter/2` (or corresponding `Map` and `Keyword` calls) is more efficient than `Enum.filter/2 |> Enum.filter/2`.
 
       This should be refactored:
 
@@ -24,17 +24,32 @@ defmodule Credo.Check.Refactor.FilterFilter do
     ]
 
   alias Credo.Check.Refactor.EnumHelpers
+  alias Credo.Check.Refactor.MapHelpers
+  alias Credo.Check.Refactor.KeywordHelpers
 
   @doc false
   def run(source_file, params \\ []) do
     issue_meta = IssueMeta.for(source_file, params)
 
-    message = "One `Enum.filter/2` is more efficient than `Enum.filter/2 |> Enum.filter/2`"
     trigger = "|>"
 
-    Credo.Code.prewalk(
-      source_file,
-      &EnumHelpers.traverse(&1, &2, issue_meta, message, trigger, :filter, :filter, __MODULE__)
+    Enum.flat_map(
+      [
+        {&EnumHelpers.traverse/8, "Enum"},
+        {&MapHelpers.traverse/8, "Map"},
+        {&KeywordHelpers.traverse/8, "Keyword"}
+      ],
+      fn {traverse, module} ->
+        message =
+          "One `#{module}.filter/2` is more efficient than `#{module}.filter/2 |> #{module}.filter/2`"
+
+        Credo.Code.prewalk(
+          source_file,
+          fn ast, issues ->
+            traverse.(ast, issues, issue_meta, message, trigger, :filter, :filter, __MODULE__)
+          end
+        )
+      end
     )
   end
 end
