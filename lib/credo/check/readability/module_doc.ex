@@ -5,7 +5,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       ignore_names: [
         ~r/(\.\w+Controller|\.Endpoint|\.\w+Live(\.\w+)?|\.Repo|\.Router|\.\w+Socket|\.\w+View|\.\w+HTML|\.\w+JSON|\.Telemetry|\.Layouts|\.Mailer)$/
       ],
-      ignore_modules_using: []
+      ignore_modules_using: [Credo.Check, Ecto.Schema, Phoenix.LiveView, ~r/\.Web$/]
     ],
     explanations: [
       check: """
