@@ -27,6 +27,10 @@ defmodule Credo.Check.Consistency.UnusedVariableNames.Collector do
     {ast, reduce_unused_variables(params, callback, acc)}
   end
 
+  defp traverse(callback, {:test, _, [_name, context, [do: _] | _]} = ast, acc) do
+    {ast, reduce_unused_variables([context], callback, acc)}
+  end
+
   defp traverse(callback, {:->, _, [params | _]} = ast, acc) do
     {ast, reduce_unused_variables(params, callback, acc)}
   end

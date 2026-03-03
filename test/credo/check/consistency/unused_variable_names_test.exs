@@ -360,6 +360,23 @@ defmodule Credo.Check.Consistency.UnusedVariableNamesTest do
     ])
   end
 
+  test "it should report a violation for a test context with a list match (expects meaningful)" do
+    [
+      ~S'''
+      defmodule Credo.SampleTest do
+        use ExUnit.Case
+
+        test "my test", %{list: [item1 | _]} do
+          assert item1
+        end
+      end
+      '''
+    ]
+    |> to_source_files()
+    |> run_check(@described_check, force: :meaningful)
+    |> assert_issue(%{line_no: 4, trigger: "_"})
+  end
+
   test "it should report a violation once" do
     [
       ~S'''
