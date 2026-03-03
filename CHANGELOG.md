@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.17
+
+- `Credo.Check.Readability.ModuleDoc` add new param `:ignore_modules_using` (defaults to `[Credo.Check, Ecto.Schema, Phoenix.LiveView, ~r/\.Web$/]`)
+- `Credo.Check.Warning.UnusedOperation` update `:modules` param: instead of a list of functions to check, `:all` can be given to check all functions in a module
+- New Check: `Credo.Check.Refactor.CondInsteadOfIfElse`
+- New Check: `Credo.Check.Warning.WrongTestFilename`
+
 ## 1.7.16
 
 - Fix compatibility & compiler warnings with Elixir 1.20.0-rc.1
