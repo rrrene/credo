@@ -5,7 +5,7 @@ defmodule Credo.Execution.Task.UseColors do
 
   alias Credo.CLI.Output.UI
 
-  def call(exec, _opts) do
+  def call(%Execution{} = exec, _opts) do
     UI.use_colors(exec)
   end
 end

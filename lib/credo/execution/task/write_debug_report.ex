@@ -9,7 +9,7 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   alias Credo.CLI.Output.UI
   alias Credo.Execution.ExecutionTiming
 
-  def call(%Credo.Execution{debug: true} = exec, _opts) do
+  def call(%Credo.Execution{config: %{debug: true}} = exec, _opts) do
     Logger.flush()
 
     time_load = exec |> get_assign("credo.time.source_files", 0) |> div(1000)

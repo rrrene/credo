@@ -4,7 +4,7 @@ defmodule Credo.CLI.Command.Info.Output.Default do
   alias Credo.CLI.Output.UI
   alias Credo.Execution
 
-  def print(%Execution{verbose: true}, info) do
+  def print(%Execution{config: %{verbose: true}}, info) do
     info
     |> verbose_info()
     |> UI.puts()

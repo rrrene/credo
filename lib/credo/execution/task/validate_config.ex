@@ -16,7 +16,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     |> inspect_config_if_debug()
   end
 
-  defp validate_only_checks(%Execution{only_checks: only_checks} = exec)
+  defp validate_only_checks(%Execution{config: %{only_checks: only_checks}} = exec)
        when is_list(only_checks) do
     if Enum.any?(only_checks, &(&1 == "")) do
       UI.warn([
@@ -32,7 +32,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
   end
 
-  defp validate_ignore_checks(%Execution{ignore_checks: ignore_checks} = exec)
+  defp validate_ignore_checks(%Execution{config: %{ignore_checks: ignore_checks}} = exec)
        when is_list(ignore_checks) do
     if Enum.any?(ignore_checks, &(&1 == "")) do
       UI.warn([
@@ -48,8 +48,8 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
   end
 
-  defp validate_checks(%Execution{checks: %{enabled: checks}} = exec) do
-    Enum.each(checks, fn check_tuple ->
+  defp validate_checks(%Execution{config: %{checks: %{enabled: enabled_checks}}} = exec) do
+    Enum.each(enabled_checks, fn check_tuple ->
       warn_if_check_missing(check_tuple)
       warn_if_check_params_invalid(check_tuple)
     end)
@@ -117,7 +117,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     |> String.replace(~r/^Elixir\./, "")
   end
 
-  defp inspect_config_if_debug(%Execution{debug: true} = exec) do
+  defp inspect_config_if_debug(%Execution{config: %{debug: true}} = exec) do
     require Logger
 
     Logger.debug(fn ->
@@ -134,11 +134,11 @@ defmodule Credo.Execution.Task.ValidateConfig do
   defp inspect_config_if_debug(exec), do: exec
 
   defp remove_missing_checks(
-         %Execution{checks: %{enabled: enabled_checks, disabled: disabled_checks}} = exec
+         %Execution{config: %{checks: %{enabled: enabled_checks, disabled: disabled_checks}}} = exec
        ) do
     enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
     disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
-    %{exec | checks: %{enabled: enabled_checks, disabled: disabled_checks}}
+    Execution.put_config(exec, :checks, %{enabled: enabled_checks, disabled: disabled_checks})
   end
 end

@@ -14,7 +14,7 @@ defmodule Credo.CLI.Command.Version do
     ]
 
   @doc false
-  def call(%Execution{format: "json"} = exec, _opts) do
+  def call(%Execution{config: %{format: "json"}} = exec, _opts) do
     JSON.print_map(%{version: Credo.version()})
 
     exec

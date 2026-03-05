@@ -24,7 +24,7 @@ defmodule Credo.CLI.Output.FormatDelegator do
 
           _ ->
             quote do
-              defp format_mod(%Execution{format: unquote(to_string(format))}) do
+              defp format_mod(%Execution{config: %{format: unquote(to_string(format))}}) do
                 unquote(output_mod)
               end
             end

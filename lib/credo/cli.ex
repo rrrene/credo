@@ -42,7 +42,7 @@ defmodule Credo.CLI do
     |> halt_if_exit_status_assigned()
   end
 
-  defp halt_if_exit_status_assigned(%Execution{mute_exit_status: true}) do
+  defp halt_if_exit_status_assigned(%Execution{config: %{mute_exit_status: true}}) do
     # Skip if exit status is muted
   end
 
