@@ -348,10 +348,10 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
     defp argument_type({:{}, _, _}), do: [:tuple]
     defp argument_type(nil), do: []
 
+    defp argument_type(v) when is_boolean(v), do: [:boolean]
     defp argument_type(v) when is_atom(v), do: [:atom]
     defp argument_type(v) when is_binary(v), do: [:binary]
     defp argument_type(v) when is_bitstring(v), do: [:bitstring]
-    defp argument_type(v) when is_boolean(v), do: [:boolean]
 
     defp argument_type(v) when is_list(v) do
       if Keyword.keyword?(v) do
