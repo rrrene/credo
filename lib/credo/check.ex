@@ -428,7 +428,7 @@ defmodule Credo.Check do
       def run_on_source_file(%Execution{config: %{debug: true}} = exec, source_file, params) do
         ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
         |> ExecutionTiming.append(exec,
-          task: exec.current_task,
+          task: exec.private.current_task,
           check: __MODULE__,
           filename: source_file.filename
         )

@@ -124,12 +124,11 @@ defmodule Credo.Execution.Task do
   end
 
   defp do_run(task, %Credo.Execution{halted: false} = exec, opts) do
-    old_parent_task = exec.parent_task
-    old_current_task = exec.current_task
+    {old_parent_task, old_current_task} = Execution.get_parent_and_current_task(exec)
 
     exec =
       exec
-      |> Execution.set_parent_and_current_task(exec.current_task, task)
+      |> Execution.set_parent_and_current_task(old_current_task, task)
       |> task.call(opts)
       |> Execution.ensure_execution_struct("#{task}.call/2")
 
@@ -156,7 +155,7 @@ defmodule Credo.Execution.Task do
 
     log(:call_end, context_tuple, time)
 
-    ExecutionTiming.append(exec, [task: task, parent_task: exec.parent_task], started_at, time)
+    ExecutionTiming.append(exec, [task: task, parent_task: exec.private.parent_task], started_at, time)
 
     exec
   end

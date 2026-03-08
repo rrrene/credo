@@ -28,7 +28,7 @@ defmodule Credo.Check.Runner do
 
   defp run_check(%Execution{config: %{debug: true}} = exec, {check, params}) do
     ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
-    |> ExecutionTiming.append(exec, task: exec.current_task, check: check)
+    |> ExecutionTiming.append(exec, task: exec.private.current_task, check: check)
   end
 
   defp run_check(exec, {check, params}) do

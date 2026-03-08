@@ -15,12 +15,14 @@ defmodule Credo.Execution do
             # state, which is changed over the course of Credo's execution
             halted: false,
             assigns: %{},
-            results: %{},
-            current_task: nil,
-            parent_task: nil
+            results: %{}
 
   defmodule RuntimeConfig do
     @moduledoc false
+
+    # These are fields formerly stored directly in `%Execution{}`,
+    # which comprise the config at runtime, consolidated from config files
+    # and CLI switches.
 
     @doc false
     defstruct color: true,
@@ -49,11 +51,19 @@ defmodule Credo.Execution do
   defmodule Private do
     @moduledoc false
 
+    # These are fields formerly stored directly in `%Execution{}`,
+    # which Credo needs for its execution (and we need to store them somewhere).
+
     @doc false
     defstruct commands: %{},
               config_comment_map: %{},
               pipeline_map: %{},
-              initializing_plugin: nil,
+              # PIDs
+              config_files_pid: nil,
+              source_files_pid: nil,
+              issues_pid: nil,
+              timing_pid: nil,
+              # set by checks, plugins, etc.
               cli_switches: [
                 debug: :boolean,
                 color: :boolean,
@@ -63,12 +73,12 @@ defmodule Credo.Execution do
               ],
               cli_aliases: [C: :config_name, D: :debug],
               cli_switch_plugin_param_converters: [],
-              skipped_checks: nil,
-              config_files_pid: nil,
-              source_files_pid: nil,
-              issues_pid: nil,
-              timing_pid: nil,
-              max_concurrent_check_runs: nil
+              # other state set by Credo
+              max_concurrent_check_runs: nil,
+              initializing_plugin: nil,
+              current_task: nil,
+              parent_task: nil,
+              skipped_checks: nil
   end
 
   @typedoc false
@@ -691,8 +701,15 @@ defmodule Credo.Execution do
   # Task tracking
 
   @doc false
-  def set_parent_and_current_task(%__MODULE__{} = exec, parent_task, current_task) do
-    %{exec | parent_task: parent_task, current_task: current_task}
+  def get_parent_and_current_task(%__MODULE__{private: private}) do
+    {private.parent_task, private.current_task}
+  end
+
+  @doc false
+  def set_parent_and_current_task(%__MODULE__{private: private} = exec, parent_task, current_task) do
+    private = %{private | parent_task: parent_task, current_task: current_task}
+
+    %{exec | private: private}
   end
 
   # Running tasks
