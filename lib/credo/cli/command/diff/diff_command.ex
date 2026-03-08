@@ -59,12 +59,10 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
   def previous_ref(exec) do
     case exec.cli_options.switches do
       %{since: given_datetime} ->
-        previous_ref_as_datetime(given_datetime) ||
-          {:error, "given value is not a valid commit date: #{given_datetime}"}
+        previous_ref_as_datetime(given_datetime)
 
       %{from_dir: given_dir} ->
-        previous_ref_as_path(given_dir) ||
-          {:error, "given value is not a local directory: #{given_dir}"}
+        previous_ref_as_path(given_dir)
 
       %{from_git_ref: given_git_ref} ->
         previous_ref_as_git_ref(given_git_ref) ||

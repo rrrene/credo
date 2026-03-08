@@ -233,9 +233,6 @@ defmodule Credo.Execution do
   defp filter_ignore_checks_by_tags(_checks, []), do: []
   defp filter_ignore_checks_by_tags(checks, tags), do: filter_checks_by_tags(checks, tags)
 
-  defp filter_checks_by_tags(_checks, nil), do: []
-  defp filter_checks_by_tags(_checks, []), do: []
-
   defp filter_checks_by_tags(checks, tags) do
     tags = Enum.map(tags, &String.to_atom/1)
 
