@@ -128,7 +128,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   defp cannot_be_in_pipeline?(ast) do
-    PipeHelper.cannot_be_in_pipeline?(ast, [], [])
+    PipeHelper.cannot_be_in_pipeline?(ast, [], [:fn])
   end
 
   defmodule PipeHelper do

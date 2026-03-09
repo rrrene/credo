@@ -224,6 +224,22 @@ defmodule Credo.Check.Readability.NestedFunctionCallsTest do
     |> refute_issues()
   end
 
+  test "it should NOT report external function wrapping a multi-clause anonymous function" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_code do
+        Tesla.Mock.mock(fn
+          %{method: :get} -> %Tesla.Env{status: 200, body: "hello"}
+          %{method: :post} -> %Tesla.Env{status: 200, body: "world"}
+        end)
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should report nested function calls inside a pipeline when the inner function calls could be a pipeline of their own" do
     ~S'''
     defmodule CredoSampleModule do
