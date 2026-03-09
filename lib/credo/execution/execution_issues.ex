@@ -10,13 +10,15 @@ defmodule Credo.Execution.ExecutionIssues do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %{exec | issues_pid: pid}
+    Execution.put_private(exec, :issues_pid, pid)
   end
 
   @doc "Appends an `issue` for the specified `filename`."
   def append(_, [] = _issues), do: :ok
 
-  def append(%Execution{issues_pid: pid}, issues) when is_list(issues) do
+  def append(%Execution{} = exec, issues) when is_list(issues) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     issues
     |> Enum.group_by(& &1.filename)
     |> Enum.each(fn {filename, issues} ->
@@ -24,27 +26,37 @@ defmodule Credo.Execution.ExecutionIssues do
     end)
   end
 
-  def append(%Execution{issues_pid: pid}, %Issue{} = issue) do
+  def append(%Execution{} = exec, %Issue{} = issue) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     GenServer.call(pid, {:append, issue.filename, issue})
   end
 
   @doc "Appends an `issue` for the specified `filename`."
-  def append(%Execution{issues_pid: pid}, %SourceFile{filename: filename}, issue) do
+  def append(%Execution{} = exec, %SourceFile{filename: filename}, issue) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     GenServer.call(pid, {:append, filename, issue})
   end
 
   @doc "Returns the issues for the specified `filename`."
-  def get(%Execution{issues_pid: pid}, %SourceFile{filename: filename}) do
+  def get(%Execution{} = exec, %SourceFile{filename: filename}) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     GenServer.call(pid, {:get, filename})
   end
 
   @doc "Sets/overwrites all `issues` for the given Execution struct."
-  def set(%Execution{issues_pid: pid}, issues) do
+  def set(%Execution{} = exec, issues) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     GenServer.call(pid, {:set, issues})
   end
 
   @doc "Returns all `issues` for the given Execution struct."
-  def to_map(%Execution{issues_pid: pid}) do
+  def to_map(%Execution{} = exec) do
+    pid = Execution.get_private(exec, :issues_pid)
+
     GenServer.call(pid, :to_map)
   end
 

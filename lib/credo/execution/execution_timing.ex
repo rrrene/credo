@@ -56,7 +56,9 @@ defmodule Credo.Execution.ExecutionTiming do
   @doc """
   Adds a timing to the given `exec` using the given values of `tags`, `started_at` and `duration`.
   """
-  def append(%Execution{timing_pid: pid}, tags, started_at, duration) do
+  def append(%Execution{} = exec, tags, started_at, duration) do
+    pid = Execution.get_private(exec, :timing_pid)
+
     spawn(fn ->
       GenServer.call(pid, {:append, tags, started_at, duration})
     end)
@@ -65,7 +67,9 @@ defmodule Credo.Execution.ExecutionTiming do
   @doc """
   Adds a timing piped from `run/2` to the given `exec` (using the given values of `tags`, `started_at` and `duration`).
   """
-  def append({started_at, duration, _result}, %Execution{timing_pid: pid}, tags) do
+  def append({started_at, duration, _result}, %Execution{} = exec, tags) do
+    pid = Execution.get_private(exec, :timing_pid)
+
     spawn(fn ->
       GenServer.call(pid, {:append, tags, started_at, duration})
     end)
@@ -74,7 +78,9 @@ defmodule Credo.Execution.ExecutionTiming do
   @doc """
   Returns all timings for the given `exec`.
   """
-  def all(%Execution{timing_pid: pid}) do
+  def all(%Execution{} = exec) do
+    pid = Execution.get_private(exec, :timing_pid)
+
     GenServer.call(pid, :all)
   end
 
@@ -160,7 +166,7 @@ defmodule Credo.Execution.ExecutionTiming do
   def start_server(exec) do
     {:ok, pid} = GenServer.start_link(__MODULE__, [])
 
-    %{exec | timing_pid: pid}
+    Execution.put_private(exec, :timing_pid, pid)
   end
 
   @doc false

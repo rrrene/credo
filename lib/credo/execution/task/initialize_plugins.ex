@@ -6,7 +6,7 @@ defmodule Credo.Execution.Task.InitializePlugins do
   alias Credo.Execution
 
   def call(exec, _opts) do
-    Enum.reduce(exec.plugins, exec, &init_plugin(&2, &1))
+    Enum.reduce(exec.config.plugins, exec, &init_plugin(&2, &1))
   end
 
   defp init_plugin(exec, {_mod, false}), do: exec

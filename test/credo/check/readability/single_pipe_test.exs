@@ -187,7 +187,7 @@ defmodule Credo.Check.Readability.SinglePipeTest do
       def some_fun do
         ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
         |> ExecutionTiming.append(exec,
-          task: exec.current_task,
+          task: exec.some_task,
           check: __MODULE__,
           filename: source_file.filename
         )

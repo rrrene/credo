@@ -167,5 +167,5 @@ defmodule Credo.CLI.Command do
 
   @callback treat_unknown_args_as_files?() :: boolean()
 
-  @callback cli_switches() :: [Map.t()]
+  @callback cli_switches() :: [map()]
 end

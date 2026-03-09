@@ -53,7 +53,7 @@ defmodule Credo.CLI.Command.Diff.DiffCommand do
     )
   end
 
-  def call(%Execution{help: true} = exec, _opts), do: DiffOutput.print_help(exec)
+  def call(%Execution{config: %{help: true}} = exec, _opts), do: DiffOutput.print_help(exec)
   def call(exec, _opts), do: Execution.run_pipeline(exec, __MODULE__)
 
   def previous_ref(exec) do
