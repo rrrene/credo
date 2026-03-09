@@ -1,14 +1,31 @@
 # Changelog
 
-## 1.7.15-dev
+## 1.7.17
+
+- `Credo.Check.Readability.ModuleDoc` add new param `:ignore_modules_using` (defaults to `[Credo.Check, Ecto.Schema, Phoenix.LiveView, ~r/\.Web$/]`)
+- `Credo.Check.Warning.UnusedOperation` update `:modules` param: instead of a list of functions to check, `:all` can be given to check all functions in a module
+- New Check: `Credo.Check.Refactor.CondInsteadOfIfElse`
+- New Check: `Credo.Check.Warning.WrongTestFilename`
+
+## 1.7.16
+
+- Fix compatibility & compiler warnings with Elixir 1.20.0-rc.1
+- `Credo.Check.Refactor.PassAsyncInTestCases` add new param `:force_comment_on_explicit_false` (defaults to `false`)
+- `Credo.Check.Warning.Dbg` add new param `:allow_captures` (defaults to `false`)
+- New Check: `Credo.Check.Warning.UnusedMapOperation`
+- New Check: `Credo.Check.Warning.UnusedOperation`
+
+## 1.7.15
 
 - Improve performance on large projects
 - Parse token_metadata for source files
 - `Credo.Check.Warning.ExpensiveEmptyEnumCheck` have better issue messages
 - `Credo.Check.Refactor.MatchInCondition` add new param `:allow_operators`
+- `Credo.Check.Refactor.MatchInCondition` fix false positive
 - `Credo.Check.Readability.AliasOrder` fix false positive
 - `Credo.Check.Readability.FunctionNames` fix false positive
 - `Credo.Check.Readability.SinglePipe` add new param `:allow_blocks` (defaults to `true`)
+- `Credo.Check.Refactor.ModuleDependencies` fix false positive
 
 ## 1.7.14
 

@@ -1,11 +1,81 @@
 defmodule Credo.Check.Warning.UnusedOperation do
+  use Credo.Check,
+    id: "EX5029",
+    base_priority: :high,
+    param_defaults: [modules: []],
+    explanations: [
+      check: """
+      The result of a call to some functions has to be used.
+
+      This is a generic check that you can configure to your needs.
+      With checks like `UnusedEnumOperation` you can catch instances where you call
+      e.g. `Enum.reject/1`, but accidentally do not use the result:
+
+          def prepend_my_username(my_username, usernames) do
+            Enum.reject(usernames, &is_nil/1)
+
+            [my_username] ++ usernames
+          end
+
+      With this check you can do the same for your modules and functions.
+      """,
+      params: [
+        modules: """
+        The modules and functions that should trigger this check.
+
+        Format: `{module, functions}` or `{module, functions, issue_message}`
+
+        `functions` can be a list of functions names as atoms or `:all` to include all functions of `module`.
+        """
+      ]
+    ]
+
+  @doc false
+  @impl true
+  def run(%SourceFile{} = source_file, params) do
+    ctx = Context.build(source_file, params, __MODULE__)
+
+    ctx = %{ctx | params: normalize_params(ctx.params)}
+
+    Enum.flat_map(ctx.params.modules, fn {mod, fun_list, issue_message} ->
+      issues = run(source_file, params, mod, fun_list, &format_issue/2)
+
+      case issue_message do
+        "" <> message -> Enum.map(issues, fn %Issue{} = issue -> %{issue | message: message} end)
+        nil -> issues
+      end
+    end)
+  end
+
+  defp normalize_params(params) do
+    modules =
+      Enum.map(params.modules, fn
+        {mod, fun_list} -> {normalize_mod(mod), fun_list, nil}
+        {mod, fun_list, issue_message} -> {normalize_mod(mod), fun_list, issue_message}
+      end)
+
+    Map.put(params, :modules, modules)
+  end
+
+  defp normalize_mod(mod) do
+    mod
+    |> Module.split()
+    |> Enum.map(&String.to_atom/1)
+  end
+
   # The result of a call to the provided module's functions has to be used.
 
   alias Credo.Check.Warning.UnusedFunctionReturnHelper
   alias Credo.IssueMeta
 
   @doc false
-  def run(source_file, params \\ [], checked_module, funs_with_return_value, format_issue_fun) do
+  def run(source_file, params \\ [], checked_module, funs_with_return_value, format_issue_fun)
+
+  def run(source_file, params, checked_module, :all, format_issue_fun) do
+    run(source_file, params, checked_module, nil, format_issue_fun)
+  end
+
+  def run(source_file, params, checked_module, funs_with_return_value, format_issue_fun) do
     issue_meta = IssueMeta.for(source_file, params)
 
     relevant_funs =
@@ -21,7 +91,7 @@ defmodule Credo.Check.Warning.UnusedOperation do
       UnusedFunctionReturnHelper.find_unused_calls(
         source_file,
         params,
-        [checked_module],
+        List.wrap(checked_module),
         relevant_funs
       )
 
@@ -38,10 +108,17 @@ defmodule Credo.Check.Warning.UnusedOperation do
     end)
   end
 
+  defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module)
+       when is_list(checked_module) do
+    issue_for(format_issue_fun, issue_meta, meta, trigger, Module.concat(checked_module))
+  end
+
   defp issue_for(format_issue_fun, issue_meta, meta, trigger, checked_module) do
+    module_name = Credo.Code.Name.full(checked_module)
+
     format_issue_fun.(
       issue_meta,
-      message: "There should be no unused return values for #{checked_module} functions.",
+      message: "There should be no unused return values for `#{module_name}` functions.",
       trigger: trigger,
       line_no: meta[:line],
       column: meta[:column]

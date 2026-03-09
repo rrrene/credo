@@ -351,78 +351,81 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
       '''
       |> Code.string_to_quoted()
 
-    ast_expected =
-      {:test, [line: 1],
-       [
-         "returns {:ok, result} when reply and :DOWN in message queue",
-         [
-           do:
-             {:__block__, [],
+    assert match?(
+             {:test, [line: 1],
               [
-                {:=, [line: 2],
-                 [
-                   {:task, [line: 2], nil},
-                   {:%, [line: 2],
-                    [
-                      {:__aliases__, [line: 2], [:Task]},
-                      {:%{}, [line: 2],
-                       [
-                         ref: {:make_ref, [line: 2], []},
-                         owner: {:self, [line: 2], []},
-                         pid: nil,
-                         mfa: {:{}, [line: 2], [{:__MODULE__, [line: 2], nil}, :test, 1]}
-                       ]}
-                    ]}
-                 ]},
-                {:send, [line: 3],
-                 [
-                   {:self, [line: 3], []},
-                   {{{:., [line: 3], [{:task, [line: 3], nil}, :ref]}, [no_parens: true, line: 3],
-                     []}, :result}
-                 ]},
-                {:send, [line: 4],
-                 [
-                   {:self, [line: 4], []},
-                   {:{}, [line: 4],
-                    [
-                      :DOWN,
-                      {{:., [line: 4], [{:task, [line: 4], nil}, :ref]},
-                       [no_parens: true, line: 4], []},
-                      :process,
-                      {:self, [line: 4], []},
-                      :abnormal
-                    ]}
-                 ]},
-                {:assert, [line: 5],
-                 [
-                   {:==, [line: 5],
-                    [
-                      {{:., [line: 5], [{:__aliases__, [line: 5], [:Task]}, :yield_many]},
-                       [line: 5], [[{:task, [line: 5], nil}], 0]},
-                      [{{:task, [line: 5], nil}, {:ok, :result}}]
-                    ]}
-                 ]},
-                {:refute_received, [line: 6],
-                 [
-                   {:{}, [line: 6],
-                    [
-                      :DOWN,
-                      {:_, [line: 6], nil},
-                      {:_, [line: 6], nil},
-                      {:_, [line: 6], nil},
-                      {:_, [line: 6], nil}
-                    ]}
-                 ]}
-              ]}
-         ]
-       ]}
+                "returns {:ok, result} when reply and :DOWN in message queue",
+                [
+                  do:
+                    {:__block__, _meta,
+                     [
+                       {:=, [line: 2],
+                        [
+                          {:task, [line: 2], nil},
+                          {:%, [line: 2],
+                           [
+                             {:__aliases__, [line: 2], [:Task]},
+                             {:%{}, [line: 2],
+                              [
+                                ref: {:make_ref, [line: 2], []},
+                                owner: {:self, [line: 2], []},
+                                pid: nil,
+                                mfa: {:{}, [line: 2], [{:__MODULE__, [line: 2], nil}, :test, 1]}
+                              ]}
+                           ]}
+                        ]},
+                       {:send, [line: 3],
+                        [
+                          {:self, [line: 3], []},
+                          {{{:., [line: 3], [{:task, [line: 3], nil}, :ref]},
+                            [no_parens: true, line: 3], []}, :result}
+                        ]},
+                       {:send, [line: 4],
+                        [
+                          {:self, [line: 4], []},
+                          {:{}, [line: 4],
+                           [
+                             :DOWN,
+                             {{:., [line: 4], [{:task, [line: 4], nil}, :ref]},
+                              [no_parens: true, line: 4], []},
+                             :process,
+                             {:self, [line: 4], []},
+                             :abnormal
+                           ]}
+                        ]},
+                       {:assert, [line: 5],
+                        [
+                          {:==, [line: 5],
+                           [
+                             {{:., [line: 5], [{:__aliases__, [line: 5], [:Task]}, :yield_many]},
+                              [line: 5], [[{:task, [line: 5], nil}], 0]},
+                             [{{:task, [line: 5], nil}, {:ok, :result}}]
+                           ]}
+                        ]},
+                       {:refute_received, [line: 6],
+                        [
+                          {:{}, [line: 6],
+                           [
+                             :DOWN,
+                             {:_, [line: 6], nil},
+                             {:_, [line: 6], nil},
+                             {:_, [line: 6], nil},
+                             {:_, [line: 6], nil}
+                           ]}
+                        ]}
+                     ]}
+                ]
+              ]},
+             ast
+           )
 
-    assert ast_expected == ast
-
-    expected =
+    expected_pre_1_20 =
       "8A00FB049ABAAC6444CDAD783246B6C715BD994FF9B59F1546BC009EE0F93469"
 
-    assert expected == DuplicatedCode.to_hash(ast)
+    expected =
+      "C5CBF7BA8D2DD13FCEE306314EA871E0C242C781EA99FEF759ED125B9A89B390"
+
+    assert DuplicatedCode.to_hash(ast) in [expected_pre_1_20, expected]
   end
 
   test "returns different hashes for different code snippets" do

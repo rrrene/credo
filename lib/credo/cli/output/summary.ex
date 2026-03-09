@@ -20,14 +20,14 @@ defmodule Credo.CLI.Output.Summary do
 
   def print(
         _source_files,
-        %Execution{format: "flycheck"},
+        %Execution{config: %{format: "flycheck"}},
         _time_load,
         _time_run
       ) do
     nil
   end
 
-  def print(_source_files, %Execution{format: "oneline"}, _time_load, _time_run) do
+  def print(_source_files, %Execution{config: %{format: "oneline"}}, _time_load, _time_run) do
     nil
   end
 
@@ -52,7 +52,7 @@ defmodule Credo.CLI.Output.Summary do
 
   defp print_first_run_hint(exec), do: exec
 
-  defp print_cry_for_help(%Execution{format: "short"}) do
+  defp print_cry_for_help(%Execution{config: %{format: "short"}}) do
     nil
   end
 
@@ -68,11 +68,11 @@ defmodule Credo.CLI.Output.Summary do
     Enum.count(result)
   end
 
-  defp print_priority_hint(%Execution{format: "short"}) do
+  defp print_priority_hint(%Execution{config: %{format: "short"}}) do
     nil
   end
 
-  defp print_priority_hint(%Execution{min_priority: min_priority})
+  defp print_priority_hint(%Execution{config: %{min_priority: min_priority}})
        when min_priority >= 0 do
     UI.puts()
 

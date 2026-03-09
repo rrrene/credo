@@ -3,13 +3,17 @@ defmodule Credo.Check.Warning.Dbg do
     id: "EX5026",
     base_priority: :high,
     elixir_version: ">= 1.14.0-dev",
+    param_defaults: [allow_captures: false],
     explanations: [
       check: """
       Calls to dbg/0 and dbg/2 should mostly be used during debugging sessions.
 
       This check warns about those calls, because they probably have been committed
       in error.
-      """
+      """,
+      params: [
+        allow_captures: "Allow using a capture, e.g. `&dbg/1`."
+      ]
     ]
 
   @doc false
@@ -45,6 +49,17 @@ defmodule Credo.Check.Warning.Dbg do
 
   defp walk({{:., _, [{:__aliases__, meta, [:Kernel]}, :dbg]}, _, _args} = ast, ctx) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Kernel.dbg"))}
+  end
+
+  defp walk(
+         {:&, _, [{:/, _, [{:dbg, _meta, _}, _arity]}]} = ast,
+         %{params: %{allow_captures: true}} = ctx
+       ) do
+    {ast, ctx}
+  end
+
+  defp walk({:&, _, [{:/, _, [{:dbg, meta, _}, _arity]}]} = ast, ctx) do
+    {ast, put_issue(ctx, issue_for(ctx, meta, "dbg"))}
   end
 
   defp walk({:|>, _, [_, {:dbg, meta, nil}]} = ast, ctx) do

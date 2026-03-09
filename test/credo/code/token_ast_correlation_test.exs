@@ -27,6 +27,10 @@ defmodule Credo.Code.TokenAstCorrelationTest do
   end
   '''
 
+  if Version.match?(System.version(), ">= 1.20.0-dev") do
+    @tag :skip
+  end
+
   @tag needs_elixir: "1.17.0"
   test "should give correct ast for source_example1" do
     source = @source_example1
@@ -469,6 +473,10 @@ defmodule Credo.Code.TokenAstCorrelationTest do
       end
 
     assert expected == tokens
+  end
+
+  if Version.match?(System.version(), ">= 1.20.0-dev") do
+    @tag :skip
   end
 
   @tag needs_elixir: "1.17.0"

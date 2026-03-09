@@ -6,8 +6,44 @@ defmodule Credo.Code.ModuleTest do
   doctest Credo.Code.Module
 
   #
+  # exception
+  #
+
+  test "should return boolean indicating whether the only argument is a module AST with an defexception/1 DSL call" do
+    ast =
+      quote do
+        defmodule MyAppError do
+          defexception [:message]
+        end
+      end
+
+    assert Module.exception?(ast)
+    refute Module.exception?(nil)
+  end
+
+  #
   # attribute
   #
+
+  test "1.20.x block AST compatibility" do
+    doc = "1.20.x compatible"
+
+    ast =
+      {:defmodule, [context: Elixir, imports: [{2, Kernel}]],
+       [
+         {:__aliases__, [alias: false], [:Example]},
+         [
+           do:
+             {:__block__, [line: 1, column: 1],
+              [
+                {:@, [context: Elixir, imports: [{1, Kernel}]],
+                 [{:moduledoc, [context: Elixir], [doc]}]}
+              ]}
+         ]
+       ]}
+
+    assert doc == Module.attribute(ast, :moduledoc)
+  end
 
   test "should return the given module attribute" do
     {:ok, ast} =

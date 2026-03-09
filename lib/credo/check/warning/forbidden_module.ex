@@ -2,7 +2,6 @@ defmodule Credo.Check.Warning.ForbiddenModule do
   use Credo.Check,
     id: "EX5004",
     base_priority: :high,
-    category: :warning,
     param_defaults: [modules: []],
     explanations: [
       check: """

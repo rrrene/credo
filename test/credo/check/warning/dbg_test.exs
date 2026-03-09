@@ -54,6 +54,35 @@ defmodule Credo.Check.Warning.DbgTest do
     |> refute_issues
   end
 
+  test "it should NOT report captured &dbg/1 when using :allow_captures" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        params
+        |> tap(&dbg/1)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_captures: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report captured &dbg/1 when using :allow_captures /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        dbg = &dbg/1
+
+        dbg.(params)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_captures: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -63,6 +92,19 @@ defmodule Credo.Check.Warning.DbgTest do
     defmodule CredoSampleModule do
       def some_function(parameter1, parameter2) do
         dbg parameter1 + parameter2
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a violation for dbg/2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(parameter1, parameter2) do
+        dbg parameter1 + parameter2, limit: :infinity
       end
     end
     '''
@@ -214,5 +256,33 @@ defmodule Credo.Check.Warning.DbgTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(%{line_no: 3, trigger: "dbg"})
+  end
+
+  test "it should report a violation /11" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def headers_to_strings(headers) do
+        :x |> dbg(limit: infinity)
+        Enum.map(headers, fn {key, value} -> "#{key}: #{value}" end)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: "dbg"})
+  end
+
+  test "it should report a violation /12" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(params) do
+        params
+        |> tap(&dbg/1)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 4, trigger: "dbg"})
   end
 end

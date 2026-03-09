@@ -77,7 +77,7 @@ defmodule Credo.Code.Module do
   def attribute({:defmodule, _, _arguments} = ast, attr_name) do
     arguments =
       case Credo.Code.Block.do_block_for!(ast) do
-        {:__block__, [], arguments} -> arguments
+        {:__block__, _meta, arguments} -> arguments
         value -> List.wrap(value)
       end
 
@@ -307,7 +307,6 @@ defmodule Credo.Code.Module do
 
   def name(_), do: "<Unknown Module Name>"
 
-  # TODO: write unit test
   def exception?({:defmodule, _, [{:__aliases__, _, _name_list}, arguments]}) do
     arguments
     |> Block.calls_in_do_block()
