@@ -1,7 +1,7 @@
 defmodule Credo.Mixfile do
   use Mix.Project
 
-  @version "1.7.17"
+  @version "1.8.0-dev"
 
   def project do
     [
@@ -173,6 +173,7 @@ defmodule Credo.Mixfile do
 
   defp deps do
     [
+      {:credo_tokenizer, "~> 0.2"},
       {:file_system, "~> 0.2 or ~> 1.0"},
       {:bunt, "~> 0.2.1 or ~> 1.0"},
       {:jason, "~> 1.0"},

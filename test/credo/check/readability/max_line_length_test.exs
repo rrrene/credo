@@ -176,6 +176,26 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation for interpolations in heredocs" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def render(assigns) do
+        """
+        My render template
+
+        #{
+        opts =
+          TOMLConfigProvider.init(
+            "test/support/mysupercharts/fixture/config/#{platform()}/invalid_config.toml")}
+        """
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_length: 80)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation with exec" do
     ~S'''
     defmodule CredoSampleModule do
@@ -210,6 +230,17 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_length: 80)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation if long strings are follow by more code `do`" do
+    ~S'''
+    test "it should NOT report a violation when call is buried in else block and is not the last call, but the result is assigned to a variable" do
+      # ...
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
     |> refute_issues()
   end
 
@@ -256,6 +287,6 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     '''
     |> to_source_file
     |> run_check(@described_check, max_length: 80, ignore_urls: false)
-    |> assert_issue()
+    |> assert_issue(%{trigger: "efb4bcddc3/lib/credo.ex#L4"})
   end
 end
