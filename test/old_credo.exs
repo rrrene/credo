@@ -13,7 +13,7 @@ credo_opts =
     [github: "rrrene/credo", ref: old_credo_ref]
   end
 
-Mix.install([{:credo, credo_opts}, {:credo_tokenizer, ">= 0.0.0"}])
+Mix.install([{:credo, credo_opts}, {:credo_tokenizer, ">= 0.2.5"}])
 
 IO.puts(:stderr, "\n[version] credo #{Credo.version()} (installed from #{old_credo_ref})\n")
 

@@ -233,6 +233,17 @@ defmodule Credo.Check.Readability.MaxLineLengthTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation if long strings are follow by more code `do`" do
+    ~S'''
+    test "it should NOT report a violation when call is buried in else block and is not the last call, but the result is assigned to a variable" do
+      # ...
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

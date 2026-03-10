@@ -83,7 +83,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
     tokens_by_line =
       if ignore_strings do
         Enum.reject(tokens_by_line, fn
-          [_eol | [{{:string, _}, {_, column, _, _}, _, _} | _tokens]] -> column < max_length
+          [_eol, {{:string, _}, {_, column, _, _}, _, _} | _tokens] -> column < max_length
+          [_eol, _, {{:string, _}, {_, column, _, _}, _, _} | _tokens] -> column < max_length
           _ -> false
         end)
       else
