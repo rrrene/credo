@@ -6,11 +6,14 @@
 
 old_credo_ref = List.first(argv) || "v1.7.17"
 
-if old_credo_ref == "." do
-  Mix.install([{:credo, path: "."}])
-else
-  Mix.install([{:credo, github: "rrrene/credo", ref: old_credo_ref}])
-end
+credo_opts =
+  if old_credo_ref == "." do
+    [path: "."]
+  else
+    [github: "rrrene/credo", ref: old_credo_ref]
+  end
+
+Mix.install([{:credo, credo_opts}, {:credo_tokenizer, ">= 0.0.0"}])
 
 IO.puts(:stderr, "\n[version] credo #{Credo.version()} (installed from #{old_credo_ref})\n")
 
