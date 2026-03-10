@@ -429,6 +429,21 @@ defmodule Credo.Check.Readability.TrailingWhiteSpaceTest do
     |> refute_issues()
   end
 
+  test "it should NOT report false positive after opening parens of a map" do
+    """
+    defmodule CredoSampleModule do
+      def something do
+        %{
+          foo: "bar"
+        }
+      end
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
