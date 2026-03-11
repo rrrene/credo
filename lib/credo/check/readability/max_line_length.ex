@@ -150,9 +150,8 @@ defmodule Credo.Check.Readability.MaxLineLength do
   defp contains_url?([]), do: false
 
   defp contains_url?({_, _, [_ | _] = contents, _}), do: Enum.any?(contents, &contains_url?/1)
-  defp contains_url?({_, _, _, _}), do: false
 
-  defp contains_url?(value) when is_atom(value), do: false
+  defp contains_url?(_), do: false
 
   defp issue_for(issue_meta, line_no, line_length, max_length) do
     column = max_length + 1
