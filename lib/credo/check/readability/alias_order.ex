@@ -73,8 +73,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     line = meta[:line]
 
     candidate =
-      {{compare_name(fullname, sort_method), line, line},
-       module: fullname, trigger: fullname, column: meta[:column]}
+      {{compare_name(fullname, sort_method), line, line}, module: fullname, trigger: fullname, column: meta[:column]}
 
     {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end

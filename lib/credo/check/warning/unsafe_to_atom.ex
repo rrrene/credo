@@ -110,8 +110,7 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     args
     |> Enum.any?(fn arg -> Keyword.keyword?(arg) and Keyword.get(arg, :keys) == :atoms end)
     |> if do
-      {"Jason.#{decode}(..., keys: :atoms)", "Jason.#{decode}(..., keys: :atoms!)",
-       "Jason.#{decode}"}
+      {"Jason.#{decode}(..., keys: :atoms)", "Jason.#{decode}(..., keys: :atoms!)", "Jason.#{decode}"}
     else
       nil
     end

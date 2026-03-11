@@ -7,9 +7,7 @@ defmodule Credo.SarifTest do
 
   test "it should report issues using suggest command (using --format sarif)" do
     exec =
-      IntegrationTest.run(
-        ~w[suggest --config-file test/fixtures/integration_test_config/.sarif.exs --format sarif]
-      )
+      IntegrationTest.run(~w[suggest --config-file test/fixtures/integration_test_config/.sarif.exs --format sarif])
 
     issues = Credo.Execution.get_issues(exec)
 

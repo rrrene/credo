@@ -1,7 +1,7 @@
 defmodule Credo.Check.Refactor.EnumHelpers do
   def traverse(
-        {{:., _, [{:__aliases__, meta, [:Enum]}, second]}, _,
-         [{{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}, _]} = ast,
+        {{:., _, [{:__aliases__, meta, [:Enum]}, second]}, _, [{{:., _, [{:__aliases__, _, [:Enum]}, first]}, _, _}, _]} =
+          ast,
         issues,
         issue_meta,
         message,

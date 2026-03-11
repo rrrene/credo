@@ -83,8 +83,7 @@ defmodule Credo.Check.Refactor.WithClauses do
   defp issue_if_not_starting_with_pattern_clause(_clauses, line, ctx) do
     [
       format_issue(ctx,
-        message:
-          "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`.",
+        message: "`with` doesn't start with a <- clause, move the non-pattern <- clauses outside of the `with`.",
         trigger: "with",
         line_no: line
       )

@@ -51,10 +51,8 @@ defmodule Credo.Check.Design.AliasUsage do
         excluded_namespaces: "List of namespaces to be excluded for this check.",
         excluded_lastnames: "List of lastnames to be excluded for this check.",
         if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
-        if_called_more_often_than:
-          "Only raise an issue if a module is called more often than this.",
-        if_referenced:
-          "Raise an issue if a module is referenced by name, e.g. as an argument in a function call.",
+        if_called_more_often_than: "Only raise an issue if a module is called more often than this.",
+        if_referenced: "Raise an issue if a module is referenced by name, e.g. as an argument in a function call.",
         only: """
         Regex or a list of regexes that specifies which modules to include for this check.
 

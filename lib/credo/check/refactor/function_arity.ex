@@ -50,8 +50,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
   defp issue_for(issue_meta, meta, trigger, max_value, actual_value) do
     format_issue(
       issue_meta,
-      message:
-        "Function takes too many parameters (arity is #{actual_value}, max is #{max_value}).",
+      message: "Function takes too many parameters (arity is #{actual_value}, max is #{max_value}).",
       trigger: trigger,
       line_no: meta[:line],
       severity: Severity.compute(actual_value, max_value)

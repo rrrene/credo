@@ -67,9 +67,8 @@ defmodule Credo.CodeTest do
 
   test "contains_child?/2 should return true /2" do
     parent =
-      {{:., [line: 3, column: 22],
-        [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
-       [{:value, [line: 3, column: 34], nil}]}
+      {{:., [line: 3, column: 22], [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]},
+       [line: 3, column: 23], [{:value, [line: 3, column: 34], nil}]}
 
     child = [{:value, [line: 3, column: 34], nil}]
 
@@ -78,9 +77,8 @@ defmodule Credo.CodeTest do
 
   test "find_child/2 should return true when using a match expression" do
     parent =
-      {{:., [line: 3, column: 22],
-        [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]}, [line: 3, column: 23],
-       [{:value, [line: 3, column: 34], nil}]}
+      {{:., [line: 3, column: 22], [{:__aliases__, [line: 3, column: 16], [:String]}, :to_integer]},
+       [line: 3, column: 23], [{:value, [line: 3, column: 34], nil}]}
 
     child = [{:value, [line: 3, column: 34], nil}]
 

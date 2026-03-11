@@ -30,8 +30,8 @@ defmodule Credo.Check.Refactor.MapJoin do
   end
 
   defp walk(
-         {{:., _, [{:__aliases__, meta, [:Enum]}, :join]}, _,
-          [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} = ast,
+         {{:., _, [{:__aliases__, meta, [:Enum]}, :join]}, _, [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} =
+           ast,
          ctx
        ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.join"))}

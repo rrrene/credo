@@ -36,8 +36,7 @@ defmodule Credo.Code.ModuleTest do
            do:
              {:__block__, [line: 1, column: 1],
               [
-                {:@, [context: Elixir, imports: [{1, Kernel}]],
-                 [{:moduledoc, [context: Elixir], [doc]}]}
+                {:@, [context: Elixir, imports: [{1, Kernel}]], [{:moduledoc, [context: Elixir], [doc]}]}
               ]}
          ]
        ]}

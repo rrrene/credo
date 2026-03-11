@@ -59,8 +59,7 @@ defmodule Credo.Check.Warning.UnsafeExec do
   end
 
   defp get_forbidden_call([:erlang, :open_port], [{:spawn, _}, _]) do
-    {":erlang.open_port/2 with `:spawn`", ":erlang.open_port/2 with `:spawn_executable`",
-     ":erlang.open_port"}
+    {":erlang.open_port/2 with `:spawn`", ":erlang.open_port/2 with `:spawn_executable`", ":erlang.open_port"}
   end
 
   defp get_forbidden_call(_, _) do

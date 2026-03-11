@@ -75,8 +75,7 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
   defp issue_for(issue_meta, meta, trigger) do
     format_issue(
       issue_meta,
-      message:
-        "There are identical sub-expressions to the left and to the right of the '#{trigger}' operator.",
+      message: "There are identical sub-expressions to the left and to the right of the '#{trigger}' operator.",
       trigger: trigger,
       line_no: meta[:line],
       column: meta[:column]

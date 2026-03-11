@@ -377,8 +377,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
                        {:send, [line: 3],
                         [
                           {:self, [line: 3], []},
-                          {{{:., [line: 3], [{:task, [line: 3], nil}, :ref]},
-                            [no_parens: true, line: 3], []}, :result}
+                          {{{:., [line: 3], [{:task, [line: 3], nil}, :ref]}, [no_parens: true, line: 3], []}, :result}
                         ]},
                        {:send, [line: 4],
                         [
@@ -386,8 +385,7 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
                           {:{}, [line: 4],
                            [
                              :DOWN,
-                             {{:., [line: 4], [{:task, [line: 4], nil}, :ref]},
-                              [no_parens: true, line: 4], []},
+                             {{:., [line: 4], [{:task, [line: 4], nil}, :ref]}, [no_parens: true, line: 4], []},
                              :process,
                              {:self, [line: 4], []},
                              :abnormal
@@ -397,8 +395,8 @@ defmodule Credo.Check.Design.DuplicatedCodeTest do
                         [
                           {:==, [line: 5],
                            [
-                             {{:., [line: 5], [{:__aliases__, [line: 5], [:Task]}, :yield_many]},
-                              [line: 5], [[{:task, [line: 5], nil}], 0]},
+                             {{:., [line: 5], [{:__aliases__, [line: 5], [:Task]}, :yield_many]}, [line: 5],
+                              [[{:task, [line: 5], nil}], 0]},
                              [{{:task, [line: 5], nil}, {:ok, :result}}]
                            ]}
                         ]},

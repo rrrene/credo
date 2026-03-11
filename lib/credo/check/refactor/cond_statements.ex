@@ -76,8 +76,7 @@ defmodule Credo.Check.Refactor.CondStatements do
   defp issue_for(issue_meta, meta) do
     format_issue(
       issue_meta,
-      message:
-        "Cond statements should contain at least two conditions besides `true`, consider using `if` instead.",
+      message: "Cond statements should contain at least two conditions besides `true`, consider using `if` instead.",
       trigger: "cond",
       line_no: meta[:line]
     )

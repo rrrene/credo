@@ -36,8 +36,8 @@ defmodule Credo.Check.Refactor.MapInto do
   end
 
   defp walk(
-         {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _,
-          [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} = ast,
+         {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} =
+           ast,
          ctx
        ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.into"))}

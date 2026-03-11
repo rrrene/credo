@@ -31,8 +31,7 @@ defmodule Credo.Check.Readability.MultiAlias do
   end
 
   defp walk(
-         {:alias, _,
-          [{{_, _, [{alias_op, meta, _base_alias}, :{}]}, _, [{:__aliases__, _, mod_list} | _]}]} =
+         {:alias, _, [{{_, _, [{alias_op, meta, _base_alias}, :{}]}, _, [{:__aliases__, _, mod_list} | _]}]} =
            ast,
          ctx
        )
@@ -47,8 +46,7 @@ defmodule Credo.Check.Readability.MultiAlias do
   defp issue_for(ctx, line_no, trigger) do
     format_issue(
       ctx,
-      message:
-        "Avoid grouping aliases in '{ ... }'; please specify one fully-qualified alias per line.",
+      message: "Avoid grouping aliases in '{ ... }'; please specify one fully-qualified alias per line.",
       trigger: trigger,
       line_no: line_no
     )

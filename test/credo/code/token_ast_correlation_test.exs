@@ -46,8 +46,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
         {:column, 1}
       ],
       [
-        {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}],
-         [:Credo, :Sample]},
+        {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}], [:Credo, :Sample]},
         [
           do: {
             :__block__,
@@ -118,8 +117,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                   {:column, 3}
                 ],
                 [
-                  {:__aliases__, [{:last, [line: 8, column: 13]}, {:line, 8}, {:column, 13}],
-                   [:InlineModule]},
+                  {:__aliases__, [{:last, [line: 8, column: 13]}, {:line, 8}, {:column, 13}], [:InlineModule]},
                   [
                     do: {
                       :def,
@@ -156,9 +154,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                               {:column, 13}
                             ],
                             [
-                              {:{},
-                               [{:closing, [line: 10, column: 11]}, {:line, 10}, {:column, 7}],
-                               [:ok]},
+                              {:{}, [{:closing, [line: 10, column: 11]}, {:line, 10}, {:column, 7}], [:ok]},
                               {
                                 {
                                   :.,
@@ -495,8 +491,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
           {:column, 1}
         ],
         [
-          {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}],
-           [:Credo, :Sample]},
+          {:__aliases__, [{:last, [line: 1, column: 17]}, {:line, 1}, {:column, 11}], [:Credo, :Sample]},
           [
             do: {
               :defmodule,
@@ -508,8 +503,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                 {:column, 3}
               ],
               [
-                {:__aliases__, [{:last, [line: 2, column: 13]}, {:line, 2}, {:column, 13}],
-                 [:InlineModule]},
+                {:__aliases__, [{:last, [line: 2, column: 13]}, {:line, 2}, {:column, 13}], [:InlineModule]},
                 [
                   do: {
                     :def,
@@ -580,8 +574,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                                                 {:column, 27}
                                               ],
                                               [
-                                                {:-, [line: 4, column: 30],
-                                                 [{:c, [line: 4, column: 29], nil}, 1]}
+                                                {:-, [line: 4, column: 30], [{:c, [line: 4, column: 29], nil}, 1]}
                                               ]
                                             },
                                             {
@@ -592,8 +585,7 @@ defmodule Credo.Code.TokenAstCorrelationTest do
                                                 {:column, 36}
                                               ],
                                               [
-                                                {:-, [line: 4, column: 39],
-                                                 [{:d, [line: 4, column: 38], nil}, 2]}
+                                                {:-, [line: 4, column: 39], [{:d, [line: 4, column: 38], nil}, 2]}
                                               ]
                                             }
                                           ]

@@ -84,15 +84,13 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttributeTest do
         trigger: "Application.get_all_env"
       },
       %{
-        message:
-          "Module attribute @config_7 makes use of unsafe Application configuration call Application.get_env/2",
+        message: "Module attribute @config_7 makes use of unsafe Application configuration call Application.get_env/2",
         line_no: 8,
         column: 13,
         trigger: "Application.get_env"
       },
       %{
-        message:
-          "Module attribute @config_9 makes use of unsafe Application configuration call Application.get_env/3",
+        message: "Module attribute @config_9 makes use of unsafe Application configuration call Application.get_env/3",
         line_no: 10,
         column: 13,
         trigger: "Application.get_env"

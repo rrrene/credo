@@ -26,8 +26,7 @@ defmodule Credo.Check.Readability.ModuleNames do
       it easier to follow.
       """,
       params: [
-        ignore:
-          "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
+        ignore: "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
       ]
     ]
 

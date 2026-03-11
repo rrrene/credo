@@ -34,9 +34,7 @@ defmodule Credo.Check.HousekeepingParamsTest do
     errors =
       Path.join(__DIR__, "*/**/*_test.exs")
       |> Path.wildcard()
-      |> Enum.reject(
-        &String.match?(&1, ~r/(collector|helper|duplicated_code|perceived_complexity)/)
-      )
+      |> Enum.reject(&String.match?(&1, ~r/(collector|helper|duplicated_code|perceived_complexity)/))
       |> Enum.map(&{&1, File.read!(&1)})
       |> Enum.map(fn {filename, test_source} ->
         check_filename =

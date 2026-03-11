@@ -66,8 +66,7 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
   defp issue_for(ctx, meta) do
     format_issue(
       ctx,
-      message:
-        "`Map.get` with no default return value is potentially unsafe in pipes, use `Map.get/3` instead.",
+      message: "`Map.get` with no default return value is potentially unsafe in pipes, use `Map.get/3` instead.",
       trigger: "Map.get",
       line_no: meta[:line],
       column: meta[:column]

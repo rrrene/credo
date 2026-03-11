@@ -99,8 +99,8 @@ defmodule Credo.CheckTest do
   defmodule IssueInvalidMessageTestCheck do
     use Credo.Check
 
-    @message <<70, 111, 117, 110, 100, 32, 109, 105, 115, 115, 112, 101, 108, 108, 101, 100, 32,
-               119, 111, 114, 100, 32, 96, 103, 97, 114, 114, 121, 226, 96, 46>>
+    @message <<70, 111, 117, 110, 100, 32, 109, 105, 115, 115, 112, 101, 108, 108, 101, 100, 32, 119, 111, 114, 100, 32,
+               96, 103, 97, 114, 114, 121, 226, 96, 46>>
 
     def run(%SourceFile{} = source_file, params \\ []) do
       IssueMeta.for(source_file, params) |> format_issue(message: @message) |> List.wrap()

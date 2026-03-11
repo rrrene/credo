@@ -23,8 +23,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
       """,
       params: [
         only_greater_than: "The check only reports numbers greater than this.",
-        trailing_digits:
-          "The check allows for the given number of trailing digits (can be a number, range or list)"
+        trailing_digits: "The check allows for the given number of trailing digits (can be a number, range or list)"
       ]
     ]
 

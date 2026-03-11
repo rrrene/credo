@@ -46,8 +46,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
       it easier to follow.
       """,
       params: [
-        ignore_names:
-          "List of modules to ignore based on their name. Accepts atoms, strings and regexes.",
+        ignore_names: "List of modules to ignore based on their name. Accepts atoms, strings and regexes.",
         ignore_modules_using:
           "List of modules to ignore based on their `use` declarations. Accepts atoms, strings and regexes."
       ]

@@ -54,8 +54,7 @@ defmodule Credo.Check.Readability.FunctionNames do
     end
 
     defp walk(
-           {op, _op_meta,
-            [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
+           {op, _op_meta, [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
            ctx
          )
          when op in [:def, :defp, :defmacro, :defmacrop] do

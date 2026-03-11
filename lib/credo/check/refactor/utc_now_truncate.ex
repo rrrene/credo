@@ -160,8 +160,7 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
   defp issue_for(ctx, meta, mod_name) do
     format_issue(
       ctx,
-      message:
-        "Pass time unit to `#{mod_name}.utc_now` instead of composing with `#{mod_name}.truncate/2`.",
+      message: "Pass time unit to `#{mod_name}.utc_now` instead of composing with `#{mod_name}.truncate/2`.",
       trigger: "#{mod_name}.truncate",
       line_no: meta[:line]
     )

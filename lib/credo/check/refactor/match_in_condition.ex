@@ -47,8 +47,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
       params: [
         allow_tagged_tuples:
           "Allow tagged tuples in conditions, e.g. `if {:ok, contents} = File.read( \"foo.txt\") do`",
-        allow_operators:
-          "Allow operators in conditions, e.g. `if contents = File.read(input <> \".txt\") do`"
+        allow_operators: "Allow operators in conditions, e.g. `if contents = File.read(input <> \".txt\") do`"
       ]
     ]
 
