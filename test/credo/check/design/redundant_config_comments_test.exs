@@ -1,28 +1,22 @@
 defmodule Credo.Check.Design.RedundantConfigCommentsTest do
   use Credo.Test.Case
 
+  alias Credo.CLI.Task.PrepareChecksToRun
   alias Credo.Execution
-  alias Credo.Issue
 
   @described_check Credo.Check.Design.RedundantConfigComments
 
   @filename "lib/credo_sample_module.ex"
 
+  defp run_check_with_exec(%Credo.SourceFile{} = source_file, described_check, params, exec) do
+    source_files = List.wrap(source_file)
+    exec = PrepareChecksToRun.set_config_comments(exec, source_files)
+
+    run_check(source_files, described_check, params, exec)
+  end
+
   setup do
-    issues =
-      %Issue{
-        filename: @filename,
-        check: Credo.Check.Readability.ModuleAttributeNames,
-        message: "some message",
-        line_no: 3,
-        column: 3,
-        trigger: "@"
-      }
-      |> List.wrap()
-
-    exec = Execution.put_issues(Execution.build(), issues)
-
-    [exec: exec]
+    [exec: Execution.build()]
   end
 
   #
@@ -30,8 +24,6 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
   #
 
   test "it should NOT report expected code" do
-    exec = Execution.build()
-
     ~S'''
     defmodule CredoSampleModule do
       # credo:disable-for-this-file Credo.Check.Readability.ModuleAttributeNames
@@ -39,7 +31,7 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
     end
     '''
     |> to_source_file(@filename)
-    |> run_check(@described_check, [], exec)
+    |> run_check(@described_check, [])
     |> refute_issues()
   end
 
@@ -55,8 +47,8 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
     end
     '''
     |> to_source_file(@filename)
-    |> run_check(@described_check, [], exec)
-    |> assert_issue()
+    |> run_check_with_exec(@described_check, [], exec)
+    |> assert_issue(%{trigger: "# credo:", line_no: 2})
   end
 
   test "it should report a violation when using # credo:disable-for-next-line", %{exec: exec} do
@@ -67,7 +59,7 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
     end
     '''
     |> to_source_file(@filename)
-    |> run_check(@described_check, [], exec)
+    |> run_check_with_exec(@described_check, [], exec)
     |> assert_issue()
   end
 
@@ -80,7 +72,7 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
     end
     '''
     |> to_source_file(@filename)
-    |> run_check(@described_check, [], exec)
+    |> run_check_with_exec(@described_check, [], exec)
     |> assert_issue()
   end
 
@@ -93,7 +85,7 @@ defmodule Credo.Check.Design.RedundantConfigCommentsTest do
     end
     '''
     |> to_source_file(@filename)
-    |> run_check(@described_check, [], exec)
+    |> run_check_with_exec(@described_check, [], exec)
     |> assert_issue()
   end
 end

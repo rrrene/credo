@@ -15,7 +15,8 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
     |> exclude_checks_based_on_elixir_version
   end
 
-  defp set_config_comments(exec, source_files) do
+  @doc false
+  def set_config_comments(exec, source_files) do
     config_comment_map =
       source_files
       |> Credo.Check.ConfigCommentFinder.run()
