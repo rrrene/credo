@@ -200,9 +200,16 @@ defmodule Credo.Sources do
           |> Path.wildcard()
 
         true ->
-          path
-          |> Path.wildcard()
-          |> Enum.flat_map(&recurse_path/1)
+          expanded = Path.wildcard(path)
+
+          if expanded == [path] do
+            # If the path not a regular file, nor a directory, nor does its
+            # wildcard expansion match any additional files, it is probably
+            # a broken symlink.
+            expanded
+          else
+            Enum.flat_map(expanded, &recurse_path/1)
+          end
       end
 
     Enum.map(paths, &Path.expand/1)
