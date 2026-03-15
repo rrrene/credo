@@ -13,11 +13,7 @@ defmodule Credo.Check.Runner do
   Runs all checks on all source files (according to the config).
   """
   def run(source_files, exec) when is_list(source_files) do
-    all_check_tuples =
-      exec
-      |> Execution.checks()
-      |> warn_about_ineffective_patterns(exec)
-      |> fix_deprecated_notation_for_checks_without_params()
+    {all_check_tuples, _, _} = Execution.checks(exec)
 
     check_tuples_grouped_by_group =
       all_check_tuples
@@ -133,29 +129,5 @@ defmodule Credo.Check.Runner do
 
   defp warn_about_failed_run(check, _) do
     UI.warn("Error while running #{check}")
-  end
-
-  defp fix_deprecated_notation_for_checks_without_params(checks) do
-    Enum.map(checks, fn
-      {check} -> {check, []}
-      {check, params} -> {check, params}
-    end)
-  end
-
-  defp warn_about_ineffective_patterns(
-         {checks, _included_checks, []},
-         %Execution{config: %{ignore_checks: [_ | _] = ignore_checks}}
-       ) do
-    UI.warn([
-      :red,
-      "A pattern was given to ignore checks, but it did not match any: ",
-      inspect(ignore_checks)
-    ])
-
-    checks
-  end
-
-  defp warn_about_ineffective_patterns({checks, _, _}, _) do
-    checks
   end
 end

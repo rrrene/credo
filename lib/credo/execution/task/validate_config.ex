@@ -11,7 +11,8 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
     |> validate_checks()
     |> validate_only_checks()
-    |> validate_ignore_checks()
+    |> validate_empty_ignore_checks_patterns()
+    |> validate_ineffective_ignore_checks_patterns()
     |> validate_checks_scheduling_groups()
     |> remove_missing_checks()
     |> inspect_config_if_debug()
@@ -33,7 +34,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
   end
 
-  defp validate_ignore_checks(%Execution{config: %{ignore_checks: ignore_checks}} = exec)
+  defp validate_empty_ignore_checks_patterns(%Execution{config: %{ignore_checks: ignore_checks}} = exec)
        when is_list(ignore_checks) do
     if Enum.any?(ignore_checks, &(&1 == "")) do
       UI.warn([
@@ -45,7 +46,27 @@ defmodule Credo.Execution.Task.ValidateConfig do
     exec
   end
 
-  defp validate_ignore_checks(exec) do
+  defp validate_empty_ignore_checks_patterns(exec) do
+    exec
+  end
+
+  defp validate_ineffective_ignore_checks_patterns(%Execution{config: %{ignore_checks: [_ | _] = ignore_checks}} = exec) do
+    case Execution.checks(exec) do
+      {_, _, []} ->
+        UI.warn([
+          :red,
+          "** (config) A pattern was given to ignore checks, but it did not match any: ",
+          inspect(ignore_checks)
+        ])
+
+        exec
+
+      _ ->
+        exec
+    end
+  end
+
+  defp validate_ineffective_ignore_checks_patterns(exec) do
     exec
   end
 
