@@ -252,7 +252,7 @@ defmodule Credo.ConfigBuilder do
 
   # exclude/ignore certain checks
   defp add_switch_ignore(exec, %{ignore: ignore}) do
-    put_config(exec, :ignore_checks, ignore)
+    add_switch_ignore(exec, %{ignore_checks: ignore})
   end
 
   # this catches a `--ignore-checks/ignore` without an argument after it
