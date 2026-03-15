@@ -12,6 +12,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
     |> validate_checks()
     |> validate_only_checks()
     |> validate_ignore_checks()
+    |> validate_checks_scheduling_groups()
     |> remove_missing_checks()
     |> inspect_config_if_debug()
   end
@@ -140,5 +141,19 @@ defmodule Credo.Execution.Task.ValidateConfig do
     disabled_checks = Enum.filter(disabled_checks, &Check.defined?/1)
 
     Execution.put_config(exec, :checks, %{enabled: enabled_checks, disabled: disabled_checks})
+  end
+
+  defp validate_checks_scheduling_groups(exec) do
+    {result, _only_matching, _ignore_matching} = Execution.checks(exec)
+    default_group_number = Credo.Check.default_scheduled_in_group()
+
+    if Enum.all?(result, fn {check, _params} -> check.scheduled_in_group() > default_group_number end) do
+      UI.warn([
+        :red,
+        "** (config) All checks scheduled to run seem to be depending on the results of earlier checks, but there are none."
+      ])
+    end
+
+    exec
   end
 end

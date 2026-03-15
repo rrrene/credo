@@ -891,4 +891,9 @@ defmodule Credo.Check do
       {:error, _} -> false
     end
   end
+
+  @doc false
+  def default_scheduled_in_group do
+    1
+  end
 end
