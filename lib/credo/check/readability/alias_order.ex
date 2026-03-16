@@ -79,15 +79,25 @@ defmodule Credo.Check.Readability.AliasOrder do
   end
 
   defp walk(
-         {:alias, _, [{{:., _, [{:__aliases__, _, base_mod_list}, :{}]}, meta, multi_mod_list}]},
+         {:alias, _, [{{:., _, [{:__aliases__, base_meta, base_mod_list}, :{}]}, meta, multi_mod_list}]},
          %{params: %{sort_method: sort_method}} = ctx
        ) do
     candidates = multi_candidates(base_mod_list, multi_mod_list, sort_method)
     line = meta[:line]
     {{compare, _, _}, _} = List.first(candidates)
 
+    base_name = Credo.Code.Name.full(base_mod_list)
+
+    sub_names =
+      Enum.map(multi_mod_list, fn {:__aliases__, _, mod_list} ->
+        Credo.Code.Name.full(mod_list)
+      end)
+
+    multi_alias_name = "#{base_name}.{#{Enum.join(sub_names, ", ")}}"
+
     candidate =
-      {{compare, line, meta[:closing][:line]}, [multi_aliases: candidates]}
+      {{compare, line, meta[:closing][:line]},
+       multi_aliases: candidates, module: multi_alias_name, trigger: multi_alias_name, column: base_meta[:column]}
 
     {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end
