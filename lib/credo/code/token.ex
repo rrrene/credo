@@ -371,12 +371,13 @@ defmodule Credo.Code.Token do
     |> reduce(callback, acc)
   end
 
-  def reduce([_ | _] = list, callback, acc) do
-    [nil | list]
-    |> do_reduce(callback, acc)
+  def reduce([], _callback, acc) do
+    acc
   end
 
-  defp do_reduce([], _callback, acc), do: acc
+  def reduce([_ | _] = list, callback, acc) do
+    do_reduce([_first_prev = nil | list], callback, acc)
+  end
 
   defp do_reduce([prev, current, next | rest], callback, acc) do
     acc = callback.(prev, current, next, acc)
@@ -385,10 +386,9 @@ defmodule Credo.Code.Token do
   end
 
   defp do_reduce([prev, current], callback, acc) do
-    acc = callback.(prev, current, nil, acc)
-
-    do_reduce([], callback, acc)
+    # stop iterating
+    callback.(prev, current, _last_next = nil, acc)
   end
 
-  # defp do_reduce(tokens, _callback, acc) when is_list(tokens), do: acc
+  defp do_reduce(tokens, _callback, acc) when is_list(tokens), do: acc
 end
