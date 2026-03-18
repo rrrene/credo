@@ -71,11 +71,11 @@ defmodule Credo.Check.Warning.UnusedOperation do
   @doc false
   def run(source_file, params \\ [], checked_module, funs_with_return_value, format_issue_fun)
 
-  def run(source_file, params, checked_module, :all, format_issue_fun) do
+  def run(%SourceFile{} = source_file, params, checked_module, :all, format_issue_fun) do
     run(source_file, params, checked_module, nil, format_issue_fun)
   end
 
-  def run(source_file, params, checked_module, funs_with_return_value, format_issue_fun) do
+  def run(%SourceFile{} = source_file, params, checked_module, funs_with_return_value, format_issue_fun) do
     issue_meta = IssueMeta.for(source_file, params)
 
     relevant_funs =

@@ -362,6 +362,40 @@ defmodule Credo.Check.Warning.UnusedMapOperationTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a violation when used in a function call" do
+    ~S'''
+    defmodule SomeMod do
+      @other_mod OtherMod
+
+      def some_function do
+        @other_mod.other_function(Map.merge(%{}, %{}))
+
+        :ok
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should NOT report a violation when used in a macro using quote/0" do
+    ~S'''
+    defmodule SomeMod do
+      defmacro some_macro(some_fun) do
+        quote do
+          unquote(some_fun).(Map.merge(%{}, %{}))
+
+          :ok
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
