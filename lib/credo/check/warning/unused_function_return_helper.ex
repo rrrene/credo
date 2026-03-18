@@ -95,7 +95,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
   for op <- @def_ops do
     defp verify_candidate({unquote(op), _, arguments} = ast, :not_verified = _acc, candidate)
          when is_list(arguments) do
-      # IO.inspect(ast, label: "#{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
+      # IO.inspect(ast, label: "verify_candidate #{unquote(op)} (#{Macro.to_string(candidate)} #{acc})")
 
       if last_call_in_do_block?(ast, candidate) || last_call_in_rescue_block?(ast, candidate) ||
            last_call_in_catch_block?(ast, candidate) do
@@ -238,6 +238,45 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
        )
        when is_atom(fun_name) and is_list(arguments) do
     # IO.inspect(ast, label: "anon_fun.() (#{Macro.to_string(candidate)} #{acc})")
+
+    if Credo.Code.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
+  # unquote(something).my_fun()
+  defp verify_candidate(
+         {{:., _,
+           [
+             {:unquote, _, _}
+           ]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_list(arguments) do
+    # IO.inspect(ast, label: "unquote(something).fun() /5 (#{Macro.to_string(candidate)} #{acc})")
+
+    if Credo.Code.contains_child?(arguments, candidate) do
+      {nil, :VERIFIED}
+    else
+      {ast, acc}
+    end
+  end
+
+  # @something.my_fun()
+  defp verify_candidate(
+         {{:., _,
+           [
+             {:@, _, _},
+             _
+           ]}, _, arguments} = ast,
+         :not_verified = acc,
+         candidate
+       )
+       when is_list(arguments) do
+    # IO.inspect(ast, label: "@something.fun() /5 (#{Macro.to_string(candidate)} #{acc})")
 
     if Credo.Code.contains_child?(arguments, candidate) do
       {nil, :VERIFIED}
