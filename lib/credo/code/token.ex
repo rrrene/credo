@@ -368,16 +368,27 @@ defmodule Credo.Code.Token do
   def reduce("" <> string, callback, acc) do
     string
     |> CredoTokenizer.tokenize!()
+    |> reduce(callback, acc)
+  end
+
+  def reduce([_ | _] = list, callback, acc) do
+    [nil | list]
     |> do_reduce(callback, acc)
   end
 
   defp do_reduce([], _callback, acc), do: acc
 
-  defp do_reduce([prev | [current | [next | rest]]], callback, acc) do
+  defp do_reduce([prev, current, next | rest], callback, acc) do
     acc = callback.(prev, current, next, acc)
 
-    do_reduce([current | [next | rest]], callback, acc)
+    do_reduce([current, next | rest], callback, acc)
   end
 
-  defp do_reduce(tokens, _callback, acc) when is_list(tokens), do: acc
+  defp do_reduce([prev, current], callback, acc) do
+    acc = callback.(prev, current, nil, acc)
+
+    do_reduce([], callback, acc)
+  end
+
+  # defp do_reduce(tokens, _callback, acc) when is_list(tokens), do: acc
 end

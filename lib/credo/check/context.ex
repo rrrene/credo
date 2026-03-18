@@ -16,6 +16,13 @@ defmodule Credo.Check.Context do
   end
 
   @doc false
+  def handle_param(ctx, param_name, handle_fn) do
+    param_value = handle_fn.(ctx.params[param_name])
+    params = Map.put(ctx.params, param_name, param_value)
+    %{ctx | params: params}
+  end
+
+  @doc false
   def put_param(ctx, param_name, param_value) do
     Map.put(ctx, :params, Map.put(ctx.params, param_name, param_value))
   end

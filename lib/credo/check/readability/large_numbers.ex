@@ -29,126 +29,48 @@ defmodule Credo.Check.Readability.LargeNumbers do
 
   @doc false
   def run(%SourceFile{} = source_file, params) do
-    min_number = Params.get(params, :only_greater_than, __MODULE__)
-    issue_meta = IssueMeta.for(source_file, Keyword.merge(params, only_greater_than: min_number))
-
-    allowed_trailing_digits =
-      case Params.get(params, :trailing_digits, __MODULE__) do
+    ctx =
+      source_file
+      |> Context.build(params, __MODULE__)
+      |> Context.handle_param(:trailing_digits, fn
         %Range{} = value -> Enum.to_list(value)
         value -> List.wrap(value)
-      end
+      end)
 
-    source_file
-    |> Credo.Code.to_tokens()
-    |> collect_number_tokens([], min_number)
-    |> find_issues([], allowed_trailing_digits, issue_meta)
+    ctx = Credo.Code.Token.reduce(source_file, &find_candidates/4, ctx)
+    ctx.issues
   end
 
-  defp collect_number_tokens([], acc, _), do: acc
-
-  defp collect_number_tokens([head | t], acc, min_number) do
-    acc =
-      case number_token(head, min_number) do
-        nil -> acc
-        token -> acc ++ [token]
-      end
-
-    collect_number_tokens(t, acc, min_number)
+  defp find_candidates(_prev, {{:number, _}, _, "0b" <> _, _}, _next, ctx) do
+    ctx
   end
 
-  # tuple for Elixir >= 1.10.0
-  defp number_token({:flt, {_, _, number}, _} = tuple, min_number) when min_number < number do
-    tuple
+  defp find_candidates(_prev, {{:number, _}, _, "0o" <> _, _}, _next, ctx) do
+    ctx
   end
 
-  # tuple for Elixir >= 1.6.0
-  defp number_token({:int, {_, _, number}, _} = tuple, min_number) when min_number < number do
-    tuple
+  defp find_candidates(_prev, {{:number, _}, _, "0x" <> _, _}, _next, ctx) do
+    ctx
   end
 
-  defp number_token({:float, {_, _, number}, _} = tuple, min_number) when min_number < number do
-    tuple
-  end
+  defp find_candidates(
+         _prev,
+         {{:number, _}, {line_no, column, _, _}, source, %{value: number}},
+         _next,
+         %{params: %{only_greater_than: only_greater_than, trailing_digits: trailing_digits}} = ctx
+       )
+       when number > only_greater_than do
+    underscored_versions = number_with_underscores(number, trailing_digits, source)
 
-  # tuple for Elixir <= 1.5.x
-  defp number_token({:number, _, number} = tuple, min_number) when min_number < number do
-    tuple
-  end
-
-  defp number_token(_, _), do: nil
-
-  defp find_issues([], acc, _allowed_trailing_digits, _issue_meta) do
-    acc
-  end
-
-  # tuple for Elixir >= 1.10.0
-  defp find_issues(
-         [{:flt, {line_no, column1, number} = location, _} | t],
-         acc,
-         allowed_trailing_digits,
-         issue_meta
-       ) do
-    acc =
-      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
-
-    find_issues(t, acc, allowed_trailing_digits, issue_meta)
-  end
-
-  # tuple for Elixir >= 1.6.0
-  defp find_issues(
-         [{:int, {line_no, column1, number} = location, _} | t],
-         acc,
-         allowed_trailing_digits,
-         issue_meta
-       ) do
-    acc =
-      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
-
-    find_issues(t, acc, allowed_trailing_digits, issue_meta)
-  end
-
-  defp find_issues(
-         [{:float, {line_no, column1, number} = location, _} | t],
-         acc,
-         allowed_trailing_digits,
-         issue_meta
-       ) do
-    acc =
-      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
-
-    find_issues(t, acc, allowed_trailing_digits, issue_meta)
-  end
-
-  # tuple for Elixir <= 1.5.x
-  defp find_issues(
-         [{:number, {line_no, column1, _column2} = location, number} | t],
-         acc,
-         allowed_trailing_digits,
-         issue_meta
-       ) do
-    acc =
-      acc ++ find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta)
-
-    find_issues(t, acc, allowed_trailing_digits, issue_meta)
-  end
-
-  defp find_issue(line_no, column1, location, number, allowed_trailing_digits, issue_meta) do
-    source = source_fragment(location, issue_meta)
-    underscored_versions = number_with_underscores(number, allowed_trailing_digits, source)
-
-    if decimal_in_source?(source) && not Enum.member?(underscored_versions, source) do
-      [
-        issue_for(
-          issue_meta,
-          line_no,
-          column1,
-          source,
-          underscored_versions
-        )
-      ]
+    if not Enum.member?(underscored_versions, source) do
+      put_issue(ctx, issue_for(ctx, line_no, column, source, underscored_versions))
     else
-      []
+      ctx
     end
+  end
+
+  defp find_candidates(_prev, _current, _next, ctx) do
+    ctx
   end
 
   defp number_with_underscores(number, allowed_trailing_digits, _) when is_integer(number) do
@@ -196,51 +118,14 @@ defmodule Credo.Check.Readability.LargeNumbers do
     |> Enum.uniq()
   end
 
-  defp issue_for(issue_meta, line_no, column, trigger, expected) do
-    params = IssueMeta.params(issue_meta)
-    only_greater_than = Params.get(params, :only_greater_than, __MODULE__)
-
+  defp issue_for(%{params: %{only_greater_than: only_greater_than}} = ctx, line_no, column, trigger, expected) do
     format_issue(
-      issue_meta,
+      ctx,
       message:
         "Numbers larger than #{only_greater_than} should be written with underscores: #{Enum.join(expected, " or ")}",
       line_no: line_no,
       column: column,
       trigger: trigger
     )
-  end
-
-  defp decimal_in_source?(source) do
-    case String.slice(source, 0, 2) do
-      "0b" -> false
-      "0o" -> false
-      "0x" -> false
-      "" -> false
-      _ -> true
-    end
-  end
-
-  defp source_fragment({line_no, column1, _}, issue_meta) do
-    line =
-      issue_meta
-      |> IssueMeta.source_file()
-      |> SourceFile.line_at(line_no)
-
-    beginning_of_number =
-      ~r/[^0-9_oxb]*([0-9_oxb]+$)/
-      |> Regex.run(String.slice(line, 1..column1))
-      |> List.wrap()
-      |> List.last()
-      |> to_string()
-
-    ending_of_number =
-      ~r/^([0-9_\.]+)/
-      |> Regex.run(String.slice(line, (column1 + 1)..-1//1))
-      |> List.wrap()
-      |> List.last()
-      |> to_string()
-      |> String.replace(~r/\.\..*/, "")
-
-    beginning_of_number <> ending_of_number
   end
 end

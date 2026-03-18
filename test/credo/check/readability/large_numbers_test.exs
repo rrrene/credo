@@ -33,6 +33,24 @@ defmodule Credo.Check.Readability.LargeNumbersTest do
     |> refute_issues()
   end
 
+  test "it should NOT report basic types" do
+    ~S'''
+    def numbers do
+      1          # integer
+      0x1F       # integer
+      1.0        # float
+      true       # boolean
+      :atom      # atom / symbol
+      "elixir"   # string
+      [1, 2, 3]  # list
+      {1, 2, 3}  # tuple
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report multiple large floats on a line" do
     ~S'''
     def numbers do
