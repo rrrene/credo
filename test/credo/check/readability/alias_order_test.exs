@@ -278,6 +278,18 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> assert_issue(%{trigger: "Sorter"})
   end
 
+  test "it should report a violation with multi-alias /4" do
+    """
+    defmodule MyApp.MyModule do
+      alias Phoenix.{Controller, LiveView}
+      alias MyApp.Core.{Account, User}
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "Phoenix.{Controller, LiveView}"})
+  end
+
   test "it should report a violation with case-sensitive sorting" do
     ~S'''
     defmodule Test do
