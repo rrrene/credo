@@ -219,7 +219,19 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     """
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(%{trigger: "Phoenix.Controller"})
+  end
+
+  test "it should report a violation for unsorted alias before multi-alias /2" do
+    """
+    defmodule MyApp.MyModule do
+      alias MyPhoenixProject.Controller.{Account, User}
+      alias MyPhoenixProject.Context
+    end
+    """
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "MyPhoenixProject.Controller"})
   end
 
   test "it should report a violation with multi-alias" do
@@ -276,18 +288,6 @@ defmodule Credo.Check.Readability.AliasOrderTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(%{trigger: "Sorter"})
-  end
-
-  test "it should report a violation with multi-alias /4" do
-    """
-    defmodule MyApp.MyModule do
-      alias Phoenix.{Controller, LiveView}
-      alias MyApp.Core.{Account, User}
-    end
-    """
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue(%{trigger: "Phoenix.{Controller, LiveView}"})
   end
 
   test "it should report a violation with case-sensitive sorting" do
