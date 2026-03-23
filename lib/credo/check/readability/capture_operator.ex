@@ -75,7 +75,7 @@ defmodule Credo.Check.Readability.CaptureOperator do
     {nil, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk({:&, meta, [_ | _]} = ast, ctx) do
+  defp walk({:&, meta, [_ | _]}, ctx) do
     {nil, put_issue(ctx, issue_for(ctx, meta))}
   end
 
