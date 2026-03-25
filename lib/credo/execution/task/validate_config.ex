@@ -14,7 +14,8 @@ defmodule Credo.Execution.Task.ValidateConfig do
     |> validate_empty_ignore_checks_patterns()
     |> validate_ineffective_ignore_checks_patterns()
     |> validate_checks_scheduling_groups()
-    |> remove_missing_checks()
+    |> remove_undefined_checks()
+    |> save_validated_config()
     |> inspect_config_if_debug()
   end
 
@@ -155,7 +156,7 @@ defmodule Credo.Execution.Task.ValidateConfig do
 
   defp inspect_config_if_debug(exec), do: exec
 
-  defp remove_missing_checks(
+  defp remove_undefined_checks(
          %Execution{config: %{checks: %{enabled: enabled_checks, disabled: disabled_checks}}} = exec
        ) do
     enabled_checks = Enum.filter(enabled_checks, &Check.defined?/1)
@@ -165,10 +166,10 @@ defmodule Credo.Execution.Task.ValidateConfig do
   end
 
   defp validate_checks_scheduling_groups(exec) do
-    {result, _only_matching, _ignore_matching} = Execution.checks(exec)
+    {checks, _only_matching, _ignore_matching} = Execution.checks(exec)
     default_group_number = Credo.Check.default_scheduled_in_group()
 
-    if Enum.all?(result, fn {check, _params} -> check.scheduled_in_group() > default_group_number end) do
+    if checks != [] && Enum.all?(checks, fn {check, _} -> check.scheduled_in_group() > default_group_number end) do
       UI.warn([
         :red,
         "** (config) All checks scheduled to run seem to be depending on the results of earlier checks, but there are none."
@@ -176,5 +177,9 @@ defmodule Credo.Execution.Task.ValidateConfig do
     end
 
     exec
+  end
+
+  defp save_validated_config(exec) do
+    Execution.put_assign(exec, "credo.validated_config", exec.config)
   end
 end

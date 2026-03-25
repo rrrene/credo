@@ -42,11 +42,31 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
           "erlang" => System.otp_release()
         },
         "config" => %{
+          "configs" => configs(exec),
           "plugins" => plugins(exec),
           "checks" => checks(exec),
           "files" => files(exec)
         }
       }
+    end
+
+    defp configs(exec) do
+      Execution.get_config_files(exec)
+      |> Enum.map(fn
+        {name, nil, value} ->
+          """
+          ## #{inspect(name)}
+
+          #{inspect(value, pretty: true)}
+          """
+
+        {:file, file, value} ->
+          """
+          ## file: #{file}
+
+          #{inspect(value, pretty: true)}
+          """
+      end)
     end
 
     defp plugins(exec) do

@@ -200,9 +200,12 @@ defmodule Credo.Check do
   ]
 
   {config, _binding} = Code.eval_file(".credo.exs")
-  %{:name => "default", :checks => %{:enabled => check_tuples}} = List.first(config[:configs])
 
-  @__default_checks__ Enum.map(check_tuples, fn {check, _params} -> check end)
+  %{:name => "default", :checks => %{:enabled => enabled_check_tuples, :disabled => disabled_check_tuples}} =
+    List.first(config[:configs])
+
+  @__default_enabled_checks__ Enum.map(enabled_check_tuples, fn {check, _params} -> check end)
+  @__default_all_checks__ Enum.map(enabled_check_tuples ++ disabled_check_tuples, fn {check, _params} -> check end)
 
   @doc false
   defmacro __using__(opts) do
@@ -345,12 +348,12 @@ defmodule Credo.Check do
 
     caller_module = __CALLER__.module
     app = Mix.Project.config()[:app]
-    default_check? = caller_module in @__default_checks__
+    default_enabled_check? = caller_module in @__default_enabled_checks__
 
     quote do
       @moduledoc Credo.Check.__build_moduledoc__(
                    unquote(opts),
-                   unquote(default_check?),
+                   unquote(default_enabled_check?),
                    unquote(app)
                  )
 
@@ -521,7 +524,7 @@ defmodule Credo.Check do
   end
 
   @doc false
-  def __build_moduledoc__(opts, default_check?, app) do
+  def __build_moduledoc__(opts, default_enabled_check?, app) do
     base_priority = opts[:base_priority] || 0
     explanations = opts[:explanations] || []
     param_defaults = opts[:param_defaults] || []
@@ -534,8 +537,8 @@ defmodule Credo.Check do
         "works with any version of Elixir"
       end
 
-    default_check_hint =
-      if default_check? do
+    default_enabled_check_hint =
+      if default_enabled_check? do
         """
         > #### This check is enabled by default. {: .tip}
         >
@@ -609,7 +612,7 @@ defmodule Credo.Check do
     """
     ## Basics
 
-    #{String.trim(default_check_hint)}
+    #{String.trim(default_enabled_check_hint)}
 
     #{String.trim(tag_hint)}
 
@@ -748,18 +751,12 @@ defmodule Credo.Check do
   defp force_priority_if_given(issue, nil), do: issue
 
   defp force_priority_if_given(issue, priority) do
-    %{
-      issue
-      | priority: priority
-    }
+    %{issue | priority: priority}
   end
 
   defp add_column_if_missing(issue, trigger, line_no, column, source_file) do
     if trigger && line_no && !column do
-      %{
-        issue
-        | column: SourceFile.column(source_file, line_no, trigger)
-      }
+      %{issue | column: SourceFile.column(source_file, line_no, trigger)}
     else
       issue
     end
@@ -769,11 +766,7 @@ defmodule Credo.Check do
     if line_no do
       {_def, scope} = scope_for(source_file, line: line_no)
 
-      %{
-        issue
-        | priority: issue.priority + priority_for(source_file, scope),
-          scope: scope
-      }
+      %{issue | priority: issue.priority + priority_for(source_file, scope), scope: scope}
     else
       issue
     end
@@ -895,5 +888,20 @@ defmodule Credo.Check do
   @doc false
   def default_scheduled_in_group do
     1
+  end
+
+  @doc false
+  def standard_checks do
+    @__default_all_checks__
+  end
+
+  @doc false
+  def enabled_standard_checks do
+    @__default_enabled_checks__
+  end
+
+  @doc false
+  def all_loaded_checks do
+    Credo.Code.loaded_modules_implementing(__MODULE__)
   end
 end
