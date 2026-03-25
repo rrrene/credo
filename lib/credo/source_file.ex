@@ -177,4 +177,9 @@ defmodule Credo.SourceFile do
   end
 
   def column(_, _, _), do: nil
+
+  @doc false
+  def no_source_file do
+    %__MODULE__{}
+  end
 end

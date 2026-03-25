@@ -81,6 +81,8 @@ defmodule Credo.ConfigFile do
     |> merge()
     |> map_ok_files()
     |> ensure_values_present()
+
+    # |> dbg(limit: :infinity)
   end
 
   defp ensure_any_config_found(list, config_name) do
@@ -362,11 +364,11 @@ defmodule Credo.ConfigFile do
     merge_checks(base, other)
   end
 
-  def merge_checks(%__MODULE__{checks: checks_base}, %__MODULE__{
+  def merge_checks(%__MODULE__{checks: checks_base_as_list}, %__MODULE__{
         checks: %{extra: _} = checks_map_other
       })
-      when is_list(checks_base) do
-    base = %__MODULE__{checks: %{enabled: checks_base}}
+      when is_list(checks_base_as_list) do
+    base = %__MODULE__{checks: %{enabled: checks_base_as_list}}
     other = %__MODULE__{checks: checks_map_other}
 
     merge_checks(base, other)
@@ -394,29 +396,37 @@ defmodule Credo.ConfigFile do
     }
   end
 
-  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base_enabled} = checks_base}, %__MODULE__{
         checks: %{} = checks_other
       })
-      when is_list(checks_base) do
-    base = normalize_check_tuples(checks_base)
+      when is_list(checks_base_enabled) do
+    base = normalize_check_tuples(checks_base_enabled)
     other = normalize_check_tuples(checks_other[:extra])
-    disabled = disable_check_tuples(checks_other[:disabled])
+
+    disabled =
+      merge_checks(List.wrap(Map.get(checks_base, :disabled)), List.wrap(checks_other[:disabled]))
+
+    enabled = merge_checks(base, other) |> Keyword.drop(Keyword.keys(disabled))
 
     %{
-      enabled: base |> Keyword.merge(other) |> Keyword.merge(disabled),
-      disabled: checks_other[:disabled] || []
+      enabled: enabled,
+      disabled: disabled
     }
   end
 
   # this def catches all the cases where no valid key was found in `checks_map_other`
-  def merge_checks(%__MODULE__{checks: %{enabled: checks_base}}, %__MODULE__{
+  def merge_checks(%__MODULE__{checks: %{enabled: checks_base_enabled}}, %__MODULE__{
         checks: %{}
       })
-      when is_list(checks_base) do
-    base = %__MODULE__{checks: %{enabled: checks_base}}
+      when is_list(checks_base_enabled) do
+    base = %__MODULE__{checks: %{enabled: checks_base_enabled}}
     other = %__MODULE__{checks: []}
 
     merge_checks(base, other)
+  end
+
+  def merge_checks(base, other) when is_list(base) and is_list(other) do
+    Keyword.merge(base, other)
   end
 
   #

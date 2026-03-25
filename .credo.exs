@@ -89,9 +89,7 @@
           # set this value to 0 (zero).
           #
           {Credo.Check.Design.TagTODO, [exit_status: 2]},
-
-          # Uncomment the following if you want to find redundant config comments that
-          # are not/no longer ignoring issues.
+          #
           {Credo.Check.Design.RedundantConfigComments, []},
 
           #
@@ -179,6 +177,7 @@
           {Credo.Check.Consistency.UnusedVariableNames, []},
           {Credo.Check.Design.DuplicatedCode, []},
           {Credo.Check.Design.SkipTestWithoutComment, []},
+          {Credo.Check.Design.MissingCheckInConfig, []},
           {Credo.Check.Readability.AliasAs, []},
           {Credo.Check.Readability.BlockPipe, []},
           {Credo.Check.Readability.ImplTrue, []},

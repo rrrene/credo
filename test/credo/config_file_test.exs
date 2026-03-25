@@ -262,8 +262,7 @@ defmodule Credo.ConfigFileTest do
         {Credo.Check.Consistency.LineEndings, []},
         {Credo.Check.Design.AliasUsage, []},
         {Credo.Check.Design.TagFIXME, []},
-        {Credo.Check.Design.TagTODO, []},
-        {Credo.Check.Consistency.Tabs, false}
+        {Credo.Check.Design.TagTODO, []}
       ],
       disabled: [
         {Credo.Check.Consistency.Tabs, []}
@@ -441,8 +440,7 @@ defmodule Credo.ConfigFileTest do
         {Credo.Check.Consistency.LineEndings, []},
         {Credo.Check.Design.AliasUsage, []},
         {Credo.Check.Design.TagFIXME, []},
-        {Credo.Check.Design.TagTODO, []},
-        {Credo.Check.Consistency.Tabs, false}
+        {Credo.Check.Design.TagTODO, []}
       ],
       disabled: [
         {Credo.Check.Consistency.Tabs, [force: :tabs]}
@@ -452,12 +450,122 @@ defmodule Credo.ConfigFileTest do
     assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
   end
 
+  test "merge_checks works for map syntax %{} /7" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Consistency.Tabs, []}
+        ],
+        disabled: [
+          {Credo.Check.Consistency.SpaceInParentheses, []},
+          {Credo.Check.Consistency.SpaceAroundOperators, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        extra: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Consistency.Tabs, false}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Consistency.Tabs, false}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.SpaceInParentheses, []},
+        {Credo.Check.Consistency.SpaceAroundOperators, []}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks works for map syntax %{} /8" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []},
+          {Credo.Check.Warning.IExPry, []}
+        ],
+        disabled: [
+          {Credo.Check.Consistency.SpaceInParentheses, []},
+          {Credo.Check.Consistency.SpaceAroundOperators, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        extra: [
+          {Credo.Check.Design.AliasUsage, []},
+          {Credo.Check.Design.TagFIXME, []},
+          {Credo.Check.Design.TagTODO, []},
+          {Credo.Check.Warning.IExPry, [files: %{excluded: ["lib/my_project.ex"]}]}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.ExceptionNames, []},
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Design.AliasUsage, []},
+        {Credo.Check.Design.TagFIXME, []},
+        {Credo.Check.Design.TagTODO, []},
+        {Credo.Check.Warning.IExPry, [files: %{excluded: ["lib/my_project.ex"]}]}
+      ],
+      disabled: [
+        {Credo.Check.Consistency.SpaceInParentheses, []},
+        {Credo.Check.Consistency.SpaceAroundOperators, []}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merges lists of checks semantically" do
+    base = [
+      {Credo.Check.Consistency.ExceptionNames, []},
+      {Credo.Check.Consistency.LineEndings, []},
+      {Credo.Check.Design.AliasUsage, []},
+      {Credo.Check.Design.TagFIXME, []},
+      {Credo.Check.Design.TagTODO, []},
+      {Credo.Check.Consistency.Tabs, false}
+    ]
+
+    other = [
+      {Credo.Check.Consistency.Tabs, [force: :tabs]}
+    ]
+
+    assert ConfigFile.merge_checks(base, other) == [
+             {Credo.Check.Consistency.ExceptionNames, []},
+             {Credo.Check.Consistency.LineEndings, []},
+             {Credo.Check.Design.AliasUsage, []},
+             {Credo.Check.Design.TagFIXME, []},
+             {Credo.Check.Design.TagTODO, []},
+             {Credo.Check.Consistency.Tabs, [force: :tabs]}
+           ]
+  end
+
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do
     dirs = ConfigFile.relevant_directories(".")
 
-    config_subdir_count =
-      dirs
-      |> Enum.count(&String.ends_with?(&1, "config"))
+    config_subdir_count = Enum.count(dirs, &String.ends_with?(&1, "config"))
 
     assert config_subdir_count > 1
   end
