@@ -6,6 +6,7 @@ defmodule Credo.CLI.Command.Suggest.SuggestOutput do
     flycheck: Credo.CLI.Command.Suggest.Output.FlyCheck,
     oneline: Credo.CLI.Command.Suggest.Output.Oneline,
     json: Credo.CLI.Command.Suggest.Output.Json,
+    jsonl: Credo.CLI.Command.Suggest.Output.Jsonl,
     sarif: Credo.CLI.Command.Suggest.Output.Sarif
 
   alias Credo.CLI.Output.UI
