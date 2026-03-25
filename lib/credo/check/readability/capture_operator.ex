@@ -85,7 +85,7 @@ defmodule Credo.Check.Readability.CaptureOperator do
 
   defp issue_for(ctx, meta) do
     format_issue(
-      IssueMeta.for(ctx.source_file, ctx.params),
+      ctx,
       message: "Use an anonymous function instead of the capture operator.",
       trigger: "&",
       line_no: meta[:line],
