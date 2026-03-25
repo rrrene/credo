@@ -3,6 +3,7 @@ defmodule Mix.Tasks.Credo do
 
   @shortdoc "Run code analysis (use `--help` for options)"
   @moduledoc @shortdoc
+  @requirements ["loadpaths"]
 
   @doc false
   def run(argv) do
