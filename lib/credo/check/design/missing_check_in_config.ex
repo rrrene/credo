@@ -69,7 +69,11 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
   end
 
   defp issue_for(ctx, check) do
-    issue = format_issue(ctx, message: "Check `#{inspect(check)}` missing in config: enable or disable it explicitly.")
+    issue =
+      format_issue(ctx,
+        message: "Check `#{inspect(check)}` missing in config: enable or disable it explicitly.",
+        trigger: Issue.no_trigger()
+      )
 
     %{issue | scope: "config"}
   end

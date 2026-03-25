@@ -48,6 +48,6 @@ defmodule Credo.Check.Design.MissingCheckInConfigTest do
 
     [source_file]
     |> run_check(@described_check, [], exec)
-    |> assert_issues()
+    |> assert_issues([%{trigger: Issue.no_trigger()}])
   end
 end
