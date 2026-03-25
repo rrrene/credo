@@ -8,13 +8,17 @@ defmodule Credo.CLI.Output.Formatter.JSON do
     %{
       "issues" => Enum.map(issues, &issue_to_json/1)
     }
-    |> print_map()
+    |> print_map(pretty: true)
   end
 
-  def print_map(map) do
+  def print_map(map, json_opts \\ []) do
+    print_term(map, json_opts)
+  end
+
+  def print_term(map, json_opts \\ []) do
     map
     |> prepare_for_json()
-    |> Jason.encode!(pretty: true)
+    |> Jason.encode!(json_opts)
     |> UI.puts()
   end
 
