@@ -4,7 +4,7 @@
     {argv, ["--" | rest]} -> {argv, rest}
   end
 
-old_credo_ref = List.first(argv) || "v1.7.17"
+old_credo_ref = List.first(argv) || "1169b69b"
 
 credo_opts =
   if old_credo_ref == "." do
@@ -18,7 +18,7 @@ Mix.install([{:credo, credo_opts}, {:credo_tokenizer, ">= 0.2.5"}])
 IO.puts(:stderr, "\n[version] credo #{Credo.version()} (installed from #{old_credo_ref})\n")
 
 args =
-  ~w"--mute-exit-status --strict --enable-disabled-checks .+ --no-color --format oneline" ++
+  ~w"--mute-exit-status --strict --enable-disabled-checks .+ --no-color --format jsonl" ++
     additional_credo_args
 
 IO.puts(:stderr, "[run] $ mix credo #{Enum.join(args, " ")}\n")
