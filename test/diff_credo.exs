@@ -42,20 +42,24 @@ defmodule Main do
     end)
 
     IO.puts("")
-    IO.puts("Issues: #{green()}+#{length(added_issues)} #{red()}-#{length(removed_issues)}")
+    IO.puts("")
+    IO.puts("#{green()}+#{length(added_issues)} #{red()}-#{length(removed_issues)}#{reset()} issues")
     IO.puts("#{reset()}")
 
+    IO.puts("")
     IO.puts("#{bright()}#{yellow()}CHANGED: #{length(updated_issues)} issues")
     IO.puts("#{reset()}")
 
     print_issue_lists(updated_issues, yellow())
 
+    IO.puts("")
     IO.puts("#{bright()}#{cyan()}NEW: #{length(new_issues)} issues")
     IO.puts("#{reset()}")
 
     print_issue_lists(new_issues, cyan())
     IO.puts("#{reset()}")
 
+    IO.puts("")
     IO.puts("#{bright()}#{red()}Actually removed: #{length(actually_removed_issues)} issues")
     IO.puts("#{reset()}")
 
@@ -79,6 +83,7 @@ defmodule Main do
       |> Enum.slice(0..(max - 1))
       |> Enum.each(fn issue ->
         IO.puts("  - " <> to_line(issue, false))
+        IO.puts(to_inspected(issue))
       end)
 
       if length > max do
@@ -95,6 +100,51 @@ defmodule Main do
 
   defp to_issue("< " <> line) do
     %{kind: "removed", issue: to_issue(:json.decode(line))}
+  end
+
+  def to_inspected(%{} = issue) do
+    issue
+    |> get_issue_inline()
+    |> String.trim()
+    |> indent(2)
+  rescue
+    e ->
+      IO.warn(inspect(issue))
+      reraise(e, __STACKTRACE__)
+  end
+
+  defp indent(string, count) do
+    string
+    |> String.split("\n")
+    |> Enum.map(&"#{String.pad_leading("", count)}#{&1}")
+    |> Enum.join("\n")
+  end
+
+  def get_issue_inline(issue, reset_color \\ :red) do
+    source_line = get_source_line(issue)
+
+    marker =
+      if issue.line_no && issue.column && issue.trigger do
+        String.duplicate(" ", issue.column - 1) <> String.duplicate("^", String.length(to_string(issue.trigger)))
+      else
+        ""
+      end
+
+    """
+    #{cyan()}#{String.pad_leading("#{issue.line_no} |", 6)}#{format([reset_color])} #{source_line}
+    #{cyan()}#{String.pad_leading("", 6)} #{marker}#{format([reset_color])}
+    """
+  end
+
+  defp get_source_line(%{filename: filename, line_no: nil}) do
+    nil
+  end
+
+  defp get_source_line(%{filename: filename, line_no: line_no}) do
+    case File.read(filename) do
+      {:ok, contents} -> contents |> String.split("\n") |> Enum.at(line_no - 1)
+      _ -> nil
+    end
   end
 
   defp same_issue?(current_issue, %{} = previous_issue) do
@@ -123,14 +173,18 @@ defmodule Main do
     %{
       category: category,
       check: check,
-      column: column,
+      column: can_be_nil(column),
       filename: filename,
-      line_no: line_no,
+      line_no: can_be_nil(line_no),
       message: message,
-      scope: scope,
-      trigger: trigger
+      scope: can_be_nil(scope),
+      trigger: can_be_nil(trigger)
     }
   end
+
+  defp can_be_nil(:null), do: nil
+  defp can_be_nil(["__no_trigger__"]), do: nil
+  defp can_be_nil(value), do: value
 
   defp to_line(%{
          kind: kind,
