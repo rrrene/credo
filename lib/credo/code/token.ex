@@ -66,7 +66,15 @@ defmodule Credo.Code.Token do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
-  # Elixir >= 1.10.0 tuple syntax
+  # Elixir >= 1.20.0 sigil syntax
+  def position(
+        {:sigil, {line_no, col_start, {_line_no_end, _col_end}}, _, atom_or_charlist, _list,
+         _number, _binary}
+      ) do
+    position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
+  end
+
+  # Elixir >= 1.10.0 sigil syntax
   def position({:sigil, {line_no, col_start, nil}, _, atom_or_charlist, _list, _number, _binary}) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
