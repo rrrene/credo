@@ -688,7 +688,8 @@ defmodule Credo.Code.TokenTest do
 
     assert tokens == expected
 
-    assert {1, 37, 1, 52} == Token.position({:sigil, {1, 37, sigil_end_position}, :sigil_w, ["use import"], ~c"a", nil, "/"})
+    assert {1, 37, 1, 52} ==
+             Token.position({:sigil, {1, 37, sigil_end_position}, :sigil_w, ["use import"], ~c"a", nil, "/"})
   end
 
   test "should iterate all items as `current` in reduce" do
