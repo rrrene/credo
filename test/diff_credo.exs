@@ -29,7 +29,10 @@ defmodule Main do
         Enum.any?(removed_issues, &same_issue?(current_issue, &1))
       end)
 
-    actually_removed_issues = removed_issues -- updated_issues
+    actually_removed_issues =
+      Enum.filter(removed_issues, fn current_issue ->
+        not Enum.any?(added_issues, &same_issue?(current_issue, &1))
+      end)
 
     new_categories = Enum.map(new_issues, & &1.category) |> Enum.uniq()
     updated_categories = Enum.map(updated_issues, & &1.category) |> Enum.uniq()
@@ -154,7 +157,6 @@ defmodule Main do
     same_file_or_same_line? &&
       current_issue.category == previous_issue.category &&
       current_issue.message == previous_issue.message &&
-      current_issue.trigger == previous_issue.trigger &&
       current_issue.scope == previous_issue.scope
   end
 

@@ -4,7 +4,7 @@
     {argv, ["--" | rest]} -> {argv, rest}
   end
 
-old_credo_ref = List.first(argv) || "1169b69b"
+old_credo_ref = List.first(argv) || "474b7691"
 
 credo_opts =
   if old_credo_ref == "." do
