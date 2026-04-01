@@ -84,7 +84,7 @@ defmodule Credo.Code.InterpolationHelper do
   # Elixir >= 1.11.0
   #
   defp map_interpolations(
-         {:sigil, {_line_no, _col_start, nil}, _, list, _empty_list, nil, _another_binary} =
+         {:sigil, {_line_no, _col_start, _end_position}, _, list, _empty_list, nil, _another_binary} =
            token,
          source
        ) do

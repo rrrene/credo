@@ -391,7 +391,7 @@ defmodule Credo.Code.TokenTest do
                {:",", {1, 21, 0}},
                {:identifier, {1, 23, ~c"acc"}, :acc},
                {:concat_op, {1, 27, nil}, :<>},
-               {:sigil, {1, 30, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("},
+               {:sigil, {1, 30, _end_position}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("},
                {:")", {1, 40, nil}},
                {:eol, {1, 41, 1}}
              ],
@@ -670,6 +670,10 @@ defmodule Credo.Code.TokenTest do
       run_check(@described_check, ignore: ~w/use import/a)
       ''')
 
+    # Elixir >= 1.20.0-rc.4 changed the sigil token's third position element
+    # from `nil` to `{end_line, end_col}`.
+    sigil_end_position = if Version.match?(System.version(), ">= 1.20.0-rc.4"), do: {1, 52}, else: nil
+
     expected = [
       {:paren_identifier, {1, 1, ~c"run_check"}, :run_check},
       {:"(", {1, 10, nil}},
@@ -677,14 +681,14 @@ defmodule Credo.Code.TokenTest do
       {:identifier, {1, 12, ~c"described_check"}, :described_check},
       {:",", {1, 27, 0}},
       {:kw_identifier, {1, 29, ~c"ignore"}, :ignore},
-      {:sigil, {1, 37, nil}, :sigil_w, ["use import"], ~c"a", nil, "/"},
+      {:sigil, {1, 37, sigil_end_position}, :sigil_w, ["use import"], ~c"a", nil, "/"},
       {:")", {1, 52, nil}},
       {:eol, {1, 53, 1}}
     ]
 
     assert tokens == expected
 
-    assert {1, 37, 1, 52} == Token.position({:sigil, {1, 37, nil}, :sigil_w, ["use import"], ~c"a", nil, "/"})
+    assert {1, 37, 1, 52} == Token.position({:sigil, {1, 37, sigil_end_position}, :sigil_w, ["use import"], ~c"a", nil, "/"})
   end
 
   test "should iterate all items as `current` in reduce" do
