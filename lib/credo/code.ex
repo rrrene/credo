@@ -257,10 +257,12 @@ defmodule Credo.Code do
     :code.all_loaded()
     |> Enum.map(fn {mod, _} -> mod end)
     |> Enum.filter(fn mod ->
-      mod.module_info()[:attributes]
-      |> Keyword.get_values(:behaviour)
-      |> List.flatten()
-      |> Enum.member?(behaviour_module)
+      if function_exported?(mod, :module_info, 0) do
+        mod.module_info()[:attributes]
+        |> Keyword.get_values(:behaviour)
+        |> List.flatten()
+        |> Enum.member?(behaviour_module)
+      end
     end)
   end
 end
