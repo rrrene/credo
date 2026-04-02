@@ -37,8 +37,9 @@ defmodule Main do
     new_categories = Enum.map(new_issues, & &1.category) |> Enum.uniq()
     updated_categories = Enum.map(updated_issues, & &1.category) |> Enum.uniq()
 
-    new_checks = Enum.map(new_issues, & &1.check) |> Enum.uniq()
-    updated_checks = Enum.map(updated_issues, & &1.check) |> Enum.uniq()
+    new_checks = Enum.map(new_issues, & &1.check) |> Enum.uniq() |> Enum.sort()
+    updated_checks = Enum.map(updated_issues, & &1.check) |> Enum.uniq() |> Enum.sort()
+    actually_removed_checks = Enum.map(actually_removed_issues, & &1.check) |> Enum.uniq() |> Enum.sort()
 
     Enum.each(issues, fn issue ->
       IO.puts(to_line(issue))
@@ -67,6 +68,20 @@ defmodule Main do
     IO.puts("#{reset()}")
 
     print_issue_lists(actually_removed_issues, red())
+    IO.puts("#{reset()}")
+
+    if updated_checks != [] do
+      IO.puts("#{bright()}#{yellow()}CHANGED:\n  - #{Enum.join(updated_checks, "\n  - ")}")
+    end
+
+    if new_checks != [] do
+      IO.puts("#{bright()}#{cyan()}NEW:\n  - #{Enum.join(new_checks, "\n  - ")}")
+    end
+
+    if actually_removed_checks != [] do
+      IO.puts("#{bright()}#{red()}Removed:\n  - #{Enum.join(actually_removed_checks, "\n  - ")}")
+    end
+
     IO.puts("#{reset()}")
 
     exit({:shutdown, exit_status})
@@ -228,7 +243,7 @@ defmodule Main do
         ""
       end
 
-    "#{file_slug} #{message}" <> suffix
+    "#{file_slug} #{faint()}#{message}" <> suffix
   end
 end
 
