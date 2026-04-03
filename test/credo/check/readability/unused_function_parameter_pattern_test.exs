@@ -1,7 +1,7 @@
-defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
+defmodule Credo.Check.Readability.UnusedFunctionParameterPatternTest do
   use Credo.Test.Case
 
-  @described_check Credo.Check.Warning.UnusedFunctionParameterPattern
+  @described_check Credo.Check.Readability.UnusedFunctionParameterPattern
 
   test "it should NOT report used variables in patterns" do
     ~S'''
@@ -43,7 +43,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(%{trigger: "="})
+    |> assert_issue(%{trigger: "_ignored"})
   end
 
   test "it should report a violation when pattern matching and ignoring (flipped)" do
@@ -56,7 +56,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(%{trigger: "="})
+    |> assert_issue(%{trigger: "_ignored"})
   end
 
   test "it should report a violation in defp" do
@@ -69,7 +69,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(%{trigger: "="})
+    |> assert_issue(%{trigger: "_ignored"})
   end
 
   test "it should report a violation in defmacro" do
@@ -82,7 +82,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(%{trigger: "="})
+    |> assert_issue(%{trigger: "_ignored"})
   end
 
   test "it should report a violation with when clause" do
@@ -95,7 +95,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     '''
     |> to_source_file()
     |> run_check(@described_check)
-    |> assert_issue(%{trigger: "="})
+    |> assert_issue(%{trigger: "_ignored"})
   end
 
   test "it should report multiple violations" do
@@ -109,6 +109,7 @@ defmodule Credo.Check.Warning.UnusedFunctionParameterPatternTest do
     |> to_source_file()
     |> run_check(@described_check)
     |> assert_issues(2)
+    |> assert_issues_match([%{trigger: "_ignored1"}, %{trigger: "_ignored2"}])
   end
 
   test "it should report nested violations" do
