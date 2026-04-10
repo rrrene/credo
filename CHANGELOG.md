@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.18
+
+- Fix compatibility & compiler warnings with Elixir 1.20.0-rc.4
+- Fix problem with transitive deps in umbrella apps
+- `Credo.Check.Warning.UnusedMapOperation` fix false positives
+
 ## 1.7.17
 
 - `Credo.Check.Readability.ModuleDoc` add new param `:ignore_modules_using` (defaults to `[Credo.Check, Ecto.Schema, Phoenix.LiveView, ~r/\.Web$/]`)
