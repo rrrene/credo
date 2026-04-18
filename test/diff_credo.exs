@@ -25,9 +25,13 @@ defmodule Main do
       end)
 
     updated_issues =
-      Enum.filter(added_issues, fn current_issue ->
-        Enum.any?(removed_issues, &same_issue?(current_issue, &1))
+      added_issues
+      |> Enum.map( fn current_issue ->
+        old_issue = Enum.find(removed_issues, &same_issue?(current_issue, &1))
+
+        Map.put(current_issue, :old_issue, old_issue)
       end)
+      |> Enum.filter(fn %{old_issue: old_issue} -> not is_nil(old_issue) end)
 
     actually_removed_issues =
       Enum.filter(removed_issues, fn current_issue ->
@@ -100,7 +104,10 @@ defmodule Main do
       issues
       |> Enum.slice(0..(max - 1))
       |> Enum.each(fn issue ->
-        IO.puts("  - " <> to_line(issue, false))
+        if issue[:old_issue] do
+          IO.puts("  #{red()}- #{reset()}" <> to_line(issue[:old_issue], false) <> reset())
+        end
+        IO.puts("  #{green()}+ #{reset()}" <> to_line(issue, false))
         IO.puts(to_inspected(issue))
       end)
 

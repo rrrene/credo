@@ -12,7 +12,7 @@ defmodule Credo.Check.Runner do
   @doc """
   Runs all checks on all source files (according to the config).
   """
-  def run(source_files, exec) when is_list(source_files) do
+  def run(source_files, %Execution{} = exec) when is_list(source_files) do
     {all_check_tuples, _, _} = Execution.checks(exec)
 
     check_tuples_grouped_by_group =
