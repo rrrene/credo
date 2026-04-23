@@ -61,8 +61,6 @@ defmodule Credo.Check.Design.AliasUsage do
       ]
     ]
 
-  alias Credo.Code.Name
-
   @keywords [:alias]
 
   @doc false
@@ -71,10 +69,7 @@ defmodule Credo.Check.Design.AliasUsage do
     ctx = Context.build(source_file, params, __MODULE__)
 
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-
-    result.issues
-    |> filter_issues_if_called_more_often_than(ctx.params.if_called_more_often_than)
-    |> filter_issues_if_nested_deeper_than(ctx.params.if_nested_deeper_than)
+    filter_issues_if_called_more_often_than(result.issues, ctx.params.if_called_more_often_than)
   end
 
   defp walk({:defmodule, _, _} = ast, ctx) do
@@ -133,6 +128,7 @@ defmodule Credo.Check.Design.AliasUsage do
       params: %{
         excluded_namespaces: excluded_namespaces,
         excluded_lastnames: excluded_lastnames,
+        if_nested_deeper_than: if_nested_deeper_than,
         only: only
       },
       aliases: aliases,
@@ -140,7 +136,7 @@ defmodule Credo.Check.Design.AliasUsage do
     } = ctx
 
     cond do
-      Enum.count(mod_list) <= 1 || Enum.any?(mod_list, &tuple?/1) ->
+      match?([_], mod_list) || mod_list == [] || Enum.any?(mod_list, &tuple?/1) ->
         {ast, ctx}
 
       Enum.any?(mod_list, &unquote?/1) ->
@@ -156,6 +152,9 @@ defmodule Credo.Check.Design.AliasUsage do
         {ast, ctx}
 
       conflicting_with_other_modules?(mod_list, mod_deps) ->
+        {ast, ctx}
+
+      Enum.count(mod_list) <= if_nested_deeper_than ->
         {ast, ctx}
 
       true ->
@@ -232,12 +231,6 @@ defmodule Credo.Check.Design.AliasUsage do
     end)
     |> Enum.flat_map(fn {_trigger, issues} ->
       issues
-    end)
-  end
-
-  defp filter_issues_if_nested_deeper_than(issues, count) do
-    Enum.filter(issues, fn issue ->
-      Name.parts_count(issue.trigger) > count
     end)
   end
 
