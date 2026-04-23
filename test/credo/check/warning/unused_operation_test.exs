@@ -76,6 +76,7 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
       def some_function(parameter1, parameter2) do
         MyModule.transform(parameter1)
         OtherModule.do_something(parameter3)
+        My.Nested.Module.my_fun(parameter4)
 
         :ok
       end
@@ -85,10 +86,11 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
     |> run_check(@described_check,
       modules: [
         {MyModule, :all},
-        {OtherModule, :all, "My special issue message"}
+        {OtherModule, :all, "My special issue message"},
+        {My.Nested.Module, [:my_fun]}
       ]
     )
-    |> assert_issues(2)
+    |> assert_issues(3)
     |> assert_issues_match([
       %{
         trigger: "MyModule.transform",
@@ -97,6 +99,10 @@ defmodule Credo.Check.Warning.UnusedOperationTest do
       %{
         trigger: "OtherModule.do_something",
         message: "My special issue message"
+      },
+      %{
+        trigger: "My.Nested.Module.my_fun",
+        message: ~r/My\.Nested\.Module/
       }
     ])
   end

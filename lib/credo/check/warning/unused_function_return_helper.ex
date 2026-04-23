@@ -39,7 +39,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          required_mod_list,
          nil
        ) do
-    if mods == required_mod_list do
+    if mods == required_mod_list or mods in required_mod_list do
       {ast, [ast | acc]}
     else
       {ast, acc}
@@ -52,7 +52,7 @@ defmodule Credo.Check.Warning.UnusedFunctionReturnHelper do
          required_mod_list,
          restrict_fun_names
        ) do
-    if mods == required_mod_list and fun_name in restrict_fun_names do
+    if (mods == required_mod_list or mods in required_mod_list) and fun_name in restrict_fun_names do
       {ast, [ast | acc]}
     else
       {ast, acc}
