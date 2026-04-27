@@ -26,7 +26,7 @@ defmodule Main do
 
     updated_issues =
       added_issues
-      |> Enum.map( fn current_issue ->
+      |> Enum.map(fn current_issue ->
         old_issue = Enum.find(removed_issues, &same_issue?(current_issue, &1))
 
         Map.put(current_issue, :old_issue, old_issue)
@@ -107,6 +107,7 @@ defmodule Main do
         if issue[:old_issue] do
           IO.puts("  #{red()}- #{reset()}" <> to_line(issue[:old_issue], false) <> reset())
         end
+
         IO.puts("  #{green()}+ #{reset()}" <> to_line(issue, false))
         IO.puts(to_inspected(issue))
       end)
