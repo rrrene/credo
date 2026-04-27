@@ -1,10 +1,16 @@
 defmodule Credo.ExecutionTest do
   use ExUnit.Case
 
+  alias Credo.CLI.Options
   alias Credo.Execution
 
   setup do
     [exec: %Execution{config: %Execution.RuntimeConfig{}, private: %Execution.Private{}}]
+  end
+
+  test "show_all? should be true when --all was given" do
+    exec = %Execution{cli_options: %Options{switches: %{all: true}}}
+    assert Execution.show_all?(exec)
   end
 
   test "it should work for put_assign & get_assign", %{exec: exec} do

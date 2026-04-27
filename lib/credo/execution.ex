@@ -307,6 +307,8 @@ defmodule Credo.Execution do
 
   @all_min_priority -99
 
+  def show_all?(%__MODULE__{cli_options: %{switches: %{all: true}}}), do: true
+
   def show_all?(%__MODULE__{} = exec) do
     exec.config.min_priority <= @all_min_priority
   end
