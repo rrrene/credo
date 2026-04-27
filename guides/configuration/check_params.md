@@ -14,10 +14,12 @@ Checks and their params are configured in [Credo's configuration file](./config_
   configs: [
     %{
       name: "default",
-      checks: [
-        {Credo.Check.Consistency.TabsOrSpaces, false},
-        {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2},
-      ],
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.TabsOrSpaces, []},
+          {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2},
+        ]
+      }
       # files etc.
     }
   ]
@@ -32,14 +34,7 @@ All checks are configured using a two-element tuple:
 
 `MyApp.CheckModule` is the module representing the check to be configured ([read more about custom checks](../custom_checks/adding_checks.md)).
 
-`params` can be either `false`, to disable the check ...
-
-```elixir
-# This check won't be part of the analysis
-{Credo.Check.Consistency.TabsOrSpaces, false}
-```
-
-... or a keyword list of parameters, used to configure the check:
+`params` are a keyword list of parameters, used to configure the check:
 
 ```elixir
 {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2}

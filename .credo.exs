@@ -60,11 +60,10 @@
       # You can customize the parameters of any check by adding a second element
       # to the tuple.
       #
-      # To disable a check put `false` as second element:
-      #
-      #     {Credo.Check.Design.DuplicatedCode, false}
-      #
       checks: %{
+        #
+        # To disable a check move it to the `:disabled` section.
+        #
         enabled: [
           #
           ## Consistency Checks
@@ -211,7 +210,7 @@
           {Credo.Check.Warning.MapGetUnsafePass, []},
           {Credo.Check.Warning.MixEnv, []},
           {Credo.Check.Warning.UnsafeToAtom, []}
-          # {Credo.Check.Warning.UnusedOperation, [{MyMagicModule, [:fun1, :fun2]}]}
+          {Credo.Check.Warning.UnusedOperation, []}
 
           # {Credo.Check.Refactor.MapInto, []},
 
