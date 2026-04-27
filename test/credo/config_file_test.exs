@@ -562,6 +562,87 @@ defmodule Credo.ConfigFileTest do
            ]
   end
 
+  test "merge_checks treats true as default params" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []},
+          {Credo.Check.Consistency.LineEndings, []}
+        ],
+        disabled: [
+          {Credo.Check.Readability.StrictModuleLayout, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Readability.StrictModuleLayout, true}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Readability.StrictModuleLayout, []}
+      ],
+      disabled: []
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks treats true as default params for disabled checks" do
+    base = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.ExceptionNames, []}
+        ]
+      }
+    }
+
+    other = %ConfigFile{
+      checks: %{
+        enabled: [
+          {Credo.Check.Consistency.LineEndings, []}
+        ],
+        disabled: [
+          {Credo.Check.Readability.StrictModuleLayout, true}
+        ]
+      }
+    }
+
+    expected = %{
+      enabled: [
+        {Credo.Check.Consistency.LineEndings, []},
+        {Credo.Check.Readability.StrictModuleLayout, false}
+      ],
+      disabled: [
+        {Credo.Check.Readability.StrictModuleLayout, []}
+      ]
+    }
+
+    assert_sorted_equality(expected, ConfigFile.merge_checks(base, other))
+  end
+
+  test "merge_checks treats true as default params when merging check lists" do
+    base = [
+      {Credo.Check.Consistency.ExceptionNames, []},
+      {Credo.Check.Consistency.LineEndings, true}
+    ]
+
+    other = [
+      {Credo.Check.Readability.StrictModuleLayout, true}
+    ]
+
+    assert ConfigFile.merge_checks(base, other) == [
+             {Credo.Check.Consistency.ExceptionNames, []},
+             {Credo.Check.Consistency.LineEndings, []},
+             {Credo.Check.Readability.StrictModuleLayout, []}
+           ]
+  end
+
   test "loads .credo.exs from ./config subdirs in ascending directories as well" do
     dirs = ConfigFile.relevant_directories(".")
 

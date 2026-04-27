@@ -64,6 +64,10 @@
       #
       #     {Credo.Check.Design.DuplicatedCode, false}
       #
+      # To enable a check with default params put `true` or `[]` as second element:
+      #
+      #     {Credo.Check.Readability.StrictModuleLayout, true}
+      #
       checks: %{
         enabled: [
           #

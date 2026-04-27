@@ -45,6 +45,12 @@ All checks are configured using a two-element tuple:
 {Credo.Check.Design.AliasUsage, if_nested_deeper_than: 2}
 ```
 
+Passing `true` is equivalent to passing an empty list of parameters:
+
+```elixir
+{Credo.Check.Readability.StrictModuleLayout, true}
+```
+
 ## General params
 
 While `params` are defined by each check individually, there are a couple of general params provided by Credo, which work the same for each check.
