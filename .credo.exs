@@ -89,6 +89,7 @@
           #
           {Credo.Check.Design.TagTODO, [exit_status: 2]},
           #
+          {Credo.Check.Design.DeprecatedChecksConfig, []},
           {Credo.Check.Design.RedundantConfigComments, []},
 
           #
