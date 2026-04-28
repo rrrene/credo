@@ -62,7 +62,12 @@ defmodule Credo.Check.Design.DeprecatedChecksConfig do
         (List.wrap(check_map[:enabled]) ++ List.wrap(check_map[:disabled]))
         |> Enum.flat_map(fn
           {check, false} ->
-            [issue_for(ctx, "Using `false` for deactivating check `#{inspect(check)}` in Credo's config is deprecated, move them to `disabled` instead.")]
+            [
+              issue_for(
+                ctx,
+                "Using `false` for deactivating check `#{inspect(check)}` in Credo's config is deprecated, move them to `disabled` instead."
+              )
+            ]
 
           {_check, _params} ->
             []
