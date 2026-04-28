@@ -31,9 +31,7 @@ defmodule Credo.Check.Design.DeprecatedChecksConfigTest do
 
     [source_file]
     |> run_check(@described_check, [], exec)
-    |> assert_issue(fn issue ->
-      assert issue.trigger == Credo.Issue.no_trigger()
-    end)
+    |> assert_issue(%{trigger: Credo.Issue.no_trigger(), message: ~r/:checks/})
   end
 
   test "it should report a violation for deactivating checks by setting params to `false`" do
