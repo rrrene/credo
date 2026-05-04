@@ -6,8 +6,10 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     explanations: [
       check: """
       Some modules that are included by a package may be hazardous
-      if used by your application. Use this check to allow these modules in
-      your dependencies but forbid them to be used in your application.
+      if used by your application.
+
+      Use this check to allow these modules in your dependencies but
+      forbid them to be used in your application.
 
       Examples:
 
@@ -24,15 +26,22 @@ defmodule Credo.Check.Warning.ForbiddenModule do
 
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    ctx = put_param(ctx, :modules, prepare_modules(ctx.params.modules))
+    ctx =
+      source_file
+      |> Context.build(params, __MODULE__)
+      |> Context.handle_param(:modules, fn modules ->
+        Map.new(modules, fn
+          {module, message} -> {Name.full(module), message}
+          module -> {Name.full(module), nil}
+        end)
+      end)
+
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
     result.issues
   end
 
   defp walk({:__aliases__, meta, modules} = ast, ctx) do
     module = Name.full(modules)
-
     issue = issue_if_forbidden(ctx, meta, module, module)
 
     {ast, put_issue(ctx, issue)}
@@ -63,15 +72,6 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     if Map.has_key?(ctx.params.modules, module) do
       issue_for(ctx, meta, module, trigger)
     end
-  end
-
-  defp prepare_modules(modules) do
-    modules
-    |> Enum.map(fn
-      {module, message} -> {Name.full(module), message}
-      module -> {Name.full(module), nil}
-    end)
-    |> Map.new()
   end
 
   defp issue_for(ctx, meta, module, trigger) do

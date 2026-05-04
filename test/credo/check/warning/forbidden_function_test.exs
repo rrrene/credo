@@ -3,15 +3,11 @@ defmodule Credo.Check.Warning.ForbiddenFunctionTest do
 
   @described_check Credo.Check.Warning.ForbiddenFunction
 
-  @binary_to_term_error "Use Plug.Crypto.non_executable_binary_to_term/2 instead."
+  #
+  # cases NOT raising issues
+  #
 
-  @erlang_binary_to_term_config [
-    functions: [
-      {:erlang, :binary_to_term, @binary_to_term_error}
-    ]
-  ]
-
-  test "produces no issues when no functions configured" do
+  test "it should NOT report with default params" do
     """
     defmodule MyModule do
       def decode(data) do
@@ -24,105 +20,88 @@ defmodule Credo.Check.Warning.ForbiddenFunctionTest do
     |> refute_issues()
   end
 
-  describe "Erlang function calls" do
-    test "will alert on any arity" do
-      for function_args <- ["", "foo", "foo, bar"] do
-        """
-        defmodule MyModule do
-          def decode(data) do
-            :erlang.binary_to_term(#{function_args})
-          end
-        end
-        """
-        |> to_source_file()
-        |> run_check(@described_check, @erlang_binary_to_term_config)
-        |> assert_issue(fn issue ->
-          assert issue.trigger == ":erlang.binary_to_term"
-          assert issue.message == ":erlang.binary_to_term is forbidden: #{@binary_to_term_error}"
-        end)
+  test "allows non-forbidden functions from the same module" do
+    """
+    defmodule MyModule do
+      def safe do
+        SomeModule.safe_function(foo)
       end
     end
-
-    test "ignores other Erlang functions" do
-      """
-      defmodule MyModule do
-        def my_function do
-          :erlang.term_to_binary(%{foo: "bar"})
-        end
-      end
-      """
-      |> to_source_file()
-      |> run_check(@described_check, @erlang_binary_to_term_config)
-      |> refute_issues()
-    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, functions: [{SomeModule, :dangerous_function, "This function is dangerous."}])
+    |> refute_issues()
   end
 
-  describe "Elixir function calls" do
-    test "will alert on any arity" do
-      error_message = "This function is dangerous."
-
-      for function_args <- ["", "foo", "foo, bar"] do
-        """
-        defmodule MyModule do
-          def dangerous do
-            SomeModule.dangerous_function(#{function_args})
-          end
-        end
-        """
-        |> to_source_file()
-        |> run_check(@described_check,
-          functions: [
-            {SomeModule, :dangerous_function, error_message}
-          ]
-        )
-        |> assert_issue(fn issue ->
-          assert issue.trigger == "SomeModule.dangerous_function"
-          assert issue.message == "SomeModule.dangerous_function is forbidden: #{error_message}"
-        end)
+  test "ignores other Erlang functions" do
+    """
+    defmodule MyModule do
+      def my_function do
+        :erlang.term_to_binary(%{foo: "bar"})
       end
     end
-
-    test "handles nested module names" do
-      custom_error = "Don't use this."
-
-      """
-      defmodule MyModule do
-        def call do
-          Some.Nested.Module.forbidden_func()
-        end
-      end
-      """
-      |> to_source_file()
-      |> run_check(@described_check,
-        functions: [
-          {Some.Nested.Module, :forbidden_func, custom_error}
-        ]
-      )
-      |> assert_issue(fn issue ->
-        assert issue.trigger == "Some.Nested.Module.forbidden_func"
-        assert issue.message == "Some.Nested.Module.forbidden_func is forbidden: #{custom_error}"
-      end)
-    end
-
-    test "allows non-forbidden functions from the same module" do
-      """
-      defmodule MyModule do
-        def safe do
-          SomeModule.safe_function(foo)
-        end
-      end
-      """
-      |> to_source_file()
-      |> run_check(@described_check,
-        functions: [
-          {SomeModule, :dangerous_function, "This function is dangerous."}
-        ]
-      )
-      |> refute_issues()
-    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check,
+      functions: [{:erlang, :binary_to_term, "Use Plug.Crypto.non_executable_binary_to_term/2 instead."}]
+    )
+    |> refute_issues()
   end
 
-  test "detects multiple violations" do
+  #
+  # cases raising issues
+  #
+
+  test "it should report on different arities" do
+    """
+    defmodule MyModule do
+      def dangerous do
+        SomeModule.dangerous_function()
+        SomeModule.dangerous_function("foo")
+        SomeModule.dangerous_function("foo", "bar")
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, functions: [{SomeModule, :dangerous_function, "This function is dangerous."}])
+    |> assert_issues(3)
+  end
+
+  test "it should report on different arities for Erlang calls" do
+    """
+    defmodule MyModule do
+      def decode(data) do
+        :erlang.binary_to_term()
+        :erlang.binary_to_term("foo")
+        :erlang.binary_to_term("foo", "bar")
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check,
+      functions: [{:erlang, :binary_to_term, "Use Plug.Crypto.non_executable_binary_to_term/2 instead."}]
+    )
+    |> assert_issues(3)
+  end
+
+  test "it should report on nested module names" do
+    """
+    defmodule MyModule do
+      def call do
+        Some.Nested.Module.forbidden_func()
+        __MODULE__.Nested.Module.fun()
+      end
+    end
+    """
+    |> to_source_file()
+    |> run_check(@described_check, functions: [{Some.Nested.Module, :forbidden_func, "Don't use this."}])
+    |> assert_issue(%{
+      trigger: "Some.Nested.Module.forbidden_func",
+      message: ~r"Don't use this."
+    })
+  end
+
+  test "it should report on multiple violations" do
     """
     defmodule MyModule do
       def decode(data) do
@@ -141,13 +120,11 @@ defmodule Credo.Check.Warning.ForbiddenFunctionTest do
         {SomeModule, :dangerous_function, "This is dangerous."}
       ]
     )
-    |> assert_issues(fn issues ->
-      messages = Enum.map(issues, & &1.message) |> Enum.sort()
-      assert [":erlang.binary_to_term" <> _, "SomeModule.dangerous_function" <> _] = messages
-    end)
+    |> assert_issues(2)
+    |> assert_issues_match([%{message: "Use safe alternative."}, %{message: "This is dangerous."}])
   end
 
-  test "handles piped calls" do
+  test "it should report on piped calls" do
     """
     defmodule MyModule do
       def decode(data) do
@@ -159,7 +136,9 @@ defmodule Credo.Check.Warning.ForbiddenFunctionTest do
     end
     """
     |> to_source_file()
-    |> run_check(@described_check, @erlang_binary_to_term_config)
+    |> run_check(@described_check,
+      functions: [{:erlang, :binary_to_term, "Use Plug.Crypto.non_executable_binary_to_term/2 instead."}]
+    )
     |> assert_issue()
   end
 end

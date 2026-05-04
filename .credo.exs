@@ -145,6 +145,8 @@
           {Credo.Check.Warning.BoolOperationOnSameValues, []},
           {Credo.Check.Warning.Dbg, []},
           {Credo.Check.Warning.ExpensiveEmptyEnumCheck, []},
+          {Credo.Check.Warning.ForbiddenFunction, []},
+          {Credo.Check.Warning.ForbiddenModule, []},
           {Credo.Check.Warning.IExPry, []},
           {Credo.Check.Warning.IoInspect, []},
           {Credo.Check.Warning.MissedMetadataKeyInLoggerConfig, []},
@@ -159,6 +161,7 @@
           {Credo.Check.Warning.UnusedKeywordOperation, []},
           {Credo.Check.Warning.UnusedListOperation, []},
           {Credo.Check.Warning.UnusedMapOperation, []},
+          {Credo.Check.Warning.UnusedOperation, []},
           {Credo.Check.Warning.UnusedPathOperation, []},
           {Credo.Check.Warning.UnusedRegexOperation, []},
           {Credo.Check.Warning.UnusedStringOperation, []},
@@ -210,8 +213,7 @@
           {Credo.Check.Warning.LeakyEnvironment, []},
           {Credo.Check.Warning.MapGetUnsafePass, []},
           {Credo.Check.Warning.MixEnv, []},
-          {Credo.Check.Warning.UnsafeToAtom, []},
-          {Credo.Check.Warning.UnusedOperation, []}
+          {Credo.Check.Warning.UnsafeToAtom, []}
 
           # {Credo.Check.Refactor.MapInto, []},
 

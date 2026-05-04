@@ -8,16 +8,20 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
     ],
     explanations: [
       check: """
-      Some functions may be hazardous if used directly. Use this check to
-      forbid specific functions from being called directly by your application,
-      while allowing other functions in the same module.
+      Some functions that are included by a package or public in your project
+      may be hazardous if used directly.
+
+      Use this check to forbid specific functions from being called directly
+      by your application (while allowing other functions from the same module).
 
       This check is similar to `Credo.Check.Warning.ForbiddenModule`, but for
       specific functions within a module rather than the entire module.
 
-      For example, `:erlang.binary_to_term/1` is vulnerable to arbitrary code
-      execution exploits when deserializing untrusted data; you may want to point
-      developers to `Plug.Crypto.non_executable_binary_to_term/2` instead, which
+      Example:
+
+      `:erlang.binary_to_term/1` is vulnerable to arbitrary code execution exploits
+      when deserializing untrusted data; you may want to point developers to
+      `Plug.Crypto.non_executable_binary_to_term/2` instead, which
       disallows anonymous functions in the deserialized term.
       """,
       params: [
@@ -27,77 +31,65 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
         Example:
 
             functions: [
-              {:erlang, :binary_to_term, "Use Plug.Crypto.non_executable_binary_to_term/2 instead."}
+              {:erlang, :binary_to_term, "Use `Plug.Crypto.non_executable_binary_to_term/2` instead."}
             ]
         """
       ]
     ]
 
-  @doc false
   @impl Credo.Check
   def run(%SourceFile{} = source_file, params \\ []) do
-    case Params.get(params, :functions, __MODULE__) do
-      [_ | _] = functions ->
-        issue_meta = IssueMeta.for(source_file, params)
-        forbidden_map = build_forbidden_map(functions)
-        Credo.Code.prewalk(source_file, &traverse(&1, &2, issue_meta, forbidden_map))
+    ctx =
+      source_file
+      |> Context.build(params, __MODULE__)
+      |> Context.handle_param(:functions, fn functions ->
+        Map.new(functions, fn {module, fun, message} ->
+          if not is_atom(module), do: raise("Module name must be an atom; got #{inspect(module)}")
+          if not is_atom(fun), do: raise("Function name must be an atom; got #{inspect(fun)}")
 
-      [] ->
-        []
-    end
+          {{module, fun}, message}
+        end)
+      end)
+
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
-  defp build_forbidden_map(functions) do
-    Map.new(functions, fn {module, fun, message} ->
-      if not is_atom(module), do: raise("Module name must be an atom; got #{inspect(module)}")
-      if not is_atom(fun), do: raise("Function name must be an atom; got #{inspect(fun)}")
-      {{module, fun}, to_string(message)}
-    end)
-  end
-
-  # Handle calls to erlang modules like :erlang.binary_to_term(x)
-  defp traverse({{:., meta, [module, function]}, _, _} = ast, issues, issue_meta, forbidden_map)
+  # :erlang.binary_to_term(x)
+  defp walk({{:., meta, [module, function]}, _, _} = ast, ctx)
        when is_atom(module) and is_atom(function) do
-    {ast, append_issue_if_forbidden({module, function}, forbidden_map, issues, issue_meta, meta)}
+    issue = issue_for({module, function}, ctx, meta)
+
+    {ast, put_issue(ctx, issue)}
   end
 
-  # Handle calls to Elixir modules like MyModule.my_function(...)
-  defp traverse(
-         {{:., meta, [{:__aliases__, _, module_parts}, function]}, _call_meta, _args} = ast,
-         issues,
-         issue_meta,
-         forbidden_map
-       )
+  # MyModule.my_function(...)
+  defp walk({{:., meta, [{:__aliases__, _, module_parts}, function]}, _call_meta, _args} = ast, ctx)
        when is_atom(function) and is_list(module_parts) do
-    issues =
+    ctx =
       if Enum.all?(module_parts, &is_atom/1) do
-        module = Credo.Code.Name.full(module_parts)
-        append_issue_if_forbidden({module, function}, forbidden_map, issues, issue_meta, meta)
+        module = Module.concat(module_parts)
+        issue = issue_for({module, function}, ctx, meta)
+
+        put_issue(ctx, issue)
       else
-        issues
+        ctx
       end
 
-    {ast, issues}
+    {ast, ctx}
   end
 
-  defp traverse(ast, issues, _issue_meta, _forbidden_map), do: {ast, issues}
+  defp walk(ast, ctx), do: {ast, ctx}
 
-  defp append_issue_if_forbidden(mod_fun, forbidden_map, issues, issue_meta, meta)
-       when is_map_key(forbidden_map, mod_fun) do
-    message = Map.get(forbidden_map, mod_fun)
-    [create_issue(issue_meta, meta[:line], mod_fun, message) | issues]
-  end
+  defp issue_for({mod, fun} = mod_fun_key, %{params: %{functions: functions}} = ctx, meta)
+       when is_map_key(functions, mod_fun_key) do
+    message = Map.get(functions, mod_fun_key)
 
-  defp append_issue_if_forbidden(_mod_fun, _forbidden_map, issues, _issue_meta, _meta), do: issues
-
-  defp create_issue(issue_meta, line_no, {mod, fun}, message) do
     trigger = "#{inspect(mod)}.#{to_string(fun)}"
+    message = message || "Calls to `#{trigger}` are not allowed."
 
-    format_issue(
-      issue_meta,
-      message: "#{trigger} is forbidden: #{message}",
-      trigger: trigger,
-      line_no: line_no
-    )
+    format_issue(ctx, message: message, trigger: trigger, line_no: meta[:line])
   end
+
+  defp issue_for(_mod_fun, _forbidden_map, _meta), do: nil
 end
