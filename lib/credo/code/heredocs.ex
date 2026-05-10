@@ -248,7 +248,7 @@ defmodule Credo.Code.Heredocs do
          ) do
       parse_non_removable_normal_sigil(
         t,
-        acc,
+        ["\\\\" | acc],
         unquote(sigil_end),
         replacement,
         empty_line_replacement

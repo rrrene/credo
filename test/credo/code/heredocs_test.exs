@@ -770,4 +770,14 @@ defmodule Credo.Code.HeredocsTest do
 
     assert expected == source |> Heredocs.replace_with_spaces(".", ".", ".")
   end
+
+  test "should preserve `\\\\` token in non-removable sigils" do
+    source = ~S'''
+    @x = ~w(
+      a b \\
+    )a
+    '''
+
+    assert source == source |> Heredocs.replace_with_spaces()
+  end
 end
