@@ -3,7 +3,12 @@ defmodule Credo.Check.Readability.SinglePipe do
     id: "EX3023",
     base_priority: :high,
     tags: [:controversial],
-    param_defaults: [allow_0_arity_functions: false, allow_blocks: true],
+    param_defaults: [
+      allow_0_arity_functions: false,
+      allow_blocks: true,
+      allow_lists: false,
+      allow_maps: false
+    ],
     explanations: [
       check: """
       Pipes (`|>`) should only be used when piping data through multiple calls.
@@ -33,7 +38,9 @@ defmodule Credo.Check.Readability.SinglePipe do
       """,
       params: [
         allow_0_arity_functions: "Allow 0-arity functions",
-        allow_blocks: "Allow block functions/macro like `for`, `if` or `case`"
+        allow_blocks: "Allow block functions/macro like `for`, `if` or `case`",
+        allow_lists: "Allow single pipes where the value being piped is a list literal",
+        allow_maps: "Allow single pipes where the value being piped is a map literal (including structs)"
       ]
     ]
 
@@ -46,6 +53,22 @@ defmodule Credo.Check.Readability.SinglePipe do
   end
 
   defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+    {ast, %{ctx | continue: false}}
+  end
+
+  defp walk(
+         {:|>, _, [lhs, _]} = ast,
+         %{continue: true, params: %{allow_maps: true}} = ctx
+       )
+       when is_tuple(lhs) and elem(lhs, 0) in [:%{}, :%] do
+    {ast, %{ctx | continue: false}}
+  end
+
+  defp walk(
+         {:|>, _, [lhs, _]} = ast,
+         %{continue: true, params: %{allow_lists: true}} = ctx
+       )
+       when is_list(lhs) do
     {ast, %{ctx | continue: false}}
   end
 
