@@ -2,7 +2,7 @@ defmodule Credo.Check.Readability.UnusedFunctionParameterPattern do
   @moduledoc false
 
   use Credo.Check,
-    id: "EX5031",
+    id: "EX5032",
     base_priority: :normal,
     explanations: [
       check: """

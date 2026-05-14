@@ -1,6 +1,6 @@
 defmodule Credo.Check.Warning.ForbiddenFunction do
   use Credo.Check,
-    id: "EX5030",
+    id: "EX5033",
     base_priority: :high,
     category: :warning,
     param_defaults: [

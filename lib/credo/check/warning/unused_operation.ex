@@ -1,6 +1,6 @@
 defmodule Credo.Check.Warning.UnusedOperation do
   use Credo.Check,
-    id: "EX5029",
+    id: "EX5031",
     base_priority: :high,
     param_defaults: [modules: []],
     explanations: [
