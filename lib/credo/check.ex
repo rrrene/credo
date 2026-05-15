@@ -902,6 +902,33 @@ defmodule Credo.Check do
 
   @doc false
   def all_loaded_checks do
-    Credo.Code.loaded_modules_implementing(__MODULE__)
+    # Source credo's own checks from the curated `standard_checks/0` list
+    # rather than `:code.all_loaded/0` — until something references an
+    # unused check module the BEAM hasn't loaded it, so the all-loaded set
+    # silently misses checks that nothing has yet pulled in. That's the
+    # root of `MissingCheckInConfig` failing to flag unused checks (#1278).
+    #
+    # We supplement with check modules from any *other* loaded application
+    # (plugins, custom check libraries) by reading their module list from
+    # `:application.get_key/2`, which doesn't depend on prior code loading.
+    Enum.uniq(standard_checks() ++ external_check_modules())
+  end
+
+  defp external_check_modules do
+    for {app, _, _} <- Application.loaded_applications(),
+        app != :credo,
+        {:ok, modules} <- [:application.get_key(app, :modules)],
+        module <- modules,
+        Code.ensure_loaded?(module),
+        implements_credo_check?(module),
+        do: module
+  end
+
+  defp implements_credo_check?(module) do
+    function_exported?(module, :module_info, 1) and
+      module.module_info(:attributes)
+      |> Keyword.get_values(:behaviour)
+      |> List.flatten()
+      |> Enum.member?(__MODULE__)
   end
 end
