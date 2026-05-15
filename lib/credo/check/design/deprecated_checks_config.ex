@@ -87,6 +87,7 @@ defmodule Credo.Check.Design.DeprecatedChecksConfig do
     issue =
       format_issue(ctx,
         message: message,
+        line_no: 1,
         trigger: Issue.no_trigger()
       )
 
