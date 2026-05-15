@@ -5,7 +5,6 @@
 - Fix compatibility & compiler warnings with Elixir 1.20.0-rc.4
 - Fix problem with transitive deps in umbrella apps
 - `Credo.Check.Warning.UnusedMapOperation` fix false positives
-- New Check: `Credo.Check.Readability.SpecParameterNames`
 
 ## 1.7.17
 
