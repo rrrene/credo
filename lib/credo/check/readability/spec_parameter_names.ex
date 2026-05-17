@@ -93,10 +93,8 @@ defmodule Credo.Check.Readability.SpecParameterNames do
 
   defp line_for(_other), do: nil
 
-  defp trigger_for(
-         {{:., _dot_meta, [{:__aliases__, _alias_meta, aliases}, fun]}, _call_meta, _call_args}
-       ),
-       do: Enum.map_join(aliases, ".", &to_string/1) <> ".#{fun}"
+  defp trigger_for({{:., _dot_meta, [{:__aliases__, _alias_meta, aliases}, fun]}, _call_meta, _call_args}),
+    do: Enum.map_join(aliases, ".", &to_string/1) <> ".#{fun}"
 
   defp trigger_for({name, _meta, _args}) when is_atom(name), do: to_string(name)
   defp trigger_for(_other), do: "?"

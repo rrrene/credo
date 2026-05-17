@@ -79,7 +79,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(%{trigger: "String.t"})
   end
 
   test "it should report each unnamed parameter in a spec" do
@@ -126,7 +126,10 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+    |> assert_issues(fn issues ->
+      assert length(issues) == 2
+      assert Enum.any?(issues, &(&1.trigger == "map"))
+    end)
   end
 
   test "it should report across multiple specs in one module" do
