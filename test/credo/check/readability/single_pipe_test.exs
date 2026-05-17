@@ -96,6 +96,40 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> refute_issues()
   end
 
+  test "it should NOT report violation when piping a map or a struct and :allow_maps is true" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        %{a: 1, b: 2}
+        |> Map.put(:c, 3)
+
+        %MyStruct{name: "x"}
+        |> MyStruct.process()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_maps: true)
+    |> refute_issues()
+  end
+
+  test "it should NOT report violation when piping a list and :allow_lists is true" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        [key: :value, other: 1]
+        |> Keyword.get(:key)
+
+        [1, 2, 3]
+        |> Enum.sum()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, allow_lists: true)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -213,5 +247,61 @@ defmodule Credo.Check.Readability.SinglePipeTest do
     |> to_source_file
     |> run_check(@described_check, allow_blocks: false)
     |> assert_issue()
+  end
+
+  test "it should report a violation when piping a map and :allow_maps is not set" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        %{a: 1, b: 2}
+        |> Map.put(:c, 3)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "|>"})
+  end
+
+  test "it should report a violation when piping a struct and :allow_maps is not set" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        %MyStruct{name: "x"}
+        |> MyStruct.process()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "|>"})
+  end
+
+  test "it should report a violation when piping a list and :allow_lists is not set" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        [1, 2, 3]
+        |> Enum.sum()
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "|>"})
+  end
+
+  test "it should report a violation when piping a keyword list and :allow_lists is not set" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_fun do
+        [key: :value, other: 1]
+        |> Keyword.get(:key)
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "|>"})
   end
 end
