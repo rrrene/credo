@@ -91,7 +91,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+    |> assert_issues(2)
   end
 
   test "it should report only the unnamed parameters in a mixed spec" do
@@ -115,7 +115,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+    |> assert_issues(2)
   end
 
   test "it should report unnamed parameters in a @callback" do
@@ -126,7 +126,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 2 end)
+    |> assert_issues(2)
   end
 
   test "it should report across multiple specs in one module" do
@@ -141,6 +141,6 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(fn issues -> assert length(issues) == 3 end)
+    |> assert_issues(3)
   end
 end
