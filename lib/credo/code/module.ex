@@ -53,6 +53,15 @@ defmodule Credo.Code.Module do
     {ast, aliases ++ module_names}
   end
 
+  defp find_aliases({:alias, _, [{:__aliases__, _, mod_list}, _opts]} = ast, aliases) do
+    module_names =
+      mod_list
+      |> Name.full()
+      |> List.wrap()
+
+    {ast, aliases ++ module_names}
+  end
+
   # Multi alias
   defp find_aliases(
          {:alias, _,
