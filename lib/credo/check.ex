@@ -919,34 +919,16 @@ defmodule Credo.Check do
         app != :credo,
         {:ok, modules} <- [:application.get_key(app, :modules)],
         module <- modules,
+        Code.ensure_loaded?(module),
         implements_credo_check?(module),
         do: module
   end
 
   defp implements_credo_check?(module) do
-    case beam_attributes(module) do
-      {:ok, attributes} ->
-        attributes
-        |> Keyword.get_values(:behaviour)
-        |> List.flatten()
-        |> Enum.member?(__MODULE__)
-
-      :error ->
-        false
-    end
-  end
-
-  defp beam_attributes(module) do
-    with path when is_list(path) <- :code.which(module),
-         {:ok, {^module, [attributes: attributes]}} <- :beam_lib.chunks(path, [:attributes]) do
-      {:ok, attributes}
-    else
-      _ ->
-        if function_exported?(module, :module_info, 1) do
-          {:ok, module.module_info(:attributes)}
-        else
-          :error
-        end
-    end
+    function_exported?(module, :module_info, 1) and
+      module.module_info(:attributes)
+      |> Keyword.get_values(:behaviour)
+      |> List.flatten()
+      |> Enum.member?(__MODULE__)
   end
 end
