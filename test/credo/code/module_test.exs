@@ -445,6 +445,25 @@ defmodule Credo.Code.ModuleTest do
     assert expected == Module.aliases(ast)
   end
 
+  test "returns the list of aliases used in a given module source code when using alias with :as option" do
+    {:ok, ast} =
+      ~S'''
+      defmodule Test do
+      alias Exzmq.Socket, as: Thing
+      alias Exzmq.Tcp
+
+      def just_an_example do
+      Thing.test1
+      Exzmq.Socket.test2
+      end
+      end
+      '''
+      |> Code.string_to_quoted()
+
+    expected = ["Exzmq.Socket", "Exzmq.Tcp"]
+    assert expected == Module.aliases(ast)
+  end
+
   test "returns a default string when nested defmodule name cannot be found when Module.name is called" do
     nested_module =
       quote do

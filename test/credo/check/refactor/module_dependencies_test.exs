@@ -31,6 +31,39 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     |> refute_issues()
   end
 
+  test "it should NOT report expected code" do
+    ~S'''
+    defmodule CredoSampleModule do
+      alias Foo.Bar.DateTime
+      alias Foo.Bar.Kernel
+      alias Foo.Bar.GenServer
+      alias Foo.Bar.GenEvent
+      alias Foo.Bar.File
+      alias Foo.Bar.Time
+      alias Foo.Bar.IO
+      alias Foo.Bar.Logger
+
+      def some_function() do
+        [
+          DateTime,
+          Kernel,
+          GenServer,
+          GenEvent,
+          File,
+          Time,
+          IO,
+          Logger,
+          URI,
+          Path
+        ]
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report a violation when using param :excluded_paths" do
     ~S'''
     defmodule CredoSampleModule do
