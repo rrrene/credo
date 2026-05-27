@@ -402,6 +402,13 @@ defmodule Credo.Code.TokenTest do
     assert {1, 30, 1, 40} == Token.position({:sigil, {1, 30, nil}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("})
 
     assert {11, 28, 11, 39} == Token.position({:sigil, {11, 28, nil}, :sigil_XX, ["\\\"\\\"\\\""], [], nil, "("})
+
+    # Elixir >= 1.20 changed the third position element from nil to {end_line, end_col}
+    assert {1, 30, 1, 40} == Token.position({:sigil, {1, 30, {1, 40}}, :sigil_s, ["\\\"\\\"\\\""], [], nil, "("})
+    assert {11, 28, 11, 39} == Token.position({:sigil, {11, 28, {11, 39}}, :sigil_XX, ["\\\"\\\"\\\""], [], nil, "("})
+
+    # Elixir >= 1.20 interpolation tuple: third element is now {end_line, end_col} not nil
+    assert {1, 25, 1, 31} == Token.position({{1, 25, {1, 32}}, {1, 31, {1, 32}}, ["name"]})
   end
 
   test "should give correct token position for strings" do

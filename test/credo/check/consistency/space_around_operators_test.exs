@@ -459,4 +459,22 @@ defmodule Credo.Check.Consistency.SpaceAroundOperatorsTest do
     |> run_check(@described_check, ignore: [:+])
     |> refute_issues()
   end
+
+  test "it should not crash for issue #1289" do
+    [
+      ~S'''
+      defmodule Example do
+        def foo, do: ~D[0000-01-01]
+      end
+      ''',
+      ~S'''
+      defmodule Other do
+        def bar(x), do: x =~ ~r/foo/
+      end
+      '''
+    ]
+    |> to_source_files()
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
 end
