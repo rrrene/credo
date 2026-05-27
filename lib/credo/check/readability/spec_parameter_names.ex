@@ -58,6 +58,10 @@ defmodule Credo.Check.Readability.SpecParameterNames do
   defp check_fun_call({_fun_name, _meta, nil}, ctx), do: ctx
   defp check_fun_call(_other, ctx), do: ctx
 
+  defp check_arg(args, ctx) when is_list(args) do
+    Enum.reduce(args, ctx, &check_arg/2)
+  end
+
   # Named param: `name :: type` where name is an atom variable (nil context)
   defp check_arg({:"::", _meta, [{name, _name_meta, nil}, _type]}, ctx)
        when is_atom(name) do

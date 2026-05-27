@@ -21,7 +21,7 @@ defmodule Credo.Test.Assertions do
     issues
   end
 
-  def assert_issue(issues, callback \\ nil) do
+  def assert_issue(issues, callback \\ nil) when  is_function(callback) or is_map(callback) or is_nil(callback) do
     refute match?([], issues), "#{red()}There should be one issue, got none."
 
     assert match?([_only_issue], issues),

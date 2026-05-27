@@ -10,8 +10,8 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
   test "it should NOT report a spec with all named parameters" do
     ~S'''
     defmodule CredoSampleModule do
-      @spec create_user(attrs :: map(), email :: String.t()) :: {:ok, term()}
-      def create_user(attrs, email), do: {:ok, {attrs, email}}
+      @spec create_user(attrs :: map(), email :: String.t(), source_file :: [SourceFile.t()]) :: {:ok, term()}
+      def create_user(attrs, email, source_file), do: {:ok, {attrs, email}}
     end
     '''
     |> to_source_file
@@ -80,6 +80,42 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue()
+  end
+
+  test "it should report a spec with unnamed parameters" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @spec create_user(attrs :: map(), email :: String.t(), [SourceFile.t()]) :: {:ok, term()}
+      def create_user(attrs, email, source_file), do: {:ok, {attrs, email}}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue()
+  end
+
+  test "it should report a spec with unnamed parameters /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @spec create_user(parent, String.t(), (binary() -> any())) :: parent
+      def create_user(attrs, email, source_file), do: {:ok, {attrs, email}}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(3)
+  end
+
+  test "it should report a spec with unnamed parameters /3" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @spec create_user(parent, String.t(), list, (-> any())) :: parent
+      def create_user(attrs, email, source_file), do: {:ok, {attrs, email}}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(4)
   end
 
   test "it should report each unnamed parameter in a spec" do
