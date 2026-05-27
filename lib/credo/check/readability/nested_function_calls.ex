@@ -39,69 +39,55 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-
-    min_pipeline_length = Params.get(params, :min_pipeline_length, __MODULE__)
-
-    {_min_pipeline_length, issues} =
-      Credo.Code.prewalk(
-        source_file,
-        &traverse(&1, &2, issue_meta),
-        {min_pipeline_length, []}
-      )
-
-    issues
+    ctx = Context.build(source_file, params, __MODULE__)
+    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+    result.issues
   end
 
   # A call in a pipeline
-  defp traverse({:|>, _meta, [pipe_input, {{:., _meta2, _fun}, _meta3, args}]}, acc, _issue) do
-    {[pipe_input, args], acc}
+  defp walk({:|>, _meta, [pipe_input, {{:., _meta2, _fun}, _meta3, args}]}, ctx) do
+    {[pipe_input, args], ctx}
   end
 
   # A fully qualified call with no arguments
-  defp traverse({{:., _meta, _call}, _meta2, []} = ast, acc, _issue) do
-    {ast, acc}
+  defp walk({{:., _meta, _call}, _meta2, []} = ast, ctx) do
+    {ast, ctx}
   end
 
   # We don't look into interpolations in strings/binaries
-  defp traverse({:<<>>, _meta, _args}, acc, _issue) do
-    {nil, acc}
+  defp walk({:<<>>, _meta, _args}, ctx) do
+    {nil, ctx}
   end
 
   # We don't look into guards
-  defp traverse({expr, _meta, _args}, acc, _issue) when expr in ~w[defguard defguardp when]a do
-    {nil, acc}
+  defp walk({expr, _meta, _args}, ctx) when expr in ~w[defguard defguardp when]a do
+    {nil, ctx}
   end
 
   # We don't look into typespec attributes
-  defp traverse({:@, _, [{attr_name, _, _args}]}, acc, _issue)
+  defp walk({:@, _, [{attr_name, _, _args}]}, ctx)
        when attr_name in ~w[callback macrocallback opaque spec type typep]a do
-    {nil, acc}
+    {nil, ctx}
   end
 
   # Any call
-  defp traverse(
-         {{_name, _loc, call}, meta, args} = ast,
-         {min_pipeline_length, issues} = acc,
-         issue_meta
-       ) do
+  defp walk({{_name, _loc, call}, meta, args} = ast, %{params: %{min_pipeline_length: min_pipeline_length}} = ctx) do
     if cannot_be_in_pipeline?(ast) do
-      {ast, acc}
+      {ast, ctx}
     else
       case length_as_pipeline(args) + 1 do
         potential_pipeline_length when potential_pipeline_length >= min_pipeline_length ->
-          new_issues = issues ++ [issue_for(issue_meta, meta[:line], Name.full(call))]
-          {ast, {min_pipeline_length, new_issues}}
+          {ast, put_issue(ctx, issue_for(ctx, meta[:line], Name.full(call)))}
 
         _ ->
-          {nil, acc}
+          {nil, ctx}
       end
     end
   end
 
   # Another expression, we must no longer be in a pipeline
-  defp traverse(ast, {min_pipeline_length, issues}, _issue_meta) do
-    {ast, {min_pipeline_length, issues}}
+  defp walk(ast, ctx) do
+    {ast, ctx}
   end
 
   # Call with function call for first argument

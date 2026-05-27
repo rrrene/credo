@@ -35,11 +35,11 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
     {ast, comments} = SourceFile.ast_with_comments(source_file)
     ctx = Context.build(source_file, params, __MODULE__, %{comments: comments})
 
-    result = Credo.Code.prewalk(ast, &traverse/2, ctx)
+    result = Credo.Code.prewalk(ast, &walk/2, ctx)
     result.issues
   end
 
-  defp traverse({:@, meta, [{:tag, _, [:skip]} | _]} = ast, ctx) do
+  defp walk({:@, meta, [{:tag, _, [:skip]} | _]} = ast, ctx) do
     line_no = meta[:line] - 1
 
     found_comment? = Enum.any?(ctx.comments, fn %{line: line_no2} -> line_no2 == line_no end)
@@ -51,7 +51,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
     end
   end
 
-  defp traverse(ast, ctx) do
+  defp walk(ast, ctx) do
     {ast, ctx}
   end
 
