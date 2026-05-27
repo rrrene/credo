@@ -66,10 +66,24 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     Enum.reduce(args, ctx, &check_arg/2)
   end
 
-  # Named param: `name :: type` where name is an atom variable (nil context)
-  defp check_arg({:"::", _meta, [{name, _name_meta, nil}, _type]}, ctx)
-       when is_atom(name) do
+  # Named param: `name :: type`
+  defp check_arg({:"::", _meta, [{name, _name_meta, nil}, _type]}, ctx) when is_atom(name) do
     ctx
+  end
+
+  # Named param: `name :: type`
+  defp check_arg(nil, ctx) do
+    ctx
+  end
+
+  # Named param: `name :: type`
+  defp check_arg({:|, _meta, args}, ctx) when is_list(args) do
+    Enum.reduce(args, ctx, &check_arg/2)
+  end
+
+  # Named param: `name :: type`
+  defp check_arg({:%{}, _meta, args}, ctx) when is_list(args) do
+    Enum.reduce(args, ctx, &check_arg/2)
   end
 
   # Keyword param: `with: String.t()`
@@ -77,7 +91,7 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     check_arg(arg, ctx)
   end
 
-  defp check_arg(arg, ctx) do
+  defp check_arg({_, _, _} = arg, ctx) do
     put_issue(ctx, issue_for(ctx, arg))
   end
 

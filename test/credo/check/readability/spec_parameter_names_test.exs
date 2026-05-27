@@ -191,4 +191,40 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     |> run_check(@described_check)
     |> assert_issues(3)
   end
+
+  test "it should report across multiple specs for different reasons" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @callback assoc_query(t, Ecto.Query.t() | nil, values :: [term]) :: Ecto.Query.t()
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(2)
+    |> assert_issues_match([%{trigger: "t"}, %{trigger: "Ecto.Query.t"}])
+  end
+
+  test "it should report across multiple specs for different reasons /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @callback server_info(Plug.Conn.scheme()) ::
+        {:ok, {:inet.ip_address(), :inet.port_number()} | :inet.returned_non_ip_address()}
+        | {:error, term()}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{trigger: "Plug.Conn.scheme"})
+  end
+
+  test "it should report across multiple specs for different reasons /3" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @callback build(t, owner :: Ecto.Schema.t(), %{atom => term} | [Keyword.t()]) :: Ecto.Schema.t()
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(3)
+  end
 end
