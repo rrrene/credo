@@ -112,7 +112,7 @@ defmodule Credo.Code.Token do
   end
 
   # Elixir >= 1.9.0 tuple syntax
-  def position({{line_no, col_start, nil}, {_line_no2, _col_start2, nil}, atom_or_charlist}) do
+  def position({{line_no, col_start, _end_position}, {_line_no2, _col_start2, _end_position2}, atom_or_charlist}) do
     position_tuple_for_quoted_string(atom_or_charlist, line_no, col_start)
   end
 
@@ -252,7 +252,7 @@ defmodule Credo.Code.Token do
   defp convert_to_col_end(
          _,
          _,
-         {{line_no, col_start, nil}, {_line_no2, _col_start2, nil}, list}
+         {{line_no, col_start, _end_position}, {_line_no2, _col_start2, _end_position2}, list}
        ) do
     {line_no_end, col_end, _terminator} = convert_to_col_end(line_no, col_start, list)
 
@@ -308,7 +308,7 @@ defmodule Credo.Code.Token do
     {line_no, to_col_end(col_start, value), nil}
   end
 
-  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, list, _, _})
+  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, _end_position}, _, list, _, _})
        when is_list(list) do
     Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
   end
@@ -323,7 +323,7 @@ defmodule Credo.Code.Token do
     Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
   end
 
-  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, value, _, _}) do
+  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, _end_position}, _, value, _, _}) do
     {line_no, to_col_end(col_start, value), nil}
   end
 
