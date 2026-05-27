@@ -95,6 +95,10 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     put_issue(ctx, issue_for(ctx, arg))
   end
 
+  defp check_arg(_, ctx) do
+    ctx
+  end
+
   defp issue_for(ctx, {_, meta, _} = arg) do
     format_issue(
       ctx,
