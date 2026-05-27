@@ -37,7 +37,11 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     result.issues
   end
 
-  defp walk({:@, _meta, [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]}, ctx)
+  defp walk(
+         {:@, _meta,
+          [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]},
+         ctx
+       )
        when attr_type in [:spec, :callback] do
     {nil, check_fun_call(fun_call, ctx)}
   end
