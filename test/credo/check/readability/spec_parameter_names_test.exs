@@ -91,7 +91,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issue()
+    |> assert_issue(%{trigger: "SourceFile.t"})
   end
 
   test "it should report a spec with unnamed parameters /2" do
