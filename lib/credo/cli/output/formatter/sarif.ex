@@ -187,7 +187,7 @@ defmodule Credo.CLI.Output.Formatter.SARIF do
                 "uriBaseId" => "ROOTPATH"
               },
               "region" => %{
-                "startLine" => issue.line_no,
+                "startLine" => issue.line_no || 1,
                 "startColumn" => issue.column || 1,
                 "endColumn" => column_end,
                 "snippet" => %{

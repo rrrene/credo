@@ -60,7 +60,7 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
   end
 
   defp checks_to_compare_with(:credo_checks_enabled_by_default) do
-    Credo.Check.standard_checks()
+    Credo.Check.enabled_standard_checks()
   end
 
   @doc false
@@ -72,7 +72,6 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
     issue =
       format_issue(ctx,
         message: "Check `#{inspect(check)}` missing in config: enable or disable it explicitly.",
-        line_no: 1,
         trigger: Issue.no_trigger()
       )
 
