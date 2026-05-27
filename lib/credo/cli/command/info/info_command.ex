@@ -66,6 +66,13 @@ defmodule Credo.CLI.Command.Info.InfoCommand do
 
           #{inspect(value, pretty: true)}
           """
+
+        {:plugin, plugin, value} ->
+          """
+          ## Plugin: #{plugin}
+
+          #{inspect(value, pretty: true)}
+          """
       end)
     end
 
