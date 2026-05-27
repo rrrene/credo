@@ -31,7 +31,7 @@ defmodule Credo.Check.Refactor.ModuleDependenciesTest do
     |> refute_issues()
   end
 
-  test "it should NOT report expected code" do
+  test "it should NOT report expected code when using aliased modules" do
     ~S'''
     defmodule CredoSampleModule do
       alias Foo.Bar.DateTime
