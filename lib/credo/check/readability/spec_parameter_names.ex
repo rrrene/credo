@@ -68,6 +68,11 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     ctx
   end
 
+  # Keyword param: `with: String.t()`
+  defp check_arg({_keyword, arg}, ctx) do
+    check_arg(arg, ctx)
+  end
+
   defp check_arg(arg, ctx) do
     put_issue(ctx, issue_for(ctx, arg))
   end

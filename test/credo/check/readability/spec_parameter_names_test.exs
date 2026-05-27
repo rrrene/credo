@@ -130,6 +130,18 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     |> assert_issues(2)
   end
 
+  test "it should report a spec with unnamed parameters /4" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @spec fill_in(parent, Query.t(), with: String.t()) :: parent
+      def create_user(attrs, email, source_file), do: {:ok, {attrs, email}}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(3)
+  end
+
   test "it should report only the unnamed parameters in a mixed spec" do
     ~S'''
     defmodule CredoSampleModule do
