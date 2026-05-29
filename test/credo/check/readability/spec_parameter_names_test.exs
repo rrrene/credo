@@ -225,6 +225,20 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(3)
+    |> assert_issues(2)
+    |> assert_issues_match([%{trigger: "t"}, %{trigger: "Keyword.t"}])
+  end
+
+  test "it should report across multiple specs for different reasons /4" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @callback get_and_update(data, key, (value | nil -> {current_value, new_value :: value} | :pop)) ::
+                  {current_value, new_data :: data}
+                when current_value: value, data: container
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(4)
   end
 end

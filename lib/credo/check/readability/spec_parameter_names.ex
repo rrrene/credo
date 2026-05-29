@@ -76,23 +76,20 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     ctx
   end
 
-  # Named param: `name :: type`
   defp check_arg({:|, _meta, args}, ctx) when is_list(args) do
     Enum.reduce(args, ctx, &check_arg/2)
   end
 
-  # Named param: `name :: type`
   defp check_arg({:%{}, _meta, args}, ctx) when is_list(args) do
-    Enum.reduce(args, ctx, &check_arg/2)
+    ctx
   end
 
-  # Keyword param: `with: String.t()`
-  defp check_arg({_keyword, arg}, ctx) do
-    check_arg(arg, ctx)
-  end
-
-  defp check_arg({_, _, _} = arg, ctx) do
+  defp check_arg({_, [_|_] = _meta, _} = arg, ctx) do
     put_issue(ctx, issue_for(ctx, arg))
+  end
+
+  defp check_arg(tuple, ctx) when is_tuple(tuple) do
+    Enum.reduce(Tuple.to_list(tuple), ctx, &check_arg/2)
   end
 
   defp check_arg(_, ctx) do
