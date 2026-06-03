@@ -65,7 +65,7 @@ defmodule Credo.Execution.Timing do
 
   @doc false
   def record_event(%Credo.Execution{} = exec, event_name, attributes \\ %{}) do
-    span_ctx = get_span_ctx(exec) |> dbg
+    span_ctx = get_span_ctx(exec)
 
     event = %{
       name: event_name,
@@ -73,7 +73,7 @@ defmodule Credo.Execution.Timing do
       attributes: attributes
     }
 
-    set_span_ctx(exec, %{span_ctx | events: [event | span_ctx.events]}) |> dbg
+    set_span_ctx(exec, %{span_ctx | events: [event | span_ctx.events]})
 
     exec
   end
