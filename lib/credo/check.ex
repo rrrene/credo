@@ -377,6 +377,8 @@ defmodule Credo.Check do
 
       import Credo.Check.Context, except: [build: 4]
 
+      require Credo.Execution.Timing, as: Timing
+
       unquote(def_base_priority)
       unquote(def_category)
       unquote(def_elixir_version)
@@ -431,17 +433,10 @@ defmodule Credo.Check do
       @impl true
       def run_on_source_file(exec, source_file, params \\ [])
 
-      def run_on_source_file(%Execution{config: %{debug: true}} = exec, source_file, params) do
-        ExecutionTiming.run(&do_run_on_source_file/3, [exec, source_file, params])
-        |> ExecutionTiming.append(exec,
-          task: exec.private.current_task,
-          check: __MODULE__,
-          filename: source_file.filename
-        )
-      end
-
-      def run_on_source_file(exec, source_file, params) do
-        do_run_on_source_file(exec, source_file, params)
+      def run_on_source_file(exec, %{filename: filename} = source_file, params) do
+        Timing.span exec, "check:source_file", task: exec.private.current_task, check: __MODULE__, filename: filename do
+          do_run_on_source_file(exec, source_file, params)
+        end
       end
 
       defp do_run_on_source_file(exec, source_file, params) do

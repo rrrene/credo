@@ -52,10 +52,7 @@ defmodule Credo.Execution.Task do
   """
   @callback error(exec :: Credo.Execution.t(), opts :: Keyword.t()) :: Credo.Execution.t()
 
-  require Logger
-
   alias Credo.Execution
-  alias Credo.Execution.ExecutionTiming
 
   defmacro __using__(_opts \\ []) do
     quote do
@@ -103,15 +100,15 @@ defmodule Credo.Execution.Task do
     end
   end
 
+  require Credo.Execution.Timing, as: Timing
+
   @doc false
   def run(task, exec, opts \\ [])
 
-  def run(task, %Credo.Execution{config: %{debug: true}} = exec, opts) do
-    run_with_timing(task, exec, opts)
-  end
-
   def run(task, %Execution{} = exec, opts) do
-    do_run(task, exec, opts)
+    Timing.span exec, "task", parent_task: exec.private.parent_task, task: task, opts: Map.new(opts) do
+      do_run(task, exec, opts)
+    end
   end
 
   def run(_task, exec, _opts) do
@@ -143,41 +140,5 @@ defmodule Credo.Execution.Task do
 
   defp do_run(_task, exec, _opts) do
     exec
-  end
-
-  #
-
-  defp run_with_timing(task, exec, opts) do
-    context_tuple = {:task, exec, task, opts}
-    log(:call_start, context_tuple)
-
-    {started_at, time, exec} = ExecutionTiming.run(&do_run/3, [task, exec, opts])
-
-    log(:call_end, context_tuple, time)
-
-    ExecutionTiming.append(exec, [task: task, parent_task: exec.private.parent_task], started_at, time)
-
-    exec
-  end
-
-  defp log(:call_start, {:task, _exec, task, _opts}) do
-    Logger.info("Calling #{task} ...")
-  end
-
-  defp log(:call_end, {:task, _exec, task, _opts}, time) do
-    Logger.info("Finished #{task} in #{format_time(time)} ...")
-  end
-
-  defp format_time(time) do
-    cond do
-      time > 1_000_000 ->
-        "#{div(time, 1_000_000)}s"
-
-      time > 1_000 ->
-        "#{div(time, 1_000)}ms"
-
-      true ->
-        "#{time}μs"
-    end
   end
 end

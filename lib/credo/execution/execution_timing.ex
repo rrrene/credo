@@ -59,9 +59,14 @@ defmodule Credo.Execution.ExecutionTiming do
   def append(%Execution{} = exec, tags, started_at, duration) do
     pid = Execution.get_private(exec, :timing_pid)
 
-    spawn(fn ->
-      GenServer.call(pid, {:append, tags, started_at, duration})
-    end)
+    GenServer.cast(pid, {:append, tags, started_at, duration})
+  end
+
+  @doc false
+  def append(%Execution{} = exec, name, span_ctx, tags, started_at, duration) do
+    pid = Execution.get_private(exec, :timing_pid)
+
+    GenServer.cast(pid, {:append, name, span_ctx, tags, started_at, duration})
   end
 
   @doc """
@@ -70,9 +75,7 @@ defmodule Credo.Execution.ExecutionTiming do
   def append({started_at, duration, _result}, %Execution{} = exec, tags) do
     pid = Execution.get_private(exec, :timing_pid)
 
-    spawn(fn ->
-      GenServer.call(pid, {:append, tags, started_at, duration})
-    end)
+    GenServer.cast(pid, {:append, tags, started_at, duration})
   end
 
   @doc """
@@ -127,24 +130,26 @@ defmodule Credo.Execution.ExecutionTiming do
   Returns the earliest timestamp for the given `exec`.
   """
   def started_at(exec) do
-    {_, started_at, _} =
-      exec
-      |> all()
-      |> List.first()
-
-    started_at
+    exec
+    |> all()
+    |> List.first()
+    |> case do
+      {_, started_at, _} -> started_at
+      {_, _, _, _, started_at, _} -> started_at
+    end
   end
 
   @doc """
   Returns the latest timestamp plus its duration for the given `exec`.
   """
   def ended_at(exec) do
-    {_, started_at, duration} =
-      exec
-      |> all()
-      |> List.last()
-
-    started_at + duration
+    exec
+    |> all()
+    |> List.first()
+    |> case do
+      {_, started_at, duration} -> started_at + duration
+      {_, _, _, _, started_at, duration} -> started_at + duration
+    end
   end
 
   defp format_time(time) do
@@ -174,16 +179,29 @@ defmodule Credo.Execution.ExecutionTiming do
     {:ok, []}
   end
 
+  # Deprecated
   @doc false
-  def handle_call({:append, tags, started_at, time}, _from, current_state) do
-    new_current_state = [{tags, started_at, time} | current_state]
+  def handle_cast({:append, tags, started_at, time}, current_state) do
+    new_current_state = [{nil, tags, started_at, time} | current_state]
 
-    {:reply, :ok, new_current_state}
+    {:noreply, new_current_state}
+  end
+
+  @doc false
+  def handle_cast({:append, span_ctx, name, tags, started_at, time}, current_state) do
+    events = span_ctx.events
+    new_current_state = [{Map.drop(span_ctx, [:events]), name, Map.new(tags), events, started_at, time} | current_state]
+
+    {:noreply, new_current_state}
   end
 
   @doc false
   def handle_call(:all, _from, current_state) do
-    list = Enum.sort_by(current_state, fn {_, started_at, _} -> started_at end)
+    list =
+      Enum.sort_by(current_state, fn
+        {_, started_at, _} -> started_at
+        {_, _, _, _, started_at, _} -> started_at
+      end)
 
     {:reply, list, current_state}
   end

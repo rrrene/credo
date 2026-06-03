@@ -3,6 +3,8 @@ defmodule Credo.Execution.Task.InitializeCommand do
 
   alias Credo.Execution
 
+  require Credo.Execution.Timing, as: Timing
+
   def call(%Execution{} = exec, _opts) do
     command_name = Execution.get_command_name(exec)
     command_mod = Execution.get_command(exec, command_name)
@@ -19,6 +21,7 @@ defmodule Credo.Execution.Task.InitializeCommand do
     |> Enum.reduce(exec, fn {switch_alias, switch_name}, exec ->
       Execution.put_cli_switch_alias(exec, command_mod, switch_name, switch_alias)
     end)
+        |> Timing.add_event("init_command", %{command_name: command_name})
   end
 
   defp cli_options_switches(command_mod) do

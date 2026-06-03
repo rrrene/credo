@@ -88,8 +88,19 @@ defmodule Credo.Execution.Task.WriteDebugReport do
   end
 
   def timings_to_map(list) do
-    Enum.map(list, fn {tags, started_at, duration} ->
-      %{tags: Enum.into(tags, %{}), started_at: started_at, duration: duration}
+    Enum.map(list, fn {%{} = span_ctx, name, tags, events, started_at, duration} ->
+      %{
+        span_id: to_hex(span_ctx.span_id),
+        parent_span_id: to_hex(span_ctx.parent_span_id),
+        name: name,
+        tags: tags,
+        events: events,
+        started_at: started_at,
+        duration: duration
+      }
     end)
   end
+
+  defp to_hex(nil), do: nil
+  defp to_hex(id), do: Base.encode16(id, case: :lower)
 end

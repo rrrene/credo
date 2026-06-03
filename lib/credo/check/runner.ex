@@ -7,7 +7,8 @@ defmodule Credo.Check.Runner do
   alias Credo.Check.Params
   alias Credo.CLI.Output.UI
   alias Credo.Execution
-  alias Credo.Execution.ExecutionTiming
+
+  require Credo.Execution.Timing, as: Timing
 
   @doc """
   Runs all checks on all source files (according to the config).
@@ -33,13 +34,10 @@ defmodule Credo.Check.Runner do
     :ok
   end
 
-  defp run_check(%Execution{config: %{debug: true}} = exec, {check, params}) do
-    ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
-    |> ExecutionTiming.append(exec, task: exec.private.current_task, check: check)
-  end
-
   defp run_check(exec, {check, params}) do
-    do_run_check(exec, {check, params})
+    Timing.span exec, "check", task: exec.private.current_task, check: check do
+      do_run_check(exec, {check, params})
+    end
   end
 
   defp do_run_check(exec, {check, params}) do

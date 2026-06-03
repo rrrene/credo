@@ -5,8 +5,14 @@ defmodule Credo.Execution.Task.InitializePlugins do
 
   alias Credo.Execution
 
+  require Credo.Execution.Timing, as: Timing
+
   def call(exec, _opts) do
-    Enum.reduce(exec.config.plugins, exec, &init_plugin(&2, &1))
+    exec = Enum.reduce(exec.config.plugins, exec, &init_plugin(&2, &1))
+
+    dbg(exec.private.span_ctx)
+
+    exec
   end
 
   defp init_plugin(exec, {_mod, false}), do: exec
@@ -19,6 +25,7 @@ defmodule Credo.Execution.Task.InitializePlugins do
         |> mod.init()
         |> Execution.ensure_execution_struct("#{mod}.init/1")
         |> Execution.set_initializing_plugin(nil)
+        |> Timing.add_event("init_plugin", %{plugin: mod})
       else
         Execution.halt(
           exec,

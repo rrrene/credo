@@ -11,6 +11,8 @@ defmodule Credo do
   alias Credo.Execution
   alias Credo.Execution.Task.WriteDebugReport
 
+  require Credo.Execution.Timing, as: Timing
+
   @version Mix.Project.config()[:version]
 
   @doc """
@@ -25,9 +27,11 @@ defmodule Credo do
 
   """
   def run(argv_or_exec) do
-    argv_or_exec
-    |> Execution.build()
-    |> Execution.run()
+    exec = Execution.build(argv_or_exec)
+
+    Timing.span exec, "main", argv: exec.cli_options.argv do
+      Execution.run(exec)
+    end
     |> WriteDebugReport.call([])
   end
 

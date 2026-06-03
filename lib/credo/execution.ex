@@ -78,6 +78,7 @@ defmodule Credo.Execution do
               initializing_plugin: nil,
               current_task: nil,
               parent_task: nil,
+              span_ctx: nil,
               skipped_checks: nil
   end
 
@@ -137,10 +138,11 @@ defmodule Credo.Execution do
   @doc "Builds an Execution struct for the given `argv`."
   def build(argv \\ []) when is_list(argv) do
     max_concurrent_check_runs = System.schedulers_online()
+    debug? = "--debug" in argv
 
     %__MODULE__{
       cli_options: %Options{argv: argv},
-      config: %__MODULE__.RuntimeConfig{},
+      config: %__MODULE__.RuntimeConfig{debug: debug?},
       private: %__MODULE__.Private{max_concurrent_check_runs: max_concurrent_check_runs}
     }
     |> put_pipeline(@execution_pipeline_key, @execution_pipeline)
