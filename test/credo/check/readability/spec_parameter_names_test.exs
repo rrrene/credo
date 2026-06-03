@@ -115,7 +115,7 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(4)
+    |> assert_issues(3)
   end
 
   test "it should report each unnamed parameter in a spec" do
@@ -239,6 +239,6 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     '''
     |> to_source_file
     |> run_check(@described_check)
-    |> assert_issues(4)
+    |> assert_issues(3)
   end
 end
