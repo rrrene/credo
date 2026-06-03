@@ -3,11 +3,16 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     id: "EX5016",
     base_priority: :high,
     category: :warning,
-    tags: [:controversial],
     explanations: [
       check: """
-      Creating atoms from unknown or external sources dynamically is a potentially
-      unsafe operation because atoms are not garbage-collected by the runtime.
+      Creating atoms from unknown or external input is a security risk, not just a
+      style preference.
+
+      Atoms are not garbage-collected by the runtime and the number of atoms a node
+      can hold is capped (1_048_576 by default). Any code path that turns
+      attacker-controlled input into atoms can therefore exhaust the atom table and
+      crash the entire VM. That is a denial-of-service vulnerability, and in a
+      web-facing application it is a CVE waiting to happen.
 
       Creating an atom from a string or charlist should be done by using
 
@@ -33,6 +38,9 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
 
           Jason.decode(str)
 
+      For more on atom exhaustion as an attack vector, see:
+
+      https://erlef.org/blog/security/atom-exhaustion
       """
     ]
 
