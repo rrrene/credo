@@ -8,11 +8,7 @@ defmodule Credo.Execution.Task.InitializePlugins do
   require Credo.Execution.Timing, as: Timing
 
   def call(exec, _opts) do
-    exec = Enum.reduce(exec.config.plugins, exec, &init_plugin(&2, &1))
-
-    dbg(exec.private.span_ctx)
-
-    exec
+    Enum.reduce(exec.config.plugins, exec, &init_plugin(&2, &1))
   end
 
   defp init_plugin(exec, {_mod, false}), do: exec
