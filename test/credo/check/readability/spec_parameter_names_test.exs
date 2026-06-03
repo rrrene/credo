@@ -241,4 +241,17 @@ defmodule Credo.Check.Readability.SpecParameterNamesTest do
     |> run_check(@described_check)
     |> assert_issues(3)
   end
+
+  test "it should report across multiple specs for different reasons /5" do
+    ~S'''
+    defmodule CredoSampleModule do
+      @spec shift(DateTime.t(), list({atom(), term})) :: DateTime.t() | {:error, term}
+      def shift(%DateTime{} = datetime, shifts) when is_list(shifts) do
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issues(3)
+  end
 end

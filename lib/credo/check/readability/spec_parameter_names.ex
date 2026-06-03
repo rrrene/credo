@@ -87,8 +87,16 @@ defmodule Credo.Check.Readability.SpecParameterNames do
     ctx
   end
 
-  defp check_arg({_, [_ | _] = _meta, _} = arg, ctx) do
+  defp check_arg({_, [_ | _] = _meta, nil} = arg, ctx) do
     put_issue(ctx, issue_for(ctx, arg))
+  end
+
+  defp check_arg({_, [_ | _] = _meta, []} = arg, ctx) do
+    put_issue(ctx, issue_for(ctx, arg))
+  end
+
+  defp check_arg({_, [_ | _] = _meta, args}, ctx) do
+    Enum.reduce(args, ctx, &check_arg/2)
   end
 
   # Keyword param: `with: String.t()`
