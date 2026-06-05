@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.19
+
+- Fix compatibility & compiler warnings with Elixir 1.20.0
+
 ## 1.7.18
 
 - Fix compatibility & compiler warnings with Elixir 1.20.0-rc.4
