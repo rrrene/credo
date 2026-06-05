@@ -146,7 +146,6 @@ defmodule Credo.Code.Token do
   @doc false
   def position_tuple_for_quoted_string(list, line_no, col_start)
       when is_list(list) do
-    # add 1 for " (closing double quote)
     {line_no_end, col_end, terminator} = convert_to_col_end(line_no, col_start, list)
 
     {line_no_end, col_end} =
@@ -243,7 +242,7 @@ defmodule Credo.Code.Token do
     {line_no, to_col_end(col_start, value), nil}
   end
 
-  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, list, _, _})
+  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, _end_position_or_nil}, _, list, _, _})
        when is_list(list) do
     Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
   end
@@ -252,13 +251,13 @@ defmodule Credo.Code.Token do
   defp convert_to_col_end(
          _,
          _,
-         {:sigil, {line_no, col_start, nil}, _, list, _list, _number, _binary}
+         {:sigil, {line_no, col_start, _end_position_or_nil}, _, list, _list, _number, _binary}
        )
        when is_list(list) do
     Enum.reduce(list, {line_no, col_start, nil}, &reduce_to_col_end/2)
   end
 
-  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, nil}, _, value, _, _}) do
+  defp convert_to_col_end(_, _, {:sigil, {line_no, col_start, _end_position_or_nil}, _, value, _, _}) do
     {line_no, to_col_end(col_start, value), nil}
   end
 
