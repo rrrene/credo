@@ -339,4 +339,16 @@ defmodule Credo.Code.TokenTest do
 
     assert {1, 1, 1, 15} == position
   end
+
+  test "should give correct token position for sigil /2" do
+    source = ~S'''
+    "#{~p"/users/log-in"}?#{URI.encode_query(params)}"
+    '''
+
+    tokens = Credo.Code.to_tokens(source)
+
+    position = tokens |> List.first() |> Token.position()
+
+    assert {1, 1, 1, 51} == position
+  end
 end
