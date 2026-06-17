@@ -33,6 +33,49 @@ defmodule Credo.CLI.Output.UITest do
     assert expected == lines
   end
 
+  test "it should keep each line break on its own element so callers can write them" do
+    lines =
+      "First line of the message.\nSecond line of the message."
+      |> UI.wrap_at(80)
+
+    expected = [
+      "First line of the message.\n",
+      "Second line of the message."
+    ]
+
+    assert expected == lines
+  end
+
+  test "it should keep a blank line as its own element" do
+    lines =
+      "First paragraph.\n\nSecond paragraph."
+      |> UI.wrap_at(80)
+
+    expected = [
+      "First paragraph.\n",
+      "\n",
+      "Second paragraph."
+    ]
+
+    assert expected == lines
+  end
+
+  test "with_trailing_newline should append a newline to plain content" do
+    assert ["Plain wrapped line", "\n"] == UI.with_trailing_newline("Plain wrapped line")
+  end
+
+  test "with_trailing_newline should not double a newline already present in the final chunk" do
+    line = ["First line of the message.\n"]
+
+    assert line == UI.with_trailing_newline(line)
+  end
+
+  test "with_trailing_newline should keep a blank line as a single line break" do
+    line = ["\n"]
+
+    assert line == UI.with_trailing_newline(line)
+  end
+
   test "it should be able to break up a line including unicode characters" do
     lines =
       "あいうえ"
