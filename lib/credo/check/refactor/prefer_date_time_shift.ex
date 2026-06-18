@@ -2,6 +2,7 @@ defmodule Credo.Check.Refactor.PreferDateTimeShift do
   use Credo.Check,
     id: "EX4034",
     base_priority: :low,
+    elixir_version: ">= 1.17.0",
     explanations: [
       check: """
       `Date.shift/2`, `DateTime.shift/2`, `NaiveDateTime.shift/2`, and
