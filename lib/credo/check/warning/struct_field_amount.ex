@@ -15,7 +15,7 @@ defmodule Credo.Check.Warning.StructFieldAmount do
       the Erlang Virtual Machines changes, potentially leading to bloating
       and higher memory usage.
 
-      https://hexdocs.pm/elixir/1.19.0/code-anti-patterns.html#structs-with-32-fields-or-more
+      See https://hexdocs.pm/elixir/1.19.0/code-anti-patterns.html#structs-with-32-fields-or-more
       """,
       params: [
         max_fields: "The maximum number of field a struct should be allowed to have."
