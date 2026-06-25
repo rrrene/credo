@@ -60,7 +60,7 @@ defmodule Credo.Mixfile do
       main: "overview",
       logo: "assets/credo-logo-with-trail.png",
       extra_section: "GUIDES",
-      assets: "guides/assets",
+      assets: %{"guides/assets" => "doc/assets"},
       formatters: ["html"],
       nest_modules_by_prefix: nest_modules_by_prefix(),
       groups_for_modules: groups_for_modules(),
