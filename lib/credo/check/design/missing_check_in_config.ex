@@ -3,7 +3,7 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
     id: "EX2007",
     base_priority: :high,
     param_defaults: [
-      compare_to: :all
+      compare_to: :credo_checks
     ],
     explanations: [
       check: """
@@ -16,7 +16,7 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
         compare_to: """
         Which set of checks should be considered when looking for missing checks:
 
-        - `:all` - all checks
+        - `:all` - all checks ever mentioned in any transitive config
         - `:credo_checks` - all checks from Credo
         - `:credo_checks_enabled_by_default` - all checks from Credo that are enabled by default
         """
@@ -42,7 +42,7 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
           (List.wrap(check_map[:enabled]) ++ List.wrap(check_map[:disabled]))
           |> Enum.map(&elem(&1, 0))
 
-        all_relevant_checks = checks_to_compare_with(ctx.params.compare_to)
+        all_relevant_checks = checks_to_compare_with(exec, ctx.params.compare_to)
 
         all_relevant_checks -- configured_checks
 
@@ -51,15 +51,15 @@ defmodule Credo.Check.Design.MissingCheckInConfig do
     end
   end
 
-  defp checks_to_compare_with(:all) do
-    Credo.Check.all_loaded_checks()
+  defp checks_to_compare_with(exec, :all) do
+    Credo.Check.mentioned_checks(exec)
   end
 
-  defp checks_to_compare_with(:credo_checks) do
+  defp checks_to_compare_with(_exec, :credo_checks) do
     Credo.Check.standard_checks()
   end
 
-  defp checks_to_compare_with(:credo_checks_enabled_by_default) do
+  defp checks_to_compare_with(_exec, :credo_checks_enabled_by_default) do
     Credo.Check.enabled_standard_checks()
   end
 

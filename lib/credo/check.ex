@@ -896,7 +896,32 @@ defmodule Credo.Check do
   end
 
   @doc false
-  def all_loaded_checks do
-    Credo.Code.loaded_modules_implementing(__MODULE__)
+  # TODO: decide whether this should live here or in `Credo.Execution`.
+  def mentioned_checks(exec) do
+    exec
+    |> Credo.Execution.ExecutionConfigFiles.get()
+    |> Enum.map(fn {type, location, exs_string} ->
+      case Credo.ExsLoader.parse(exs_string, location, exec) do
+        {:ok, %{configs: configs}} ->
+          checks = Enum.flat_map(configs, &extract_mentioned_check_modules/1)
+          %{type: type, location: location, checks: checks}
+
+        _ ->
+          nil
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.flat_map(& &1.checks)
   end
+
+  defp extract_mentioned_check_modules(%{checks: %{} = check_map}) do
+    (List.wrap(check_map[:enabled]) ++ List.wrap(check_map[:disabled]) ++ List.wrap(check_map[:extra]))
+    |> Enum.map(&elem(&1, 0))
+  end
+
+  defp extract_mentioned_check_modules(%{checks: check_list}) when is_list(check_list) do
+    Enum.map(check_list, &elem(&1, 0))
+  end
+
+  defp extract_mentioned_check_modules(_), do: []
 end
