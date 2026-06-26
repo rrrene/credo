@@ -37,47 +37,42 @@ defmodule Credo.Check.Readability.Specs do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    specs = Credo.Code.prewalk(source_file, &find_specs(&1, &2))
-
-    ctx = Context.build(source_file, params, __MODULE__, %{specs: specs})
+    ctx = Context.build(source_file, params, __MODULE__, %{specs: []})
     result = Credo.Code.prewalk(source_file, &walk/2, ctx)
     result.issues
   end
 
-  defp find_specs(
+  defp walk(
          {:spec, _, [{:when, _, [{:"::", _, [{name, _, args}, _]}, _]} | _]} = ast,
-         specs
+         ctx
        ) do
-    {ast, [{name, length(args)} | specs]}
+    {ast, unshift(ctx, :specs, {name, length(args)})}
   end
 
-  defp find_specs({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, specs)
+  defp walk({:spec, _, [{_, _, [{name, _, args} | _]}]} = ast, ctx)
        when is_list(args) or is_nil(args) do
     args = with nil <- args, do: []
-    {ast, [{name, length(args)} | specs]}
+
+    {ast, unshift(ctx, :specs, {name, length(args)})}
   end
 
-  defp find_specs({:impl, _, [impl]} = ast, specs) when impl != false do
-    {ast, [:impl | specs]}
+  defp walk({:impl, _, [impl]} = ast, ctx) when impl != false do
+    {ast, unshift(ctx, :specs, :impl)}
   end
 
-  defp find_specs({keyword, meta, [{:when, _, def_ast} | _]}, [:impl | specs])
+  defp walk({keyword, meta, [{:when, _, def_ast} | _]}, %{specs: [:impl | _specs]} = ctx)
        when keyword in [:def, :defp] do
-    find_specs({keyword, meta, def_ast}, [:impl | specs])
+    walk({keyword, meta, def_ast}, ctx)
   end
 
-  defp find_specs({keyword, _, [{name, _, nil}, _]} = ast, [:impl | specs])
+  defp walk({keyword, _, [{name, _, nil}, _]} = ast, %{specs: [:impl | _specs]} = ctx)
        when keyword in [:def, :defp] do
-    {ast, [{name, 0} | specs]}
+    {ast, unshift(ctx, :specs, {name, 0})}
   end
 
-  defp find_specs({keyword, _, [{name, _, args}, _]} = ast, [:impl | specs])
+  defp walk({keyword, _, [{name, _, args}, _]} = ast, %{specs: [:impl | _specs]} = ctx)
        when keyword in [:def, :defp] do
-    {ast, [{name, length(args)} | specs]}
-  end
-
-  defp find_specs(ast, issues) do
-    {ast, issues}
+    {ast, unshift(ctx, :specs, {name, length(args)})}
   end
 
   defp walk({:quote, _, _}, ctx) do
