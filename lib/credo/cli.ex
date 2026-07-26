@@ -11,7 +11,7 @@ defmodule Credo.CLI do
   See `Credo.run/1` if you want to run Credo programmatically.
   """
   def main(argv \\ []) do
-    Credo.Application.start(nil, nil)
+    Application.ensure_all_started(:credo)
 
     {options, _argv_rest, _errors} = OptionParser.parse(argv, strict: [watch: :boolean])
 
