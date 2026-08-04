@@ -407,6 +407,51 @@ defmodule Credo.Check.Design.AliasUsageTest do
   # cases raising issues
   #
 
+  #
+  # struct literal cases
+  #
+
+  test "it should NOT report struct literal when module is already aliased" do
+    ~S'''
+    defmodule Foo do
+      alias Foo.Bar.Baz
+
+      def run do
+        %Baz{}
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
+  test "it should report struct literal with unaliased nested module" do
+    ~S'''
+    defmodule Foo do
+      def run do
+        %Foo.Bar.Baz{}
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: "Foo.Bar.Baz"})
+  end
+
+  test "it should report struct literal with fields and unaliased nested module" do
+    ~S'''
+    defmodule Foo do
+      def run do
+        %Foo.Bar.Baz{key: :value}
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: "Foo.Bar.Baz"})
+  end
+
   test "it should report violation on impossible additional alias when using multi alias" do
     ~S'''
     defmodule Test do
