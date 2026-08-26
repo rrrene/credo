@@ -59,6 +59,29 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCasesTest do
       |> refute_issues()
     end
 
+    test "it allows `use #{@case_name}, async:` with a value from a function call" do
+      ~s'''
+      defmodule FooTest do
+        use #{@case_name}, async: Application.compile_env(:my_app, :async, true)
+      end
+      '''
+      |> to_source_file()
+      |> run_check(@described_check)
+      |> refute_issues()
+    end
+
+    test "it allows `use #{@case_name}, async:` with a value from an attribute" do
+      ~s'''
+      defmodule FooTest do
+        @async false
+        use #{@case_name}, async: @async
+      end
+      '''
+      |> to_source_file()
+      |> run_check(@described_check, force_comment_on_explicit_false: true)
+      |> refute_issues()
+    end
+
     #
     # cases raising issues
     #
