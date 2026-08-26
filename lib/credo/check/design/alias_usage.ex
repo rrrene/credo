@@ -119,6 +119,12 @@ defmodule Credo.Check.Design.AliasUsage do
     do_find_issues(ast, mod_list, meta, ctx)
   end
 
+  # Struct literals: %Foo.Bar.Baz{} — the module is a reference, not a function call
+  defp find_issues({:%, _, [{:__aliases__, meta, mod_list}, _]} = ast, ctx)
+       when is_list(mod_list) do
+    do_find_issues(ast, mod_list, meta, ctx)
+  end
+
   defp find_issues(ast, ctx) do
     {ast, ctx}
   end
