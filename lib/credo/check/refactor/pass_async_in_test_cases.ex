@@ -41,11 +41,7 @@ defmodule Credo.Check.Refactor.PassAsyncInTestCases do
         {:ok, false} ->
           handle_explicit_async_false(ast, ctx)
 
-        # `true`, or a value that is only known at compile or run time, such as
-        # `Application.compile_env/3` or a module attribute. The option is
-        # passed, which is what this check asks for, and whether it resolves to
-        # `false` cannot be seen here.
-        {:ok, _passed} ->
+        {:ok, _not_false} ->
           {ast, ctx}
       end
     else
