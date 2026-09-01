@@ -391,7 +391,7 @@ defmodule Credo.ConfigFile do
     disabled = disable_check_tuples(checks_other[:disabled])
 
     %{
-      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.merge(disabled),
+      enabled: checks_other_enabled |> normalize_check_tuples() |> Keyword.drop(Keyword.keys(disabled)),
       disabled: checks_other[:disabled] || []
     }
   end
