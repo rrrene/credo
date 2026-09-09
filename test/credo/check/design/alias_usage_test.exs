@@ -452,6 +452,19 @@ defmodule Credo.Check.Design.AliasUsageTest do
     |> assert_issue(%{line_no: 3, trigger: "Foo.Bar.Baz"})
   end
 
+  test "it should NOT report struct literal when include_struct_literals is false" do
+    ~S'''
+    defmodule Foo do
+      def run do
+        %Foo.Bar.Baz{}
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, include_struct_literals: false)
+    |> refute_issues()
+  end
+
   test "it should report violation on impossible additional alias when using multi alias" do
     ~S'''
     defmodule Test do
