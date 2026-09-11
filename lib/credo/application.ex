@@ -6,6 +6,8 @@ defmodule Credo.Application do
   @worker_modules [
     Credo.CLI.Output.Shell,
     Credo.Service.SourceFileAST,
+    Credo.Service.SourceFileCredoTokens,
+    Credo.Service.SourceFileElixirTokens,
     Credo.Service.SourceFileLines,
     Credo.Service.SourceFileScopes,
     Credo.Service.SourceFileScopePriorities,
