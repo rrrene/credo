@@ -1,6 +1,6 @@
 # mix credo list
 
-`list` suggests issues, grouping them by file and NOT limitting the list to a certain count.
+`list` suggests issues, grouping them by file and NOT limiting the list to a certain count.
 
 ## Examples
 

@@ -31,7 +31,7 @@ defmodule Credo.Check.Design.DeprecatedChecksConfig do
                   enabled: [
                     # ...
                   ],
-                  diabled: [
+                  disabled: [
                     {Credo.Check.Readability.LargeNumbers, only_greater_than: 99_999}
                   ]
                 }
