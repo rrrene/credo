@@ -23,6 +23,18 @@ defmodule Credo.Service.ETSTableHelper do
         {:ok, _pid} = GenServer.start_link(__MODULE__, opts, name: __MODULE__)
       end
 
+      def get_or_compute(source_file, fallback_fun) when is_function(fallback_fun, 1) do
+        case get(source_file) do
+          {:ok, cached_value} ->
+            cached_value
+
+          :notfound ->
+            computed_value = fallback_fun.(source_file)
+            put(source_file, computed_value)
+            computed_value
+        end
+      end
+
       def get(source_file) do
         hash = source_file.hash
 

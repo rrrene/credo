@@ -150,19 +150,11 @@ defmodule Credo.Code do
   def to_tokens(string_or_source_file)
 
   def to_tokens(%SourceFile{} = source_file) do
-    case SourceFileElixirTokens.get(source_file) do
-      {:ok, tokens} ->
-        tokens
-
-      :notfound ->
-        tokens =
-          source_file
-          |> SourceFile.source()
-          |> to_tokens(source_file.filename)
-
-        SourceFileElixirTokens.put(source_file, tokens)
-        tokens
-    end
+    SourceFileElixirTokens.get_or_compute(source_file, fn source_file ->
+      source_file
+      |> SourceFile.source()
+      |> to_tokens(source_file.filename)
+    end)
   end
 
   def to_tokens(source, filename \\ "nofilename") when is_binary(source) do

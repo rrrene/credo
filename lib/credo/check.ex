@@ -800,39 +800,21 @@ defmodule Credo.Check do
   #       {:defmodule, "Foo.Bar"}
   #     ]
   defp scope_list(%SourceFile{} = source_file) do
-    case SourceFileScopes.get(source_file) do
-      {:ok, value} ->
-        value
+    SourceFileScopes.get_or_compute(source_file, fn source_file ->
+      ast = SourceFile.ast(source_file)
+      lines = SourceFile.lines(source_file)
+      scope_info_list = Scope.scope_info_list(ast)
 
-      :notfound ->
-        ast = SourceFile.ast(source_file)
-        lines = SourceFile.lines(source_file)
-        scope_info_list = Scope.scope_info_list(ast)
-
-        result =
-          Enum.map(lines, fn {line_no, _} ->
-            Scope.name_from_scope_info_list(scope_info_list, line_no)
-          end)
-
-        SourceFileScopes.put(source_file, result)
-
-        result
-    end
+      Enum.map(lines, fn {line_no, _} ->
+        Scope.name_from_scope_info_list(scope_info_list, line_no)
+      end)
+    end)
   end
 
   defp priority_for(source_file, scope) do
     # Caching scope priorities, because these have to be computed only once per file. This
     # significantly speeds up the execution time when a large number of issues are generated.
-    scope_prio_map =
-      case SourceFileScopePriorities.get(source_file) do
-        {:ok, value} ->
-          value
-
-        :notfound ->
-          result = Priority.scope_priorities(source_file)
-          SourceFileScopePriorities.put(source_file, result)
-          result
-      end
+    scope_prio_map = SourceFileScopePriorities.get_or_compute(source_file, &Priority.scope_priorities/1)
 
     scope_prio_map[scope] || 0
   end

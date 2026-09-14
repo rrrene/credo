@@ -349,19 +349,11 @@ defmodule Credo.Code.Token do
   def tokenize!(string_or_source_file)
 
   def tokenize!(%Credo.SourceFile{} = source_file) do
-    case SourceFileCredoTokens.get(source_file) do
-      {:ok, tokens} ->
-        tokens
-
-      :notfound ->
-        tokens =
-          source_file
-          |> Credo.SourceFile.source()
-          |> CredoTokenizer.tokenize!()
-
-        SourceFileCredoTokens.put(source_file, tokens)
-        tokens
-    end
+    SourceFileCredoTokens.get_or_compute(source_file, fn source_file ->
+      source_file
+      |> Credo.SourceFile.source()
+      |> CredoTokenizer.tokenize!()
+    end)
   end
 
   def tokenize!("" <> source) do
