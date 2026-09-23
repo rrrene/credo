@@ -326,7 +326,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       :normal,
       message_color,
       " ",
-      first_line
+      first_line |> String.trim()
     ]
     |> UI.puts()
 
@@ -356,7 +356,7 @@ defmodule Credo.CLI.Command.Diff.Output.Default do
       :normal,
       message_color,
       " ",
-      message
+      message |> String.trim()
     ]
     |> UI.puts()
   end
