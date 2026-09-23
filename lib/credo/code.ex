@@ -14,6 +14,7 @@ defmodule Credo.Code do
   alias Credo.Code.Sigils
   alias Credo.Code.Strings
 
+  alias Credo.Service.SourceFileElixirTokens
   alias Credo.SourceFile
 
   defmodule ParserError do
@@ -149,9 +150,11 @@ defmodule Credo.Code do
   def to_tokens(string_or_source_file)
 
   def to_tokens(%SourceFile{} = source_file) do
-    source_file
-    |> SourceFile.source()
-    |> to_tokens(source_file.filename)
+    SourceFileElixirTokens.get_or_compute(source_file, fn source_file ->
+      source_file
+      |> SourceFile.source()
+      |> to_tokens(source_file.filename)
+    end)
   end
 
   def to_tokens(source, filename \\ "nofilename") when is_binary(source) do

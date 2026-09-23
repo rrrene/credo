@@ -3,6 +3,8 @@ defmodule Credo.Code.Token do
   This module provides helper functions to analyse tokens returned by `Credo.Code.to_tokens/1`.
   """
 
+  alias Credo.Service.SourceFileCredoTokens
+
   @doc """
   Returns `true` if the given `token` contains a line break.
   """
@@ -347,9 +349,11 @@ defmodule Credo.Code.Token do
   def tokenize!(string_or_source_file)
 
   def tokenize!(%Credo.SourceFile{} = source_file) do
-    source_file
-    |> Credo.SourceFile.source()
-    |> CredoTokenizer.tokenize!()
+    SourceFileCredoTokens.get_or_compute(source_file, fn source_file ->
+      source_file
+      |> Credo.SourceFile.source()
+      |> CredoTokenizer.tokenize!()
+    end)
   end
 
   def tokenize!("" <> source) do
@@ -361,7 +365,7 @@ defmodule Credo.Code.Token do
 
   def reduce(%Credo.SourceFile{} = source_file, callback, acc) do
     source_file
-    |> Credo.SourceFile.source()
+    |> tokenize!()
     |> reduce(callback, acc)
   end
 
