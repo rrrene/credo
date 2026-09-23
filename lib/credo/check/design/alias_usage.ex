@@ -15,6 +15,7 @@ defmodule Credo.Check.Design.AliasUsage do
       if_called_more_often_than: 0,
       if_nested_deeper_than: 0,
       if_referenced: false,
+      include_struct_literals: true,
       only: nil
     ],
     explanations: [
@@ -53,6 +54,8 @@ defmodule Credo.Check.Design.AliasUsage do
         if_nested_deeper_than: "Only raise an issue if a module is nested deeper than this.",
         if_called_more_often_than: "Only raise an issue if a module is called more often than this.",
         if_referenced: "Raise an issue if a module is referenced by name, e.g. as an argument in a function call.",
+        include_struct_literals:
+          "Raise an issue when a struct literal (e.g. `%Foo.Bar{}`) references an unaliased nested module.",
         only: """
         Regex or a list of regexes that specifies which modules to include for this check.
 
@@ -116,6 +119,15 @@ defmodule Credo.Check.Design.AliasUsage do
          %{params: %{if_referenced: true}} = ctx
        )
        when is_list(mod_list) and is_atom(fun_atom) and fun_atom not in @keywords do
+    do_find_issues(ast, mod_list, meta, ctx)
+  end
+
+  # Struct literals: %Foo.Bar.Baz{} — the module is a reference, not a function call
+  defp find_issues(
+         {:%, _, [{:__aliases__, meta, mod_list}, _]} = ast,
+         %{params: %{include_struct_literals: true}} = ctx
+       )
+       when is_list(mod_list) do
     do_find_issues(ast, mod_list, meta, ctx)
   end
 
