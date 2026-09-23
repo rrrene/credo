@@ -25,7 +25,7 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
             _ -> :rescued
           end
 
-      This emphazises that you really want to try/rescue anything the function does,
+      This emphasizes that you really want to try/rescue anything the function does,
       which might be important for other contributors so they can reason about adding
       code to the function.
 
