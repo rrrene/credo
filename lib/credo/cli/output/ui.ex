@@ -23,6 +23,8 @@ defmodule Credo.CLI.Output.UI do
     def puts(_), do: nil
     def puts(_, color) when is_atom(color), do: nil
 
+    def write(_), do: nil
+
     def warn(_), do: nil
   else
     defdelegate puts, to: @shell_service
@@ -32,7 +34,24 @@ defmodule Credo.CLI.Output.UI do
       @shell_service.puts([color, v])
     end
 
+    defdelegate write(v), to: @shell_service
+
     defdelegate warn(v), to: @shell_service
+  end
+
+  def write_line(value) do
+    value
+    |> with_trailing_newline()
+    |> write()
+  end
+
+  @doc false
+  def with_trailing_newline(value) do
+    if ends_with_newline?(value) do
+      value
+    else
+      List.wrap(value) ++ ["\n"]
+    end
   end
 
   def edge(color, indent \\ 2) when is_integer(indent) do
@@ -95,6 +114,18 @@ defmodule Credo.CLI.Output.UI do
       true ->
         chars_to_display = max_length - String.length(ellipsis)
         String.slice(line, 0, chars_to_display) <> ellipsis
+    end
+  end
+
+  defp ends_with_newline?(value) do
+    value
+    |> List.wrap()
+    |> List.flatten()
+    |> Enum.reject(&is_atom/1)
+    |> List.last()
+    |> case do
+      nil -> false
+      value -> value |> to_string() |> String.ends_with?("\n")
     end
   end
 end

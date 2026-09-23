@@ -263,13 +263,10 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       " ",
       first_line
     ]
-    |> UI.puts()
+    |> UI.write_line()
 
     other_lines
     |> Enum.each(&print_issue_message(&1, outer_color, message_color))
-  end
-
-  defp print_issue_message("", _outer_color, _message_color) do
   end
 
   defp print_issue_message(message, outer_color, message_color) do
@@ -282,7 +279,7 @@ defmodule Credo.CLI.Command.Suggest.Output.Default do
       " ",
       message
     ]
-    |> UI.puts()
+    |> UI.write_line()
   end
 
   defp print_issue_line(
