@@ -58,6 +58,45 @@ defmodule Credo.Check.Warning.UnsafeExecTest do
     |> assert_issue(%{line_no: 3, column: 5, trigger: ":os.cmd"})
   end
 
+  test "it should report a violation when piped" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def run_with_os_cmd(command_line) do
+        command_line |> :os.cmd()
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: ":os.cmd"})
+  end
+
+  test "it should report a violation when piped /2" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def run_with_os_cmd(command_line) do
+        command_line |> :os.cmd([])
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: ":os.cmd"})
+  end
+
+  test "it should report a violation when piped /3" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def run_with_erlang_open_port(command_line) do
+        {:spawn, command_line} |> :erlang.open_port([])
+      end
+    end
+    '''
+    |> to_source_file()
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: ":erlang.open_port"})
+  end
+
   test "it should report a violation /3" do
     ~S'''
     defmodule CredoSampleModule do
