@@ -203,6 +203,7 @@
           {Credo.Check.Refactor.CondInsteadOfIfElse, []},
           {Credo.Check.Refactor.DoubleBooleanNegation, []},
           {Credo.Check.Refactor.FilterReject, []},
+          {Credo.Check.Refactor.ForbiddenNesting, []},
           {Credo.Check.Refactor.IoPuts, []},
           {Credo.Check.Refactor.MapMap, []},
           {Credo.Check.Refactor.ModuleDependencies, []},
