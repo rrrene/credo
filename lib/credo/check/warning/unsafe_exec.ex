@@ -34,18 +34,11 @@ defmodule Credo.Check.Warning.UnsafeExec do
     result.issues
   end
 
-  # In `cmd |> :os.cmd()` the piped value lives in the enclosing `:|>` node, so
-  # the inner call carries one argument fewer and the arity match below misses
-  # it. Credo.Check.Warning.UnsafeToAtom already handles the pipe form this way.
   defp walk({:|>, _meta1, [_lhs, {{:., meta, call}, _, args}]} = ast, ctx) do
     case get_forbidden_pipe(call, args) do
       {bad, suggestion, trigger} ->
         [module, _function] = call
 
-        # Returning nil stops the walk descending into the call we just
-        # reported. `cmd |> :os.cmd([])` would otherwise be picked up a second
-        # time by the plain-call clause below, whose :os.cmd/1 arity matches the
-        # inner node once the piped argument is left out.
         {nil, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger, module))}
 
       nil ->
