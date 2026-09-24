@@ -29,7 +29,7 @@ $ mix credo suggest --checks-without-tag formatter --checks-without-tag controve
 | [`--enable-disabled-checks`](#enable-disabled-checks)                                              | Re-enable disabled checks that match the given comma-seperated patterns  |
 | [`--files-included`](#files-included)                                                              | Only include these files                                                 |
 | [`--files-excluded`](#files-excluded)                                                              | Exclude these files                                                      |
-| [`--format`](#format)                                                                              | Display the list in a specific format (json, flycheck, sarif or oneline) |
+| [`--format`](#format)                                                                              | Display the list in a specific format (github, json, flycheck, sarif or oneline) |
 | [`--ignore-checks`](#ignore-checks-aliased-as-ignore)                                              | Ignore checks that match the given comma-seperated patterns              |
 | [`--ignore`](#ignore)                                                                              | Alias for [`--ignore-checks`](#ignore-checks-aliased-as-ignore)          |
 | [`--min-priority`](#min-priority)                                                                  | Minimum priority to show issues                                          |
@@ -151,7 +151,7 @@ $ mix credo --files-excluded "./test/**/*.exs"
 
 ### `--format`
 
-Display the list in a specific format (json, flycheck, sarif or oneline)
+Display the list in a specific format (github, json, flycheck, sarif or oneline)
 
 ```bash
 $ mix credo --format json

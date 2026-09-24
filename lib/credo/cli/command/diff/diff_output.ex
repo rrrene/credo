@@ -4,6 +4,7 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
   use Credo.CLI.Output.FormatDelegator,
     default: Credo.CLI.Command.Diff.Output.Default,
     flycheck: Credo.CLI.Command.Diff.Output.FlyCheck,
+    github: Credo.CLI.Command.Diff.Output.GitHub,
     oneline: Credo.CLI.Command.Diff.Output.Oneline,
     json: Credo.CLI.Command.Diff.Output.Json
 
@@ -41,7 +42,7 @@ defmodule Credo.CLI.Command.Diff.DiffOutput do
             --enable-disabled-checks  Re-enable disabled checks that match the given strings
             --files-included          Only include these files (accepts globs, can be used multiple times)
             --files-excluded          Exclude these files (accepts globs, can be used multiple times)
-            --format                  Display the list in a specific format (json)
+            --format                  Display the list in a specific format (github,json)
             --from-dir                Diff from the given directory
             --from-git-ref            Diff from the given Git ref
             --from-git-merge-base     Diff from where the current HEAD branched off from the given merge base
