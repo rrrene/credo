@@ -49,17 +49,10 @@ defmodule Credo.Check.Readability.BlockPipe do
       params: [
         exclude: "Do not raise an issue for these macros and functions."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:|>, meta, [_, {function, _, [[{:do, _} | _]]}]} = ast, ctx) do
+  def handle_walk({:|>, meta, [_, {function, _, [[{:do, _} | _]]}]} = ast, ctx) do
     if Enum.member?(ctx.params.exclude, function) do
       {ast, ctx}
     else
@@ -67,7 +60,7 @@ defmodule Credo.Check.Readability.BlockPipe do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

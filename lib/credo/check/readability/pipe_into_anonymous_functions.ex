@@ -36,20 +36,14 @@ defmodule Credo.Check.Readability.PipeIntoAnonymousFunctions do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @impl true
-  def run(source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:|>, meta, [_, {{:., _, [{:fn, _, _} | _]}, _, _}]} = ast, ctx) do
+  def handle_walk({:|>, meta, [_, {{:., _, [{:fn, _, _} | _]}, _, _}]} = ast, ctx) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

@@ -32,21 +32,14 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
       case will be executed when the condition is met, which is the opposite of
       what the wording seems to imply.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, [{:unless, _, _}]}, ctx) do
+  def handle_walk({:@, _, [{:unless, _, _}]}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:unless, meta, _arguments} = ast, ctx) do
+  def handle_walk({:unless, meta, _arguments} = ast, ctx) do
     if Credo.Code.Block.else_block?(ast) do
       {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
@@ -54,7 +47,7 @@ defmodule Credo.Check.Refactor.UnlessWithElse do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

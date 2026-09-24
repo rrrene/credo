@@ -28,17 +28,10 @@ defmodule Credo.Check.Refactor.CondStatements do
       NOTE: This check is mutually exclusive with `Credo.Check.Refactor.CondInsteadOfIfElse`,
       which recommends the opposite. Enable only one of these checks.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:cond, meta, arguments} = ast, ctx) do
+  def handle_walk({:cond, meta, arguments} = ast, ctx) do
     conditions =
       arguments
       |> Credo.Code.Block.do_block_for!()
@@ -56,7 +49,7 @@ defmodule Credo.Check.Refactor.CondStatements do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

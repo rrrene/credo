@@ -19,141 +19,135 @@ defmodule Credo.Check.Refactor.UtcNowTruncate do
       The reason for this is not just performance, because no separate function
       call is required, but also brevity of the resulting code.
       """
-    ]
-
-  @doc false
-  def run(source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
+    ],
+    managed_traversal: :ast
 
   # DateTime.truncate(DateTime.utc_now(), _)
   # DateTime.truncate(DateTime.utc_now(_), _)
   # DateTime.truncate(DateTime.utc_now(_, _), _)
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
-          [
-            {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
-            _
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
+         [
+           {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
+           _
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # DateTime.utc_now() |> DateTime.truncate(_)
   # DateTime.utc_now(_) |> DateTime.truncate(_)
   # DateTime.utc_now(_, _) |> DateTime.truncate(_)
-  defp walk(
-         {:|>, _,
-          [
-            {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
-            {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _},
+           {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # DateTime.truncate(_ |> DateTime.utc_now(), _)
   # DateTime.truncate(_ |> DateTime.utc_now(_), _)
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _}
-             ]},
-            _
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _}
+            ]},
+           _
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # _ |> DateTime.utc_now() |> DateTime.truncate(_)
   # _ |> DateTime.utc_now(_) |> DateTime.truncate(_)
-  defp walk(
-         {:|>, _,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _}
-             ]},
-            {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:DateTime]}, :utc_now]}, _, _}
+            ]},
+           {{:., meta, [{:__aliases__, _, [:DateTime]}, :truncate]}, _, [_]}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "DateTime"))}
   end
 
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(), _)
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(_), _)
   # NaiveDateTime.truncate(NaiveDateTime.utc_now(_, _), _)
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
-          [
-            {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
-            _
-          ]} =
-           ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
+         [
+           {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
+           _
+         ]} =
+          ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # NaiveDateTime.utc_now() |> NaiveDateTime.truncate(_)
   # NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
   # NaiveDateTime.utc_now(_, _) |> NaiveDateTime.truncate(_)
-  defp walk(
-         {:|>, _,
-          [
-            {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
-            {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _},
+           {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # NaiveDateTime.truncate(_ |> NaiveDateTime.utc_now(), _)
   # NaiveDateTime.truncate(_ |> NaiveDateTime.utc_now(_), _)
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _}
-             ]},
-            _
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _}
+            ]},
+           _
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
   # _ |> NaiveDateTime.utc_now() |> NaiveDateTime.truncate(_)
   # _ |> NaiveDateTime.utc_now(_) |> NaiveDateTime.truncate(_)
-  defp walk(
-         {:|>, _,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _}
-             ]},
-            {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:NaiveDateTime]}, :utc_now]}, _, _}
+            ]},
+           {{:., meta, [{:__aliases__, _, [:NaiveDateTime]}, :truncate]}, _, [_]}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "NaiveDateTime"))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

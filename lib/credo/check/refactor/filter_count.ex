@@ -20,62 +20,56 @@ defmodule Credo.Check.Refactor.FilterCount do
       to `Enum.filter/2` and `Enum.count/1` require two iterations whereas
       `Enum.count/2` performs the same work in one pass.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  def run(source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:|>, _,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
-             ]},
-            {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
+            ]},
+           {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
-          [
-            {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
+         [
+           {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(
-         {:|>, _,
-          [
-            {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _},
-            {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _},
+           {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _, []}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
-          [
-            {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}]}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:Enum]}, :count]}, _,
+         [
+           {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :filter]}, _, _}]}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

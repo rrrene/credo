@@ -38,17 +38,10 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:with, _meta, args}, ctx) do
+  def handle_walk({:with, _meta, args}, ctx) do
     issues =
       args
       |> Stream.map(&issue_or_nil(&1, ctx))
@@ -57,7 +50,7 @@ defmodule Credo.Check.Readability.WithCustomTaggedTuple do
     {args, put_issue(ctx, issues)}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp issue_or_nil({:<-, meta, [{tuple_tag, _}, {tuple_tag, _}]}, ctx) when is_atom(tuple_tag) do
     issue_for(tuple_tag, meta, ctx)

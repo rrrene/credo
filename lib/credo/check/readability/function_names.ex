@@ -26,7 +26,8 @@ defmodule Credo.Check.Readability.FunctionNames do
       params: [
         allow_acronyms: "Allows acronyms like HTTP or OTP in function names."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
@@ -37,27 +38,26 @@ defmodule Credo.Check.Readability.FunctionNames do
   # all non-special-form operators
   @all_nonspecial_operators ~W(! && ++ -- .. <> =~ @ |> || != !== * + - / ** < <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~ +++ ---)a
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__, %{issues: %{}})
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
+  def build_context(source_file, params) do
+    Context.build(source_file, params, __MODULE__, %{issues: %{}})
+  end
 
-    Map.values(result.issues)
+  def issues_from_context(ctx) do
+    Map.values(ctx.issues)
   end
 
   # Ignore sigil definitions
   for sigil <- @all_sigil_atoms do
-    defp walk({op, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast, ctx)
-         when op in [:def, :defp, :defmacro, :defmacrop] do
+    def handle_walk({op, _meta, [{unquote(sigil), _sigil_meta, _args} | _tail]} = ast, ctx)
+        when op in [:def, :defp, :defmacro, :defmacrop] do
       {ast, ctx}
     end
 
-    defp walk(
-           {op, _op_meta, [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
-           ctx
-         )
-         when op in [:def, :defp, :defmacro, :defmacrop] do
+    def handle_walk(
+          {op, _op_meta, [{:when, _when_meta, [{unquote(sigil), _sigil_meta, _args} | _tail]}, _block]} = ast,
+          ctx
+        )
+        when op in [:def, :defp, :defmacro, :defmacrop] do
       {ast, ctx}
     end
   end
@@ -65,49 +65,49 @@ defmodule Credo.Check.Readability.FunctionNames do
   # NOTE: see above for how we want to avoid `sigil_X` definitions
   for op <- @def_ops do
     # Ignore variables named e.g. `defp`
-    defp walk({unquote(op), _meta, nil} = ast, ctx) do
+    def handle_walk({unquote(op), _meta, nil} = ast, ctx) do
       {ast, ctx}
     end
 
     # ignore non-special-form (overridable) operators
-    defp walk({unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast, ctx)
-         when operator in @all_nonspecial_operators do
+    def handle_walk({unquote(op), _meta, [{operator, _at_meta, _args} | _tail]} = ast, ctx)
+        when operator in @all_nonspecial_operators do
       {ast, ctx}
     end
 
     # ignore non-special-form (overridable) operators
-    defp walk(
-           {unquote(op), _meta,
-            [
-              {:when, _,
-               [
-                 {operator, _, _} | _
-               ]}
-              | _
-            ]} = ast,
-           ctx
-         )
-         when operator in @all_nonspecial_operators do
+    def handle_walk(
+          {unquote(op), _meta,
+           [
+             {:when, _,
+              [
+                {operator, _, _} | _
+              ]}
+             | _
+           ]} = ast,
+          ctx
+        )
+        when operator in @all_nonspecial_operators do
       {ast, ctx}
     end
 
-    defp walk(
-           {unquote(op), _meta, [{:when, _when_meta, [{name, meta, args} | _guard]} | _]} = ast,
-           ctx
-         ) do
+    def handle_walk(
+          {unquote(op), _meta, [{:when, _when_meta, [{name, meta, args} | _guard]} | _]} = ast,
+          ctx
+        ) do
       {ast, process_call(name, args, meta, ctx)}
     end
 
-    defp walk({unquote(op), _meta, [{name, meta, args} | _]} = ast, ctx) when is_atom(name) do
+    def handle_walk({unquote(op), _meta, [{name, meta, args} | _]} = ast, ctx) when is_atom(name) do
       {ast, process_call(name, args, meta, ctx)}
     end
 
-    defp walk({unquote(op), _meta, _} = ast, ctx) do
+    def handle_walk({unquote(op), _meta, _} = ast, ctx) do
       {ast, ctx}
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

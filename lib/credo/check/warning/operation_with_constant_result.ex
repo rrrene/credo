@@ -15,38 +15,31 @@ defmodule Credo.Check.Warning.OperationWithConstantResult do
       In practice they are likely the result of a debugging session or were made by
       mistake.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   @ops_and_constant_results [
     {:*, "zero", 0},
     {:*, "the left side of the expression", 1}
   ]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   # skip references to functions
-  defp walk({:&, _, _}, ctx) do
+  def handle_walk({:&, _, _}, ctx) do
     {nil, ctx}
   end
 
   # skip specs
-  defp walk({:@, _, [{:spec, _, _}]}, ctx) do
+  def handle_walk({:@, _, [{:spec, _, _}]}, ctx) do
     {nil, ctx}
   end
 
   for {op, constant_result, operand} <- @ops_and_constant_results do
-    defp walk({unquote(op), meta, [_lhs, unquote(operand)]} = ast, ctx) do
+    def handle_walk({unquote(op), meta, [_lhs, unquote(operand)]} = ast, ctx) do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(op), unquote(constant_result)))}
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

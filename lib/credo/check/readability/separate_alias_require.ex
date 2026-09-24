@@ -35,19 +35,12 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Block
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:defmodule, _, _} = ast, ctx) do
+  def handle_walk({:defmodule, _, _} = ast, ctx) do
     {_previous_calls, issues} =
       ast
       |> Block.calls_in_do_block()
@@ -72,7 +65,7 @@ defmodule Credo.Check.Readability.SeparateAliasRequire do
     {ast, put_issue(ctx, issues)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

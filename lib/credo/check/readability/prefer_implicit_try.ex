@@ -33,25 +33,16 @@ defmodule Credo.Check.Readability.PreferImplicitTry do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   @def_ops [:def, :defp, :defmacro]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
+  def handle_walk({op, _, [{_, _, _}, [do: {:try, meta, _}]]} = ast, ctx) when op in @def_ops do
+    {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  for op <- @def_ops do
-    defp walk({unquote(op), _, [{_, _, _}, [do: {:try, meta, _}]]} = ast, ctx) do
-      {ast, put_issue(ctx, issue_for(ctx, meta))}
-    end
-  end
-
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

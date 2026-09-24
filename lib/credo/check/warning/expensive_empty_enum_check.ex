@@ -23,15 +23,8 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
           not Enum.any?(enum, condition)
 
       """
-    ]
-
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
+    ],
+    managed_traversal: :ast
 
   @enum_count_pattern quote do: {{:., _, [{:__aliases__, _, [:Enum]}, :count]}, _, _}
   @length_pattern quote do: {:length, _, [_]}
@@ -42,29 +35,29 @@ defmodule Credo.Check.Warning.ExpensiveEmptyEnumCheck do
 
   for {pattern, trigger} <- @comparisons do
     # Comparisons against 0
-    defp walk({op, meta, [unquote(pattern) = pattern, 0]} = ast, ctx) when op in @operators do
+    def handle_walk({op, meta, [unquote(pattern) = pattern, 0]} = ast, ctx) when op in @operators do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(pattern)))}
     end
 
-    defp walk({op, meta, [0, unquote(pattern) = pattern]} = ast, ctx) when op in @operators do
+    def handle_walk({op, meta, [0, unquote(pattern) = pattern]} = ast, ctx) when op in @operators do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(pattern)))}
     end
 
     # Comparisons against 1
-    defp walk({:>=, meta, [unquote(pattern) = pattern, 1]} = ast, ctx) do
+    def handle_walk({:>=, meta, [unquote(pattern) = pattern, 1]} = ast, ctx) do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(pattern)))}
     end
 
-    defp walk({:<, meta, [unquote(pattern) = pattern, 1]} = ast, ctx) do
+    def handle_walk({:<, meta, [unquote(pattern) = pattern, 1]} = ast, ctx) do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(pattern)))}
     end
 
-    defp walk({:<=, meta, [1, unquote(pattern) = pattern]} = ast, ctx) do
+    def handle_walk({:<=, meta, [1, unquote(pattern) = pattern]} = ast, ctx) do
       {ast, put_issue(ctx, issue_for(ctx, meta, unquote(trigger), suggest(pattern)))}
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

@@ -35,24 +35,17 @@ defmodule Credo.Check.Refactor.DoubleBooleanNegation do
 
       This makes your code more explicit than relying on the implications of `!!`.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   @negation_operators [:!, :not]
   defguard is_doube_negation(a, b) when a in @negation_operators and b in @negation_operators
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({a, meta, [{b, _, ast}]}, ctx) when is_doube_negation(a, b) do
+  def handle_walk({a, meta, [{b, _, ast}]}, ctx) when is_doube_negation(a, b) do
     {ast, put_issue(ctx, issue_for(ctx, meta, format_trigger(a, b)))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

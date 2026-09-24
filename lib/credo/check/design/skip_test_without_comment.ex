@@ -27,19 +27,16 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
       While the pure existence of a comment does not change anything per se, a thoughtful
       comment can improve the odds for future iteration on the issue.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(source_file, params) do
-    {ast, comments} = SourceFile.ast_with_comments(source_file)
-    ctx = Context.build(source_file, params, __MODULE__, %{comments: comments})
+  def build_context(source_file, params) do
+    {_ast, comments} = SourceFile.ast_with_comments(source_file)
 
-    result = Credo.Code.prewalk(ast, &walk/2, ctx)
-    result.issues
+    Context.build(source_file, params, __MODULE__, %{comments: comments})
   end
 
-  defp walk({:@, meta, [{:tag, _, [:skip]} | _]} = ast, ctx) do
+  def handle_walk({:@, meta, [{:tag, _, [:skip]} | _]} = ast, ctx) do
     line_no = meta[:line] - 1
 
     found_comment? = Enum.any?(ctx.comments, fn %{line: line_no2} -> line_no2 == line_no end)
@@ -51,7 +48,7 @@ defmodule Credo.Check.Design.SkipTestWithoutComment do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

@@ -42,83 +42,80 @@ defmodule Credo.Check.Readability.SinglePipe do
         allow_lists: "Allow single pipes where the value being piped is a list literal",
         allow_maps: "Allow single pipes where the value being piped is a map literal (including structs)"
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__, %{continue: true})
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
+  def build_context(source_file, params) do
+    Context.build(source_file, params, __MODULE__, %{continue: true})
   end
 
-  defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+  def handle_walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
     {ast, %{ctx | continue: false}}
   end
 
-  defp walk(
-         {:|>, _, [lhs, _]} = ast,
-         %{continue: true, params: %{allow_maps: true}} = ctx
-       )
-       when is_tuple(lhs) and elem(lhs, 0) in [:%{}, :%] do
+  def handle_walk(
+        {:|>, _, [lhs, _]} = ast,
+        %{continue: true, params: %{allow_maps: true}} = ctx
+      )
+      when is_tuple(lhs) and elem(lhs, 0) in [:%{}, :%] do
     {ast, %{ctx | continue: false}}
   end
 
-  defp walk(
-         {:|>, _, [lhs, _]} = ast,
-         %{continue: true, params: %{allow_lists: true}} = ctx
-       )
-       when is_list(lhs) do
+  def handle_walk(
+        {:|>, _, [lhs, _]} = ast,
+        %{continue: true, params: %{allow_lists: true}} = ctx
+      )
+      when is_list(lhs) do
     {ast, %{ctx | continue: false}}
   end
 
-  defp walk(
-         {:|>, meta, [{_block_op, _, block_args} = call, _]} = ast,
-         %{continue: true, params: %{allow_blocks: true}} = ctx
-       )
-       when is_list(block_args) and block_args != [] do
+  def handle_walk(
+        {:|>, meta, [{_block_op, _, block_args} = call, _]} = ast,
+        %{continue: true, params: %{allow_blocks: true}} = ctx
+      )
+      when is_list(block_args) and block_args != [] do
     case Credo.Code.Block.do_block_for(call) do
       nil -> {ast, put_issue(%{ctx | continue: false}, issue_for(ctx, meta))}
       _val -> {ast, %{ctx | continue: false}}
     end
   end
 
-  defp walk(
-         {:|>, meta, _} = ast,
-         %{continue: true, params: %{allow_0_arity_functions: false}} = ctx
-       ) do
+  def handle_walk(
+        {:|>, meta, _} = ast,
+        %{continue: true, params: %{allow_0_arity_functions: false}} = ctx
+      ) do
     {
       ast,
       put_issue(%{ctx | continue: false}, issue_for(ctx, meta))
     }
   end
 
-  defp walk(
-         {:|>, _, [{{:., _, _}, _, []}, _]} = ast,
-         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
-       ) do
+  def handle_walk(
+        {:|>, _, [{{:., _, _}, _, []}, _]} = ast,
+        %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+      ) do
     {ast, %{ctx | continue: false}}
   end
 
-  defp walk(
-         {:|>, _, [{fun, _, []}, _]} = ast,
-         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
-       )
-       when is_atom(fun) do
+  def handle_walk(
+        {:|>, _, [{fun, _, []}, _]} = ast,
+        %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+      )
+      when is_atom(fun) do
     {ast, %{ctx | continue: false}}
   end
 
-  defp walk(
-         {:|>, meta, _} = ast,
-         %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
-       ) do
+  def handle_walk(
+        {:|>, meta, _} = ast,
+        %{continue: true, params: %{allow_0_arity_functions: true}} = ctx
+      ) do
     {
       ast,
       put_issue(%{ctx | continue: false}, issue_for(ctx, meta))
     }
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, %{ctx | continue: true}}
   end
 

@@ -53,22 +53,27 @@ defmodule Credo.Check.Readability.AliasOrder do
                       before their lower case equivalent.
         """
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__, %{alias_memo: [], alias_groups: []})
+    ctx = build_context(source_file, params)
 
-    Credo.Code.prewalk(source_file, &walk/2, ctx)
+    Credo.Code.prewalk(source_file, &handle_walk/2, ctx)
     |> extract_group_from_memo()
     |> find_issues()
   end
 
-  defp walk(
-         {:alias, _, [{:__aliases__, meta, mod_list} | _]},
-         %{params: %{sort_method: sort_method}} = ctx
-       ) do
+  def build_context(source_file, params) do
+    Context.build(source_file, params, __MODULE__, %{alias_memo: [], alias_groups: []})
+  end
+
+  def handle_walk(
+        {:alias, _, [{:__aliases__, meta, mod_list} | _]},
+        %{params: %{sort_method: sort_method}} = ctx
+      ) do
     fullname = Credo.Code.Name.full(mod_list)
     line = meta[:line]
 
@@ -78,10 +83,10 @@ defmodule Credo.Check.Readability.AliasOrder do
     {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end
 
-  defp walk(
-         {:alias, _, [{{:., _, [{:__aliases__, _, base_mod_list}, :{}]}, meta, multi_mod_list}]},
-         %{params: %{sort_method: sort_method}} = ctx
-       ) do
+  def handle_walk(
+        {:alias, _, [{{:., _, [{:__aliases__, _, base_mod_list}, :{}]}, meta, multi_mod_list}]},
+        %{params: %{sort_method: sort_method}} = ctx
+      ) do
     candidates = multi_candidates(base_mod_list, multi_mod_list, sort_method)
     line = meta[:line]
     {{compare, _, _}, _} = List.first(candidates)
@@ -93,7 +98,7 @@ defmodule Credo.Check.Readability.AliasOrder do
     {nil, extract_group_and_add_candidate(ctx, candidate, line)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

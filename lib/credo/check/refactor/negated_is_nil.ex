@@ -41,18 +41,11 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
       technical, but a human one. If we can use the positive, more direct and human
       friendly case, we should.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:when, _, [_, {negation, meta, [{:is_nil, _, _}]}]} = ast, ctx)
-       when negation in [:!, :not] do
+  def handle_walk({:when, _, [_, {negation, meta, [{:is_nil, _, _}]}]} = ast, ctx)
+      when negation in [:!, :not] do
     trigger = to_string(negation)
 
     issue =
@@ -66,12 +59,12 @@ defmodule Credo.Check.Refactor.NegatedIsNil do
     {ast, put_issue(ctx, issue)}
   end
 
-  defp walk({:when, meta, [fun, {_, _, [first_op | second_op]}]} = ast, ctx) do
-    {_, ctx} = walk({:when, meta, [fun, first_op]}, ctx)
-    {_, ctx} = walk({:when, meta, [fun, second_op]}, ctx)
+  def handle_walk({:when, meta, [fun, {_, _, [first_op | second_op]}]} = ast, ctx) do
+    {_, ctx} = handle_walk({:when, meta, [fun, first_op]}, ctx)
+    {_, ctx} = handle_walk({:when, meta, [fun, second_op]}, ctx)
 
     {ast, ctx}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 end

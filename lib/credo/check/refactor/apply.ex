@@ -21,25 +21,18 @@ defmodule Credo.Check.Refactor.Apply do
 
           apply(module, :function, [arg_1, arg_2, ..., arg_n])
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, [{:spec, _, _}]}, ctx) do
+  def handle_walk({:@, _, [{:spec, _, _}]}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:apply, _meta, [{:__MODULE__, _, _}, _fun, _args]} = ast, ctx) do
+  def handle_walk({:apply, _meta, [{:__MODULE__, _, _}, _fun, _args]} = ast, ctx) do
     {ast, ctx}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     case issue(ast, ctx) do
       :stop ->
         {nil, ctx}

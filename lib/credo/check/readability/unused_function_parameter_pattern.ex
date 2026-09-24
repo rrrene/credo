@@ -32,29 +32,22 @@ defmodule Credo.Check.Readability.UnusedFunctionParameterPattern do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
-
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
+    ],
+    managed_traversal: :ast
 
   @def_ops [:def, :defp, :defmacro]
 
-  defp walk({def_op, _meta, [{:when, _when_meta, [{_fun_name, _fun_meta, arguments} | _guards]} | _]} = ast, ctx)
-       when def_op in @def_ops and is_list(arguments) do
+  def handle_walk({def_op, _meta, [{:when, _when_meta, [{_fun_name, _fun_meta, arguments} | _guards]} | _]} = ast, ctx)
+      when def_op in @def_ops and is_list(arguments) do
     {ast, find_unused_patterns(arguments, ctx)}
   end
 
-  defp walk({def_op, _meta, [{_fun_name, _fun_meta, arguments} | _]} = ast, ctx)
-       when def_op in @def_ops and is_list(arguments) do
+  def handle_walk({def_op, _meta, [{_fun_name, _fun_meta, arguments} | _]} = ast, ctx)
+      when def_op in @def_ops and is_list(arguments) do
     {ast, find_unused_patterns(arguments, ctx)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

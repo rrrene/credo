@@ -50,22 +50,12 @@ defmodule Credo.Check.Readability.ModuleDoc do
         ignore_modules_using:
           "List of modules to ignore based on their `use` declarations. Accepts atoms, strings and regexes."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Module
 
-  @doc false
-  def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    if Path.extname(filename) == ".exs" do
-      []
-    else
-      ctx = Context.build(source_file, params, __MODULE__)
-      result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-      result.issues
-    end
-  end
-
-  defp walk({:defmodule, _meta, _arguments} = ast, ctx) do
+  def handle_walk({:defmodule, _meta, _arguments} = ast, ctx) do
     mod_name = Module.name(ast)
 
     cond do
@@ -80,7 +70,7 @@ defmodule Credo.Check.Readability.ModuleDoc do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

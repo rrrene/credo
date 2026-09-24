@@ -25,63 +25,56 @@ defmodule Credo.Check.Refactor.MapInto do
       **NOTE**: This check is only available in Elixir < 1.8 since performance
       improvements have since made this check obsolete.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} =
-           ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, [{{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}, _]} =
+          ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.into"))}
   end
 
-  defp walk(
-         {:|>, _,
-          [
-            {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
-            {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, _}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _},
+           {{:., _, [{:__aliases__, meta, [:Enum]}, :into]}, _, _}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Enum.into"))}
   end
 
-  defp walk(
-         {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
-          [
-            {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
-            _
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {{:., meta, [{:__aliases__, _, [:Enum]}, :into]}, _,
+         [
+           {:|>, _, [_, {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}]},
+           _
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta, "|>"))}
   end
 
-  defp walk(
-         {:|>, meta,
-          [
-            {:|>, _,
-             [
-               _,
-               {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
-             ]},
-            {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, into_args}
-          ]} = ast,
-         ctx
-       )
-       when length(into_args) == 1 do
+  def handle_walk(
+        {:|>, meta,
+         [
+           {:|>, _,
+            [
+              _,
+              {{:., _, [{:__aliases__, _, [:Enum]}, :map]}, _, _}
+            ]},
+           {{:., _, [{:__aliases__, _, [:Enum]}, :into]}, _, into_args}
+         ]} = ast,
+        ctx
+      )
+      when length(into_args) == 1 do
     {ast, put_issue(ctx, issue_for(ctx, meta, "|>"))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

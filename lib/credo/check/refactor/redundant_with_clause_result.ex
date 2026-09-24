@@ -23,21 +23,14 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
             something(map)
           end
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Block
 
   require Credo.Code
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:with, meta, clauses_and_body} = ast, ctx) do
+  def handle_walk({:with, meta, clauses_and_body} = ast, ctx) do
     case split(clauses_and_body) do
       {:ok, clauses, body} ->
         case issue_for({clauses, body}, meta, ctx) do
@@ -50,7 +43,7 @@ defmodule Credo.Check.Refactor.RedundantWithClauseResult do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

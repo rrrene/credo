@@ -27,31 +27,24 @@ defmodule Credo.Check.Readability.SpecParameterNames do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:@, _meta,
-          [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]},
-         ctx
-       )
-       when attr_type in [:spec, :callback] do
+  def handle_walk(
+        {:@, _meta,
+         [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]},
+        ctx
+      )
+      when attr_type in [:spec, :callback] do
     {nil, check_fun_call(fun_call, ctx)}
   end
 
-  defp walk({:@, _meta, [{attr_type, _attr_meta, [{:"::", _meta2, [fun_call, _return_type]}]}]}, ctx)
-       when attr_type in [:spec, :callback] do
+  def handle_walk({:@, _meta, [{attr_type, _attr_meta, [{:"::", _meta2, [fun_call, _return_type]}]}]}, ctx)
+      when attr_type in [:spec, :callback] do
     {nil, check_fun_call(fun_call, ctx)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

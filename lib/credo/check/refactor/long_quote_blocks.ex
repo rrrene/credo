@@ -70,25 +70,18 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
         max_line_count: "The maximum number of lines a quote block should be allowed to have.",
         ignore_comments: "Ignores comments when counting the lines of a `quote` block."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:quote, meta, arguments} = ast,
-         %{
-           params: %{
-             max_line_count: max_line_count,
-             ignore_comments: ignore_comments
-           }
-         } = ctx
-       ) do
+  def handle_walk(
+        {:quote, meta, arguments} = ast,
+        %{
+          params: %{
+            max_line_count: max_line_count,
+            ignore_comments: ignore_comments
+          }
+        } = ctx
+      ) do
     max_line_no = Credo.Code.prewalk(arguments, &find_max_line_no(&1, &2), 0)
     line_count = max_line_no - meta[:line]
 
@@ -118,7 +111,7 @@ defmodule Credo.Check.Refactor.LongQuoteBlocks do
     {ast, put_issue(ctx, issue)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

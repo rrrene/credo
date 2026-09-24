@@ -15,7 +15,8 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
       params: [
         max_complexity: "The maximum cyclomatic complexity a function should have."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   @def_ops [:def, :defp, :defmacro]
   # these have two outcomes: it succeeds or does not
@@ -38,25 +39,17 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     cond: 1
   ]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   # exception for `__using__` macros
-  defp walk({:defmacro, _, [{:__using__, _, _}, _]} = ast, ctx) do
+  def handle_walk({:defmacro, _, [{:__using__, _, _}, _]} = ast, ctx) do
     {ast, ctx}
   end
 
   for op <- @def_ops do
-    defp walk(
-           {unquote(op), meta, arguments} = ast,
-           %{params: %{max_complexity: max_complexity}} = ctx
-         )
-         when is_list(arguments) do
+    def handle_walk(
+          {unquote(op), meta, arguments} = ast,
+          %{params: %{max_complexity: max_complexity}} = ctx
+        )
+        when is_list(arguments) do
       complexity =
         ast
         |> complexity_for
@@ -72,7 +65,7 @@ defmodule Credo.Check.Refactor.PerceivedComplexity do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

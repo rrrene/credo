@@ -31,47 +31,40 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
       params: [
         min_pipeline_length: "Set a minimum pipeline length"
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Check.Readability.NestedFunctionCalls.PipeHelper
   alias Credo.Code.Name
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   # A call in a pipeline
-  defp walk({:|>, _meta, [pipe_input, {{:., _meta2, _fun}, _meta3, args}]}, ctx) do
+  def handle_walk({:|>, _meta, [pipe_input, {{:., _meta2, _fun}, _meta3, args}]}, ctx) do
     {[pipe_input, args], ctx}
   end
 
   # A fully qualified call with no arguments
-  defp walk({{:., _meta, _call}, _meta2, []} = ast, ctx) do
+  def handle_walk({{:., _meta, _call}, _meta2, []} = ast, ctx) do
     {ast, ctx}
   end
 
   # We don't look into interpolations in strings/binaries
-  defp walk({:<<>>, _meta, _args}, ctx) do
+  def handle_walk({:<<>>, _meta, _args}, ctx) do
     {nil, ctx}
   end
 
   # We don't look into guards
-  defp walk({expr, _meta, _args}, ctx) when expr in ~w[defguard defguardp when]a do
+  def handle_walk({expr, _meta, _args}, ctx) when expr in ~w[defguard defguardp when]a do
     {nil, ctx}
   end
 
   # We don't look into typespec attributes
-  defp walk({:@, _, [{attr_name, _, _args}]}, ctx)
-       when attr_name in ~w[callback macrocallback opaque spec type typep]a do
+  def handle_walk({:@, _, [{attr_name, _, _args}]}, ctx)
+      when attr_name in ~w[callback macrocallback opaque spec type typep]a do
     {nil, ctx}
   end
 
   # Any call
-  defp walk({{_name, _loc, call}, meta, args} = ast, %{params: %{min_pipeline_length: min_pipeline_length}} = ctx) do
+  def handle_walk({{_name, _loc, call}, meta, args} = ast, %{params: %{min_pipeline_length: min_pipeline_length}} = ctx) do
     if cannot_be_in_pipeline?(ast) do
       {ast, ctx}
     else
@@ -86,7 +79,7 @@ defmodule Credo.Check.Readability.NestedFunctionCalls do
   end
 
   # Another expression, we must no longer be in a pipeline
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

@@ -18,24 +18,17 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   # ignore non-alphanumeric @ ASTs, for when you're redefining the @ macro.
-  defp walk({:@, _meta, [{:{}, _, _}]} = ast, ctx) do
+  def handle_walk({:@, _meta, [{:{}, _, _}]} = ast, ctx) do
     {ast, ctx}
   end
 
-  defp walk({:@, meta, [{name, _, _arguments}]} = ast, ctx) when is_atom(name) do
+  def handle_walk({:@, meta, [{name, _, _arguments}]} = ast, ctx) when is_atom(name) do
     if name |> to_string |> Name.snake_case?() do
       {ast, ctx}
     else
@@ -43,7 +36,7 @@ defmodule Credo.Check.Readability.ModuleAttributeNames do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

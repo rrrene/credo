@@ -49,24 +49,17 @@ defmodule Credo.Check.Refactor.MatchInCondition do
           "Allow tagged tuples in conditions, e.g. `if {:ok, contents} = File.read( \"foo.txt\") do`",
         allow_operators: "Allow operators in conditions, e.g. `if contents = File.read(input <> \".txt\") do`"
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   # all non-special-form operators
   @all_nonspecial_operators ~W(! && ++ -- .. <> =~ |> || != !== * + - / ** < <= == === > >= ||| &&& <<< >>> <<~ ~>> <~ ~> <~> <|> ^^^ ~~~ +++ ---)a
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({op, _, nil} = ast, ctx) when op in [:if, :unless] do
+  def handle_walk({op, _, nil} = ast, ctx) when op in [:if, :unless] do
     {ast, ctx}
   end
 
-  defp walk({op, _, arguments} = ast, ctx) when op in [:if, :unless] do
+  def handle_walk({op, _, arguments} = ast, ctx) when op in [:if, :unless] do
     condition_head = Enum.reject(arguments, &Keyword.keyword?/1)
 
     ctx =
@@ -79,7 +72,7 @@ defmodule Credo.Check.Refactor.MatchInCondition do
     {ast, ctx}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

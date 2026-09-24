@@ -31,21 +31,14 @@ defmodule Credo.Check.Readability.ImplTrue do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, meta, [{:impl, _, [true]}]}, ctx) do
+  def handle_walk({:@, meta, [{:impl, _, [true]}]}, ctx) do
     {nil, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

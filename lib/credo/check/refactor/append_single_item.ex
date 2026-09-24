@@ -21,27 +21,20 @@ defmodule Credo.Check.Refactor.AppendSingleItem do
           Enum.reverse(list)
 
       """
-    ]
-
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
+    ],
+    managed_traversal: :ast
 
   # [a] ++ b is OK
-  defp walk({:++, _, [[_], _]} = ast, ctx) do
+  def handle_walk({:++, _, [[_], _]} = ast, ctx) do
     {ast, ctx}
   end
 
   # a ++ [b] is not
-  defp walk({:++, meta, [_, [_]]} = ast, ctx) do
+  def handle_walk({:++, meta, [_, [_]]} = ast, ctx) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

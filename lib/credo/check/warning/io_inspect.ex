@@ -10,33 +10,26 @@ defmodule Credo.Check.Warning.IoInspect do
       This check warns about those calls, because they might have been committed
       in error.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {{:., _, [{:__aliases__, meta, [:"Elixir", :IO]}, :inspect]}, _, args} = ast,
-         ctx
-       )
-       when length(args) < 3 do
+  def handle_walk(
+        {{:., _, [{:__aliases__, meta, [:"Elixir", :IO]}, :inspect]}, _, args} = ast,
+        ctx
+      )
+      when length(args) < 3 do
     {ast, put_issue(ctx, issue_for(ctx, meta, "Elixir.IO.inspect"))}
   end
 
-  defp walk(
-         {{:., _, [{:__aliases__, meta, [:IO]}, :inspect]}, _, args} = ast,
-         ctx
-       )
-       when length(args) < 3 do
+  def handle_walk(
+        {{:., _, [{:__aliases__, meta, [:IO]}, :inspect]}, _, args} = ast,
+        ctx
+      )
+      when length(args) < 3 do
     {ast, put_issue(ctx, issue_for(ctx, meta, "IO.inspect"))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

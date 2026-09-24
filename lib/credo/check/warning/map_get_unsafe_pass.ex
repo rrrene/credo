@@ -23,43 +23,36 @@ defmodule Credo.Check.Warning.MapGetUnsafePass do
       If you are sure the value exists and can't be nil, please use `Map.fetch!/2`.
       If you are not sure, `Map.get/3` can help you provide a safe default value.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:|>, _,
-          [
-            {:|>, _,
-             [
-               _pipe_start,
-               {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_single]}
-             ]},
-            {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {:|>, _,
+            [
+              _pipe_start,
+              {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_single]}
+            ]},
+           {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(
-         {:|>, _,
-          [
-            {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_first, _second]},
-            {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
-          ]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:|>, _,
+         [
+           {{:., _, [{:__aliases__, meta, [:Map]}, :get]}, _, [_first, _second]},
+           {{:., _, [{:__aliases__, _, [:Enum]}, _enum_fun]}, _, _enum_args}
+         ]} = ast,
+        ctx
+      ) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 
