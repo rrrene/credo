@@ -27,31 +27,24 @@ defmodule Credo.Check.Readability.SpecParameterNames do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:@, _meta,
-          [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]},
-         ctx
-       )
-       when attr_type in [:spec, :callback] do
+  def handle_walk(
+        {:@, _meta,
+         [{attr_type, _attr_meta, [{:when, _meta2, [{:"::", _inner_meta, [fun_call, _return_type]} | _guards]}]}]},
+        ctx
+      )
+      when attr_type in [:spec, :callback] do
     {nil, check_fun_call(fun_call, ctx)}
   end
 
-  defp walk({:@, _meta, [{attr_type, _attr_meta, [{:"::", _meta2, [fun_call, _return_type]}]}]}, ctx)
-       when attr_type in [:spec, :callback] do
+  def handle_walk({:@, _meta, [{attr_type, _attr_meta, [{:"::", _meta2, [fun_call, _return_type]}]}]}, ctx)
+      when attr_type in [:spec, :callback] do
     {nil, check_fun_call(fun_call, ctx)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 
@@ -62,23 +55,30 @@ defmodule Credo.Check.Readability.SpecParameterNames do
   defp check_fun_call({_fun_name, _meta, nil}, ctx), do: ctx
   defp check_fun_call(_other, ctx), do: ctx
 
-  defp check_arg(args, ctx) when is_list(args) do
-    Enum.reduce(args, ctx, &check_arg/2)
-  end
-
-  # Named param: `name :: type` where name is an atom variable (nil context)
-  defp check_arg({:"::", _meta, [{name, _name_meta, nil}, _type]}, ctx)
-       when is_atom(name) do
+  # Named param: `name :: type`
+  defp check_arg({:"::", _meta, [{name, _name_meta, nil}, _type]}, ctx) when is_atom(name) do
     ctx
   end
 
-  # Keyword param: `with: String.t()`
-  defp check_arg({_keyword, arg}, ctx) do
-    check_arg(arg, ctx)
+  # Named param: `name :: type`
+  defp check_arg(nil, ctx) do
+    ctx
   end
 
-  defp check_arg(arg, ctx) do
+  defp check_arg({:|, _meta, args}, ctx) when is_list(args) do
+    Enum.reduce(args, ctx, &check_arg/2)
+  end
+
+  defp check_arg({:%{}, _meta, args}, ctx) when is_list(args) do
+    ctx
+  end
+
+  defp check_arg({_, [_ | _] = _meta, _} = arg, ctx) do
     put_issue(ctx, issue_for(ctx, arg))
+  end
+
+  defp check_arg(tuple, ctx) when is_tuple(tuple) do
+    Enum.reduce(Tuple.to_list(tuple), ctx, &check_arg/2)
   end
 
   defp check_arg(_, ctx) do

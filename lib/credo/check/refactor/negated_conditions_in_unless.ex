@@ -22,26 +22,19 @@ defmodule Credo.Check.Refactor.NegatedConditionsInUnless do
       to wrap your head around a block of code that is executed if a negated
       condition is NOT met. See what I mean?
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, [{:unless, _, _}]}, ctx) do
+  def handle_walk({:@, _, [{:unless, _, _}]}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:unless, _meta, [{negator, meta, _arguments} | _]} = ast, ctx)
-       when negator in [:!, :not] do
+  def handle_walk({:unless, _meta, [{negator, meta, _arguments} | _]} = ast, ctx)
+      when negator in [:!, :not] do
     {ast, put_issue(ctx, issue_for(ctx, meta, negator))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

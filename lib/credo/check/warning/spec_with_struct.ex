@@ -18,19 +18,12 @@ defmodule Credo.Check.Warning.SpecWithStruct do
           # NOT preferred
           @spec a_function(%MyModule{}) :: any
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, [{:spec, _, args}]}, ctx) do
+  def handle_walk({:@, _, [{:spec, _, args}]}, ctx) do
     case Macro.prewalk(args, [], &find_structs/2) do
       {ast, []} ->
         {ast, ctx}
@@ -45,7 +38,7 @@ defmodule Credo.Check.Warning.SpecWithStruct do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

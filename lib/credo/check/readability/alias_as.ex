@@ -45,21 +45,19 @@ defmodule Credo.Check.Readability.AliasAs do
       params: [
         ignore: "List of modules to ignore and allow to `alias Module, as: ...`"
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    ctx = %{ctx | params: %{ignore: Enum.map(ctx.params.ignore, &Credo.Code.Name.full/1)}}
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
+  def build_context(source_file, params) do
+    source_file
+    |> Context.build(params, __MODULE__)
+    |> Context.handle_param(:ignore, fn ignore -> Enum.map(ignore, &Credo.Code.Name.full/1) end)
   end
 
-  defp walk(
-         {:alias, _, [{_, _, _} = name, [as: {_, meta, _}]]},
-         %{params: %{ignore: ignore}} = ctx
-       ) do
+  def handle_walk(
+        {:alias, _, [{_, _, _} = name, [as: {_, meta, _}]]},
+        %{params: %{ignore: ignore}} = ctx
+      ) do
     fullname = Credo.Code.Name.full(name)
 
     if Enum.member?(ignore, fullname) do
@@ -69,11 +67,11 @@ defmodule Credo.Check.Readability.AliasAs do
     end
   end
 
-  defp walk({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, ctx) do
+  def handle_walk({:alias, _, [{_, _, _}, [as: {_, meta, _}]]}, ctx) do
     {nil, put_issue(ctx, issue_for(ctx, meta))}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

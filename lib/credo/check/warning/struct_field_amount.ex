@@ -20,17 +20,10 @@ defmodule Credo.Check.Warning.StructFieldAmount do
       params: [
         max_fields: "The maximum number of field a struct should be allowed to have."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:defstruct, meta, [fields]} = ast, ctx) when is_list(fields) do
+  def handle_walk({:defstruct, meta, [fields]} = ast, ctx) when is_list(fields) do
     count = length(fields)
 
     if count > ctx.params.max_fields do
@@ -40,7 +33,7 @@ defmodule Credo.Check.Warning.StructFieldAmount do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

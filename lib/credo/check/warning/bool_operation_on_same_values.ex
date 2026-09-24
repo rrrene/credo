@@ -16,26 +16,19 @@ defmodule Credo.Check.Warning.BoolOperationOnSameValues do
 
       Each of these cases behaves the same as if you were just writing `x`.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   @bool_ops [:and, :or, :&&, :||]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:defmodule, _meta, _} = ast, ctx) do
+  def handle_walk({:defmodule, _meta, _} = ast, ctx) do
     redefined_ops = Credo.Code.prewalk(ast, &find_bool_op_redefinition(&1, &2))
     ctx = Map.merge(ctx, %{redefined_ops: redefined_ops})
 
     {ast, Credo.Code.prewalk(ast, &walk_module/2, ctx)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

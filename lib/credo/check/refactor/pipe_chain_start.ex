@@ -30,7 +30,8 @@ defmodule Credo.Check.Refactor.PipeChainStart do
         excluded_functions: "All functions listed will be ignored.",
         excluded_argument_types: "All pipes with argument types listed will be ignored."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   @elixir_custom_operators [
     :<-,
@@ -49,27 +50,19 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     :..//
   ]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
+  def handle_walk({:|>, _, [{:|>, _, _} | _]} = ast, ctx) do
     {ast, ctx}
   end
 
-  defp walk(
-         {:|>, meta, [lhs | _rhs]} = ast,
-         %{
-           params: %{
-             excluded_functions: excluded_functions,
-             excluded_argument_types: excluded_argument_types
-           }
-         } = ctx
-       ) do
+  def handle_walk(
+        {:|>, meta, [lhs | _rhs]} = ast,
+        %{
+          params: %{
+            excluded_functions: excluded_functions,
+            excluded_argument_types: excluded_argument_types
+          }
+        } = ctx
+      ) do
     if valid_chain_start?(lhs, excluded_functions, excluded_argument_types) do
       {ast, ctx}
     else
@@ -77,7 +70,7 @@ defmodule Credo.Check.Refactor.PipeChainStart do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

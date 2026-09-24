@@ -18,41 +18,34 @@ defmodule Credo.Check.Readability.VariableNames do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
   @special_var_names [:__CALLER__, :__DIR__, :__ENV__, :__MODULE__]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:=, _meta, [lhs, _rhs]} = ast, ctx) do
+  def handle_walk({:=, _meta, [lhs, _rhs]} = ast, ctx) do
     {ast, issues_for_lhs(lhs, ctx)}
   end
 
-  defp walk({:->, _meta, [lhs, _rhs]} = ast, ctx) do
+  def handle_walk({:->, _meta, [lhs, _rhs]} = ast, ctx) do
     {ast, issues_for_lhs(lhs, ctx)}
   end
 
-  defp walk({:<-, _meta, [lhs, _rhs]} = ast, ctx) do
+  def handle_walk({:<-, _meta, [lhs, _rhs]} = ast, ctx) do
     {ast, issues_for_lhs(lhs, ctx)}
   end
 
-  defp walk({:def, _meta, [{_fun, _fun_meta, [lhs, _rhs]}, _fun_rhs]} = ast, ctx) do
+  def handle_walk({:def, _meta, [{_fun, _fun_meta, [lhs, _rhs]}, _fun_rhs]} = ast, ctx) do
     {ast, issues_for_lhs(lhs, ctx)}
   end
 
-  defp walk({:defp, _meta, [{_fun, _fun_meta, [lhs, _rhs]}, _fun_rhs]} = ast, ctx) do
+  def handle_walk({:defp, _meta, [{_fun, _fun_meta, [lhs, _rhs]}, _fun_rhs]} = ast, ctx) do
     {ast, issues_for_lhs(lhs, ctx)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

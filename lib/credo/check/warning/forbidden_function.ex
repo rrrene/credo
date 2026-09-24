@@ -35,37 +35,33 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
             ]
         """
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @impl Credo.Check
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx =
-      source_file
-      |> Context.build(params, __MODULE__)
-      |> Context.handle_param(:functions, fn functions ->
-        Map.new(functions, fn {module, fun, message} ->
-          if not is_atom(module), do: raise("Module name must be an atom; got #{inspect(module)}")
-          if not is_atom(fun), do: raise("Function name must be an atom; got #{inspect(fun)}")
+  def build_context(source_file, params) do
+    source_file
+    |> Context.build(params, __MODULE__)
+    |> Context.handle_param(:functions, fn functions ->
+      Map.new(functions, fn {module, fun, message} ->
+        if not is_atom(module), do: raise("Module name must be an atom; got #{inspect(module)}")
+        if not is_atom(fun), do: raise("Function name must be an atom; got #{inspect(fun)}")
 
-          {{module, fun}, message}
-        end)
+        {{module, fun}, message}
       end)
-
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
+    end)
   end
 
   # :erlang.binary_to_term(x)
-  defp walk({{:., meta, [module, function]}, _, _} = ast, ctx)
-       when is_atom(module) and is_atom(function) do
+  def handle_walk({{:., meta, [module, function]}, _, _} = ast, ctx)
+      when is_atom(module) and is_atom(function) do
     issue = issue_for({module, function}, ctx, meta)
 
     {ast, put_issue(ctx, issue)}
   end
 
   # MyModule.my_function(...)
-  defp walk({{:., meta, [{:__aliases__, _, module_parts}, function]}, _call_meta, _args} = ast, ctx)
-       when is_atom(function) and is_list(module_parts) do
+  def handle_walk({{:., meta, [{:__aliases__, _, module_parts}, function]}, _call_meta, _args} = ast, ctx)
+      when is_atom(function) and is_list(module_parts) do
     ctx =
       if Enum.all?(module_parts, &is_atom/1) do
         module = Module.concat(module_parts)
@@ -79,7 +75,7 @@ defmodule Credo.Check.Warning.ForbiddenFunction do
     {ast, ctx}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp issue_for({mod, fun} = mod_fun_key, %{params: %{functions: functions}} = ctx, meta)
        when is_map_key(functions, mod_fun_key) do

@@ -42,19 +42,12 @@ defmodule Credo.Check.Readability.WithSingleClause do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Block
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:with, meta, [_, _ | _] = clauses_and_body} = ast, ctx) do
+  def handle_walk({:with, meta, [_, _ | _] = clauses_and_body} = ast, ctx) do
     if Block.do_block?(ast) && Block.else_block?(ast) do
       {clauses, [_body]} = Enum.split(clauses_and_body, -1)
 
@@ -71,7 +64,7 @@ defmodule Credo.Check.Readability.WithSingleClause do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

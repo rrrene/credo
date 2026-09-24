@@ -7,6 +7,7 @@ defmodule Credo.Check.Context do
   def build(source_file, params, check_mod, merge_map \\ %{}) do
     Map.merge(
       %{
+        __ctx: %{},
         source_file: source_file,
         params: Params.get(params, check_mod),
         issues: []

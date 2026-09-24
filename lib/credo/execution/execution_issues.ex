@@ -16,7 +16,7 @@ defmodule Credo.Execution.ExecutionIssues do
   @doc "Appends an `issue` for the specified `filename`."
   def append(_, [] = _issues), do: :ok
 
-  def append(%Execution{} = exec, issues) when is_list(issues) do
+  def append(%Execution{} = exec, [%Issue{} | _] = issues) when is_list(issues) do
     pid = Execution.get_private(exec, :issues_pid)
 
     issues

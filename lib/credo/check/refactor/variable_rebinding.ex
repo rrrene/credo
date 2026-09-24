@@ -44,17 +44,10 @@ defmodule Credo.Check.Refactor.VariableRebinding do
       params: [
         allow_bang: "Variables with a bang suffix will be ignored."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk([do: {:__block__, _, ast}], ctx) do
+  def handle_walk([do: {:__block__, _, ast}], ctx) do
     variables =
       ast
       |> Enum.map(&find_assignments/1)
@@ -78,7 +71,7 @@ defmodule Credo.Check.Refactor.VariableRebinding do
     {ast, put_issue(ctx, new_issues)}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

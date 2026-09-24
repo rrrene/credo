@@ -20,28 +20,21 @@ defmodule Credo.Check.Readability.MultiAlias do
       But you can improve the odds of others reading and liking your code by making
       it easier to follow.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk(
-         {:alias, _, [{{_, _, [{alias_op, meta, _base_alias}, :{}]}, _, [{:__aliases__, _, mod_list} | _]}]} =
-           ast,
-         ctx
-       )
-       when alias_op in [:__aliases__, :__MODULE__] do
+  def handle_walk(
+        {:alias, _, [{{_, _, [{alias_op, meta, _base_alias}, :{}]}, _, [{:__aliases__, _, mod_list} | _]}]} =
+          ast,
+        ctx
+      )
+      when alias_op in [:__aliases__, :__MODULE__] do
     module = Credo.Code.Name.full(mod_list)
 
     {ast, put_issue(ctx, issue_for(ctx, meta[:line], module))}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp issue_for(ctx, line_no, trigger) do
     format_issue(

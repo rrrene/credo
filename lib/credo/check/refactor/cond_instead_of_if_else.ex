@@ -36,21 +36,14 @@ defmodule Credo.Check.Refactor.CondInsteadOfIfElse do
       params: [
         allow_one_liners: "Allow one-liner `if/else` expressions (e.g., `if x, do: y, else: z`)."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, [{:if, _, _}]}, ctx) do
+  def handle_walk({:@, _, [{:if, _, _}]}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:if, meta, _arguments} = ast, %{params: %{allow_one_liners: true}} = ctx) do
+  def handle_walk({:if, meta, _arguments} = ast, %{params: %{allow_one_liners: true}} = ctx) do
     if Credo.Code.Block.else_block?(ast) and block_if?(meta) do
       {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
@@ -58,7 +51,7 @@ defmodule Credo.Check.Refactor.CondInsteadOfIfElse do
     end
   end
 
-  defp walk({:if, meta, _arguments} = ast, ctx) do
+  def handle_walk({:if, meta, _arguments} = ast, ctx) do
     if Credo.Code.Block.else_block?(ast) do
       {ast, put_issue(ctx, issue_for(ctx, meta))}
     else
@@ -66,7 +59,7 @@ defmodule Credo.Check.Refactor.CondInsteadOfIfElse do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

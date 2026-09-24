@@ -59,20 +59,16 @@ defmodule Credo.Check.Design.AliasUsage do
         `excluded_namespaces` and `excluded_lastnames` take precedence over this parameter.
         """
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   @keywords [:alias]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    filter_issues_if_called_more_often_than(result.issues, ctx.params.if_called_more_often_than)
+  def issues_from_context(ctx) do
+    filter_issues_if_called_more_often_than(ctx.issues, ctx.params.if_called_more_often_than)
   end
 
-  defp walk({:defmodule, _, _} = ast, ctx) do
+  def handle_walk({:defmodule, _, _} = ast, ctx) do
     aliases = Credo.Code.Module.aliases(ast)
     mod_deps = Credo.Code.Module.modules(ast)
 
@@ -86,7 +82,7 @@ defmodule Credo.Check.Design.AliasUsage do
     {ast, ctx}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

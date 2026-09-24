@@ -13,25 +13,18 @@ defmodule Credo.Check.Refactor.FunctionArity do
         max_arity: "The maximum number of parameters which a function should take.",
         ignore_defp: "Set to `true` to ignore private functions."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Parameters
 
   @def_ops [:def, :defp, :defmacro]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:defp, _, _} = ast, %{params: %{ignore_defp: true}} = ctx) do
+  def handle_walk({:defp, _, _} = ast, %{params: %{ignore_defp: true}} = ctx) do
     {ast, ctx}
   end
 
-  defp walk({op, meta, arguments} = ast, ctx) when op in @def_ops and is_list(arguments) do
+  def handle_walk({op, meta, arguments} = ast, ctx) when op in @def_ops and is_list(arguments) do
     arity = Parameters.count(ast)
 
     if arity > ctx.params.max_arity do
@@ -43,7 +36,7 @@ defmodule Credo.Check.Refactor.FunctionArity do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

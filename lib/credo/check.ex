@@ -193,6 +193,7 @@ defmodule Credo.Check do
     :elixir_version,
     :exit_status,
     :explanations,
+    :managed_traversal,
     :id,
     :param_defaults,
     :run_on_all,
@@ -346,6 +347,31 @@ defmodule Credo.Check do
         end
       end
 
+    managed_traversal =
+      if opts[:managed_traversal] do
+        quote do
+          def managed_traversal do
+            unquote(opts[:managed_traversal])
+          end
+
+          def build_context(source_file, params) do
+            Context.build(source_file, params, __MODULE__)
+          end
+
+          def issues_from_context(ctx) do
+            ctx.issues
+          end
+
+          defoverridable build_context: 2, issues_from_context: 1
+        end
+      else
+        quote do
+          def managed_traversal do
+            false
+          end
+        end
+      end
+
     caller_module = __CALLER__.module
     app = Mix.Project.config()[:app]
     default_enabled_check? = caller_module in @__default_enabled_checks__
@@ -387,6 +413,7 @@ defmodule Credo.Check do
       unquote(def_tags)
       unquote(docs_uri)
       unquote(id)
+      unquote(managed_traversal)
 
       @impl true
       def format_issue(issue_meta, issue_options) do

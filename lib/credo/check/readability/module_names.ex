@@ -28,19 +28,12 @@ defmodule Credo.Check.Readability.ModuleNames do
       params: [
         ignore: "List of ignored module names and patterns e.g. `[~r/Sample_Module/, \"Credo.Sample_Module\"]`"
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:defmodule, _meta, [{:__aliases__, meta, names} | _]} = ast, ctx) do
+  def handle_walk({:defmodule, _meta, [{:__aliases__, meta, names} | _]} = ast, ctx) do
     name =
       names
       |> Enum.filter(&String.Chars.impl_for/1)
@@ -60,7 +53,7 @@ defmodule Credo.Check.Readability.ModuleNames do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

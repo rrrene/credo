@@ -20,7 +20,8 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
       In practice they are likely the result of a debugging session or were made by
       mistake.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   @def_ops [:def, :defp, :defmacro]
   @ops ~w(== >= <= != > < / -)a
@@ -35,23 +36,15 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
     {:-, "Operation", 0}
   ]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   for op <- @def_ops do
     # exclude def arguments for operators
-    defp walk({unquote(op), _meta, [{op, _, _} | rest]}, ctx) when op in @ops do
+    def handle_walk({unquote(op), _meta, [{op, _, _} | rest]}, ctx) when op in @ops do
       {rest, ctx}
     end
   end
 
   for {op, operation_name, constant_result} <- @ops_and_constant_results do
-    defp walk({unquote(op), meta, [lhs, rhs]} = ast, ctx) do
+    def handle_walk({unquote(op), meta, [lhs, rhs]} = ast, ctx) do
       if variable_or_mod_attribute?(lhs) &&
            Credo.Code.remove_metadata(lhs) == Credo.Code.remove_metadata(rhs) do
         new_issue =
@@ -65,11 +58,11 @@ defmodule Credo.Check.Warning.OperationOnSameValues do
   end
 
   # exclude @spec definitions
-  defp walk({:@, _meta, [{:spec, _, _} | _]}, ctx) do
+  def handle_walk({:@, _meta, [{:spec, _, _} | _]}, ctx) do
     {nil, ctx}
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

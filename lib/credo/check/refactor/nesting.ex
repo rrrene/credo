@@ -27,32 +27,25 @@ defmodule Credo.Check.Refactor.Nesting do
       params: [
         max_nesting: "The maximum number of levels code should be nested."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   @def_ops [:def, :defp, :defmacro]
   @nest_ops [:if, :unless, :case, :cond, :fn, :for, :with]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
   for op <- @def_ops do
-    defp walk(
-           {unquote(op) = op, meta, arguments} = ast,
-           %{params: %{max_nesting: max_nesting}} = ctx
-         )
-         when is_list(arguments) do
+    def handle_walk(
+          {unquote(op) = op, meta, arguments} = ast,
+          %{params: %{max_nesting: max_nesting}} = ctx
+        )
+        when is_list(arguments) do
       arguments
       |> find_depth([], meta[:line], op)
       |> handle_depth(ast, ctx, max_nesting)
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

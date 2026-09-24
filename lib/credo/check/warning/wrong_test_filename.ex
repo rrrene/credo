@@ -24,23 +24,12 @@ defmodule Credo.Check.Warning.WrongTestFilename do
       into believing that subsequently running the full test suite (`mix test`) will also
       test your file.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{filename: filename} = source_file, params \\ []) do
-    if String.ends_with?(filename, "_test.exs") do
-      []
-    else
-      ctx = Context.build(source_file, params, __MODULE__)
-      result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-      result.issues
-    end
-  end
+  def handle_walk({:quote, _, [_ | _]}, ctx), do: {nil, ctx}
 
-  defp walk({:quote, _, [_ | _]}, ctx), do: {nil, ctx}
-
-  defp walk({:use, meta, [{:__aliases__, _, module_parts} | _]} = ast, ctx) do
+  def handle_walk({:use, meta, [{:__aliases__, _, module_parts} | _]} = ast, ctx) do
     module_name = Credo.Code.Name.full(module_parts)
 
     if String.ends_with?(module_name, "Case") do
@@ -50,7 +39,7 @@ defmodule Credo.Check.Warning.WrongTestFilename do
     end
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp issue_for(module_name, ctx, meta) do
     format_issue(

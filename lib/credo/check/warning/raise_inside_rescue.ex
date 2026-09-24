@@ -31,33 +31,26 @@ defmodule Credo.Check.Warning.RaiseInsideRescue do
               raise error
           end
       """
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Block
 
   @def_ops [:def, :defp, :defmacro, :defmacrop]
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:try, _meta, _arguments} = ast, ctx) do
+  def handle_walk({:try, _meta, _arguments} = ast, ctx) do
     case Block.rescue_block_for(ast) do
       {:ok, rescue_block} -> {ast, Credo.Code.prewalk(rescue_block, &find_issues/2, ctx)}
       _ -> {ast, ctx}
     end
   end
 
-  defp walk({op, _meta, [_def, [do: _do, rescue: rescue_block]]}, ctx)
-       when op in @def_ops do
+  def handle_walk({op, _meta, [_def, [do: _do, rescue: rescue_block]]}, ctx)
+      when op in @def_ops do
     {rescue_block, Credo.Code.prewalk(rescue_block, &find_issues/2, ctx)}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp find_issues({:raise, meta, _arguments} = ast, ctx) do
     {ast, put_issue(ctx, issue_for(ctx, meta))}

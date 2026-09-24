@@ -20,37 +20,33 @@ defmodule Credo.Check.Warning.ForbiddenModule do
       params: [
         modules: "List of modules or `{Module, \"Error message\"}` tuples that must not be used."
       ]
-    ]
+    ],
+    managed_traversal: :ast
 
   alias Credo.Code.Name
 
-  @impl Credo.Check
-  def run(%SourceFile{} = source_file, params) do
-    ctx =
-      source_file
-      |> Context.build(params, __MODULE__)
-      |> Context.handle_param(:modules, fn modules ->
-        Map.new(modules, fn
-          {module, message} -> {Name.full(module), message}
-          module -> {Name.full(module), nil}
-        end)
+  def build_context(source_file, params) do
+    source_file
+    |> Context.build(params, __MODULE__)
+    |> Context.handle_param(:modules, fn modules ->
+      Map.new(modules, fn
+        {module, message} -> {Name.full(module), message}
+        module -> {Name.full(module), nil}
       end)
-
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
+    end)
   end
 
-  defp walk({:__aliases__, meta, modules} = ast, ctx) do
+  def handle_walk({:__aliases__, meta, modules} = ast, ctx) do
     module = Name.full(modules)
     issue = issue_if_forbidden(ctx, meta, module, module)
 
     {ast, put_issue(ctx, issue)}
   end
 
-  defp walk(
-         {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]} = ast,
-         ctx
-       ) do
+  def handle_walk(
+        {:alias, _meta, [{{_, _, [{:__aliases__, _opts, base_alias}, :{}]}, _, aliases}]} = ast,
+        ctx
+      ) do
     issues =
       Enum.reduce(aliases, [], fn {:__aliases__, meta, module}, issues ->
         full_module = Name.full([base_alias, module])
@@ -66,7 +62,7 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     {ast, put_issue(ctx, issues)}
   end
 
-  defp walk(ast, ctx), do: {ast, ctx}
+  def handle_walk(ast, ctx), do: {ast, ctx}
 
   defp issue_if_forbidden(ctx, meta, module, trigger) do
     if Map.has_key?(ctx.params.modules, module) do

@@ -12,7 +12,7 @@ defmodule Credo.Check.Runner do
   @doc """
   Runs all checks on all source files (according to the config).
   """
-  def run(source_files, %Execution{} = exec) when is_list(source_files) do
+  def run(%Execution{} = exec) do
     {all_check_tuples, _, _} = Execution.checks(exec)
 
     check_tuples_grouped_by_group =
@@ -22,15 +22,107 @@ defmodule Credo.Check.Runner do
       |> Enum.map(fn {_key, check_tuples} -> check_tuples end)
 
     Enum.each(check_tuples_grouped_by_group, fn check_tuples ->
-      check_tuples
-      |> Task.async_stream(&run_check(exec, &1),
-        timeout: :infinity,
-        ordered: false
-      )
+      buckets = Enum.group_by(check_tuples, fn {check, _params} -> check.managed_traversal() end)
+
+      checks_wo_managed_traversal = Map.get(buckets, false, [])
+
+      [
+        Task.async_stream(checks_wo_managed_traversal, &run_check(exec, &1), timeout: :infinity, ordered: false),
+        __MODULE__.ManagedTraversalAST.to_stream(exec, Map.get(buckets, :ast))
+      ]
+      |> Enum.reject(&is_nil/1)
+      |> Stream.concat()
       |> Stream.run()
     end)
 
     :ok
+  end
+
+  defmodule ManagedTraversalAST do
+    def to_stream(exec, checks)
+
+    def to_stream(_, nil), do: nil
+    def to_stream(_, []), do: nil
+
+    def to_stream(%Credo.Execution{} = exec, [_ | _] = check_tuples) do
+      source_files = Execution.get_source_files(exec)
+      filenames = Enum.map(source_files, & &1.filename)
+
+      Task.async_stream(source_files, &run_source_file(exec, check_tuples, filenames, &1),
+        timeout: :infinity,
+        ordered: false
+      )
+    end
+
+    defp run_source_file(exec, check_tuples, filenames, source_file) do
+      walker_ctx = build_all_check_contexts(check_tuples, source_file)
+
+      issues =
+        source_file
+        |> Credo.Code.prewalk(&walk(&1, &2, filenames), walker_ctx)
+        |> Enum.flat_map(fn {check, %{__ctx: _} = check_ctx} -> check.issues_from_context(check_ctx) end)
+
+      Credo.Execution.ExecutionIssues.append(exec, issues)
+    end
+
+    defp build_all_check_contexts(walker_checks, source_file) do
+      walker_checks
+      |> Enum.map(fn {check, params} ->
+        {check, check.build_context(source_file, params)}
+      end)
+      |> Map.new()
+    end
+
+    defp walk(ast, walker_ctx, known_files) do
+      walker_ctx =
+        Enum.reduce(walker_ctx, walker_ctx, fn
+          {check, %{source_file: %{filename: filename}, params: params} = check_ctx}, inner_walker_ctx ->
+            if run_check_for_file?(filename, known_files, check, params) do
+              try do
+                check_ctx =
+                  case check.handle_walk(ast, check_ctx) do
+                    %{__ctx: _} = check_ctx -> check_ctx
+                    {_ast, %{__ctx: _} = check_ctx} -> check_ctx
+                  end
+
+                Map.put(inner_walker_ctx, check, check_ctx)
+              rescue
+                error ->
+                  UI.warn([
+                    :orange,
+                    "Error while running #{check} on #{inner_walker_ctx.__meta.filename}:#{inner_walker_ctx.__meta.line_no}"
+                  ])
+
+                  reraise error, __STACKTRACE__
+              end
+            else
+              inner_walker_ctx
+            end
+        end)
+
+      {ast, walker_ctx}
+    end
+
+    defp run_check_for_file?(filename, known_files, check, params) do
+      files_included = Params.files_included(params, check, known_files)
+      files_excluded = Params.files_excluded(params, check)
+
+      file_included? =
+        if files_included != known_files do
+          Credo.Sources.filename_matches?(filename, files_included)
+        else
+          true
+        end
+
+      file_excluded? =
+        if files_excluded != [] do
+          Credo.Sources.filename_matches?(filename, files_excluded)
+        else
+          false
+        end
+
+      file_included? && !file_excluded?
+    end
   end
 
   defp run_check(%Execution{config: %{debug: true}} = exec, {check, params}) do

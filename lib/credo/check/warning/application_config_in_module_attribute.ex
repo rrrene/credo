@@ -26,24 +26,17 @@ defmodule Credo.Check.Warning.ApplicationConfigInModuleAttribute do
       `Application.compile_env!/2` if you wish to set configuration at
       compile time using module attributes.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params \\ []) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _meta, [attribute_definition]} = ast, ctx) do
+  def handle_walk({:@, _meta, [attribute_definition]} = ast, ctx) do
     case traverse_attribute(attribute_definition) do
       nil -> {ast, ctx}
       {attribute, call} -> {ast, put_issue(ctx, issue_for(attribute, call, ctx))}
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

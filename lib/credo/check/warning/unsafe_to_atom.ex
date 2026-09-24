@@ -34,30 +34,23 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
           Jason.decode(str)
 
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:@, _, _}, ctx) do
+  def handle_walk({:@, _, _}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:unquote, _, [_ | _] = _args}, ctx) do
+  def handle_walk({:unquote, _, [_ | _] = _args}, ctx) do
     {nil, ctx}
   end
 
   # module.unquote(:"some_atom")
-  defp walk({{:., _, [_, :unquote]}, _, [_ | _] = _args}, ctx) do
+  def handle_walk({{:., _, [_, :unquote]}, _, [_ | _] = _args}, ctx) do
     {nil, ctx}
   end
 
-  defp walk({:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast, ctx) do
+  def handle_walk({:|>, _meta1, [_lhs, {{:., _meta2, call}, meta, args}]} = ast, ctx) do
     case get_forbidden_pipe(call, args) do
       {bad, suggestion, trigger} ->
         {ast, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger))}
@@ -67,7 +60,7 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     end
   end
 
-  defp walk({{:., _loc, call}, meta, args} = ast, ctx) do
+  def handle_walk({{:., _loc, call}, meta, args} = ast, ctx) do
     case get_forbidden_call(call, args) do
       {bad, suggestion, trigger} ->
         {ast, put_issue(ctx, issue_for(ctx, meta, bad, suggestion, trigger))}
@@ -77,7 +70,7 @@ defmodule Credo.Check.Warning.UnsafeToAtom do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 

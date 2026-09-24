@@ -38,17 +38,10 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
       while later or have to introduce a colleague to it, you might be surprised
       how much clearer things get when the "happy path" comes first.
       """
-    ]
+    ],
+    managed_traversal: :ast
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-    result = Credo.Code.prewalk(source_file, &walk/2, ctx)
-    result.issues
-  end
-
-  defp walk({:if, meta, arguments} = ast, ctx) do
+  def handle_walk({:if, meta, arguments} = ast, ctx) do
     negator = negated_condition(arguments)
 
     if negator && Credo.Code.Block.else_block?(ast) do
@@ -58,7 +51,7 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
     end
   end
 
-  defp walk(ast, ctx) do
+  def handle_walk(ast, ctx) do
     {ast, ctx}
   end
 
