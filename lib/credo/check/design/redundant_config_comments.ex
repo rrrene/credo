@@ -37,7 +37,7 @@ defmodule Credo.Check.Design.RedundantConfigComments do
   end
 
   def redundant_config_comments(issues, exec) do
-    config_comment_map = Execution.get_private(exec, :config_comment_map)
+    config_comment_map = Execution.get_config_comments(exec)
 
     Enum.flat_map(config_comment_map, fn {filename, config_comments} ->
       issues_for_file = Enum.filter(issues, &(&1.filename == filename))

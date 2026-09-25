@@ -56,9 +56,9 @@ defmodule Credo.Execution do
 
     @doc false
     defstruct commands: %{},
-              config_comment_map: %{},
               pipeline_map: %{},
               # PIDs
+              config_comments_pid: nil,
               config_files_pid: nil,
               source_files_pid: nil,
               issues_pid: nil,
@@ -128,6 +128,7 @@ defmodule Credo.Execution do
     halt_execution: [Credo.Execution.Task.AssignExitStatusForIssues]
   ]
 
+  alias Credo.Execution.ExecutionConfigComments
   alias Credo.Execution.ExecutionConfigFiles
   alias Credo.Execution.ExecutionIssues
   alias Credo.Execution.ExecutionSourceFiles
@@ -173,6 +174,7 @@ defmodule Credo.Execution do
   @doc false
   defp start_servers(%__MODULE__{} = exec) do
     exec
+    |> ExecutionConfigComments.start_server()
     |> ExecutionConfigFiles.start_server()
     |> ExecutionIssues.start_server()
     |> ExecutionSourceFiles.start_server()
@@ -529,6 +531,20 @@ defmodule Credo.Execution do
       |> do_put_nested_assign(rest, value)
 
     Map.put(map, next_key, new_map)
+  end
+
+  # Config Comments
+
+  @doc false
+  def get_config_comments(%__MODULE__{} = exec) do
+    Credo.Execution.ExecutionConfigComments.get(exec)
+  end
+
+  @doc false
+  def put_config_comments(%__MODULE__{} = exec, config_comment_map) do
+    ExecutionConfigComments.put(exec, config_comment_map)
+
+    exec
   end
 
   # Config Files
