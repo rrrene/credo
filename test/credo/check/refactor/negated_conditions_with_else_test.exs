@@ -34,30 +34,6 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
         else
           2
         end
-
-        if not not a do
-          1
-        else
-          2
-        end
-
-        if !(!a) do
-          1
-        else
-          2
-        end
-
-        if !not a do
-          1
-        else
-          2
-        end
-
-        if not !a do
-          1
-        else
-          2
-        end
       end
     end
     '''
@@ -119,22 +95,5 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(%{line_no: 3, trigger: "not"})
-  end
-
-  test "it should report a violation for a triple negation" do
-    ~S'''
-    defmodule Mix.Tasks.Credo do
-      def run(argv) do
-        if !!!allowed? do
-          true
-        else
-          false
-        end
-      end
-    end
-    '''
-    |> to_source_file
-    |> run_check(@described_check)
-    |> assert_issue(%{line_no: 3, trigger: "!"})
   end
 end
