@@ -25,6 +25,47 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a double negation" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(a) do
+        if !!a do
+          1
+        else
+          2
+        end
+
+        if not not a do
+          1
+        else
+          2
+        end
+
+        if !(!a) do
+          1
+        else
+          2
+        end
+
+        if !not a do
+          1
+        else
+          2
+        end
+
+        if not !a do
+          1
+        else
+          2
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -78,5 +119,22 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     |> to_source_file
     |> run_check(@described_check)
     |> assert_issue(%{line_no: 3, trigger: "not"})
+  end
+
+  test "it should report a violation for a triple negation" do
+    ~S'''
+    defmodule Mix.Tasks.Credo do
+      def run(argv) do
+        if !!!allowed? do
+          true
+        else
+          false
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> assert_issue(%{line_no: 3, trigger: "!"})
   end
 end

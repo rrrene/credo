@@ -30,6 +30,9 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
 
       The same goes for negation through `!` instead of `not`.
 
+      A double negation like `!!allowed?` is not reported, since it is not a
+      negated condition (it coerces the value to a boolean).
+
       The reason for this is not a technical but a human one. It is easier to wrap
       your head around a positive condition and then thinking "and else we do ...".
 
@@ -62,9 +65,14 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
     {ast, ctx}
   end
 
-  defp negated_condition({:!, _, _}), do: "!"
+  # an even number of stacked negations (like `!!a`) is not a negated condition
+  defp negated_condition({:!, _, _} = ast) do
+    if odd_negations?(ast), do: "!"
+  end
 
-  defp negated_condition({:not, _, _}), do: "not"
+  defp negated_condition({:not, _, _} = ast) do
+    if odd_negations?(ast), do: "not"
+  end
 
   # parentheses around the condition wrap it in a __block__
   defp negated_condition({:__block__, _, arguments}) do
@@ -76,6 +84,16 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
   end
 
   defp negated_condition(_), do: nil
+
+  defp odd_negations?(ast), do: rem(count_negations(ast), 2) == 1
+
+  defp count_negations({operator, _, [argument]}) when operator in [:!, :not] do
+    1 + count_negations(argument)
+  end
+
+  defp count_negations({:__block__, _, [argument]}), do: count_negations(argument)
+
+  defp count_negations(_), do: 0
 
   defp issue_for(ctx, meta, trigger) do
     format_issue(
