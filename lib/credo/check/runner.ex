@@ -56,7 +56,10 @@ defmodule Credo.Check.Runner do
     end
 
     defp run_source_file(exec, check_tuples, filenames, source_file) do
-      walker_ctx = build_all_check_contexts(check_tuples, source_file)
+      walker_ctx =
+        check_tuples
+        |> Enum.filter(&run_check_for_file?(&1, source_file.filename, filenames))
+        |> build_all_check_contexts(source_file)
 
       issues =
         source_file
@@ -74,37 +77,33 @@ defmodule Credo.Check.Runner do
       |> Map.new()
     end
 
-    defp walk(ast, walker_ctx, known_files) do
+    defp walk(ast, walker_ctx, _known_files) do
       walker_ctx =
         Enum.reduce(walker_ctx, walker_ctx, fn
-          {check, %{source_file: %{filename: filename}, params: params} = check_ctx}, inner_walker_ctx ->
-            if run_check_for_file?(filename, known_files, check, params) do
-              try do
-                check_ctx =
-                  case check.handle_walk(ast, check_ctx) do
-                    %{__ctx: _} = check_ctx -> check_ctx
-                    {_ast, %{__ctx: _} = check_ctx} -> check_ctx
-                  end
+          {check, check_ctx}, inner_walker_ctx ->
+            try do
+              check_ctx =
+                case check.handle_walk(ast, check_ctx) do
+                  %{__ctx: _} = check_ctx -> check_ctx
+                  {_ast, %{__ctx: _} = check_ctx} -> check_ctx
+                end
 
-                Map.put(inner_walker_ctx, check, check_ctx)
-              rescue
-                error ->
-                  UI.warn([
-                    :orange,
-                    "Error while running #{check} on #{inner_walker_ctx.__meta.filename}:#{inner_walker_ctx.__meta.line_no}"
-                  ])
+              Map.put(inner_walker_ctx, check, check_ctx)
+            rescue
+              error ->
+                UI.warn([
+                  :orange,
+                  "Error while running #{check} on #{inner_walker_ctx.__meta.filename}:#{inner_walker_ctx.__meta.line_no}"
+                ])
 
-                  reraise error, __STACKTRACE__
-              end
-            else
-              inner_walker_ctx
+                reraise error, __STACKTRACE__
             end
         end)
 
       {ast, walker_ctx}
     end
 
-    defp run_check_for_file?(filename, known_files, check, params) do
+    defp run_check_for_file?({check, params}, filename, known_files) do
       files_included = Params.files_included(params, check, known_files)
       files_excluded = Params.files_excluded(params, check)
 
@@ -126,12 +125,7 @@ defmodule Credo.Check.Runner do
     end
   end
 
-  defp run_check(%Execution{config: %{debug: true}} = exec, {check, params}) do
-    ExecutionTiming.run(&do_run_check/2, [exec, {check, params}])
-    |> ExecutionTiming.append(exec, task: exec.private.current_task, check: check)
-  end
-
-  defp run_check(exec, {check, params}) do
+  defp run_check(%Execution{} = exec, {check, params}) do
     Timing.span exec, "check", task: exec.private.current_task, check: check do
       do_run_check(exec, {check, params})
     end
