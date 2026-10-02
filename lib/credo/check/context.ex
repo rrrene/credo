@@ -1,6 +1,13 @@
 defmodule Credo.Check.Context do
   @moduledoc false
 
+  @type t :: %{
+          __ctx: map(),
+          source_file: Credo.SourceFile.t(),
+          params: map(),
+          issues: list(Credo.Issue.t())
+        }
+
   alias Credo.Check.Params
 
   @doc false

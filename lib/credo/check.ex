@@ -163,8 +163,16 @@ defmodule Credo.Check do
   @callback starting_phase() :: integer()
 
   @doc false
+  @callback build_context(source_file :: Credo.SourceFile.t(), params :: Keyword.t()) :: Credo.Check.Context.t()
+
+  @doc false
+  @callback issues_from_context(ctx :: Credo.Check.Context.t()) :: list(Credo.Issue.t())
+
+  @doc false
   @callback format_issue(issue_meta :: Credo.IssueMeta.t(), opts :: Keyword.t()) ::
               Credo.Issue.t()
+
+  @optional_callbacks build_context: 2, issues_from_context: 1
 
   @base_category_exit_status_map %{
     consistency: 1,
@@ -354,20 +362,39 @@ defmodule Credo.Check do
             unquote(opts[:managed_traversal])
           end
 
+          @impl true
           def build_context(source_file, params) do
             Context.build(source_file, params, __MODULE__)
           end
 
+          @impl true
           def issues_from_context(ctx) do
             ctx.issues
           end
-
-          defoverridable build_context: 2, issues_from_context: 1
         end
       else
         quote do
           def managed_traversal do
             false
+          end
+        end
+      end
+
+    default_def_run =
+      if opts[:managed_traversal] do
+        quote do
+          def run(%SourceFile{} = source_file, params) do
+            ctx = build_context(source_file, params)
+
+            source_file
+            |> Credo.Code.prewalk(&handle_walk/2, ctx)
+            |> issues_from_context()
+          end
+        end
+      else
+        quote do
+          def run(%SourceFile{} = source_file, params) do
+            throw("Implement me")
           end
         end
       end
@@ -490,9 +517,7 @@ defmodule Credo.Check do
       @impl true
       def run(source_file, params)
 
-      def run(%SourceFile{} = source_file, params) do
-        throw("Implement me")
-      end
+      unquote(default_def_run)
 
       @impl true
       def starting_phase, do: 1
