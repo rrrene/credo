@@ -15,7 +15,7 @@ defmodule Credo.Check.Design.RedundantConfigComments do
   alias Credo.Check.ConfigComment
 
   @impl true
-  def scheduled_in_group, do: 10
+  def starting_phase, do: 10
 
   @doc false
   def run_on_all_source_files(exec, source_files, params) do
