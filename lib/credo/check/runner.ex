@@ -16,13 +16,13 @@ defmodule Credo.Check.Runner do
   def run(%Execution{} = exec) do
     {all_check_tuples, _, _} = Execution.checks(exec)
 
-    check_tuples_grouped_by_group =
+    check_tuples_by_starting_phase =
       all_check_tuples
-      |> Enum.group_by(fn {check, _params} -> check.scheduled_in_group() end)
+      |> Enum.group_by(fn {check, _params} -> check.starting_phase() end)
       |> Enum.sort_by(fn {key, _check_tuples} -> key end)
       |> Enum.map(fn {_key, check_tuples} -> check_tuples end)
 
-    Enum.each(check_tuples_grouped_by_group, fn check_tuples ->
+    Enum.each(check_tuples_by_starting_phase, fn check_tuples ->
       buckets = Enum.group_by(check_tuples, fn {check, _params} -> check.managed_traversal() end)
 
       checks_wo_managed_traversal = Map.get(buckets, false, [])
