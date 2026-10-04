@@ -25,41 +25,46 @@ defmodule Credo.Check.Readability.LargeNumbers do
         only_greater_than: "The check only reports numbers greater than this.",
         trailing_digits: "The check allows for the given number of trailing digits (can be a number, range or list)"
       ]
-    ]
+    ],
+    managed_traversal: :tokens
 
   @doc false
   def run(%SourceFile{} = source_file, params) do
-    ctx =
-      source_file
-      |> Context.build(params, __MODULE__)
-      |> Context.handle_param(:trailing_digits, fn
-        %Range{} = value -> Enum.to_list(value)
-        value -> List.wrap(value)
-      end)
+    ctx = build_context(source_file, params)
 
-    ctx = Credo.Code.Token.reduce(source_file, &find_candidates/4, ctx)
+    ctx = Credo.Code.Token.reduce(source_file, &handle_reduce/4, ctx)
     ctx.issues
   end
 
-  defp find_candidates(_prev, {{:number, _}, _, "0b" <> _, _}, _next, ctx) do
+  @impl true
+  def build_context(source_file, params) do
+    source_file
+    |> Context.build(params, __MODULE__)
+    |> Context.handle_param(:trailing_digits, fn
+      %Range{} = value -> Enum.to_list(value)
+      value -> List.wrap(value)
+    end)
+  end
+
+  def handle_reduce(_prev, {{:number, _}, _, "0b" <> _, _}, _next, ctx) do
     ctx
   end
 
-  defp find_candidates(_prev, {{:number, _}, _, "0o" <> _, _}, _next, ctx) do
+  def handle_reduce(_prev, {{:number, _}, _, "0o" <> _, _}, _next, ctx) do
     ctx
   end
 
-  defp find_candidates(_prev, {{:number, _}, _, "0x" <> _, _}, _next, ctx) do
+  def handle_reduce(_prev, {{:number, _}, _, "0x" <> _, _}, _next, ctx) do
     ctx
   end
 
-  defp find_candidates(
-         _prev,
-         {{:number, _}, {line_no, column, _, _}, source, %{value: number}},
-         _next,
-         %{params: %{only_greater_than: only_greater_than, trailing_digits: trailing_digits}} = ctx
-       )
-       when number > only_greater_than do
+  def handle_reduce(
+        _prev,
+        {{:number, _}, {line_no, column, _, _}, source, %{value: number}},
+        _next,
+        %{params: %{only_greater_than: only_greater_than, trailing_digits: trailing_digits}} = ctx
+      )
+      when number > only_greater_than do
     underscored_versions = number_with_underscores(number, trailing_digits, source)
 
     if not Enum.member?(underscored_versions, source) do
@@ -69,7 +74,7 @@ defmodule Credo.Check.Readability.LargeNumbers do
     end
   end
 
-  defp find_candidates(_prev, _current, _next, ctx) do
+  def handle_reduce(_prev, _current, _next, ctx) do
     ctx
   end
 

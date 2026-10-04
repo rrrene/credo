@@ -32,23 +32,13 @@ defmodule Credo.Check.Readability.StringSigils do
       params: [
         maximum_allowed_quotes: "The maximum amount of escaped quotes you want to tolerate."
       ]
-    ]
+    ],
+    managed_traversal: :tokens
 
   @quote_codepoint 34
 
-  @doc false
-  @impl true
-  def run(%SourceFile{} = source_file, params) do
-    ctx = Context.build(source_file, params, __MODULE__)
-
-    source_file
-    |> Credo.Code.Token.reduce(&collect/4, ctx)
-    |> then(& &1.issues)
-    |> Enum.reverse()
-  end
-
-  defp collect({{:string, _}, {line_no, _, _, _}, [value], _}, _, _, ctx)
-       when is_binary(value) do
+  def handle_reduce({{:string, _}, {line_no, _, _, _}, [value], _}, _, _, ctx)
+      when is_binary(value) do
     if too_many_quotes?(value, ctx.params.maximum_allowed_quotes) do
       put_issue(ctx, issue_for(ctx, line_no, value))
     else
@@ -56,7 +46,7 @@ defmodule Credo.Check.Readability.StringSigils do
     end
   end
 
-  defp collect(_prev, _current, _next, ctx), do: ctx
+  def handle_reduce(_prev, _current, _next, ctx), do: ctx
 
   defp too_many_quotes?(string, limit) do
     too_many_quotes?(string, 0, limit)

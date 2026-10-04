@@ -19,36 +19,36 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
       params: [
         ignore_strings: "Set to `false` to check lines that are strings or in heredocs"
       ]
-    ]
+    ],
+    managed_traversal: :tokens
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
     ctx = Context.build(source_file, params, __MODULE__)
-
-    result = Credo.Code.Token.reduce(source_file, &collect/4, ctx)
+    result = Credo.Code.Token.reduce(source_file, &handle_reduce/4, ctx)
     result.issues
   end
 
-  defp collect(
-         _prev,
-         {{type, _}, {line, _, line2, _}, [first | _], _},
-         _next,
-         %{params: %{ignore_strings: false}} = ctx
-       )
-       when type in [:string, :heredoc] and not is_integer(first) do
-    do_collect_from_string(ctx, line, line2)
+  def handle_reduce(
+        _prev,
+        {{type, _}, {line, _, line2, _}, [first | _], _},
+        _next,
+        %{params: %{ignore_strings: false}} = ctx
+      )
+      when type in [:string, :heredoc] and not is_integer(first) do
+    do_handle_reduce_from_string(ctx, line, line2)
   end
 
-  defp collect(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col, _, _}, _, _}, ctx) do
+  def handle_reduce(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col, _, _}, _, _}, ctx) do
     ctx
   end
 
-  defp collect(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col2, _, _}, _, _}, ctx) do
+  def handle_reduce(_, {_, {_, _, line, col}, _, _}, {{:eol, _}, {line, col2, _, _}, _, _}, ctx) do
     put_issue(ctx, issue_for(ctx, line, col, col2))
   end
 
-  defp collect(_prev, _current, _next, ctx) do
+  def handle_reduce(_prev, _current, _next, ctx) do
     ctx
   end
 
@@ -58,7 +58,7 @@ defmodule Credo.Check.Readability.TrailingWhiteSpace do
     indent
   end
 
-  defp do_collect_from_string(ctx, line, line2) do
+  defp do_handle_reduce_from_string(ctx, line, line2) do
     lines =
       Enum.map(line..line2, fn line_no ->
         {line_no, SourceFile.line_at(ctx.source_file, line_no)}
