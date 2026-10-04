@@ -28,6 +28,11 @@ defmodule Credo.CLI.Output.Shell do
     GenServer.call(__MODULE__, {:suppress_output, false})
   end
 
+  @doc "Like `puts/1`, but does not append a trailing newline."
+  def write(value) do
+    GenServer.call(__MODULE__, {:write, value})
+  end
+
   @doc "Like `puts/1`, but writes to `:stderr`."
   def warn(value) do
     GenServer.call(__MODULE__, {:warn, value})
@@ -77,6 +82,32 @@ defmodule Credo.CLI.Output.Shell do
     {:reply, nil, current_state}
   end
 
+  def handle_call({:write, _value}, _from, %{suppress_output: true} = current_state) do
+    {:reply, nil, current_state}
+  end
+
+  def handle_call(
+        {:write, value},
+        _from,
+        %{use_colors: true, suppress_output: false} = current_state
+      ) do
+    do_write(value)
+
+    {:reply, nil, current_state}
+  end
+
+  def handle_call(
+        {:write, value},
+        _from,
+        %{use_colors: false, suppress_output: false} = current_state
+      ) do
+    value
+    |> remove_colors()
+    |> do_write()
+
+    {:reply, nil, current_state}
+  end
+
   def handle_call({:warn, _value}, _from, %{suppress_output: true} = current_state) do
     {:reply, nil, current_state}
   end
@@ -112,6 +143,10 @@ defmodule Credo.CLI.Output.Shell do
 
   defp do_puts(value) do
     Bunt.puts(value)
+  end
+
+  defp do_write(value) do
+    Bunt.write(value)
   end
 
   defp do_warn(value) do
