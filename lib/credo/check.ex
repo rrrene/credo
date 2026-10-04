@@ -381,22 +381,35 @@ defmodule Credo.Check do
       end
 
     default_def_run =
-      if opts[:managed_traversal] do
-        quote do
-          def run(%SourceFile{} = source_file, params) do
-            ctx = build_context(source_file, params)
+      case opts[:managed_traversal] do
+        :ast ->
+          quote do
+            def run(%SourceFile{} = source_file, params) do
+              ctx = build_context(source_file, params)
 
-            source_file
-            |> Credo.Code.prewalk(&handle_walk/2, ctx)
-            |> issues_from_context()
+              source_file
+              |> Credo.Code.prewalk(&handle_walk/2, ctx)
+              |> issues_from_context()
+            end
           end
-        end
-      else
-        quote do
-          def run(%SourceFile{} = source_file, params) do
-            throw("Implement me")
+
+        :tokens ->
+          quote do
+            def run(%SourceFile{} = source_file, params) do
+              ctx = Context.build(source_file, params, __MODULE__)
+
+              source_file
+              |> Credo.Code.Token.reduce(&handle_reduce/4, ctx)
+              |> issues_from_context()
+            end
           end
-        end
+
+        _ ->
+          quote do
+            def run(%SourceFile{} = source_file, params) do
+              throw("Implement me")
+            end
+          end
       end
 
     caller_module = __CALLER__.module
