@@ -37,6 +37,9 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
       might seem so important to put it first. But when you revisit this code a
       while later or have to introduce a colleague to it, you might be surprised
       how much clearer things get when the "happy path" comes first.
+
+      NOTE: A double negation like `!!result` is allowed, since it is not a
+            negated condition (it coerces the value to a boolean).
       """
     ]
 
@@ -62,9 +65,17 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElse do
     {ast, ctx}
   end
 
-  defp negated_condition({:!, _, _}), do: "!"
+  defp negated_condition({:!, _, [{:!, _, _} | _]}) do
+    nil
+  end
 
-  defp negated_condition({:not, _, _}), do: "not"
+  defp negated_condition({:!, _, _}) do
+    "!"
+  end
+
+  defp negated_condition({:not, _, _}) do
+    "not"
+  end
 
   # parentheses around the condition wrap it in a __block__
   defp negated_condition({:__block__, _, arguments}) do

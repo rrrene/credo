@@ -27,20 +27,15 @@ defmodule Credo.Check.Readability.Semicolons do
   @impl true
   def run(%SourceFile{} = source_file, params) do
     ctx = Context.build(source_file, params, __MODULE__)
-
-    source_file
-    |> Credo.Code.to_tokens()
-    |> collect_issues([], ctx)
+    ctx = Credo.Code.Token.reduce(source_file, &handle_reduce/4, ctx)
+    ctx.issues
   end
 
-  defp collect_issues([], acc, _ctx), do: acc
-
-  defp collect_issues([{:";", {line_no, column1, _}} | rest], acc, ctx) do
-    acc = [issue_for(ctx, line_no, column1) | acc]
-    collect_issues(rest, acc, ctx)
+  defp handle_reduce(_prev, {{:";", _}, {line_no, column, _, _}, _, _}, _next, ctx) do
+    put_issue(ctx, issue_for(ctx, line_no, column))
   end
 
-  defp collect_issues([_ | rest], acc, ctx), do: collect_issues(rest, acc, ctx)
+  defp handle_reduce(_prev, _current, _next, ctx), do: ctx
 
   defp issue_for(ctx, line_no, column) do
     format_issue(

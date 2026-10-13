@@ -25,6 +25,23 @@ defmodule Credo.Check.Refactor.NegatedConditionsWithElseTest do
     |> refute_issues()
   end
 
+  test "it should NOT report a double negation" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function(a) do
+        if !!a do
+          1
+        else
+          2
+        end
+      end
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #

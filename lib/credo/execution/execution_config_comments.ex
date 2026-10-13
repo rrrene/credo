@@ -1,0 +1,39 @@
+defmodule Credo.Execution.ExecutionConfigComments do
+  @moduledoc false
+
+  use GenServer
+
+  alias Credo.Execution
+
+  def start_server(exec) do
+    {:ok, pid} = GenServer.start_link(__MODULE__, [])
+
+    Execution.put_private(exec, :config_comments_pid, pid)
+  end
+
+  def put(%Execution{} = exec, config_comment_map) do
+    pid = Execution.get_private(exec, :config_comments_pid)
+
+    GenServer.call(pid, {:put, config_comment_map})
+  end
+
+  def get(%Execution{} = exec) do
+    pid = Execution.get_private(exec, :config_comments_pid)
+
+    GenServer.call(pid, :get)
+  end
+
+  # callbacks
+
+  def init(_) do
+    {:ok, []}
+  end
+
+  def handle_call({:put, new_state}, _from, _current_state) do
+    {:reply, new_state, new_state}
+  end
+
+  def handle_call(:get, _from, current_state) do
+    {:reply, current_state, current_state}
+  end
+end

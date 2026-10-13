@@ -22,7 +22,7 @@ defmodule Credo.CLI.Task.PrepareChecksToRun do
       |> Credo.Check.ConfigCommentFinder.run()
       |> Enum.into(%{})
 
-    Execution.put_private(exec, :config_comment_map, config_comment_map)
+    Execution.put_config_comments(exec, config_comment_map)
   end
 
   defp enable_disabled_checks_if_applicable(%Execution{config: %{enable_disabled_checks: nil}} = exec) do

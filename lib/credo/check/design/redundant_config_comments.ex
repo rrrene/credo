@@ -15,7 +15,7 @@ defmodule Credo.Check.Design.RedundantConfigComments do
   alias Credo.Check.ConfigComment
 
   @impl true
-  def scheduled_in_group, do: 10
+  def starting_phase, do: 10
 
   @doc false
   def run_on_all_source_files(exec, source_files, params) do
@@ -37,7 +37,7 @@ defmodule Credo.Check.Design.RedundantConfigComments do
   end
 
   def redundant_config_comments(issues, exec) do
-    config_comment_map = Execution.get_private(exec, :config_comment_map)
+    config_comment_map = Execution.get_config_comments(exec)
 
     Enum.flat_map(config_comment_map, fn {filename, config_comments} ->
       issues_for_file = Enum.filter(issues, &(&1.filename == filename))

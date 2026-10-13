@@ -29,7 +29,7 @@ defmodule Credo.CLI.Filter do
   end
 
   def ignored_by_config_comment?(%Issue{} = issue, exec) do
-    config_comment_map = Execution.get_private(exec, :config_comment_map)
+    config_comment_map = Execution.get_config_comments(exec)
 
     case config_comment_map[issue.filename] do
       config_comments when is_list(config_comments) ->
