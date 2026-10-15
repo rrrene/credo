@@ -66,6 +66,17 @@ defmodule Credo.Check.Warning.ForbiddenModule do
     {ast, put_issue(ctx, issues)}
   end
 
+  defp walk({:., meta, [erlang_module, _fun]} = ast, ctx) when is_atom(erlang_module) do
+    module = Name.full(erlang_module)
+    trigger = inspect(erlang_module)
+
+    # The dot's metadata points at the `.`, so step back to the start of the module atom
+    meta = Keyword.update(meta, :column, nil, &(&1 - String.length(trigger)))
+    issue = issue_if_forbidden(ctx, meta, module, trigger)
+
+    {ast, put_issue(ctx, issue)}
+  end
+
   defp walk(ast, ctx), do: {ast, ctx}
 
   defp issue_if_forbidden(ctx, meta, module, trigger) do

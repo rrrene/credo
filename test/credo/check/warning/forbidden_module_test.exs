@@ -132,4 +132,15 @@ defmodule Credo.Check.Warning.ForbiddenModuleTest do
     )
     |> assert_issues()
   end
+
+  test "it warns on usage of a forbidden Erlang module" do
+    ~S'''
+    defmodule CredoSampleModule do
+      def some_function, do: :ets.new(:table, [:set, :public])
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, modules: [:ets])
+    |> assert_issue(%{line_no: 2, column: 26, message: "The `:ets` module is not allowed."})
+  end
 end
