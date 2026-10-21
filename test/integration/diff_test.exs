@@ -105,4 +105,37 @@ defmodule Credo.DiffTest do
     assert exec.cli_options.command == "diff"
     assert issues == []
   end
+
+  test "it should pass switches given before --from-git-ref on to the previous run" do
+    exec =
+      IntegrationTest.run([
+        "diff",
+        "--working-dir",
+        @fixture_integration_cloned_repo,
+        "--min-priority",
+        "high",
+        "--from-git-ref",
+        "HEAD"
+      ])
+
+    previous_exec = Credo.Execution.get_assign(exec, "credo.diff.previous_exec")
+
+    assert previous_exec.config.min_priority == exec.config.min_priority
+  end
+
+  test "it should pass switches given before --working-dir on to the previous run" do
+    exec =
+      IntegrationTest.run([
+        "diff",
+        "--strict",
+        "--working-dir",
+        @fixture_integration_cloned_repo,
+        "--from-git-ref",
+        "HEAD"
+      ])
+
+    previous_exec = Credo.Execution.get_assign(exec, "credo.diff.previous_exec")
+
+    assert previous_exec.config.min_priority == exec.config.min_priority
+  end
 end
