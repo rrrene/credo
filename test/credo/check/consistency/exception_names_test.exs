@@ -99,6 +99,29 @@ defmodule Credo.Check.Consistency.ExceptionNamesTest do
     |> refute_issues()
   end
 
+  test "it should NOT infer a convention when prefixes and suffixes are tied" do
+    [
+      ~S'''
+      defmodule NervesHubWeb.Unauthorized do
+        defexception [:message]
+      end
+      ''',
+      ~S'''
+      defmodule NervesHubWeb.NotFoundError do
+        defexception [:message]
+      end
+      ''',
+      ~S'''
+      defmodule NervesHubWeb.UnauthorizedError do
+        defexception [:message]
+      end
+      '''
+    ]
+    |> to_source_files
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should not report (prefixes)" do
     [
       ~S'''
