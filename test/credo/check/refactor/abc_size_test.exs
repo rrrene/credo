@@ -120,6 +120,17 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     |> refute_issues()
   end
 
+  test "it should NOT report parameters of a function with a guard" do
+    ~S'''
+    def some_function(a, b, c, d) when is_integer(a) do
+      {a, b, c, d}
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check, max_size: 0)
+    |> refute_issues()
+  end
+
   #
   # cases raising issues
   #
@@ -373,6 +384,36 @@ defmodule Credo.Check.Refactor.ABCSizeTest do
     '''
 
     assert rounded_abc_size(source) == 6
+  end
+
+  test "it should NOT count parameters as function calls when the function has a guard" do
+    source = ~S'''
+    def sample(id) when is_atom(id) do
+      id
+    end
+    '''
+
+    assert rounded_abc_size(source) == 0
+  end
+
+  test "it should return the same ABC size with and without a guard" do
+    with_guard_source = ~S'''
+    def sample(id) when is_atom(id) do
+      quote bind_quoted: [id: id] do
+        id
+      end
+    end
+    '''
+
+    without_guard_source = ~S'''
+    def sample(id) do
+      quote bind_quoted: [id: id] do
+        id
+      end
+    end
+    '''
+
+    assert abc_size(with_guard_source) == abc_size(without_guard_source)
   end
 
   test "it should NOT count functions given to ignore for abc size" do

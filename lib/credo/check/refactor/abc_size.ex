@@ -112,6 +112,9 @@ defmodule Credo.Check.Refactor.ABCSize do
 
   defp get_parameters(arguments) do
     case Enum.at(arguments, 0) do
+      {:when, _meta, [head | _guards]} ->
+        get_parameters([head])
+
       {_name, _meta, nil} ->
         []
 
