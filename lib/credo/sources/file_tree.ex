@@ -22,10 +22,31 @@ defmodule Credo.Sources.FileTree do
   defstruct files: MapSet.new(), dirs: %{}
 
   @doc """
-  Builds a file tree from the given list of absolute (expanded) file paths.
+  Builds a file tree from the given list of absolute file paths.
+
+  Paths are normalized with `Path.expand/1` (so e.g. `/app/./lib/a.ex` and `/app/lib/a.ex`
+  are the same file), and `files/1` returns them in that normalized form.
   """
   def new(paths) do
-    %__MODULE__{files: MapSet.new(paths), dirs: Enum.reduce(paths, %{}, &add_to_parents(&2, &1))}
+    files =
+      MapSet.new(paths, fn path ->
+        if Path.type(path) != :absolute do
+          raise ArgumentError, "expected an absolute path, got: #{inspect(path)}"
+        end
+
+        Path.expand(path)
+      end)
+
+    dirs =
+      files
+      |> Enum.reduce(%{}, &add_to_parents(&2, &1))
+      # `list_dir/1` is called for every directory a glob visits (for every pattern of every check),
+      # so prepare its result up front: like `Path.wildcard/1`, ignore entries starting with a dot
+      |> Map.new(fn {dir, children} ->
+        {dir, for(child <- children, not String.starts_with?(child, "."), do: String.to_charlist(child))}
+      end)
+
+    %__MODULE__{files: files, dirs: dirs}
   end
 
   defp add_to_parents(dirs, path) do
@@ -48,6 +69,11 @@ defmodule Credo.Sources.FileTree do
       end
     end
   end
+
+  @doc """
+  Returns the (normalized) paths of all files in the tree.
+  """
+  def files(%__MODULE__{files: files}), do: files
 
   def regular?(%__MODULE__{files: files}, path), do: MapSet.member?(files, path)
 
@@ -100,8 +126,7 @@ defmodule Credo.Sources.FileTree do
 
     case tree.dirs do
       %{^path => children} ->
-        # like `Path.wildcard/1`, ignore entries starting with a dot
-        {:ok, for(child <- children, not String.starts_with?(child, "."), do: String.to_charlist(child))}
+        {:ok, children}
 
       _ ->
         {:error, :enoent}

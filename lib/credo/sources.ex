@@ -111,18 +111,21 @@ defmodule Credo.Sources do
   end
 
   @doc false
-  # Returns what `find_in_dir/3` would, but treats the given expanded `paths` as the only files
-  # that exist, so it never hits the filesystem. (Like `find_in_dir/3`, literal `.ex`/`.exs`
-  # paths in `included` are returned as-is, whether or not they're among `paths`.)
+  # Returns what `find_in_dir/3` would, but treats the given absolute `paths` as the only files
+  # that exist, so it never hits the filesystem. Returned paths are normalized with `Path.expand/1`.
+  # (Unlike `find_in_dir/3`, literal `.ex`/`.exs` paths in `included` are only returned
+  # if they're among `paths`.)
   #
   # It's used to determine which of the already loaded source files a check's `files` param filters it to.
   #
   # Passing `:all` as `included` includes every one of `paths` (rather than the default sources glob),
   # without having to match each of them as a pattern of its own.
   def find_in_paths(paths, working_dir, :all, excluded) do
-    paths
-    |> MapSet.new()
-    |> exclude_and_limit(working_dir, excluded, FileTree.new(paths))
+    tree = FileTree.new(paths)
+
+    tree
+    |> FileTree.files()
+    |> exclude_and_limit(working_dir, excluded, tree)
   end
 
   def find_in_paths(paths, working_dir, included, excluded) do
@@ -210,7 +213,13 @@ defmodule Credo.Sources do
     paths =
       cond do
         non_wildcard_elixir_file_path?(path) ->
-          [path]
+          # On disk, literal Elixir file paths are trusted without a (comparatively costly) existence check.
+          # In memory that check is cheap, and it lets callers tell when none of the given paths matched.
+          if fs == :disk or regular?(fs, path) do
+            [path]
+          else
+            []
+          end
 
         regular?(fs, path) ->
           [path]

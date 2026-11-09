@@ -3,6 +3,17 @@ defmodule Credo.Sources.FileTreeTest do
 
   alias Credo.Sources.FileTree
 
+  test "new/1 normalizes paths" do
+    tree = FileTree.new(["/app/./lib/a.ex", "/app/lib/../lib/b.ex", "/app/lib/c.ex/"])
+
+    assert MapSet.new(["/app/lib/a.ex", "/app/lib/b.ex", "/app/lib/c.ex"]) == FileTree.files(tree)
+    assert ["/app/lib/a.ex", "/app/lib/b.ex", "/app/lib/c.ex"] == Enum.sort(FileTree.wildcard(tree, "/app/**/*.ex"))
+  end
+
+  test "new/1 rejects relative paths" do
+    assert_raise ArgumentError, fn -> FileTree.new(["/app/lib/a.ex", "lib/b.ex"]) end
+  end
+
   # `FileTree` relies on `:filelib.wildcard/2` invoking its callbacks synchronously in the
   # calling process, since it passes the tree to them via the process dictionary.
   # If `:filelib` ever starts running callbacks in another process (a pool, a server,

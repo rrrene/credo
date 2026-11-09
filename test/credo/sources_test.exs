@@ -358,6 +358,20 @@ defmodule Credo.SourcesTest do
       assert ["lib/app/worker.ex"] == find_in_fake_paths(["lib/app/worker.ex"], [])
     end
 
+    test "it does not return literal file paths that are not among the given paths" do
+      assert [] == find_in_fake_paths(["lib/not_loaded.ex"], [])
+      assert ["lib/app.ex"] == find_in_fake_paths(["lib/not_loaded.ex", "lib/app.ex"], [])
+    end
+
+    test "it normalizes the given paths" do
+      unnormalized = Enum.map(["lib/./app.ex", "lib/app/../app/worker.ex", "test/"], &(@fake_dir <> "/" <> &1))
+      normalized = Enum.map(["lib/app.ex", "lib/app/worker.ex", "test"], &Path.join(@fake_dir, &1))
+
+      assert normalized == Credo.Sources.find_in_paths(unnormalized, @fake_dir, :all, [])
+      assert ["lib/app.ex", "lib/app/worker.ex"] == find_in_fake_paths(["lib/"], [], unnormalized)
+      assert ["lib/app/worker.ex"] == find_in_fake_paths(:all, ["lib/app.ex", "test"], unnormalized)
+    end
+
     test "it excludes globs, directories and regexes" do
       assert ["test/app_test.exs", "test/test_helper.exs"] ==
                find_in_fake_paths(["test/"], ["test/app/", "test/**/*.ex"])
