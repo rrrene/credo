@@ -79,16 +79,9 @@ defmodule Credo.Sources do
         value -> value
       end
 
-    working_dir = Execution.working_dir(exec)
-
-    included_patterns = convert_globs_to_local_paths(working_dir, files.included)
-    excluded_patterns = convert_globs_to_local_paths(working_dir, files.excluded)
-
-    MapSet.new()
-    |> include(included_patterns, :disk)
-    |> exclude(excluded_patterns, :disk)
-    |> Enum.sort()
-    |> Enum.take(max_file_count())
+    exec
+    |> Execution.working_dir()
+    |> do_find_in_dir(files.included, files.excluded, :disk)
     |> read_files(parse_timeout)
   end
 
@@ -113,28 +106,22 @@ defmodule Credo.Sources do
 
       iex> Sources.find_in_dir("/home/rrrene/elixir", ["*.ex"], [~r/messy/])
   """
-  def find_in_dir(working_dir, included, excluded)
-
-  def find_in_dir(working_dir, [], excluded),
-    do: find_in_dir(working_dir, [Path.join(@default_sources_glob)], excluded)
-
   def find_in_dir(working_dir, included, excluded) do
-    do_find_in_dir(working_dir, included, excluded, :disk)
+    do_find_in_dir(working_dir, default_included(included), excluded, :disk)
   end
 
   @doc false
-  # Filters the given expanded `paths` to just the subset the `included` and `excluded` patterns allow.
+  # Returns what `find_in_dir/3` would, but treats the given expanded `paths` as the only files
+  # that exist, so it never hits the filesystem. (Like `find_in_dir/3`, literal `.ex`/`.exs`
+  # paths in `included` are returned as-is, whether or not they're among `paths`.)
   #
-  # This matches what `find_in_dir/3` would return, but it avoids hitting the filesystem.
   # It's used to determine which of the already loaded source files a check's `files` param filters it to.
-  def find_in_paths(paths, working_dir, included, excluded)
-
-  def find_in_paths(paths, working_dir, [], excluded),
-    do: find_in_paths(paths, working_dir, [Path.join(@default_sources_glob)], excluded)
-
   def find_in_paths(paths, working_dir, included, excluded) do
-    do_find_in_dir(working_dir, included, excluded, FileTree.new(paths))
+    do_find_in_dir(working_dir, default_included(included), excluded, FileTree.new(paths))
   end
+
+  defp default_included([]), do: [Path.join(@default_sources_glob)]
+  defp default_included(included), do: included
 
   defp do_find_in_dir(working_dir, included, excluded, fs) do
     included_patterns = convert_globs_to_local_paths(working_dir, included)

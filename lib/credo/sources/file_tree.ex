@@ -16,8 +16,7 @@ defmodule Credo.Sources.FileTree do
   # `:filelib` requires a module with `read_file_info/1`, `read_link_info/1` and `list_dir/1` callbacks.
   # It *only* accepts an atom module (there's no way to pass state). But, it always invokes the callbacks
   # *synchronously* in the calling process. Thus, it's safe for us to stash the tree in the process dictionary
-  # for the duration of `wildcard/2`: it's process-local, so concurrent callers can't see each other's trees,
-  # and we restore any previous value to support reentrancy.
+  # for the duration of `wildcard/2`: it's process-local, so concurrent callers can't see each other's trees.
   @process_dict_key {__MODULE__, :tree}
 
   defstruct files: MapSet.new(), dirs: %{}
@@ -26,9 +25,7 @@ defmodule Credo.Sources.FileTree do
   Builds a file tree from the given list of absolute (expanded) file paths.
   """
   def new(paths) do
-    Enum.reduce(paths, %__MODULE__{}, fn path, tree ->
-      %{tree | files: MapSet.put(tree.files, path), dirs: add_to_parents(tree.dirs, path)}
-    end)
+    %__MODULE__{files: MapSet.new(paths), dirs: Enum.reduce(paths, %{}, &add_to_parents(&2, &1))}
   end
 
   defp add_to_parents(dirs, path) do
@@ -60,7 +57,7 @@ defmodule Credo.Sources.FileTree do
   Same as `Path.wildcard/1`, but traversing `tree` instead of the actual filesystem.
   """
   def wildcard(%__MODULE__{} = tree, glob) do
-    previous = Process.put(@process_dict_key, tree)
+    Process.put(@process_dict_key, tree)
 
     try do
       glob
@@ -68,11 +65,7 @@ defmodule Credo.Sources.FileTree do
       |> :filelib.wildcard(__MODULE__)
       |> Enum.map(&IO.chardata_to_string/1)
     after
-      if previous do
-        Process.put(@process_dict_key, previous)
-      else
-        Process.delete(@process_dict_key)
-      end
+      Process.delete(@process_dict_key)
     end
   end
 
