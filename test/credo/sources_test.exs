@@ -377,6 +377,20 @@ defmodule Credo.SourcesTest do
              ] == find_in_fake_paths([], ["test/support/case.ex"])
     end
 
+    test "it includes every given path for :all" do
+      paths = [Path.join(@fake_dir, "README.md") | @fake_paths]
+
+      assert Enum.sort(paths) == Credo.Sources.find_in_paths(paths, @fake_dir, :all, [])
+
+      assert [
+               "README.md",
+               "lib/.hidden/secret.ex",
+               "lib/app.ex",
+               "lib/app/worker.ex",
+               "mix.exs"
+             ] == find_in_fake_paths(:all, ["test/", ~r/router/], paths)
+    end
+
     test "it ignores files on disk that are not among the given paths" do
       dir = @fixture_integration_test_config
       [clean_redux, dirty] = Enum.map(["lib/clean/clean_redux.ex", "lib/clean/dirty.ex"], &Path.expand(&1, dir))

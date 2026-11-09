@@ -54,9 +54,16 @@ defmodule Credo.Sources.FileTree do
   def dir?(%__MODULE__{dirs: dirs}, path), do: Map.has_key?(dirs, path)
 
   @doc """
-  Same as `Path.wildcard/1`, but traversing `tree` instead of the actual filesystem.
+  Like `Path.wildcard/1`, but traversing `tree` instead of the actual filesystem.
+
+  Unlike `Path.wildcard/1`, `glob` must be an absolute path, since the tree only knows
+  about absolute paths (a relative glob would otherwise silently match nothing).
   """
   def wildcard(%__MODULE__{} = tree, glob) do
+    if Path.type(glob) != :absolute do
+      raise ArgumentError, "expected an absolute glob, got: #{inspect(glob)}"
+    end
+
     Process.put(@process_dict_key, tree)
 
     try do

@@ -116,6 +116,15 @@ defmodule Credo.Sources do
   # paths in `included` are returned as-is, whether or not they're among `paths`.)
   #
   # It's used to determine which of the already loaded source files a check's `files` param filters it to.
+  #
+  # Passing `:all` as `included` includes every one of `paths` (rather than the default sources glob),
+  # without having to match each of them as a pattern of its own.
+  def find_in_paths(paths, working_dir, :all, excluded) do
+    paths
+    |> MapSet.new()
+    |> exclude_and_limit(working_dir, excluded, FileTree.new(paths))
+  end
+
   def find_in_paths(paths, working_dir, included, excluded) do
     do_find_in_dir(working_dir, default_included(included), excluded, FileTree.new(paths))
   end
@@ -125,10 +134,16 @@ defmodule Credo.Sources do
 
   defp do_find_in_dir(working_dir, included, excluded, fs) do
     included_patterns = convert_globs_to_local_paths(working_dir, included)
-    excluded_patterns = convert_globs_to_local_paths(working_dir, excluded)
 
     MapSet.new()
     |> include(included_patterns, fs)
+    |> exclude_and_limit(working_dir, excluded, fs)
+  end
+
+  defp exclude_and_limit(files, working_dir, excluded, fs) do
+    excluded_patterns = convert_globs_to_local_paths(working_dir, excluded)
+
+    files
     |> exclude(excluded_patterns, fs)
     |> Enum.sort()
     |> Enum.take(max_file_count())
