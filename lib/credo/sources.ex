@@ -5,6 +5,7 @@ defmodule Credo.Sources do
 
   alias Credo.Execution
   alias Credo.SourceFile
+  alias Credo.Sources.FileTree
 
   @default_sources_glob ~w(** *.{ex,exs})
   @stdin_filename "stdin"
@@ -84,8 +85,8 @@ defmodule Credo.Sources do
     excluded_patterns = convert_globs_to_local_paths(working_dir, files.excluded)
 
     MapSet.new()
-    |> include(included_patterns)
-    |> exclude(excluded_patterns)
+    |> include(included_patterns, :disk)
+    |> exclude(excluded_patterns, :disk)
     |> Enum.sort()
     |> Enum.take(max_file_count())
     |> read_files(parse_timeout)
@@ -100,7 +101,7 @@ defmodule Credo.Sources do
   end
 
   def find(path) when is_binary(path) do
-    recurse_path(path)
+    recurse_path(path, :disk)
   end
 
   @doc """
@@ -118,12 +119,30 @@ defmodule Credo.Sources do
     do: find_in_dir(working_dir, [Path.join(@default_sources_glob)], excluded)
 
   def find_in_dir(working_dir, included, excluded) do
+    do_find_in_dir(working_dir, included, excluded, :disk)
+  end
+
+  @doc false
+  # Filters the given expanded `paths` to just the subset the `included` and `excluded` patterns allow.
+  #
+  # This matches what `find_in_dir/3` would return, but it avoids hitting the filesystem.
+  # It's used to determine which of the already loaded source files a check's `files` param filters it to.
+  def find_in_paths(paths, working_dir, included, excluded)
+
+  def find_in_paths(paths, working_dir, [], excluded),
+    do: find_in_paths(paths, working_dir, [Path.join(@default_sources_glob)], excluded)
+
+  def find_in_paths(paths, working_dir, included, excluded) do
+    do_find_in_dir(working_dir, included, excluded, FileTree.new(paths))
+  end
+
+  defp do_find_in_dir(working_dir, included, excluded, fs) do
     included_patterns = convert_globs_to_local_paths(working_dir, included)
     excluded_patterns = convert_globs_to_local_paths(working_dir, excluded)
 
     MapSet.new()
-    |> include(included_patterns)
-    |> exclude(excluded_patterns)
+    |> include(included_patterns, fs)
+    |> exclude(excluded_patterns, fs)
     |> Enum.sort()
     |> Enum.take(max_file_count())
   end
@@ -147,68 +166,75 @@ defmodule Credo.Sources do
     end
   end
 
-  defp include(files, []), do: files
+  defp include(files, [], _fs), do: files
 
-  defp include(files, [path | remaining_paths]) do
+  defp include(files, [path | remaining_paths], fs) do
     include_paths =
       path
-      |> recurse_path()
+      |> recurse_path(fs)
       |> Enum.into(MapSet.new())
 
     files
     |> MapSet.union(include_paths)
-    |> include(remaining_paths)
+    |> include(remaining_paths, fs)
   end
 
-  defp exclude(files, []), do: files
+  defp exclude(files, [], _fs), do: files
 
-  defp exclude(files, [pattern | remaining_patterns]) when is_list(files) do
+  defp exclude(files, [pattern | remaining_patterns], fs) when is_list(files) do
     files
     |> Enum.into(MapSet.new())
-    |> exclude([pattern | remaining_patterns])
+    |> exclude([pattern | remaining_patterns], fs)
   end
 
-  defp exclude(files, [pattern | remaining_patterns]) when is_binary(pattern) do
+  defp exclude(files, [pattern | remaining_patterns], fs) when is_binary(pattern) do
     exclude_paths =
       pattern
-      |> recurse_path
+      |> recurse_path(fs)
       |> Enum.into(MapSet.new())
 
     files
     |> MapSet.difference(exclude_paths)
-    |> exclude(remaining_patterns)
+    |> exclude(remaining_patterns, fs)
   end
 
-  defp exclude(files, [pattern | remaining_patterns]) do
+  defp exclude(files, [pattern | remaining_patterns], fs) do
     files
     |> Enum.reject(&String.match?(&1, pattern))
-    |> exclude(remaining_patterns)
+    |> exclude(remaining_patterns, fs)
   end
 
-  defp recurse_path(path) do
+  defp recurse_path(path, fs) do
     paths =
       cond do
         non_wildcard_elixir_file_path?(path) ->
           [path]
 
-        File.regular?(path) ->
+        regular?(fs, path) ->
           [path]
 
-        File.dir?(path) ->
-          [path | @default_sources_glob]
-          |> Path.join()
-          |> Path.wildcard()
+        dir?(fs, path) ->
+          wildcard(fs, Path.join([path | @default_sources_glob]))
 
         true ->
-          case Path.wildcard(path) do
+          case wildcard(fs, path) do
             # avoid infinite loop caused by broken symlinks
             [^path] -> [path]
-            paths -> Enum.flat_map(paths, &recurse_path/1)
+            paths -> Enum.flat_map(paths, &recurse_path(&1, fs))
           end
       end
 
     Enum.map(paths, &Path.expand/1)
   end
+
+  defp regular?(:disk, path), do: File.regular?(path)
+  defp regular?(fs, path), do: FileTree.regular?(fs, path)
+
+  defp dir?(:disk, path), do: File.dir?(path)
+  defp dir?(fs, path), do: FileTree.dir?(fs, path)
+
+  defp wildcard(:disk, glob), do: Path.wildcard(glob)
+  defp wildcard(fs, glob), do: FileTree.wildcard(fs, glob)
 
   defp non_wildcard_elixir_file_path?(path) do
     wildcard_characters = ["*", "{", "}", "?", "[", "]"]

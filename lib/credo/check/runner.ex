@@ -78,12 +78,18 @@ defmodule Credo.Check.Runner do
           end
 
         true ->
+          working_dir = Execution.working_dir(exec)
+
+          # Only the source files which were already loaded for this execution can be relevant,
+          # so the check's `files` patterns are matched against those instead
+          # of walking the entire working dir on disk once per check.
           exec
-          |> Execution.working_dir()
-          |> Credo.Sources.find_in_dir(files_included, files_excluded)
+          |> Execution.get_source_files()
+          |> Enum.map(&Path.expand(&1.filename))
+          |> Credo.Sources.find_in_paths(working_dir, files_included, files_excluded)
           |> case do
             [] -> :skip_run
-            files -> files
+            files -> MapSet.new(files)
           end
       end
 
