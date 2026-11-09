@@ -78,12 +78,29 @@ defmodule Credo.Check.Runner do
           end
 
         true ->
-          exec
-          |> Execution.working_dir()
-          |> Credo.Sources.find_in_dir(files_included, files_excluded)
-          |> case do
+          # Only the source files which were already loaded for this execution can be relevant,
+          # so the check's `files` patterns are matched against those instead
+          # of walking the entire working dir on disk once per check.
+          expanded_known_files = Enum.map(known_files, &Path.expand/1)
+
+          # When the check only specifies exclusions, start from all known files. (We must not pass
+          # `known_files` themselves as patterns: they are relative to the cwd, not the working dir,
+          # e.g. when running `mix credo apps/my_app` from an umbrella root.)
+          included =
+            if files_included == known_files do
+              :all
+            else
+              files_included
+            end
+
+          case Credo.Sources.find_in_paths(
+                 expanded_known_files,
+                 Execution.working_dir(exec),
+                 included,
+                 files_excluded
+               ) do
             [] -> :skip_run
-            files -> files
+            files -> MapSet.new(files)
           end
       end
 
