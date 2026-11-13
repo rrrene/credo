@@ -7,6 +7,17 @@ defmodule Credo.Check.Readability.RedundantBlankLinesTest do
   # cases NOT raising issues
   #
 
+  test "it should NOT report escaped double quote characters followed by apostrophes" do
+    ~S'''
+    defmodule M do
+      def a([?\" | _]), do: "'"
+    end
+    '''
+    |> to_source_file
+    |> run_check(@described_check)
+    |> refute_issues()
+  end
+
   test "it should NOT report expected code" do
     ~S'''
     defmodule ModuleWithoutRedundantBlankLines do

@@ -3,6 +3,26 @@ defmodule Credo.Code.StringsTest do
 
   alias Credo.Code.Strings
 
+  test "it should not read an escaped backslash in code as escaping the next quote" do
+    source = ~S'''
+    defmodule M do
+      def a(x \\"abc"), do: x
+      def b(x \\'"'), do: x
+      def c, do: [?\\, "abc"]
+    end
+    '''
+
+    expected = ~S'''
+    defmodule M do
+      def a(x \\"   "), do: x
+      def b(x \\'"'), do: x
+      def c, do: [?\\, "   "]
+    end
+    '''
+
+    assert expected == Strings.replace_with_spaces(source)
+  end
+
   test "it should return the source without string literals 2" do
     source = """
     @moduledoc \"\"\"
