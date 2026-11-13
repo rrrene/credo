@@ -15,6 +15,24 @@ defmodule Credo.Code.SigilsTest do
     assert source == Sigils.replace_with_spaces(source)
   end
 
+  test "it should not read an escaped backslash in code as escaping the next quote" do
+    source = ~S'''
+    defmodule M do
+      def a(x \\"~s(abc)"), do: x
+      def b(x \\"x"), do: ~s(abc)
+    end
+    '''
+
+    expected = ~S'''
+    defmodule M do
+      def a(x \\"~s(abc)"), do: x
+      def b(x \\"x"), do: ~s(   )
+    end
+    '''
+
+    assert expected == Sigils.replace_with_spaces(source)
+  end
+
   test "it should return the source without string literals 3" do
     source = """
     x = ~c|a b c|
