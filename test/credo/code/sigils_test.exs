@@ -3,6 +3,18 @@ defmodule Credo.Code.SigilsTest do
 
   alias Credo.Code.Sigils
 
+  test "it should preserve a string literal at the very end of the source" do
+    source = ~S(x = "ab")
+
+    assert source == Sigils.replace_with_spaces(source)
+  end
+
+  test "it should preserve an unclosed string literal at the very end of the source" do
+    source = ~S("ab)
+
+    assert source == Sigils.replace_with_spaces(source)
+  end
+
   test "it should return the source without string literals 3" do
     source = """
     x = ~c|a b c|

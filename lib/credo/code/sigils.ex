@@ -261,7 +261,7 @@ defmodule Credo.Code.Sigils do
     parse_string_literal(t, ["\n" | acc], replacement, empty_line_replacement)
   end
 
-  defp parse_string_literal(<<h::utf8, t>>, acc, replacement, empty_line_replacement) do
+  defp parse_string_literal(<<h::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_string_literal(t, [<<h::utf8>> | acc], replacement, empty_line_replacement)
   end
 
