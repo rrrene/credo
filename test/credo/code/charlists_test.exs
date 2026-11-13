@@ -3,6 +3,39 @@ defmodule Credo.Code.CharlistsTest do
 
   alias Credo.Code.Charlists
 
+  test "it should preserve strings and following code after an escaped double quote character" do
+    source = ~S'''
+    defmodule M do
+      def a([?\" | _]), do: "'"
+      def b, do: :ok
+    end
+    '''
+
+    assert source == Charlists.replace_with_spaces(source)
+  end
+
+  test "it should not read an escaped backslash in code as escaping the next quote" do
+    source = ~S'''
+    defmodule M do
+      def a(x \\"'"), do: x
+      def b(x \\'abc'), do: x
+      def c, do: [?\\, "'", 'abc']
+      def d, do: {"#{?\\}", 'abc'}
+    end
+    '''
+
+    expected = ~S'''
+    defmodule M do
+      def a(x \\"'"), do: x
+      def b(x \\'   '), do: x
+      def c, do: [?\\, "'", '   ']
+      def d, do: {"      ", '   '}
+    end
+    '''
+
+    assert expected == Charlists.replace_with_spaces(source)
+  end
+
   test "it should return the source unchanged if there are no charlists" do
     source = ~S'''
     "it should report a violation if the with doesn't start with <- clauses"

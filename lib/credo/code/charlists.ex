@@ -148,6 +148,14 @@ defmodule Credo.Code.Charlists do
     end
   end
 
+  defp parse_code(<<"\\\\"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_code(t, ["\\\\" | acc], replacement, empty_line_replacement)
+  end
+
+  defp parse_code(<<"\\\""::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
+    parse_code(t, ["\\\"" | acc], replacement, empty_line_replacement)
+  end
+
   defp parse_code(<<"\\\'"::utf8, t::binary>>, acc, replacement, empty_line_replacement) do
     parse_code(t, ["\\\'" | acc], replacement, empty_line_replacement)
   end
